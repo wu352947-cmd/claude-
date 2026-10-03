@@ -93,12 +93,16 @@ public/           网站根目录
   assets/         图片
   fonts/          自托管字体
 src/journal.html  落地页源文件，同时也是在线展示版（Artifact）
-tools/            build-landing.mjs（生成落地页）、fetch-fonts.mjs（下载并修补字体）
+tools/            build-landing.mjs（生成落地页）、build-demo.mjs（生成试玩版）、fetch-fonts.mjs（下载并修补字体）
 deploy/           nginx.conf、backup.sh
 test/             接口测试
 ```
 
 修改落地页后运行 `npm run build`。
+
+## 在线试玩版
+
+`npm run demo` 生成 `dist-demo/`：同一套手帐前端，加上 `public/app/js/demo/mock.js` 在浏览器里模拟全部接口（数据存在本机 localStorage，回信用模板生成，验证码直接显示）。登录页有“直接用示例手帐体验”，一键生成大半年的示例内容。改了接口时，记得让 mock.js 的返回格式与 `server/index.js` 保持一致。
 
 ## 素材与授权
 

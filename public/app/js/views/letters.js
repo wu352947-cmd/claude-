@@ -57,7 +57,7 @@ export async function openLetter(letter) {
     const paper = h(`<article class="letter-paper" tabindex="-1"><h4>${esc(letter.title)}</h4>
       ${paras.map((p, i) => `<p class="para" style="--i:${i}">${esc(p)}</p>`).join('')}
       ${last ? `<p class="para sign" style="--i:${paras.length}">${esc(last)}</p>` : ''}
-      ${letter.meta?.ai ? `<p class="para ai-label" style="--i:${paras.length + 1}">此信由 AI 生成，仅供陪伴，不构成专业建议</p>` : ''}
+      ${letter.meta?.ai ? `<p class="para ai-label" style="--i:${paras.length + 1}">${letter.meta.demo ? '试玩版的回信由模板生成；正式版里，月亮会由 AI 读完你的这一页再写' : '此信由 AI 生成，仅供陪伴，不构成专业建议'}</p>` : ''}
       ${(letter.meta?.crisis || letter.meta?.flagged) ? `<div class="para hotline" style="--i:${paras.length + 1}">如果你此刻很难受，可以拨打全国统一心理援助热线 <b>12356</b>。紧急情况请拨打 <b>110</b> 或 <b>120</b>。</div>` : ''}
       <div class="row para" style="--i:${paras.length + 2};display:flex;justify-content:flex-end;gap:10px;margin-top:18px"><button class="btn small" data-close>收好这封信</button></div>
     </article>`);

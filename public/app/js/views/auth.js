@@ -1,16 +1,17 @@
 // 登录 / 注册：手机号验证码（默认）与账号密码两种方式
+import { SITE, url } from '../site.js';
 import { api } from '../api.js';
 import { modal, toast } from '../ui.js';
 import { state } from '../main.js';
 import { codeFieldsHtml, bindCodeFields } from '../codefield.js';
 
-const agreeHtml = id => `<label class="agree"><input type="checkbox" id="${id}"><span>我已阅读并同意 <a href="/terms.html" target="_blank">用户协议</a> 与 <a href="/privacy.html" target="_blank">隐私政策</a></span></label>`;
+const agreeHtml = id => `<label class="agree"><input type="checkbox" id="${id}"><span>我已阅读并同意 <a href="${url('terms.html')}" target="_blank">用户协议</a> 与 <a href="${url('privacy.html')}" target="_blank">隐私政策</a></span></label>`;
 
 export function authView(root, onDone) {
   const smsOn = !!state.config.sms;
   let mode = smsOn ? 'phone' : 'login';
   root.innerHTML = `<div class="auth">
-    <div class="auth-art" aria-hidden="true"><div class="moon-gate"><img src="/assets/gate-dawn.jpg" alt=""></div><div class="title">拾光手帐</div>
+    <div class="auth-art" aria-hidden="true"><div class="moon-gate"><img src="${url('assets/gate-dawn.jpg')}" alt=""></div><div class="title">拾光手帐</div>
       <div class="seal"><span>月</span><span>白</span><span>小</span><span>记</span></div></div>
     <div class="auth-card paper"><span class="tape" style="top:-10px;left:30px;transform:rotate(-4deg)"></span>
       <p class="h-eyebrow">ようこそ</p><h1 class="h-title" style="font-size:30px">把日子写成一页一页温柔的纸</h1>
@@ -36,7 +37,8 @@ export function authView(root, onDone) {
         <button class="btn ink" type="submit" id="go">翻开手帐</button>
         ${smsOn ? '<button type="button" class="linkish" id="forgot">忘记密码？用手机验证码重设</button>' : ''}
       </form>
-      <p class="muted" style="font-size:12px;margin:16px 0 0"><a href="/">← 回到首页</a></p>
+      ${SITE.demo ? `<div class="demo-note"><p><b>试玩版</b> · 所有内容只保存在这台设备的浏览器里。</p><button type="button" class="btn acc" id="demoSeed">直接用示例手帐体验</button><p class="muted">会生成一本写了大半年的示例手帐，可以直接翻看画卷、手帐本和信箱。</p></div>` : ''}
+      <p class="muted" style="font-size:12px;margin:16px 0 0"><a href="${SITE.home}" ${SITE.demo ? 'target="_blank" rel="noopener"' : ''}>← 回到首页</a></p>
     </div></div>`;
   const $ = s => root.querySelector(s);
   const setMode = m => {
@@ -72,6 +74,10 @@ export function authView(root, onDone) {
       onDone(r.user, mode === 'register');
     } catch (ex) { err.textContent = ex.message; }
     $('#go').disabled = false;
+  });
+  $('#demoSeed')?.addEventListener('click', async () => {
+    const b = $('#demoSeed'); b.disabled = true; b.textContent = '正在铺开示例手帐…';
+    try { const r = await api.demoSeed(); onDone(r.user, false); } catch (ex) { toast(ex.message); b.disabled = false; }
   });
   setTimeout(() => (smsOn && mode === 'phone' ? $('#lg-ph') : $('#un')).focus(), 300);
 }

@@ -470,3 +470,8 @@ main{position:relative; z-index:1; outline:none}
 .memory-card .btn{background:rgba(255,255,255,.55); color:#4A3B2A; box-shadow:none}
 .time-in{border:0; border-bottom:1.5px solid var(--line); background:transparent; padding:6px 2px; font-family:var(--f-latin); font-size:18px; outline:none}
 .time-in:focus{border-color:var(--acc)}
+
+/* 试玩版 */
+.demo-note{margin-top:18px; padding:14px 16px; border-radius:10px; background:var(--acc-soft); display:grid; gap:8px}
+.demo-note p{margin:0; font-size:13px}
+.demo-chip{font-style:normal; margin-left:6px; padding:1px 8px; border-radius:10px; background:var(--shu); color:#fff; font-size:11px; letter-spacing:.1em}

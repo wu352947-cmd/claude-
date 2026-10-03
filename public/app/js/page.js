@@ -1,4 +1,5 @@
 // 手帐页：渲染（只读 / 可编辑）+ 贴纸与照片的拖拽、旋转、缩放
+import { photoUrl } from './site.js';
 import { h, esc, quiet } from './ui.js';
 import { STICKER_MAP } from './stickers.js';
 import { MOODS, faceSvg } from './faces.js';
@@ -117,7 +118,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
   function render(item, land) {
     let node;
     if (item.type === 'photo') {
-      node = h(`<div class="stk photo-stk${land ? ' dev' : ''}" tabindex="${editable ? 0 : -1}" aria-label="照片"><img alt="手帐里的照片" src="/api/uploads/${encodeURIComponent(item.id)}" draggable="false" loading="lazy"><span class="cap">${esc(item.cap || '')}</span></div>`);
+      node = h(`<div class="stk photo-stk${land ? ' dev' : ''}" tabindex="${editable ? 0 : -1}" aria-label="照片"><img alt="手帐里的照片" src="${photoUrl(item.id)}" draggable="false" loading="lazy"><span class="cap">${esc(item.cap || '')}</span></div>`);
     } else {
       const def = STICKER_MAP[item.k]; if (!def) return;
       node = h(`<div class="stk" tabindex="${editable ? 0 : -1}" aria-label="贴纸：${def.name}">${uniqSvg(def.svg)}</div>`);
@@ -226,7 +227,7 @@ export function miniPage(entry, i, todayKey) {
   const m = MOODS.find(x => x.k === entry.mood);
   const items = [...(entry.page?.stickers || []).slice(0, 5), ...(entry.page?.photos || []).slice(0, 1).map(p => ({ ...p, type: 'photo' }))];
   const stk = items.map(it => {
-    if (it.type === 'photo') return `<span class="stk-mini" style="left:${(it.x * 100 - 13).toFixed(1)}%;top:${(it.y * 75 - 12).toFixed(1)}%;width:26%;transform:rotate(${it.r || 0}deg);background:#fff;padding:2%"><img src="/api/uploads/${encodeURIComponent(it.id)}" alt="" loading="lazy" style="aspect-ratio:1;object-fit:cover"></span>`;
+    if (it.type === 'photo') return `<span class="stk-mini" style="left:${(it.x * 100 - 13).toFixed(1)}%;top:${(it.y * 75 - 12).toFixed(1)}%;width:26%;transform:rotate(${it.r || 0}deg);background:#fff;padding:2%"><img src="${photoUrl(it.id)}" alt="" loading="lazy" style="aspect-ratio:1;object-fit:cover"></span>`;
     const def = STICKER_MAP[it.k]; if (!def) return '';
     const w = def.w * (it.s || 1) * 100;
     return `<span class="stk-mini" style="left:${(it.x * 100 - w / 2).toFixed(1)}%;top:${(it.y * 75 - w * def.ar * .75 / 2).toFixed(1)}%;width:${w.toFixed(1)}%;aspect-ratio:${1 / def.ar};transform:rotate(${it.r || 0}deg)">${uniqSvg(def.svg)}</span>`;

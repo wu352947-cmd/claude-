@@ -1,4 +1,5 @@
 // 设置：昵称、外观、安静模式、导出、注销
+import { url, saveFile, leaveSite } from '../site.js';
 import { api } from '../api.js';
 import { h, esc, toast, modal, confirmBox } from '../ui.js';
 import { state, applyPrefs } from '../main.js';
@@ -25,7 +26,7 @@ export function settingsView(root) {
       <div style="display:flex;gap:8px;flex-wrap:wrap">${!u.phone && state.config.sms ? '<button class="btn small" id="bind">绑定手机号</button>' : ''}${u.phone && state.config.sms ? `<button class="btn small" id="setpw">${u.hasPassword ? '修改密码' : '设置密码'}</button>` : ''}</div></section>
     <section class="paper set-row"><div><h4>账号</h4><p>${esc(u.username)} · ${new Date(u.createdAt).getFullYear()} 年加入</p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" id="logout">退出登录</button><button class="btn small danger" id="del">注销账号</button></div></section>
-    <p class="muted" style="font-size:13px"><a href="/privacy.html">隐私政策</a> · <a href="/terms.html">用户协议</a> · 心里难受时可拨打全国统一心理援助热线 12356</p>
+    <p class="muted" style="font-size:13px"><a href="${url('privacy.html')}" target="_blank">隐私政策</a> · <a href="${url('terms.html')}" target="_blank">用户协议</a> · 心里难受时可拨打全国统一心理援助热线 12356</p>
   </div></div>`;
   const save = async patch => { try { const r = await api.updateMe(patch); state.user = r.user; applyPrefs(); return true; } catch (e) { toast(e.message); return false; } };
   root.querySelector('#nickF').addEventListener('submit', async e => { e.preventDefault(); if (await save({ nickname: root.querySelector('#nick').value })) toast('好的，记住啦'); });
@@ -45,17 +46,12 @@ export function settingsView(root) {
       `UID:shiguang-reminder-${Date.now()}@${location.host}`, `DTSTAMP:${stamp}`, `DTSTART:${start}`, 'DURATION:PT10M', 'RRULE:FREQ=DAILY',
       'SUMMARY:写一页拾光手帐', `DESCRIPTION:今天的纸还空着，写一句也好。\\n${location.origin}/app/`, `URL:${location.origin}/app/`,
       'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:写一页拾光手帐', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
-    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
-    const a = h(`<a href="${url}" download="拾光手帐提醒.ics"></a>`); document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 5000);
-    toast(`已生成每天 ${t} 的日历提醒，打开文件即可加入日历`);
+    if (saveFile(new Blob([ics], { type: 'text/calendar;charset=utf-8' }), '拾光手帐提醒.ics')) toast(`已生成每天 ${t} 的日历提醒，打开文件即可加入日历`);
   });
   root.querySelector('#exp').addEventListener('click', async () => {
     try {
       const data = await api.exportAll();
-      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
-      const a = h(`<a href="${url}" download="拾光手帐-${new Date().toISOString().slice(0, 10)}.json"></a>`); document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 5000); toast(`已导出 ${data.entries.length} 页手帐`);
+      if (saveFile(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }), `拾光手帐-${new Date().toISOString().slice(0, 10)}.json`)) toast(`已导出 ${data.entries.length} 页手帐`);
     } catch (e) { toast(e.message); }
   });
   root.querySelector('#logout').addEventListener('click', async () => { if (await confirmBox('要退出登录吗？', '手帐都安全地存在云端，下次登录就能看到。', '退出')) { await api.logout().catch(() => {}); location.hash = ''; location.reload(); } });
@@ -78,7 +74,7 @@ export function settingsView(root) {
       <div class="row" style="margin-top:0"><button type="button" class="btn" data-close>再想想</button><button class="btn shu">永久注销</button></div></form>`);
     m.el.querySelector('form').addEventListener('submit', async e => {
       e.preventDefault();
-      try { await api.deleteMe(m.el.querySelector('#dp').value); location.href = '/'; }
+      try { await api.deleteMe(m.el.querySelector('#dp').value); leaveSite(); }
       catch (err) { m.el.querySelector('.err').textContent = err.message; }
     });
   });
@@ -90,7 +86,7 @@ export function settingsView(root) {
     const err = m.el.querySelector('.err'), cf = bindCodeFields(m.el, 'dl', 'delete', t => { err.textContent = t; });
     m.el.querySelector('form').addEventListener('submit', async e => {
       e.preventDefault();
-      try { await api.deleteMeByCode(cf.code()); location.href = '/'; } catch (ex) { err.textContent = ex.message; }
+      try { await api.deleteMeByCode(cf.code()); leaveSite(); } catch (ex) { err.textContent = ex.message; }
     });
   }
 }

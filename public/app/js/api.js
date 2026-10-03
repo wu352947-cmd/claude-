@@ -38,5 +38,6 @@ export const api = {
   smsLogin: b => call('POST', '/api/auth/sms/login', b),
   resetPassword: b => call('POST', '/api/auth/reset', b),
   bindPhone: b => call('POST', '/api/me/phone', b),
-  deleteMeByCode: code => call('DELETE', '/api/me', { code })
+  deleteMeByCode: code => call('DELETE', '/api/me', { code }),
+  demoSeed: () => call('POST', '/api/demo/seed', {})
 };

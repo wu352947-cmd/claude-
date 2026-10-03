@@ -1,4 +1,5 @@
 // 我的千里江山：把一年的手帐画成一卷青绿山水
+import { saveFile } from '../site.js';
 // 写得多的日子山高，心情为峰顶着色，季节决定点景；贴纸成树、照片成屋、封存有舟、回信有灯、满月有月。
 import { api } from '../api.js';
 import { h, esc, toast, quiet, sleep } from '../ui.js';
@@ -251,8 +252,7 @@ export async function scrollView(root, yearArg) {
       const c = document.createElement('canvas'), end = Math.min(total, todayIdx >= 0 ? dayX(todayIdx + 1) + 300 : total);
       c.width = end; c.height = H; paint(c.getContext('2d'), 0, end, 1);
       const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-      const url = URL.createObjectURL(blob), a = h(`<a href="${url}" download="我的千里江山-${year}.png"></a>`); document.body.append(a); a.click(); a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 8000); toast('长图已保存', { seal: '卷' });
+      if (saveFile(blob, `我的千里江山-${year}.png`)) toast('长图已保存', { seal: '卷' });
     } catch { toast('长图没能生成，请稍后再试'); }
     btn.disabled = false;
   });

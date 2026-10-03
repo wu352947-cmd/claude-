@@ -56,7 +56,7 @@ async function route() {
 function enter(user, fresh) {
   state.user = user; applyPrefs();
   document.getElementById('topbar').hidden = false;
-  document.getElementById('termChip').innerHTML = `<b>${'春夏秋冬'[term.season]}</b>${term.name} · ${term.hou}`;
+  document.getElementById('termChip').innerHTML = `<b>${'春夏秋冬'[term.season]}</b>${term.name} · ${term.hou}${state.config.demo ? '<em class="demo-chip">试玩版</em>' : ''}`;
   if (fresh) toast(`欢迎，${user.nickname}。这是你手帐的第一页。`, { seal: '拾' });
   if (!location.hash || location.hash === '#/register' || location.hash === '#/login') location.hash = '#/today'; else route();
   refreshCounts();
