@@ -21,7 +21,7 @@ vec3 skyCol(vec3 d, vec3 eye){
   vec3 zen = vec3(0.0016, 0.0026, 0.0060);
   vec3 hor = vec3(0.011, 0.020, 0.027);
   vec3 c = mix(hor, zen, smoothstep(-0.01, 0.42, h));
-  c = mix(c, vec3(0.006,0.010,0.013), smoothstep(0.0, -0.08, h));
+  c = mix(c, hor*0.85, smoothstep(0.0, -0.08, h));
   vec3 fd = normalize(uFire - eye);
   float g = max(dot(d, fd), 0.);
   c += vec3(1.0, 0.42, 0.13) * uFireI * (pow(g, 14.) * 0.03 + pow(g, 90.) * 0.2 + pow(g, 4.) * 0.004);
@@ -221,7 +221,7 @@ float waveH(vec2 p, float t){
           float k=smoothstep(1800.,300.,dc);
           vec3 N=normalize(vec3(-(waveH(p+vec2(e,0.),t)-waveH(p-vec2(e,0.),t))/(2.*e)*k, 1., -(waveH(p+vec2(0.,e),t)-waveH(p-vec2(0.,e),t))/(2.*e)*k));
           // fine chop
-          float ns=snoise(vec3(p*0.32, t*0.5)); float ns2=snoise(vec3(p*0.9+3., t*0.8));
+          float ns=snoise(vec3(p*0.32, t*0.5)); float ns2=sin(p.x*0.93+t*1.3+sin(p.y*0.71))*sin(p.y*1.07-t*1.1+sin(p.x*0.6));
           N=normalize(N+vec3(ns*0.26+ns2*0.14, 0., snoise(vec3(p.yx*0.32+7., t*0.5))*0.26+ns2*0.08)*mix(1.,0.35,smoothstep(100.,900.,dc)));
           vec3 V=normalize(cameraPosition-vW);
           vec3 Rf=reflect(-V,N); Rf.y=abs(Rf.y);
@@ -244,7 +244,8 @@ float waveH(vec2 p, float t){
           float foam=smoothstep(10.,0.,abs(ri-46.+snoise(vec3(vW.xz*0.05,t*0.2))*7.))*smoothstep(0.1,0.6,snoise(vec3(vW.xz*0.12,t*0.4))+0.3);
           vec3 Lf=uFire-vW; col+=foam*vec3(1.,0.55,0.25)*uFireI*1500./(dot(Lf,Lf)+40.)*0.35;
           col=min(col,vec3(5.));
-          col=mix(col,uFogC*uDark,1.-exp(-dc*0.00085));
+          vec3 vd=normalize(vW-cameraPosition); vd.y=max(vd.y,-0.02);
+          col=mix(col,skyCol(vd,cameraPosition)*mix(1.,uDark,0.5),1.-exp(-dc*0.00085));
           gl_FragColor=vec4(col,1.);
         }`,
     }));
@@ -376,7 +377,7 @@ float waveH(vec2 p, float t){
           float a=vA;
           float fall=exp(-a/900.)*smoothstep(0.,25.,a);
           float n=snoise(vW*vec3(0.010,0.03,0.010)+vec3(-uTime*0.25,0.,uTime*0.12))*0.5+0.5;
-          float n2=snoise(vW*0.035+vec3(uTime*0.3,0.,0.))*0.5+0.5;
+          float n2=0.5+0.5*sin(vW.x*0.05+uTime*0.4)*sin(vW.z*0.043-uTime*0.3+vW.y*0.03);
           float mist=mix(0.25,1.4,n)*mix(0.7,1.2,n2);
           // fade near the lens so the cone never shows its hull
           float dcam=length(cameraPosition-vW); float nearF=smoothstep(15.,120.,dcam);

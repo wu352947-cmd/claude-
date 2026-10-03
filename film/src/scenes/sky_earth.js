@@ -177,7 +177,7 @@ void main(){
   vec2 d=gl_PointCoord-.5; float r2=dot(d,d)*4.;
   float f=exp(-r2*4.5)+.25*exp(-r2*1.2);
   vec3 c=mix(vec3(1.,.48,.16),vec3(1.,.85,.6),vHot);
-  gl_FragColor=vec4(c*f*vI,1.);
+  gl_FragColor=vec4(c*f*vI*2.6,1.);
 }`;
 
 const STAR_VERT = /* glsl */`
@@ -272,10 +272,18 @@ export function bake(renderer) {
         bri.push(Math.min(1, c * (0.45 + 0.7 * r())));
         k++;
       }
-      // convergence point: dense city close to the hint direction
-      const d = dir((x + 0.5) / BW, (y + 0.5) / BH);
-      const ang = d[0] * P_HINT.x + d[1] * P_HINT.y + d[2] * P_HINT.z;
-      if (ang > 0.985) { const sc = c * (ang - 0.985); if (sc > best) { best = sc; bestDir = d; } }
+      // convergence point: the densest city region near the hint direction (night side)
+      if (c > 0.25 && (x & 1) === 0 && (y & 1) === 0) {
+        const d = dir((x + 0.5) / BW, (y + 0.5) / BH);
+        const ang = d[0] * P_HINT.x + d[1] * P_HINT.y + d[2] * P_HINT.z;
+        const ds = d[0] * SUN.x + d[1] * SUN.y + d[2] * SUN.z;
+        if (ang > 0.86 && ds < -0.35 && ds > -0.65) {
+          let sum = 0;
+          for (let j = -12; j <= 12; j += 2) for (let i = -12; i <= 12; i += 2) sum += px[(clamp(y + j, 0, BH - 1) * BW + ((x + i + BW) % BW)) * 4 + 2];
+          const sc = sum * (0.6 + ang);
+          if (sc > best) { best = sc; bestDir = d; }
+        }
+      }
     }
   }
   let total = 0; for (let y = 0; y < BH; y++) total += Math.cos((y / BH - 0.5) * Math.PI) * BW;
@@ -314,7 +322,7 @@ function localCities(px, BW, BH, P) {
     const q = d.clone().multiplyScalar(R * 3.0);
     const n1 = noise3(q.x, q.y, q.z), n2 = noise3(q.x * 3.1 + 5, q.y * 3.1, q.z * 3.1), n3 = noise3(q.x * 9.3, q.y * 9.3 + 2, q.z * 9.3);
     const road = Math.exp(-Math.pow(Math.abs(noise3(q.x * 0.9 + 11, q.y * 0.9, q.z * 0.9)) / 0.035, 2));
-    let dens = Math.pow(c, 1.1) * (smoothstep(-0.25, 0.55, n1 + 0.5 * n2) * 1.4 + road * 0.5) * (0.55 + 0.45 * n3) * 0.9;
+    let dens = Math.pow(c, 1.1) * (smoothstep(-0.25, 0.55, n1 + 0.5 * n2) * 1.4 + road * 0.5) * (0.55 + 0.45 * n3) * 3.2;
     const edgeFade = smoothstep(RAD, RAD * 0.8, rr);
     if (r() > dens * edgeFade) continue;
     const rad = R * 1.0004;
@@ -369,7 +377,7 @@ export function createEarth(renderer, { segments = 256 } = {}) {
   lg.setAttribute('position', new THREE.BufferAttribute(B.locPos, 3));
   lg.setAttribute('aB', new THREE.BufferAttribute(B.locB, 1));
   const locMat = cityMat.clone();
-  locMat.uniforms = { ...cityMat.uniforms, uSize: { value: 0.0035 }, uVis: { value: 1 } };
+  locMat.uniforms = { ...cityMat.uniforms, uSize: { value: 0.0042 }, uVis: { value: 1 } };
   const local = new THREE.Points(lg, locMat);
   local.renderOrder = 1; local.frustumCulled = false;
   group.add(local);
@@ -390,6 +398,7 @@ export function createEarth(renderer, { segments = 256 } = {}) {
       const near = smoothstep(9, 3.5, alt);
       locMat.uniforms.uVis.value = near;
       earthMat.uniforms.uCityTex.value = lerp(0.5, 0.12, near);
+      common.uExpo.value = lerp(0.45, 1.0, smoothstep(0.25, 2.5, alt));
     },
   };
 }
@@ -453,7 +462,7 @@ export function surfaceTL(F, x, z, alt, out = new THREE.Vector3()) {
 }
 
 // N1 camera path (global time g): high over the night side, descending toward P until 188.
-export const N1_END = { back: 1.0, alt: 0.2 };
+export const N1_END = { back: 1.6, alt: 0.2 };
 export function n1Pose(P, g) {
   const F = tlFrame(P);
   const u = clamp((g - 176) / 12);

@@ -83,14 +83,14 @@ const FS = /* glsl */`
 uniform float uPartU; uniform float uTier; uniform float uWin;
 varying vec3 vW; varying vec3 vN; varying vec2 vUV; varying float vPart; varying vec3 vO;
 ${LIGHT_GLSL}
-${GLSL.snoise}
+float cn(vec3 p){ return 0.5+0.25*sin(p.x*1.7+sin(p.z*1.3+p.y*0.7))*sin(p.z*1.9+sin(p.y*1.1+p.x*0.7)) + 0.25*sin(p.y*2.3+sin(p.x*1.1))*sin(p.x*2.9-p.z*1.3); }
 ${GLSL.hash}
 void main(){
   vec3 N=normalize(vN); if(!gl_FrontFacing) N=-N;
   vec3 V=normalize(cameraPosition-vW);
   float part=uPartU>=0.?uPartU:floor(vPart+0.5);
   vec3 alb; vec3 em=vec3(0.); float snow=0.;
-  float nz=snoise(vW*0.6)*0.5+0.5;
+  float nz=cn(vW*1.1);
   if(part<0.5){                     // tiles
     float g=abs(fract(vUV.x)-0.5)*2.;
     float aa=fwidth(vUV.x)*2.;
@@ -120,7 +120,7 @@ void main(){
     alb=vec3(0.16,0.16,0.17)*(0.7+0.5*nz);
     snow=smoothstep(0.6,0.9,N.y);
   } else if(part<5.5){              // ground snow
-    float n2=snoise(vW*vec3(0.02,0.,0.02))*0.5+0.5;
+    float n2=cn(vW*vec3(0.04,0.,0.04));
     alb=vec3(0.55,0.6,0.7)*(0.75+0.25*n2);
     snow=0.;
   } else if(part<6.5){              // iron
@@ -582,14 +582,14 @@ export default {
     if (t < 5.4) {
       const u = t / 5.4;
       const az = THREE.MathUtils.degToRad(lerp(-30, -24, u));
-      const d = lerp(146, 130, u);
-      pos = new THREE.Vector3(Math.sin(az) * d, lerp(2.6, 3.4, u), Math.cos(az) * d);
-      tgt = new THREE.Vector3(0, 37, 0); sx = 0.68; sy = 0.5; fov = 38;
+      const d = lerp(142, 132, u);
+      pos = new THREE.Vector3(Math.sin(az) * d, lerp(16.5, 15.5, u), Math.cos(az) * d);
+      tgt = new THREE.Vector3(0, 41, 0); sx = 0.68; sy = 0.5; fov = 38;
     } else {
       const keys = [5.4, ...BELLS, 13.75, 14.5];
       // camera pose per key: [azDeg, dist, camY, target(Vector3), sx, sy, fov]
       const poses = [
-        [-24, 130, 3.4, new THREE.Vector3(0, 37, 0), 0.68, 0.5, 38],
+        [-24, 132, 15.5, new THREE.Vector3(0, 41, 0), 0.68, 0.5, 38],
         [0, 52, 3.0, bellPos(0), 0.5, 0.40, 34],
         [0, 50, 11.5, bellPos(1), 0.5, 0.42, 34],
         [0, 48, 22.0, bellPos(2), 0.5, 0.44, 33],

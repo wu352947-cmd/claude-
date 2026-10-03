@@ -38,11 +38,22 @@ export function makeSky(THREE, uniforms) {
 precision highp float;
 ${SKY_GLSL}
 ${GLSL.hash}
+${GLSL.snoise}
 uniform float uStars;
 varying vec3 vD;
 void main(){
   vec3 d = normalize(vD);
   vec3 col = skyCol(d, 1.);
+  // low stratus streaks just above the horizon, under-lit by the coming dawn
+  if (d.y > .003 && d.y < .12) {
+    float az = atan(d.x, -d.z);
+    float c = snoise(vec3(az * 2.6, d.y * 42., 1.)) * .65 + snoise(vec3(az * 8., d.y * 120., 2.)) * .35;
+    float m = smoothstep(.12, .55, c) * smoothstep(.006, .022, d.y) * (1. - smoothstep(.03, .075, d.y));
+    vec2 hz = normalize(d.xz);
+    float az2 = dot(hz, normalize(uSun.xz)) * .5 + .5;
+    vec3 cc = vec3(.003, .003, .007) + vec3(.26, .085, .04) * (.1 + pow(az2, 3.) * .6 + pow(az2, 16.) * 1.4) * uLine * (1. - smoothstep(.01, .08, d.y) * .6);
+    col = mix(col, cc * uDawn, m * .8);
+  }
   // sparse soft stars, fading toward the horizon glow
   vec2 sp = vec2(atan(d.x, -d.z), asin(clamp(d.y, -1., 1.))) * 260.;
   vec2 cell = floor(sp), f = fract(sp) - .5;

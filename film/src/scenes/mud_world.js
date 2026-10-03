@@ -4,13 +4,14 @@ import { rng, noise3, fbm3, clamp, smoothstep } from '../engine/util.js';
 
 // ---------------------------------------------------------------- ziggurat
 // Axes: +x east, +z north, +y up. Front (stairs) faces south (−z).
-export const TERRACE = { ax: 130, az: 105, b: 0.6, y0: 0, h: 3 };
+// batter widths (b·h) are whole metres so the hip lines run exactly along cell diagonals
+export const TERRACE = { ax: 130, az: 105, b: 2 / 3, y0: 0, h: 3 };
 export const TIERS = [
-  { ax: 62, az: 45, b: 0.25, y0: 3, h: 12 },
-  { ax: 50, az: 35, b: 0.25, y0: 15, h: 9 },
-  { ax: 40, az: 27, b: 0.25, y0: 24, h: 7 },
-  { ax: 31, az: 20, b: 0.25, y0: 31, h: 6 },
-  { ax: 23, az: 14, b: 0.25, y0: 37, h: 5 },
+  { ax: 62, az: 45, b: 3 / 12, y0: 3, h: 12 },
+  { ax: 50, az: 35, b: 2 / 9, y0: 15, h: 9 },
+  { ax: 40, az: 27, b: 2 / 7, y0: 24, h: 7 },
+  { ax: 31, az: 20, b: 2 / 6, y0: 31, h: 6 },
+  { ax: 23, az: 14, b: 1 / 5, y0: 37, h: 5 },
 ];
 export const TOP_Y = 42;
 export const TEMPLE = { ax: 9, az: 6, y0: 42, h: 7.5, zc: 2 };
@@ -116,12 +117,11 @@ export function buildHeightMesh(G) {
     const out = [...B].filter(v => v > lo && v < hi);
     for (let v = lo; v <= hi + 1e-6; ) {
       out.push(v);
-      const inner = Math.abs(v) < 70 ? 1.0 : 2.0;
-      v += inner;
+      v += 1.0;
     }
     out.sort((a, b) => a - b);
     const ded = [];
-    for (const v of out) if (!ded.length || v - ded[ded.length - 1] > 0.12) ded.push(v);
+    for (const v of out) if (!ded.length || v - ded[ded.length - 1] > 0.05) ded.push(v);
     else if (B.has(Math.round(v * 100) / 100)) ded[ded.length - 1] = v;
     return ded;
   };
@@ -268,13 +268,13 @@ export function drawGround(net, size = 4096) {
     for (let i = 1; i < pts.length; i++) {
       const [x0, z0] = pts[i - 1], [x1, z1] = pts[i];
       const dx = x1 - x0, dz = z1 - z0, l = Math.hypot(dx, dz) || 1, tx = dx / l, tz = dz / l, nx = -tz, nz = tx;
-      for (let s = 0; s < l; s += 9 + R() * 14) {
+      for (let s = 0; s < l; s += 12 + R() * 10) {
         const px = x0 + tx * s, pz = z0 + tz * s;
-        if (Math.hypot(px, pz) < 330) continue;
+        if (Math.hypot(px / 1.08, pz) < 790) continue;
         for (const side of [-1, 1]) {
-          if (R() < 0.18) continue;
-          const len = maxLen * (0.35 + R() * 0.65), w = 7 + R() * 12, st = 10;
-          const tone = R();
+          if (R() < 0.1) continue;
+          const len = maxLen * (0.75 + R() * 0.25), w = 11 + R() * 8, st = 10;
+          const tone = R() < 0.5 ? R() * 0.45 : 0.45 + R() * 0.55;
           const v = Math.floor(60 + tone * 195);
           g.fillStyle = `rgb(0,${v},0)`;
           g.save();
@@ -289,6 +289,23 @@ export function drawGround(net, size = 4096) {
   for (const n of net.nodes) if (n.canal) strips(n.pts, n.depth < 2 ? 260 : 170);
   // river-side groves / fields
   strips(net.river.filter((_, i) => i % 2 === 0), 420);
+  const grove = (x, z, r, n) => {
+    for (let i = 0; i < n; i++) {
+      const a = R() * Math.PI * 2, d = Math.sqrt(R()) * r;
+      g.fillStyle = `rgb(0,${20 + Math.floor(R() * 30)},0)`;
+      g.beginPath(); g.arc(X(x + Math.cos(a) * d), Z(z + Math.sin(a) * d), (3 + R() * 3.5) * k, 0, Math.PI * 2); g.fill();
+    }
+  };
+  g.globalCompositeOperation = 'source-over';
+  for (let i = 0; i < net.river.length; i += 3) {
+    const [x, z] = net.river[i];
+    for (const side of [-1, 1]) if (R() < 0.7) grove(x + side * (70 + R() * 60) * 0.62, z + side * (70 + R() * 60) * 0.78, 40 + R() * 50, 60);
+  }
+  for (const n of net.nodes) if (n.canal) for (let i = 2; i < n.pts.length; i += 4) {
+    const [x, z] = n.pts[i];
+    if (R() < 0.45 && Math.hypot(x, z) > 300) grove(x + (R() - 0.5) * 50, z + (R() - 0.5) * 50, 18 + R() * 28, 22);
+  }
+  g.globalCompositeOperation = 'lighter';
   g.globalCompositeOperation = 'source-over';
   // erase fields where water/paths are (keep channels clean) then add them
   g.globalCompositeOperation = 'lighter';
@@ -347,7 +364,7 @@ export function buildHouses(net, seed = 23) {
     const rot = noise3(x * 0.003, z * 0.003, 9) * 0.5;
     // birth: crystallises outward from the platform and along the paths
     const birth = 7.5 + (r - 140) / 600 * 9.5 + (R() - 0.5) * 2.0 + clamp(dPath / 60) * 2.0 - (R() < 0.08 ? 8 : 0);
-    out.push({ x, z, sx, sz, sy, rot, birth: Math.max(-1, Math.min(birth, 19)), death: 24.0 + (r / 745) * 2.5 + R() * 2.2, lamp: R() < 0.55 });
+    out.push({ x, z, sx, sz, sy, rot, birth: Math.max(-1, Math.min(birth, 19)), death: 23.6 + (r / 745) * 1.6 + R() * 1.4, lamp: R() < 0.55 });
   }
   return out;
 }

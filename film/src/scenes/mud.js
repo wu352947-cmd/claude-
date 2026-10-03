@@ -27,7 +27,12 @@ vec3 groundAlb(vec2 xz, vec4 m, float sand){
   float r = length(xz);
   a *= mix(0.86, 1., smoothstep(180., 820., r));             // trodden urban ground
   float tone = m.g;
-  if (tone > 0.02) {
+  if (tone > 0.05 && tone < 0.22) {
+    // date-palm groves: dark clumps
+    float cl = vnoise(xz * 0.35);
+    a = mix(a, vec3(0.035, 0.05, 0.025) * (0.7 + 0.6 * cl), 0.9);
+  } else if (tone > 0.02) {
+    tone = (tone - 0.235) / 0.765;
     vec3 f = mix(vec3(0.085, 0.11, 0.05), vec3(0.20, 0.19, 0.09), smoothstep(0.25, 0.6, tone));
     f = mix(f, vec3(0.30, 0.23, 0.14), smoothstep(0.62, 0.8, tone));
     f = mix(f, vec3(0.40, 0.32, 0.17), smoothstep(0.9, 0.98, tone));
@@ -43,7 +48,8 @@ vec3 groundAlb(vec2 xz, vec4 m, float sand){
 vec3 waterShade(vec3 P, float sand){
   vec3 V = normalize(uCam - P);
   vec3 Rr = reflect(-V, vec3(0., 1., 0.));
-  Rr = normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z));
+  vec3 sunH = normalize(vec3(uSunDir.x, 0.12, uSunDir.z));
+  Rr = normalize(mix(normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z)), sunH, 0.45 * (1. - uNight)));
   float fr = 0.04 + 0.96 * pow(1. - max(V.y, 0.), 5.);
   vec3 c = vec3(0.012, 0.018, 0.02) + skyBase(Rr) * (0.35 + 0.65 * fr);
   float sp = pow(max(dot(Rr, uSunDir), 0.), 600.) * 30. + pow(max(dot(Rr, uSunDir), 0.), 60.) * 0.6;
@@ -169,7 +175,7 @@ void main(){
   // dust on terraces
   alb = mix(alb, vec3(0.58, 0.48, 0.35), (1. - isWall) * 0.35 * built);
   // the freshly laid platform: slabs of mud drying at different rates
-  if (abs(vHz - 3.) < 0.05 && N.y > 0.9) {
+  if (abs(vHz - 3.) < 0.05 && N.y > 0.9 && uTime < 12.) {
     vec2 cell = floor(P.xz / vec2(11., 8.5));
     float hs = hash12(cell);
     vec2 fc = fract(P.xz / vec2(11., 8.5));
@@ -178,7 +184,7 @@ void main(){
     float wetS = smoothstep(0.35, 0.9, hs) * (1. - smoothstep(4., 16., uTime));
     alb = mix(alb, vec3(0.27, 0.19, 0.13), wetS * 0.8);
     alb *= 0.93 + 0.12 * hs;
-    alb *= 1. - 0.25 * seam * (1. - smoothstep(0.3, 0.7, fwc * 4.));
+    alb *= 1. - 0.25 * seam * (1. - smoothstep(0.3, 0.7, fwc * 4.)) * (1. - smoothstep(6., 12., uTime));
   }
   // --- stairs: treads / risers
   float sC = step(abs(P.x), 4.5) * step(-64., P.z) * step(P.z, -42.);
@@ -327,7 +333,7 @@ void main(){
   vec3 emit = vec3(0.);
   float door = step(abs(vO.x), 1.3) * step(vO.y, ${(TEMPLE.y0 + 4.2).toFixed(1)}) * step(N.z, -0.5);
   alb = mix(alb, vec3(0.03), door);
-  emit += vec3(1.0, 0.42, 0.12) * 5. * uFireI * door * (0.8 + 0.2 * sin(uTime * 13.));
+  emit += vec3(1.0, 0.42, 0.12) * 2.2 * uFireI * door * (0.8 + 0.2 * sin(uTime * 13.));
   vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
   vec3 c = shade(vP, N, alb, 1., 1., 1., 0.6) + emit;
   gl_FragColor = vec4(applyFog(c, vP), 1.);
@@ -336,10 +342,10 @@ void main(){
 const TORCH_VS = /* glsl */`
 ${COMMON}
 uniform sampler2D uPaths;
-uniform float uTau, uDensity, uDispT0, uTauD0, uTauRate, uPx, uTorchI;
+uniform float uTau, uDensity, uDispT0, uTauD0, uTauRate, uPx, uTorchI, uLag;
 attribute vec4 aA;   // row, phase, speed, lateral
 attribute vec4 aB;   // threshold, seed, departure delay, kind (0 walker, 1 resident, 2 worker)
-uniform vec3 uRing; uniform float uWorkers;
+uniform vec3 uRing; uniform float uWorkers, uProc;
 attribute vec3 aC;   // path length | resident x, z, birth
 varying float vI; varying float vS;
 vec2 pathAt(float row, float s){
@@ -361,6 +367,8 @@ void main(){
   float fade = 1.;
   vec2 xz;
   float tdep = uDispT0 + aB.z;
+  float T = uTime - uLag;
+  if (uLag > 0. && (T < tdep + 0.05 || aB.w > 1.5)) { gl_Position = vec4(0., 0., -2., 1.); gl_PointSize = 0.; return; }
   float vis = 1.;
   float worker = step(1.5, aB.w);
   if (worker > 0.5) {
@@ -386,16 +394,16 @@ void main(){
     gl_Position = vis < 0.5 ? vec4(0., 0., -2., 1.) : projectionMatrix * mv;
     return;
   }
-  if (aB.w < 0.5) {
-    vis = step(aB.x, uDensity);
-    if (uTime < tdep) xz = walker(uTau, fade);
+  if (aB.w < 0.5 || aB.w > 2.5) {
+    vis = aB.w > 2.5 ? step(aB.x, uProc) : step(aB.x, uDensity);
+    if (T < tdep) xz = walker(uTau, fade);
     else { float f2; xz = walker(uTauD0 + (tdep - uDispT0) * uTauRate, f2); fade = f2 > 0.05 ? 1. : 0.; }
   } else {
     xz = aC.xy;
-    vis = step(tdep, uTime);                          // residents appear as they leave
+    vis = step(tdep, T);                              // residents appear as they leave
   }
-  if (uTime > tdep) {
-    float dt = uTime - tdep;
+  if (T > tdep) {
+    float dt = T - tdep;
     float a0 = atan(xz.y, xz.x) + (aB.y - 0.5) * 0.6;
     vec2 dir = vec2(cos(a0), sin(a0));
     float v = 18. + 45. * fract(aB.y * 7.31), acc = 40. + 120. * fract(aB.y * 3.17);
@@ -409,8 +417,8 @@ void main(){
   vec4 mv = viewMatrix * vec4(P, 1.);
   float dist = -mv.z;
   float flick = 0.75 + 0.25 * sin(uTime * (9. + 7. * aB.y) + aB.y * 40.);
-  float sz = uPx * clamp(700. / dist, 0.8, 3.0);
-  vI = vis * fade * flick * uTorchI * (aB.w > 0.5 ? 0.8 : 1.) * min(1., sz / 1.6);
+  float sz = uPx * clamp(700. / dist, 0.8, 4.0);
+  vI = vis * fade * flick * uTorchI * (aB.w > 0.5 ? 0.8 : 1.) * min(1., sz / 1.6) * min(1., pow(uPx * 1.1 / sz, 1.5)) * (1. - uLag * 2.6);
   gl_PointSize = max(sz, 1.6 * uPx / 2.6);
   vS = aB.y;
   gl_Position = vis * fade < 0.001 ? vec4(0., 0., -2., 1.) : projectionMatrix * mv;
@@ -449,10 +457,10 @@ void main(){
   float x = abs(p.x + (n - 0.5) * 0.18 * p.y);
   float body = smoothstep(w, w * 0.25, x) * smoothstep(0., 0.08, p.y) * (1. - smoothstep(0.55, 1., p.y + (n - 0.5) * 0.3));
   float core = smoothstep(w * 0.55, 0., x) * (1. - smoothstep(0.1, 0.5, p.y));
-  vec3 c = vec3(1.0, 0.36, 0.08) * body * 3.5 + vec3(1.0, 0.75, 0.4) * core * 6.;
+  vec3 c = vec3(1.0, 0.34, 0.07) * body * 2.2 + vec3(1.0, 0.72, 0.38) * core * 3.4;
   // halo
-  float hd = length(vec2(p.x, (p.y - 0.25) * 0.8));
-  c += vec3(1.0, 0.45, 0.15) * exp(-hd * hd * 18.) * 0.6;
+  float hd = length(vec2(p.x, (p.y - 0.3) * 0.9));
+  c += vec3(1.0, 0.45, 0.15) * max(exp(-hd * hd * 22.) - 0.02, 0.) * 0.5;
   gl_FragColor = vec4(c * uI, 1.);
 }`;
 
@@ -538,7 +546,7 @@ export default {
     gTex.colorSpace = THREE.NoColorSpace; gTex.anisotropy = 4; gTex.minFilter = THREE.LinearMipmapLinearFilter;
     const U = {
       uTime: { value: 0 }, uCam: v3(),
-      uSunDir: v3(0, 1, 0), uSunCol: v3(), uMoonDir: v3(0.35, 0.72, -0.6), uMoonCol: v3(),
+      uSunDir: v3(0, 1, 0), uSunCol: v3(), uMoonDir: v3(0.82, 0.47, 0.33), uMoonCol: v3(),
       uZen: v3(), uHor: v3(), uGlow: v3(), uAmb: v3(), uBounce: v3(),
       uFogDen: { value: 0.0007 }, uNight: { value: 0 },
       uHF: { value: hfTex }, uHFRect: { value: new THREE.Vector4(HF.x0 - G.res / 2, HF.z0 - G.res / 2, G.nx * G.res, G.nz * G.res) },
@@ -595,6 +603,8 @@ export default {
 
     // ---------- torch-people
     const R = util.rng(31);
+    // procession: straight up the central stair to the gate
+    net.paths.push([[0, -520], [0, -300], [0, -140], [0, -100], [0, -64], [0, -42], [0, -37]]);
     const rows = net.paths.length;
     const pData = new Float32Array(256 * rows * 4), lens = [];
     net.paths.forEach((poly, r) => {
@@ -611,8 +621,10 @@ export default {
     for (let i = 0; i < NW; i++) {
       let x = R() * totalLen, r = 0;
       while (r < rows - 1 && x > lens[r]) { x -= lens[r]; r++; }
-      tA.set([r, R(), 13 + R() * 12, (R() - 0.5) * 2 * (2 + R() * 5)], i * 4);
-      tB.set([R(), R(), R() * 2.6, 0], i * 4);
+      const proc = i < 1400;
+      if (proc) { r = rows - 1; }
+      tA.set([r, R(), proc ? 9 + R() * 4 : 13 + R() * 12, (R() - 0.5) * 2 * (proc ? 1 + R() * 2.6 : 2 + R() * 5)], i * 4);
+      tB.set([R(), R(), R() * 2.6, proc ? 3 : 0], i * 4);
       tC.set([lens[r], 0, 0], i * 3);
     }
     lampHouses.forEach((h, j) => {
@@ -629,14 +641,19 @@ export default {
     const tGeo2 = new THREE.BufferGeometry();
     tGeo2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NT * 3), 3));
     tGeo2.setAttribute('aA', new THREE.BufferAttribute(tA, 4)); tGeo2.setAttribute('aB', new THREE.BufferAttribute(tB, 4)); tGeo2.setAttribute('aC', new THREE.BufferAttribute(tC, 3));
-    const torchU = { uPaths: { value: pTex }, uTau: { value: 0 }, uDensity: { value: 0.3 }, uDispT0: { value: 23.8 }, uTauD0: { value: 0 }, uTauRate: { value: 1 }, uPx: { value: 3.0 * pxScale }, uTorchI: { value: 1 }, uRing: { value: new THREE.Vector3(100, 80, 3) }, uWorkers: { value: 1 } };
+    const torchU = { uPaths: { value: pTex }, uTau: { value: 0 }, uDensity: { value: 0.3 }, uDispT0: { value: 23.8 }, uTauD0: { value: 0 }, uTauRate: { value: 1 }, uPx: { value: 3.0 * pxScale }, uTorchI: { value: 1 }, uRing: { value: new THREE.Vector3(100, 80, 3) }, uWorkers: { value: 1 }, uLag: { value: 0 }, uProc: { value: 0 } };
     const torches = new THREE.Points(tGeo2, mat(TORCH_VS, TORCH_FS, torchU, { blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
     torches.frustumCulled = false; torches.renderOrder = 20;
     scene.add(torches);
+    // motion-streak copies of the scattering people (drawn only after they leave)
+    const lagCopies = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3].map((L, i) => {
+      const p = new THREE.Points(tGeo2, mat(TORCH_VS, TORCH_FS, { ...torchU, uLag: { value: L } }, { blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
+      p.frustumCulled = false; p.renderOrder = 20; p.visible = false; scene.add(p); return p;
+    });
 
     // ---------- fire + embers
     const fireC = new THREE.Vector3(0, TEMPLE.y0 + TEMPLE.h + 2.2, TEMPLE.zc + 1);
-    const flameU = { uC: { value: fireC }, uSize: { value: new THREE.Vector2(5.5, 9) }, uTime: U.uTime, uI: { value: 0 } };
+    const flameU = { uC: { value: fireC }, uSize: { value: new THREE.Vector2(7, 12) }, uTime: U.uTime, uI: { value: 0 } };
     const flame = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0.5, 0.5, 0), new THREE.ShaderMaterial({ uniforms: flameU, vertexShader: FLAME_VS, fragmentShader: FLAME_FS, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
     flame.frustumCulled = false; flame.renderOrder = 21;
     scene.add(flame);
@@ -674,7 +691,7 @@ export default {
     const tau = t => { const x = util.clamp(t, 0, 32) * 240, i = Math.floor(x), f = x - i; return tauTab[i] + (tauTab[Math.min(i + 1, tauTab.length - 1)] - tauTab[i]) * f; };
 
     return {
-      scene, camera, clearColor: 0x000000, THREE, util, track, U, tU, torchU, flameU, emberU, dustU, veilU, veilScene, veilCam, sky, tau, pxScale,
+      scene, camera, clearColor: 0x000000, THREE, util, track, U, flame, embers, dust, lagCopies, tU, torchU, flameU, emberU, dustU, veilU, veilScene, veilCam, sky, tau, pxScale,
       v: { a: new THREE.Vector3(), b: new THREE.Vector3() },
     };
   },
@@ -687,9 +704,9 @@ export default {
     // ---------------- day phase (cycles; 0 sunrise, .25 noon, .5 sunset, .75 midnight)
     const ramp = (x, a, d) => { const u = clamp((x - a) / d); return d * (u * u * u - u * u * u * u / 2) + Math.max(0, x - a - d); };
     const t0 = 8.3, t1 = 20.4, du = 1.2, dd = 1.8;
-    const vmax = 7.242 / ((t1 - t0) - (du + dd) / 2);
+    const vmax = (7.242 + 0.4820 - 0.4700) / ((t1 - t0) - (du + dd) / 2);
     const integ = x => ramp(x, t0, du) - ramp(x, t1 - dd, dd);   // ∫ speed profile (unit height)
-    const phi = 0.482 + vmax * integ(clamp(t, 0, 40)) + (t < t0 ? (t - 4) * 0.0012 : 0);
+    const phi = 0.4700 + vmax * integ(clamp(t, 0, 40)) + (t < t0 ? (t - 4) * 0.0012 : 0);
     const a = phi * Math.PI * 2;
     const lat = 0.54;
     const sun = new S.THREE.Vector3(Math.cos(a), Math.sin(a) * Math.cos(lat), -Math.sin(a) * Math.sin(lat)).normalize();
@@ -701,7 +718,8 @@ export default {
       [-0.14, [0.012, 0.014, 0.045], [0.050, 0.040, 0.085], [0, 0, 0]],
       [-0.05, [0.040, 0.034, 0.100], [0.300, 0.140, 0.140], [0, 0, 0]],
       [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
-      [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.8, 1.45, 0.62]],
+      [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.9, 1.50, 0.62]],
+      [0.17, [0.170, 0.190, 0.360], [1.050, 0.720, 0.420], [3.4, 2.10, 0.95]],
       [0.32, [0.240, 0.350, 0.600], [0.920, 0.800, 0.620], [3.6, 3.0, 2.2]],
       [1.00, [0.210, 0.360, 0.680], [0.850, 0.820, 0.720], [4.0, 3.6, 3.0]],
     ];
@@ -711,10 +729,10 @@ export default {
     U.uZen.value.fromArray(zen); U.uHor.value.fromArray(hor);
     U.uSunCol.value.fromArray(sunc).multiplyScalar(smoothstep(-0.03, 0.02, e));
     U.uGlow.value.set(hor[0] * 0.9, hor[1] * 0.55, hor[2] * 0.35).multiplyScalar(1 - night);
-    U.uAmb.value.set(zen[0] * 0.55 + hor[0] * 0.07, zen[1] * 0.55 + hor[1] * 0.07, zen[2] * 0.55 + hor[2] * 0.07);
+    U.uAmb.value.set(zen[0] * 0.45 + hor[0] * 0.06, zen[1] * 0.45 + hor[1] * 0.06, zen[2] * 0.45 + hor[2] * 0.06);
     U.uBounce.value.fromArray(sunc).multiplyScalar(0.06 * smoothstep(-0.03, 0.1, e)).add(new S.THREE.Vector3(0.004, 0.003, 0.003));
     U.uNight.value = night;
-    U.uMoonCol.value.set(0.075, 0.10, 0.17).multiplyScalar(night * 1.25);
+    U.uMoonCol.value.set(0.11, 0.145, 0.24).multiplyScalar(night * 1.5);
     U.uStarI.value = night * 1.1;
 
     // ---------------- construction
@@ -730,12 +748,14 @@ export default {
       S.torchU.uRing.value.set(ax, az, y); }
     S.tU.uTempLevel.value = track([[0, TEMPLE.y0 - 0.1], [17.7, TEMPLE.y0 - 0.1], [18.8, TEMPLE.y0 + 12]], t);
     const fire = smoothstep(18.9, 19.6, t) * (1 - smoothstep(24.2, 25.4, t));
-    U.uFireI.value = fire * (7 + 1.2 * Math.sin(t * 17) + 0.8 * Math.sin(t * 29.3)) * (0.35 + 0.65 * night);
+    U.uFireI.value = fire * (1.5 + 0.25 * Math.sin(t * 17) + 0.18 * Math.sin(t * 29.3)) * (0.35 + 0.65 * night);
     S.flameU.uI.value = fire * (1.0 + 0.12 * Math.sin(t * 23));
+    S.flame.visible = fire > 0.002; S.embers.visible = fire > 0.002;
+    S.dust.visible = S.dustU.uDustI.value > 0.001 || t > 23;
     S.emberU.uI.value = fire;
 
     // ---------------- erosion and dispersal
-    const er = track([[0, 0], [23.4, 0], [29.2, 1]], t, 'inOutSine');
+    const er = track([[0, 0], [23.3, 0], [28.6, 1]], t, 'inOutSine');
     U.uErode.value = er;
     S.tU.uTempErode.value = smoothstep(23.6, 25.6, t);
     U.uSandCover.value = track([[0, 0], [23.6, 0], [30, 1.15]], t, 'inOutSine');
@@ -744,18 +764,21 @@ export default {
 
     // people
     S.torchU.uTau.value = S.tau(t);
+    S.lagCopies.forEach(p => p.visible = t > S.torchU.uDispT0.value + 0.1);
     S.torchU.uTauD0.value = S.tau(S.torchU.uDispT0.value);
     S.torchU.uDensity.value = track([[0, 0.38], [8.5, 0.45], [19.5, 1.0]], t);
-    S.torchU.uTorchI.value = lerp(0.6, 1.0, Math.max(night, smoothstep(0.12, -0.02, e)));
-    S.torchU.uWorkers.value = track([[0, 0.12], [8, 0.16], [9, 1], [17.5, 1], [19.5, 0]], t);
+    S.torchU.uProc.value = track([[0, 0], [16.5, 0], [19, 1]], t);
+    S.torchU.uTorchI.value = lerp(0.6, 1.0, Math.max(night, smoothstep(0.12, -0.02, e))) * (1 + 0.6 * smoothstep(23.8, 25, t));
+    { const ring = S.torchU.uRing.value; const per = 4 * (ring.x + ring.y);
+      S.torchU.uWorkers.value = track([[0, 0.12], [8, 0.16], [9, 1], [17.5, 1], [19.5, 0]], t) * (t > 8.6 ? Math.min(1, per / 2.4 / 1800) : 1); }
 
     // ---------------- camera (orbit parameters around the platform centre)
     const deg = Math.PI / 180;
-    const az = track([[0, -58], [8, -63], [20, -100], [24.2, -92], [29.5, -70], [31, -66]], t) * deg;
-    const dist = track([[0, 585], [8, 545], [14, 420], [20, 175], [24.2, 150], [29.5, 820], [31, 880]], t);
-    const hgt = track([[0, 830], [8, 775], [14, 210], [20, 46], [24.2, 41], [29.5, 330], [31, 350]], t);
-    const tgt = track([[0, [0, 0, -10]], [8, [0, 0, -10]], [14, [0, 14, 0]], [20, [0, 55, 60]], [24.2, [0, 62, 70]], [29.5, [0, 0, 60]], [31, [0, 0, 60]]], t);
-    const fov = track([[0, 31], [8, 30], [20, 36], [24.2, 37], [29.5, 34]], t);
+    const az = track([[0, -58], [8, -63], [17, -92], [20, -97], [23.6, -93], [25.6, -82], [28, -64], [31, -58]], t) * deg;
+    const dist = track([[0, 585], [8, 545], [14, 400], [17, 230], [20, 118], [23.6, 104], [25.6, 300], [28, 560], [31, 600]], t);
+    const hgt = track([[0, 830], [8, 775], [14, 200], [17, 75], [20, 47], [23.6, 45], [25.6, 190], [28, 800], [31, 850]], t);
+    const tgt = track([[0, [0, 0, -10]], [8, [0, 0, -10]], [14, [0, 14, 0]], [17, [0, 36, 10]], [20, [0, 62, 60]], [23.6, [0, 66, 66]], [25.6, [0, 12, 10]], [28, [0, 0, -10]], [31, [0, 0, -10]]], t);
+    const fov = track([[0, 31], [8, 30], [17, 34], [20, 38], [23.6, 39], [25.6, 34], [28, 31]], t);
     camera.position.set(Math.cos(az) * dist, hgt, Math.sin(az) * dist);
     camera.lookAt(tgt[0], tgt[1], tgt[2]);
     camera.fov = fov; camera.updateProjectionMatrix();

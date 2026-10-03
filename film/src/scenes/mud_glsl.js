@@ -29,7 +29,9 @@ vec3 skyBase(vec3 d){
   return c;
 }
 vec3 fogColor(vec3 d){
-  return skyBase(normalize(vec3(d.x, 0.015 + max(d.y, 0.) * 0.25, d.z)));
+  // looking down, the haze in-scatters more of the high (cool) sky; toward the horizon, the warm glow
+  float e = d.y >= 0. ? 0.015 + d.y * 0.25 : 0.015 + (-d.y) * 0.2;
+  return skyBase(normalize(vec3(d.x, e, d.z)));
 }
 vec3 applyFog(vec3 col, vec3 P){
   vec3 v = P - uCam; float dist = length(v); vec3 d = v / max(dist, 1e-3);
@@ -38,7 +40,7 @@ vec3 applyFog(vec3 col, vec3 P){
   float y0 = uCam.y, y1 = P.y;
   float dens = abs(y1 - y0) > 0.5 ? (exp(-k * max(min(y0, y1), 0.)) - exp(-k * max(max(y0, y1), 0.))) / (k * abs(y1 - y0)) : exp(-k * max(y0, 0.));
   float f = 1. - exp(-dist * uFogDen * dens);
-  return mix(col, fogColor(d) * mix(0.6, 1., smoothstep(-0.4, 0.02, d.y)), f);
+  return mix(col, fogColor(d) * mix(0.75, 1., smoothstep(-0.4, 0.02, d.y)), f);
 }
 
 // ---- heightfield (ziggurat) as currently shown
@@ -71,12 +73,12 @@ float hfShadow(vec3 P, vec3 L){
   float tN = max(max(tn.x, tn.y), max(tn.z, 0.)), tF = min(min(tf.x, tf.y), tf.z);
   if (tF <= tN) return 1.;
   float t = tN + 0.3, res = 1.;
-  for (int i = 0; i < 28; i++) {
+  for (int i = 0; i < 20; i++) {
     vec3 Q = P + L * t;
     float d = Q.y - hfHeight(Q.xz);
     res = min(res, clamp(6. * d / t + 0.15, 0., 1.));
     if (res < 0.01 || t > tF) break;
-    t += clamp(d * 0.6, 0.5, 30.);
+    t += clamp(d * 0.7, 0.6, 30.);
   }
   return smoothstep(0., 1., res);
 }
@@ -124,58 +126,63 @@ vec3 shade(vec3 P, vec3 N, vec3 alb, float ao, float sh, float shm, float rough)
   // shrine fire
   if (uFireI > 0.001) {
     vec3 Lf = uFirePos - P; float d2 = dot(Lf, Lf); Lf *= inversesqrt(d2);
-    c += alb * vec3(1., 0.45, 0.16) * uFireI * max(dot(N, Lf) * 0.8 + 0.2, 0.) / (1. + d2 * 0.02);
+    c += alb * vec3(1., 0.45, 0.16) * uFireI * max(dot(N, Lf), 0.) / (1. + d2 * 0.035);
   }
   return c;
 }
 `;
 
 // Star trails around the celestial pole (latitude ~31°N, pole due north = +z).
-// uRot: sky rotation angle (rad), uTrail: trail length (rad of rotation), uPix: pixel angular size.
+// Stratified: thin declination bands, each with n stars in equal RA slots (jittered), so a pixel
+// only tests the few slots its trail can reach — cost is independent of star density.
+// uRot: sky rotation (rad), uTrail: trail length (rad), uPix: pixel angular size.
 export const STARS = /* glsl */`
 uniform float uRot, uTrail, uPix, uStarI;
 const float PI = 3.14159265;
-vec3 starLayer(vec3 d, float bandW, float nmax, float seed, float magBias){
+const float TAU = 6.2831853;
+vec3 starBand(float b, float dec, float ra, float bandW, float dens, float seed){
+  vec3 sum = vec3(0.);
+  float cd = cos((b + 0.5) * bandW - PI * 0.5);
+  float n = max(1., floor(dens * cd + 0.5));
+  float w = TAU / n;
+  float r = mod(ra - uRot, TAU);
+  float i0 = floor(r / w) - 1.;
+  float cnt = floor((r + uTrail) / w) - i0 + 1.;
+  float sig = uPix * 0.7;
+  for (int k = 0; k < 10; k++) {
+    if (float(k) >= cnt) break;
+    float i = mod(i0 + float(k), n);
+    vec3 h = hash31(b * 157.31 + i * 3.917 + seed);
+    float sdec = (b + h.x) * bandW - PI * 0.5;
+    float dd = dec - sdec;
+    float sra = (i + h.y) * w;
+    float dra = mod(r - sra + PI, TAU) - PI;
+    float cs = cos(sdec);
+    float along = dra * cs, Lc = uTrail * cs;
+    float da = along > 0. ? along : (along < -Lc ? -Lc - along : 0.);
+    float d2 = (dd * dd + da * da) / (sig * sig);
+    if (d2 > 12.) continue;
+    // magnitude: N(<m) ~ 10^(0.45 m): few bright, many faint
+    float m = -1.0 + 8.5 * pow(h.z, 0.22);
+    float flux = pow(10., -0.4 * m) * 2.6;
+    float tail = (Lc > 1e-6 && along < 0.) ? mix(1., 0.4, clamp(-along / Lc, 0., 1.)) : 1.;
+    float smear = Lc > 1e-6 ? 1. / (1. + Lc / (sig * 30.)) : 1.;
+    vec3 tint = mix(vec3(0.72, 0.83, 1.15), vec3(1.18, 0.93, 0.72), fract(h.x * 7.31 + h.y * 3.17));
+    sum += tint * (min(flux, 2.5) * exp(-d2 * 0.5) * tail * max(smear, 0.25));
+  }
+  return sum;
+}
+vec3 starField(vec3 d){
   vec3 P = normalize(vec3(0., sin(0.541), cos(0.541)));
   vec3 E1 = normalize(cross(P, vec3(1., 0., 0.)));
   vec3 E2 = cross(P, E1);
   float dec = asin(clamp(dot(d, P), -1., 1.));
   float ra = atan(dot(d, E2), dot(d, E1));
+  const float bandW = 0.0032;
   float bN = (dec + PI * 0.5) / bandW;
   float b0 = floor(bN);
-  float fb = bN - b0;
-  vec3 sum = vec3(0.);
-  float sig = uPix * 0.75;
-  for (int k = 0; k < 2; k++) {
-    float b = b0 + (k == 0 ? 0. : (fb > 0.5 ? 1. : -1.));
-    float cd = cos((b + 0.5) * bandW - PI * 0.5);
-    float n = floor(nmax * cd + hash11(b * 3.7 + seed));
-    for (int i = 0; i < 24; i++) {
-      if (float(i) >= n) break;
-      vec3 h = hash31(b * 61.37 + float(i) * 7.913 + seed);
-      float sdec = (b + h.x) * bandW - PI * 0.5;
-      float dd = dec - sdec;
-      if (abs(dd) > sig * 4.) continue;
-      float sra = h.y * 2. * PI + uRot;
-      float dra = mod(ra - sra + PI, 2. * PI) - PI;
-      float cs = cos(sdec);
-      float along = dra * cs;
-      float Lc = uTrail * cs;
-      float da = along > 0. ? along : (along < -Lc ? -Lc - along : 0.);
-      float w = exp(-(dd * dd + da * da) / (sig * sig * 2.));
-      // magnitude distribution: few bright, many faint
-      float m = pow(h.z, 7.0) * 1.0 + pow(h.z, 1.5) * 0.08 + magBias;
-      float tail = (Lc > 1e-5 && along < 0.) ? mix(1., 0.35, clamp(-along / Lc, 0., 1.)) : 1.;
-      // trails smear the flux, but long-exposure film keeps them visible
-      float smear = Lc > 1e-5 ? mix(1., 0.55, clamp(Lc / (sig * 12.), 0., 1.)) : 1.;
-      vec3 tint = mix(vec3(0.74, 0.84, 1.15), vec3(1.15, 0.94, 0.74), fract(h.x * 7.31 + h.y * 3.17));
-      sum += tint * (m * w * tail * smear);
-    }
-  }
-  return sum;
-}
-vec3 starField(vec3 d){
-  vec3 s = starLayer(d, 0.0085, 22., 1.7, 0.0) + starLayer(d, 0.0055, 20., 9.3, 0.0) * 0.5;
+  float b1 = b0 + (bN - b0 > 0.5 ? 1. : -1.);
+  vec3 s = starBand(b0, dec, ra, bandW, 70., 1.7) + starBand(b1, dec, ra, bandW, 70., 1.7);
   return s * uStarI;
 }
 `;

@@ -78,7 +78,7 @@ uniform float uMode, uSide, uTime, uGlass, uCand;
 uniform vec3 uSun;
 varying vec3 vW; varying vec3 vN;
 ${GLASS}
-${GLSL.snoise}
+float cn(vec3 p){ return 0.5+0.25*sin(p.x*1.7+sin(p.z*1.3+p.y*0.7))*sin(p.z*1.9+sin(p.y*1.1+p.x*0.7)) + 0.25*sin(p.y*2.3+sin(p.x*1.1))*sin(p.x*2.9-p.z*1.3); }
 float bayLocal(float z){ return mod(z - ${Z0.toFixed(1)}, ${BAY.toFixed(2)}) - ${(BAY / 2).toFixed(2)}; }
 float bayIdx(float z){ return floor((z - ${Z0.toFixed(1)}) / ${BAY.toFixed(2)}); }
 vec3 stained(vec3 p, vec3 N){
@@ -134,7 +134,7 @@ void main(){
     alb=vec3(0.24,0.24,0.26)*(0.8+0.3*h)*(1.-0.4*j);
   }
   // ashlar texture on stone
-  float n=snoise(p*vec3(0.9,0.5,0.9))*0.5+0.5;
+  float n=cn(p*vec3(1.6,0.9,1.6));
   alb*=0.85+0.25*n;
   // light: cool window fill (stronger high in the nave), candles near the floor, stained sun patches
   vec3 amb=mix(vec3(0.018,0.020,0.028), vec3(0.085,0.090,0.115), smoothstep(2.,40.,p.y))*(0.65+0.35*max(N.y*-1.,0.)+0.3*abs(N.x));
@@ -189,7 +189,7 @@ export default {
     // aisle ceilings (simple barrel) and the wall above the arcade seen from the aisles
     for (const s of [-1, 1]) {
       // flat soffit band
-      const b = new THREE.Mesh(new THREE.PlaneGeometry(XA - XW, L).rotateX(Math.PI / 2), sGen); b.position.set(s * (XW + XA) / 2, 19.8, 0); nave.add(b);
+      const b = new THREE.Mesh(new THREE.PlaneGeometry(XA - XW, L).rotateX(Math.PI / 2), sGen); b.position.set(s * (XW + XA) / 2, 19.8, 0); // (soffit omitted: reads as a black slab)
     }
 
     // ---------------------------------------------------------------- vault
@@ -244,16 +244,16 @@ export default {
     // ---------------------------------------------------------------- light shafts through the clerestory (+x side)
     const beams = new THREE.Group(); nave.add(beams);
     {
-      const geo = new THREE.CylinderGeometry(1, 1, 1, 28, 10, true); geo.translate(0, 0.5, 0);
+      const geo = new THREE.CylinderGeometry(1, 1, 1, 20, 4, true); geo.translate(0, 0.5, 0);
       const mat = new THREE.ShaderMaterial({
         uniforms: { ...U, uB: { value: 1 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
         vertexShader: `attribute float aSeed; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying float vSeed; void main(){ vSeed=aSeed; vL=position; vec4 w=modelMatrix*instanceMatrix*vec4(position,1.); vW=w.xyz; vN=normalize(mat3(modelMatrix*instanceMatrix)*normal); gl_Position=projectionMatrix*viewMatrix*w; }`,
-        fragmentShader: `uniform float uTime, uB, uGlass; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying float vSeed; ${GLASS} ${GLSL.snoise}
+        fragmentShader: `uniform float uTime, uB, uGlass; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying float vSeed; ${GLASS} float cn(vec3 p){ return 0.5+0.25*sin(p.x*1.7+sin(p.z*1.3+p.y*0.7))*sin(p.z*1.9+sin(p.y*1.1+p.x*0.7)) + 0.25*sin(p.y*2.3+sin(p.x*1.1))*sin(p.x*2.9-p.z*1.3); }
           void main(){ vec3 V=normalize(cameraPosition-vW); float f=pow(abs(dot(normalize(vN),V)),3.2);
             float a=vL.y;
             vec3 col=glassCol(vec2(vL.x*2.6, 31.+vL.z*4.5), floor(vW.z*0.13)+3.);
             float fall=smoothstep(0.,0.06,a)*mix(1.,0.25,a);
-            float n=snoise(vW*0.18+vec3(0.,-uTime*0.12,uTime*0.05))*0.5+0.5;
+            float n=cn(vW*0.35+vec3(0.,-uTime*0.25,uTime*0.1));
             float dc=length(cameraPosition-vW);
             vec3 dom = vSeed<0.5? vec3(1.0,0.05,0.07) : vSeed<1.5? vec3(0.08,0.18,1.0) : vSeed<2.5? vec3(1.0,0.6,0.12) : vec3(0.6,0.1,0.5);
             col=mix(dom,col,0.3)*1.1;
@@ -545,7 +545,7 @@ export default {
     const age = t - STRIKE;
     const pulse = age > 0 && t < CUT ? Math.exp(-age * 3.5) : 0;
     return {
-      exposure: (t < CUT ? 1.15 : 1.35) + pulse * 0.35,
+      exposure: (t < CUT ? 1.15 : 1.6) + pulse * 0.35,
       contrast: 1.06,
       saturation: 1.1,
       tint: [0.97, 0.99, 1.05],

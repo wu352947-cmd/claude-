@@ -182,14 +182,26 @@ function compositeGlow(g, s, opts, setT, items) {
   q.g.clearRect(0, 0, q.c.width, q.c.height);
   setT(q.g, s / q.d);
   q.g.textBaseline = 'middle';
+  // bounding box (reference px) of everything that glows — only that region is composited
+  let x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
   for (const it of items) {
-    if (it[0] === 'text') { q.g.font = it[1]; q.g.fillStyle = ink(Math.min(1, it[5])); q.g.fillText(it[2], it[3], it[4]); }
-    else { // cursor: a slightly fattened bar so its halo reads as light, not as a smudge
+    if (it[0] === 'text') {
+      q.g.font = it[1]; q.g.fillStyle = ink(Math.min(1, it[5])); q.g.fillText(it[2], it[3], it[4]);
+      const w = measure(it[1], it[2]), hh = parseFloat(it[1].match(/(\d+(?:\.\d+)?)px/)[1]);
+      x0 = Math.min(x0, it[3]); x1 = Math.max(x1, it[3] + w); y0 = Math.min(y0, it[4] - hh); y1 = Math.max(y1, it[4] + hh);
+    } else { // cursor: a slightly fattened bar so its halo reads as light, not as a smudge
       q.g.fillStyle = ink(Math.min(1, it[4]));
       q.g.fillRect(it[1] - 1.5, it[2] - it[3] / 2 - 1, CURSOR.w + 3, it[3] + 2);
+      x0 = Math.min(x0, it[1]); x1 = Math.max(x1, it[1] + CURSOR.w); y0 = Math.min(y0, it[2] - it[3]); y1 = Math.max(y1, it[2] + it[3]);
     }
   }
   q.g.setTransform(1, 0, 0, 1, 0, 0);
+  // reference box → device px (through the same transform), padded by the blur reach
+  const m = new DOMMatrix(); setT({ setTransform: (a, b, c, d, ee, f) => m.setMatrixValue(`matrix(${a},${b},${c},${d},${ee},${f})`) }, s);
+  const pad = 14 * e.d * s / 4;
+  const bx0 = Math.max(0, m.a * x0 + m.e - pad), by0 = Math.max(0, m.d * y0 + m.f - pad);
+  const bx1 = Math.min(W, m.a * x1 + m.e + pad), by1 = Math.min(H, m.d * y1 + m.f + pad);
+  if (bx1 <= bx0 || by1 <= by0) return;
   e.g.setTransform(1, 0, 0, 1, 0, 0);
   e.g.clearRect(0, 0, e.c.width, e.c.height);
   e.g.imageSmoothingEnabled = true; e.g.imageSmoothingQuality = 'high';
@@ -197,8 +209,14 @@ function compositeGlow(g, s, opts, setT, items) {
   g.save();
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
   g.globalCompositeOperation = 'lighter';
-  g.globalAlpha = 0.55; g.drawImage(q.c, 0, 0, q.c.width * q.d, q.c.height * q.d);
-  g.globalAlpha = 0.5;  g.drawImage(e.c, 0, 0, e.c.width * e.d, e.c.height * e.d);
+  const blit = (b, alpha) => {
+    const sx = Math.floor(bx0 / b.d), sy = Math.floor(by0 / b.d), sw = Math.min(b.c.width - sx, Math.ceil(bx1 / b.d) - sx + 1), sh = Math.min(b.c.height - sy, Math.ceil(by1 / b.d) - sy + 1);
+    if (sw <= 0 || sh <= 0) return;
+    g.globalAlpha = alpha;
+    g.drawImage(b.c, sx, sy, sw, sh, sx * b.d, sy * b.d, sw * b.d, sh * b.d);
+  };
+  blit(q, 0.55);
+  blit(e, 0.5);
   g.restore();
 }
 

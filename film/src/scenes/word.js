@@ -62,7 +62,7 @@ void main(){
   float ends=smoothstep(0.,.04,vS)*smoothstep(1.,.96,vS);
   vec3 col=vKind<.5?vec3(.25,.75,1.):vec3(1.,.72,.32);
   col=mix(col,vec3(1.,.8,.45),vC*.7);
-  float I=(.32+head+(p1+p2)*5.)*ends*across*uFade;
+  float I=(.16+head*.7+(p1+p2)*3.)*ends*across*uFade;
   gl_FragColor=vec4(col*I,1.);
 }`;
 
@@ -80,7 +80,7 @@ function buildArcs(B, P) {
     if (v.dot(P) > 0.2 && r() < 0.15) far.push(v);
   }
   const arcs = [];
-  const NA = 820, NC = 380;
+  const NA = 620, NC = 340;
   for (let i = 0; i < NA + NC; i++) {
     const conv = i >= NA;
     const A = (r() < 0.75 || !far.length) ? hubs[Math.floor(r() * hubs.length)] : far[Math.floor(r() * far.length)];
@@ -89,10 +89,10 @@ function buildArcs(B, P) {
     else {
       let k = 0;
       do { Bv = (r() < 0.7 ? hubs[Math.floor(r() * hubs.length)] : far[Math.floor(r() * far.length)] || hubs[0]); k++; }
-      while (k < 12 && (A.angleTo(Bv) < 0.03 || A.angleTo(Bv) > 0.9));
+      while (k < 12 && (A.angleTo(Bv) < 0.03 || A.angleTo(Bv) > 0.5));
     }
     const tb = conv ? 183.6 + 3.9 * Math.pow(r(), 0.7) : 179.0 + 7.0 * Math.sqrt(r());
-    arcs.push({ A, B: Bv, tb, dur: 0.7 + 1.6 * r(), cs: conv ? 0 : 184.0 + 3.0 * r(), seed: r(), h: 0.10 + 0.22 * r(), kind: r() < 0.55 ? 0 : 1 });
+    arcs.push({ A, B: Bv, tb, dur: 0.7 + 1.6 * r(), cs: conv ? 0 : 184.0 + 3.0 * r(), seed: r(), h: 0.035 + 0.07 * r(), kind: r() < 0.55 ? 0 : 1 });
   }
   const SEG = 40, VPA = (SEG + 1) * 2;
   const n = arcs.length * VPA;
@@ -150,11 +150,12 @@ function towerCam(st, g, cam) {
     const u = clamp((g - G_ERUPT) / 20);
     y = camY(g);
     const r = radiusAt(y);
-    rho = lerp(N1_END.back, r + 0.3 + 1.1 * r, smoothstep(0, 0.35, u));
+    rho = lerp(N1_END.back, lerp(0.35 + 5.0 * r, 0.15 + 2.6 * r, smoothstep(0.55, 0.95, u)), smoothstep(0, 0.4, u));
+    fov = lerp(34, 40, smoothstep(0, 0.3, u));
     phi = -(Math.PI * 2 * 1.45) * ease.inOutSine(u) * 0.98;
     // keep the horizon low in frame: pitch follows the horizon dip
     const dip = Math.acos(R / (R + y));
-    const pitch = lerp(-0.2, -dip + 0.2, smoothstep(0, 0.25, u));
+    const pitch = lerp(-0.2, -dip + lerp(0.22, 0.42, smoothstep(0.4, 0.9, u)), smoothstep(0, 0.25, u));
     yt = y + rho * Math.tan(pitch);
     sx = lerp(0.5, 0.44, smoothstep(0, 0.3, u)); sy = lerp(0.66, 0.5, smoothstep(0, 0.25, u));
     if (g < G_ERUPT + 1.5) {   // eruption: the column punches up out of frame; hold P low in frame
@@ -163,21 +164,16 @@ function towerCam(st, g, cam) {
     }
   } else {
     // N4: top of the tower; crest the edge, then push in on the cursor
-    const a = clamp((g - 215.4) / (227 - 215.4));
     const apexY = HT + 0.02 + CUR_H / 2;
-    const crest = ease.inOutSine(clamp((g - 215.4) / 6.2));
-    const push = ease.inOutCubic(clamp((g - 220.0) / 6.6));
-    y = lerp(HT - 0.32, apexY + 0.02, crest);
-    // final distance so the cursor is 34 px tall: d = h·H / (34·2·tan(fov/2)) at reference H = 804
+    const crest = ease.inOutSine(clamp((g - 215.4) / 6.6));
+    const push = ease.inOutCubic(clamp((g - 220.6) / 6.0));
     const dEnd = CUR_H * 804 / (CURSOR.h * 2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
-    rho = lerp(lerp(0.95, 0.75, crest), dEnd, push);
-    phi = -(Math.PI * 2 * 1.45) * 0.98 - 0.9 + 0.9 * crest + 0.15 * push;
-    const tgtY = lerp(HT - 0.15, apexY, smoothstep(0, 0.8, crest));
-    y = lerp(y, apexY, push);
-    yt = tgtY;
+    y = lerp(lerp(HT - 0.5, apexY + 0.07, crest), apexY, push);
+    rho = lerp(lerp(0.95, 0.62, crest), dEnd, push);
+    phi = -(Math.PI * 2 * 1.45) * 0.98 - 0.7 + 0.7 * crest + 0.12 * push;
+    yt = lerp(lerp(HT - 1.15, apexY, Math.pow(crest, 0.8)), apexY, push);
     sx = lerp(0.5, CURSOR.x + (CURSOR.w / 2) / REF_W, push);
-    sy = lerp(0.42, CURSOR.y, push);
-    void a;
+    sy = lerp(lerp(0.5, 0.45, crest), CURSOR.y, push);
   }
   const pos = tlToWorld(F, Math.sin(phi) * rho, y, Math.cos(phi) * rho);
   const tgt = tlToWorld(F, 0, yt, 0);
@@ -212,7 +208,7 @@ export default {
     T.U.uR.value = R;
     scene.add(T.core, T.rampMesh, T.glyphs);
     T.core.renderOrder = 1; T.rampMesh.renderOrder = 2; T.glyphs.renderOrder = 7;
-    const ST = buildStream(atlas, T.U, 16000);
+    const ST = buildStream(atlas, T.U, 11000);
     ST.mesh.renderOrder = 8;
     scene.add(ST.mesh);
 
@@ -251,7 +247,7 @@ export default {
       const a = r() * Math.PI * 2, d = 0.25 + Math.pow(r(), 0.6) * 3.2;
       const cx = Math.cos(a) * d, cz = Math.sin(a) * d;
       // clumpy deck
-      PUFF.push({ x: cx, z: cz, alt: 0.07 + 0.06 * r(), s: 0.05 + 0.14 * r(), seed: r(), a: 0.35 + 0.45 * r() });
+      PUFF.push({ x: cx, z: cz, alt: 0.05 + 0.04 * r(), s: 0.05 + 0.12 * r(), seed: r(), a: 0.25 + 0.35 * r() });
     }
 
     return { scene, camera, E, S, P, F, arcs, T, ST, pGlow, column, sun, apexGlow, cursor3d, puffs, PUFF, W, H, towerW };
@@ -273,24 +269,24 @@ export default {
     const N4 = g > 212;
     // arcs
     st.arcs.U.uTime.value = g;
-    st.arcs.U.uFade.value = 1 - smoothstep(192, 199, g);
+    st.arcs.U.uFade.value = 1 - smoothstep(188.3, 191.5, g);
     st.arcs.mesh.visible = g < 199.5;
     // convergence glow & eruption
     const conv = smoothstep(184, 188, g);
     const flash = g >= G_ERUPT ? Math.exp(-(g - G_ERUPT) * 2.2) : 0;
-    st.pGlow.material.uniforms.uI.value = (conv * conv * 2.5 + flash * 14) * (1 - smoothstep(192, 196, g));
-    const ps = (0.05 + conv * 0.25 + flash * 1.2);
+    st.pGlow.material.uniforms.uI.value = (conv * conv * 0.9 + flash * 4) * (1 - smoothstep(192, 196, g));
+    const ps = (0.04 + conv * 0.14 + flash * 0.6);
     st.pGlow.scale.set(ps, ps, 1);
     st.pGlow.material.uniforms.uCore.value = 30;
     // column of light shooting up
     const colLen = g >= G_ERUPT ? Math.min(6, (g - G_ERUPT) * 9) : 0;
-    st.column.material.uniforms.uI.value = g >= G_ERUPT ? 6 * Math.exp(-(g - G_ERUPT) * 0.6) : 0;
+    st.column.material.uniforms.uI.value = g >= G_ERUPT ? 2.2 * Math.exp(-(g - G_ERUPT) * 0.7) : 0;
     st.column.visible = g >= G_ERUPT && g < 196;
     st.column.matrix.copy(st.towerW).multiply(new THREE.Matrix4().makeScale(1, Math.max(colLen, 1e-3), 1));
     // earth ground glow at the base
     const em = st.E.earthMat.uniforms;
     em.uGlowPos.value.copy(F.o);
-    em.uGlowCol.value.set(1, 0.68, 0.32).multiplyScalar((conv * 0.5 + (g >= G_ERUPT ? 1.6 : 0) + flash * 3) * (N4 ? 0.4 : 1));
+    em.uGlowCol.value.set(1, 0.68, 0.32).multiplyScalar((conv * 0.15 + (g >= G_ERUPT ? 0.35 : 0) + flash * 0.8) * (N4 ? 0.4 : 1));
     em.uGlowRad.value = 0.9;
 
     // tower
@@ -299,13 +295,13 @@ export default {
     T.uFront.value = fr;
     const endFade = 1 - smoothstep(223.6, 226.4, g);
     T.uFade.value = N4 ? endFade : 1;
-    T.uBright.value = N4 ? 1.3 : 1.6;
+    T.uBright.value = N4 ? 0.8 : 0.95;
     st.T.glyphs.visible = st.T.rampMesh.visible = st.T.core.visible = g >= G_ERUPT;
     // stream
     const SU = st.ST.U;
     SU.uVis.value = (g < G_ERUPT ? 0 : smoothstep(G_ERUPT + 0.5, G_ERUPT + 3, g)) * (N4 ? endFade : 1);
     SU.uApex.value = N4 ? 1 : 0;
-    SU.uBright.value = N4 ? 1.6 : 1.3;
+    SU.uBright.value = N4 ? 0.9 : 0.6;
     // stars fade to black at the very end
     st.S.mat.uniforms.uVis.value = N4 ? 1 - smoothstep(222.5, 225.5, g) : 1;
     st.E.group.visible = !(N4 && g > 226.3);
@@ -324,8 +320,8 @@ export default {
       st.cursor3d.position.copy(tlToWorld(F, 0, HT + 0.02 + CUR_H / 2, 0));
       st.cursor3d.quaternion.copy(cam.quaternion);
       st.cursor3d.material.opacity = blink * (1 - smoothstep(225, 226.5, g));
-      st.apexGlow.material.uniforms.uI.value = (0.25 + 0.6 * blink) * (1 - smoothstep(224.5, 226.5, g));
-      st.apexGlow.scale.set(0.5, 0.5, 1);
+      st.apexGlow.material.uniforms.uI.value = (0.06 + 0.16 * blink) * (1 - smoothstep(224.5, 226.5, g));
+      st.apexGlow.scale.set(0.3, 0.3, 1);
       st.apexGlow.material.uniforms.uCore.value = 60;
     }
 
@@ -346,7 +342,7 @@ export default {
     const pu = st.puffs.uniforms;
     pu.uSrcPos.value.copy(tlToWorld(F, 0, 0.15, 0));
     const tl = g >= G_ERUPT ? 1 : conv * 0.3;
-    pu.uSrcCol.value.set(1, 0.66, 0.3).multiplyScalar(2.4 * tl + flash * 6);
+    pu.uSrcCol.value.set(1, 0.66, 0.3).multiplyScalar(0.5 * tl + flash * 1.2);
     pu.uSrcRange.value = 0.7;
     pu.uSkyCol.value.set(0.012, 0.016, 0.03);
     pu.uGroundCol.value.set(0.05, 0.03, 0.015);

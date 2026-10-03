@@ -148,9 +148,9 @@ void main(){
   gl_Position = projectionMatrix * mv;
   float dist = max(-mv.z, .01);
   float S = uPx * (.3 + .3 * fract(s * 3.7)) / dist;
-  float Sc = clamp(S, 2., 40.);
+  float Sc = clamp(S, 2., 26.);
   gl_PointSize = Sc;
-  vK = clamp(Sc / .9, 1., 40.);
+  vK = clamp(Sc / .9, 1., 30.);
   float edge = smoothstep(span * .5, span * .42, abs(x));
   vA = m * edge * uAmt * (.4 + .6 * fract(s * 13.1)) * min(S / Sc, 1.) * .35;
   vC = vec3(1., .62, .36) * (.16 + .2 * uLine) * uDawn * (1. + uPulse * .6);
@@ -235,9 +235,9 @@ void main(){
   vec3 p = vec3(xn * hw, yn * hh, -d);
   gl_Position = projectionMatrix * vec4(p, 1.);
   // motion-blurred streaks: length ∝ screen speed (≈ constant in normalised coords), thin
-  float L = uPx * hw * sp * .016 / d * (.7 + .6 * fract(s * 11.7));
+  float L = uPx * hw * sp * .011 / d * (.7 + .6 * fract(s * 11.7));
   float th = uPx * (.0008 + .0025 * pow(fract(s * 7.9), 4.)) / d;
-  float Sc = clamp(L, 2., 90.);
+  float Sc = clamp(L, 2., 48.);
   gl_PointSize = Sc;
   vK = clamp(Sc / max(th, .8), 1., 60.);
   float on = smoothstep(-1.4, -1.05, xn) * smoothstep(1.4, 1.05, xn);
@@ -306,7 +306,6 @@ export default {
       minX = Math.min(minX, px); maxX = Math.max(maxX, px);
     }
     const nG = pos.length / 3;
-    console.warn("prologue grains", nG);
     for (let i = 0; i < nG; i++) {
       const xn = (dat[i * 4 + 2] - minX) / (maxX - minX);
       dat[i * 4 + 2] = SHED0 + xn * SHED_DUR + (R() - 0.5) * 0.45 + (R() < 0.04 ? -0.3 * R() : 0);
@@ -334,7 +333,7 @@ export default {
     scene.add(devil);
 
     // ---- sand curtain across the lens (camera space) ----
-    const NC = 26000, cd = new Float32Array(NC * 4), r4 = rng(909);
+    const NC = 20000, cd = new Float32Array(NC * 4), r4 = rng(909);
     for (let i = 0; i < NC * 4; i++) cd[i] = r4();
     const cU = { uT: { value: 0 }, uPx: { value: uPx }, uC: { value: 0 } };
     const curtain = points(THREE, NC, [['position', new Float32Array(NC * 3), 3], ['aD', cd, 4]], CURTAIN_VERT, STREAK_FRAG, cU);

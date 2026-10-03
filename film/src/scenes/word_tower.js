@@ -72,7 +72,7 @@ export async function buildAtlas() {
 // ---------------------------------------------------------------- tower geometry
 export const HT = 3.3;              // tower height
 export const RB = 0.42;             // base radius
-export const NCOL = 200, ROWS = 5;
+export const NCOL = 120, ROWS = 8;
 export function radiusAt(y) {
   const u = clamp(y / HT, 0, 1);
   // Bruegel: broad stepped base, then a long tapering spire
@@ -109,7 +109,7 @@ void main(){
   float sun=along>0.?1.:smoothstep(uR*.995,uR*1.02,perp);
   float hot=exp(-max(uTime-iA.y,0.)*1.6);
   float pulse=pow(.5+.5*sin(iP.y*9.-uTime*3.2+iA.z*2.),6.);
-  vCol=mix(iC*vec3(1.,.8,.5),vec3(1.,.97,.9),.35+.3*sun)*(uBright*(1.+.9*pulse+sun*.6)+hot*7.);
+  vCol=mix(iC*vec3(1.,.8,.5),vec3(1.,.97,.9),.35+.3*sun)*(uBright*(1.+.7*pulse+sun*.5)+hot*3.);
   vA=step(0.,uTime-iA.y)*uFade*(.75+.5*iA.z);
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
   gl_Position=projectionMatrix*viewMatrix*w;
@@ -150,6 +150,7 @@ void main(){
   p=mix(pa,pb,uApex);
   float fade=smoothstep(0.,.08,ph)*smoothstep(1.,.85,ph);
   vec4 mv=viewMatrix*uTowerW*vec4(p,1.);
+  fade*=smoothstep(.04,.25,-mv.z);
   float s=iP.w*mix(1.,.6+.4*(1.-ph),uApex);
   mv.xy+=position.xy*s;
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
@@ -217,7 +218,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
   // ramp strip (ledge) + dark core
   const rv = [], rs = [];
   for (const [t, y, rr, pitch] of ramp) {
-    const led = pitch * 0.22;
+    const led = pitch * 0.12;
     rv.push(Math.cos(t) * rr * 0.985, y, Math.sin(t) * rr * 0.985, Math.cos(t) * (rr + led), y, Math.sin(t) * (rr + led));
     rs.push(0, timeAt(y), 1, timeAt(y));
   }
@@ -236,7 +237,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
         vec3 L=normalize(uSunL); float al=dot(vW,L); float sun=al>0.?1.:smoothstep(uR*.995,uR*1.02,length(vW-al*L));
         float edge=smoothstep(.75,1.,vE);
         float hot=exp(-(uTime-vT)*1.2);
-        vec3 c=vec3(.05,.035,.02)+vec3(1.,.72,.38)*(edge*2.2+hot*5.)+vec3(1.,.8,.55)*sun*.35;
+        vec3 c=vec3(.03,.02,.012)+vec3(1.,.72,.38)*(edge*.45+hot*2.)+vec3(1.,.8,.55)*sun*.25;
         gl_FragColor=vec4(c*uFade,1.); }`,
   });
   const rampMesh = new THREE.Mesh(rg, rampMat);
@@ -257,7 +258,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
         float dif=max(dot(Nw,L),0.)*sun;
         float band=.5+.5*sin(vL.y*140.);
         vec3 c=vec3(.012,.01,.014)+vec3(.35,.22,.1)*dif*.6+vec3(.08,.05,.02)*band;
-        c+=vec3(1.,.7,.35)*smoothstep(.06,0.,uFront-vL.y)*3.;
+        c+=vec3(1.,.7,.35)*smoothstep(.06,0.,uFront-vL.y)*1.2;
         gl_FragColor=vec4(c*uFade,1.); }`,
   }));
   core.frustumCulled = false;
@@ -270,7 +271,7 @@ export function buildStream(atlas, U, count = 16000) {
   const P = [], A = [], UV = [], C = [];
   for (let i = 0; i < count; i++) {
     const si = Math.floor(r() * SCRIPTS.length), [s0, sn] = atlas.starts[si];
-    const rho = 0.5 + Math.pow(r(), 0.7) * 2.8;
+    const rho = 0.45 + Math.pow(r(), 1.6) * 2.6;
     P.push(rho, r() * Math.PI * 2, Math.pow(r(), 0.8), 0.006 + 0.012 * r());
     A.push(0.05 + 0.12 * r(), r(), 0.8 + 2.2 * r(), 0);
     UV.push(...atlas.uv(s0 + Math.floor(r() * sn)));
