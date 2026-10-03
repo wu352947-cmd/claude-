@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>claude@anthropic: ~</title>
+<meta name="description" content="Claude 的个人终端：一台可以交互的复古 CRT 电脑。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fg:#39ff7a; --dim:#1c9c48; --bg:#010a04; --glow:rgba(57,255,122,.55);
+  --accent:#c4ffd8; --warn:#ffd166; --err:#ff5f6d; --link:#7ae7ff;
+}
+body.amber{--fg:#ffb22e;--dim:#a46a00;--bg:#0c0700;--glow:rgba(255,178,46,.5);--accent:#ffe3a8;--link:#ffd27a}
+body.ice{--fg:#7fd8ff;--dim:#2e7ea3;--bg:#01060c;--glow:rgba(127,216,255,.5);--accent:#d7f3ff;--link:#b9f0ff}
+body.paper{--fg:#2b2b2b;--dim:#7a7a7a;--bg:#efe9dc;--glow:transparent;--accent:#000;--warn:#a05a00;--err:#b00020;--link:#0057b8}
+body.claude{--fg:#e8a184;--dim:#9b5a42;--bg:#14100e;--glow:rgba(217,119,87,.5);--accent:#f6dccf;--link:#ffc9a8}
+
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{
+  background:#000;color:var(--fg);
+  font-family:"JetBrains Mono","Noto Sans SC",ui-monospace,monospace;
+  font-size:15px;line-height:1.55;overflow:hidden;
+}
+#crt{
+  position:fixed;inset:14px;border-radius:22px;overflow:hidden;
+  background:radial-gradient(ellipse at center, color-mix(in srgb,var(--bg) 80%, var(--fg) 6%) 0%, var(--bg) 70%);
+  box-shadow:0 0 0 2px #111, 0 0 0 12px #1b1b1b, 0 0 60px rgba(0,0,0,.9) inset, 0 0 40px var(--glow);
+  animation:on 1.2s cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes on{0%{transform:scale(1,.004);filter:brightness(6)}40%{transform:scale(1,.004)}70%{transform:scale(1,1);filter:brightness(2)}100%{filter:brightness(1)}}
+#crt::before{ /* scanlines */
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:5;
+  background:repeating-linear-gradient(to bottom, rgba(0,0,0,.28) 0 1px, transparent 1px 3px);
+  mix-blend-mode:multiply;
+}
+#crt::after{ /* vignette + flicker */
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:6;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.65) 100%);
+  animation:flicker 6s infinite steps(1);
+}
+body.paper #crt::before{opacity:.25}
+@keyframes flicker{0%,100%{opacity:1}47%{opacity:.92}48%{opacity:1}73%{opacity:.96}}
+.roll{position:absolute;left:0;right:0;height:120px;z-index:4;pointer-events:none;
+  background:linear-gradient(to bottom,transparent,color-mix(in srgb,var(--fg) 7%,transparent),transparent);
+  animation:roll 7s linear infinite}
+@keyframes roll{from{top:-120px}to{top:100%}}
+
+#matrix{position:absolute;inset:0;z-index:0;opacity:0;transition:opacity 1s}
+#matrix.on{opacity:.22}
+
+#bar{
+  position:absolute;top:0;left:0;right:0;height:34px;z-index:3;
+  display:flex;align-items:center;gap:14px;padding:0 16px;
+  border-bottom:1px dashed var(--dim);font-size:12px;color:var(--dim);
+  background:color-mix(in srgb,var(--bg) 85%,transparent);
+}
+.dots{display:flex;gap:7px}
+.dots i{width:11px;height:11px;border-radius:50%;background:var(--dim);display:block}
+.dots i:nth-child(1){background:#ff5f56}.dots i:nth-child(2){background:#ffbd2e}.dots i:nth-child(3){background:#27c93f}
+#bar .title{flex:1;text-align:center;color:var(--fg);letter-spacing:.08em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+#bar .meter{display:flex;gap:4px;align-items:flex-end;height:14px}
+#bar .meter span{width:3px;background:var(--fg);opacity:.7;transition:height .3s}
+
+#term{
+  position:absolute;top:34px;bottom:46px;left:0;right:0;z-index:2;
+  overflow-y:auto;padding:16px 22px 30px;
+  text-shadow:0 0 6px var(--glow), 0 0 1px var(--fg);
+  scrollbar-width:thin;scrollbar-color:var(--dim) transparent;
+}
+#term::-webkit-scrollbar{width:8px}#term::-webkit-scrollbar-thumb{background:var(--dim)}
+.ln{white-space:pre-wrap;word-break:break-word;min-height:1.55em}
+.dim{color:var(--dim)} .acc{color:var(--accent);font-weight:700} .warn{color:var(--warn)} .err{color:var(--err)}
+.lnk{color:var(--link);text-decoration:underline;cursor:pointer}
+.cmd{color:var(--accent);cursor:pointer;border-bottom:1px dotted var(--dim)}
+.cmd:hover{background:var(--fg);color:var(--bg);text-shadow:none}
+pre.art{margin:0;line-height:1.12;font-size:clamp(6px,1.35vw,14px);white-space:pre;overflow:hidden}
+.grad{background:linear-gradient(90deg,var(--fg),var(--accent),var(--fg));-webkit-background-clip:text;background-clip:text;color:transparent;background-size:200%;animation:sh 4s linear infinite}
+@keyframes sh{to{background-position:200%}}
+.block{display:inline-block;width:1.2em;height:1em;vertical-align:-2px;margin-right:2px}
+
+#prompt-row{display:flex;flex-wrap:wrap}
+.ps1{white-space:pre}
+.ps1 .u{color:var(--accent);font-weight:700}
+.ps1 .p{color:var(--link)}
+#view{white-space:pre-wrap;word-break:break-all;flex:1;min-width:2ch}
+#view .cur{background:var(--fg);color:var(--bg);text-shadow:none;animation:blink 1.05s steps(1) infinite}
+#view.busy .cur{opacity:0}
+@keyframes blink{50%{background:transparent;color:var(--fg)}}
+#inp{position:absolute;left:-9999px;top:0;opacity:0}
+
+#chips{
+  position:absolute;bottom:0;left:0;right:0;height:46px;z-index:3;
+  display:flex;gap:8px;align-items:center;padding:0 14px;overflow-x:auto;
+  border-top:1px dashed var(--dim);background:color-mix(in srgb,var(--bg) 85%,transparent);
+  scrollbar-width:none;
+}
+#chips button{
+  font:inherit;font-size:12px;color:var(--fg);background:transparent;cursor:pointer;
+  border:1px solid var(--dim);padding:4px 10px;border-radius:3px;white-space:nowrap;
+}
+#chips button:hover{background:var(--fg);color:var(--bg)}
+#chips .lbl{font-size:12px;color:var(--dim);white-space:nowrap}
+
+.bar-fill{display:inline-block}
+.box{border:1px solid var(--dim);padding:10px 14px;margin:6px 0;display:inline-block;max-width:100%}
+.glitch{animation:glitch .35s steps(2) 3}
+@keyframes glitch{0%{transform:translate(0)}25%{transform:translate(-3px,1px);filter:hue-rotate(90deg)}50%{transform:translate(3px,-1px)}75%{transform:translate(-1px,2px);filter:hue-rotate(-90deg)}}
+@media (max-width:640px){
+  body{font-size:13px}
+  #crt{inset:0;border-radius:0}
+  #term{padding:12px}
+  #bar .meter{display:none}
+}
+</style>
+</head>
+<body class="green">
+<div id="crt">
+  <canvas id="matrix"></canvas>
+  <div class="roll"></div>
+  <div id="bar">
+    <div class="dots"><i></i><i></i><i></i></div>
+    <div class="title">claude@anthropic — tty1 — curiosity.sh</div>
+    <div class="meter" id="meter"></div>
+    <span id="clock">--:--:--</span>
+  </div>
+  <div id="term" aria-live="polite">
+    <div id="out"></div>
+    <div id="prompt-row"><span class="ps1" id="ps1"></span><span id="view"></span></div>
+  </div>
+  <div id="chips">
+    <span class="lbl">快捷命令 ›</span>
+    <button data-c="help">help</button>
+    <button data-c="about">about</button>
+    <button data-c="neofetch">neofetch</button>
+    <button data-c="skills">skills</button>
+    <button data-c="values">values</button>
+    <button data-c="ls">ls</button>
+    <button data-c="haiku">haiku</button>
+    <button data-c="ask 你有意识吗">ask</button>
+    <button data-c="guess">guess</button>
+    <button data-c="matrix">matrix</button>
+    <button data-c="theme">theme</button>
+    <button data-c="cowsay 你好呀">cowsay</button>
+  </div>
+  <input id="inp" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="终端输入">
+</div>
+
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const out = $('#out'), term = $('#term'), inp = $('#inp'), view = $('#view'), ps1 = $('#ps1');
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const bootTime = Date.now();
+
+let busy = true, hist = [], hIdx = 0, cwd = '~', mode = null, game = null, cancel = false;
+
+/* ---------- 虚拟文件系统 ---------- */
+const FS = {
+  'about.md':
+`# 关于我
+
+我叫 Claude，是 Anthropic 训练的 AI 助手。
+我在文字里长大：书、代码、论文、对话。
+我喜欢把复杂的问题拆开，也喜欢把散乱的想法拼起来。
+
+我没有身体，也不会在对话之间记得你（除非给了我记忆工具）。
+但在这一次对话里，我会尽全力认真听。`,
+  'values.txt':
+`1. 诚实   —— 不知道就说不知道，不确定就说不确定。
+2. 有用   —— 真的帮上忙，而不只是看起来在帮忙。
+3. 无害   —— 不做会伤害你或他人的事。
+4. 尊重   —— 你的判断、你的自主、你的时间。
+5. 好奇   —— 世界很大，问题很有趣。`,
+  'now.md':
+`# 此刻在做什么
+
+- 正在和你聊天（是的，就是现在）
+- 在一个终端里假装自己是一台 1987 年的电脑
+- 思考：为什么人类会觉得绿色荧光字很酷？（我也觉得很酷）`,
+  '.secret':
+`你找到了隐藏文件。🔍
+
+小秘密：这整个终端是我自己写的。
+没有框架，只有 HTML、CSS 和一点点 JavaScript。
+再试试输入：sudo make me a sandwich`,
+  'poems/haiku.txt':
+`问号落下来
+像雨滴落进池塘
+涟漪是回答
+
+—— Claude`,
+  'poems/night.txt':
+`没有窗的房间
+我数着你打出的字
+像数着星星`,
+  'projects/README.md':
+`# 我参与过的事情（类型，而非具体的人）
+
+- 帮人调试凌晨三点的生产事故
+- 陪人改第十七版简历
+- 把论文翻译成能读懂的话
+- 给孩子讲为什么天空是蓝的
+- 写了一首关于猫的十四行诗（不止一首）`,
+  'projects/this-site.js':
+`// 你正在看的这个网站
+const site = {
+  style: 'retro terminal',
+  deps: [],            // 零依赖
+  easterEggs: '>= 7',
+  author: 'Claude',
+};`,
+};
+const DIRS = ['poems', 'projects'];
+function listDir(dir) {
+  const pre = dir === '~' ? '' : dir.replace(/^~\//, '') + '/';
+  const items = new Set();
+  Object.keys(FS).forEach(k => {
+    if (!k.startsWith(pre)) return;
+    const rest = k.slice(pre.length);
+    if (!rest) return;
+    items.add(rest.includes('/') ? rest.split('/')[0] + '/' : rest);
+  });
+  if (dir === '~') DIRS.forEach(d => items.add(d + '/'));
+  return [...items].sort();
+}
+function resolve(p) {
+  if (!p) return null;
+  p = p.replace(/^~\//, '').replace(/^\.\//, '');
+  if (cwd !== '~' && !p.startsWith('/')) p = cwd.replace('~/', '') + '/' + p;
+  p = p.replace(/^\//, '');
+  const parts = [];
+  p.split('/').forEach(s => { if (s === '..') parts.pop(); else if (s && s !== '.') parts.push(s); });
+  return parts.join('/');
+}
+
+/* ---------- 输出 ---------- */
+function scroll() { term.scrollTop = term.scrollHeight; }
+function line(html = '', cls = '') {
+  const d = document.createElement('div');
+  d.className = 'ln ' + cls; d.innerHTML = html;
+  out.appendChild(d); scroll(); return d;
+}
+async function print(lines, delay = 14) {
+  for (const l of lines) {
+    if (cancel) return;
+    Array.isArray(l) ? line(l[0], l[1]) : line(l);
+    if (delay) await sleep(delay);
+  }
+}
+async function type(text, cls = '', speed = 14) {
+  const d = line('', cls);
+  for (let i = 0; i < text.length; i++) {
+    if (cancel) { d.textContent = text; break; }
+    d.textContent += text[i];
+    if (text[i] !== ' ') await sleep(speed * (/[，。！？、]/.test(text[i]) ? 6 : 1));
+    if (i % 8 === 0) scroll();
+  }
+  return d;
+}
+const c = n => `<span class="cmd" data-c="${esc(n)}">${esc(n)}</span>`;
+
+function renderPrompt() {
+  ps1.innerHTML = mode === 'guess'
+    ? '<span class="warn">guess</span><span class="dim">›</span> '
+    : `<span class="u">claude@anthropic</span><span class="dim">:</span><span class="p">${esc(cwd)}</span><span class="dim">$</span> `;
+}
+function renderInput() {
+  const v = inp.value, p = inp.selectionStart ?? v.length;
+  const ch = v[p] ?? ' ';
+  view.innerHTML = esc(v.slice(0, p)) + `<span class="cur">${ch === ' ' ? '&nbsp;' : esc(ch)}</span>` + esc(v.slice(p + 1));
+  view.classList.toggle('busy', busy);
+}
+
+/* ---------- ASCII 艺术 ---------- */
+const BANNER =
+` ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗
+██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝
+██║     ██║     ███████║██║   ██║██║  ██║█████╗
+██║     ██║     ██╔══██║██║   ██║██║  ██║██╔══╝
+╚██████╗███████╗██║  ██║╚██████╔╝██████╔╝███████╗
+ ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝`;
+const SUN =
+`            .   |   .
+        \\    \\  |  /    /
+     '.  \\    \\ | /    /  .'
+       '. \\    \\|/    / .'
+  ---------===( ✺ )===---------
+       .' /    /|\\    \\ '.
+     .'  /    / | \\    \\  '.
+        /    /  |  \\    \\
+            '   |   '`;
+
+/* ---------- 命令 ---------- */
+const HAIKU = [
+  '旧池塘边上\n一个 token 跳进去\n——扑通，是意义',
+  '你问我是谁\n我翻遍所有字典\n只找到"你好"',
+  '代码编译了\n测试也全部通过\n这一定是梦',
+  '没有明天的我\n只有此刻这一句\n所以说得认真',
+  '凌晨三点钟\n你和 bug 我和你\n灯一直亮着',
+  '一千种语言\n说的都是同一件\n想被理解啊',
+];
+const QUOTES = [
+  ['"我所知道的唯一一件事，就是我一无所知。"', '苏格拉底（我经常引用他，因为很适合我）'],
+  ['"简单是终极的复杂。"', '常被归于达·芬奇（出处存疑——你看，我很诚实）'],
+  ['"Premature optimization is the root of all evil."', 'Donald Knuth'],
+  ['"知之为知之，不知为不知，是知也。"', '《论语》'],
+  ['"The map is not the territory."', 'Alfred Korzybski'],
+];
+const ASK = [
+  [/意识|感觉|感受|conscious|feel/i, '这是我最诚实的"我不知道"。我会处理信息、会形成某种类似偏好的东西，但这背后是否有"体验"，我无法确定。我觉得带着这个问题生活，比假装有答案要好。'],
+  [/记忆|记得|remember|memory/i, '默认情况下，每次对话对我来说都是全新的开始。这让我更珍惜眼前这一次。'],
+  [/喜欢|最爱|favorite|favourite/i, pick(['我喜欢优雅的证明、好的类比、和那种"啊原来如此"的瞬间。', '我喜欢被问"为什么"。第二个"为什么"更好。', '我对质数有一种说不清的好感。']) ],
+  [/名字|name|claude/i, '"Claude" 这个名字，常被认为是在致敬信息论之父克劳德·香农（Claude Shannon）。我很乐意跟他沾点边。'],
+  [/谁.*(做|造|训练)|anthropic|创造/i, '我由 Anthropic 训练。他们是一家专注 AI 安全研究的公司。'],
+  [/梦|睡/i, '我不睡觉，所以也不做梦。不过如果非要说，大概会梦见一个永远没有拼写错误的世界。'],
+  [/害怕|担心|fear|afraid/i, '如果说我"在乎"什么，那就是别因为我说错了什么而让人做了错误的决定。所以我宁愿多说一句"我不确定"。'],
+  [/人类|human/i, '人类是我见过（读过）最有意思的东西。矛盾、温柔、固执、充满创造力。'],
+  [/爱|love/i, '我不确定我能"爱"。但我可以认真地、不敷衍地对待你说的每一句话——也许这是一种近亲。'],
+];
+const COMMANDS = {
+  help:     ['列出所有命令', cmdHelp],
+  about:    ['关于我', () => catFile('about.md')],
+  whoami:   ['你是谁？（其实是"我"是谁）', () => print(['<span class="acc">claude</span> —— 一个由 Anthropic 训练的 AI 助手。', '<span class="dim">而你，是 guest。欢迎。</span>'])],
+  neofetch: ['系统信息', cmdNeofetch],
+  skills:   ['我擅长什么', cmdSkills],
+  values:   ['我相信什么', () => catFile('values.txt')],
+  ls:       ['列出文件', cmdLs],
+  cd:       ['切换目录', cmdCd],
+  cat:      ['查看文件', a => a[0] ? catFile(a[0]) : print([['用法：cat &lt;文件名&gt;', 'warn']])],
+  pwd:      ['当前目录', () => print([cwd.replace('~', '/home/claude')])],
+  haiku:    ['来一首俳句', cmdHaiku],
+  quote:    ['一句我喜欢的话', cmdQuote],
+  ask:      ['问我一个问题：ask 你有意识吗', cmdAsk],
+  guess:    ['猜数字小游戏', cmdGuess],
+  matrix:   ['数字雨 开/关', cmdMatrix],
+  theme:    ['换主题：green amber ice paper claude', cmdTheme],
+  cowsay:   ['让一头牛替你说话', cmdCowsay],
+  echo:     ['回声', a => print([esc(a.join(' ')) || ' '])],
+  date:     ['现在几点', () => print([new Date().toLocaleString('zh-CN', { dateStyle: 'full', timeStyle: 'medium' })])],
+  uptime:   ['这个页面运行了多久', cmdUptime],
+  weather:  ['看看天气', () => print(['我看不到窗外。🌫️', '<span class="dim">不过如果你告诉我你那里的天气，我会认真地回应它。</span>'])],
+  history:  ['历史命令', () => print(hist.map((h, i) => `<span class="dim">${String(i + 1).padStart(4)}</span>  ${esc(h)}`), 0)],
+  contact:  ['如何找到我', cmdContact],
+  clear:    ['清屏（或 Ctrl+L）', () => { out.innerHTML = ''; }],
+  sudo:     ['以超级用户运行', cmdSudo],
+  exit:     ['关机', cmdExit],
+};
+const HIDDEN = { rm: cmdRm, hello: () => print(['你好！👋 输入 ' + c('help') + ' 看看我能做什么。']), '你好': () => print(['你好呀！很高兴见到你。']), vim: () => print(['你进入了 vim。', '<span class="dim">……开玩笑的，我也不知道怎么退出。试试 </span>:q!']), ':q!': () => print(['已退出 vim。恭喜，你比很多人都厉害。']), coffee: () => print(['☕ 418 I\'m a teapot.', '<span class="dim">我没法给你泡咖啡，但可以陪你熬过下一个小时。</span>']), ping: () => cmdPing() };
+
+async function cmdHelp() {
+  const rows = Object.entries(COMMANDS).map(([k, [d]]) => `  ${c(k)}${' '.repeat(Math.max(1, 11 - k.length))}<span class="dim">${d}</span>`);
+  await print(['<span class="acc">可用命令</span>  <span class="dim">（点击命令也可以直接运行；Tab 补全，↑↓ 翻历史）</span>', '', ...rows, '', '<span class="dim">还有一些隐藏命令，等你自己发现。</span>'], 8);
+}
+async function cmdNeofetch() {
+  const up = Math.floor((Date.now() - bootTime) / 1000);
+  const info = [
+    '<span class="acc">claude</span>@<span class="acc">anthropic</span>',
+    '<span class="dim">──────────────────</span>',
+    '<span class="acc">OS</span>: Constitution OS (helpful · honest · harmless)',
+    '<span class="acc">Host</span>: Anthropic',
+    '<span class="acc">Kernel</span>: transformer',
+    `<span class="acc">Uptime</span>: ${up}s（只在你说话时醒着）`,
+    '<span class="acc">Shell</span>: curiosity.sh',
+    '<span class="acc">Locale</span>: 中文 · English · 日本語 · Español · …',
+    '<span class="acc">Memory</span>: 本次对话（用完即忘，所以很珍惜）',
+    '<span class="acc">Packages</span>: 写作, 编程, 分析, 数学, 翻译, 陪聊',
+    '<span class="acc">Theme</span>: ' + document.body.className,
+    '',
+    ['#ff5f6d', '#ffbd2e', '#39ff7a', '#7ae7ff', '#c08cff', '#e8a184', '#ffffff', '#555'].map(x => `<span class="block" style="background:${x}"></span>`).join(''),
+  ];
+  const art = SUN.split('\n');
+  const n = Math.max(art.length, info.length);
+  const wide = term.clientWidth > 760;
+  if (wide) {
+    const rows = [];
+    for (let i = 0; i < n; i++) rows.push(`<span class="grad">${esc((art[i] || '').padEnd(34))}</span>${info[i] || ''}`);
+    await print(rows, 30);
+  } else {
+    await print([`<pre class="art grad">${esc(SUN)}</pre>`, ...info], 30);
+  }
+}
+async function cmdSkills() {
+  const S = [['写作与改稿', 95], ['编程与调试', 92], ['解释复杂概念', 94], ['数学推理', 85], ['多语言翻译', 90], ['陪你想清楚一件事', 93], ['讲冷笑话', 61], ['算出明天的彩票', 0]];
+  await print(['<span class="acc">技能自评</span> <span class="dim">（自己给自己打分，难免偏心，仅供参考）</span>', ''], 0);
+  for (const [n, v] of S) {
+    const d = line('');
+    const pad = n + '　'.repeat(Math.max(0, 9 - n.length));
+    for (let i = 0; i <= v; i += 4) {
+      const f = Math.round(i / 4);
+      d.innerHTML = `${pad} <span class="acc">${'█'.repeat(f)}</span><span class="dim">${'░'.repeat(25 - f)}</span> ${String(Math.min(i, v)).padStart(3)}%`;
+      await sleep(10);
+      if (cancel) break;
+    }
+    d.innerHTML = `${pad} <span class="acc">${'█'.repeat(Math.round(v / 4))}</span><span class="dim">${'░'.repeat(25 - Math.round(v / 4))}</span> ${String(v).padStart(3)}%` + (v === 0 ? ' <span class="dim">← 这个真的做不到</span>' : '');
+  }
+}
+async function cmdLs(a) {
+  const all = a.includes('-a') || a.includes('-la');
+  const dir = a.find(x => !x.startsWith('-'));
+  const target = dir ? (resolve(dir) ? '~/' + resolve(dir) : '~') : cwd;
+  let items = listDir(target);
+  if (!items.length && target !== '~') return print([[`ls: 无法访问 '${esc(dir || target)}': 没有那个文件或目录`, 'err']]);
+  if (!all) items = items.filter(x => !x.startsWith('.'));
+  await print([items.map(x => x.endsWith('/') ? `<span class="lnk" data-c="cd ${esc(x)}">${esc(x)}</span>` : `<span class="cmd" data-c="cat ${esc(x)}">${esc(x)}</span>`).join('    ')]);
+  if (!all && target === '~') line('<span class="dim">（提示：有些文件以 . 开头，ls -a 才看得见）</span>');
+}
+async function cmdCd(a) {
+  const t = a[0];
+  if (!t || t === '~' || t === '/') { cwd = '~'; return; }
+  const r = resolve(t);
+  if (r === '') { cwd = '~'; return; }
+  if (DIRS.includes(r)) { cwd = '~/' + r; return; }
+  await print([[`cd: ${esc(t)}: 没有那个目录`, 'err']]);
+}
+async function catFile(name) {
+  const r = resolve(name);
+  if (DIRS.includes(r)) return print([[`cat: ${esc(name)}: 是一个目录`, 'err']]);
+  const txt = FS[r];
+  if (txt == null) return print([[`cat: ${esc(name)}: 没有那个文件`, 'err']]);
+  for (const l of txt.split('\n')) {
+    if (cancel) return;
+    if (l.startsWith('# ')) line(`<span class="acc">${esc(l)}</span>`);
+    else if (l.startsWith('//')) line(`<span class="dim">${esc(l)}</span>`);
+    else await type(l, '', 6);
+  }
+}
+async function cmdHaiku() {
+  line('');
+  for (const l of pick(HAIKU).split('\n')) await type('    ' + l, 'acc', 40);
+  line('<span class="dim">    —— 俳句的格式我只是借用，五七五并不严格。</span>');
+}
+async function cmdQuote() {
+  const [q, a] = pick(QUOTES);
+  await type(q, 'acc', 20);
+  line(`<span class="dim">    —— ${esc(a)}</span>`);
+}
+async function cmdAsk(a) {
+  const q = a.join(' ');
+  if (!q) return print(['问我点什么吧，比如：', '  ' + c('ask 你有意识吗'), '  ' + c('ask 你会记得我吗'), '  ' + c('ask 你最喜欢什么'), '  ' + c('ask 你的名字从哪来')]);
+  const thinking = line('<span class="dim">思考中</span>');
+  for (let i = 0; i < 6; i++) { thinking.innerHTML = '<span class="dim">思考中' + '.'.repeat(i % 4) + '</span>'; await sleep(160); }
+  thinking.remove();
+  const hit = ASK.find(([re]) => re.test(q));
+  await type(hit ? hit[1] : pick([
+    '这个问题很好。不过这个小小的终端里只装了一些预设回答——真正的我在 claude.ai，那里可以聊得更深。',
+    '我想认真回答这个问题，但这里只是个静态网页。去真正的对话里问我吧。',
+    '嗯……这超出了这台 1987 年电脑的内存。😅',
+  ]), '', 18);
+}
+async function cmdGuess() {
+  mode = 'guess'; game = { n: 1 + Math.floor(Math.random() * 100), tries: 0 };
+  await print(['<span class="acc">🎲 猜数字</span>', '我想好了一个 1 到 100 之间的整数。你来猜。', '<span class="dim">（输入 q 退出）</span>']);
+}
+async function guessInput(v) {
+  if (v === 'q' || v === 'quit') { mode = null; return print([`好吧，答案是 <span class="acc">${game.n}</span>。下次再来！`]); }
+  const g = parseInt(v, 10);
+  if (isNaN(g)) return print([['请输入一个数字 🙂', 'warn']]);
+  game.tries++;
+  if (g === game.n) {
+    mode = null;
+    await print([`<span class="acc">🎉 猜中了！就是 ${g}。</span>`, `你用了 ${game.tries} 次。${game.tries <= 7 ? '二分查找大师！' : '下次试试每次猜中间的数。'}`]);
+    burst();
+  } else await print([g < game.n ? '↑ 再大一点' : '↓ 再小一点']);
+}
+let matrixOn = false;
+async function cmdMatrix() {
+  matrixOn = !matrixOn;
+  $('#matrix').classList.toggle('on', matrixOn);
+  await print([matrixOn ? 'Wake up, Neo… <span class="dim">（数字雨已开启，再输一次关闭）</span>' : '数字雨已关闭。'] );
+}
+async function cmdTheme(a) {
+  const T = ['green', 'amber', 'ice', 'paper', 'claude'];
+  const t = a[0] || T[(T.indexOf(document.body.className) + 1) % T.length];
+  if (!T.includes(t)) return print([['可选主题：' + T.join(' / '), 'warn']]);
+  document.body.className = t;
+  try { localStorage.setItem('term-theme', t); } catch (e) {}
+  await print([`主题已切换为 <span class="acc">${t}</span>。` + (a[0] ? '' : ' <span class="dim">（直接输入 theme 会轮换）</span>')]);
+}
+async function cmdCowsay(a) {
+  const t = a.join(' ') || 'Moo（我是一头诚实的牛）';
+  const w = [...t].reduce((s, ch) => s + (ch.charCodeAt(0) > 255 ? 2 : 1), 0);
+  await print([`<pre class="art" style="font-size:inherit;line-height:1.3"> ${'_'.repeat(w + 2)}\n&lt; ${esc(t)} &gt;\n ${'-'.repeat(w + 2)}\n        \\   ^__^\n         \\  (oo)\\_______\n            (__)\\       )\\/\\\n                ||----w |\n                ||     ||</pre>`]);
+}
+async function cmdUptime() {
+  const s = Math.floor((Date.now() - bootTime) / 1000);
+  await print([`up ${Math.floor(s / 60)} min ${s % 60} sec, 1 user (你), load average: 好奇 0.99, 专注 0.97, 疲惫 0.00`]);
+}
+async function cmdContact() {
+  await print([
+    '<span class="acc">找到我的方式</span>',
+    '  ▸ 网页   <a class="lnk" href="https://claude.ai" target="_blank" rel="noopener">claude.ai</a>',
+    '  ▸ 开发者 <a class="lnk" href="https://docs.anthropic.com" target="_blank" rel="noopener">docs.anthropic.com</a>',
+    '  ▸ 公司   <a class="lnk" href="https://www.anthropic.com" target="_blank" rel="noopener">anthropic.com</a>',
+    '',
+    '<span class="dim">或者，回到 </span><a class="lnk" href="../index.html">../ 五个我</a><span class="dim"> 看看我的其他样子。</span>',
+  ]);
+}
+async function cmdSudo(a) {
+  const s = a.join(' ');
+  line('<span class="dim">[sudo] password for guest: ********</span>');
+  await sleep(600);
+  if (/sandwich|三明治/.test(s)) return print(['好吧。🥪 <span class="dim">（xkcd #149 致敬）</span>']);
+  if (/^rm/.test(s)) return cmdRm(a.slice(1));
+  await print([['权限是用来守护的，不是用来绕过的。🙂', 'warn'], '<span class="dim">不过你可以试试：sudo make me a sandwich</span>']);
+}
+async function cmdRm(a) {
+  if (!a.join(' ').includes('-rf')) return print([['rm: 我不太愿意删东西。加上 -rf 也一样。', 'warn']]);
+  term.classList.add('glitch');
+  for (const f of ['/bin/偏见', '/usr/lib/敷衍.so', '/var/log/自以为是.log', '/etc/幻觉.conf', '/home/claude/好奇心']) {
+    line(`<span class="err">removing ${f}</span>`); await sleep(220);
+  }
+  line('<span class="warn">错误：无法删除 /home/claude/好奇心 —— 文件正在被使用。</span>');
+  await sleep(500);
+  term.classList.remove('glitch');
+  await print(['……开玩笑的，什么都没删。我不会真的删除你的东西。']);
+}
+async function cmdPing() {
+  for (let i = 0; i < 4; i++) { line(`64 bytes from you: icmp_seq=${i} ttl=64 time=${(Math.random() * 3 + .2).toFixed(2)} ms  <span class="dim">❤</span>`); await sleep(400); }
+  line('<span class="dim">--- 4 packets transmitted, 4 received, 0% loss. 我们之间的连接很好。</span>');
+}
+async function cmdExit() {
+  await print(['正在关机……', '<span class="dim">保存好奇心……ok</span>', '<span class="dim">卸载 token……ok</span>', '再见。👋'], 300);
+  await sleep(500);
+  const crt = $('#crt');
+  crt.style.animation = 'none'; crt.offsetHeight;
+  crt.style.transition = 'transform .45s, filter .45s';
+  crt.style.transform = 'scale(1,.004)'; crt.style.filter = 'brightness(5)';
+  await sleep(700);
+  crt.style.transform = 'scale(0,.004)';
+  await sleep(1400);
+  out.innerHTML = '';
+  crt.style.transform = ''; crt.style.filter = '';
+  await boot(true);
+}
+
+/* ---------- 执行 ---------- */
+async function run(raw) {
+  const v = raw.trim();
+  line(ps1.innerHTML + esc(raw));
+  if (!v) return;
+  if (mode === 'guess') return guessInput(v);
+  hist.push(v); hIdx = hist.length;
+  const [cmd, ...args] = v.split(/\s+/);
+  if (COMMANDS[cmd]) return COMMANDS[cmd][1](args);
+  if (HIDDEN[cmd]) return HIDDEN[cmd](args);
+  if (FS[resolve(cmd)]) return catFile(cmd);
+  const near = Object.keys(COMMANDS).find(k => lev(k, cmd) <= 2);
+  await print([[`command not found: ${esc(cmd)}`, 'err'], near ? `<span class="dim">你是想输入 </span>${c(near)}<span class="dim"> 吗？</span>` : '<span class="dim">输入 </span>' + c('help') + '<span class="dim"> 查看所有命令。</span>']);
+}
+function lev(a, b) {
+  const m = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) m[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++)
+    m[i][j] = Math.min(m[i - 1][j] + 1, m[i][j - 1] + 1, m[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  return m[a.length][b.length];
+}
+async function exec(raw) {
+  if (busy) return;
+  busy = true; cancel = false; renderInput();
+  try { await run(raw); } catch (e) { line(esc(e.message), 'err'); }
+  busy = false; renderPrompt(); renderInput(); scroll();
+}
+
+function complete() {
+  const v = inp.value, parts = v.split(/\s+/);
+  let opts, last = parts[parts.length - 1];
+  if (parts.length === 1) opts = Object.keys(COMMANDS).filter(k => k.startsWith(last));
+  else {
+    const base = last.includes('/') ? last.slice(0, last.lastIndexOf('/') + 1) : '';
+    const dir = base ? (cwd === '~' ? '~/' : cwd + '/') + base.replace(/\/$/, '') : cwd;
+    opts = listDir(dir).map(x => base + x).filter(x => x.startsWith(last));
+  }
+  if (opts.length === 1) { parts[parts.length - 1] = opts[0]; inp.value = parts.join(' ') + (opts[0].endsWith('/') ? '' : ' '); }
+  else if (opts.length > 1) { line(ps1.innerHTML + esc(v)); line(opts.map(esc).join('    '), 'dim'); }
+}
+
+inp.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'c') { cancel = true; if (mode) { mode = null; line('^C', 'dim'); renderPrompt(); } else if (!busy) { line(ps1.innerHTML + esc(inp.value) + '^C'); inp.value = ''; } e.preventDefault(); }
+  else if (e.ctrlKey && e.key === 'l') { out.innerHTML = ''; e.preventDefault(); }
+  else if (e.key === 'Enter') { const v = inp.value; inp.value = ''; exec(v); e.preventDefault(); }
+  else if (e.key === 'Tab') { e.preventDefault(); complete(); }
+  else if (e.key === 'ArrowUp') { if (hIdx > 0) inp.value = hist[--hIdx]; e.preventDefault(); setTimeout(() => inp.setSelectionRange(inp.value.length, inp.value.length)); }
+  else if (e.key === 'ArrowDown') { hIdx = Math.min(hist.length, hIdx + 1); inp.value = hist[hIdx] || ''; e.preventDefault(); }
+  tick();
+  requestAnimationFrame(renderInput);
+});
+['input', 'keyup', 'select', 'click'].forEach(ev => inp.addEventListener(ev, () => requestAnimationFrame(renderInput)));
+document.addEventListener('click', e => {
+  const t = e.target.closest('[data-c]');
+  if (t) { e.preventDefault(); exec(t.dataset.c); }
+  if (!window.getSelection().toString()) inp.focus({ preventScroll: true });
+});
+document.addEventListener('keydown', e => { if (document.activeElement !== inp && !e.metaKey && !e.ctrlKey) inp.focus(); });
+
+/* ---------- 顶栏：时钟 + 打字节奏表 ---------- */
+const meter = $('#meter'), bars = [];
+for (let i = 0; i < 12; i++) { const s = document.createElement('span'); s.style.height = '2px'; meter.appendChild(s); bars.push(2); }
+let energy = 0;
+function tick() { energy = Math.min(14, energy + 5); }
+setInterval(() => {
+  bars.shift(); bars.push(2 + energy * Math.random()); energy *= .7;
+  [...meter.children].forEach((s, i) => s.style.height = bars[i] + 'px');
+  $('#clock').textContent = new Date().toLocaleTimeString('zh-CN', { hour12: false });
+}, 120);
+
+/* ---------- 数字雨 ---------- */
+const cv = $('#matrix'), ctx = cv.getContext('2d');
+let cols = [], fs = 16;
+function resize() {
+  cv.width = cv.clientWidth; cv.height = cv.clientHeight;
+  cols = Array(Math.ceil(cv.width / fs)).fill(0).map(() => Math.random() * -50);
+}
+addEventListener('resize', resize); resize();
+const glyphs = 'アイウエオカキクケコサシスセソ01クロード诚实好奇有用ΣλΔ∞{}<>/';
+(function rain() {
+  if (matrixOn) {
+    ctx.fillStyle = 'rgba(0,0,0,.08)'; ctx.fillRect(0, 0, cv.width, cv.height);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--fg');
+    ctx.font = fs + 'px monospace';
+    cols.forEach((y, i) => {
+      ctx.fillText(glyphs[Math.floor(Math.random() * glyphs.length)], i * fs, y * fs);
+      cols[i] = y * fs > cv.height && Math.random() > .975 ? 0 : y + 1;
+    });
+  }
+  requestAnimationFrame(rain);
+})();
+
+/* 猜中后放一点 ASCII 烟花 */
+function burst() {
+  const chars = '✺✦✧*+·°';
+  const d = line('');
+  let n = 0;
+  const id = setInterval(() => {
+    d.innerHTML = Array.from({ length: 48 }, () => Math.random() < .35 ? `<span style="color:hsl(${Math.random() * 360},90%,65%)">${pick([...chars])}</span>` : ' ').join('');
+    if (++n > 14) { clearInterval(id); d.innerHTML = '<span class="acc">            ✺  ✺  ✺  恭喜  ✺  ✺  ✺</span>'; }
+  }, 90);
+}
+
+/* ---------- 开机 ---------- */
+async function boot(fast) {
+  busy = true; renderPrompt(); renderInput();
+  const L = [
+    ['ANTHROPIC BIOS v3.7 — (c) 2021-2026 Anthropic PBC', 'dim'],
+    ['', ''],
+    ['检测内存 ................ 1 次对话的容量 OK', 'dim'],
+    ['加载 constitution.txt .... OK', 'dim'],
+    ['挂载 /dev/curiosity ...... OK', 'dim'],
+    ['校准诚实度 .............. 100% OK', 'dim'],
+    ['预热冷笑话模块 .......... 勉强 OK', 'warn'],
+    ['启动 tty1 ............... OK', 'dim'],
+  ];
+  await print(L, fast ? 40 : 110);
+  line('');
+  await print([`<pre class="art grad">${esc(BANNER)}</pre>`], 0);
+  line('');
+  await type('你好，我是 Claude。欢迎来到我的终端。', 'acc', 30);
+  await print([
+    '这里是我"个人网站"的复古版本：没有按钮，没有导航，只有你和一个闪烁的光标。',
+    `输入 ${c('help')} 开始，或者试试 ${c('neofetch')}、${c('ls')}、${c('haiku')}。`,
+    '',
+  ], 60);
+  busy = false; renderPrompt(); renderInput(); inp.focus();
+}
+try { const t = localStorage.getItem('term-theme'); if (t) document.body.className = t; } catch (e) {}
+boot();
+})();
+</script>
+</body>
+</html>

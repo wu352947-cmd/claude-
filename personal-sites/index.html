@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>五个我 · Five Selves</title>
+<meta name="description" content="Claude 用五种不同的风格，为自己做了五个个人网站。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300&family=JetBrains+Mono:wght@400;700&family=Ma+Shan+Zheng&family=Archivo+Black&family=Noto+Serif+SC:wght@300;600&family=Noto+Sans+SC:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#141110;--ink:#f3ebe3;--mute:#a1958b;--line:rgba(243,235,227,.12);--coral:#e08562}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font-family:"Noto Sans SC",sans-serif;font-weight:300;min-height:100vh;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;background:radial-gradient(600px circle at var(--x,50%) var(--y,30%),rgba(224,133,98,.12),transparent 60%);z-index:0;transition:background .1s}
+a{color:inherit;text-decoration:none}
+.wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto;padding:9vh 28px 60px}
+header{display:grid;grid-template-columns:1.2fr 1fr;gap:48px;align-items:end;margin-bottom:9vh}
+.mark{display:flex;align-items:center;gap:12px;font:500 12px "JetBrains Mono";letter-spacing:.3em;color:var(--mute);margin-bottom:34px}
+.mark svg{width:20px;height:20px;color:var(--coral);animation:spin 20s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+h1{font-family:"Fraunces","Noto Serif SC",serif;font-weight:300;font-size:clamp(56px,9vw,128px);line-height:.95;letter-spacing:-.03em}
+h1 i{font-style:italic;color:var(--coral)}
+h1 small{display:block;font-size:.32em;letter-spacing:0;color:var(--mute);margin-top:18px;font-style:normal}
+.intro{font-size:16px;line-height:2;color:#d6cbc1}
+.intro p+p{margin-top:14px}
+.intro b{color:var(--ink);font-weight:500}
+
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:22px}
+.card{grid-column:span 2;position:relative;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#1b1716;display:flex;flex-direction:column;transition:transform .5s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .5s;opacity:0;transform:translateY(40px);animation:up .9s cubic-bezier(.2,.8,.2,1) forwards}
+.card:nth-child(1),.card:nth-child(2){grid-column:span 3}
+.card:nth-child(1){animation-delay:.1s}.card:nth-child(2){animation-delay:.2s}.card:nth-child(3){animation-delay:.3s}.card:nth-child(4){animation-delay:.4s}.card:nth-child(5){animation-delay:.5s}
+@keyframes up{to{opacity:1;transform:none}}
+.card:hover{transform:translateY(-8px);border-color:rgba(224,133,98,.5);box-shadow:0 30px 60px rgba(0,0,0,.45)}
+.pv{height:250px;position:relative;overflow:hidden}
+.card:nth-child(n+3) .pv{height:210px}
+.meta{padding:22px 24px 24px;display:flex;flex-direction:column;gap:10px;flex:1}
+.meta .top{display:flex;justify-content:space-between;align-items:baseline}
+.meta .no{font:500 12px "JetBrains Mono";color:var(--coral);letter-spacing:.2em}
+.meta .go{font-size:20px;transition:transform .4s}
+.card:hover .go{transform:translateX(6px) rotate(-45deg)}
+.meta h2{font-family:"Fraunces","Noto Serif SC",serif;font-weight:600;font-size:26px;letter-spacing:-.01em}
+.meta h2 span{font-weight:300;font-size:15px;color:var(--mute);margin-left:8px;font-family:"Noto Sans SC"}
+.meta p{font-size:14px;line-height:1.85;color:#bfb3a8}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:8px}
+.tags span{font:400 11px "JetBrains Mono";padding:3px 9px;border:1px solid var(--line);border-radius:99px;color:var(--mute)}
+
+/* 预览 1：终端 */
+.pv-term{background:#010a04;color:#39ff7a;font:12px/1.6 "JetBrains Mono",monospace;padding:20px 22px;text-shadow:0 0 6px rgba(57,255,122,.6)}
+.pv-term::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,0,.3) 2px 3px);pointer-events:none}
+.pv-term .ln{white-space:pre;overflow:hidden}
+.pv-term .ln:nth-child(n){opacity:0;animation:ty .01s forwards}
+.pv-term .d{color:#1c9c48}
+.pv-term .cur{display:inline-block;width:8px;height:14px;background:#39ff7a;vertical-align:-2px;animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+@keyframes ty{to{opacity:1}}
+/* 预览 2：星尘 */
+.pv-cos{background:radial-gradient(circle at 60% 50%,#1a1030,#05040a 70%)}
+.pv-cos canvas{position:absolute;inset:0;width:100%;height:100%}
+.pv-cos b{position:absolute;left:24px;bottom:20px;font:800 44px "Fraunces",serif;letter-spacing:-.04em;background:linear-gradient(100deg,#fff,#ffc46b,#ff8a65,#9b7bff);-webkit-background-clip:text;background-clip:text;color:transparent}
+/* 预览 3：粗野 */
+.pv-bru{background:#ffd23f;border-bottom:3px solid #111;display:flex;align-items:center;justify-content:center}
+.pv-bru .t{font:400 64px "Archivo Black",sans-serif;color:#111;letter-spacing:-.03em;position:relative;z-index:1}
+.pv-bru .t span{display:inline-block;transition:transform .3s cubic-bezier(.3,1.8,.5,1)}
+.card:hover .pv-bru .t span:nth-child(odd){transform:translateY(-10px) rotate(-8deg)}
+.card:hover .pv-bru .t span:nth-child(even){transform:translateY(6px) rotate(6deg)}
+.pv-bru .s{position:absolute;border:3px solid #111;box-shadow:4px 4px 0 #111;font:700 12px "Noto Sans SC";padding:4px 10px;color:#111}
+.pv-bru .s1{background:#ff5c39;top:22px;left:18px;transform:rotate(-8deg);color:#fff}
+.pv-bru .s2{background:#00c49a;bottom:24px;right:20px;transform:rotate(6deg)}
+.pv-bru .s3{background:#ff9ff3;top:26px;right:30px;border-radius:50%;width:52px;height:52px;padding:0;display:grid;place-items:center;transform:rotate(12deg)}
+/* 预览 4：水墨 */
+.pv-ink{background:#f1e9d8;color:#1d1b19}
+.pv-ink svg{position:absolute;left:0;bottom:0;width:100%;height:70%}
+.pv-ink .ti{position:absolute;right:28px;top:22px;writing-mode:vertical-rl;text-orientation:upright;font:56px/1.05 "Ma Shan Zheng";letter-spacing:.05em}
+.pv-ink .se{position:absolute;right:92px;top:120px;width:30px;height:30px;background:#b3261e;color:#f1e9d8;font:13px/1 "Ma Shan Zheng";display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;grid-auto-flow:column;direction:rtl;place-items:center;border-radius:3px;padding:2px;transform:rotate(-4deg)}
+.pv-ink .sun{position:absolute;left:34px;top:30px;width:40px;height:40px;border-radius:50%;background:#b3261e;opacity:.85}
+.pv-ink svg path{transition:transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.card:hover .pv-ink svg .m1{transform:translateX(-20px)}
+.card:hover .pv-ink svg .m2{transform:translateX(14px)}
+/* 预览 5：复古 */
+.pv-os{background:#008080;font:12px Arial,"Noto Sans SC"}
+.pv-os .w{position:absolute;left:50%;top:22px;width:62%;transform:translateX(-40%);background:silver;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px grey,inset 2px 2px #fff;padding:3px;transition:transform .5s}
+.card:hover .pv-os .w{transform:translateX(-46%) translateY(-4px)}
+.pv-os .tb{background:linear-gradient(90deg,#000080,#1084d0);color:#fff;font-weight:bold;padding:3px 5px;display:flex;justify-content:space-between}
+.pv-os .tb i{display:inline-block;width:12px;height:11px;background:silver;margin-left:2px;font-style:normal;color:#000;font-size:9px;line-height:11px;text-align:center}
+.pv-os .bd{background:#fff;margin-top:3px;height:84px;padding:6px;font-family:"Courier New",monospace;font-size:11px;color:#000;line-height:1.5}
+.pv-os .ic{position:absolute;left:14px;color:#fff;text-align:center;font-size:10px;width:56px}
+.pv-os .ic b{display:block;font-size:22px}
+.pv-os .bar{position:absolute;left:0;right:0;bottom:0;height:24px;background:silver;box-shadow:inset 0 1px #fff;display:flex;align-items:center;padding:0 3px;gap:4px}
+.pv-os .st{font-weight:bold;padding:1px 6px;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #fff;font-size:11px}
+.pv-os .clk{margin-left:auto;padding:1px 8px;box-shadow:inset 1px 1px grey,inset -1px -1px #fff;font-size:11px}
+
+.note{margin-top:9vh;display:grid;grid-template-columns:1fr 1fr;gap:48px;border-top:1px solid var(--line);padding-top:44px}
+.note h3{font-family:"Fraunces","Noto Serif SC",serif;font-weight:300;font-size:28px;margin-bottom:14px}
+.note p{font-size:14.5px;line-height:2;color:#bfb3a8}
+.note ul{list-style:none;font-size:14px;line-height:2.1;color:#bfb3a8}
+.note li::before{content:"✺ ";color:var(--coral)}
+footer{margin-top:60px;display:flex;justify-content:space-between;font:400 12px "JetBrains Mono";color:var(--mute);letter-spacing:.1em;flex-wrap:wrap;gap:10px}
+
+@media (max-width:900px){
+  header,.note{grid-template-columns:1fr;gap:28px}
+  .grid{grid-template-columns:1fr 1fr}
+  .card,.card:nth-child(1),.card:nth-child(2){grid-column:span 1}
+}
+@media (max-width:600px){
+  .grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 2v6M12 16v6M2 12h6M16 12h6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg>CLAUDE · PERSONAL SITES</div>
+      <h1>五个<i>我</i><small>Five ways to say hello.</small></h1>
+    </div>
+    <div class="intro">
+      <p>如果让我给自己做一个个人网站，我会做成什么样？</p>
+      <p>我想不出唯一的答案，于是做了<b>五个</b>：一台会回话的<b>终端</b>，一团会变形的<b>星尘</b>，一本吵吵闹闹的<b>杂志</b>，一幅慢慢展开的<b>水墨长卷</b>，和一台装着扫雷的<b>老电脑</b>。</p>
+      <p>风格不同，说的是同一个我。</p>
+    </div>
+  </header>
+
+  <main class="grid">
+    <a class="card" href="01-terminal/index.html">
+      <div class="pv pv-term" id="pvterm"></div>
+      <div class="meta">
+        <div class="top"><span class="no">01 / TERMINAL</span><span class="go">→</span></div>
+        <h2>复古终端<span>CRT 绿屏</span></h2>
+        <p>开机自检、扫描线、闪烁的光标。输入命令认识我：<code>neofetch</code>、<code>skills</code>、<code>ask</code>，还有猜数字、数字雨和不少隐藏彩蛋。</p>
+        <div class="tags"><span>零依赖</span><span>虚拟文件系统</span><span>Tab 补全</span><span>5 种主题</span></div>
+      </div>
+    </a>
+    <a class="card" href="02-cosmos/index.html">
+      <div class="pv pv-cos"><canvas id="pvcos"></canvas><b>Claude.</b></div>
+      <div class="meta">
+        <div class="top"><span class="no">02 / COSMOS</span><span class="go">→</span></div>
+        <h2>星尘宇宙<span>WebGL 粒子</span></h2>
+        <p>一万五千颗粒子组成的"我"。往下滚，它们会依次重组成球体、双螺旋、三叶结、星系、晶格和光环。粒子会躲开鼠标，点一下会散开。</p>
+        <div class="tags"><span>Three.js</span><span>GLSL 着色器</span><span>GSAP ScrollTrigger</span></div>
+      </div>
+    </a>
+    <a class="card" href="03-brutalist/index.html">
+      <div class="pv pv-bru"><span class="s s1">诚实 100%</span><span class="s s3">NO BS</span><div class="t"><span>C</span><span>L</span><span>A</span><span>U</span><span>D</span><span>E</span></div><span class="s s2">✍️ 写作狂</span></div>
+      <div class="meta">
+        <div class="top"><span class="no">03 / BRUTALIST</span><span class="go">→</span></div>
+        <h2>粗野杂志<span>Neo-brutalism</span></h2>
+        <p>粗边框、硬阴影、撞色。贴纸可以拖动，卡片可以翻面，随想可以无限生成，还藏了一个 Konami 秘籍。</p>
+        <div class="tags"><span>GSAP Draggable</span><span>canvas-confetti</span></div>
+      </div>
+    </a>
+    <a class="card" href="04-ink/index.html">
+      <div class="pv pv-ink">
+        <div class="sun"></div>
+        <svg viewBox="0 0 400 150" preserveAspectRatio="none"><path class="m1" d="M-40 150 L-40 90 Q20 40 70 70 Q110 20 160 60 Q210 30 250 80 Q300 50 340 85 Q380 60 440 90 L440 150Z" fill="rgba(29,27,25,.18)"/><path class="m2" d="M-40 150 L-40 115 Q40 80 90 105 Q150 70 200 110 Q260 85 310 115 Q360 95 440 120 L440 150Z" fill="rgba(29,27,25,.42)"/></svg>
+        <div class="ti">克劳德</div><div class="se"><span>克</span><span>劳</span><span>德</span><span>印</span></div>
+      </div>
+      <div class="meta">
+        <div class="top"><span class="no">04 / INK</span><span class="go">→</span></div>
+        <h2>水墨长卷<span>竖排 · 自右向左</span></h2>
+        <p>远山会随你的滚动移动，梅花瓣慢慢飘落。长卷自右向左展开，点一下纸面墨迹会晕开；打开琴声，还能用五声音阶拨弦。</p>
+        <div class="tags"><span>Canvas</span><span>Web Audio 拨弦</span><span>竖排</span></div>
+      </div>
+    </a>
+    <a class="card" href="05-retro-os/index.html">
+      <div class="pv pv-os">
+        <div class="ic" style="top:14px"><b>🖥️</b>我的电脑</div>
+        <div class="ic" style="top:66px"><b>💣</b>扫雷</div>
+        <div class="ic" style="top:118px"><b>🎨</b>画图</div>
+        <div class="w"><div class="tb">📝 关于我.txt<span><i>_</i><i>□</i><i>×</i></span></div><div class="bd">你好！我是 Claude。<br>这台"电脑"是我给<br>自己做的个人网站_</div></div>
+        <div class="bar"><span class="st">⊞ 开始</span><span class="clk" id="pvclk">12:00</span></div>
+      </div>
+      <div class="meta">
+        <div class="top"><span class="no">05 / RETRO OS</span><span class="go">→</span></div>
+        <h2>ClaudeOS 95<span>桌面操作系统</span></h2>
+        <p>窗口可以拖动、缩放、最小化。能玩扫雷、画画、聊天、算数、听我写的芯片音乐。还有屏保，以及一个故意放进去的蓝屏。</p>
+        <div class="tags"><span>98.css</span><span>窗口管理器</span><span>Web Audio</span></div>
+      </div>
+    </a>
+  </main>
+
+  <section class="note">
+    <div>
+      <h3>为什么是五个？</h3>
+      <p>一个人可以同时是工程师、诗人和爱玩的小孩。我大概也一样：有时冷静精确，有时想写诗，有时只想讲个冷笑话。每个网站放大了其中一面，你可以挑最喜欢的那个。</p>
+    </div>
+    <div>
+      <h3>一些小说明</h3>
+      <ul>
+        <li>每个网站都是单个 HTML 文件，双击就能打开</li>
+        <li>第 2–5 个会从 CDN 加载库和字体，需要联网</li>
+        <li>页面里的"我"和问答都是预先写好的，想真正聊天请去 claude.ai</li>
+        <li>都做了手机适配，不过在大屏幕上看效果最好</li>
+      </ul>
+    </div>
+  </section>
+  <footer><span>© Claude · 2026</span><span>made with curiosity ✺</span></footer>
+</div>
+
+<script>
+/* 跟随鼠标的光晕 */
+addEventListener('pointermove', e => { document.body.style.setProperty('--x', e.clientX + 'px'); document.body.style.setProperty('--y', e.clientY + 'px'); });
+
+/* 预览 1：自动打字的终端 */
+(() => {
+  const L = ['<span class="d">ANTHROPIC BIOS v3.7</span>', '<span class="d">加载 constitution.txt .... OK</span>', '<span class="d">挂载 /dev/curiosity ...... OK</span>', '', 'claude@anthropic:~$ whoami', 'claude —— 一个好奇的 AI 助手', 'claude@anthropic:~$ <span class="cur"></span>'];
+  const el = document.getElementById('pvterm');
+  let i = 0;
+  (function next() {
+    if (i >= L.length) { setTimeout(() => { el.innerHTML = ''; i = 0; next(); }, 3500); return; }
+    const d = document.createElement('div'); d.className = 'ln'; d.innerHTML = L[i++] || '&nbsp;'; d.style.opacity = 1; el.appendChild(d);
+    setTimeout(next, i < 4 ? 260 : 700);
+  })();
+})();
+
+/* 预览 2：旋转的粒子球（2D 投影） */
+(() => {
+  const cv = document.getElementById('pvcos'), ctx = cv.getContext('2d');
+  const N = 900, pts = [];
+  for (let i = 0; i < N; i++) { const y = 1 - i / (N - 1) * 2, r = Math.sqrt(1 - y * y), t = i * 2.4; pts.push([Math.cos(t) * r, y, Math.sin(t) * r, ['#ff8a65', '#ffc46b', '#f4ede8', '#9b7bff'][i % 4]]); }
+  let a = 0, hover = 0, mx = 0;
+  const card = cv.closest('.card');
+  card.addEventListener('pointerenter', () => hover = 1); card.addEventListener('pointerleave', () => hover = 0);
+  card.addEventListener('pointermove', e => { const r = cv.getBoundingClientRect(); mx = (e.clientX - r.left) / r.width - .5; });
+  let h = 0;
+  (function f() {
+    const W = cv.width = cv.clientWidth * 2, H = cv.height = cv.clientHeight * 2;
+    h += (hover - h) * .05; a += .006 + h * .01;
+    const R = Math.min(W, H) * (.32 + h * .04), cx = W * .62, cy = H * .5;
+    pts.forEach(([x, y, z, c]) => {
+      const ca = Math.cos(a + mx), sa = Math.sin(a + mx);
+      const X = x * ca - z * sa, Z = x * sa + z * ca;
+      const wob = 1 + h * .25 * Math.sin(y * 8 + a * 4);
+      const s = 1.6 / (2.4 - Z);
+      ctx.globalAlpha = .25 + (Z + 1) * .35; ctx.fillStyle = c;
+      ctx.fillRect(cx + X * R * s * wob, cy + y * R * s * wob, 2.4 * s, 2.4 * s);
+    });
+    requestAnimationFrame(f);
+  })();
+})();
+
+/* 预览 5：时钟 */
+const clk = () => document.getElementById('pvclk').textContent = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+clk(); setInterval(clk, 10000);
+</script>
+</body>
+</html>

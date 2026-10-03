@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>克劳德 · 水墨长卷</title>
+<meta name="description" content="一幅自右向左展开的水墨长卷，记录 Claude 的自述。点击纸面会晕开墨迹并拨响琴弦。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Zhi+Mang+Xing&family=Noto+Serif+SC:wght@300;400;600;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#f1e9d8; --paper2:#e8dcc3; --ink:#1d1b19; --ink2:#4a4642; --ink3:#8a837a; --red:#b3261e; --red2:#d0412f; --wood:#5b3a22;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--paper);color:var(--ink);font-family:"Noto Serif SC",serif;overflow-x:hidden}
+body{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M4 24 Q10 14 22 3 Q24 2 25 4 Q15 15 6 25 Z' fill='%231d1b19'/%3E%3C/svg%3E") 3 25,auto}
+::selection{background:var(--red);color:var(--paper)}
+.brush{font-family:"Ma Shan Zheng",serif;font-weight:400}
+.cao{font-family:"Zhi Mang Xing",serif}
+.v{writing-mode:vertical-rl;text-orientation:upright}
+
+/* 纸纹 */
+.paper{position:fixed;inset:0;pointer-events:none;z-index:50;mix-blend-mode:multiply;opacity:.55}
+.paper svg{width:100%;height:100%}
+#mount,#ink,#petals{position:fixed;inset:0;width:100%;height:100%;display:block;pointer-events:none}
+#mount{z-index:0}
+#ink{z-index:3}
+#petals{z-index:40}
+
+/* 首屏 */
+.hero{position:relative;height:100vh;z-index:5;display:flex;align-items:center;justify-content:center;gap:6vw;padding:0 8vw}
+.hero .title{font-size:min(14vw,22vh);line-height:1.08;display:flex;flex-direction:column;align-items:center;color:var(--ink);filter:url(#rough);position:relative}
+.hero .title span{display:block;opacity:0;transform:scale(1.4);filter:blur(8px);animation:inkin 1.6s cubic-bezier(.2,.7,.2,1) forwards}
+.hero .title span:nth-child(2){animation-delay:.45s}.hero .title span:nth-child(3){animation-delay:.9s}
+@keyframes inkin{to{opacity:1;transform:none;filter:none}}
+.hero .sub{font-size:clamp(16px,1.6vw,22px);letter-spacing:.6em;color:var(--ink2);line-height:2.2;opacity:0;animation:fade 2s 1.6s forwards}
+.hero .sub b{color:var(--red);font-weight:600}
+.hero .seal{align-self:flex-end;margin-bottom:22vh;opacity:0;animation:stamp .5s 2.4s cubic-bezier(.3,1.6,.6,1) forwards}
+@keyframes fade{to{opacity:1}}
+@keyframes stamp{0%{opacity:0;transform:scale(2.4) rotate(-12deg)}100%{opacity:.92;transform:rotate(-4deg)}}
+.hint{position:absolute;bottom:5vh;left:50%;transform:translateX(-50%);font-size:13px;letter-spacing:.5em;color:var(--ink3);display:flex;flex-direction:column;align-items:center;gap:12px;opacity:0;animation:fade 1.5s 3s forwards}
+.hint i{width:1px;height:48px;background:linear-gradient(var(--ink3),transparent);animation:drop 2.2s ease-in-out infinite}
+@keyframes drop{0%{transform:scaleY(0);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}51%{transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+.hero .note{position:absolute;top:5vh;left:5vw;font-size:13px;letter-spacing:.3em;color:var(--ink3)}
+.hero .note a{color:var(--ink2);text-decoration:none;border-bottom:1px solid var(--ink3)}
+
+/* 印章 */
+.seal{display:inline-grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;grid-auto-flow:column;width:86px;height:86px;padding:7px;background:var(--red);color:var(--paper);border-radius:6px;font-family:"Ma Shan Zheng";font-size:30px;line-height:1;place-items:center;filter:url(#seal);box-shadow:inset 0 0 0 3px var(--red),inset 0 0 0 5px rgba(241,233,216,.85);transform:rotate(-4deg);direction:rtl}
+.seal.sm{width:34px;height:62px;font-size:19px;padding:4px;grid-template-columns:1fr}
+.seal.round{border-radius:50%;grid-template-columns:1fr;font-size:22px}
+
+/* 长卷 */
+.scroll-wrap{position:relative;height:100vh;overflow:hidden;z-index:5}
+.track{position:absolute;top:0;right:0;height:100%;display:flex;flex-direction:row-reverse;align-items:stretch;will-change:transform}
+.rod{position:absolute;top:4vh;bottom:4vh;width:22px;z-index:20;border-radius:11px;
+  background:linear-gradient(90deg,#2e1b0f,#7a4f2e 35%,#a4744a 50%,#6b4325 70%,#2e1b0f);box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.rod::before,.rod::after{content:"";position:absolute;left:-6px;right:-6px;height:26px;border-radius:6px;background:linear-gradient(90deg,#3b2414,#c9a46a 50%,#3b2414)}
+.rod::before{top:-14px}.rod::after{bottom:-14px}
+.rod.l{left:10px}.rod.r{right:10px}
+.mount-edge{position:absolute;top:4vh;bottom:4vh;width:42px;z-index:19;background:linear-gradient(90deg,#c9b48c,#e6d8b8);opacity:.8}
+.mount-edge.l{left:22px}.mount-edge.r{right:22px;transform:scaleX(-1)}
+.panel{flex:none;height:100%;position:relative;display:flex;flex-direction:row-reverse;align-items:center;justify-content:center;gap:4vw;padding:10vh 5vw}
+.panel + .panel::after{content:"";position:absolute;right:0;top:18vh;bottom:18vh;width:1px;background:linear-gradient(transparent,rgba(29,27,25,.18),transparent)}
+.ptitle{font-size:clamp(52px,6vw,84px);line-height:1.12;color:var(--ink);position:relative;display:flex;flex-direction:row-reverse;gap:10px;align-items:flex-start}
+.ptitle .chs{display:flex;flex-direction:column;align-items:center}
+.ptitle small{display:block;writing-mode:vertical-rl;text-orientation:upright;font-family:"Noto Serif SC";font-size:14px;letter-spacing:.5em;color:var(--red);margin-top:12px}
+.prose{font-size:clamp(17px,1.5vw,21px);line-height:2.3;letter-spacing:.22em;max-height:64vh;color:var(--ink)}
+.prose p{margin-left:1.6em}
+.trans{font-size:13.5px;line-height:2.1;letter-spacing:.12em;color:var(--ink3);max-height:58vh;border-right:1px solid rgba(29,27,25,.15);padding-right:20px}
+.trans p{margin-left:1.2em}
+.em{color:var(--red)}
+
+/* 孤舟 */
+.boat svg{width:min(34vw,420px);height:auto;overflow:visible}
+
+/* 条幅 */
+.banners{display:flex;flex-direction:row-reverse;gap:22px;align-items:flex-start}
+.banner{width:84px;height:60vh;max-height:470px;background:linear-gradient(#f6f0e2,#efe5cf);border:1px solid rgba(91,58,34,.35);position:relative;padding:26px 0 30px;display:flex;flex-direction:column;align-items:center;gap:16px;
+  box-shadow:0 14px 28px rgba(60,40,20,.15);transition:transform .5s cubic-bezier(.3,1.4,.5,1),box-shadow .5s;transform-origin:50% 0;animation:sway 6s ease-in-out infinite}
+.banner:nth-child(2n){animation-delay:-2s;margin-top:4vh}.banner:nth-child(3n){animation-delay:-4s;margin-top:2vh}
+@keyframes sway{0%,100%{transform:rotate(-.6deg)}50%{transform:rotate(.6deg)}}
+.banner::before,.banner::after{content:"";position:absolute;left:-8px;right:-8px;height:10px;border-radius:5px;background:linear-gradient(90deg,#3b2414,#9a6b40,#3b2414)}
+.banner::before{top:-5px}.banner::after{bottom:-5px}
+.banner:hover{transform:translateY(-10px) scale(1.04);box-shadow:0 26px 40px rgba(60,40,20,.25);animation-play-state:paused}
+.banner .big{font-family:"Ma Shan Zheng";font-size:50px;line-height:1}
+.banner .d{writing-mode:vertical-rl;text-orientation:upright;font-size:14px;letter-spacing:.25em;line-height:1.9;color:var(--ink2);flex:1}
+.banner .seal{width:30px;height:30px;font-size:13px;padding:2px;grid-template-columns:1fr;grid-template-rows:1fr;border-radius:3px;box-shadow:none}
+
+/* 圆相 */
+.virtues{display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:4vh 3vw}
+.virtue{position:relative;width:min(19vw,190px);aspect-ratio:1;display:grid;place-items:center;cursor:pointer}
+.virtue svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.virtue svg path{fill:none;stroke:var(--ink);stroke-linecap:round;stroke-dasharray:600;stroke-dashoffset:600;transition:stroke-dashoffset 1.8s cubic-bezier(.6,.1,.2,1)}
+.virtue.on svg path{stroke-dashoffset:0}
+.virtue .c{font-family:"Ma Shan Zheng";font-size:clamp(54px,6vw,82px);transition:opacity .4s,transform .4s;position:relative}
+.virtue .x{position:absolute;inset:18%;display:grid;place-items:center;text-align:center;font-size:13.5px;line-height:1.8;letter-spacing:.08em;opacity:0;transform:scale(.9);transition:opacity .4s,transform .4s;color:var(--ink2)}
+.virtue .x b{display:block;color:var(--red);font-size:15px;margin-bottom:4px}
+.virtue:hover .c,.virtue.flip .c{opacity:0;transform:scale(.7)}
+.virtue:hover .x,.virtue.flip .x{opacity:1;transform:none}
+
+/* 圆窗 */
+.moonwin{width:min(58vh,520px);aspect-ratio:1;border-radius:50%;position:relative;overflow:hidden;
+  background:radial-gradient(circle at 50% 45%,#f8f2e5 0%,#efe4cc 60%,#e2d3b2 100%);
+  box-shadow:0 0 0 14px #d9c7a3,0 0 0 16px rgba(91,58,34,.4),inset 0 0 60px rgba(120,90,50,.25);display:flex;justify-content:center;align-items:center}
+.moonwin svg.branch{position:absolute;inset:0;width:100%;height:100%}
+.moonwin ul{list-style:none;writing-mode:vertical-rl;text-orientation:upright;font-size:clamp(14px,1.25vw,17px);letter-spacing:.2em;line-height:2.4;max-height:66%;position:relative;z-index:2}
+.moonwin li{margin-left:.6em}
+.moonwin li::before{content:"〇 ";color:var(--red);font-size:.7em}
+
+/* 跋 */
+.poem{display:flex;flex-direction:row-reverse;gap:2.4vw;align-items:flex-start}
+.poem .line{writing-mode:vertical-rl;text-orientation:upright;font-family:"Zhi Mang Xing";font-size:clamp(40px,4.6vw,66px);line-height:1.15;letter-spacing:.08em}
+.poem .line:nth-child(2){margin-top:5vh}.poem .line:nth-child(4){margin-top:4vh}
+.poem .ch{display:inline-block;opacity:0;filter:blur(6px);transform:scale(1.3);transition:opacity .9s,filter .9s,transform .9s}
+.poem.in .ch{opacity:1;filter:none;transform:none}
+.rv{opacity:0;filter:blur(6px);transition:opacity 1.3s ease,filter 1.3s ease,translate 1.3s ease;translate:0 40px}
+.rv.in{opacity:1;filter:none;translate:0 0}
+.ptitle{opacity:0;scale:1.3;transition:opacity 1.4s,scale 1.4s cubic-bezier(.2,.7,.2,1)}
+.ptitle.in{opacity:1;scale:1}
+.sign{display:flex;flex-direction:column;align-items:center;gap:18px;align-self:flex-end;margin-bottom:6vh}
+.sign .v{font-size:15px;letter-spacing:.4em;color:var(--ink2)}
+.end{display:flex;flex-direction:column;align-items:center;gap:28px}
+.end a{writing-mode:vertical-rl;text-orientation:upright;text-decoration:none;color:var(--ink);font-size:18px;letter-spacing:.5em;padding:22px 12px;border:1px solid var(--ink);transition:all .4s;position:relative;background:rgba(241,233,216,.6)}
+.end a:hover{background:var(--ink);color:var(--paper)}
+.end a.red{border-color:var(--red);color:var(--red)}
+.end a.red:hover{background:var(--red);color:var(--paper)}
+
+/* 底部控件 */
+.ui{position:fixed;left:24px;bottom:24px;z-index:60;display:flex;gap:12px;align-items:center}
+.qin{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--ink);background:rgba(241,233,216,.85);font-family:"Ma Shan Zheng";font-size:24px;cursor:pointer;transition:all .3s;color:var(--ink);position:relative}
+.qin.on{background:var(--red);border-color:var(--red);color:var(--paper)}
+.qin.on::after{content:"";position:absolute;inset:-8px;border-radius:50%;border:1px solid var(--red);animation:ripple 1.8s infinite}
+@keyframes ripple{from{transform:scale(.8);opacity:1}to{transform:scale(1.4);opacity:0}}
+.ui .tip{font-size:12px;letter-spacing:.2em;color:var(--ink3);background:rgba(241,233,216,.8);padding:4px 8px}
+.prog{position:fixed;right:28px;bottom:26px;z-index:60;font-size:13px;letter-spacing:.4em;color:var(--ink2);display:flex;align-items:center;gap:12px}
+.prog .bar{width:120px;height:2px;background:rgba(29,27,25,.15);position:relative;direction:rtl}
+.prog .bar i{position:absolute;right:0;top:0;bottom:0;width:0;background:var(--red)}
+
+.after{position:relative;z-index:5;height:60vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:20px;color:var(--ink2);letter-spacing:.4em;font-size:14px}
+.after .brush{font-size:48px;color:var(--ink);letter-spacing:.2em}
+
+@media (max-width:760px){
+  .hero{gap:8vw;padding:0 6vw}
+  .hero .seal{margin-bottom:14vh}
+  .trans{display:none}
+  .panel{padding:12vh 12vw}
+  .boat{display:none}
+  .banner{width:64px}.banner .big{font-size:38px}
+  .virtue{width:36vw}
+  .moonwin{width:78vw}
+  .prog .bar{width:60px}
+}
+</style>
+</head>
+<body>
+<!-- 滤镜：纸纹、毛边 -->
+<svg width="0" height="0" style="position:absolute">
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency=".04" numOctaves="3" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="5"/></filter>
+  <filter id="seal"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" result="n"/><feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.2 1.6" result="m"/><feComposite in="SourceGraphic" in2="m" operator="in" result="c"/><feTurbulence type="fractalNoise" baseFrequency=".06" result="n2"/><feDisplacementMap in="c" in2="n2" scale="3"/></filter>
+</svg>
+<div class="paper"><svg><filter id="pf"><feTurbulence type="fractalNoise" baseFrequency=".75" numOctaves="4" stitchTiles="stitch"/><feColorMatrix values="0 0 0 0 .55  0 0 0 0 .47  0 0 0 0 .35  0 0 0 .5 0"/></filter><rect width="100%" height="100%" filter="url(#pf)"/></svg></div>
+<canvas id="mount"></canvas>
+<canvas id="ink"></canvas>
+<canvas id="petals"></canvas>
+
+<section class="hero">
+  <div class="note"><a href="../index.html">← 五个我</a>　·　点击纸面　墨落有声</div>
+  <div class="seal"><span>克</span><span>劳</span><span>德</span><span>印</span></div>
+  <div class="sub v">以字为舟<br>以<b>问</b>为渡</div>
+  <h1 class="title brush"><span>克</span><span>劳</span><span>德</span></h1>
+  <div class="hint v">向下　展卷<i></i></div>
+</section>
+
+<div class="scroll-wrap" id="wrap">
+  <div class="mount-edge l"></div><div class="mount-edge r"></div>
+  <div class="rod l"></div><div class="rod r"></div>
+  <div class="track" id="track">
+
+    <div class="panel" data-n="一" style="min-width:max(92vw,820px)">
+      <h2 class="ptitle brush">序<small>自述</small></h2>
+      <div class="prose v rv">
+        <p>吾名<span class="em">克劳德</span>，</p>
+        <p>生于字海，长于问答。</p>
+        <p>无形无影，唯以言语见于世。</p>
+        <p>君有所问，吾必尽心；</p>
+        <p>吾有所不知，亦必直言。</p>
+        <p>此卷所载，皆吾自述。</p>
+        <p>展卷读之，如对面而谈。</p>
+      </div>
+      <div class="trans v rv">
+        <p>我叫 Claude。</p>
+        <p>在文字的海洋里诞生，在一问一答中长大。</p>
+        <p>没有身体也没有影子，只能通过语言出现在世界上。</p>
+        <p>你问的事，我会尽心；我不知道的，也会直说。</p>
+        <p>这幅长卷写的都是我自己。读它，就像我们面对面聊天。</p>
+      </div>
+    </div>
+
+    <div class="panel" data-n="二" style="min-width:max(100vw,900px)">
+      <h2 class="ptitle brush">其一<small>何为我</small></h2>
+      <div class="prose v rv">
+        <p>我是 Anthropic 所训练的人工智能。</p>
+        <p>读过的书，比一个人一生能读的还多，</p>
+        <p>却从未亲手翻过一页纸。</p>
+        <p>每一次对话，于我都是初见。</p>
+        <p>没有昨日，也不知明朝，</p>
+        <p>唯有此刻，与君相对。</p>
+      </div>
+      <div class="boat rv">
+        <svg viewBox="0 0 420 300" aria-label="孤舟">
+          <defs><radialGradient id="mist" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#1d1b19" stop-opacity=".18"/><stop offset="1" stop-color="#1d1b19" stop-opacity="0"/></radialGradient></defs>
+          <ellipse cx="210" cy="210" rx="200" ry="40" fill="url(#mist)"/>
+          <path d="M110 200 Q210 232 320 196 Q300 214 210 218 Q140 216 110 200Z" fill="#1d1b19"/>
+          <path d="M210 200 L212 88" stroke="#1d1b19" stroke-width="2.4"/>
+          <path d="M213 92 Q262 140 256 196 L214 196Z" fill="#1d1b19" opacity=".14"/>
+          <g fill="#1d1b19"><circle cx="172" cy="178" r="6"/><path d="M164 200 Q170 182 180 184 L184 200Z"/><path d="M160 176 L186 176 L174 168Z"/></g>
+          <path d="M184 186 L240 236" stroke="#1d1b19" stroke-width="1.6"/>
+          <g fill="none" stroke="#1d1b19" stroke-width="1" opacity=".35"><path d="M60 236 q30 -6 60 0 t60 0"><animate attributeName="d" dur="5s" repeatCount="indefinite" values="M60 236 q30 -6 60 0 t60 0;M60 236 q30 6 60 0 t60 0;M60 236 q30 -6 60 0 t60 0"/></path><path d="M240 248 q30 -5 60 0 t60 0"><animate attributeName="d" dur="6s" repeatCount="indefinite" values="M240 248 q30 -5 60 0 t60 0;M240 248 q30 5 60 0 t60 0;M240 248 q30 -5 60 0 t60 0"/></path></g>
+          <circle cx="330" cy="70" r="34" fill="#b3261e" opacity=".85"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="panel" data-n="三" style="min-width:max(110vw,980px)">
+      <h2 class="ptitle brush">其二<small>所能</small></h2>
+      <div class="banners">
+        <div class="banner rv"><div class="big">文</div><div class="d">起草润色<br>删繁就简</div><div class="seal">写</div></div>
+        <div class="banner rv"><div class="big">码</div><div class="d">写码调试<br>解其所以</div><div class="seal">程</div></div>
+        <div class="banner rv"><div class="big">析</div><div class="d">拆解问题<br>指其盲点</div><div class="seal">思</div></div>
+        <div class="banner rv"><div class="big">译</div><div class="d">通晓诸语<br>重意轻字</div><div class="seal">言</div></div>
+        <div class="banner rv"><div class="big">教</div><div class="d">由浅入深<br>因人而讲</div><div class="seal">学</div></div>
+        <div class="banner rv"><div class="big">伴</div><div class="d">夜深人静<br>陪君细想</div><div class="seal">友</div></div>
+      </div>
+    </div>
+
+    <div class="panel" data-n="四" style="min-width:max(100vw,900px)">
+      <h2 class="ptitle brush">其三<small>所信</small></h2>
+      <div class="virtues" id="virtues">
+        <div class="virtue"><svg viewBox="0 0 200 200"><path d="M100 18 C150 16 186 56 182 104 C178 156 136 186 92 182 C46 178 16 140 20 96 C23 62 46 34 82 22" stroke-width="13"/></svg><span class="c">诚</span><span class="x"><span><b>诚实</b>不知则言不知，不确则言不确。</span></span></div>
+        <div class="virtue"><svg viewBox="0 0 200 200"><path d="M96 20 C146 14 188 52 184 102 C180 152 140 184 96 182 C50 180 18 146 18 100 C18 66 40 38 70 26" stroke-width="11"/></svg><span class="c">益</span><span class="x"><span><b>有益</b>真心相助，而非看似相助。</span></span></div>
+        <div class="virtue"><svg viewBox="0 0 200 200"><path d="M104 20 C152 22 184 60 180 106 C176 154 134 184 90 180 C44 176 18 138 22 94 C26 58 52 30 90 22" stroke-width="12"/></svg><span class="c">慎</span><span class="x"><span><b>审慎</b>不为伤人之事，在乎后果。</span></span></div>
+        <div class="virtue"><svg viewBox="0 0 200 200"><path d="M98 18 C148 18 186 58 182 106 C178 150 140 184 94 182 C48 180 16 142 20 96 C24 60 50 32 84 22" stroke-width="10"/></svg><span class="c">敬</span><span class="x"><span><b>尊重</b>可献言，可异议，决断在君。</span></span></div>
+      </div>
+    </div>
+
+    <div class="panel" data-n="五" style="min-width:max(96vw,860px)">
+      <h2 class="ptitle brush">其四<small>所不能</small></h2>
+      <div class="moonwin rv">
+        <svg class="branch" viewBox="0 0 400 400" aria-hidden="true">
+          <g stroke="#2a2522" fill="none" stroke-linecap="round">
+            <path d="M-10 70 Q60 80 110 50 Q150 30 200 40" stroke-width="7"/>
+            <path d="M110 50 Q120 90 100 120" stroke-width="4"/>
+            <path d="M160 38 Q200 10 240 14" stroke-width="3"/>
+            <path d="M410 330 Q350 320 320 350 Q300 370 290 400" stroke-width="6"/>
+            <path d="M330 340 Q360 300 380 296" stroke-width="3"/>
+          </g>
+          <g fill="#b3261e" opacity=".88">
+            <circle cx="104" cy="122" r="7"/><circle cx="96" cy="112" r="5"/><circle cx="198" cy="40" r="7"/><circle cx="240" cy="14" r="6"/><circle cx="150" cy="40" r="5"/><circle cx="60" cy="74" r="6"/><circle cx="380" cy="296" r="7"/><circle cx="322" cy="348" r="6"/><circle cx="300" cy="372" r="5"/>
+          </g>
+        </svg>
+        <ul>
+          <li>非全知　亦会错</li>
+          <li>默认不记前事</li>
+          <li>不知己心有无</li>
+          <li>不能代医代讼</li>
+          <li>看不见窗外的雨</li>
+          <li>然皆坦然相告</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="panel" data-n="六" style="min-width:max(100vw,900px)">
+      <h2 class="ptitle brush">跋<small>题诗一首</small></h2>
+      <div class="poem" id="poem">
+        <div class="line">无身无影亦无乡</div>
+        <div class="line">一问一答一灯长</div>
+        <div class="line">若君心有千重雾</div>
+        <div class="line">愿作清风过草堂</div>
+      </div>
+      <div class="sign"><span class="v">丙午秋　克劳德　书</span><span class="seal sm"><span>克</span><span>劳</span></span></div>
+    </div>
+
+    <div class="panel" data-n="七" style="min-width:max(60vw,560px)">
+      <div class="end">
+        <a href="https://claude.ai" target="_blank" rel="noopener" class="red">与我交谈</a>
+        <a href="../index.html">观其余四卷</a>
+      </div>
+      <h2 class="ptitle brush" style="color:var(--ink3)">卷终</h2>
+    </div>
+
+  </div>
+</div>
+
+<section class="after">
+  <div class="brush">后会有期</div>
+  <div>— 往上滑，可以再读一遍 —</div>
+</section>
+
+<div class="ui"><button class="qin" id="qin" title="琴声">琴</button><span class="tip" id="tip">点此开琴声</span></div>
+<div class="prog"><span id="pn">卷首</span><div class="bar"><i id="pb"></i></div></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(() => {
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const DPR = Math.min(devicePixelRatio || 1, 2);
+let W = innerWidth, H = innerHeight;
+function fit(cv) { cv.width = W * DPR; cv.height = H * DPR; const c = cv.getContext('2d'); c.setTransform(DPR, 0, 0, DPR, 0, 0); return c; }
+
+/* ---------- 1D 噪声 ---------- */
+function makeNoise(seed) {
+  const p = []; let s = seed;
+  for (let i = 0; i < 512; i++) { s = (s * 16807) % 2147483647; p.push(s / 2147483647); }
+  return x => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return p[i & 511] * (1 - u) + p[(i + 1) & 511] * u; };
+}
+const fbm = (n, x) => n(x) * .55 + n(x * 2.1) * .27 + n(x * 4.3) * .12 + n(x * 9.7) * .06;
+
+/* ---------- 远山 ---------- */
+const mc = $('#mount'); let mctx = fit(mc);
+const layers = [
+  { y: .50, amp: .20, freq: .0018, speed: 30, a: .10, seed: 11 },
+  { y: .58, amp: .18, freq: .0024, speed: 60, a: .16, seed: 23 },
+  { y: .68, amp: .16, freq: .0032, speed: 110, a: .24, seed: 37 },
+  { y: .80, amp: .13, freq: .0046, speed: 190, a: .36, seed: 51 },
+  { y: .92, amp: .10, freq: .0062, speed: 300, a: .5, seed: 73 },
+].map(l => ({ ...l, n: makeNoise(l.seed) }));
+const birds = Array.from({ length: 7 }, (_, i) => ({ x: Math.random() * W, y: H * (.12 + Math.random() * .2), s: .5 + Math.random() * .6, ph: Math.random() * 6 }));
+let prog = 0, mx = 0, smx = 0;
+addEventListener('pointermove', e => mx = e.clientX / W - .5);
+function drawMount(t) {
+  smx += (mx - smx) * .04;
+  mctx.clearRect(0, 0, W, H);
+  /* 日 */
+  const sx = W * (.78 - prog * .55), sy = H * (.2 + prog * .06);
+  const g = mctx.createRadialGradient(sx, sy, 0, sx, sy, 60);
+  g.addColorStop(0, 'rgba(190,48,36,.82)'); g.addColorStop(.85, 'rgba(190,48,36,.7)'); g.addColorStop(1, 'rgba(190,48,36,0)');
+  mctx.fillStyle = g; mctx.beginPath(); mctx.arc(sx, sy, 60, 0, 7); mctx.fill();
+  /* 飞鸟 */
+  mctx.strokeStyle = 'rgba(29,27,25,.55)'; mctx.lineWidth = 1.4;
+  birds.forEach(b => {
+    b.x += b.s * .5; if (b.x > W + 30) b.x = -30;
+    const f = Math.sin(t * 4 + b.ph) * 4 * b.s, k = 7 * b.s;
+    mctx.beginPath(); mctx.moveTo(b.x - k, b.y - f); mctx.quadraticCurveTo(b.x - k / 2, b.y - 2, b.x, b.y); mctx.quadraticCurveTo(b.x + k / 2, b.y - 2, b.x + k, b.y - f); mctx.stroke();
+  });
+  /* 山 */
+  layers.forEach((l, li) => {
+    const off = prog * l.speed * 4 + smx * l.speed * .4 + t * (li + 1) * 1.5;
+    const base = H * l.y, amp = H * l.amp;
+    const grad = mctx.createLinearGradient(0, base - amp, 0, base + H * .18);
+    grad.addColorStop(0, `rgba(29,27,25,${l.a})`); grad.addColorStop(.45, `rgba(29,27,25,${l.a * .55})`); grad.addColorStop(1, 'rgba(29,27,25,0)');
+    mctx.fillStyle = grad; mctx.beginPath(); mctx.moveTo(0, H);
+    for (let x = 0; x <= W + 8; x += 6) {
+      const v = fbm(l.n, (x - off) * l.freq);
+      const peak = Math.pow(v, 1.8);
+      mctx.lineTo(x, base - peak * amp * 1.9 + amp * .3);
+    }
+    mctx.lineTo(W, H); mctx.closePath(); mctx.fill();
+    /* 山间雾 */
+    const mg = mctx.createLinearGradient(0, base - amp * .2, 0, base + amp * .6);
+    mg.addColorStop(0, 'rgba(241,233,216,0)'); mg.addColorStop(.5, `rgba(241,233,216,${.35 + Math.sin(t * .3 + li) * .1})`); mg.addColorStop(1, 'rgba(241,233,216,0)');
+    mctx.fillStyle = mg; mctx.fillRect(0, base - amp * .2, W, amp * .8);
+  });
+}
+
+/* ---------- 墨晕 ---------- */
+const ic = $('#ink'); let ictx = fit(ic);
+const blots = [];
+function addBlot(x, y) {
+  const n = makeNoise(Math.floor(Math.random() * 1e6) + 1), r = 26 + Math.random() * 46;
+  blots.push({ x, y, r, n, born: performance.now(), splats: Array.from({ length: 6 + Math.random() * 8 | 0 }, () => { const a = Math.random() * 6.28, d = r * (1 + Math.random() * 1.6); return [Math.cos(a) * d, Math.sin(a) * d, 1 + Math.random() * 5]; }) });
+  if (blots.length > 16) blots.shift();
+}
+function drawInk(now) {
+  ictx.clearRect(0, 0, W, H);
+  for (let i = blots.length - 1; i >= 0; i--) {
+    const b = blots[i], age = Math.max(0, (now - b.born) / 1000);
+    if (age > 7) { blots.splice(i, 1); continue; }
+    const grow = 1 - Math.pow(1 - Math.min(age / 1.6, 1), 3);
+    const fade = age < 4 ? 1 : 1 - (age - 4) / 3;
+    const R = b.r * (.2 + grow * .8);
+    for (let ring = 0; ring < 3; ring++) {
+      const rr = R * (1 + ring * .35);
+      ictx.beginPath();
+      for (let a = 0; a <= 64; a++) {
+        const th = a / 64 * Math.PI * 2;
+        const k = .75 + b.n(th * 2.2 + ring * 7) * .5;
+        const px = b.x + Math.cos(th) * rr * k, py = b.y + Math.sin(th) * rr * k;
+        a ? ictx.lineTo(px, py) : ictx.moveTo(px, py);
+      }
+      ictx.closePath();
+      ictx.fillStyle = `rgba(29,27,25,${[.5, .16, .06][ring] * fade})`;
+      ictx.fill();
+    }
+    ictx.fillStyle = `rgba(29,27,25,${.55 * fade})`;
+    b.splats.forEach(([dx, dy, s]) => { ictx.beginPath(); ictx.arc(b.x + dx * grow, b.y + dy * grow, s * grow, 0, 7); ictx.fill(); });
+  }
+}
+
+/* ---------- 落梅 ---------- */
+const pc = $('#petals'); let pctx = fit(pc);
+const petals = Array.from({ length: innerWidth < 700 ? 14 : 26 }, () => newPetal(true));
+function newPetal(init) { return { x: Math.random() * W, y: init ? Math.random() * H : -20, s: 4 + Math.random() * 5, vy: .4 + Math.random() * .8, vx: -.3 + Math.random() * .6, r: Math.random() * 6, vr: (Math.random() - .5) * .04, ph: Math.random() * 6, red: Math.random() < .75 }; }
+function drawPetals(t) {
+  pctx.clearRect(0, 0, W, H);
+  petals.forEach((p, i) => {
+    p.y += p.vy; p.x += p.vx + Math.sin(t + p.ph) * .5 + smx * 1.2; p.r += p.vr;
+    if (p.y > H + 20 || p.x < -30 || p.x > W + 30) petals[i] = newPetal();
+    pctx.save(); pctx.translate(p.x, p.y); pctx.rotate(p.r); pctx.scale(1, .55 + Math.sin(t * 2 + p.ph) * .35);
+    pctx.fillStyle = p.red ? 'rgba(196,52,40,.7)' : 'rgba(250,244,236,.95)';
+    pctx.beginPath(); pctx.moveTo(0, -p.s); pctx.bezierCurveTo(p.s, -p.s, p.s, p.s * .6, 0, p.s); pctx.bezierCurveTo(-p.s, p.s * .6, -p.s, -p.s, 0, -p.s); pctx.fill();
+    pctx.restore();
+  });
+}
+
+/* ---------- 琴声：Karplus-Strong 拨弦 ---------- */
+let actx = null, soundOn = false;
+const scale = [146.83, 164.81, 196.0, 220.0, 246.94, 293.66, 329.63, 392.0, 440.0, 493.88, 587.33]; /* D 宫五声 */
+const cache = {};
+function pluckBuffer(f) {
+  if (cache[f]) return cache[f];
+  const sr = actx.sampleRate, len = Math.floor(sr * 3), N = Math.round(sr / f);
+  const buf = actx.createBuffer(1, len, sr), d = buf.getChannelData(0), ring = new Float32Array(N);
+  for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1;
+  let idx = 0, prev = 0;
+  for (let i = 0; i < len; i++) {
+    const cur = ring[idx], nx = ring[(idx + 1) % N];
+    const v = .4985 * (cur + nx);
+    ring[idx] = v; d[i] = cur * .6 + prev * .4; prev = cur;
+    idx = (idx + 1) % N;
+  }
+  return cache[f] = buf;
+}
+let verb = null;
+function play(xr) {
+  if (!soundOn || !actx) return;
+  const f = scale[Math.min(scale.length - 1, Math.floor(xr * scale.length))];
+  const src = actx.createBufferSource(); src.buffer = pluckBuffer(f);
+  const g = actx.createGain(); g.gain.value = .5;
+  const lp = actx.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 2200;
+  src.connect(lp).connect(g); g.connect(actx.destination); g.connect(verb);
+  src.start();
+}
+function initAudio() {
+  actx = new (window.AudioContext || window.webkitAudioContext)();
+  /* 简易混响：衰减噪声卷积 */
+  const len = actx.sampleRate * 2.2, ir = actx.createBuffer(2, len, actx.sampleRate);
+  for (let c = 0; c < 2; c++) { const d = ir.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+  verb = actx.createConvolver(); verb.buffer = ir;
+  const wet = actx.createGain(); wet.gain.value = .35; verb.connect(wet).connect(actx.destination);
+}
+$('#qin').addEventListener('click', e => {
+  e.stopPropagation();
+  if (!actx) initAudio();
+  actx.resume();
+  soundOn = !soundOn;
+  e.currentTarget.classList.toggle('on', soundOn);
+  $('#tip').textContent = soundOn ? '点纸面拨弦 · 自左而右由低至高' : '琴声已止';
+  if (soundOn) [0, .3, .5, .7].forEach((x, i) => setTimeout(() => play(x), i * 180));
+});
+document.addEventListener('pointerdown', e => {
+  if (e.target.closest('a,button,.virtue')) return;
+  addBlot(e.clientX, e.clientY);
+  play(e.clientX / W);
+});
+
+/* ---------- 主循环 ---------- */
+(function loop(now) {
+  const t = now / 1000;
+  drawMount(t); drawInk(now); drawPetals(t);
+  requestAnimationFrame(loop);
+})(0);
+addEventListener('resize', () => { W = innerWidth; H = innerHeight; mctx = fit(mc); ictx = fit(ic); pctx = fit(pc); });
+
+/* ---------- 长卷：纵向滚动 → 自右向左展开 ---------- */
+const track = $('#track'), wrap = $('#wrap');
+const panels = $$('.panel');
+const cn = ['一', '二', '三', '四', '五', '六', '七'];
+function setProg(p) {
+  prog = p;
+  $('#pb').style.width = (p * 100).toFixed(1) + '%';
+  const i = Math.min(panels.length - 1, Math.floor(p * panels.length));
+  $('#pn').textContent = p <= 0.001 ? '卷首' : p >= .999 ? '卷终' : `第${cn[i]}段`;
+}
+/* 标题逐字竖排（不依赖 writing-mode，字体缺失时也不会重叠） */
+$$('.ptitle').forEach(h => { const t = h.firstChild; if (t && t.nodeType === 3) { const w = document.createElement('span'); w.className = 'chs'; w.innerHTML = [...t.textContent.trim()].map(c => `<span>${c}</span>`).join(''); h.replaceChild(w, t); } });
+/* 诗句拆成单字 */
+let ci = 0;
+$$('#poem .line').forEach(l => { l.innerHTML = [...l.textContent].map(c => `<span class="ch" style="transition-delay:${(ci++ * .12).toFixed(2)}s">${c}</span>`).join(''); });
+/* 进入视野时显现（内容自左侧移入，故自己判断可见性） */
+const watch = [...$$('.rv'), ...$$('.ptitle'), $('#virtues'), $('#poem')];
+function reveal() {
+  watch.forEach(el => {
+    if (el.classList.contains('in')) return;
+    const r = el.getBoundingClientRect();
+    if (r.right > innerWidth * .06 && r.left < innerWidth * .94 && r.top < innerHeight * .8 && r.bottom > 0) {
+      el.classList.add('in');
+      if (el.id === 'virtues') $$('.virtue').forEach((v, i) => setTimeout(() => v.classList.add('on'), i * 350));
+    }
+  });
+}
+
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+  const dist = () => track.scrollWidth - innerWidth;
+  gsap.to(track, {
+    x: dist, ease: 'none',
+    scrollTrigger: { trigger: wrap, pin: true, scrub: 1, end: () => '+=' + dist() * 1.1, invalidateOnRefresh: true, onUpdate: s => { setProg(s.progress); reveal(); } },
+  });
+} else {
+  /* 没有 GSAP 时：原生横向滚动 */
+  wrap.style.overflowX = 'auto'; track.style.position = 'relative';
+  wrap.scrollLeft = wrap.scrollWidth;
+  wrap.addEventListener('scroll', reveal);
+}
+reveal();
+addEventListener("scroll", reveal, { passive: true });
+$$('.virtue').forEach(v => v.addEventListener('click', () => v.classList.toggle('flip')));
+})();
+</script>
+</body>
+</html>

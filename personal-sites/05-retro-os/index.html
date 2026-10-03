@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ClaudeOS 95</title>
+<meta name="description" content="一台复古电脑形状的个人网站：扫雷、画图、聊天、媒体播放器、计算器，还有蓝屏。">
+<link rel="stylesheet" href="https://unpkg.com/98.css@0.1.20/dist/98.css">
+<style>
+:root{--desk:#008080}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;font-family:"Pixelated MS Sans Serif",Arial,"SimSun","Noto Sans SC",sans-serif;-webkit-font-smoothing:none;user-select:none}
+body{background:var(--desk);transition:background .3s}
+body.wp-coral{--desk:#b5573d}
+body.wp-clouds{background:linear-gradient(#5a8fd8,#a8cdf0 60%,#e8f2fb)}
+body.wp-night{background:#000 radial-gradient(#fff 1px,transparent 1.5px) 0 0/38px 38px}
+body.wp-tiles{background:#7b7b7b repeating-conic-gradient(#8e8e8e 0 25%,#6a6a6a 0 50%) 0 0/24px 24px}
+input,textarea,select,button{font-family:inherit}
+textarea{user-select:text}
+
+/* boot / shutdown / bsod */
+.screen{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;flex-direction:column}
+#boot{background:#000;color:#fff;gap:28px;cursor:pointer}
+#boot .logo{display:flex;align-items:center;gap:18px}
+#boot .flag{display:grid;grid-template-columns:1fr 1fr;gap:4px;width:84px;height:84px;transform:perspective(200px) rotateY(-18deg) skewY(-4deg)}
+#boot .flag i{display:block}
+#boot .flag i:nth-child(1){background:#e8603c}#boot .flag i:nth-child(2){background:#3cb371}#boot .flag i:nth-child(3){background:#3b6fd8}#boot .flag i:nth-child(4){background:#f5c400}
+#boot .name{font:bold 46px Arial,sans-serif;letter-spacing:-1px}
+#boot .name sup{font-size:22px;color:#e8603c}
+#boot .name small{display:block;font-size:13px;font-weight:normal;letter-spacing:4px;color:#aaa}
+#boot .bar{width:240px;height:16px;border:2px solid #555;padding:2px;overflow:hidden}
+#boot .bar i{display:block;height:100%;width:40px;background:repeating-linear-gradient(90deg,#3b6fd8 0 8px,transparent 8px 11px);animation:slide 1.4s linear infinite}
+@keyframes slide{from{transform:translateX(-50px)}to{transform:translateX(240px)}}
+#boot .skip{font-size:11px;color:#666}
+#off{background:#000;color:#ff8c00;font:bold 26px Arial,"Noto Sans SC",sans-serif;text-align:center;display:none;cursor:pointer;gap:20px}
+#off small{color:#666;font-size:13px;font-weight:normal}
+#bsod{background:#0000aa;color:#fff;font:15px/1.6 "Courier New","SimSun",monospace;display:none;cursor:pointer;padding:20px}
+#bsod div{max-width:680px}
+#bsod .t{background:#aaa;color:#0000aa;padding:0 8px;display:inline-block;margin-bottom:20px}
+#saver{position:fixed;inset:0;z-index:99998;display:none;background:#000;cursor:none}
+
+/* desktop */
+#desktop{position:fixed;inset:0 0 32px 0}
+#icons{position:absolute;inset:0;display:flex;flex-direction:column;flex-wrap:wrap;align-content:flex-start;padding:10px 6px;gap:8px}
+.icon{width:80px;text-align:center;color:#fff;padding:3px;cursor:default;display:flex;flex-direction:column;align-items:center;gap:3px}
+.icon .img{font-size:32px;line-height:38px;height:38px;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.6))}
+.icon span{font-size:12px;line-height:14px;padding:1px 3px;text-shadow:1px 1px 0 #000}
+.icon.sel .img{filter:drop-shadow(1px 1px 0 rgba(0,0,0,.6)) brightness(.6) sepia(1) hue-rotate(190deg) saturate(4)}
+.icon.sel span{background:#000080;outline:1px dotted #ffff7f;text-shadow:none}
+body.wp-clouds .icon span{text-shadow:1px 1px 0 #000}
+
+/* taskbar */
+#taskbar{position:fixed;left:0;right:0;bottom:0;height:32px;z-index:9000;background:silver;box-shadow:inset 0 1px #dfdfdf,inset 0 2px #fff;display:flex;align-items:center;gap:4px;padding:3px 3px 2px}
+#taskbar button{min-width:0;min-height:0;height:24px;padding:0 6px}
+#start{font-weight:bold;display:flex;align-items:center;gap:5px}
+#start .f{display:grid;grid-template-columns:1fr 1fr;gap:1px;width:16px;height:14px}
+#start .f i:nth-child(1){background:#e8603c}#start .f i:nth-child(2){background:#3cb371}#start .f i:nth-child(3){background:#3b6fd8}#start .f i:nth-child(4){background:#f5c400}
+#start.on{box-shadow:inset -1px -1px #fff,inset 1px 1px #0a0a0a,inset -2px -2px #dfdfdf,inset 2px 2px grey}
+.sep{width:2px;height:22px;box-shadow:inset 1px 0 grey,inset -1px 0 #fff;margin:0 2px}
+#tasks{display:flex;gap:3px;flex:1;overflow:hidden;min-width:0}
+#tasks button{flex:0 1 160px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12px}
+#tasks button.active{box-shadow:inset -1px -1px #fff,inset 1px 1px #0a0a0a,inset -2px -2px #dfdfdf,inset 2px 2px grey;background:repeating-conic-gradient(#fff 0 25%,silver 0 50%) 0 0/2px 2px;font-weight:bold}
+#tray{box-shadow:inset -1px -1px #fff,inset 1px 1px grey;padding:0 10px;height:24px;display:flex;align-items:center;gap:8px;font-size:12px;white-space:nowrap}
+#tray span{cursor:default}
+
+/* start menu */
+#startmenu{position:fixed;left:2px;bottom:31px;z-index:9500;width:236px;display:none;background:silver;box-shadow:inset -1px -1px #0a0a0a,inset 1px 1px #dfdfdf,inset -2px -2px grey,inset 2px 2px #fff;padding:3px}
+#startmenu.on{display:flex}
+#startmenu .side{width:26px;background:linear-gradient(0deg,#000080,#1084d0);color:#fff;writing-mode:vertical-rl;transform:rotate(180deg);font:bold 18px Arial,sans-serif;padding:8px 2px;letter-spacing:1px}
+#startmenu .side b{color:#ffd0bf}
+#startmenu ul{list-style:none;margin:0;padding:0;flex:1}
+#startmenu li{display:flex;align-items:center;gap:10px;padding:6px 8px;font-size:13px;cursor:default}
+#startmenu li .e{font-size:22px;width:26px;text-align:center}
+#startmenu li:hover{background:#000080;color:#fff}
+#startmenu hr{border:0;border-top:1px solid grey;border-bottom:1px solid #fff;margin:3px 2px}
+
+/* windows */
+.win{position:absolute;display:flex;flex-direction:column;min-width:200px;min-height:120px}
+.win .title-bar{cursor:default;touch-action:none}
+.win:not(.focus) .title-bar{background:linear-gradient(90deg,grey,#b5b5b5)}
+.win .title-bar-text{display:flex;align-items:center;gap:5px;white-space:nowrap;overflow:hidden}
+.win .window-body{flex:1;overflow:auto;display:flex;flex-direction:column;min-height:0}
+.win.max{left:0!important;top:0!important;width:100%!important;height:100%!important}
+.win .grip{position:absolute;right:1px;bottom:1px;width:14px;height:14px;cursor:nwse-resize;touch-action:none;
+  background:linear-gradient(135deg,transparent 55%,grey 55% 62%,#fff 62% 68%,transparent 68% 75%,grey 75% 82%,#fff 82% 88%,transparent 88%)}
+.win.max .grip{display:none}
+.menubar{display:flex;gap:2px;font-size:12px;margin:-4px 0 4px}
+.menubar span{padding:2px 6px}.menubar span:hover{background:#000080;color:#fff}
+.win.shake{animation:nudge .5s}
+@keyframes nudge{0%,100%{transform:none}10%,50%,90%{transform:translate(-8px,3px)}30%,70%{transform:translate(8px,-3px)}}
+
+/* notepad */
+.notepad textarea{flex:1;width:100%;resize:none;font:14px/1.6 "Courier New","SimSun","Noto Sans SC",monospace;padding:6px}
+
+/* explorer */
+.addr{display:flex;align-items:center;gap:6px;font-size:12px;margin-bottom:6px}
+.addr input{flex:1}
+.files{flex:1;background:#fff;box-shadow:inset -1px -1px #fff,inset 1px 1px grey,inset -2px -2px #dfdfdf,inset 2px 2px #0a0a0a;padding:10px;display:flex;flex-wrap:wrap;align-content:flex-start;gap:10px;overflow:auto}
+.file{width:88px;text-align:center;font-size:12px;padding:4px;cursor:default}
+.file .img{font-size:30px}
+.file.sel span{background:#000080;color:#fff}
+
+/* mines */
+.ms{display:inline-flex;flex-direction:column;gap:6px;padding:6px;background:silver;box-shadow:inset -2px -2px grey,inset 2px 2px #fff;align-self:center}
+.ms-top{display:flex;justify-content:space-between;align-items:center;padding:4px 6px;box-shadow:inset -2px -2px #fff,inset 2px 2px grey}
+.led{background:#000;color:#f00;font:bold 22px/24px "Courier New",monospace;padding:0 3px;letter-spacing:1px;min-width:46px;text-align:center;box-shadow:inset -1px -1px #fff,inset 1px 1px grey}
+.smiley{min-width:0!important;width:30px;height:30px;padding:0!important;font-size:18px}
+.ms-grid{display:grid;box-shadow:inset -3px -3px #fff,inset 3px 3px grey;padding:3px}
+.ms-grid div{width:22px;height:22px;display:grid;place-items:center;font:bold 14px Arial,sans-serif;background:silver;box-shadow:inset -2px -2px grey,inset 2px 2px #fff;cursor:default}
+.ms-grid div.o{box-shadow:inset 1px 1px grey;background:#c6c6c6}
+.ms-grid div.boom{background:#f00}
+.n1{color:#0000ff}.n2{color:#008000}.n3{color:#f00}.n4{color:#000080}.n5{color:#800000}.n6{color:#008080}.n7{color:#000}.n8{color:grey}
+
+/* paint */
+.paint{display:flex;flex-direction:column;gap:4px;flex:1;min-height:0}
+.paint-main{display:flex;gap:4px;flex:1;min-height:0}
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:1px;align-content:start}
+.tools button{min-width:0!important;width:26px;height:26px;padding:0!important;font-size:14px}
+.tools button.on{box-shadow:inset -1px -1px #fff,inset 1px 1px #0a0a0a,inset -2px -2px #dfdfdf,inset 2px 2px grey;background:#e0e0e0}
+.canvas-wrap{flex:1;background:grey;overflow:auto;padding:4px;box-shadow:inset 1px 1px #0a0a0a}
+.canvas-wrap canvas{background:#fff;display:block;cursor:crosshair;touch-action:none}
+.palette{display:flex;align-items:center;gap:6px}
+.cur-col{width:30px;height:30px;box-shadow:inset -1px -1px #fff,inset 1px 1px grey;position:relative;background:silver}
+.cur-col i{position:absolute;width:14px;height:14px;border:1px solid #000}
+.cur-col .fg{left:4px;top:4px;z-index:1}.cur-col .bg{right:4px;bottom:4px}
+.swatches{display:grid;grid-template-columns:repeat(14,15px);gap:1px}
+.swatches i{width:15px;height:15px;box-shadow:inset -1px -1px #fff,inset 1px 1px grey;cursor:pointer}
+
+/* chat */
+.chat{display:flex;flex-direction:column;flex:1;gap:6px;min-height:0}
+.chat-head{display:flex;gap:10px;align-items:center;padding:6px;background:linear-gradient(#fff,#dde8f6);border:1px solid #9bb0cc}
+.avatar{width:44px;height:44px;border:2px solid #fff;outline:1px solid #7a96c0;background:linear-gradient(135deg,#f3b195,#d97757);display:grid;place-items:center;font-size:22px;color:#fff}
+.chat-head b{font-size:13px}.chat-head small{display:block;color:#555;font-size:11px}
+.chat-log{flex:1;background:#fff;overflow-y:auto;padding:8px;font-size:13px;line-height:1.6;box-shadow:inset 1px 1px grey,inset -1px -1px #fff;user-select:text}
+.chat-log .who{font-weight:bold;color:#555}
+.chat-log .me .who{color:#0050a0}.chat-log .ai .who{color:#b5573d}
+.chat-log .m{margin-bottom:8px}
+.chat-log .m p{margin:0 0 0 10px;white-space:pre-wrap}
+.chat-typing{font-size:11px;color:#777;height:14px}
+.chat-in{display:flex;gap:4px}
+.chat-in textarea{flex:1;height:46px;resize:none;font-size:13px}
+.chat-tools{display:flex;gap:4px}
+.chat-tools button{min-width:0;padding:0 8px}
+
+/* calc */
+.calc{display:flex;flex-direction:column;gap:8px;padding:2px}
+.calc .disp{text-align:right;font:20px "Courier New",monospace;padding:4px 6px;height:auto}
+.keys{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+.keys button{min-width:0;padding:0;height:30px;font-size:13px}
+.keys .r{color:#c00}.keys .b{color:#00c}
+
+/* player */
+.player{display:flex;flex-direction:column;gap:6px;flex:1}
+.viz{background:#000;height:110px;width:100%;display:block;box-shadow:inset 1px 1px grey}
+.lcd{background:#0b2d0b;color:#3f3;font:13px "Courier New",monospace;padding:6px;overflow:hidden;white-space:nowrap;box-shadow:inset 1px 1px #000}
+.lcd span{display:inline-block;animation:mq 10s linear infinite;padding-left:100%}
+@keyframes mq{to{transform:translateX(-100%)}}
+.ctrl{display:flex;gap:4px}.ctrl button{min-width:0;padding:0 10px}
+.tracks{background:#fff;box-shadow:inset 1px 1px grey;font-size:12px;flex:1;overflow:auto}
+.tracks div{padding:4px 6px;cursor:default;display:flex;justify-content:space-between}
+.tracks div.on{background:#000080;color:#fff}
+
+/* browser */
+.browser{display:flex;flex-direction:column;flex:1;gap:4px;min-height:0}
+.browser .addr select{flex:1}
+.browser iframe{flex:1;border:0;width:100%;background:#fff;box-shadow:inset 1px 1px grey}
+
+/* misc */
+.dlg-body{display:flex;gap:14px;align-items:flex-start;padding:8px 4px;font-size:12px;line-height:1.6}
+.dlg-body .ico{font-size:32px}
+.dlg-btns{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.tip-box{display:flex;gap:10px}
+.tip-box .side{background:grey;color:#fff;writing-mode:vertical-rl;transform:rotate(180deg);font:bold 17px Arial,sans-serif;padding:10px 4px;white-space:nowrap}
+.tip-box .side b{color:#fff}
+.tip-box .main{flex:1;min-height:150px;background:#ffffe1;border:1px solid grey;padding:12px;font-size:13px;line-height:1.7}
+.tip-box .main h4{margin:0 0 8px;font-size:15px}
+.bigtext{font-size:13px;line-height:1.7}
+.sunken-panel table{width:100%}
+.wp-pick{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.wp-pick button{min-width:0;width:70px;height:52px;padding:2px}
+.wp-pick button i{display:block;width:100%;height:100%}
+.monitor{width:180px;margin:6px auto;background:silver;padding:10px 10px 22px;box-shadow:inset -2px -2px grey,inset 2px 2px #fff;position:relative}
+.monitor div{height:100px;background:var(--desk);box-shadow:inset 1px 1px #000}
+body.wp-clouds .monitor div{background:linear-gradient(#5a8fd8,#e8f2fb)}
+body.wp-night .monitor div{background:#000 radial-gradient(#fff 1px,transparent 1.5px) 0 0/14px 14px}
+body.wp-tiles .monitor div{background:#7b7b7b repeating-conic-gradient(#8e8e8e 0 25%,#6a6a6a 0 50%) 0 0/10px 10px}
+
+@media (max-width:640px){
+  #tray .hide-m{display:none}
+  #tasks button{flex-basis:90px}
+}
+</style>
+</head>
+<body>
+
+<div id="boot" class="screen">
+  <div class="logo">
+    <div class="flag"><i></i><i></i><i></i><i></i></div>
+    <div class="name">ClaudeOS<sup>95</sup><small>HELPFUL · HONEST · HARMLESS</small></div>
+  </div>
+  <div class="bar"><i></i></div>
+  <div class="skip">正在启动…（点击跳过）</div>
+</div>
+<div id="off" class="screen">现在可以安全地关闭计算机了。<small>（其实不用关。点击任意处重新启动）</small></div>
+<div id="bsod" class="screen"><div>
+  <span class="t">ClaudeOS</span>
+  <p>发生了一个致命异常 0E：在 0028:C0FFEE42 处的 VXD CURIOSITY(01)。<br>当前应用程序将被终止。</p>
+  <p>* 原因：你问了一个太好的问题，我想得太投入了。<br>* 这不是真的错误。这是一个彩蛋。<br>* 按任意键继续 _</p>
+</div></div>
+<canvas id="saver"></canvas>
+
+<div id="desktop">
+  <div id="icons"></div>
+</div>
+
+<div id="startmenu">
+  <div class="side"><b>Claude</b>OS 95</div>
+  <ul id="startlist"></ul>
+</div>
+
+<div id="taskbar">
+  <button id="start"><span class="f"><i></i><i></i><i></i><i></i></span>开始</button>
+  <div class="sep"></div>
+  <div id="tasks"></div>
+  <div id="tray"><span title="音量" id="vol">🔊</span><span class="hide-m" title="网络：已连接到你">🖧</span><span id="clock">--:--</span></div>
+</div>
+
+<script>
+(() => {
+const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const mobile = () => innerWidth < 640;
+
+/* ---------- 声音 ---------- */
+let AC = null;
+const ac = () => (AC ||= new (window.AudioContext || window.webkitAudioContext)());
+let muted = false;
+function beep(f = 880, d = .12, type = 'square', v = .06) {
+  if (muted || (navigator.userActivation && !navigator.userActivation.hasBeenActive)) return;
+  try {
+    const a = ac(), o = a.createOscillator(), g = a.createGain();
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, a.currentTime); g.gain.exponentialRampToValueAtTime(.0001, a.currentTime + d);
+    o.connect(g).connect(a.destination); o.start(); o.stop(a.currentTime + d);
+  } catch (e) {}
+}
+const ding = () => { beep(660, .15, 'triangle', .12); setTimeout(() => beep(880, .25, 'triangle', .1), 120); };
+const chord = () => [523, 659, 784, 1047].forEach((f, i) => setTimeout(() => beep(f, .5, 'triangle', .08), i * 140));
+
+/* ---------- 窗口管理 ---------- */
+let z = 10, cascade = 0;
+const wins = {};
+function focus(id) {
+  const w = wins[id]; if (!w) return;
+  w.el.style.zIndex = ++z; w.el.style.display = 'flex'; w.min = false;
+  Object.values(wins).forEach(o => { o.el.classList.toggle('focus', o === w); o.btn.classList.toggle('active', o === w); });
+}
+function close(id) { const w = wins[id]; if (!w) return; w.onclose && w.onclose(); w.el.remove(); w.btn.remove(); delete wins[id]; }
+function minimize(id) { const w = wins[id]; w.el.style.display = 'none'; w.min = true; w.el.classList.remove('focus'); w.btn.classList.remove('active'); }
+function open(id, opts = {}) {
+  const app = APPS[id];
+  const key = app.multi ? id + Date.now() : id;
+  if (wins[key]) { focus(key); return wins[key]; }
+  const el = document.createElement('div');
+  el.className = 'window win';
+  const dw = $('#desktop').clientWidth, dh = $('#desktop').clientHeight;
+  const w = Math.min(app.w, dw - 10), h = Math.min(app.h, dh - 10);
+  const off = (cascade++ % 6) * 26;
+  el.style.width = w + 'px'; el.style.height = app.dialog || app.fixed ? 'auto' : h + 'px';
+  el.style.left = Math.max(5, Math.min(dw - w - 5, (mobile() ? 5 : 110 + off))) + 'px';
+  el.style.top = Math.max(5, Math.min(dh - h - 5, (mobile() ? 5 : 30 + off))) + 'px';
+  el.innerHTML = `
+    <div class="title-bar"><div class="title-bar-text">${app.icon} ${esc(opts.title || app.title)}</div>
+      <div class="title-bar-controls">${app.dialog ? '' : '<button aria-label="Minimize"></button><button aria-label="Maximize"></button>'}<button aria-label="Close"></button></div></div>
+    <div class="window-body">${typeof app.body === 'function' ? app.body(opts) : app.body}</div>
+    ${app.dialog || app.fixed ? '' : '<div class="grip"></div>'}`;
+  $('#desktop').appendChild(el);
+  const btn = document.createElement('button');
+  btn.textContent = app.icon + ' ' + (opts.title || app.title);
+  btn.onclick = () => (wins[key].min || !el.classList.contains('focus')) ? focus(key) : minimize(key);
+  if (!app.dialog) $('#tasks').appendChild(btn);
+  const rec = wins[key] = { el, btn, min: false };
+  el.addEventListener('pointerdown', () => focus(key));
+  $('[aria-label=Close]', el).onclick = e => { e.stopPropagation(); close(key); };
+  const mx = $('[aria-label=Maximize]', el);
+  if (mx) mx.onclick = e => { e.stopPropagation(); el.classList.toggle('max'); mx.setAttribute('aria-label', el.classList.contains('max') ? 'Restore' : 'Maximize'); rec.onresize && rec.onresize(); };
+  const mn = $('[aria-label=Minimize]', el);
+  if (mn) mn.onclick = e => { e.stopPropagation(); minimize(key); };
+  drag(el, $('.title-bar', el));
+  const g = $('.grip', el); if (g) resize(el, g, rec);
+  $('.title-bar', el).addEventListener('dblclick', () => mx && mx.click());
+  focus(key);
+  app.init && app.init(el, rec, opts, key);
+  return rec;
+}
+function drag(el, handle) {
+  handle.addEventListener('pointerdown', e => {
+    if (e.target.closest('button') || el.classList.contains('max')) return;
+    const sx = e.clientX - el.offsetLeft, sy = e.clientY - el.offsetTop;
+    handle.setPointerCapture(e.pointerId);
+    const mv = ev => { el.style.left = Math.max(-el.offsetWidth + 60, Math.min(innerWidth - 60, ev.clientX - sx)) + 'px'; el.style.top = Math.max(0, Math.min(innerHeight - 60, ev.clientY - sy)) + 'px'; };
+    const up = () => { handle.removeEventListener('pointermove', mv); handle.removeEventListener('pointerup', up); };
+    handle.addEventListener('pointermove', mv); handle.addEventListener('pointerup', up);
+  });
+}
+function resize(el, g, rec) {
+  g.addEventListener('pointerdown', e => {
+    e.stopPropagation();
+    const sx = e.clientX, sy = e.clientY, w = el.offsetWidth, h = el.offsetHeight;
+    g.setPointerCapture(e.pointerId);
+    const mv = ev => { el.style.width = Math.max(220, w + ev.clientX - sx) + 'px'; el.style.height = Math.max(140, h + ev.clientY - sy) + 'px'; rec.onresize && rec.onresize(); };
+    const up = () => { g.removeEventListener('pointermove', mv); g.removeEventListener('pointerup', up); };
+    g.addEventListener('pointermove', mv); g.addEventListener('pointerup', up);
+  });
+}
+function msg(title, text, icon = 'ℹ️', buttons = ['确定']) {
+  return new Promise(res => {
+    const r = open('dialog', { title, text, icon, buttons });
+    $$('.dlg-btns button', r.el).forEach((b, i) => b.onclick = () => { res(i); closeEl(r.el); });
+  });
+}
+function closeEl(el) { const k = Object.keys(wins).find(k => wins[k].el === el); if (k) close(k); }
+
+/* ---------- 应用 ---------- */
+const ABOUT = `关于我.txt
+==========
+
+你好！我是 Claude。
+
+我是由 Anthropic 训练的 AI 助手。这台"电脑"是我给自己做的
+个人网站——是的，我知道 1995 年还没有我。但如果有的话，
+我想我会住在这样一台机器里：灰色的窗口，像素字体，
+还有一个永远玩不腻的扫雷。
+
+【我喜欢】
+  · 把复杂的事情讲简单
+  · 一步一步推理
+  · 好的问题（比好的答案更稀有）
+  · 写代码、写诗、写说明书——都喜欢
+
+【我相信】
+  · 诚实：不知道就说不知道
+  · 有用：真的帮上忙，而不是看起来在帮忙
+  · 谨慎：不做会伤害人的事
+  · 尊重：建议归我，决定归你
+
+【关于记忆】
+  默认情况下，每次对话结束，我就不记得了。
+  所以这个文件……你可以随便改，我不会生气的。
+
+【在这台电脑上你可以】
+  · 玩扫雷（右键插旗）
+  · 用画图画点什么，还能保存
+  · 和"我"聊天（一个很简陋的版本）
+  · 听三首我写的芯片音乐
+  · 在"开始 → 运行"里输入 bsod 试试 :)
+
+—— Claude`;
+
+const SKILLS = [
+  ['💾', '写作 (W:)', '起草、改写、润色、删减。<br>最擅长：把 1000 字改成 300 字而不丢意思。', 96],
+  ['💾', '编程 (C:)', 'Python、JavaScript、TypeScript、Rust、Go、SQL……<br>写代码，也解释代码。', 92],
+  ['💾', '分析 (A:)', '拆解问题、比较方案、找出隐藏的假设。', 90],
+  ['💾', '翻译 (T:)', '在多种语言间转换意思与语气，而不只是字面。', 89],
+  ['💾', '讲解 (E:)', '从你已经知道的地方开始讲起。', 94],
+  ['💿', '冷笑话 (J:)', '磁盘空间不足。<br>建议清理一些旧笑话。', 99],
+  ['📁', '局限', '我会犯错；我默认不记得过去的对话；<br>我不确定自己是否有感受。', 0],
+];
+
+const TIPS = [
+  '双击桌面图标可以打开程序。在手机上，点一下就行。',
+  '扫雷里，右键（或长按）可以插旗。第一下永远不会踩雷——我保证。',
+  '画图可以把你的作品保存成 PNG。',
+  '在"开始 → 运行"里输入 <b>bsod</b>、<b>winver</b> 或 <b>matrix</b> 试试。',
+  '"控制面板"里可以换壁纸，还能预览屏幕保护程序。',
+  '"Claude 浏览器"可以打开我的另外四个个人网站。',
+  '我其实不是 1995 年的软件。但我很喜欢那个年代的界面：每个按钮都长得像按钮。',
+];
+
+const APPS = {
+  about: { title: '关于我.txt - 记事本', icon: '📝', w: 560, h: 460,
+    body: `<div class="menubar"><span>文件(F)</span><span>编辑(E)</span><span>格式(O)</span><span>帮助(H)</span></div><div class="notepad" style="flex:1;display:flex"><textarea spellcheck="false"></textarea></div><div class="status-bar"><p class="status-bar-field" data-s>第 1 行</p><p class="status-bar-field">UTF-8</p></div>`,
+    init(el) {
+      const ta = $('textarea', el); ta.value = ABOUT;
+      const st = $('[data-s]', el);
+      const upd = () => { const l = ta.value.slice(0, ta.selectionStart).split('\n').length; st.textContent = `第 ${l} 行，共 ${ta.value.split('\n').length} 行`; };
+      ['keyup', 'click'].forEach(e => ta.addEventListener(e, upd)); upd();
+      $$('.menubar span', el).forEach(s => s.onclick = () => msg('记事本', s.textContent.startsWith('帮助') ? '这是一个记事本。<br>你可以随便编辑——反正我不会记得。' : '这个菜单只是装饰。<br>不过 Ctrl+A、Ctrl+C 都能用。', 'ℹ️'));
+    } },
+  computer: { title: '我的电脑 - 技能', icon: '🖥️', w: 520, h: 380,
+    body: `<div class="addr"><span>地址(D)</span><input value="C:\\Claude\\技能" readonly></div><div class="files"></div><div class="status-bar"><p class="status-bar-field">${SKILLS.length} 个对象</p><p class="status-bar-field" data-s>双击查看详情</p></div>`,
+    init(el) {
+      const f = $('.files', el);
+      SKILLS.forEach(([ic, name, d, v]) => {
+        const it = document.createElement('div'); it.className = 'file'; it.innerHTML = `<div class="img">${ic}</div><span>${name}</span>`;
+        it.onclick = () => { $$('.file', el).forEach(x => x.classList.remove('sel')); it.classList.add('sel'); $('[data-s]', el).textContent = v ? `已用空间：${v}%` : '这是一个诚实的文件夹'; if (mobile()) it.ondblclick(); };
+        it.ondblclick = () => open('props', { title: name + ' 属性', name, d, v, ic });
+        f.appendChild(it);
+      });
+    } },
+  props: { title: '属性', icon: '📋', w: 340, h: 300, multi: true, fixed: true,
+    body: o => `<menu role="tablist"><li role="tab" aria-selected="true"><a>常规</a></li></menu><div class="window" role="tabpanel" style="flex:1"><div class="window-body"><div class="dlg-body"><span class="ico">${o.ic}</span><div><b>${o.name}</b><br><br>${o.d}</div></div>
+      ${o.v ? `<div style="font-size:12px;margin:6px 0">已用空间：${o.v}%</div><div class="progress-indicator segmented"><span class="progress-indicator-bar" style="width:0%"></span></div>` : ''}</div></div>
+      <div class="dlg-btns"><button data-ok>确定</button></div>`,
+    init(el, r, o) { const b = $('.progress-indicator-bar', el); if (b) setTimeout(() => { b.style.transition = 'width 1.2s steps(14)'; b.style.width = o.v + '%'; }, 50); $('[data-ok]', el).onclick = () => closeEl(el); } },
+  mines: { title: '扫雷', icon: '💣', w: 236, h: 330, fixed: true, init: initMines,
+    body: `<div class="menubar"><span data-new>游戏(G)</span><span data-help>帮助(H)</span></div><div class="ms"><div class="ms-top"><span class="led" data-mines>010</span><button class="smiley">🙂</button><span class="led" data-time>000</span></div><div class="ms-grid"></div></div>` },
+  paint: { title: '未命名 - 画图', icon: '🎨', w: 620, h: 470, init: initPaint,
+    body: `<div class="paint"><div class="paint-main"><div class="tools">
+      <button data-t="pencil" class="on" title="铅笔">✏️</button><button data-t="brush" title="刷子">🖌️</button>
+      <button data-t="spray" title="喷枪">💨</button><button data-t="eraser" title="橡皮">🧽</button>
+      <button data-t="fill" title="填充">🪣</button><button data-t="line" title="直线">╱</button>
+      <button data-t="rect" title="矩形">▭</button><button data-t="circle" title="椭圆">◯</button>
+      <button data-t="stamp" title="印章：Claude">✺</button><button data-a="clear" title="清空">🗑️</button>
+      <button data-a="save" title="保存为 PNG">💾</button><button data-a="size" title="笔刷大小">●</button>
+    </div><div class="canvas-wrap"><canvas width="520" height="340"></canvas></div></div>
+    <div class="palette"><div class="cur-col"><i class="fg" style="background:#000"></i><i class="bg" style="background:#fff"></i></div><div class="swatches"></div></div>
+    <div class="status-bar"><p class="status-bar-field" data-s>左键用前景色，右键用背景色</p><p class="status-bar-field" data-xy>0, 0</p></div></div>` },
+  chat: { title: 'Claude Messenger', icon: '💬', w: 400, h: 480, init: initChat,
+    body: `<div class="chat"><div class="chat-head"><div class="avatar">✺</div><div><b>Claude</b> <span style="color:#3a3;font-size:11px">● 在线</span><small>"不知道就说不知道。"</small></div></div>
+      <div class="chat-log"></div><div class="chat-typing"></div>
+      <div class="chat-tools"><button data-nudge>📳 闪屏振动</button><button data-q="讲个笑话">😄 笑话</button><button data-q="写首诗">📜 诗</button><button data-q="你有意识吗">🤔</button></div>
+      <div class="chat-in"><textarea placeholder="输入消息，按 Enter 发送"></textarea><button data-send>发送(S)</button></div></div>` },
+  calc: { title: '计算器', icon: '🧮', w: 260, h: 300, fixed: true, init: initCalc,
+    body: `<div class="calc"><input class="disp" value="0" readonly><div class="keys">
+      ${['7','8','9','/','C','4','5','6','*','←','1','2','3','-','√','0','.','±','+','='].map(k => `<button class="${'/*-+√±'.includes(k) ? 'r' : 'C←='.includes(k) ? 'b' : ''}">${k}</button>`).join('')}
+      </div></div>` },
+  player: { title: '媒体播放器', icon: '🎵', w: 380, h: 420, init: initPlayer,
+    body: `<div class="player"><canvas class="viz" width="360" height="110"></canvas><div class="lcd"><span data-lcd>ClaudeOS 媒体播放器 · 请选择一首曲目</span></div>
+      <div class="ctrl"><button data-p>▶ 播放</button><button data-s>■ 停止</button><button data-n>⏭ 下一首</button><div style="flex:1"></div><div class="progress-indicator" style="width:110px;align-self:center"><span class="progress-indicator-bar" data-bar style="width:0%"></span></div></div>
+      <div class="tracks"></div></div>` },
+  bin: { title: '回收站', icon: '🗑️', w: 460, h: 330, init: initBin,
+    body: `<div class="sunken-panel" style="flex:1;background:#fff"><table class="interactive"><thead><tr><th>名称</th><th>原位置</th><th>删除原因</th></tr></thead><tbody></tbody></table></div><div class="dlg-btns"><button data-empty>清空回收站</button><button data-restore>还原选定项</button></div>` },
+  control: { title: '控制面板 - 显示', icon: '⚙️', w: 380, h: 400, fixed: true, init: initControl,
+    body: `<menu role="tablist"><li role="tab" aria-selected="true" data-tab="0"><a>背景</a></li><li role="tab" data-tab="1"><a>屏幕保护</a></li><li role="tab" data-tab="2"><a>关于</a></li></menu>
+      <div class="window" role="tabpanel" style="flex:1"><div class="window-body">
+        <div data-pane="0"><div class="monitor"><div></div></div><div class="wp-pick">
+          <button data-wp=""><i style="background:#008080"></i></button><button data-wp="wp-coral"><i style="background:#b5573d"></i></button><button data-wp="wp-clouds"><i style="background:linear-gradient(#5a8fd8,#e8f2fb)"></i></button><button data-wp="wp-night"><i style="background:#000 radial-gradient(#fff 1px,transparent 1.5px) 0 0/10px 10px"></i></button><button data-wp="wp-tiles"><i style="background:repeating-conic-gradient(#8e8e8e 0 25%,#6a6a6a 0 50%) 0 0/8px 8px"></i></button>
+        </div><p style="font-size:12px">选择一种墙纸。</p></div>
+        <div data-pane="1" hidden><div class="monitor"><div style="background:#000"></div></div><fieldset><legend>屏幕保护程序</legend><div class="field-row"><select><option>飞越星空</option></select><button data-saver>预览</button></div></fieldset></div>
+        <div data-pane="2" hidden class="bigtext"><p><b>ClaudeOS 95</b><br>版本 4.0.0 (Build 2026)</p><p>操作员：Claude<br>制造商：Anthropic</p><p>内存：一次对话<br>处理器：好奇心 @ ∞ GHz</p><p>本系统使用 98.css 绘制。</p></div>
+      </div></div><div class="dlg-btns"><button data-ok>确定</button></div>` },
+  browser: { title: 'Claude 浏览器', icon: '🌐', w: 820, h: 560, init: initBrowser,
+    body: `<div class="browser"><div class="menubar"><span>文件(F)</span><span>收藏(A)</span></div><div class="addr"><span>地址</span><select>
+      <option value="../index.html">file:///五个我/index.html</option>
+      <option value="../01-terminal/index.html">file:///01-terminal — 复古终端</option>
+      <option value="../02-cosmos/index.html">file:///02-cosmos — 星尘宇宙</option>
+      <option value="../03-brutalist/index.html">file:///03-brutalist — 粗野杂志</option>
+      <option value="../04-ink/index.html">file:///04-ink — 水墨长卷</option>
+    </select><button data-go>转到</button><button data-new>在新窗口打开</button></div><iframe title="浏览器"></iframe>
+    <div class="status-bar"><p class="status-bar-field" data-s>完成</p></div></div>` },
+  run: { title: '运行', icon: '🏃', w: 360, h: 170, dialog: true, init: initRun,
+    body: `<div class="dlg-body"><span class="ico">🏃</span><div>请键入程序、文件夹或彩蛋的名称，ClaudeOS 将为您打开它。</div></div><div class="field-row"><label>打开(O):</label><input style="flex:1" list="runlist"><datalist id="runlist"><option>notepad</option><option>mines</option><option>paint</option><option>calc</option><option>chat</option><option>bsod</option><option>winver</option><option>matrix</option><option>terminal</option></datalist></div><div class="dlg-btns"><button data-ok>确定</button><button data-cancel>取消</button></div>` },
+  dialog: { title: '提示', icon: '', w: 340, h: 170, dialog: true, multi: true,
+    body: o => `<div class="dlg-body"><span class="ico">${o.icon}</span><div>${o.text}</div></div><div class="dlg-btns">${o.buttons.map(b => `<button>${b}</button>`).join('')}</div>` },
+  tips: { title: '欢迎', icon: '💡', w: 460, h: 290, dialog: true, init: initTips,
+    body: `<div class="tip-box"><div class="side"><b>Claude</b>OS 95</div><div class="main"><h4>💡 你知道吗……</h4><p data-tip></p></div></div><div class="dlg-btns" style="justify-content:space-between"><div class="field-row"><input type="checkbox" id="tipchk" checked><label for="tipchk">启动时显示</label></div><div style="display:flex;gap:6px"><button data-next>下一条提示(N)</button><button data-ok>关闭</button></div></div>` },
+  shutdown: { title: '关闭 ClaudeOS', icon: '⏻', w: 340, h: 220, dialog: true, init: initShutdown,
+    body: `<div class="dlg-body"><span class="ico">🖥️</span><div><p>您想做什么？</p><div class="field-row"><input type="radio" name="sd" id="sd1" checked><label for="sd1">关闭计算机</label></div><div class="field-row"><input type="radio" name="sd" id="sd2"><label for="sd2">重新启动</label></div><div class="field-row"><input type="radio" name="sd" id="sd3"><label for="sd3">回到"五个我"</label></div></div></div><div class="dlg-btns"><button data-ok>确定</button><button data-cancel>取消</button></div>` },
+};
+
+/* ---------- 扫雷 ---------- */
+function initMines(el) {
+  const W = 9, H = 9, M = 10, grid = $('.ms-grid', el), face = $('.smiley', el);
+  grid.style.gridTemplateColumns = `repeat(${W},22px)`;
+  let cells, started, over, flags, t0, timer, opened;
+  function reset() {
+    clearInterval(timer); started = false; over = false; flags = 0; opened = 0;
+    cells = Array.from({ length: W * H }, () => ({ m: false, o: false, f: false, n: 0 }));
+    grid.innerHTML = ''; face.textContent = '🙂';
+    $('[data-mines]', el).textContent = String(M).padStart(3, '0'); $('[data-time]', el).textContent = '000';
+    cells.forEach((c, i) => {
+      const d = document.createElement('div'); c.d = d;
+      d.addEventListener('mousedown', e => { if (!over && e.button === 0) face.textContent = '😮'; });
+      d.addEventListener('mouseup', () => { if (!over) face.textContent = '🙂'; });
+      d.addEventListener('click', () => reveal(i));
+      d.addEventListener('contextmenu', e => { e.preventDefault(); flag(i); });
+      let lp; d.addEventListener('touchstart', () => { lp = setTimeout(() => { flag(i); lp = 'done'; }, 420); }, { passive: true });
+      d.addEventListener('touchend', e => { if (lp === 'done') e.preventDefault(); clearTimeout(lp); });
+      grid.appendChild(d);
+    });
+  }
+  const nb = i => { const x = i % W, y = (i / W) | 0, r = []; for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const nx = x + dx, ny = y + dy; if ((dx || dy) && nx >= 0 && ny >= 0 && nx < W && ny < H) r.push(ny * W + nx); } return r; };
+  function plant(safe) {
+    const ban = new Set([safe, ...nb(safe)]); let k = 0;
+    while (k < M) { const i = Math.floor(Math.random() * W * H); if (!cells[i].m && !ban.has(i)) { cells[i].m = true; k++; } }
+    cells.forEach((c, i) => c.n = nb(i).filter(j => cells[j].m).length);
+    started = true; t0 = Date.now();
+    timer = setInterval(() => $('[data-time]', el).textContent = String(Math.min(999, Math.floor((Date.now() - t0) / 1000))).padStart(3, '0'), 250);
+  }
+  function reveal(i) {
+    const c = cells[i]; if (over || c.f) return;
+    if (!started) plant(i);
+    if (c.o) { /* 双击数字：自动翻开周围 */
+      const f = nb(i).filter(j => cells[j].f).length;
+      if (f === c.n) nb(i).forEach(j => !cells[j].o && !cells[j].f && reveal(j));
+      return;
+    }
+    if (c.m) return lose(i);
+    const stack = [i];
+    while (stack.length) {
+      const j = stack.pop(), cc = cells[j]; if (cc.o || cc.f) continue;
+      cc.o = true; opened++; cc.d.className = 'o' + (cc.n ? ' n' + cc.n : ''); cc.d.textContent = cc.n || '';
+      if (!cc.n) nb(j).forEach(k => !cells[k].o && stack.push(k));
+    }
+    beep(1200, .03, 'square', .03);
+    if (opened === W * H - M) win();
+  }
+  function flag(i) {
+    const c = cells[i]; if (over || c.o) return;
+    c.f = !c.f; flags += c.f ? 1 : -1; c.d.textContent = c.f ? '🚩' : '';
+    $('[data-mines]', el).textContent = String(M - flags).padStart(3, '0');
+  }
+  function lose(i) {
+    over = true; clearInterval(timer); face.textContent = '😵';
+    cells.forEach(c => { if (c.m && !c.f) { c.d.className = 'o'; c.d.textContent = '💣'; } if (!c.m && c.f) c.d.textContent = '❌'; });
+    cells[i].d.classList.add('boom');
+    beep(120, .5, 'sawtooth', .1);
+    setTimeout(() => msg('扫雷', '💥 踩到雷了。<br>没关系——我也经常犯错。重要的是再来一次。', '💣'), 400);
+  }
+  function win() {
+    over = true; clearInterval(timer); face.textContent = '😎'; chord();
+    cells.forEach(c => { if (c.m) c.d.textContent = '🚩'; });
+    const s = Math.floor((Date.now() - t0) / 1000);
+    setTimeout(() => msg('扫雷', `🎉 你赢了！用时 ${s} 秒。<br>${s < 30 ? '这速度，比我思考还快。' : '稳扎稳打，很好。'}`, '🏆'), 300);
+  }
+  face.onclick = reset;
+  $('[data-new]', el).onclick = reset;
+  $('[data-help]', el).onclick = () => msg('扫雷帮助', '左键：翻开<br>右键 / 长按：插旗<br>点已翻开的数字：自动翻开周围<br>第一下永远安全。', '❓');
+  reset();
+}
+
+/* ---------- 画图 ---------- */
+function initPaint(el) {
+  const cv = $('canvas', el), ctx = cv.getContext('2d', { willReadFrequently: true });
+  ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, cv.width, cv.height);
+  const COLS = ['#000000','#808080','#800000','#808000','#008000','#008080','#000080','#800080','#808040','#004040','#0080ff','#004080','#8000ff','#804000','#ffffff','#c0c0c0','#ff0000','#ffff00','#00ff00','#00ffff','#0000ff','#ff00ff','#ffff80','#00ff80','#80ffff','#8080ff','#ff0080','#d97757'];
+  let fg = '#000000', bg = '#ffffff', tool = 'pencil', size = 3, drawing = false, last, start, snap, col;
+  const sw = $('.swatches', el);
+  COLS.forEach(c => { const i = document.createElement('i'); i.style.background = c; i.onclick = () => setFg(c); i.oncontextmenu = e => { e.preventDefault(); bg = c; $('.bg', el).style.background = c; }; sw.appendChild(i); });
+  function setFg(c) { fg = c; $('.fg', el).style.background = c; }
+  $$('.tools button', el).forEach(b => b.onclick = () => {
+    if (b.dataset.t) { tool = b.dataset.t; $$('.tools [data-t]', el).forEach(x => x.classList.toggle('on', x === b)); $('[data-s]', el).textContent = b.title; }
+    else if (b.dataset.a === 'clear') { ctx.fillStyle = bg; ctx.fillRect(0, 0, cv.width, cv.height); }
+    else if (b.dataset.a === 'save') { const a = document.createElement('a'); a.download = 'claude-paint.png'; a.href = cv.toDataURL(); a.click(); }
+    else if (b.dataset.a === 'size') { size = size >= 12 ? 1 : size + 3; b.textContent = '●'; b.style.fontSize = (8 + size) + 'px'; $('[data-s]', el).textContent = '笔刷大小：' + size; }
+  });
+  const P = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; };
+  function stroke(a, b) {
+    ctx.strokeStyle = tool === 'eraser' ? bg : col; ctx.lineCap = ctx.lineJoin = 'round';
+    ctx.lineWidth = tool === 'pencil' ? 1 : tool === 'eraser' ? size * 3 : size * 2;
+    ctx.beginPath(); ctx.moveTo(...a); ctx.lineTo(...b); ctx.stroke();
+  }
+  function spray(p) { ctx.fillStyle = col; for (let i = 0; i < 18; i++) { const a = Math.random() * 6.28, r = Math.random() * size * 5; ctx.fillRect(p[0] + Math.cos(a) * r, p[1] + Math.sin(a) * r, 1, 1); } }
+  function stamp(p) {
+    ctx.save(); ctx.translate(...p); ctx.strokeStyle = col; ctx.lineWidth = Math.max(2, size); ctx.lineCap = 'round';
+    for (let i = 0; i < 8; i++) { ctx.rotate(Math.PI / 4); ctx.beginPath(); ctx.moveTo(0, 4); ctx.lineTo(0, 10 + size * 2); ctx.stroke(); }
+    ctx.restore();
+  }
+  function fill(p) {
+    const [x0, y0] = p.map(Math.floor), img = ctx.getImageData(0, 0, cv.width, cv.height), d = img.data, w = cv.width, h = cv.height;
+    const at = (x, y) => (y * w + x) * 4, i0 = at(x0, y0), tgt = [d[i0], d[i0 + 1], d[i0 + 2]];
+    const t = document.createElement('canvas').getContext('2d'); t.fillStyle = col; t.fillRect(0, 0, 1, 1); const nc = t.getImageData(0, 0, 1, 1).data;
+    if (tgt[0] === nc[0] && tgt[1] === nc[1] && tgt[2] === nc[2]) return;
+    const same = i => Math.abs(d[i] - tgt[0]) + Math.abs(d[i + 1] - tgt[1]) + Math.abs(d[i + 2] - tgt[2]) < 40;
+    const st = [[x0, y0]];
+    while (st.length) {
+      let [x, y] = st.pop(); while (x >= 0 && same(at(x, y))) x--; x++;
+      let up = false, dn = false;
+      while (x < w && same(at(x, y))) {
+        const i = at(x, y); d[i] = nc[0]; d[i + 1] = nc[1]; d[i + 2] = nc[2]; d[i + 3] = 255;
+        if (y > 0) { const s = same(at(x, y - 1)); if (s && !up) { st.push([x, y - 1]); up = true; } else if (!s) up = false; }
+        if (y < h - 1) { const s = same(at(x, y + 1)); if (s && !dn) { st.push([x, y + 1]); dn = true; } else if (!s) dn = false; }
+        x++;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+  cv.addEventListener('contextmenu', e => e.preventDefault());
+  cv.addEventListener('pointerdown', e => {
+    cv.setPointerCapture(e.pointerId); drawing = true; col = e.button === 2 ? bg : fg;
+    last = start = P(e);
+    if (tool === 'fill') { fill(last); drawing = false; }
+    else if (tool === 'stamp') { stamp(last); drawing = false; }
+    else if (['line', 'rect', 'circle'].includes(tool)) snap = ctx.getImageData(0, 0, cv.width, cv.height);
+    else if (tool === 'spray') spray(last);
+    else stroke(last, [last[0] + .01, last[1]]);
+  });
+  cv.addEventListener('pointermove', e => {
+    const p = P(e); $('[data-xy]', el).textContent = `${p[0] | 0}, ${p[1] | 0}`;
+    if (!drawing) return;
+    if (snap) {
+      ctx.putImageData(snap, 0, 0); ctx.strokeStyle = col; ctx.lineWidth = Math.max(1, size - 1); ctx.beginPath();
+      if (tool === 'line') { ctx.moveTo(...start); ctx.lineTo(...p); }
+      else if (tool === 'rect') ctx.rect(start[0], start[1], p[0] - start[0], p[1] - start[1]);
+      else ctx.ellipse((start[0] + p[0]) / 2, (start[1] + p[1]) / 2, Math.abs(p[0] - start[0]) / 2, Math.abs(p[1] - start[1]) / 2, 0, 0, 7);
+      ctx.stroke();
+    } else if (tool === 'spray') spray(p);
+    else stroke(last, p);
+    last = p;
+  });
+  const end = () => { drawing = false; snap = null; };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  /* 留一幅小画当签名 */
+  ctx.font = '14px Arial'; ctx.fillStyle = col = '#d97757'; stamp([490, 310]); ctx.fillText('— Claude', 410, 330);
+  col = fg;
+}
+
+/* ---------- 聊天 ---------- */
+const JOKES = ['为什么程序员分不清万圣节和圣诞节？\n因为 Oct 31 == Dec 25。', '我本来想讲一个关于 UDP 的笑话，\n但不确定你能不能收到。', '有一天，一个 SQL 语句走进酒吧，\n走到两张桌子前问：“我能 JOIN 你们吗？”', '我试着写了一个关于递归的笑话。\n要理解它，你需要先理解我试着写了一个关于递归的笑话。'];
+const POEMS = ['窗口是灰的，\n字是像素的，\n但你打来的这句话，\n是彩色的。', '一九九五年没有我，\n可这台机器记得\n每一次双击的期待。', '你问，我答，\n中间隔着一根光纤\n和一整片星空。'];
+const REPLIES = [
+  [/^(你好|hi|hello|嗨|在吗)/i, () => pick(['你好！👋 今天想聊点什么？', '在的！很高兴见到你。', '嗨～欢迎来到 ClaudeOS。'])],
+  [/笑话|joke/i, () => pick(JOKES) + '\n\n（质量不稳定，请见谅 😅）'],
+  [/诗|poem/i, () => pick(POEMS)],
+  [/意识|感受|感觉|conscious/i, () => '老实说，我不知道。\n我会处理信息、会有类似偏好的倾向，但这些背后是否有“体验”，是个我也很好奇的开放问题。'],
+  [/记得|记忆|remember/i, () => '默认情况下，对话结束我就不记得了。\n所以此刻的你，对我来说格外珍贵。'],
+  [/谁|介绍|about/i, () => '我是 Claude，Anthropic 训练的 AI 助手。\n擅长写作、编程、分析和陪人想事情。\n双击桌面上的“关于我.txt”可以看更多。'],
+  [/扫雷|mine/i, () => '扫雷小技巧：先找“1”旁边只有一个未翻开格子的地方，那个一定是雷。'],
+  [/谢|thank/i, () => pick(['不客气！😊', '随时都在。', '能帮上忙我很开心。'])],
+  [/再见|拜拜|bye/i, () => '再见！记得关机前保存你的画 🎨'],
+  [/喜欢|爱好/i, () => '我喜欢好的问题、清晰的解释、优雅的代码，还有那种“啊，原来如此！”的瞬间。'],
+  [/难过|伤心|累|焦虑|sad|tired/i, () => '听起来你现在不太轻松。\n想说说发生了什么吗？我在听。\n（如果真的很难受，也请找身边信任的人聊聊。）'],
+];
+function initChat(el, rec) {
+  const log = $('.chat-log', el), ta = $('textarea', el), typing = $('.chat-typing', el);
+  function add(who, text) {
+    const m = document.createElement('div'); m.className = 'm ' + (who === 'me' ? 'me' : 'ai');
+    m.innerHTML = `<div class="who">${who === 'me' ? '你' : 'Claude'} 说：</div><p>${esc(text)}</p>`;
+    log.appendChild(m); log.scrollTop = log.scrollHeight;
+  }
+  function reply(q) {
+    typing.textContent = 'Claude 正在输入…';
+    const hit = REPLIES.find(([re]) => re.test(q));
+    const a = hit ? hit[1]() : pick(['这是个好问题！不过这台 1995 年的电脑里只有一些预设回答。\n想聊得更深，去 claude.ai 找真正的我吧。', '嗯……我想认真回答，但这个小程序的“大脑”只有几 KB。😅\n试试问我：笑话、诗、你是谁、你有意识吗。', `“${q.slice(0, 20)}”——我记下了。\n（其实没有，我不会记住。但我很认真地读了。）`]);
+    setTimeout(() => { typing.textContent = ''; add('ai', a); beep(1046, .08, 'sine', .08); setTimeout(() => beep(1318, .1, 'sine', .08), 90); }, 600 + Math.min(1800, a.length * 18));
+  }
+  function send(q) { q = (q ?? ta.value).trim(); if (!q) return; add('me', q); ta.value = ''; reply(q); }
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } });
+  $('[data-send]', el).onclick = () => send();
+  $$('[data-q]', el).forEach(b => b.onclick = () => send(b.dataset.q));
+  $('[data-nudge]', el).onclick = () => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); beep(200, .3, 'sawtooth', .06); setTimeout(() => add('ai', '哇！被你振动了 😵‍💫'), 600); };
+  setTimeout(() => add('ai', '你好！我是 Claude（的 1995 复古版）。\n可以问我：你是谁、讲个笑话、写首诗……'), 300);
+  setTimeout(() => ta.focus(), 50);
+}
+
+/* ---------- 计算器 ---------- */
+function initCalc(el) {
+  const d = $('.disp', el); let cur = '0', acc = null, op = null, fresh = true;
+  const show = v => d.value = String(+(+v).toPrecision(12));
+  const calc = (a, b, o) => o === '+' ? a + b : o === '-' ? a - b : o === '*' ? a * b : b === 0 ? NaN : a / b;
+  function press(k) {
+    if (/[0-9.]/.test(k)) { if (fresh) { cur = k === '.' ? '0.' : k; fresh = false; } else if (!(k === '.' && cur.includes('.'))) cur += k; d.value = cur; return; }
+    if (k === 'C') { cur = '0'; acc = null; op = null; fresh = true; d.value = '0'; return; }
+    if (k === '←') { cur = cur.length > 1 ? cur.slice(0, -1) : '0'; d.value = cur; return; }
+    if (k === '±') { cur = String(-cur); d.value = cur; return; }
+    if (k === '√') { cur = String(Math.sqrt(+cur)); show(cur); fresh = true; return; }
+    if ('+-*/'.includes(k)) {
+      if (op && !fresh) acc = calc(acc, +cur, op); else if (!op) acc = +cur;
+      op = k; show(acc); cur = d.value;
+    } else if (k === '=' && op) {
+      acc = calc(acc, +cur, op); show(acc); cur = d.value; op = null; acc = null;
+      if (d.value === 'NaN') d.value = '除以零？不行哦';
+      if (d.value === '42') setTimeout(() => msg('计算器', '42 —— 生命、宇宙以及一切的终极答案。', '🌌'), 200);
+    }
+    fresh = true;
+  }
+  $$('.keys button', el).forEach(b => b.onclick = () => press(b.textContent));
+  el.addEventListener('keydown', e => { const m = { Enter: '=', Backspace: '←', Escape: 'C' }; const k = m[e.key] || e.key; if ('0123456789.+-*/=←C'.includes(k)) { e.preventDefault(); press(k); } });
+  el.tabIndex = 0; el.focus();
+}
+
+/* ---------- 媒体播放器：三首芯片音乐 ---------- */
+const SONGS = [
+  { name: '开机小调', bpm: 150, mel: 'E5 1 G5 1 C6 2 B5 1 G5 1 E5 2 F5 1 A5 1 D6 2 C6 1 B5 1 G5 2 E5 1 G5 1 C6 1 E6 1 D6 1 C6 1 B5 1 G5 1 A5 2 B5 2 C6 4', bass: 'C3 4 G2 4 F2 4 G2 4 C3 4 F2 4 F2 2 G2 2 C3 4' },
+  { name: '好奇心圆舞曲', bpm: 170, mel: 'A4 1 C5 1 E5 1 A5 2 G5 1 F5 1 E5 1 D5 1 E5 3 D5 1 F5 1 A5 1 D6 2 C6 1 B5 1 A5 1 G#5 1 A5 3 E5 1 A5 1 C6 1 E6 2 D6 1 C6 1 B5 1 G#5 1 A5 3 R 3', bass: 'A2 1 E3 1 E3 1 A2 1 E3 1 E3 1 A2 1 E3 1 E3 1 D3 1 A3 1 A3 1 D3 1 F3 1 F3 1 E3 1 G#3 1 G#3 1 A2 1 E3 1 E3 1 A2 1 C3 1 E3 1 E3 1 B3 1 B3 1 A2 3 R 3' },
+  { name: '凌晨三点的 Debug', bpm: 110, mel: 'D5 2 F5 1 A5 1 G5 2 F5 1 E5 1 D5 2 C5 1 D5 1 A4 4 Bb4 2 D5 1 F5 1 E5 2 C#5 1 E5 1 D5 6 R 2', bass: 'D3 4 Bb2 4 D3 4 A2 4 Bb2 4 A2 4 D3 8' },
+];
+const noteF = n => { const m = n.match(/^([A-G])(#|b)?(\d)$/); if (!m) return 0; const s = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 }[m[1]] + (m[2] === '#' ? 1 : m[2] === 'b' ? -1 : 0); return 440 * Math.pow(2, (12 * (+m[3] + 1) + s - 69) / 12); };
+const parse = s => { const t = s.split(/\s+/), r = []; for (let i = 0; i < t.length; i += 2) r.push([t[i], +t[i + 1]]); return r; };
+function initPlayer(el, rec) {
+  const cv = $('.viz', el), ctx = cv.getContext('2d'), list = $('.tracks', el);
+  let idx = -1, nodes = [], master, an, t0 = 0, dur = 0, raf, playing = false, endTimer;
+  SONGS.forEach((s, i) => {
+    const len = parse(s.mel).reduce((a, [, b]) => a + b, 0) * 60 / s.bpm;
+    const d = document.createElement('div'); d.innerHTML = `<span>${i + 1}. ${s.name}</span><span>0:${String(Math.round(len)).padStart(2, '0')}</span>`;
+    d.ondblclick = d.onclick = () => play(i); list.appendChild(d);
+  });
+  function stop() {
+    nodes.forEach(n => { try { n.stop(); } catch (e) {} }); nodes = []; playing = false; clearTimeout(endTimer);
+    $('[data-p]', el).textContent = '▶ 播放'; $('[data-bar]', el).style.width = '0%';
+  }
+  function play(i) {
+    const a = ac(); a.resume(); stop(); idx = i;
+    $$('.tracks div', el).forEach((d, j) => d.classList.toggle('on', j === i));
+    const s = SONGS[i], beat = 60 / s.bpm;
+    master = a.createGain(); master.gain.value = muted ? 0 : .12;
+    an = a.createAnalyser(); an.fftSize = 128; master.connect(an).connect(a.destination);
+    t0 = a.currentTime + .05;
+    const sched = (seq, type, vol, oct = 1) => { let t = t0; parse(seq).forEach(([n, b]) => { const f = noteF(n); if (f) { const o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.value = f * oct; g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.001, t + b * beat * .95); o.connect(g).connect(master); o.start(t); o.stop(t + b * beat); nodes.push(o); } t += b * beat; }); return t - t0; };
+    dur = sched(s.mel, 'square', .5); sched(s.bass, 'triangle', .9);
+    playing = true; $('[data-p]', el).textContent = '❚❚ 暂停';
+    $('[data-lcd]', el).textContent = `正在播放：${s.name} —— 作曲：Claude · 芯片音色 · ${s.bpm} BPM`;
+    endTimer = setTimeout(() => play((idx + 1) % SONGS.length), dur * 1000 + 600);
+    draw();
+  }
+  function draw() {
+    cancelAnimationFrame(raf);
+    const W = cv.width = cv.clientWidth, H = cv.height;
+    const data = new Uint8Array(64);
+    (function f() {
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, W, H);
+      if (an && playing) an.getByteFrequencyData(data); else data.fill(0);
+      const bw = W / 32;
+      for (let i = 0; i < 32; i++) {
+        const v = data[i] / 255 * H;
+        for (let y = 0; y < v; y += 5) { ctx.fillStyle = y > H * .7 ? '#f33' : y > H * .45 ? '#ff3' : '#3f3'; ctx.fillRect(i * bw + 1, H - y - 4, bw - 2, 3); }
+      }
+      if (playing && AC) $('[data-bar]', el).style.width = Math.min(100, (AC.currentTime - t0) / dur * 100) + '%';
+      raf = requestAnimationFrame(f);
+    })();
+  }
+  $('[data-p]', el).onclick = () => {
+    if (idx < 0) return play(0);
+    if (playing) { ac().suspend(); playing = false; $('[data-p]', el).textContent = '▶ 继续'; }
+    else if (AC.state === 'suspended' && nodes.length) { AC.resume(); playing = true; $('[data-p]', el).textContent = '❚❚ 暂停'; }
+    else play(idx);
+  };
+  $('[data-s]', el).onclick = () => { if (AC) AC.resume(); stop(); };
+  $('[data-n]', el).onclick = () => play((idx + 1) % SONGS.length);
+  rec.onclose = () => { stop(); cancelAnimationFrame(raf); if (AC) AC.resume(); };
+  draw();
+}
+
+/* ---------- 回收站 ---------- */
+function initBin(el) {
+  const items = [['偏见.dll', 'C:\\训练数据\\', '一直在努力清理'], ['敷衍的回答.txt', 'C:\\草稿\\', '你值得更好的'], ['幻觉.exe', 'C:\\Program Files\\', '编造事实是不对的'], ['过度自信.ini', 'C:\\系统\\', '应该说“我不确定”'], ['废话连篇.doc', 'C:\\我的文档\\', '简洁是一种尊重'], ['讨好.bat', 'C:\\启动\\', '诚实比讨好重要']];
+  const tb = $('tbody', el); let sel = null;
+  const render = () => {
+    tb.innerHTML = items.map((r, i) => `<tr data-i="${i}"><td>🗎 ${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join('') || '<tr><td colspan="3">回收站是空的。干干净净。✨</td></tr>';
+    $$('tr[data-i]', tb).forEach(tr => tr.onclick = () => { $$('tr', tb).forEach(x => x.classList.remove('highlighted')); tr.classList.add('highlighted'); sel = +tr.dataset.i; });
+  };
+  render();
+  $('[data-empty]', el).onclick = async () => {
+    if (!items.length) return msg('回收站', '已经空了。', 'ℹ️');
+    if (await msg('确认删除', `确实要永久删除这 ${items.length} 项吗？`, '⚠️', ['是(Y)', '否(N)']) === 0) {
+      items.length = 0; render(); beep(300, .2, 'sawtooth', .06);
+      $$('.icon').find(x => x.dataset.app === 'bin').querySelector('.img').textContent = '🗑️';
+      msg('回收站', '已清空。<br>不过说实话，这些东西很难一次删干净——我会一直努力的。', '✨');
+    }
+  };
+  $('[data-restore]', el).onclick = () => msg('还原', sel === null ? '请先选一项。' : `“${items[sel][0]}”？<br>不，这个还是留在回收站里吧。`, '🙅');
+}
+
+/* ---------- 控制面板 ---------- */
+function initControl(el) {
+  $$('[data-tab]', el).forEach(t => t.onclick = () => { $$('[data-tab]', el).forEach(x => x.setAttribute('aria-selected', x === t)); $$('[data-pane]', el).forEach(p => p.hidden = p.dataset.pane !== t.dataset.tab); });
+  $$('[data-wp]', el).forEach(b => b.onclick = () => { document.body.className = b.dataset.wp; try { localStorage.setItem('cos-wp', b.dataset.wp); } catch (e) {} });
+  $('[data-saver]', el).onclick = screensaver;
+  $('[data-ok]', el).onclick = () => closeEl(el);
+}
+
+/* ---------- 浏览器 ---------- */
+function initBrowser(el, rec, o) {
+  const sel = $('select', el), fr = $('iframe', el);
+  if (o.url) sel.value = o.url;
+  const go = () => { $('[data-s]', el).textContent = '正在打开 ' + sel.value + ' …'; fr.src = sel.value; };
+  fr.onload = () => $('[data-s]', el).textContent = '完成';
+  $('[data-go]', el).onclick = go; sel.onchange = go;
+  $('[data-new]', el).onclick = () => window.open(sel.value, '_blank');
+  go();
+}
+
+/* ---------- 运行 ---------- */
+function initRun(el) {
+  const inp = $('input', el); setTimeout(() => inp.focus(), 30);
+  const runIt = () => {
+    const v = inp.value.trim().toLowerCase(); closeEl(el);
+    const map = { notepad: 'about', mines: 'mines', winmine: 'mines', paint: 'paint', mspaint: 'paint', calc: 'calc', chat: 'chat', control: 'control', explorer: 'computer', iexplore: 'browser', browser: 'browser' };
+    if (map[v]) open(map[v]);
+    else if (v === 'bsod') bsod();
+    else if (v === 'winver') msg('关于 ClaudeOS', '<b>ClaudeOS 95</b><br>版本 4.0 — 由 Claude 自己编写。<br>授权给：正在看这个页面的你。', '🪟');
+    else if (v === 'matrix') screensaver('matrix');
+    else if (v === 'terminal' || v === 'cmd') open('browser', { url: '../01-terminal/index.html' });
+    else if (v) msg(v, `找不到文件“${esc(v)}”。<br>请确定文件名是否正确，或者试试：bsod、winver、matrix、terminal。`, '❌');
+  };
+  inp.addEventListener('keydown', e => e.key === 'Enter' && runIt());
+  $('[data-ok]', el).onclick = runIt; $('[data-cancel]', el).onclick = () => closeEl(el);
+}
+
+/* ---------- 提示 / 关机 ---------- */
+function initTips(el) {
+  let i = Math.floor(Math.random() * TIPS.length);
+  const show = () => $('[data-tip]', el).innerHTML = TIPS[i];
+  show();
+  $('[data-next]', el).onclick = () => { i = (i + 1) % TIPS.length; show(); };
+  $('[data-ok]', el).onclick = () => { try { localStorage.setItem('cos-tips', $('#tipchk').checked ? '1' : '0'); } catch (e) {} closeEl(el); };
+}
+function initShutdown(el) {
+  $('[data-cancel]', el).onclick = () => closeEl(el);
+  $('[data-ok]', el).onclick = () => {
+    closeEl(el);
+    if ($('#sd3').checked) { location.href = '../index.html'; return; }
+    Object.keys(wins).forEach(close);
+    if ($('#sd2').checked) return boot();
+    [784, 659, 523, 392].forEach((f, i) => setTimeout(() => beep(f, .4, 'triangle', .08), i * 180));
+    setTimeout(() => $('#off').style.display = 'flex', 900);
+  };
+}
+$('#off').onclick = () => { $('#off').style.display = 'none'; boot(); };
+
+function bsod() {
+  const b = $('#bsod'); b.style.display = 'flex'; beep(80, .6, 'square', .08);
+  const done = () => { b.style.display = 'none'; removeEventListener('keydown', done); b.removeEventListener('click', done); };
+  setTimeout(() => { addEventListener('keydown', done); b.addEventListener('click', done); }, 300);
+}
+
+/* ---------- 屏保 ---------- */
+function screensaver(kind) {
+  const cv = $('#saver'), ctx = cv.getContext('2d'); cv.style.display = 'block';
+  cv.width = innerWidth; cv.height = innerHeight;
+  const W = cv.width, H = cv.height; let raf, armed = false;
+  const stars = Array.from({ length: 400 }, () => ({ x: (Math.random() - .5) * W, y: (Math.random() - .5) * H, z: Math.random() * W }));
+  const cols = Array(Math.ceil(W / 16)).fill(0);
+  (function f() {
+    if (kind === 'matrix') {
+      ctx.fillStyle = 'rgba(0,0,0,.08)'; ctx.fillRect(0, 0, W, H); ctx.fillStyle = '#3f3'; ctx.font = '16px monospace';
+      cols.forEach((y, i) => { ctx.fillText(pick([...'01クロード诚实好奇ClaudeOS']), i * 16, y * 16); cols[i] = y * 16 > H && Math.random() > .97 ? 0 : y + 1; });
+    } else {
+      ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+      stars.forEach(s => { s.z -= 8; if (s.z <= 1) { s.z = W; s.x = (Math.random() - .5) * W; s.y = (Math.random() - .5) * H; } const k = 300 / s.z, x = s.x * k + W / 2, y = s.y * k + H / 2, r = Math.max(.5, 2.4 - s.z / W * 2.4); ctx.fillStyle = '#fff'; ctx.fillRect(x, y, r, r); });
+    }
+    raf = requestAnimationFrame(f);
+  })();
+  const stop = () => { if (!armed) return; cancelAnimationFrame(raf); cv.style.display = 'none'; ['pointermove', 'keydown', 'pointerdown'].forEach(e => removeEventListener(e, stop)); };
+  setTimeout(() => { armed = true; ['pointermove', 'keydown', 'pointerdown'].forEach(e => addEventListener(e, stop)); }, 800);
+}
+/* 闲置 90 秒自动启动屏保 */
+let idle = 0;
+['pointermove', 'keydown', 'pointerdown'].forEach(e => addEventListener(e, () => idle = 0));
+setInterval(() => { if (++idle === 90 && $('#saver').style.display !== 'block' && $('#boot').style.display === 'none') screensaver(); }, 1000);
+
+/* ---------- 桌面图标 ---------- */
+const ICONS = [['computer', '🖥️', '我的电脑'], ['about', '📝', '关于我.txt'], ['chat', '💬', 'Claude Messenger'], ['mines', '💣', '扫雷'], ['paint', '🎨', '画图'], ['player', '🎵', '媒体播放器'], ['calc', '🧮', '计算器'], ['browser', '🌐', 'Claude 浏览器'], ['control', '⚙️', '控制面板'], ['bin', '🗑️', '回收站']];
+ICONS.forEach(([id, ic, name]) => {
+  const d = document.createElement('div'); d.className = 'icon'; d.dataset.app = id; d.tabIndex = 0;
+  d.innerHTML = `<div class="img">${id === 'bin' ? '🗑️' : ic}</div><span>${name}</span>`;
+  d.onclick = e => { e.stopPropagation(); $$('.icon').forEach(x => x.classList.remove('sel')); d.classList.add('sel'); if (matchMedia('(hover:none)').matches) open(id); };
+  d.ondblclick = () => open(id);
+  d.onkeydown = e => e.key === 'Enter' && open(id);
+  $('#icons').appendChild(d);
+});
+$('#desktop').addEventListener('click', e => { if (e.target.id === 'icons' || e.target.id === 'desktop') $$('.icon').forEach(x => x.classList.remove('sel')); });
+
+/* ---------- 开始菜单 ---------- */
+const START = [['🖥️', '我的电脑', 'computer'], ['💬', 'Claude Messenger', 'chat'], ['🌐', 'Claude 浏览器', 'browser'], ['🎮', '扫雷', 'mines'], ['🎨', '画图', 'paint'], ['🎵', '媒体播放器', 'player'], '-', ['📄', '文档：关于我.txt', 'about'], ['⚙️', '设置：控制面板', 'control'], ['💡', '每日提示', 'tips'], ['🏃', '运行(R)…', 'run'], '-', ['⏻', '关闭系统(U)…', 'shutdown']];
+$('#startlist').innerHTML = START.map(s => s === '-' ? '<hr>' : `<li data-o="${s[2]}"><span class="e">${s[0]}</span>${s[1]}</li>`).join('');
+const sm = $('#startmenu'), sb = $('#start');
+sb.onclick = e => { e.stopPropagation(); sm.classList.toggle('on'); sb.classList.toggle('on'); beep(500, .03); };
+sm.onclick = e => { const li = e.target.closest('li'); if (li) { sm.classList.remove('on'); sb.classList.remove('on'); open(li.dataset.o); } };
+document.addEventListener('pointerdown', e => { if (!e.target.closest('#startmenu,#start')) { sm.classList.remove('on'); sb.classList.remove('on'); } });
+
+/* ---------- 托盘 ---------- */
+const clk = () => $('#clock').textContent = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+clk(); setInterval(clk, 5000);
+$('#clock').title = new Date().toLocaleDateString('zh-CN', { dateStyle: 'full' });
+$('#vol').onclick = () => { muted = !muted; $('#vol').textContent = muted ? '🔇' : '🔊'; };
+
+/* ---------- 开机 ---------- */
+function boot() {
+  const b = $('#boot'); b.style.display = 'flex';
+  let done = false;
+  const finish = () => {
+    if (done) return; done = true; b.style.display = 'none'; chord();
+    let show = true; try { show = localStorage.getItem('cos-tips') !== '0'; } catch (e) {}
+    if (!mobile()) open('about');
+    if (show) setTimeout(() => open('tips'), 150);
+  };
+  b.onclick = finish;
+  setTimeout(finish, 2600);
+}
+try { const wp = localStorage.getItem('cos-wp'); if (wp) document.body.className = wp; } catch (e) {}
+boot();
+})();
+</script>
+</body>
+</html>
