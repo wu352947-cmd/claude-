@@ -361,7 +361,7 @@ export class Planner {
       if (i === ts.length - 1 && ts.length > 3 && Math.random() < 0.4) { const other = ROUTES[tSite === 'A' ? 'B' : 'A'][0]; a.brain.route = other.slice(0, 4); a.brain.lurk = true; }
       a.brain.state = 'route'; a.brain.goal = null;
     });
-    for (const b of bots) { b.brain.bought = false; b.brain.target = null; b.brain.heard = null; b.brain.memory.clear(); b.brain.planting = false; }
+    for (const b of bots) { b.brain.bought = false; b.brain.target = null; b.brain.heard = null; b.brain.memory.clear(); b.brain.planting = false; b.brain.nade = null; b.brain.order = null; b.brain.path = null; b.brain.spot && b.brain.spot.clear(); }
   }
 
   avoidFn(bot) { return null; }
@@ -429,6 +429,7 @@ export class Planner {
       }
       return;
     }
+    if (bot.state === 'getbomb' && (a.inv.c4 || !g.bomb.dropped)) { bot.state = 'route'; bot.goal = null; }
     // bomb carrier at site -> plant
     if (a.inv.c4) {
       const inSite = g.inSite(a.pos);

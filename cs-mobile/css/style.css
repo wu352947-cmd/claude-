@@ -306,3 +306,9 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 @keyframes vsin { from { opacity: 0; transform: translateX(var(--dx, -20px)); } }
 @keyframes vsbar { to { width: 100%; } }
 @media (max-height: 420px) { #versus .vs-row { padding: 3px 8px; font-size: 13px; } #versus .vs-x { font-size: 44px; } #versus .vs-map { font-size: 30px; } }
+
+#tutorial { position: fixed; inset: 0; z-index: 58; display: flex; background: rgba(5, 6, 8, .55); }
+#tutorial .tu-zone { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; text-align: center; border: 2px dashed rgba(245, 166, 35, .55); margin: 12px; border-radius: 16px; color: #eee; }
+#tutorial .tu-zone.left { flex: 0.75; } #tutorial b { font-family: Teko; font-size: 34px; letter-spacing: 4px; color: var(--acc); } #tutorial span { font-size: 14px; color: #ccd; line-height: 1.6; }
+#tutorial .tu-tip { position: absolute; left: 50%; bottom: 18px; transform: translateX(-50%); padding: 6px 14px; border-radius: 8px; background: rgba(10, 11, 13, .85); font-size: 13px; white-space: nowrap; }
+.tc-hint { transition: opacity 1s; } .tc-hint.gone { opacity: 0; }

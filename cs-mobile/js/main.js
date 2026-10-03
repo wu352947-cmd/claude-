@@ -179,7 +179,16 @@ class App {
     if (this.state === 'match' && this._vsOn) {
       // versus screen stays up for 2.2s of *rendered* time (hides first-frame shader compile)
       if (this._vsStart === null) this._vsStart = now;
-      else if (now - this._vsStart > 2200) { this._vsOn = false; $('versus').classList.add('hidden'); this.paused = false; this.audio.play('cock', { volume: 0.6 }); }
+      else if (now - this._vsStart > 2200) {
+        this._vsOn = false; $('versus').classList.add('hidden'); this.paused = false; this.audio.play('cock', { volume: 0.6 });
+        let seen = false; try { seen = localStorage.getItem('csdust_tut') === '1'; } catch (e) { }
+        if (!seen && !this.settings.desktop) {
+          this.paused = true; const tu = $('tutorial'); tu.classList.remove('hidden');
+          const close = () => { tu.classList.add('hidden'); this.paused = false; try { localStorage.setItem('csdust_tut', '1'); } catch (e) { } tu.removeEventListener('click', close); tu.removeEventListener('touchend', close); };
+          tu.addEventListener('click', close); tu.addEventListener('touchend', close);
+        }
+        setTimeout(() => document.querySelector('.tc-hint')?.classList.add('gone'), 12000);
+      }
     }
     if (this.state === 'match') {
       if (this.input.menuReq) { this.input.menuReq = false; if ($('versus').classList.contains('hidden')) this.pause(!this.paused); }
