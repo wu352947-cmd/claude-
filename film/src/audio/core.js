@@ -168,7 +168,7 @@ export function perc(M, param, g, { a = 0.003, peak = 1, hold = 0, tau = 0.1 } =
   param.linearRampToValueAtTime(peak, T + a);
   if (hold > 0) param.setValueAtTime(peak, T + a + hold);
   param.setTargetAtTime(0, T + a + hold, tau);
-  return T + a + hold + tau * 9;   // a safe stop time (context time)
+  return g + a + hold + tau * 9;   // a safe stop time (global time)
 }
 
 export function osc(M, type, f, g, stopG, { detune = 0, wave = null } = {}) {

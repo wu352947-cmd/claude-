@@ -42,17 +42,17 @@ vec3 groundAlb(vec2 xz, vec4 m, float sand){
   a = mix(a, vec3(0.52, 0.43, 0.31), clamp(m.b * 1.4, 0., 0.7));   // paths
   // wet dark banks along water
   a *= 1. - 0.35 * smoothstep(0.0, 0.5, m.r);
-  vec3 s = vec3(0.60, 0.48, 0.34) * (0.92 + 0.12 * n2);
+  vec3 s = vec3(0.68, 0.56, 0.42) * (0.92 + 0.12 * n2);
   return mix(a, s, sand);
 }
 vec3 waterShade(vec3 P, float sand){
   vec3 V = normalize(uCam - P);
   vec3 Rr = reflect(-V, vec3(0., 1., 0.));
   vec3 sunH = normalize(vec3(uSunDir.x, 0.12, uSunDir.z));
-  Rr = normalize(mix(normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z)), sunH, 0.75 * (1. - uNight)));
+  Rr = normalize(mix(normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z)), sunH, 0.6 * (1. - uNight)));
   float fr = 0.04 + 0.96 * pow(1. - max(V.y, 0.), 5.);
   vec3 c = vec3(0.012, 0.018, 0.02) + skyBase(Rr) * (0.35 + 0.65 * fr);
-  float sp = pow(max(dot(Rr, uSunDir), 0.), 600.) * 30. + pow(max(dot(Rr, uSunDir), 0.), 60.) * 0.6;
+  float sp = pow(max(dot(Rr, uSunDir), 0.), 600.) * 10. + pow(max(dot(Rr, uSunDir), 0.), 60.) * 0.25;
   c += uSunCol * sp;
   c += uMoonCol * pow(max(dot(Rr, uMoonDir), 0.), 300.) * 20. * uNight;
   return c;
@@ -219,7 +219,7 @@ void main(){
   float er = clamp(vE.x * 0.7 + vE.y * 0.6, 0., 1.);
   float rip = sin((P.x * 0.9 + P.z * 0.35) * 3.2 + vnoise(P.xz * 0.15) * 4.);
   N = normalize(N + vec3(0.9, 0., 0.35) * rip * 0.06 * vE.y);
-  alb = mix(alb, vec3(0.72, 0.60, 0.45) * (0.95 + 0.08 * rip), er);
+  alb = mix(alb, vec3(0.68, 0.56, 0.42) * (0.95 + 0.08 * rip), er);
   // --- construction: fresh wet mud and a glowing edge band
   vec3 emit = vec3(0.);
   float building = step(vR + 0.03, vHz) * uBuild * (1. - vE.x);
@@ -730,8 +730,8 @@ export default {
       [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
       [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.9, 1.50, 0.62]],
       [0.17, [0.170, 0.190, 0.360], [1.050, 0.720, 0.420], [3.4, 2.10, 0.95]],
-      [0.32, [0.200, 0.300, 0.560], [0.780, 0.640, 0.480], [3.6, 3.0, 2.2]],
-      [1.00, [0.170, 0.300, 0.620], [0.700, 0.660, 0.580], [4.0, 3.6, 3.0]],
+      [0.32, [0.170, 0.250, 0.480], [0.640, 0.520, 0.390], [2.8, 2.25, 1.6]],
+      [1.00, [0.140, 0.250, 0.520], [0.560, 0.520, 0.450], [2.9, 2.5, 2.0]],
     ];
     const pal = i => { let k = 0; while (k < K.length - 2 && e > K[k + 1][0]) k++; const u = clamp((e - K[k][0]) / (K[k + 1][0] - K[k][0])); const s = u * u * (3 - 2 * u); return K[k][i].map((v, j) => lerp(v, K[k + 1][i][j], s)); };
     const zen = pal(1), hor = pal(2), sunc = pal(3);
@@ -810,8 +810,8 @@ export default {
     const V = S.veilU;
     V.uTime.value = t;
     V.uBack.value = track([[0, -0.25], [1.7, 1.35]], t, 'inOutSine');
-    V.uFront.value = track([[0, -1], [29.2, -0.35], [30.5, 1.35]], t, 'inQuad');
-    V.uOp.value = t < 2 ? 1 : t > 28.8 ? 1 : 0;
+    V.uFront.value = track([[0, -1], [28.7, -0.35], [30.0, 1.4]], t, 'inQuad');
+    V.uOp.value = t < 2 ? 1 : t > 28.6 ? 1 : 0;
     const veilCol = t < 5 ? [0.40, 0.29, 0.19] : [0.20, 0.21, 0.25];
     V.uCol.value.fromArray(veilCol);
     V.uCol2.value.fromArray(veilCol.map(x => x * 0.45));

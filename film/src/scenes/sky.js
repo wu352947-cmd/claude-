@@ -473,8 +473,8 @@ function updateK1(st, t, g) {
   const clear = smoothstep(1.4, 4.0, t);
   const deep = smoothstep(L_LIFT + 1.5, L_LIFT + 5.5, t);
   const black = smoothstep(L_LIFT + 4.5, L_LIFT + 6.6, t);
-  const hor = new THREE.Vector3(.29, .29, .29).lerp(new THREE.Vector3(.40, .48, .62), clear).lerp(new THREE.Vector3(.16, .26, .50), deep).lerp(new THREE.Vector3(.0, .0, .004), black);
-  const zen = new THREE.Vector3(.27, .27, .27).lerp(new THREE.Vector3(.10, .21, .50), clear).lerp(new THREE.Vector3(.02, .06, .22), deep).lerp(new THREE.Vector3(0, 0, 0), black);
+  const hor = new THREE.Vector3(.29, .29, .29).lerp(new THREE.Vector3(.28, .40, .62), clear).lerp(new THREE.Vector3(.16, .26, .50), deep).lerp(new THREE.Vector3(.0, .0, .004), black);
+  const zen = new THREE.Vector3(.27, .27, .27).lerp(new THREE.Vector3(.05, .14, .44), clear).lerp(new THREE.Vector3(.02, .06, .22), deep).lerp(new THREE.Vector3(0, 0, 0), black);
   K.skyU.uHor.value.copy(hor); K.skyU.uZen.value.copy(zen);
   _v.set(0, 2, 0).sub(cam.position).normalize();
   K.skyU.uGlowDir.value.copy(_v);
@@ -482,13 +482,13 @@ function updateK1(st, t, g) {
   U.uSky.value.copy(zen).multiplyScalar(0.9).addScalar(0.03 * (1 - clear));
   U.uGnd.value.copy(hor).multiplyScalar(0.25);
   U.uKeyCol.value.set(1.0, 0.93, 0.82).multiplyScalar(0.9 * clear * (1 - black * 0.3));
-  U.uFogCol.value.copy(hor).multiplyScalar(lerp(1, 0.85, deep));
+  U.uFogCol.value.copy(hor).multiplyScalar(lerp(1, 0.8, clear));
   U.uFogDens.value = lerp(0.010, 0.0005, smoothstep(0.8, 4.0, t));
   st.S1.mat.uniforms.uVis.value = smoothstep(L_LIFT + 4.8, L_LIFT + 6.8, t);
 
   K.flameU.uTime.value = g;
   const fl = smoothstep(-0.4, 0.4, tau) * ign;
-  K.flameU.uInt.value = 7 * fl * lerp(1, 0.08, smoothstep(50, 500, h));
+  K.flameU.uInt.value = 4.5 * fl * lerp(1, 0.08, smoothstep(50, 500, h));
   const flen = lerp(14, 80, smoothstep(0, 4, tau)) + h * 0.06;
   const fw = 1 + smoothstep(2, 6, tau) * 0.8;
   K.flame.scale.set(fw, flen, fw);
@@ -542,11 +542,11 @@ function updateK1(st, t, g) {
   pu.uSrcPos.value.copy(U.uSrcPos.value);
   pu.uSrcCol.value.copy(U.uSrcCol.value).multiplyScalar(0.8);
   pu.uSrcRange.value = 60;
-  pu.uSkyCol.value.copy(zen).multiplyScalar(0.75).addScalar(0.05 * (1 - clear));
+  pu.uSkyCol.value.copy(hor).multiplyScalar(0.55).add(new THREE.Vector3(0, 0.01, 0.04).multiplyScalar(clear)).addScalar(0.05 * (1 - clear));
   pu.uGroundCol.value.copy(hor).multiplyScalar(0.18);
   pu.uFogCol.value.copy(U.uFogCol.value);
   pu.uFogDens.value = U.uFogDens.value * 0.8;
-  pu.uKeyCol.value.copy(U.uKeyCol.value).multiplyScalar(1.25);
+  pu.uKeyCol.value.copy(U.uKeyCol.value).multiplyScalar(1.5);
   pu.uKeyDir.value.copy(U.uKeyDir.value);
   pu.uTime.value = T;
   pu.uAlbedo.value.set(0.7, 0.68, 0.66);

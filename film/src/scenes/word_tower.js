@@ -72,12 +72,14 @@ export async function buildAtlas() {
 // ---------------------------------------------------------------- tower geometry
 export const HT = 3.3;              // tower height
 export const RB = 0.42;             // base radius
-export const NCOL = 150, ROWS = 9;
+export const NCOL = 150, ROWS = 8;
+const PITCH_K = 2.7;   // pitch / text-band height: the gap is the ramp + a recessed, shadowed tier
 export function radiusAt(y) {
   const u = clamp(y / HT, 0, 1);
   // Bruegel: broad stepped base, then a long tapering spire
-  const tier = 1 - 0.035 * smoothstep(0.55, 1, ((y / 0.11) % 1)) * (1 - u);
-  return RB * Math.pow(1 - u * 0.985, 0.95) * tier + 0.006;
+  const body = RB * (1 - 0.66 * Math.min(u, 0.9) / 0.9);            // ~3:1 base:top over the body
+  const needle = smoothstep(0.86, 1.0, u);
+  return lerp(body, 0.006, needle * needle * (3 - 2 * needle)) + 0.004;
 }
 
 const GLYPH_VERT = /* glsl */`
@@ -88,7 +90,7 @@ attribute vec3 iC;     // tint
 uniform float uTime, uBright, uFade, uFront;
 uniform vec3 uSunL;    // sun dir (local frame)
 uniform mat4 uTowerW;  // local → world
-uniform float uR;
+uniform float uR, uApexY, uTopDim; uniform vec3 uKeyL;
 varying vec2 vUv; varying vec3 vCol; varying float vA;
 void main(){
   float th=iA.x;
@@ -110,7 +112,12 @@ void main(){
   float sun=along>0.?1.:smoothstep(uR*.995,uR*1.02,perp);
   float hot=exp(-max(uTime-iA.y,0.)*1.6);
   float pulse=pow(.5+.5*sin(iP.y*9.-uTime*3.2+iA.z*2.),6.);
-  vCol=mix(iC*vec3(1.,.74,.42),vec3(1.,.93,.8),.22+.3*sun)*(uBright*(1.+.7*pulse+sun*.5)+hot*3.);
+  // key light from one side (sun / limb): lit side gold-white, shadow side deep amber
+  vec3 radW=normalize(mat3(uTowerW)*rad);
+  float key=max(dot(radW,normalize(uKeyL)),0.);
+  float shade=.16+1.05*pow(key,.85);
+  float topDim=mix(1.,smoothstep(.04,.7,uApexY-iP.y),uTopDim);
+  vCol=mix(iC*vec3(1.,.66,.32),vec3(1.,.93,.8),.15+.55*key)*(uBright*shade*(1.+.6*pulse)+hot*3.)*topDim;
   vA=step(0.,uTime-iA.y)*uFade*(.75+.5*iA.z);
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
   gl_Position=projectionMatrix*viewMatrix*w;
@@ -134,7 +141,7 @@ uniform float uTime, uFront, uVis, uApex, uBright;
 uniform vec3 uApexPos;
 uniform mat4 uTowerW;
 varying vec2 vUv; varying vec3 vCol; varying float vA;
-float rAt(float y){ float u=clamp(y/${HT.toFixed(3)},0.,1.); return ${RB.toFixed(3)}*pow(1.-u*.985,.95)+.006; }
+float rAt(float y){ float u=clamp(y/${HT.toFixed(3)},0.,1.); float b=${RB.toFixed(3)}*(1.-.66*min(u,.9)/.9); float n=smoothstep(.86,1.,u); return mix(b,.006,n*n*(3.-2.*n))+.004; }
 void main(){
   float ph=fract(uTime*iA.x+iA.y);
   vec3 p;
@@ -144,18 +151,18 @@ void main(){
   float rho=mix(iP.x,rAt(y)*1.04,pow(ph,.7));
   float th=iP.y+ph*iA.z*6.2831;
   vec3 pa=vec3(cos(th)*rho,y,sin(th)*rho);
-  // mode B: converge into the apex (the cursor)
-  float rb=iP.x*1.6*(1.-ph)+.003;
-  float tb=iP.y+ph*iA.z*4.;
-  vec3 pb=uApexPos+vec3(cos(tb)*rb,(iP.z-.6)*1.2*(1.-ph)*(1.-ph),sin(tb)*rb);
+  // mode B: a funnel of strands spiralling up and in to the apex (the cursor)
+  float rb=iP.x*.55*pow(1.-ph,1.15)+.002;
+  float tb=iP.y+ph*iA.z*3.;
+  vec3 pb=uApexPos+vec3(cos(tb)*rb,-rb*1.9,sin(tb)*rb);
   p=mix(pa,pb,uApex);
-  float fade=smoothstep(0.,.08,ph)*smoothstep(1.,.85,ph);
+  float fade=smoothstep(0.,.08,ph)*smoothstep(1.,.85,ph)*mix(1.,smoothstep(.03,.3,rb)*step(fract(iA.y*7.13),.45),uApex);
   vec4 mv=viewMatrix*uTowerW*vec4(p,1.);
   fade*=smoothstep(.04,.25,-mv.z);
   float s=iP.w*mix(1.,.6+.4*(1.-ph),uApex);
   mv.xy+=position.xy*s;
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
-  vCol=iC*vec3(1.,.8,.5)*uBright*(1.+mix(2.,.4,uApex)*smoothstep(.85,1.,ph));
+  vCol=iC*vec3(1.,.8,.5)*uBright*(1.+mix(2.,0.,uApex)*smoothstep(.8,1.,ph));
   vA=fade*uVis;
   gl_Position=projectionMatrix*mv;
 }`;
@@ -194,12 +201,18 @@ export function buildTower(atlas, frontFn, t0, t1) {
   while (yb < HT) {
     const rr = radiusAt(yb);
     const gs = 2 * Math.PI * rr / NCOL;
-    const pitch = ROWS * gs * 1.32;
+    const band = ROWS * gs * 1.12;
+    const pitch = band * PITCH_K;
+    const col = Math.round(th / dth);
     if (runLeft <= 0) { script = Math.floor(r() * SCRIPTS.length); runLeft = 6 + Math.floor(r() * 34); }
     runLeft--;
     const [s0, sn] = atlas.starts[script];
+    // arcade: every 13 columns an arched opening 4 columns wide, 5 rows high (rounded top)
+    const cm = ((col % 13) + 13) % 13;
+    const archTop = cm >= 5 && cm <= 8 ? ((cm === 5 || cm === 8) ? 4 : 5) : -1;
     for (let k = 0; k < ROWS; k++) {
-      const y = yb + gs * (0.95 + k * 1.12);
+      if (k < archTop) continue;
+      const y = yb + band * 0.32 + gs * (0.6 + k * 1.12);
       const ci = s0 + Math.floor(r() * sn);
       const sz = gs * (0.92 + 0.12 * r());
       P.push(Math.cos(th) * rr, y, Math.sin(th) * rr, sz);
@@ -216,6 +229,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
   const U = {
     uAtlas: { value: atlas.tex }, uTime: { value: 0 }, uBright: { value: 1.6 }, uFade: { value: 1 }, uFront: { value: 0 },
     uSunL: { value: new THREE.Vector3(1, 0, 0) }, uTowerW: { value: new THREE.Matrix4() }, uR: { value: 10 },
+    uKeyL: { value: new THREE.Vector3(1, 0, 0) }, uApexY: { value: HT }, uTopDim: { value: 0 },
   };
   const glyphs = new THREE.Mesh(g, new THREE.ShaderMaterial({
     vertexShader: GLYPH_VERT, fragmentShader: GLYPH_FRAG, uniforms: U,
@@ -226,7 +240,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
   // ramp strip (ledge) + dark core
   const rv = [], rs = [];
   for (const [t, y, rr, pitch] of ramp) {
-    const led = pitch * 0.12;
+    const led = pitch * 0.16;
     rv.push(Math.cos(t) * rr * 0.985, y, Math.sin(t) * rr * 0.985, Math.cos(t) * (rr + led), y, Math.sin(t) * (rr + led));
     rs.push(0, timeAt(y), 1, timeAt(y));
   }
@@ -240,12 +254,14 @@ export function buildTower(atlas, frontFn, t0, t1) {
     uniforms: U, side: THREE.DoubleSide,
     vertexShader: /* glsl */`attribute vec2 aE; uniform mat4 uTowerW; varying float vE; varying float vT; varying vec3 vW;
       void main(){ vE=aE.x; vT=aE.y; vec4 w=uTowerW*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
-    fragmentShader: /* glsl */`precision highp float; uniform float uTime, uFade, uR; uniform vec3 uSunL; varying float vE; varying float vT; varying vec3 vW;
+    fragmentShader: /* glsl */`precision highp float; uniform float uTime, uFade, uR; uniform vec3 uSunL, uKeyL; uniform mat4 uTowerW; varying float vE; varying float vT; varying vec3 vW;
       void main(){ if(uTime<vT) discard;
         vec3 L=normalize(uSunL); float al=dot(vW,L); float sun=al>0.?1.:smoothstep(uR*.995,uR*1.02,length(vW-al*L));
-        float edge=smoothstep(.75,1.,vE);
+        float edge=smoothstep(.86,1.,vE);
         float hot=exp(-(uTime-vT)*1.2);
-        vec3 c=vec3(.03,.02,.012)+vec3(1.,.72,.38)*(edge*.45+hot*2.)+vec3(1.,.8,.55)*sun*.25;
+        vec3 rw=normalize(vec3(vW-uTowerW[3].xyz)-dot(vW-uTowerW[3].xyz,normalize(uTowerW[1].xyz))*normalize(uTowerW[1].xyz));
+        float key=max(dot(rw,normalize(uKeyL)),0.);
+        vec3 c=vec3(.05,.035,.02)+vec3(.55,.38,.2)*key*.5+vec3(1.,.74,.36)*(edge*(1.6+4.*key)+hot*2.);
         gl_FragColor=vec4(c*uFade,1.); }`,
   });
   const rampMesh = new THREE.Mesh(rg, rampMat);
@@ -258,14 +274,13 @@ export function buildTower(atlas, frontFn, t0, t1) {
     uniforms: { ...U, uCamL: { value: new THREE.Vector3() } },
     vertexShader: /* glsl */`uniform mat4 uTowerW; varying vec3 vL; varying vec3 vN; varying vec3 vW;
       void main(){ vL=position; vN=normal; vec4 w=uTowerW*vec4(position,1.); vW=w.xyz; gl_Position=projectionMatrix*viewMatrix*w; }`,
-    fragmentShader: /* glsl */`precision highp float; uniform float uFront, uFade, uR, uTime; uniform vec3 uSunL; uniform mat4 uTowerW;
+    fragmentShader: /* glsl */`precision highp float; uniform float uFront, uFade, uR, uTime; uniform vec3 uSunL, uKeyL; uniform mat4 uTowerW;
       varying vec3 vL; varying vec3 vN; varying vec3 vW;
       void main(){ if(vL.y>uFront+.02) discard;
         vec3 Nw=normalize(mat3(uTowerW)*vN);
         vec3 L=normalize(uSunL); float al=dot(vW,L); float sun=al>0.?1.:smoothstep(uR*.995,uR*1.02,length(vW-al*L));
-        float dif=max(dot(Nw,L),0.)*sun;
-        float band=.5+.5*sin(vL.y*140.);
-        vec3 c=vec3(.012,.01,.014)+vec3(.35,.22,.1)*dif*.6+vec3(.08,.05,.02)*band;
+        float dif=max(dot(Nw,normalize(uKeyL)),0.);
+        vec3 c=vec3(.006,.005,.007)+vec3(.30,.19,.09)*pow(dif,1.3)*.55;
         c+=vec3(1.,.7,.35)*smoothstep(.04,0.,uFront-vL.y)*step(uFront,3.29)*.6;
         gl_FragColor=vec4(c*uFade,1.); }`,
   }));
@@ -277,11 +292,14 @@ export function buildTower(atlas, frontFn, t0, t1) {
 export function buildStream(atlas, U, count = 16000) {
   const r = rng(77);
   const P = [], A = [], UV = [], C = [];
+  const NS = 140, strands = [];
+  for (let k = 0; k < NS; k++) strands.push([0.45 + Math.pow(r(), 1.3) * 4.0, r() * Math.PI * 2, Math.pow(r(), 0.8), 0.05 + 0.1 * r(), 0.8 + 1.8 * r()]);
   for (let i = 0; i < count; i++) {
     const si = Math.floor(r() * SCRIPTS.length), [s0, sn] = atlas.starts[si];
-    const rho = 0.45 + Math.pow(r(), 1.3) * 4.0;
-    P.push(rho, r() * Math.PI * 2, Math.pow(r(), 0.8), 0.006 + 0.012 * r());
-    A.push(0.05 + 0.12 * r(), r(), 0.8 + 2.2 * r(), 0);
+    // glyphs travel in strands: a strand shares its spiral (radius, turns, rate); members differ in phase
+    const k = Math.floor(r() * NS), S = strands[k];
+    P.push(S[0] * (1 + (r() - 0.5) * 0.04), S[1] + (r() - 0.5) * 0.03, S[2], 0.006 + 0.012 * r());
+    A.push(S[3], r(), S[4], 0);
     UV.push(...atlas.uv(s0 + Math.floor(r() * sn)));
     C.push(...SCRIPTS[si][2]);
   }

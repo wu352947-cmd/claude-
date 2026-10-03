@@ -198,8 +198,8 @@ varying vec3 vC; varying float vI;
 void main(){
   vec4 mv = modelViewMatrix * vec4(position, 1.);
   float f = aS.x;
-  float sz = uPx * (1.25 + 2.4 * pow(min(f, 6.), 0.42));
-  vI = 2.6 * f * uStarI * (0.93 + 0.07 * sin(uTime * (3. + aS.z * 5.) + aS.z * 40.)) * (1.6 / (sz / uPx)) ;
+  float sz = uPx * (1.6 + 3.4 * pow(min(f, 8.), 0.45));
+  vI = 2.6 * f * uStarI * (0.93 + 0.07 * sin(uTime * (3. + aS.z * 5.) + aS.z * 40.)) * (4.2 / pow(sz / uPx, 2.)) ;
   vC = mix(vec3(0.70, 0.80, 1.20), vec3(1.25, 0.92, 0.66), aS.y);
   gl_PointSize = sz;
   gl_Position = projectionMatrix * mv;
@@ -386,7 +386,7 @@ export default {
     // Orion, built in a tangent frame around Alnilam's direction (set in update from the final framing)
     const og = new THREE.BufferGeometry();
     const op = new Float32Array(ORION.length * 3), oa = new Float32Array(ORION.length * 4);
-    ORION.forEach((s, i) => { oa.set([Math.pow(10, -0.4 * (s[2] - 1.5)) * 4.0, Math.min(1, Math.max(0, (s[3] + 0.3) / 2.1)), R(), 0], i * 4); });
+    ORION.forEach((s, i) => { oa.set([Math.pow(10, -0.4 * (s[2] - 1.5)) * 4.0 * (i < 3 ? 2.2 : 1.2), Math.min(1, Math.max(0, (s[3] + 0.3) / 2.1)), R(), 0], i * 4); });
     og.setAttribute('position', new THREE.BufferAttribute(op, 3)); og.setAttribute('aS', new THREE.BufferAttribute(oa, 4));
     const orion = new THREE.Points(og, starMat); orion.frustumCulled = false; orion.renderOrder = 11;
     starGroup.add(orion);
@@ -472,7 +472,7 @@ export default {
       const east = new THREE.Vector3().crossVectors(up, ndc).normalize();   // screen-left = east
       const north = new THREE.Vector3().crossVectors(ndc, east).normalize();
       // rotate the asterism a little so the belt tilts as seen from the northern hemisphere
-      const rot = -18 * deg;
+      const rot = 24 * deg;
       ORION.forEach((s, i) => {
         const x = s[0] * Math.cos(rot) - s[1] * Math.sin(rot), y = s[0] * Math.sin(rot) + s[1] * Math.cos(rot);
         const d = ndc.clone().addScaledVector(east, Math.tan(x * deg)).addScaledVector(north, Math.tan(y * deg)).normalize().multiplyScalar(14000);

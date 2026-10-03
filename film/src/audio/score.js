@@ -215,7 +215,7 @@ function compose(M) {
   // BRAAM — title
   at(HITS.braam - 0.05, () => {
     const g = HITS.braam;
-    I.braam(M, BUS.big(), g, [hz('D1'), hz('D2'), hz('A2'), hz('D3')], { amp: 0.36, dur: 8, open: 2600 });
+    I.braam(M, BUS.big(), g, [hz('D1'), hz('D2'), hz('A2'), hz('D3')], { amp: 0.3, dur: 8, open: 2600 });
     I.subDrop(M, BUS.sub(), g, { f0: 75, f1: 28, dur: 2.4, amp: 0.55 });
     I.impact(M, BUS.big(), g, { amp: 0.42 });
     I.bell(M, BUS.big(), g, hz('D4'), { kind: 'church', dur: 9, amp: 0.1, bright: 0.8 });
@@ -284,7 +284,7 @@ function compose(M) {
   at(83, () => {
     const parts = [[38, -0.5], [45, 0.5], [50, -0.2], [54, 0.25], [57, 0]];
     parts.forEach(([m, p], k) => {
-      const f = mhz(m), a = 0.075 * (k < 2 ? 1 : 0.7);
+      const f = mhz(m), a = 0.09 * (k < 2 ? 1 : 0.7);
       const notes = [[83, f, a * 0.35], [86, f, a * 0.65], [89.4, f, a], [90.5, f * 0.98, a * 1.1], [91.0, f * 0.9, a * 0.8], [91.6, f * 0.8, a * 0.45], [92.2, f * 0.7, a * 0.15]];
       I.strings(M, pan(M, BUS.strings(), p), 83, 92.6, notes, { mode: 'tremolo', trem: 11 + k * 0.4, cutoff: 1400 + m * 15, seed: 'trem' + k, attack: 1.2, release: 0.8 });
     });
@@ -301,32 +301,32 @@ function compose(M) {
   at(94, () => A.snow(M, BUS.amb(), 94, 108.6, [[94, 0], [95.6, 0.02], [107, 0.02], [108.3, 0]]));
   // first statement of the motif on bronze chime bells (编钟): D – A – E – F#
   [['D4', 96.6, -0.35], ['A4', 97.5, -0.1], ['E5', 98.4, 0.12], ['F#5', 99.3, 0.35]].forEach(([n, t, p], k) =>
-    at(t, () => I.bell(M, pan(M, BUS.bells(), p), t, hz(n), { kind: 'bronze', dur: 5.5 - k * 0.4, amp: 0.2, strike: 0.3, seed: 'bz' + k })));
-  at(96.6, () => I.bell(M, pan(M, BUS.bells(), -0.2), 96.6, hz('D3'), { kind: 'bronze', dur: 6, amp: 0.12, strike: 0.2, seed: 'bzlow' }));
+    at(t, () => I.bell(M, pan(M, BUS.bells(), p), t, hz(n), { kind: 'bronze', dur: 5.5 - k * 0.4, amp: 0.09, strike: 0.3, seed: 'bz' + k })));
+  at(96.6, () => I.bell(M, pan(M, BUS.bells(), -0.2), 96.6, hz('D3'), { kind: 'bronze', dur: 6, amp: 0.06, strike: 0.2, seed: 'bzlow' }));
   // wind bells on each eave, rising
   {
     const notes = ['D5', 'E5', 'F#5', 'A5', 'B5', 'D6'];
     const SC = [74, 76, 78, 81, 83, 86, 88, 90, 93];
     HITS.bellsWood.forEach((t, k) => {
       const p = k % 2 ? 0.35 : -0.35;
-      at(t, () => I.bell(M, pan(M, BUS.bells(), p), t, hz(notes[k]), { kind: 'chime', dur: 4.5, amp: 0.13, strike: 0.12, seed: 'wb' + k, beat: 1.2 }));
+      at(t, () => I.bell(M, pan(M, BUS.bells(), p), t, hz(notes[k]), { kind: 'chime', dur: 4.5, amp: 0.07, strike: 0.12, seed: 'wb' + k, beat: 1.2 }));
       const r = R('grace' + k);
       const gi = SC.indexOf(midi(notes[k])) + 1 + Math.floor(r() * 2);
       const tg = t + 0.12 + r() * 0.1;
-      at(tg, () => I.bell(M, pan(M, BUS.bells(), -p * 0.6), tg, mhz(SC[Math.min(SC.length - 1, gi)]), { kind: 'chime', dur: 2.5, amp: 0.035, strike: 0.05, seed: 'wg' + k }));
+      at(tg, () => I.bell(M, pan(M, BUS.bells(), -p * 0.6), tg, mhz(SC[Math.min(SC.length - 1, gi)]), { kind: 'chime', dur: 2.5, amp: 0.02, strike: 0.05, seed: 'wg' + k }));
     });
-    at(101.2, () => I.bell(M, pan(M, BUS.bells(), -0.1), 101.2, hz('D3'), { kind: 'bronze', dur: 6, amp: 0.08, seed: 'bzl2' }));
-    at(105.0, () => I.bell(M, pan(M, BUS.bells(), 0.1), 105.0, hz('A2'), { kind: 'bronze', dur: 6, amp: 0.07, seed: 'bzl3' }));
+    at(101.2, () => I.bell(M, pan(M, BUS.bells(), -0.1), 101.2, hz('D3'), { kind: 'bronze', dur: 6, amp: 0.045, seed: 'bzl2' }));
+    at(105.0, () => I.bell(M, pan(M, BUS.bells(), 0.1), 105.0, hz('A2'), { kind: 'bronze', dur: 6, amp: 0.04, seed: 'bzl3' }));
   }
   at(107.6, () => I.whoosh(M, BUS.sfx(), 107.6, 0.95, { amp: 0.09, f0: 110, f1: 420, pan0: 0.7, pan1: -0.7, q: 0.7, seed: 'swing' }));
 
   // ---------- FAITH 108 – 128.5
   at(HITS.bigBell, () => {
     const g = HITS.bigBell;
-    I.bell(M, BUS.big(), g, hz('D4'), { kind: 'church', dur: 18, amp: 0.42, bright: 0.85, strike: 0.35, seed: 'bigbell' });
+    I.bell(M, BUS.big(), g, hz('D4'), { kind: 'church', dur: 18, amp: 0.3, bright: 0.85, strike: 0.35, seed: 'bigbell' });
     I.subDrop(M, BUS.sub(), g, { f0: 74, f1: 72, dur: 3, amp: 0.25 });
   });
-  at(118.4, () => I.bell(M, M.bus('farbell', { send: { cathedral: 0.8 }, dry: 0.35 }), 118.4, hz('D4'), { kind: 'church', dur: 14, amp: 0.16, bright: 0.8, seed: 'bigbell2' }));
+  at(118.4, () => I.bell(M, M.bus('farbell', { send: { cathedral: 0.8 }, dry: 0.35 }), 118.4, hz('D4'), { kind: 'church', dur: 14, amp: 0.1, bright: 0.8, seed: 'bigbell2' }));
   const CHORDS = [
     [109.2, [38, 45, 50, 54, 61, 64, 69], 0.032],
     [114.6, [35, 42, 50, 57, 61, 64, 66], 0.036],
@@ -336,12 +336,12 @@ function compose(M) {
   ];
   CHORDS.forEach(([t, notes, a], k) => {
     const t1 = k + 1 < CHORDS.length ? CHORDS[k + 1][0] + 0.12 : 128.2;
-    notes.forEach((m, j) => at(t, () => I.organNote(M, pan(M, BUS.organ(), (j / 6) * 1.2 - 0.6), t, t1, mhz(m), a * (m < 45 ? 1.2 : 1) * (k === 4 ? 0.85 : 1), 'org' + k + j)));
+    notes.forEach((m, j) => at(t, () => I.organNote(M, pan(M, BUS.organ(), (j / 6) * 1.2 - 0.6), t, t1, mhz(m), 0.55 * a * (m < 45 ? 1.2 : 1) * (k === 4 ? 0.85 : 1), 'org' + k + j)));
   });
   at(112, () => {
     const voices = [[1, 'm', -0.6], [2, 'm', -0.3], [3, 'm', 0.3], [4, 'f', -0.15], [5, 'f', 0.15], [6, 'f', 0.6], [2, 'm', 0.6], [5, 'f', -0.6]];
     voices.forEach(([j, sex, p], k) => {
-      const notes = CHORDS.filter(c => c[0] < 127).map(([t, ns], ci) => [Math.max(112 + k * 0.3, t), ns[j] + (sex === 'f' && ns[j] < 60 ? 12 : 0), 0.022 + ci * 0.008, ci % 2 ? 'o' : 'a']);
+      const notes = CHORDS.filter(c => c[0] < 127).map(([t, ns], ci) => [Math.max(112 + k * 0.3, t), ns[j] + (sex === 'f' && ns[j] < 60 ? 12 : 0), 0.018 + ci * 0.0065, ci % 2 ? 'o' : 'a']);
       notes[0][0] = 112 + k * 0.3;
       choirVoice(M, pan(M, BUS.choir(), p), 112 + k * 0.3, 128.3, notes, { sex, seed: 'faith' + k, vib: 20, attack: 3, release: 1.6 });
     });
@@ -353,9 +353,9 @@ function compose(M) {
   function ironBeat({ t, p, i }, down) {
     const bar = Math.floor(i / 4), pos = i % 4;
     const late = t >= 136;
-    at(t, () => I.piston(M, pan(M, BUS.labour(), -0.15), t, down ? 0.42 : 0.3));
+    at(t, () => I.piston(M, pan(M, BUS.labour(), -0.15), t, down ? 0.3 : 0.22));
     if (late) { const ta = t + p / 2; at(ta, () => I.piston(M, pan(M, BUS.labour(), 0.35), ta, 0.16, 'p2')); }
-    if (pos === 1 || pos === 3) at(t, () => I.anvil(M, pan(M, BUS.labour(), 0.25), t, t < 136 ? hz('G#5') : hz('D#6'), 0.13));
+    if (pos === 1 || pos === 3) at(t, () => I.anvil(M, pan(M, BUS.labour(), 0.25), t, t < 136 ? hz('G#5') : hz('D#6'), 0.09));
     for (let s = 0; s < 4; s++) { const ts = t + s * p / 4, a = [0.05, 0.02, 0.035, 0.02][s] * (late ? 1.3 : 1); at(ts, () => I.gearTick(M, pan(M, BUS.labour(), 0.55), ts, 4100, a)); }
     if (pos === 3 && bar % 2 === 1) { const ts = t + p / 2; at(ts, () => I.steam(M, pan(M, BUS.labour(), -0.55), ts, 0.7, 0.05)); }
     if (bar % 2 === 0 && pos === 2 && t > 131 && t < 136) {   // riveting
@@ -377,13 +377,13 @@ function compose(M) {
   at(139.5, () => I.riser(M, BUS.sfx(), 139.5, HITS.flash, { amp: 0.14, f0: 180, f1: 8000, pitch: [hz('D2'), hz('D4')], seed: 'r146', release: 0.003 }));
 
   // ---------- FALL 146 – 154.5
-  at(HITS.flash + 0.6, () => I.tinnitus(M, M.bus('tinn', {}), HITS.flash + 0.6, { f: 8000, amp: 0.0075, dur: 7 }));
-  at(HITS.lowNote, () => I.lowNote(M, M.bus('low', { send: { hall: 0.6, cathedral: 0.25 } }), HITS.lowNote, hz('D2'), { amp: 0.32, dur: 10 }));
+  at(HITS.flash + 0.6, () => I.tinnitus(M, M.bus('tinn', {}), HITS.flash + 0.6, { f: 8000, amp: 0.0035, dur: 7 }));
+  at(HITS.lowNote, () => I.lowNote(M, M.bus('low', { send: { hall: 0.6, cathedral: 0.25 } }), HITS.lowNote, hz('D2'), { amp: 0.1, dur: 10 }));
 
   // ---------- SKY 153.5 – 176.5
   at(SKY0, () => I.riser(M, BUS.sfx(), SKY0, HITS.liftoff, { amp: 0.08, f0: 120, f1: 900, pitch: null, seed: 'revswell', release: 0.8 }));
   at(154.4, () => A.rocket(M, M.bus('rocket', { send: { hall: 0.25 } }), 154.4, 169,
-    [[154.4, 0], [156.2, 0.07], [157, 0.3], [159, 0.34], [161, 0.28], [163, 0.15], [166, 0.04], [169, 0]],
+    [[154.4, 0], [156.2, 0.05], [157, 0.22], [159, 0.25], [161, 0.21], [163, 0.11], [166, 0.03], [169, 0]],
     [[154.4, 250], [157, 1100], [159, 900], [162, 350], [165, 130], [169, 70]]));
   at(HITS.liftoff, () => {
     const g = HITS.liftoff;
@@ -483,17 +483,17 @@ function compose(M) {
   // ---------- RETURN 216 – 237.6
   at(HITS.returnFromBlack, () => {
     const g0 = HITS.returnFromBlack, g1 = EPILOGUE_CUT;
-    const lvl = x => 0.05 * sstep(g0, g0 + 3, x) * (1 - 0.35 * sstep(226, 229, x));
+    const lvl = x => 0.016 * sstep(g0, g0 + 3, x) * (1 - 0.35 * sstep(226, 229, x));
     I.droneVoice(M, BUS.drone(), g0, g1, hz('D2'), lvl, { seed: 'hum', bright: 3 });
     I.droneVoice(M, BUS.drone(), g0, g1, hz('A2'), x => lvl(x) * 0.35, { seed: 'hum5', bright: 3 });
     const o = osc(M, 'sine', hz('D1'), g0, g1 + 0.1); const g = gain(M, 0);
-    curve(M, g.gain, g0, g1, x => lvl(x) * 1.8, 20); o.connect(g).connect(M.bus('sub', {}));
+    curve(M, g.gain, g0, g1, x => lvl(x) * 1.0, 20); o.connect(g).connect(M.bus('sub', {}));
     A.textStream(M, M.bus('text', { send: { hall: 0.5 } }), g0 + 0.2, 227, [[216, 0], [217.5, 22], [222, 30], [225.5, 10], [227, 0]], { amp: 0.018 });
   });
   typing(TYPING_EPILOGUE, 'typeE');
 
   // ---------- CODA 237.6 – 260
-  at(HITS.lowBellD, () => I.bell(M, M.bus('lowbell', { send: { hall: 0.5, cathedral: 0.45 }, dry: 0.9 }), HITS.lowBellD, hz('D3'), { kind: 'church', dur: 24, amp: 0.4, bright: 0.7, strike: 0.2, seed: 'lowD' }));
+  at(HITS.lowBellD, () => I.bell(M, M.bus('lowbell', { send: { hall: 0.5, cathedral: 0.45 }, dry: 0.9 }), HITS.lowBellD, hz('D3'), { kind: 'church', dur: 24, amp: 0.15, bright: 0.7, strike: 0.2, seed: 'lowD' }));
   at(240.5, () => {
     // the many tongues return, then converge one by one on a single D-major chord
     const bus = gain(M, 0);
@@ -505,8 +505,8 @@ function compose(M) {
       const r = R('coda' + i);
       const tc = 245.2 + i * 0.72;
       const f0 = sex === 'm' ? 95 + r() * 45 : 170 + r() * 70;
-      const ev = babble('coda' + i, 240.6 + r() * 1.5, tc, { sex, f0, level: 0.03, rate: 0.9 + r() * 0.3 });
-      const a = 0.024 * (sex === 'f' ? 0.85 : 1);
+      const ev = babble('coda' + i, 240.6 + r() * 1.5, tc, { sex, f0, level: 0.036, rate: 0.9 + r() * 0.3 });
+      const a = 0.032 * (sex === 'f' ? 0.85 : 1);
       ev.push({ t: tc, f: mhz(m), ftau: 0.35, v: 'a', tau: 0.3, amp: a, atau: 0.5, voiced: 1 });
       ev.push({ t: 256, v: 'o', tau: 0.8 });
       formantVoice(M, pan(M, bus, -0.85 + 1.7 * ((i * 5) % 12) / 11), { g0: 240.5, g1: 259.9, sex, events: ev, breath: 0.12, seed: 'coda' + i, jitter: 10, vib: x => (x > tc + 0.5 ? 18 : 0) });

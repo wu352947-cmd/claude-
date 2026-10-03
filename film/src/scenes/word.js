@@ -25,7 +25,7 @@ function front(g) {
   if (g < G_ERUPT) return 0;
   return Math.min(HT, track([[G_ERUPT, 0], [G_ERUPT + 1.2, 0.45, 'outCubic'], [193, 0.9], [198, 1.6], [203, 2.55], [207.2, HT]], g, 'linear'));
 }
-const PHI_TOT = 2 * Math.PI / 0.946 + 0.32;   // the spiral faces the sunrise (-Z) at ~204
+const PHI_TOT = 2 * Math.PI / 0.946 - 0.3;   // the spiral faces the sunrise (-Z) at ~204
 // camera altitude along the tower in N2 (exponential climb)
 function camY(g) { return N1_END.alt * Math.pow(17, clamp((g - G_ERUPT) / 19.6)); }
 
@@ -160,8 +160,8 @@ function towerCam(st, g, cam) {
   } else {
     // N4: top of the tower; crest the edge, then push in on the cursor
     const apexY = HT + 0.02 + CUR_H / 2;
-    const crest = ease.inOutSine(clamp((g - 215.4) / 6.6));
-    const push = ease.inOutCubic(clamp((g - 220.6) / 6.0));
+    const crest = ease.inOutSine(clamp((g - 215.4) / 6.0));
+    const push = ease.inOutCubic(clamp((g - 222.8) / 3.0));
     const dEnd = CUR_H * 804 / (CURSOR.h * 2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
     y = lerp(lerp(HT - 0.5, apexY + 0.07, crest), apexY, push);
     rho = lerp(lerp(0.95, 0.62, crest), dEnd, push);
@@ -201,6 +201,9 @@ export default {
     T.U.uTowerW.value.copy(towerW);
     T.U.uSunL.value.copy(SUN);
     T.U.uR.value = R;
+    // key light: the sun, flattened toward the horizontal so one flank of the tower is lit, the other in shadow
+    T.U.uKeyL.value.copy(SUN).addScaledVector(F.Y, -SUN.dot(F.Y) * 0.7).normalize();
+    T.U.uApexY.value = HT + 0.02;
     scene.add(T.core, T.rampMesh, T.glyphs);
     T.core.renderOrder = 1; T.rampMesh.renderOrder = 2; T.glyphs.renderOrder = 7;
     const ST = buildStream(atlas, T.U, 36000);
@@ -227,7 +230,7 @@ export default {
     const apexGlow = glowSprite([1, 0.92, 0.82], 10);
     apexGlow.position.copy(tlToWorld(F, 0, HT + 0.02 + CUR_H / 2, 0));
     scene.add(apexGlow);
-    const curMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.93 * 1.6, 0.89 * 1.6, 0.83 * 1.6), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    const curMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.93 * 0.6, 0.89 * 0.6, 0.83 * 0.6), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
     const cursor3d = new THREE.Mesh(new THREE.PlaneGeometry(CUR_W, CUR_H), curMat);
     cursor3d.renderOrder = 11;
     scene.add(cursor3d);
@@ -238,11 +241,11 @@ export default {
     scene.add(puffs.mesh);
     const r = rng(311);
     const PUFF = [];
-    for (let i = 0; i < 620; i++) {
-      const a = r() * Math.PI * 2, d = 0.25 + Math.pow(r(), 0.6) * 3.2;
+    for (let i = 0; i < 900; i++) {
+      const a = r() * Math.PI * 2, d = 0.3 + Math.pow(r(), 0.8) * 3.0;
       const cx = Math.cos(a) * d, cz = Math.sin(a) * d;
       // clumpy deck
-      PUFF.push({ x: cx, z: cz, alt: 0.05 + 0.04 * r(), s: 0.05 + 0.12 * r(), seed: r(), a: 0.25 + 0.35 * r() });
+      PUFF.push({ x: cx, z: cz, alt: 0.045 + 0.05 * r(), s: 0.06 + 0.13 * r(), seed: r(), a: 0.5 + 0.4 * r() });
     }
 
     return { scene, camera, E, S, P, F, arcs, T, ST, pGlow, column, sun, apexGlow, cursor3d, puffs, PUFF, W, H, towerW };
@@ -292,12 +295,13 @@ export default {
     const endFade = 1 - smoothstep(223.6, 226.4, g);
     T.uFade.value = N4 ? endFade : 1;
     T.uBright.value = N4 ? 1.3 : 2.1;
+    T.uTopDim.value = N4 ? smoothstep(217, 221, g) : 0;
     st.T.glyphs.visible = st.T.rampMesh.visible = st.T.core.visible = g >= G_ERUPT;
     // stream
     const SU = st.ST.U;
     SU.uVis.value = (g < G_ERUPT ? 0 : smoothstep(G_ERUPT + 0.5, G_ERUPT + 3, g)) * (N4 ? endFade : 1);
     SU.uApex.value = N4 ? 1 : 0;
-    SU.uBright.value = N4 ? 0.45 : 1.3;
+    SU.uBright.value = N4 ? 0.28 : 0.75;
     // stars fade to black at the very end
     st.S.mat.uniforms.uVis.value = N4 ? 1 - smoothstep(222.5, 225.5, g) : 1;
     st.E.group.visible = !(N4 && g > 226.3);
@@ -305,7 +309,7 @@ export default {
     // sun (behind the limb; occluded by the Earth through the depth buffer)
     st.sun.position.copy(cam.position).addScaledVector(SUN, 900);
     st.sun.scale.set(70, 70, 1);
-    st.sun.material.uniforms.uI.value = 3.0 * (N4 ? endFade : 1);
+    st.sun.material.uniforms.uI.value = 3.0 * (N4 ? 0.25 * endFade : 1);
     st.sun.material.uniforms.uCore.value = 260;
 
     // apex cursor (3D presence; the exact pixel cursor is drawn in the overlay)
@@ -316,7 +320,7 @@ export default {
       st.cursor3d.position.copy(tlToWorld(F, 0, HT + 0.02 + CUR_H / 2, 0));
       st.cursor3d.quaternion.copy(cam.quaternion);
       st.cursor3d.material.opacity = blink * (1 - smoothstep(225, 226.5, g));
-      st.apexGlow.material.uniforms.uI.value = (0.03 + 0.08 * blink) * (1 - smoothstep(224.5, 226.5, g));
+      st.apexGlow.material.uniforms.uI.value = (0.012 + 0.03 * blink) * (1 - smoothstep(224.5, 226.5, g));
       st.apexGlow.scale.set(0.3, 0.3, 1);
       st.apexGlow.material.uniforms.uCore.value = 60;
     }
@@ -338,9 +342,10 @@ export default {
     const pu = st.puffs.uniforms;
     pu.uSrcPos.value.copy(tlToWorld(F, 0, 0.15, 0));
     const tl = g >= G_ERUPT ? 1 : conv * 0.3;
-    pu.uSrcCol.value.set(1, 0.66, 0.3).multiplyScalar(0.5 * tl + flash * 1.2);
+    pu.uSrcCol.value.set(1, 0.66, 0.3).multiplyScalar(0.55 * tl + flash * 1.0);
+    pu.uSoft.value = 0.5;
     pu.uSrcRange.value = 0.7;
-    pu.uSkyCol.value.set(0.012, 0.016, 0.03);
+    pu.uSkyCol.value.set(0.02, 0.026, 0.045);
     pu.uGroundCol.value.set(0.05, 0.03, 0.015);
     pu.uFogDens.value = 0; pu.uKeyCol.value.set(0, 0, 0);
     pu.uAlbedo.value.set(0.8, 0.8, 0.8);

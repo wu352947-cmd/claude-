@@ -49,12 +49,17 @@ void main(){
   vec3 N=normalize(uViewInv*nv);
   // point source (flame / tower), wrapped diffuse, distance falloff
   float att=1./(1.+pow(vSrcDist/uSrcRange,2.));
-  float dif=max(dot(N,vSrcDir)*.6+.4,0.);
-  vec3 col=uAlbedo*(uSrcCol*att*dif);
-  // ambient: sky above, ground bounce below
-  col+=uAlbedo*mix(uGroundCol,uSkyCol,N.y*.5+.5)*(1.-vPar.w*.6)*(.55+.45*n);
-  // key light (sun) with a fake self shadow toward the core
-  col+=uAlbedo*uKeyCol*max(dot(N,uKeyDir),0.)*(1.-vPar.w*.7);
+  float nds=dot(N,vSrcDir);
+  float dif=pow(max(nds*.75+.25,0.),1.6);
+  // occlusion: the puff's core and its lower-density folds are darker
+  float occ=mix(1.,.45+.55*smoothstep(.15,.95,r+n*.35),.75)*(1.-vPar.w*.55);
+  vec3 col=uAlbedo*(uSrcCol*att*dif)*mix(.6,1.,occ);
+  // warm under-lit rim
+  col+=uSrcCol*att*pow(1.-max(nv.z,0.),2.5)*max(nds,0.)*.6;
+  // ambient: cool sky above, warm ground bounce below
+  col+=uAlbedo*mix(uGroundCol,uSkyCol,N.y*.5+.5)*occ*(.45+.55*n);
+  // key light (sun): sculpted, with self shadow
+  col+=uAlbedo*uKeyCol*pow(max(dot(N,uKeyDir),0.),1.3)*occ;
   // inner heat (incandescent exhaust near the source)
   col+=vec3(1.,.55,.22)*vPar.y*(.6+.8*n)*(1.-r*.6);
   // fog
