@@ -29,7 +29,7 @@ export class Input {
       } else if (!leftSide && this.lookId === null) {
         this.lookId = e.pointerId; this.lx = e.clientX; this.ly = e.clientY;
       }
-      zone.setPointerCapture?.(e.pointerId);
+      try { zone.setPointerCapture?.(e.pointerId); } catch { }
       e.preventDefault();
     }, { passive: false });
     zone.addEventListener('pointermove', e => {
