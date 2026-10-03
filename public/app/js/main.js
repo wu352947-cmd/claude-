@@ -9,7 +9,7 @@ import { bookView } from './views/book.js';
 import { lettersView } from './views/letters.js';
 import { settingsView } from './views/settings.js';
 
-export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {} };
+export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {}, navDir: 0 };
 const root = document.getElementById('view');
 const docEl = document.documentElement;
 const term = termOf(new Date());

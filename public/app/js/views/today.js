@@ -14,7 +14,9 @@ export async function todayView(root, day = dayKey(new Date())) {
   root.innerHTML = `<div class="wrap view-in">
     <div id="care"></div>
     <div class="today">
-      <div class="page-col"><p class="h-eyebrow" style="margin-bottom:12px">${isToday ? 'きょうのページ' : 'あの日のページ'}</p><div id="pageHost"></div></div>
+      <div class="page-col"><div class="day-nav"><p class="h-eyebrow">${isToday ? 'きょうのページ' : 'あの日のページ'}</p>
+        <span class="go"><a href="#/day/${shift(day, -1)}" data-dir="-1" aria-label="前一天">‹ 前一天</a>${isToday ? '' : `<a href="#/day/${shift(day, 1)}" data-dir="1" aria-label="后一天">后一天 ›</a>`}${isToday ? '' : '<a href="#/today">回到今天</a>'}</span></div>
+        <div id="pageHost" class="${state.navDir > 0 ? 'turn-next' : state.navDir < 0 ? 'turn-prev' : ''}"></div></div>
       <aside class="side" aria-label="工具">
         <section class="panel">
           <h4><span>${term.name} · ${term.hou}</span><small>${term.pinyin}</small></h4>
@@ -45,6 +47,16 @@ export async function todayView(root, day = dayKey(new Date())) {
   let saveTimer = 0, pending = null, saving = false, lastSaved = entry?.updatedAt || 0;
   const page = createPage({ day, entry, editable: true, onChange: snap => { pending = snap; page.setStatus('正在收好…', true); clearTimeout(saveTimer); saveTimer = setTimeout(flush, 900); } });
   root.querySelector('#pageHost').append(page.el);
+  state.navDir = 0;
+  root.querySelectorAll('.day-nav [data-dir]').forEach(a => a.addEventListener('click', () => { state.navDir = Number(a.dataset.dir); }));
+  // 左右滑动或方向键翻到前后一天
+  const go = dir => { const t = shift(day, dir); if (t > today) return; state.navDir = dir; location.hash = t === today ? '#/today' : `#/day/${t}`; };
+  const onKey = e => { if (/input|textarea/i.test(document.activeElement?.tagName) || document.querySelector('.modal-back,.write-sheet,.reader')) return;
+    if (e.key === 'ArrowLeft' && !document.activeElement?.closest?.('.stk')) go(-1); if (e.key === 'ArrowRight' && !document.activeElement?.closest?.('.stk')) go(1); };
+  document.addEventListener('keydown', onKey);
+  let sw = null;
+  page.el.addEventListener('pointerdown', e => { if (e.pointerType === 'touch' && !e.target.closest('.stk,button,textarea')) sw = { x: e.clientX, y: e.clientY, t: Date.now() }; });
+  page.el.addEventListener('pointerup', e => { if (!sw) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.6 && Date.now() - sw.t < 600) go(dx < 0 ? 1 : -1); sw = null; });
   if (entry?.sealedAt) page.sealMark(entry.sealedAt, false);
   page.setStatus(lastSaved ? `已收好 ${fmtTime(lastSaved)}` : '还是一张白纸', false);
 
@@ -133,8 +145,10 @@ export async function todayView(root, day = dayKey(new Date())) {
     }
   });
 
-  return () => { leave(); removeEventListener('pagehide', leave); page.destroy(); };
+  return () => { leave(); removeEventListener('pagehide', leave); document.removeEventListener('keydown', onKey); page.destroy(); };
 }
+
+function shift(day, n) { const t = parseDay(day); t.setDate(t.getDate() + n); return dayKey(t); }
 
 async function shrink(file, max) {
   const bmp = await createImageBitmap(file).catch(() => { throw new Error('这张照片读不出来，换一张 JPG 或 PNG 试试'); });

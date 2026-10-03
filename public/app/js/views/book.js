@@ -83,9 +83,10 @@ function openReader(entries, startDay) {
     } else {
       const tmp = createPage({ day: list[to].day, entry: list[to], editable: false });
       if (list[to].sealedAt) tmp.sealMark(list[to].sealedAt, false);
-      overlay.querySelector('.f').append(tmp.el); tmp.destroy();
+      overlay.querySelector('.f').append(tmp.el);
+      leaf.parentElement.append(overlay); tmp.fit(); tmp.destroy();
     }
-    leaf.parentElement.append(overlay);
+    if (!overlay.isConnected) leaf.parentElement.append(overlay);
     const lr = leaf.getBoundingClientRect(), sr = leaf.parentElement.getBoundingClientRect();
     overlay.style.left = (lr.left - sr.left) + 'px'; overlay.style.top = (lr.top - sr.top) + 'px';
     await sleep(1060);

@@ -14,16 +14,20 @@ let uid = 0;
 export const uniqSvg = svg => { const s = '_' + (++uid).toString(36); return svg.replace(/id="([^"]+)"/g, `id="$1${s}"`).replace(/url\(#([^)]+)\)/g, `url(#$1${s})`); };
 const newId = () => Math.random().toString(36).slice(2, 10);
 
+// 纸张的逻辑尺寸：所有设备按同一宽度排版，再整体缩放，文字换行与贴纸位置处处一致
+export const LW = 760, LH = 1040;
+
 export function createPage({ day, entry, editable = false, onChange, promptIndex }) {
   const d = parseDay(day), term = termOf(d), moon = moonOf(d), lunar = lunarOf(d);
   const data = { mood: entry?.mood || '', body: entry?.body || '', page: { stickers: [], photos: [], weather: '', ...(entry?.page || {}) } };
-  let selected = null;
+  let selected = null, k = 1;
+  const frame = h(`<div class="page-frame"></div>`);
   const el = h(`<article class="page" aria-label="${d.getMonth() + 1}月${d.getDate()}日的手帐">
     <div class="page-head">
       <div class="date-big">${String(d.getDate()).padStart(2, '0')}</div>
       <div class="date-meta"><b>${cnDate(d)} · 星期${WEEK[d.getDay()]}</b><span>${esc(lunar.year)}${esc(lunar.month)}${esc(lunar.day)} · ${term.name} · ${term.hou}</span></div>
       <div class="right">
-        <div class="weather" role="group" aria-label="天气">${WEATHER.map(([c, k]) => `<button type="button" data-w="${c}" aria-label="${c}" aria-pressed="false" ${editable ? '' : 'disabled'}>${c}</button>`).join('')}</div>
+        <div class="weather" role="group" aria-label="天气">${WEATHER.map(([c]) => `<button type="button" data-w="${c}" aria-label="${c}" aria-pressed="false" ${editable ? '' : 'disabled'}>${c}</button>`).join('')}</div>
         <svg class="moon-ico" viewBox="0 0 40 40" aria-label="月相：${moon.name}"><circle cx="20" cy="20" r="15" fill="var(--line)"/><path d="${moonPath(moon.phase, 20, 20, 15)}" fill="#F1CF7A"/></svg>
       </div>
     </div>
@@ -35,21 +39,42 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
     <div class="page-foot"><span class="saved"><i></i><span class="st">${editable ? '已收好' : ''}</span></span><span class="count"></span></div>
     <div class="layer"></div>
   </article>`);
+  frame.append(el);
   const layer = el.querySelector('.layer'), ta = el.querySelector('.writing');
-  const W = () => el.clientWidth || 700;
 
   const paintMood = () => el.querySelectorAll('.mood').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === data.mood));
   const paintWeather = () => el.querySelectorAll('.weather button').forEach(b => { const on = b.dataset.w === data.page.weather; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
   const paintCount = () => { el.querySelector('.count').textContent = data.body ? `${[...data.body.replace(/\s/g, '')].length} 字` : ''; };
-  const autosize = () => { if (!ta) return; ta.style.height = 'auto'; ta.style.height = Math.max(320, ta.scrollHeight + 8) + 'px'; };
+  const fit = () => {
+    if (ta) { ta.style.height = 'auto'; ta.style.height = Math.max(380, ta.scrollHeight + 8) + 'px'; }
+    k = Math.min(1, (frame.clientWidth || LW) / LW);
+    el.style.transform = k < 1 ? `scale(${k})` : '';
+    frame.style.height = Math.ceil(el.offsetHeight * k) + 'px';
+    frame.classList.toggle('small', k < 0.86);
+  };
   const changed = () => { paintCount(); onChange?.(snapshot()); };
   const snapshot = () => JSON.parse(JSON.stringify(data));
 
   paintMood(); paintWeather();
   if (!editable) el.querySelector('.saved').remove();
-  if (ta) { ta.value = data.body; requestAnimationFrame(autosize); }
+  if (ta) ta.value = data.body;
   else el.querySelector('.read-body').textContent = data.body || '这一页没有写字，只留下了心情和贴纸。';
   paintCount();
+
+  // 小屏幕：纸张缩小后字太小，点正文时打开一张全屏书写纸
+  function openSheet() {
+    if (document.querySelector('.write-sheet')) return;
+    const sheet = h(`<div class="write-sheet" role="dialog" aria-modal="true" aria-label="书写">
+      <div class="ws-top"><span>${cnDate(d)} · ${term.name}</span><button type="button" class="btn small ink">写好了</button></div>
+      <p class="ws-q">${esc(el.querySelector('.prompt-line .q')?.textContent || '')}</p>
+      <textarea class="ws-ta" maxlength="20000" placeholder="慢慢写，写什么都可以。" spellcheck="false"></textarea></div>`);
+    const t = sheet.querySelector('textarea'); t.value = data.body;
+    t.addEventListener('input', () => { data.body = t.value; ta.value = t.value; changed(); });
+    const close = () => { sheet.classList.add('out'); setTimeout(() => { sheet.remove(); fit(); }, 320); };
+    sheet.querySelector('button').addEventListener('click', close);
+    sheet.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+    document.body.append(sheet); setTimeout(() => { t.focus(); t.setSelectionRange(t.value.length, t.value.length); }, 60);
+  }
 
   if (editable) {
     let pi = promptIndex ?? (d.getDate() + d.getMonth()) % PROMPTS.length;
@@ -63,29 +88,30 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
       changed();
     }));
     el.querySelectorAll('.weather button').forEach(b => b.addEventListener('click', () => { data.page.weather = data.page.weather === b.dataset.w ? '' : b.dataset.w; paintWeather(); changed(); }));
-    ta.addEventListener('input', () => { data.body = ta.value; autosize(); changed(); });
+    ta.addEventListener('input', () => { data.body = ta.value; fit(); changed(); });
+    ta.addEventListener('pointerdown', e => { if (k < 0.86) { e.preventDefault(); openSheet(); } });
+    ta.addEventListener('focus', () => { if (k < 0.86) { ta.blur(); openSheet(); } });
     el.addEventListener('pointerdown', e => { if (!e.target.closest('.stk')) select(null); });
     document.addEventListener('keydown', onKey);
   }
   function onKey(e) {
     if (!selected || !el.isConnected) return;
-    if (document.activeElement === ta || /input|textarea/i.test(document.activeElement?.tagName)) return;
+    if (/input|textarea/i.test(document.activeElement?.tagName)) return;
     if (e.key === 'Delete' || e.key === 'Backspace') { e.preventDefault(); removeItem(selected); }
     if (e.key === 'Escape') select(null);
   }
 
-  // ---------- 贴纸与照片 ----------
+  // ---------- 贴纸与照片（坐标以纸张逻辑宽度为单位） ----------
   const nodes = new Map();
   function sizeOf(item) {
-    const w = W();
-    if (item.type === 'photo') { const pw = 0.26 * w; return [pw, pw * 1.22]; }
+    if (item.type === 'photo') { const pw = 0.26 * LW; return [pw, pw * 1.22]; }
     const def = STICKER_MAP[item.k]; if (!def) return [0, 0];
-    const sw = def.w * w * (item.s || 1); return [sw, sw * def.ar];
+    const sw = def.w * LW * (item.s || 1); return [sw, sw * def.ar];
   }
   function place(item, node) {
-    const w = W(), [sw, sh] = sizeOf(item);
+    const [sw, sh] = sizeOf(item);
     node.style.width = sw + 'px'; node.style.height = sh + 'px';
-    const tf = `translate(${(item.x * w - sw / 2).toFixed(1)}px, ${(item.y * w - sh / 2).toFixed(1)}px) rotate(${(item.r || 0).toFixed(1)}deg)`;
+    const tf = `translate(${(item.x * LW - sw / 2).toFixed(1)}px, ${(item.y * LW - sh / 2).toFixed(1)}px) rotate(${(item.r || 0).toFixed(1)}deg)`;
     node.style.setProperty('--tf', tf); node.style.transform = tf;
   }
   function render(item, land) {
@@ -121,7 +147,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
     const rot = node.querySelector('.rot');
     rot.addEventListener('pointerdown', e => {
       e.stopPropagation(); e.preventDefault(); rot.setPointerCapture(e.pointerId);
-      const r = el.getBoundingClientRect(), w = W(), cx = r.left + item.x * w, cy = r.top + item.y * w;
+      const r = el.getBoundingClientRect(), cx = r.left + item.x * LW * k, cy = r.top + item.y * LW * k;
       const a0 = Math.atan2(e.clientY - cy, e.clientX - cx), d0 = Math.hypot(e.clientX - cx, e.clientY - cy), r0 = item.r || 0, s0 = item.s || 1;
       const move = ev => {
         item.r = Math.max(-180, Math.min(180, r0 + (Math.atan2(ev.clientY - cy, ev.clientX - cx) - a0) * 180 / Math.PI));
@@ -133,41 +159,42 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
     });
     node.addEventListener('pointerdown', e => {
       if (e.target.closest('.hdl')) return;
-      e.preventDefault(); select(item); node.setPointerCapture(e.pointerId); node.classList.add('drag');
-      const w = W(), sx = e.clientX, sy = e.clientY, x0 = item.x, y0 = item.y; let moved = false;
+      e.preventDefault(); e.stopPropagation(); select(item); node.setPointerCapture(e.pointerId); node.classList.add('drag');
+      const sx = e.clientX, sy = e.clientY, x0 = item.x, y0 = item.y, maxY = el.offsetHeight / LW + 0.05; let moved = false;
       const move = ev => {
-        const dx = (ev.clientX - sx) / w, dy = (ev.clientY - sy) / w; if (Math.abs(dx) + Math.abs(dy) > 0.003) moved = true;
-        item.x = Math.max(-0.05, Math.min(1.05, x0 + dx)); item.y = Math.max(-0.05, Math.min(el.clientHeight / w + 0.05, y0 + dy)); place(item, node);
+        const dx = (ev.clientX - sx) / (LW * k), dy = (ev.clientY - sy) / (LW * k); if (Math.abs(dx) + Math.abs(dy) > 0.003) moved = true;
+        item.x = Math.max(-0.05, Math.min(1.05, x0 + dx)); item.y = Math.max(-0.05, Math.min(maxY, y0 + dy)); place(item, node);
       };
       const up = () => { node.classList.remove('drag'); node.removeEventListener('pointermove', move); node.removeEventListener('pointerup', up); if (moved) changed(); };
       node.addEventListener('pointermove', move); node.addEventListener('pointerup', up);
     });
     node.addEventListener('keydown', e => {
       const step = e.shiftKey ? 0.03 : 0.008, map = { ArrowLeft: [-step, 0], ArrowRight: [step, 0], ArrowUp: [0, -step], ArrowDown: [0, step] };
-      if (map[e.key]) { e.preventDefault(); item.x += map[e.key][0]; item.y += map[e.key][1]; place(item, node); changed(); }
+      if (map[e.key]) { e.preventDefault(); e.stopPropagation(); item.x += map[e.key][0]; item.y += map[e.key][1]; place(item, node); changed(); }
     });
     node.addEventListener('focus', () => select(item));
   }
   data.page.stickers.forEach(s => render(s, false));
   data.page.photos.forEach(p => { p.type = 'photo'; render(p, false); });
 
-  const ro = new ResizeObserver(() => { el.style.setProperty('--pw', W() + 'px'); nodes.forEach((n, it) => place(it, n)); autosize(); });
-  ro.observe(el);
+  const ro = new ResizeObserver(fit);
+  ro.observe(frame);
+  requestAnimationFrame(fit);
 
-  // 新贴纸落在页面当前可见的区域里
+  // 新贴纸落在纸张当前可见的区域里
   function freeSpot(wFrac) {
-    const w = W(), r = el.getBoundingClientRect(), hFrac = el.clientHeight / w;
-    const top = Math.max(0.12, (Math.max(0, -r.top) + 80) / w), bot = Math.min(hFrac - 0.08, (Math.min(r.height, innerHeight - r.top) - 60) / w);
+    const r = el.getBoundingClientRect(), hFrac = el.offsetHeight / LW, s = LW * k;
+    const top = Math.max(0.12, (Math.max(0, -r.top) + 80) / s), bot = Math.min(hFrac - 0.08, (Math.min(r.height, innerHeight - r.top) - 60) / s);
     const y = bot > top ? top + Math.random() * (bot - top) : Math.min(hFrac - 0.1, 0.5);
     return { x: 0.14 + Math.random() * 0.72, y, r: (Math.random() - 0.5) * 24 * (wFrac > 0.2 ? 0.3 : 1) };
   }
   return {
-    el,
+    el: frame, page: el,
     data: snapshot,
-    addSticker(k) {
-      const def = STICKER_MAP[k]; if (!def) return;
+    addSticker(kk) {
+      const def = STICKER_MAP[kk]; if (!def) return;
       if (data.page.stickers.length >= 80) return false;
-      const item = { id: newId(), k, s: 1, ...freeSpot(def.w) };
+      const item = { id: newId(), k: kk, s: 1, ...freeSpot(def.w) };
       data.page.stickers.push(item); render(item, true); select(item); changed(); return true;
     },
     addPhoto(id) {
@@ -175,7 +202,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
       const item = { id, type: 'photo', cap: `${d.getMonth() + 1}.${d.getDate()}`, ...freeSpot(.26) };
       data.page.photos.push(item); render(item, true); select(item); changed(); return true;
     },
-    setStatus(text, busy) { const s = el.querySelector('.saved'); s.classList.toggle('busy', !!busy); s.querySelector('.st').textContent = text; },
+    setStatus(text, busy) { const s = el.querySelector('.saved'); if (!s) return; s.classList.toggle('busy', !!busy); s.querySelector('.st').textContent = text; },
     sealMark(ts, animate) {
       el.querySelector('.page-seal')?.remove();
       const dd = new Date(ts);
@@ -183,10 +210,11 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
       el.append(mark);
       if (animate && !quiet()) {
         el.classList.add('sealing'); mark.classList.add('slam');
-        setTimeout(() => { const r = mark.getBoundingClientRect(), pr = el.getBoundingClientRect(); const b = h('<span class="ink-burst"></span>'); b.style.left = (r.left - pr.left + r.width / 2) + 'px'; b.style.top = (r.top - pr.top + r.height / 2) + 'px'; el.append(b); setTimeout(() => b.remove(), 900); }, 380);
+        setTimeout(() => { const b = h('<span class="ink-burst"></span>'); b.style.left = (mark.offsetLeft + mark.offsetWidth / 2) + 'px'; b.style.top = (mark.offsetTop + mark.offsetHeight / 2) + 'px'; el.append(b); setTimeout(() => b.remove(), 900); }, 380);
         setTimeout(() => el.classList.remove('sealing'), 700);
       }
     },
+    fit,
     destroy() { ro.disconnect(); document.removeEventListener('keydown', onKey); }
   };
 }
