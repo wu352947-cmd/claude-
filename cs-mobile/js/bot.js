@@ -29,7 +29,7 @@ export class Bot {
     const eye = a.eye(_e);
     const tgt = _t.set(e.pos.x, e.pos.y + e.height - 0.2, e.pos.z);
     const dx = tgt.x - eye.x, dz = tgt.z - eye.z; const d = Math.hypot(dx, dz);
-    if (d > 140) return false;
+    if (d > 115) return false;
     const fy = -Math.sin(a.yaw), fz = -Math.cos(a.yaw);
     const cosA = (dx * fy + dz * fz) / (d || 1);
     if (d > 2.5 && cosA < Math.cos(75 * D2R)) return false;   // ~150° FOV
@@ -63,6 +63,7 @@ export class Bot {
     const inp = a.input;
     inp.fire = false; inp.fire2 = false; inp.reload = false; inp.jump = false; inp.use = false;
     if (g.freeze) { inp.mx = inp.mf = 0; this.buyThink(); return; }
+    if (this.nade && this.runNade(dt)) return;
     this.thinkT -= dt;
     if (this.thinkT <= 0) { this.thinkT = 0.09 + Math.random() * 0.04; this.think(); }
 
@@ -253,6 +254,7 @@ export class Bot {
         h.handled = true;
         this.setGoal(h.x, h.z, 'search');
       }
+      if (!h.naded && dist > 12 && dist < 32 && Math.random() < 0.02 && a.inv.grenades.includes('he')) { h.naded = true; this.throwAt(h.x, h.y - 1.2, h.z, 'he'); }
       if (g.time - h.t > 5) this.heard = null;
     }
 
@@ -292,6 +294,39 @@ export class Bot {
     this.lookYaw += Math.sin(this.g.time * 0.6 + this.a.id * 3) * dt * 0.6;
   }
 
+  // ---------- grenades ----------
+  throwAt(x, y, z, id) {
+    const a = this.a;
+    if (this.nade || !a.inv.grenades.includes(id) || this.target) return false;
+    const eye = a.eye(_e);
+    const dx = x - eye.x, dz = z - eye.z, dy = y - eye.y; const d = Math.hypot(dx, dz);
+    if (d < 6 || d > 42) return false;
+    // ballistic search for the pitch that lands closest to the target distance
+    let best = 0.3, be = 1e9;
+    for (let p = -0.1; p < 1.1; p += 0.04) {
+      const vx = Math.cos(p) * 17, vy = Math.sin(p) * 17 + 2.2;
+      // time when y reaches dy on the way down
+      const disc = vy * vy - 2 * 14 * (dy); if (disc < 0) continue;
+      const t = (vy + Math.sqrt(disc)) / 14; const r = vx * t;
+      if (Math.abs(r - d) < be) { be = Math.abs(r - d); best = p; }
+    }
+    a.inv.grenades.splice(a.inv.grenades.indexOf(id), 1); a.inv.grenades.unshift(id);
+    this.nade = { yaw: Math.atan2(-dx, -dz), pitch: best, phase: 0, t: 0 };
+    a.switchTo('grenade');
+    return true;
+  }
+
+  runNade(dt) {
+    const a = this.a, inp = a.input, n = this.nade; n.t += dt;
+    inp.mx = inp.mf = 0; this.lookYaw = n.yaw; this.lookPitch = n.pitch;
+    const k = Math.min(1, dt * 12); a.yaw += (n.yaw - a.yaw) * k; a.pitch += (n.pitch - a.pitch) * k;
+    if (a.cur !== 'grenade' || n.t > 3) { this.nade = null; return false; }
+    if (n.phase === 0 && this.g.time >= a.deployEnd && Math.abs(angDiff(a.yaw, n.yaw)) < 0.05) { inp.fire = true; n.phase = 1; }
+    else if (n.phase === 1) { inp.fire = false; n.phase = 2; n.done = this.g.time + 0.3; }
+    else if (n.phase === 2 && this.g.time > n.done) { this.nade = null; }
+    return true;
+  }
+
   // ---------- economy ----------
   buyThink() {
     if (this.bought) return; this.bought = true;
@@ -328,8 +363,37 @@ export class Planner {
 
   avoidFn(bot) { return null; }
 
+  // player radio commands
+  command(cmd, team) {
+    const g = this.g; const bots = g.agents.filter(a => a.brain && a.team === team && a.alive);
+    for (const a of bots) a.brain.order = null;
+    if (cmd === 'follow' || cmd === 'hold') { for (const a of bots) a.brain.order = { kind: cmd, until: g.time + 25 }; return; }
+    if ((cmd === 'A' || cmd === 'B') && team === 'T' && this.plan.T) {
+      const P = this.plan.T; P.site = cmd; P.executeT = g.time + 4; P.utility = 0;
+      bots.forEach((a, i) => {
+        const routes = ROUTES[cmd]; const r = routes[i % routes.length];
+        let bi = 0, bd = 1e9; r.forEach((p, k) => { const d = Math.hypot(p[0] - a.pos.x, p[1] - a.pos.z); if (d < bd) { bd = d; bi = k; } });
+        a.brain.route = r.map(p => [p[0] + (Math.random() - 0.5) * 3, p[1] + (Math.random() - 0.5) * 3]); a.brain.ri = bi; a.brain.lurk = false; a.brain.state = 'route'; a.brain.goal = null;
+      });
+      return;
+    }
+    if ((cmd === 'A' || cmd === 'B') && team === 'CT') {
+      bots.forEach((a, i) => { const hs = HOLDS[cmd]; const h = hs[i % hs.length]; a.brain.role = cmd; a.brain.holdSpot = h; a.brain.setGoal(h[0], h[1], 'rotate', [h[2], h[3]]); });
+    }
+  }
+
   tick(bot) {
     const g = this.g, a = bot.a;
+    if (bot.order && g.time < bot.order.until && !g.bomb.planted) {
+      const o = bot.order;
+      if (o.kind === 'follow') {
+        const p = g.player; if (!p.alive) { bot.order = null; return; }
+        if (!bot.goal || g.time > (o.next || 0)) { o.next = g.time + 1.5; const q = g.world.randomNavNear(p.pos.x - Math.sin(p.yaw) * -2.5, p.pos.z - Math.cos(p.yaw) * -2.5, 3); bot.setGoal(q.x, q.z, 'follow'); }
+        if (Math.hypot(p.pos.x - a.pos.x, p.pos.z - a.pos.z) < 4) { bot.goal = null; a.input.mx = a.input.mf = 0; bot.lookYaw = p.yaw + (Math.random() - 0.5) * 0.6; }
+        return;
+      }
+      if (o.kind === 'hold') { bot.goal = null; a.input.mx = a.input.mf = 0; return; }
+    }
     if (g.mode === 'tdm') return this.tickTDM(bot);
     if (a.team === 'T') this.tickT(bot); else this.tickCT(bot);
   }
@@ -389,6 +453,11 @@ export class Planner {
         return;
       }
       if (bot.ri > stage && g.time < P.executeT && !bot.lurk) { bot.goal = null; bot.idleLook(0.1); a.input.mx = a.input.mf = 0; return; }
+      if (bot.ri > stage && !bot.lurk && (P.utility || 0) < 3 && g.time < P.executeT + 6) {
+        const hs = HOLDS[P.site]; const h = hs[(P.utility || 0) % hs.length];
+        const id = a.inv.grenades.includes('smoke') ? 'smoke' : a.inv.grenades.includes('flash') ? 'flash' : null;
+        if (id && bot.throwAt(h[0], 1, h[1], id)) { P.utility = (P.utility || 0) + 1; return; }
+      }
       const p = r[bot.ri];
       if (!bot.goal || Math.hypot(a.pos.x - p[0], a.pos.z - p[1]) < 2.5) {
         if (bot.goal) bot.ri++;

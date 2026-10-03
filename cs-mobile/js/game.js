@@ -176,7 +176,7 @@ export class Game {
       for (const a of this.agents) a.money = Math.min(16000, a.money + (a.team === winner ? winMoney : lossMoney) + (a.team === 'T' && this.bomb.planted && a.team !== winner ? 800 : 0));
       this.lossStreak[winner] = Math.max(1, this.lossStreak[winner] - 1); this.lossStreak[loser]++;
       // MVP: most kills on winning team
-      const mvp = this.agents.filter(a => a.team === winner).sort((a, b) => b.roundKills - a.roundKills)[0];
+      const mvp = this.agents.filter(a => a.team === winner && a.roundKills > 0).sort((a, b) => b.roundKills - a.roundKills)[0];
       if (mvp) mvp.mvps++;
       this.history.push(winner);
       this.hud.onRoundEnd(this, winner, reason, mvp);
@@ -493,6 +493,18 @@ export class Game {
     }
   }
 
+  radioCommand(cmd) {
+    const P = this.player;
+    const text = { A: P.team === 'T' ? '全体进攻 A 点！' : '回防 A 点！', B: P.team === 'T' ? '全体进攻 B 点！' : '回防 B 点！', follow: '跟我来！', hold: '守住位置！', roger: '收到。', backup: '需要支援！', enemy: '发现敌人！' }[cmd];
+    this.hud.radio(P, text);
+    this.audio.play('ui_click', { volume: 0.5, rate: 0.8 });
+    if (cmd === 'backup') { for (const a of this.agents) if (a.brain && a.team === P.team && a.alive && a.pos.distanceTo(P.pos) < 60) a.brain.order = { kind: 'follow', until: this.time + 15 }; }
+    else if (cmd !== 'roger' && cmd !== 'enemy') this.planner.command(cmd, P.team);
+    // teammates acknowledge
+    const mate = this.agents.find(a => a.brain && a.team === P.team && a.alive);
+    if (mate && cmd !== 'roger') setTimeout(() => this.hud.radio(mate, '收到！'), 600 + Math.random() * 500);
+  }
+
   inSite(p) {
     for (const k in SITES) { const s = SITES[k]; if (p.x > s.x0 && p.x < s.x1 && p.z > s.z0 && p.z < s.z1) return k; }
     return null;
@@ -673,8 +685,8 @@ export class Game {
   }
 
   explode(x, y, z, maxDmg, radius, owner, isBomb) {
-    this.effects.explosion(x, y, z);
-    if (isBomb) { for (let i = 0; i < 3; i++) setTimeout(() => this.effects.explosion(x + (Math.random() - 0.5) * 6, y + Math.random() * 2, z + (Math.random() - 0.5) * 6), i * 120); }
+    this.effects.explosion(x, y, z, isBomb ? 1.8 : 1);
+    if (isBomb) { for (let i = 0; i < 4; i++) setTimeout(() => this.effects.explosion(x + (Math.random() - 0.5) * 9, y + Math.random() * 3, z + (Math.random() - 0.5) * 9, 1.3), 90 + i * 140); }
     const c = this.camera.position; const d = Math.hypot(c.x - x, c.y - y, c.z - z);
     this.audio.play(d < 40 ? 'explosion' : 'explosion_far', { pos: { x, y, z }, volume: isBomb ? 1.4 : 1.1, ref: 15, roll: 0.5, reverb: 0.6, bass: 1.0, occlude: false });
     this.shake = Math.max(this.shake || 0, Math.max(0, 1 - d / (radius * 3)) * (isBomb ? 1.5 : 0.8));

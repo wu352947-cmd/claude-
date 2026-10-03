@@ -66,6 +66,8 @@
 
 <!-- HUD -->
 <div id="hud" class="hidden">
+  <div id="vignette"></div>
+  <div id="scope"><div class="sc-ring"></div><i class="sc-h"></i><i class="sc-v"></i></div>
   <div id="topbar">
     <div class="tb-side t"><div id="alive-t" class="pips"></div><b id="score-t">0</b></div>
     <div class="tb-mid"><div id="timer">1:55</div><div id="bombicon"></div><div id="roundno"></div></div>
@@ -78,7 +80,6 @@
   <div id="crosshair"><i id="ch-t"></i><i id="ch-b"></i><i id="ch-l"></i><i id="ch-r"></i><i class="dot"></i></div>
   <div id="hitmarker"><i></i><i></i><i></i><i></i></div>
   <div id="dmgdirs"></div>
-  <div id="scope"><div class="sc-ring"></div><i class="sc-h"></i><i class="sc-v"></i></div>
   <div id="hurt"></div>
   <div id="flashov"></div>
   <div id="center"></div>
@@ -118,6 +119,12 @@
   <button class="tbtn buy" id="btn-buy" data-act="buy">购买</button>
   <button class="tbtn score" data-act="score">☰</button>
   <button class="tbtn menu" data-act="menu">❚❚</button>
+  <button class="tbtn radio" data-act="radio">无线电</button>
+  <div id="radiomenu">
+    <button data-radio="A">进攻/回防 A</button><button data-radio="B">进攻/回防 B</button>
+    <button data-radio="follow">跟我来</button><button data-radio="hold">守住位置</button>
+    <button data-radio="backup">需要支援</button><button data-radio="enemy">发现敌人</button><button data-radio="roger">收到</button>
+  </div>
   <div id="slots">
     <button class="slot" id="slot-primary" data-act="slot" data-slot="primary"></button>
     <button class="slot" id="slot-secondary" data-act="slot" data-slot="secondary"></button>

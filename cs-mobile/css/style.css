@@ -114,7 +114,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 #co-result h2 { margin: 6px 0; font-family: Teko; font-weight: 500; letter-spacing: 3px; font-size: 32px; }
 
 /* ---------- HUD ---------- */
-#hud { position: fixed; inset: 0; z-index: 5; pointer-events: none; font-weight: 700; }
+#hud { position: fixed; inset: 0; z-index: 7; pointer-events: none; font-weight: 700; }
 #topbar { position: absolute; top: 6px; left: 50%; transform: translateX(-50%); display: flex; align-items: stretch; gap: 0; }
 .tb-side { display: flex; align-items: center; gap: 8px; padding: 2px 12px; background: var(--panel); font-family: Teko; font-size: 30px; line-height: 1; }
 .tb-side.t { border-radius: 8px 0 0 8px; border-bottom: 2px solid var(--t); } .tb-side.ct { border-radius: 0 8px 8px 0; border-bottom: 2px solid var(--ct); }
@@ -197,8 +197,9 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 #ammo { font-family: Teko; font-size: 42px; line-height: .9; } #ammo.low { color: var(--red); }
 #reserve { font-family: Teko; font-size: 22px; color: #bbb; margin-left: 4px; }
 #reloadhint { display: none; font-size: 12px; color: var(--acc); }
-#buymenu { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96); width: min(880px, 92vw); max-height: 78vh; background: rgba(12, 14, 18, .94); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: all .15s; z-index: 8; }
+#buymenu { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96); width: min(880px, 92vw); max-height: 94vh; overflow: auto; background: rgba(12, 14, 18, .96); box-shadow: 0 10px 40px rgba(0,0,0,.6); border: 1px solid var(--line); border-radius: 12px; padding: 10px 14px; opacity: 0; pointer-events: none; transition: all .15s; z-index: 8; }
 #buymenu.show { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+@media (max-height: 460px) { .buyitem { grid-template-rows: 30px auto; padding: 3px 6px; margin-bottom: 4px; } .buyitem img { height: 30px; } .bm-head { margin-bottom: 4px; } }
 .bm-head { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; } .bm-head b { font-family: Teko; font-size: 26px; letter-spacing: 3px; font-weight: 500; }
 #buymoney { color: #7dff8a; font-size: 18px; } #buytime { color: var(--dim); font-size: 13px; }
 .bm-close { margin-left: auto; width: 34px; height: 34px; border-radius: 8px; background: rgba(255, 255, 255, .08); }
@@ -208,8 +209,9 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .buyitem img { grid-column: 1 / 3; height: 40px; width: 100%; object-fit: contain; }
 .buyitem .bn { font-size: 13px; } .buyitem .bp { font-size: 13px; color: #7dff8a; }
 .buyitem.poor { opacity: .4; } .buyitem.owned { border-color: rgba(125, 255, 138, .5); } .buyitem.bought { background: rgba(125, 255, 138, .3); }
-#scoreboard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, 92vw); background: rgba(12, 14, 18, .92); border-radius: 10px; padding: 12px; display: none; z-index: 8; }
-#scoreboard.show { display: block; }
+#scoreboard { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, 92vw); max-height: 92vh; overflow: hidden; background: rgba(12, 14, 18, .96); box-shadow: 0 10px 40px rgba(0,0,0,.6); border-radius: 10px; padding: 12px; display: none; z-index: 8; }
+#scoreboard.show { display: block; pointer-events: auto; }
+#scoreboard td { padding: 3px 6px; }
 .sb-head { display: flex; justify-content: space-between; align-items: center; font-family: Teko; font-size: 26px; padding: 0 6px 6px; }
 .sb-head .hist { display: flex; gap: 2px; } .sb-head .hist i { width: 8px; height: 14px; border-radius: 2px; } .hist i.t { background: var(--t); } .hist i.ct { background: var(--ct); }
 #scoreboard table { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -251,6 +253,12 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .tbtn.buy { left: calc(176px + var(--safe-l)); top: 10px; background: rgba(60, 170, 80, .45); border-color: #7dff8a; }
 .tbtn.score { right: calc(10px + var(--safe-r)); top: 8px; width: 38px; height: 38px; border-radius: 8px; font-size: 16px; }
 .tbtn.menu { right: calc(54px + var(--safe-r)); top: 8px; width: 38px; height: 38px; border-radius: 8px; font-size: 13px; }
+.tbtn.radio { right: calc(98px + var(--safe-r)); top: 8px; width: 58px; height: 38px; border-radius: 8px; font-size: 12px; }
+#radiomenu { position: absolute; right: calc(98px + var(--safe-r)); top: 52px; display: none; flex-direction: column; gap: 4px; background: rgba(12, 14, 18, .92); border: 1px solid var(--line); border-radius: 10px; padding: 6px; z-index: 9; }
+#radiomenu.show { display: flex; }
+#radiomenu button { padding: 7px 14px; border-radius: 7px; background: rgba(255, 255, 255, .06); font-size: 14px; text-align: left; }
+#radiomenu button:active { background: rgba(245, 166, 35, .4); }
+#vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at center, rgba(0,0,0,0) 62%, rgba(10,6,2,.38) 100%); }
 #slots { position: absolute; left: 50%; bottom: 6px; transform: translateX(-62%); display: flex; gap: 5px; }
 .slot { position: relative; width: 78px; height: 38px; border-radius: 6px; background: rgba(20, 22, 26, .45); border: 1px solid rgba(255, 255, 255, .18); display: flex; align-items: center; justify-content: center; padding: 3px 6px; }
 .slot img { max-width: 100%; max-height: 100%; opacity: .7; } .slot b { position: absolute; right: 3px; bottom: 1px; font-size: 11px; }
@@ -270,4 +278,12 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   .tbtn.inspect { right: calc(210px + var(--safe-r)); bottom: 116px; }
   .ld-a { font-size: 48px; } .lb-menu { padding: 8px 12px; } .lb-menu b { font-size: 16px; }
   .btn-start { font-size: 28px; padding: 10px; }
+}
+@media (max-height: 460px) {
+  #caseopen { gap: 8px; justify-content: flex-start; padding-top: 10px; }
+  .co-strip-wrap { height: 128px; } #co-strip { top: 6px; } #co-strip .card img { height: 52px; }
+  #co-result { min-height: 0; } #co-result .big { width: 300px; height: 120px; } #co-result h2 { font-size: 24px; margin: 2px 0; } #co-result p { margin: 0 0 6px; }
+  .pn-box { height: 94vh; } .pn-head { padding: 6px 12px; } #pn-body { padding: 8px 12px; }
+  .inv-side { overflow: auto; } #preview { aspect-ratio: 16/8; } .inv-info h3 { font-size: 16px; }
+  .card img { height: 48px; } .casecard { width: 200px; padding: 10px; } .casecard .box { height: 70px; }
 }

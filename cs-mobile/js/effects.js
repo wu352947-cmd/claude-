@@ -22,15 +22,15 @@ void main(){
   gl_Position = projectionMatrix * mv;
 }`;
 const FS = `
-uniform sampler2D map; varying vec2 vUv; varying vec4 vColor;
-void main(){ vec4 t = texture2D(map, vUv); float a = t.a * vColor.a * max(t.r, max(t.g, t.b));
+uniform sampler2D map; uniform float boost; varying vec2 vUv; varying vec4 vColor;
+void main(){ vec4 t = texture2D(map, vUv); float a = min(1.0, t.a * vColor.a * max(t.r, max(t.g, t.b)) * boost);
   gl_FragColor = vec4(vColor.rgb * mix(1.0, t.r, 0.35), a);
   if (gl_FragColor.a < 0.004) discard;
   #include <colorspace_fragment>
 }`;
 
 class ParticleSystem {
-  constructor(tex, max, additive, scene, renderOrder = 10) {
+  constructor(tex, max, additive, scene, renderOrder = 10, boost = 1) {
     this.max = max; this.n = 0;
     const g = new THREE.InstancedBufferGeometry();
     g.setAttribute('position', new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3));
@@ -43,7 +43,7 @@ class ParticleSystem {
     g.setAttribute('iPos', this.aPos); g.setAttribute('iColor', this.aCol); g.setAttribute('iData', this.aDat); g.setAttribute('iDir', this.aDir);
     g.instanceCount = 0;
     const m = new THREE.ShaderMaterial({
-      uniforms: { map: { value: tex } }, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false,
+      uniforms: { map: { value: tex }, boost: { value: boost } }, vertexShader: VS, fragmentShader: FS, transparent: true, depthWrite: false,
       blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
     });
     this.mesh = new THREE.Mesh(g, m); this.mesh.frustumCulled = false; this.mesh.renderOrder = renderOrder;
@@ -112,7 +112,7 @@ export class Effects {
   constructor(scene, assets, audio) {
     const F = assets.fx; this.scene = scene; this.audio = audio;
     this.smoke = new ParticleSystem(F.smoke_04, 600, false, scene, 12);
-    this.bigSmoke = new ParticleSystem(F.smoke_01, 420, false, scene, 13);
+    this.bigSmoke = new ParticleSystem(F.smoke_01, 520, false, scene, 13, 2.2);
     this.dirt = new ParticleSystem(F.dirt_01, 300, false, scene, 11);
     this.blood = new ParticleSystem(F.smoke_07, 200, false, scene, 11);
     this.spark = new ParticleSystem(F.spark_01, 300, true, scene, 14);
@@ -120,10 +120,11 @@ export class Effects {
     this.fire = new ParticleSystem(F.fire_01, 120, true, scene, 15);
     this.flare = new ParticleSystem(F.flare_01, 60, true, scene, 16);
     this.tracer = new ParticleSystem(F.trace_01, 120, true, scene, 15);
+    this.ring = new ParticleSystem(F.circle_05, 8, true, scene, 16);
     this.holes = new DecalPool(F.scorch_01, 160, scene, 0x0a0806, 0.9, 0.12);
     this.bloodDecals = new DecalPool(F.dirt_03, 60, scene, 0x3a0404, 0.85, 0.9);
     this.scorch = new DecalPool(F.scorch_03, 12, scene, 0x050403, 0.9, 4);
-    this.systems = [this.smoke, this.bigSmoke, this.dirt, this.blood, this.spark, this.flash, this.fire, this.flare, this.tracer];
+    this.systems = [this.smoke, this.bigSmoke, this.dirt, this.blood, this.spark, this.flash, this.fire, this.flare, this.tracer, this.ring];
     // casings
     const cg = new THREE.CylinderGeometry(0.0055, 0.0055, 0.032, 6); cg.rotateZ(Math.PI / 2);
     this.casingMesh = new THREE.InstancedMesh(cg, new THREE.MeshStandardMaterial({ color: 0xc9a040, metalness: 0.9, roughness: 0.3 }), 48);
@@ -180,14 +181,20 @@ export class Effects {
     });
   }
 
-  explosion(x, y, z) {
-    for (let i = 0; i < 14; i++) this.fire.add({ x: x + (Math.random() - 0.5) * 1.2, y: y + Math.random() * 1.2, z: z + (Math.random() - 0.5) * 1.2, vx: (Math.random() - 0.5) * 6, vy: 2 + Math.random() * 5, vz: (Math.random() - 0.5) * 6, life: 0.4 + Math.random() * 0.4, size: 1.5 + Math.random() * 1.5, grow: 3, r: 1, g: 0.6, b: 0.25, a: 1, drag: 3 });
-    for (let i = 0; i < 16; i++) this.bigSmoke.add({ x, y: y + 0.5, z, vx: (Math.random() - 0.5) * 7, vy: 1 + Math.random() * 4, vz: (Math.random() - 0.5) * 7, life: 2.5 + Math.random() * 2, size: 1.5, grow: 1.8, r: 0.25, g: 0.23, b: 0.2, a: 0.75, drag: 1.8, fade: 'in-out', fadeIn: 0.15 });
-    for (let i = 0; i < 30; i++) this.spark.add({ x, y: y + 0.3, z, vx: (Math.random() - 0.5) * 22, vy: Math.random() * 14, vz: (Math.random() - 0.5) * 22, life: 0.6 + Math.random() * 0.5, size: 0.05, stretch: 0.25, grav: 14, r: 1, g: 0.75, b: 0.35, a: 1 });
-    for (let i = 0; i < 12; i++) this.dirt.add({ x, y: y + 0.2, z, vx: (Math.random() - 0.5) * 12, vy: 4 + Math.random() * 8, vz: (Math.random() - 0.5) * 12, life: 1.2, size: 0.12, grav: 14, r: 0.3, g: 0.26, b: 0.2, a: 1 });
-    this.flare.add({ x, y: y + 0.5, z, life: 0.25, size: 9, r: 1, g: 0.8, b: 0.5, a: 1 });
+  explosion(x, y, z, big = 1) {
+    // core fireball
+    for (let i = 0; i < 22 * big; i++) this.fire.add({ x: x + (Math.random() - 0.5) * 1.6, y: y + 0.3 + Math.random() * 1.6, z: z + (Math.random() - 0.5) * 1.6, vx: (Math.random() - 0.5) * 9, vy: 2 + Math.random() * 7, vz: (Math.random() - 0.5) * 9, life: 0.35 + Math.random() * 0.45, size: (2.4 + Math.random() * 2.4) * big, grow: 5, spin: (Math.random() - 0.5) * 3, r: 1, g: 0.55 + Math.random() * 0.2, b: 0.2, a: 1, drag: 4 });
+    // rising dark smoke column
+    for (let i = 0; i < 26 * big; i++) this.bigSmoke.add({ x: x + (Math.random() - 0.5) * 2, y: y + 0.6 + Math.random() * 1.5, z: z + (Math.random() - 0.5) * 2, vx: (Math.random() - 0.5) * 8, vy: 1.5 + Math.random() * 4.5, vz: (Math.random() - 0.5) * 8, life: 3 + Math.random() * 2.5, size: 2.2 * big, grow: 2.4, spin: (Math.random() - 0.5) * 0.6, r: 0.2, g: 0.18, b: 0.16, a: 0.8, drag: 1.6, fade: 'in-out', fadeIn: 0.12 });
+    // dust ring along the ground
+    for (let i = 0; i < 18; i++) { const a = i / 18 * 6.283; this.smoke.add({ x, y: y + 0.2, z, vx: Math.cos(a) * 11, vy: 0.4, vz: Math.sin(a) * 11, life: 1.4, size: 1.0, grow: 2.2, r: 0.75, g: 0.65, b: 0.5, a: 0.55, drag: 3.5 }); }
+    for (let i = 0; i < 40; i++) this.spark.add({ x, y: y + 0.4, z, vx: (Math.random() - 0.5) * 26, vy: Math.random() * 16, vz: (Math.random() - 0.5) * 26, life: 0.6 + Math.random() * 0.7, size: 0.06, stretch: 0.3, grav: 14, r: 1, g: 0.75, b: 0.35, a: 1 });
+    for (let i = 0; i < 18; i++) this.dirt.add({ x, y: y + 0.2, z, vx: (Math.random() - 0.5) * 14, vy: 4 + Math.random() * 9, vz: (Math.random() - 0.5) * 14, life: 1.4, size: 0.14, grav: 14, r: 0.3, g: 0.26, b: 0.2, a: 1 });
+    this.flare.add({ x, y: y + 0.8, z, life: 0.22, size: 16 * big, r: 1, g: 0.85, b: 0.55, a: 1 });
+    this.flare.add({ x, y: y + 0.8, z, life: 0.6, size: 8 * big, grow: 6, r: 1, g: 0.5, b: 0.2, a: 0.7 });
+    this.ring.add({ x, y: y + 0.6, z, life: 0.45, size: 2, grow: 40, r: 1, g: 0.9, b: 0.7, a: 0.5 });
     this.scorch.add(x, 0.01, z, 0, 1, 0, 4 + Math.random());
-    this.light.position.set(x, y + 1, z); this.light.intensity = 60; this.light.distance = 25; this.lightT = 0.25;
+    this.light.position.set(x, y + 1.5, z); this.light.intensity = 120; this.light.distance = 32; this.lightT = 0.35;
   }
 
   smokeGrenade(x, y, z) {
@@ -225,10 +232,14 @@ export class Effects {
       s.r = target;
       if (s.t < s.life - 3) {
         s.emit -= dt;
+        if (!s.burst) {
+          s.burst = true;
+          for (let k = 0; k < 26; k++) { const a = Math.random() * 6.28, sp = 2 + Math.random() * 4; this.bigSmoke.add({ x: s.x, y: s.y - 0.6 + Math.random() * 1.2, z: s.z, vx: Math.cos(a) * sp, vy: 0.4 + Math.random() * 1.2, vz: Math.sin(a) * sp, life: s.life - 2 + Math.random() * 2, size: 2.6 + Math.random() * 1.5, grow: 0.35, spin: (Math.random() - 0.5) * 0.25, r: 0.8, g: 0.79, b: 0.76, a: 0.95, fade: 'in-out', fadeIn: 0.4, drag: 1.2 }); }
+        }
         if (s.emit <= 0) {
-          s.emit = 0.09;
-          const a = Math.random() * 6.28, rr = Math.random() * Math.max(0.5, s.r * 0.8);
-          this.bigSmoke.add({ x: s.x + Math.cos(a) * rr, y: s.y - 0.8 + Math.random() * 2.4, z: s.z + Math.sin(a) * rr, vx: Math.cos(a) * 0.3, vy: 0.05, vz: Math.sin(a) * 0.3, life: 6 + Math.random() * 3, size: 3.2 + Math.random() * 1.5, grow: 0.25, spin: (Math.random() - 0.5) * 0.2, r: 0.78, g: 0.77, b: 0.74, a: 0.85, fade: 'in-out', fadeIn: 0.8, drag: 0.5 });
+          s.emit = s.t < 3 ? 0.05 : 0.14;
+          const a = Math.random() * 6.28, rr = Math.random() * Math.max(0.5, s.r * 0.85);
+          this.bigSmoke.add({ x: s.x + Math.cos(a) * rr, y: s.y - 0.9 + Math.random() * 2.8, z: s.z + Math.sin(a) * rr, vx: Math.cos(a) * 0.25, vy: 0.04, vz: Math.sin(a) * 0.25, life: 5 + Math.random() * 3, size: 3.6 + Math.random() * 1.8, grow: 0.2, spin: (Math.random() - 0.5) * 0.2, r: 0.8, g: 0.79, b: 0.76, a: 0.92, fade: 'in-out', fadeIn: 0.6, drag: 0.5 });
         }
       }
       if (s.t >= s.life) this.smokeVolumes.splice(i, 1);

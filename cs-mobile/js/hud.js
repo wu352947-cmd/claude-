@@ -247,6 +247,7 @@ export class HUD {
   // ---------------- buy menu ----------------
   buildBuyMenu() {
     const root = $('buymenu-items'); root.innerHTML = '';
+    if (!this._bmBound) { this._bmBound = true; document.querySelector('#buymenu [data-close]').addEventListener('click', e => { e.stopPropagation(); this.toggleBuy(false); }); }
     const g = this.game, P = g.player;
     for (const cat of BUY_MENU) {
       const col = document.createElement('div'); col.className = 'buycat';
@@ -281,7 +282,7 @@ export class HUD {
   }
 
   // ---------------- scoreboard ----------------
-  toggleScore(v) { this.scoreOpen = v ?? !this.scoreOpen; $('scoreboard').classList.toggle('show', this.scoreOpen); if (this.scoreOpen) this.renderScore(); }
+  toggleScore(v) { this.scoreOpen = v ?? !this.scoreOpen; if (this.scoreOpen && !this._sbBound) { this._sbBound = true; document.getElementById('scoreboard').addEventListener('click', () => this.toggleScore(false)); } $('scoreboard').classList.toggle('show', this.scoreOpen); if (this.scoreOpen) this.renderScore(); }
   renderScore() {
     const g = this.game;
     const rows = team => g.agents.filter(a => a.team === team).sort((a, b) => b.score - a.score || b.kills - a.kills).map(a =>

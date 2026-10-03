@@ -20,6 +20,8 @@ export class Input {
       this.audio.unlock();
       for (const t of e.changedTouches) {
         const el = document.elementFromPoint(t.clientX, t.clientY);
+        const rb = el && el.closest('[data-radio]');
+        if (rb) { this.radioReq = rb.dataset.radio; document.getElementById('radiomenu').classList.remove('show'); continue; }
         const btn = el && el.closest('[data-act]');
         if (btn) { this.pressButton(btn, t, true); continue; }
         if (t.clientX < window.innerWidth * 0.42 && !this.touches.has('stick')) {
@@ -69,6 +71,8 @@ export class Input {
     // mouse clicks on buttons (desktop testing)
     layer.addEventListener('mousedown', e => {
       if (!this.enabled) return; this.audio.unlock();
+      const rb = e.target.closest('[data-radio]');
+      if (rb) { this.radioReq = rb.dataset.radio; document.getElementById('radiomenu').classList.remove('show'); return; }
       const btn = e.target.closest('[data-act]');
       if (btn) { this.pressButton(btn, { identifier: 'mouse', clientX: e.clientX, clientY: e.clientY }, true); return; }
       if (!this.pointerLocked && this.s.desktop) { $('game-canvas').requestPointerLock?.(); }
@@ -97,6 +101,7 @@ export class Input {
       case 'inspect': this.inspectReq = true; momentary(); break;
       case 'pick': this.pickReq = true; momentary(); break;
       case 'menu': this.menuReq = true; momentary(); break;
+      case 'radio': document.getElementById('radiomenu').classList.toggle('show'); momentary(); break;
       default: momentary();
     }
     this.audio.play('ui_click', { volume: 0.15 });
@@ -115,6 +120,7 @@ export class Input {
       if (e.code === 'KeyF') this.inspectReq = true;
       if (e.code === 'KeyG') this.pickReq = true;
       if (e.code === 'Escape') this.menuReq = true;
+      if (e.code === 'KeyZ') document.getElementById('radiomenu').classList.toggle('show');
     });
     window.addEventListener('keyup', e => { this.keys[e.code] = false; if (e.code === 'Tab') this.hud.toggleScore(false); });
     const cv = $('game-canvas');
@@ -176,6 +182,7 @@ export class Input {
     }
     if (this.inspectReq) { game.vm.inspect(); this.inspectReq = false; }
     if (this.pickReq) { game.pickup(a); this.pickReq = false; }
+    if (this.radioReq) { game.radioCommand(this.radioReq); this.radioReq = null; }
   }
 
   reset() {
