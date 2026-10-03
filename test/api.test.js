@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { createApp } from '../server/index.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'sg-'));
-const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', SMS_PROVIDER: 'mock', SMS_DEBUG: '1', APP_SECRET: 'test-secret', ENTRY_KEY: 'a'.repeat(64) } });
+const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', SMS_PROVIDER: 'mock', SMS_DEBUG: '1', WEATHER_PROVIDER: 'mock', APP_SECRET: 'test-secret', ENTRY_KEY: 'a'.repeat(64) } });
 await new Promise(r => server.listen(0, r));
 const base = `http://127.0.0.1:${server.address().port}`;
 test.after(() => server.close());
@@ -191,4 +191,19 @@ test('回信记忆：仅在用户开启后参考最近几页', async () => {
   await a('DELETE', `/api/letters/${r1.data.letter.id}`);
   const r2 = await a('POST', `/api/entries/${today}/reply`);
   assert.match(r2.data.letter.body, /面试结束了/);
+});
+
+test('城市与天气', async () => {
+  const a = client();
+  await a('POST', '/api/auth/register', { username: 'tenki', password: 'rainyday88', agree: true });
+  assert.equal((await a('GET', '/api/config')).data.weather, true);
+  assert.equal((await a('GET', '/api/weather')).data.weather, null, '没选城市时不取天气');
+  await a('PATCH', '/api/me', { settings: { city: 'atlantis' } });
+  assert.equal((await a('GET', '/api/me')).data.user.settings.city, undefined, '不在列表里的城市被忽略');
+  await a('PATCH', '/api/me', { settings: { city: 'hangzhou' } });
+  const w = (await a('GET', '/api/weather')).data.weather;
+  assert.equal(w.city, '杭州');
+  assert.ok(['sun', 'cloud', 'rain', 'thunder', 'snow', 'wind', 'fog'].includes(w.kind));
+  assert.equal(typeof w.temp, 'number');
+  assert.equal((await client()('GET', '/api/weather')).status, 401);
 });

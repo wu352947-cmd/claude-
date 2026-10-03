@@ -2,7 +2,8 @@
 import { url, saveFile, leaveSite } from '../site.js';
 import { api } from '../api.js';
 import { h, esc, toast, modal, confirmBox } from '../ui.js';
-import { state, applyPrefs } from '../main.js';
+import { state, applyPrefs, loadWeather } from '../main.js';
+import { CITIES } from '../cities.js';
 import { codeFieldsHtml, bindCodeFields } from '../codefield.js';
 import { resetFlow } from './auth.js';
 
@@ -16,6 +17,8 @@ export function settingsView(root) {
       <div class="seg" id="theme">${[['auto', '跟随系统'], ['light', '日'], ['dark', '夜']].map(([k, n]) => `<button type="button" data-v="${k}" class="${(s.theme || 'auto') === k ? 'on' : ''}">${n}</button>`).join('')}</div></section>
     <section class="paper set-row"><div><h4>安静模式</h4><p>关掉飘落物和大部分动画，只留下纸和字</p></div>
       <div class="seg" id="quiet"><button type="button" data-v="0" class="${s.quiet ? '' : 'on'}">关</button><button type="button" data-v="1" class="${s.quiet ? 'on' : ''}">开</button></div></section>
+    ${state.config.weather ? `<section class="paper set-row"><div><h4>我的城市</h4><p>当地正在下雨、下雪、起雾，背景里也会一起下；写手帐时天气会自动落在纸上。只按城市取天气，不读取定位</p></div>
+      <div><label class="sr" for="city">城市</label><select id="city" class="time-in"><option value="">不显示天气</option>${CITIES.map(c => `<option value="${c.k}" ${s.city === c.k ? 'selected' : ''}>${c.name}</option>`).join('')}</select></div></section>` : ''}
     <section class="paper set-row"><div><h4>每日提醒</h4><p>选一个时间，加入手机日历；到点会轻轻提醒你写一页</p></div>
       <div style="display:flex;gap:8px;align-items:center"><label class="sr" for="rmd">提醒时间</label><input type="time" id="rmd" value="${esc(s.reminder || '22:00')}" class="time-in"><button class="btn small" id="ics">加入日历</button></div></section>
     <section class="paper set-row"><div><h4>导出我的手帐</h4><p>下载全部文字、心情、贴纸布局与信件（JSON）</p></div><button class="btn small" id="exp">导出</button></section>
@@ -34,6 +37,10 @@ export function settingsView(root) {
     root.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); await fn(b.dataset.v);
   }));
   seg('theme', v => save({ settings: { theme: v } }));
+  root.querySelector('#city')?.addEventListener('change', async e => {
+    const v = e.target.value;
+    if (await save({ settings: { city: v } })) { await loadWeather(); toast(v && state.weather ? `${state.weather.city}现在${state.weather.text}，${state.weather.temp}°` : '好的，不再显示天气'); }
+  });
   seg('quiet', v => save({ settings: { quiet: v === '1' } }));
   seg('memory', async v => { if (await save({ settings: { memory: v === '1' } })) toast(v === '1' ? '月亮会记得你最近写过的事' : '月亮只读当天这一页'); });
   root.querySelector('#ics').addEventListener('click', async () => {

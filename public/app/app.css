@@ -571,3 +571,19 @@ main{position:relative; z-index:1; outline:none}
 .b-foot{position:relative; display:flex; gap:10px}
 .breathe[data-phase="end"] .b-gate{transition:transform 2s var(--ease)}
 .breathe[data-phase="end"] .b-word{letter-spacing:.3em}
+
+/* ---------- 天气 ---------- */
+.wx-ic{width:18px; height:18px; flex:none; fill:none; stroke:currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round}
+.wx-chip{display:inline-flex; align-items:center; gap:3px; margin-left:8px; padding-left:8px; border-left:1px solid var(--line); font-family:var(--f-latin); font-size:15px}
+.wx-chip .wx-ic{width:16px; height:16px}
+.wx-line{display:flex; align-items:center; gap:8px; margin:12px 0 0; padding-top:12px; border-top:1px dashed var(--line); font-size:13px; color:var(--ink-soft)}
+.wx-line b{font-family:var(--f-latin); font-weight:500; font-size:16px; color:var(--ink)}
+.wx-line a{margin-left:auto; font-size:12px; color:var(--ink-soft)}
+.wx-line a:only-of-type:first-of-type{margin-left:0}
+.wx-line .wx-ic{color:var(--acc); width:22px; height:22px}
+.weather button.suggest{box-shadow:inset 0 0 0 1.5px var(--acc); animation:wxHint 2.6s ease-in-out infinite}
+@keyframes wxHint{50%{box-shadow:inset 0 0 0 1.5px transparent}}
+@media (max-width:760px){.wx-chip{margin-left:6px; padding-left:6px}}
+.term-chip .hou{font-style:normal}
+.brand b{white-space:nowrap}
+@media (max-width:420px){.term-chip .hou{display:none}}

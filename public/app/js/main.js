@@ -10,8 +10,9 @@ import { lettersView } from './views/letters.js';
 import { settingsView } from './views/settings.js';
 import { scrollView } from './views/scroll.js';
 import { mountCalm } from './calm.js';
+import { wxIcon } from './weather.js';
 
-export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {}, navDir: 0 };
+export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {}, navDir: 0, weather: null };
 const root = document.getElementById('view');
 const docEl = document.documentElement;
 const term = termOf(new Date());
@@ -54,11 +55,27 @@ async function route() {
   root.focus({ preventScroll: true });
 }
 
+// 实时天气：进入时取一次，之后每 20 分钟刷新；画到背景上，并通知当前页面
+export async function loadWeather() {
+  if (!state.config.weather || !state.user) return;
+  let w = null;
+  try { ({ weather: w } = await api.weather()); } catch {}
+  state.weather = w;
+  fx?.setWeather(w);
+  paintChip();
+  dispatchEvent(new CustomEvent('sg:weather', { detail: w }));
+}
+function paintChip() {
+  const w = state.weather;
+  document.getElementById('termChip').innerHTML = `<b>${'春夏秋冬'[term.season]}</b>${term.name}<i class="hou"> · ${term.hou}</i>${w ? `<span class="wx-chip" title="${w.city} · ${w.text}">${wxIcon(w.kind, w.isDay)}${w.temp}°</span>` : ''}${state.config.demo ? '<em class="demo-chip">试玩版</em>' : ''}`;
+}
+let wxTimer = 0;
+
 function enter(user, fresh) {
   state.user = user; applyPrefs();
   document.getElementById('topbar').hidden = false;
   mountCalm();
-  document.getElementById('termChip').innerHTML = `<b>${'春夏秋冬'[term.season]}</b>${term.name} · ${term.hou}${state.config.demo ? '<em class="demo-chip">试玩版</em>' : ''}`;
+  paintChip(); loadWeather(); clearInterval(wxTimer); wxTimer = setInterval(loadWeather, 20 * 60_000);
   if (fresh) toast(`欢迎，${user.nickname}。这是你手帐的第一页。`, { seal: '拾' });
   if (!location.hash || location.hash === '#/register' || location.hash === '#/login') location.hash = '#/today'; else route();
   refreshCounts();

@@ -21,7 +21,7 @@ export const LW = 760, LH = 1040;
 export function createPage({ day, entry, editable = false, onChange, promptIndex }) {
   const d = parseDay(day), term = termOf(d), moon = moonOf(d), lunar = lunarOf(d);
   const data = { mood: entry?.mood || '', body: entry?.body || '', page: { stickers: [], photos: [], weather: '', ...(entry?.page || {}) } };
-  let selected = null, k = 1;
+  let selected = null, k = 1, suggest = '', wxTouched = !!data.page.weather;
   const frame = h(`<div class="page-frame"></div>`);
   const el = h(`<article class="page" aria-label="${d.getMonth() + 1}月${d.getDate()}日的手帐">
     <div class="page-head">
@@ -44,7 +44,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
   const layer = el.querySelector('.layer'), ta = el.querySelector('.writing');
 
   const paintMood = () => el.querySelectorAll('.mood').forEach(b => b.setAttribute('aria-pressed', b.dataset.m === data.mood));
-  const paintWeather = () => el.querySelectorAll('.weather button').forEach(b => { const on = b.dataset.w === data.page.weather; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+  const paintWeather = () => el.querySelectorAll('.weather button').forEach(b => { const on = b.dataset.w === data.page.weather; b.classList.toggle('on', on); b.classList.toggle('suggest', !data.page.weather && b.dataset.w === suggest); b.setAttribute('aria-pressed', on); });
   const paintCount = () => { el.querySelector('.count').textContent = data.body ? `${[...data.body.replace(/\s/g, '')].length} 字` : ''; };
   const fit = () => {
     if (ta) { ta.style.height = 'auto'; ta.style.height = Math.max(380, ta.scrollHeight + 8) + 'px'; }
@@ -53,7 +53,8 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
     frame.style.height = Math.ceil(el.offsetHeight * k) + 'px';
     frame.classList.toggle('small', k < 0.86);
   };
-  const changed = () => { paintCount(); onChange?.(snapshot()); };
+  // 当天还没选天气时，第一次动笔就把实时天气落到纸上（用户自己点过天气则不再干预）
+  const changed = () => { if (suggest && !wxTouched && !data.page.weather) { data.page.weather = suggest; wxTouched = true; paintWeather(); } paintCount(); onChange?.(snapshot()); };
   const snapshot = () => JSON.parse(JSON.stringify(data));
 
   paintMood(); paintWeather();
@@ -88,7 +89,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
       if (!quiet()) b.querySelector('svg').animate([{ transform: 'scale(.7) rotate(10deg)' }, { transform: 'scale(1.25)' }, { transform: 'scale(1.18)' }], { duration: 600, easing: 'cubic-bezier(.34,1.56,.64,1)' });
       changed();
     }));
-    el.querySelectorAll('.weather button').forEach(b => b.addEventListener('click', () => { data.page.weather = data.page.weather === b.dataset.w ? '' : b.dataset.w; paintWeather(); changed(); }));
+    el.querySelectorAll('.weather button').forEach(b => b.addEventListener('click', () => { wxTouched = true; data.page.weather = data.page.weather === b.dataset.w ? '' : b.dataset.w; paintWeather(); changed(); }));
     ta.addEventListener('input', () => { data.body = ta.value; fit(); changed(); });
     ta.addEventListener('pointerdown', e => { if (k < 0.86) { e.preventDefault(); openSheet(); } });
     ta.addEventListener('focus', () => { if (k < 0.86) { ta.blur(); openSheet(); } });
@@ -190,6 +191,7 @@ export function createPage({ day, entry, editable = false, onChange, promptIndex
     return { x: 0.14 + Math.random() * 0.72, y, r: (Math.random() - 0.5) * 24 * (wFrac > 0.2 ? 0.3 : 1) };
   }
   return {
+    suggestWeather(c) { if (!editable) return; suggest = c || ''; paintWeather(); },
     el: frame, page: el,
     data: snapshot,
     addSticker(kk) {

@@ -39,5 +39,6 @@ export const api = {
   resetPassword: b => call('POST', '/api/auth/reset', b),
   bindPhone: b => call('POST', '/api/me/phone', b),
   deleteMeByCode: code => call('DELETE', '/api/me', { code }),
-  demoSeed: () => call('POST', '/api/demo/seed', {})
+  demoSeed: () => call('POST', '/api/demo/seed', {}),
+  weather: () => call('GET', '/api/weather')
 };

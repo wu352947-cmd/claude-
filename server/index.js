@@ -12,6 +12,8 @@ import { crisisSignal, CRISIS_LETTER, HOTLINES } from './safety.js';
 import { loadKey, makeCodec } from './crypto.js';
 import { smsConfig, sendCode, validPhone, maskPhone, newCode, codeHash, sameHash } from './sms.js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+import { weatherConfig, createWeather } from './weather.js';
+import { CITY_MAP } from '../public/app/js/cities.js';
 import { termOf, moonOf, parseDay, isDayKey, SEASON_CN } from '../public/app/js/calendar.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -30,6 +32,7 @@ export function createApp(opts = {}) {
   for (const r of db.prepare("SELECT rowid, body FROM entries WHERE body != '' AND body NOT LIKE 'enc1:%'").all()) db.prepare('UPDATE entries SET body = ? WHERE rowid = ?').run(enc(r.body), r.rowid);
   for (const r of db.prepare("SELECT id, body FROM letters WHERE body NOT LIKE 'enc1:%'").all()) db.prepare('UPDATE letters SET body = ? WHERE id = ?').run(enc(r.body), r.id);
   const AI_DAILY = Number(env.AI_DAILY_LIMIT || 3);
+  const wx = weatherConfig(env), getWeather = wx.enabled ? createWeather(wx) : null;
   const ICP = env.SITE_ICP || '';
   const COOKIE_SECURE = (env.COOKIE_SECURE || 'auto').toLowerCase();
   const MOODS = new Set(['', 'happy', 'calm', 'sweet', 'tired', 'blue']);
@@ -118,7 +121,7 @@ export function createApp(opts = {}) {
     const need = () => { if (!user) throw Object.assign(new Error('请先登录'), { status: 401 }); };
 
     if (p === '/api/health') return send(res, 200, { ok: true });
-    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES, sms: sms.enabled });
+    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES, sms: sms.enabled, weather: wx.enabled });
 
     if (p === '/api/auth/sms/send' && m === 'POST') {
       if (!sms.enabled) return fail(res, 503, '短信服务尚未开启');
@@ -216,6 +219,14 @@ export function createApp(opts = {}) {
       };
       return send(res, 200, { user: publicUser(user), counts, ai: ai.enabled });
     }
+    if (p === '/api/weather' && m === 'GET') {
+      need();
+      if (!getWeather) return fail(res, 503, '天气服务尚未开启');
+      const city = CITY_MAP[parseJson(user.settings, {}).city];
+      if (!city) return send(res, 200, { weather: null });
+      try { return send(res, 200, { weather: await getWeather(city) }); }
+      catch (e) { console.error('weather', e.message); return fail(res, 503, '天气暂时取不到'); }
+    }
     if (p === '/api/me' && m === 'PATCH') {
       need();
       const b = await readJson(req);
@@ -225,6 +236,7 @@ export function createApp(opts = {}) {
         if (typeof b.settings.quiet === 'boolean') settings.quiet = b.settings.quiet;
         if (typeof b.settings.onboarded === 'boolean') settings.onboarded = b.settings.onboarded;
         if (typeof b.settings.memory === 'boolean') settings.memory = b.settings.memory;
+        if (typeof b.settings.city === 'string' && (b.settings.city === '' || CITY_MAP[b.settings.city])) settings.city = b.settings.city;
         if (typeof b.settings.reminder === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(b.settings.reminder)) settings.reminder = b.settings.reminder;
       }
       const nickname = b.nickname !== undefined ? (str(b.nickname, 20).trim() || user.username) : user.nickname;

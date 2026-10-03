@@ -2,6 +2,7 @@
 // 接口与返回格式和 server/index.js 保持一致，前端代码无需改动。
 import { termOf, moonOf, parseDay, dayKey, isDayKey, SEASON_CN, pad } from '../calendar.js';
 import { SITE } from '../site.js';
+import { CITY_MAP } from '../cities.js';
 
 const KEY = 'sgdemo.v1';
 const blank = () => ({ seq: 1, users: [], session: null, entries: {}, letters: [], usage: {}, codes: {} });
@@ -71,7 +72,7 @@ async function handle(method, path, q, b) {
   const u = me();
   const need = () => { if (!u) throw err(401, '请先登录'); };
   let m;
-  if (path === '/api/config') return { ai: true, aiDaily: 3, icp: '', hotlines: HOTLINES, sms: true, demo: true };
+  if (path === '/api/config') return { ai: true, aiDaily: 3, icp: '', hotlines: HOTLINES, sms: true, weather: true, demo: true };
   if (path === '/api/auth/register' && method === 'POST') {
     if (!validName(b.username)) throw err(400, '用户名需为 2–20 位中文、字母、数字或下划线');
     if (typeof b.password !== 'string' || b.password.length < 8) throw err(400, '密码长度需在 8–72 位之间');
@@ -124,6 +125,7 @@ async function handle(method, path, q, b) {
     const s = b.settings || {};
     if (['auto', 'light', 'dark'].includes(s.theme)) u.settings.theme = s.theme;
     for (const k of ['quiet', 'onboarded', 'memory']) if (typeof s[k] === 'boolean') u.settings[k] = s[k];
+    if (typeof s.city === 'string' && (s.city === '' || CITY_MAP[s.city])) u.settings.city = s.city;
     if (typeof s.reminder === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(s.reminder)) u.settings.reminder = s.reminder;
     save(); return { user: pub(u) };
   }
@@ -139,6 +141,7 @@ async function handle(method, path, q, b) {
     if (db.users.some(x => x.phone === b.phone)) throw err(409, '这个手机号已经绑定了别的手帐');
     useCode(b.phone, 'bind', b.code); u.phone = b.phone; save(); return { user: pub(u) };
   }
+  if (path === '/api/weather') { need(); const c = CITY_MAP[u.settings.city]; return { weather: c ? { city: c.name, ...mockWeather(c), at: now() } : null }; }
   if (path === '/api/export') { need(); return { exportedAt: new Date().toISOString(), site: '拾光手帐（试玩版）', user: pub(u), entries: Object.entries(entriesOf(u)).sort().map(([d, e]) => entryOut(d, e)), letters: db.letters.filter(l => l.uid === u.id).map(l => ({ ...letterOut(l), body: l.body })) }; }
 
   if (path === '/api/entries' && method === 'GET') {
@@ -234,7 +237,7 @@ const SAMPLE = {
 const STK = { 0: ['sakura', 'plum', 'lotus', 'tea'], 1: ['lotus', 'tea', 'fan', 'star'], 2: ['maple', 'ginkgo', 'osmanthus', 'moon'], 3: ['plum', 'moon', 'lantern', 'seal-an'] };
 function seedSample() {
   const rnd = (i, s) => { const x = Math.sin(i * 12.9898 + s * 78.233) * 43758.5453; return x - Math.floor(x); };
-  const u = { id: db.seq++, username: 'shili' + Math.floor(Math.random() * 1e5), pass: null, nickname: '小满', settings: { onboarded: true, memory: true }, created_at: now() - 200 * 864e5, phone: null };
+  const u = { id: db.seq++, username: 'shili' + Math.floor(Math.random() * 1e5), pass: null, nickname: '小满', settings: { onboarded: true, memory: true, city: 'hangzhou' }, created_at: now() - 200 * 864e5, phone: null };
   db.users.push(u); const E = entriesOf(u);
   const today = new Date(), y = today.getFullYear(), moods = ['happy', 'calm', 'sweet', 'calm', 'tired', 'happy', 'blue', 'sweet'];
   for (let d = new Date(y, 0, 1); d < new Date(today.getFullYear(), today.getMonth(), today.getDate()); d.setDate(d.getDate() + 1)) {
@@ -257,4 +260,15 @@ function seedSample() {
   db.letters.push({ id: db.seq++, uid: u.id, kind: 'future', title: '春天写给秋天', body: '春天的我在想：到了秋天，你会不会已经学会了慢一点？如果还没有，也没关系。\n\n记得去看看银杏。', meta: {}, createdAt: new Date(y, 3, 2).getTime(), deliverAt: back.getTime() });
   db.session = u.id; save();
   return u;
+}
+
+// 模拟天气：与 server/weather.js 的 mock 相同，按城市与时间稳定变化
+function mockWeather(city, t = new Date()) {
+  const seed = [...city.k].reduce((a, c) => a * 31 + c.charCodeAt(0), 7) + Math.floor(t / (3 * 3600_000));
+  const x = Math.abs((Math.sin(seed) * 43758.5453) % 1), m = t.getMonth();
+  const winter = m === 11 || m <= 1, summer = m >= 5 && m <= 7;
+  const kind = x < .32 ? 'sun' : x < .58 ? 'cloud' : x < .78 ? (winter && city.lat > 30 ? 'snow' : 'rain') : x < .86 ? (summer ? 'thunder' : 'fog') : x < .93 ? 'wind' : 'fog';
+  const text = { sun: '晴', cloud: '多云', rain: '小雨', snow: '小雪', thunder: '雷阵雨', fog: '薄雾', wind: '有风' }[kind] + '（模拟）';
+  const h = t.getHours(), base = [4, 6, 11, 17, 22, 26, 29, 28, 24, 18, 11, 6][m] - (city.lat - 30) * .6;
+  return { kind, text, temp: Math.round(base + Math.sin((h - 9) / 24 * Math.PI * 2) * 4), isDay: h >= 6 && h < 18 };
 }

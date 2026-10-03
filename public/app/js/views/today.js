@@ -9,6 +9,8 @@ import { state, refreshCounts } from '../main.js';
 import { startCoach } from '../coach.js';
 import { MOOD_MAP, faceSvg } from '../faces.js';
 import { breathe } from '../calm.js';
+import { wxIcon } from '../weather.js';
+import { WX_CHAR } from '../cities.js';
 
 export async function todayView(root, day = dayKey(new Date())) {
   const today = dayKey(new Date());
@@ -25,6 +27,7 @@ export async function todayView(root, day = dayKey(new Date())) {
           <h4><span>${term.name} · ${term.hou}</span><small>${term.pinyin}</small></h4>
           <ul class="hou-list">${JQ[term.index][4].map((x, i) => `<li>${['一', '二', '三'][i]}候 · ${x}</li>`).join('')}</ul>
           <p class="muted" style="margin:8px 0 0;font-size:13px">距${term.next}还有 ${term.daysToNext} 天</p>
+          ${state.config.weather && isToday ? '<p class="wx-line" id="wxLine"></p>' : ''}
         </section>
         <section class="panel">
           <h4><span>贴纸</span><small>シール</small></h4>
@@ -156,7 +159,17 @@ export async function todayView(root, day = dayKey(new Date())) {
     } }), quiet() ? 0 : 700);
   } else if (isToday) lastYear(day);
 
-  return () => { leave(); removeEventListener('pagehide', leave); document.removeEventListener('keydown', onKey); page.destroy(); document.querySelector('.memory-card')?.remove(); };
+  // 实时天气：侧栏一行字，纸上的天气字先轻轻圈出来
+  const paintWx = () => {
+    const w = state.weather, line = root.querySelector('#wxLine');
+    if (isToday) page.suggestWeather(w ? WX_CHAR[w.kind] : '');
+    if (!line) return;
+    line.innerHTML = w ? `${wxIcon(w.kind, w.isDay)}<span>${esc(w.city)} · ${esc(w.text)} <b>${w.temp}°</b></span><a href="#/settings" aria-label="换城市">换城市</a>`
+      : `${wxIcon('cloud')}<a href="#/settings">选一座城市，让当地的天气落进纸页</a>`;
+  };
+  paintWx(); addEventListener('sg:weather', paintWx);
+
+  return () => { leave(); removeEventListener('sg:weather', paintWx); removeEventListener('pagehide', leave); document.removeEventListener('keydown', onKey); page.destroy(); document.querySelector('.memory-card')?.remove(); };
 }
 
 // 去年今日：一年前的这一天写过的话，泛黄地飘出来

@@ -19,6 +19,7 @@
 | 仪式 | 新用户第一次进来，用聚光灯带着选心情、写一句、贴贴纸、盖第一枚印；今日页会飘出泛黄的“一年前的今天” |
 | 设置 | 昵称、日 / 夜 / 跟随系统、安静模式、每日提醒（生成每天重复的日历事件，国内手机都能用）、让月亮记得最近的事（默认关闭）、绑定手机 / 设置密码、导出全部数据、注销账号 |
 | 声景与呼吸 | 左下角的小月亮打开声景：听雨、风铃、虫鸣、围炉、颂钵五种，全部用 Web Audio 在设备上现场合成（没有音频文件、没有版权问题），按节气推荐当季的一种。“跟着圆窗呼吸”有平静 4-6、方块 4-4-4-4、入眠 4-7-8 三种节奏，圆窗随呼吸缩放，光点聚散，换气时有轻柔提示音；手帐里出现沉重的内容时，关怀提示里也会给出这个入口 |
+| 天气 | 设置里选城市（不读取定位），背景随当地实况下雨、打雷、下雪、起雾、飘云，晴天有斜照的光、晴夜有月晕和星星，大风时飘落物被吹得更快；侧栏显示“杭州 · 小雨 18°”，今天第一次动笔时天气字自动落在纸上 |
 | 季节 | 全站强调色与飘落物随当前节气所在季节自动变化（春樱 · 夏萤 · 秋叶 · 冬雪） |
 
 ## 关怀与合规设计
@@ -84,10 +85,19 @@ AI_PROVIDER=openai-compatible AI_BASE_URL=https://... AI_MODEL=... AI_API_KEY=..
 
 回信的人设与写作要求在 `server/ai.js` 的 `SYSTEM` 中。每位用户每天的回信上限由 `AI_DAILY_LIMIT` 控制（默认 3 封），同一天的手帐只回一封。
 
+## 开启实时天气
+
+```bash
+WEATHER_PROVIDER=qweather  QWEATHER_KEY=...  QWEATHER_HOST=xxxx.qweatherapi.com   # 和风天气（国内）
+WEATHER_PROVIDER=open-meteo                                                        # 免密钥，服务器在境外
+```
+
+天气按城市缓存 20 分钟，所有用户共用，调用量只与城市数有关。可选城市在 `public/app/js/cities.js`。
+
 ## 目录
 
 ```
-server/           服务端：index.js（路由与静态文件）、db.js、auth.js、ai.js、safety.js、sms.js、crypto.js
+server/           服务端：index.js（路由与静态文件）、db.js、auth.js、ai.js、safety.js、sms.js、crypto.js、weather.js
 public/           网站根目录
   index.html      落地页（由 src/journal.html 生成，勿直接修改）
   app/            手帐应用：index.html、app.css、js/（main、page、stickers、calendar、coach、sound、calm、views/today|book|scroll|letters|settings|auth）
