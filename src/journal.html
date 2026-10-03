@@ -426,8 +426,8 @@ li:hover .del, .del:focus-visible{opacity:1}
 .poems{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(16px,2.4vw,28px)}
 @media (max-width:960px){ .poems{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:440px){ .poems{grid-template-columns:1fr} }
-.pcard{perspective:1100px; aspect-ratio:3/4; max-width:100%; border:0; background:none; padding:0; text-align:inherit; --rx:0deg; --ry:0deg; --flip:0deg}
-.pcard .inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip))); transition:transform .9s var(--ease)}
+.pcard{position:relative; perspective:1100px; aspect-ratio:3/4; max-width:100%; border:0; background:none; padding:0; text-align:inherit; --rx:0deg; --ry:0deg; --flip:0deg}
+.pcard .inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip))); transition:transform 1s cubic-bezier(.3,1.28,.45,1)}
 .pcard.flipped{--flip:180deg}
 .pcard .face2{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:10px; overflow:hidden; background:var(--card);
   box-shadow:0 1px 0 var(--line), 0 24px 40px -28px var(--shadow)}
@@ -440,13 +440,61 @@ li:hover .del, .del:focus-visible{opacity:1}
 .pcard .tag b{font-family:var(--f-brush); font-weight:400; font-size:clamp(30px,3.4vw,40px); color:var(--ink); letter-spacing:.1em}
 .pcard .tag small{font-family:var(--f-kana); font-size:13px; color:var(--ink-soft); letter-spacing:.2em}
 .pcard .flip-hint{position:absolute; bottom:12px; right:14px; font-family:var(--f-kana); font-size:11px; color:var(--ink); background:var(--card); padding:2px 10px; border-radius:10px; opacity:.85}
-.pcard .back{transform:rotateY(180deg); padding:22px 18px; display:flex; flex-direction:column; gap:10px;
+.pcard .back{transform:rotateY(180deg); padding:22px 18px; display:flex; flex-direction:column; justify-content:flex-end; gap:10px;
   background:linear-gradient(color-mix(in srgb, var(--pc) 12%, var(--card)), var(--card))}
-.pcard .verse{writing-mode:vertical-rl; flex:1; min-height:0; font-family:var(--f-display); font-size:clamp(17px,1.7vw,20px); line-height:2; letter-spacing:.16em; margin:0 auto; overflow:hidden}
-.pcard .verse.jp{font-family:var(--f-kana); font-size:clamp(18px,1.9vw,22px)}
+.pcard .verse{position:relative; z-index:1; writing-mode:vertical-rl; flex:0 0 auto; text-shadow:0 0 8px var(--card), 0 0 3px var(--card); font-family:var(--f-display); font-size:clamp(15px,1.45vw,18px); line-height:1.9; letter-spacing:.12em; margin:0 auto}
+.pcard .verse.jp{font-family:var(--f-kana); font-size:clamp(16px,1.6vw,20px)}
 .pcard .by{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-soft); gap:8px}
 .pcard .by i{font-style:normal; width:26px; height:26px; flex:none; border-radius:4px; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-size:14px}
 .pcard .tr{font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin:0}
+
+.pcard::before{content:""; position:absolute; left:12%; right:12%; bottom:-16px; height:20px; border-radius:50%; pointer-events:none;
+  background:radial-gradient(closest-side, var(--shadow), transparent); opacity:.55; transition:opacity .5s}
+.pcard.flipping::before{animation:gshadow 1s var(--ease)}
+@keyframes gshadow{40%{transform:scale(.72); opacity:.25}}
+.pcard.flipping .inner{animation:lift 1s var(--ease)}
+@keyframes lift{40%{translate:0 -16px; scale:1.05}}
+.pcard .tag{transform:translate(var(--tx,0px),var(--ty,0px)); transition:transform .5s var(--ease)}
+.pcard .front > svg.pat{transform:translate(calc(var(--tx,0px) * -.6),calc(var(--ty,0px) * -.6)) scale(1.08); transition:transform .5s var(--ease)}
+.pcard .by, .pcard .tr{position:relative; z-index:1}
+.bph{position:absolute; left:0; right:0; top:0; height:56%; background-size:cover; background-position:center 40%; opacity:0; transform:scale(1.14);
+  filter:saturate(.85) brightness(var(--img-dim));
+  -webkit-mask-image:linear-gradient(#000 40%, transparent 98%); mask-image:linear-gradient(#000 40%, transparent 98%);
+  transition:opacity .9s var(--ease) .25s, transform 2.4s var(--ease) .25s}
+.pcard.flipped .bph{opacity:1; transform:scale(1)}
+.pfx{position:absolute; left:0; right:0; top:0; height:56%; overflow:hidden; pointer-events:none}
+.pfx *{position:absolute; animation-play-state:paused!important}
+.pcard.flipped .pfx *{animation-play-state:running!important}
+.verse .ch{display:inline-block}
+.pcard.inked .ch{animation:inkch .95s var(--ease) both; animation-delay:calc(var(--i) * 80ms + 420ms)}
+@keyframes inkch{0%{opacity:0; filter:blur(7px); transform:scale(1.6)} 45%{opacity:1; filter:blur(1.2px); transform:scale(1.04)} 100%{opacity:1; filter:blur(0); transform:none}}
+.pcard.inked .tr{animation:rise .8s var(--ease) both; animation-delay:calc(var(--n) * 80ms + 700ms)}
+.pcard.inked .by i{animation:sealIn .7s var(--spring) both; animation-delay:calc(var(--n) * 80ms + 900ms)}
+@keyframes sealIn{0%{transform:scale(2.6) rotate(-28deg); opacity:0} 60%{transform:scale(.9) rotate(-4deg); opacity:1} 100%{transform:scale(1) rotate(-6deg)}}
+/* 古池：一滴水落下，水纹荡开 */
+.fx-ripple .drop{left:56%; top:70%; width:5px; height:7px; margin:-3px; border-radius:50%; background:rgba(255,255,255,.9); box-shadow:0 0 6px rgba(255,255,255,.8); animation:dropF 4.2s infinite}
+@keyframes dropF{0%{transform:translateY(-140px); opacity:0} 6%{opacity:1} 21%{transform:translateY(0); opacity:1} 23%,100%{transform:translateY(0); opacity:0}}
+.fx-ripple .rg{left:56%; top:70%; width:130px; height:38px; margin:-19px 0 0 -65px; border-radius:50%; border:1.5px solid rgba(255,255,255,.75); opacity:0; animation:rgF 4.2s infinite}
+.fx-ripple .rg:nth-child(2){animation-delay:.88s} .fx-ripple .rg:nth-child(3){animation-delay:1.15s} .fx-ripple .rg:nth-child(4){animation-delay:1.45s}
+@keyframes rgF{0%{transform:scale(.04); opacity:0} 3%{opacity:.95} 55%{transform:scale(1.7); opacity:0} 100%{transform:scale(1.7); opacity:0}}
+/* 露の世：露珠鼓起、滑落 */
+.fx-dew .dw{width:var(--s); height:calc(var(--s) * 1.12); left:var(--x); top:var(--y); border-radius:50% 50% 48% 48%/58% 58% 42% 42%;
+  background:radial-gradient(circle at 34% 28%, rgba(255,255,255,.95) 0 10%, rgba(255,255,255,.35) 24%, rgba(220,255,230,.12) 55%, rgba(10,50,25,.28) 100%);
+  box-shadow:0 3px 4px rgba(0,30,10,.35), inset 0 -2px 3px rgba(255,255,255,.45); animation:dewF var(--d) var(--dl) infinite cubic-bezier(.55,0,.8,.4)}
+@keyframes dewF{0%{transform:translateY(-6px) scale(.4); opacity:0} 12%{transform:none; opacity:1} 58%{transform:scale(1.12)} 64%{transform:translateY(4px) scale(.95,1.2)} 92%{transform:translateY(130px) scale(.8,1.35); opacity:.9} 100%{transform:translateY(150px) scale(.7,1.4); opacity:0}}
+/* 山行：霜叶飘落 */
+.fx-leaves .lf2{left:var(--x); top:-12%; width:var(--s); height:var(--s); background:var(--lc); animation:lfF var(--d) var(--dl) infinite linear;
+  -webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2 5 4-2-1 5 5 1-4 3 2 3-5-1-1 6h-2l-1-6-5 1 2-3-4-3 5-1-1-5 4 2z'/%3E%3C/svg%3E") center/contain no-repeat;
+          mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1l2 5 4-2-1 5 5 1-4 3 2 3-5-1-1 6h-2l-1-6-5 1 2-3-4-3 5-1-1-5 4 2z'/%3E%3C/svg%3E") center/contain no-repeat}
+@keyframes lfF{0%{transform:translate(0,0) rotate(0); opacity:0} 8%{opacity:1} 50%{transform:translate(var(--dx),110px) rotate(200deg)} 90%{opacity:1} 100%{transform:translate(calc(var(--dx) * -.4),230px) rotate(400deg); opacity:0}}
+/* 秋暝：新雨初停，月光渐亮 */
+.fx-rain .rd{left:var(--x); top:-20%; width:1px; height:18px; background:linear-gradient(transparent, rgba(255,255,255,.75)); transform:rotate(12deg); animation:rdF var(--d) var(--dl) infinite linear, rainOut 4.2s forwards}
+@keyframes rdF{to{translate:-40px 240px}}
+@keyframes rainOut{0%,55%{opacity:1} 85%,100%{opacity:0}}
+.fx-rain .mg{left:50%; top:50%; width:160px; height:160px; margin:-80px; border-radius:50%; background:radial-gradient(closest-side, rgba(255,226,170,.75), rgba(255,210,140,.2) 45%, transparent); opacity:0; mix-blend-mode:screen;
+  animation:mgF 6s 2.6s forwards, mgP 4s 8.6s infinite ease-in-out}
+@keyframes mgF{to{opacity:1}}
+@keyframes mgP{50%{opacity:.6; transform:scale(.9)}}
 
 /* ---------- handscroll ---------- */
 .handscroll{position:relative; margin:0; padding-inline:26px}
@@ -514,17 +562,14 @@ li:hover .del, .del:focus-visible{opacity:1}
 @media (hover:none){.loupe{display:none}}
 
 /* ---------- wish lanterns ---------- */
-.night{position:relative; margin-top:clamp(64px,10vw,120px); border-radius:22px; overflow:hidden; min-height:560px; color:var(--night-ink);
+.night{position:relative; margin-top:clamp(64px,10vw,120px); border-radius:22px; overflow:hidden; min-height:600px; color:var(--night-ink);
   background:radial-gradient(ellipse at 70% 0%, #3b3f66 0%, transparent 60%), linear-gradient(var(--night-1), var(--night-2)); isolation:isolate}
-.night .skyfx{position:absolute; inset:0; z-index:0}
-.night .tw{position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:tw 3s ease-in-out infinite}
-@keyframes tw{50%{opacity:.15; transform:scale(.6)}}
-.night .moon2{position:absolute; right:9%; top:12%; width:74px; height:74px; border-radius:50%; background:radial-gradient(circle at 40% 40%, #FFF6DD, #F1D99B); box-shadow:0 0 50px 14px rgba(241,217,155,.28)}
-.night .hills{position:absolute; left:0; right:0; bottom:0; width:100%; height:140px; z-index:1}
-.night .lan-layer{position:absolute; inset:0; z-index:2; pointer-events:none}
-.lan{position:absolute; left:0; top:0; width:58px; will-change:transform, opacity}
-.lan svg{width:100%; display:block; overflow:visible}
-.lan .w{position:absolute; left:50%; top:20%; transform:translateX(-50%); writing-mode:vertical-rl; font-family:var(--f-display); font-size:11px; letter-spacing:.1em; color:#6A3A1F; max-height:60%; overflow:hidden; line-height:1.3}
+.night-cv{position:absolute; inset:0; width:100%; height:100%; display:block; z-index:0}
+.lan-tip{position:absolute; left:0; top:0; z-index:5; pointer-events:none; padding:6px 14px; border-radius:16px; background:rgba(255,242,215,.94); color:#5A3214;
+  font-family:var(--f-display); font-size:14px; letter-spacing:.12em; white-space:nowrap; box-shadow:0 0 26px rgba(255,200,120,.5);
+  transform:translate(-50%,-100%) scale(.85); opacity:0; transition:opacity .25s, transform .4s var(--spring)}
+.lan-tip.on{opacity:1; transform:translate(-50%,-100%) scale(1)}
+.flych{position:absolute; left:0; top:0; z-index:4; pointer-events:none; font-family:var(--f-display); font-size:19px; color:#FFE7A6; text-shadow:0 0 10px rgba(255,200,120,.95), 0 0 2px #fff; will-change:transform, opacity}
 .night .inner2{position:relative; z-index:3; padding:clamp(28px,5vw,56px); display:flex; flex-direction:column; gap:14px; max-width:560px}
 .night .eyebrow{color:#C9C3D9}
 .night .sec-title{color:var(--night-ink)}
@@ -904,7 +949,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         <div>
           <div class="eyebrow">うたのしおり</div>
           <h2 class="sec-title">诗笺 · 四枚<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12C80 6 140 14 210 8S275 10 296 9"/></svg></h2>
-          <p class="sec-sub">两首俳句，两首唐诗。每张背面印着纹样：青海波、七宝、市松、水玉。点开翻面。</p>
+          <p class="sec-sub">两首俳句，两首唐诗，正面是青海波、七宝、市松、水玉四种纹样。点开翻面：诗句一字一字落墨，背面的小景也会动起来。</p>
         </div>
       </div>
       <div class="poems">
@@ -912,7 +957,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <div class="inner">
             <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-sei)"/></svg>
               <div class="tag"><b>古池</b><small>松尾芭蕉</small></div><span class="flip-hint">青海波</span></div>
-            <div class="face2 back">
+            <div class="face2 back" data-fx="ripple">
+              <div class="bph" style="background-image:url(assets/poem-pond.jpg)"></div><div class="pfx" aria-hidden="true"></div>
               <p class="verse jp">古池や<br>蛙飛びこむ<br>水の音</p>
               <p class="tr">古池塘，青蛙跳入，水的声音。</p>
               <div class="by"><span>芭蕉 · 一六八六</span><i>俳</i></div>
@@ -923,7 +969,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <div class="inner">
             <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-shippo)"/></svg>
               <div class="tag"><b>露の世</b><small>小林一茶</small></div><span class="flip-hint">七宝</span></div>
-            <div class="face2 back">
+            <div class="face2 back" data-fx="dew">
+              <div class="bph" style="background-image:url(assets/poem-dew.jpg)"></div><div class="pfx" aria-hidden="true"></div>
               <p class="verse jp">露の世は<br>露の世ながら<br>さりながら</p>
               <p class="tr">露水的世呀，虽然是露水的世，虽然是如此。（周作人 译）</p>
               <div class="by"><span>一茶 · 一八一九</span><i>俳</i></div>
@@ -934,7 +981,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <div class="inner">
             <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-ichi)"/></svg>
               <div class="tag"><b>山行</b><small>唐 · 杜牧</small></div><span class="flip-hint">市松</span></div>
-            <div class="face2 back">
+            <div class="face2 back" data-fx="leaves">
+              <div class="bph" style="background-image:url(assets/poem-mountain.jpg)"></div><div class="pfx" aria-hidden="true"></div>
               <p class="verse">远上寒山石径斜<br>白云生处有人家<br>停车坐爱枫林晚<br>霜叶红于二月花</p>
               <div class="by"><span>七言绝句</span><i>诗</i></div>
             </div>
@@ -944,7 +992,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <div class="inner">
             <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-dots)"/></svg>
               <div class="tag"><b>秋暝</b><small>唐 · 王维</small></div><span class="flip-hint">水玉</span></div>
-            <div class="face2 back">
+            <div class="face2 back" data-fx="rain">
+              <div class="bph" style="background-image:url(assets/poem-pinemoon.jpg)"></div><div class="pfx" aria-hidden="true"></div>
               <p class="verse">空山新雨后<br>天气晚来秋<br>明月松间照<br>清泉石上流</p>
               <div class="by"><span>《山居秋暝》前四句</span><i>诗</i></div>
             </div>
@@ -977,16 +1026,12 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
   <section id="wish">
     <div class="wrap">
       <div class="night rv">
-        <div class="skyfx" id="skyfx" aria-hidden="true"><div class="moon2"></div></div>
-        <svg class="hills" viewBox="0 0 1200 140" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M0 80C150 40 260 70 380 60S600 20 760 50 1000 40 1200 60V140H0Z" fill="#20253D"/>
-          <path d="M0 110C200 80 330 104 520 96S860 70 1200 100V140H0Z" fill="#171B2E"/>
-        </svg>
-        <div class="lan-layer" id="lanLayer" aria-hidden="true"></div>
+        <canvas class="night-cv" id="nightCV" aria-hidden="true"></canvas>
+        <div class="lan-tip" id="lanTip" aria-hidden="true"></div>
         <div class="inner2">
           <div class="eyebrow">ねがいごと</div>
           <h2 class="sec-title">心愿 · 放一盏灯<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 10C70 4 150 14 210 9S275 7 296 11"/></svg></h2>
-          <p class="sec-sub">写一个小小的心愿，把它装进纸灯里，看它慢慢飘上夜空。灯会一直在这片天上转着。</p>
+          <p class="sec-sub">写一个小小的心愿：字会飞进纸灯，灯芯点亮后升上夜空，飞到高处化作一颗星。鼠标停在灯上能看到写着什么，点一下湖面会泛起水纹。</p>
           <form class="wish-form" id="wishForm">
             <label class="sr" for="wishInput">我的心愿</label>
             <input id="wishInput" maxlength="14" placeholder="例如：想去看一次初雪" autocomplete="off">
@@ -1004,7 +1049,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
     <p class="bigbrush" aria-hidden="true">拾光</p>
     <p class="line">日子一页一页翻过去，愿每一页都有一点光。</p>
     <div class="seal-row" aria-hidden="true"><span class="seal-sq">月</span><span class="seal-rd">安</span></div>
-    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、四季风物、抹茶拿铁与红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
+    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、四季风物、诗笺小景、心愿灯星空、抹茶拿铁与红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
   </div>
 </footer>
 
@@ -1376,12 +1421,31 @@ $$('.it',board).forEach(it=>{
 });
 
 /* ---------- poem cards ---------- */
+const FX={
+  ripple:()=>'<span class="drop"></span><span class="rg"></span><span class="rg"></span><span class="rg"></span>'.replace('<span class="drop"></span>','<span class="drop"></span>'),
+  dew:()=>[[22,26,14,5.2,0],[62,18,10,6.4,1.4],[44,48,16,4.6,2.6],[78,44,9,5.8,.6],[30,64,11,6.8,3.4],[70,70,13,5,2]].map(([x,y,s,d,dl])=>`<span class="dw" style="--x:${x}%;--y:${y}%;--s:${s}px;--d:${d}s;--dl:${dl}s"></span>`).join(''),
+  leaves:()=>Array.from({length:8},(_,i)=>{const c=['#C9452F','#D9672F','#E39A3B','#B8392A'][i%4];return `<span class="lf2" style="--x:${8+i*11.5}%;--s:${12+(i*7)%9}px;--d:${4.2+(i*1.3)%3}s;--dl:${(i*.73)%4}s;--dx:${(i%2?1:-1)*(18+(i*13)%30)}px;--lc:${c}"></span>`;}).join(''),
+  rain:()=>Array.from({length:34},(_,i)=>`<span class="rd" style="--x:${(i*37)%110}%;--d:${.55+(i*7%5)*.08}s;--dl:${-(i*.13)%1}s"></span>`).join('')+'<span class="mg"></span>'
+};
 $$('.pcard').forEach(c=>{
-  c.addEventListener('click',()=>c.classList.toggle('flipped'));
+  const back=$('.back',c), v=$('.verse',c), fx=back.dataset.fx;
+  const pfx=$('.pfx',back); pfx.classList.add('fx-'+fx); pfx.innerHTML=FX[fx]();
+  let n=0; v.innerHTML=v.innerHTML.split(/<br\s*\/?>/i).map(l=>[...l.trim()].map(ch=>`<span class="ch" style="--i:${n++}">${ch}</span>`).join('')).join('<br>');
+  c.style.setProperty('--n',n);
+  let ft=0;
+  c.addEventListener('click',()=>{
+    const on=!c.classList.contains('flipped');
+    c.classList.remove('flipping'); void c.offsetWidth; c.classList.add('flipping'); clearTimeout(ft); ft=setTimeout(()=>c.classList.remove('flipping'),1000);
+    c.classList.toggle('flipped',on);
+    if(on){ c.classList.remove('inked'); void c.offsetWidth; c.classList.add('inked');
+      if(fx==='rain'){ pfx.innerHTML=FX.rain(); } }
+    else setTimeout(()=>{ if(!c.classList.contains('flipped')) c.classList.remove('inked'); },600);
+  });
   c.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; const r=c.getBoundingClientRect(), px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
     c.style.setProperty('--ry',((px-.5)*16).toFixed(1)+'deg'); c.style.setProperty('--rx',((.5-py)*12).toFixed(1)+'deg');
+    c.style.setProperty('--tx',((px-.5)*10).toFixed(1)+'px'); c.style.setProperty('--ty',((py-.5)*10).toFixed(1)+'px');
     c.style.setProperty('--mx',(px*100)+'%'); c.style.setProperty('--my',(py*100)+'%');});
-  c.addEventListener('pointerleave',()=>{c.style.setProperty('--ry','0deg'); c.style.setProperty('--rx','0deg');});
+  c.addEventListener('pointerleave',()=>{['--ry','--rx'].forEach(k=>c.style.setProperty(k,'0deg')); ['--tx','--ty'].forEach(k=>c.style.setProperty(k,'0px'));});
 });
 
 /* ---------- WebGL 水墨晕染 ---------- */
@@ -1574,37 +1638,139 @@ const pEnd=()=>{pDrag=null;}; paint.addEventListener('pointerup',pEnd); paint.ad
   requestAnimationFrame(panLoop);
 })();
 
-/* ---------- wish lanterns ---------- */
-const sky=$('#skyfx');
-for(let i=0;i<70;i++){const s=document.createElement('span'); s.className='tw'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*75+'%';
-  const sz=Math.random()<.15?3:Math.random()<.5?2:1.2; s.style.width=s.style.height=sz+'px'; s.style.animationDelay=(-Math.random()*3)+'s'; s.style.animationDuration=(2+Math.random()*3)+'s'; s.style.opacity=.4+Math.random()*.6; sky.appendChild(s);}
-const lanLayer=$('#lanLayer'), night=$('.night'); let lans=[]; let wishes=store.get('wishes',[]);
-const LAN_SVG=`<svg viewBox="0 0 60 84"><ellipse cx="30" cy="42" rx="44" ry="50" fill="url(#lan-glow)"/><path d="M12 14Q30 4 48 14L52 66Q30 74 8 66Z" fill="url(#lan-g)"/><path d="M14 18Q30 10 46 18M10 60Q30 68 50 60" stroke="#C0622E" stroke-width="1" fill="none" opacity=".6"/><path d="M22 70h16v4H22z" fill="#8A4A24"/><ellipse cx="30" cy="72" rx="3" ry="4" fill="#FFF3C4"/></svg>`;
-function makeLan(text,big,fromForm){
-  const d=document.createElement('div'); d.className='lan'; d.innerHTML=LAN_SVG+(text?`<span class="w"></span>`:''); if(text) $('.w',d).textContent=text; lanLayer.appendChild(d);
-  const L={el:d,text,x:fromForm?.28:(.08+Math.random()*.84),y:0,sp:.25+Math.random()*.25,amp:6+Math.random()*10,ph:Math.random()*6.28,sc:big?1.25:(text?.95:.55+Math.random()*.3),born:fromForm};
-  resetLan(L,!fromForm); if(fromForm) L.y=night.clientHeight-120; lans.push(L); return L;
-}
-function resetLan(L,scatter){const h=night.clientHeight; L.y=scatter?Math.random()*h:h+40; if(!L.born) L.x=.06+Math.random()*.88; L.born=false;}
-function lanLoop(){
-  const h=night.clientHeight, w=night.clientWidth;
-  for(const L of lans){
-    L.y-=L.sp; L.ph+=.012;
-    if(L.y<-110) resetLan(L,false);
-    const prog=1-L.y/h, sc=L.sc*(1-prog*.35), op=Math.max(0,Math.min(1,(1-prog)*3, prog*6+.1));
-    L.el.style.opacity=op.toFixed(3);
-    L.el.style.transform=`translate(${(L.x*w+Math.sin(L.ph)*L.amp).toFixed(1)}px,${L.y.toFixed(1)}px) rotate(${(Math.sin(L.ph*1.3)*4).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+/* ---------- wish lanterns：星空 · 湖面倒影 ---------- */
+(function(){
+  const night=$('.night'), cv=$('#nightCV'), ctx=cv.getContext('2d'), sky=document.createElement('canvas'), sx=sky.getContext('2d'), tip=$('#lanTip');
+  let wishes=store.get('wishes',[]), W=0,H=0,D=1,HZ=0, stars=[], lans=[], ripples=[], visible=true, last=performance.now(), T=0, hover=null;
+  const img=new Image(); let imgOk=false; img.onload=()=>{imgOk=true; if(RM) draw();}; img.src='assets/night-sky.jpg';
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function resize(){
+    D=Math.min(2,devicePixelRatio||1); W=night.clientWidth; H=night.clientHeight; HZ=Math.round(H*.74);
+    cv.width=sky.width=Math.round(W*D); cv.height=sky.height=Math.round(H*D);
+    ctx.setTransform(D,0,0,D,0,0); sx.setTransform(D,0,0,D,0,0);
+    stars=Array.from({length:Math.round(W/9)},()=>({x:rnd(0,W),y:rnd(0,HZ*.92),r:rnd(.4,1.3),o:rnd(.4,1),sp:rnd(1,3.2),ph:rnd(0,6.3)}));
+    if(RM) draw();
   }
-  requestAnimationFrame(lanLoop);
-}
-for(let i=0;i<6;i++) makeLan('',false,false);
-wishes.slice(-8).forEach(w=>makeLan(w,false,false));
-function wishCount(){ const n=wishes.length; $('#wishCount').innerHTML=n?`你已经放飞了 ${n} 盏灯。<button type="button" id="wishClear">收回全部</button>`:'天上还没有你的灯。';
-  const c=$('#wishClear'); if(c) c.addEventListener('click',()=>{wishes=[]; store.set('wishes',wishes); lans=lans.filter(L=>{if(L.text){L.el.remove();return false}return true}); wishCount();}); }
-wishCount();
-$('#wishForm').addEventListener('submit',e=>{e.preventDefault(); const v=$('#wishInput').value.trim(); if(!v) return; wishes.push(v); store.set('wishes',wishes); $('#wishInput').value='';
-  const L=makeLan(v,true,true); L.sp=.7; setTimeout(()=>{L.sp=.35; L.sc=.95;},4000); wishCount(); chime();});
-if(RM){ lans.forEach(L=>{L.sp=0}); } lanLoop();
+  function launchX(){return W<720?W*.62:W*.7;}
+  function make(text,opt={}){
+    const L={text,s:text?rnd(.82,.98):rnd(.42,.72),x:rnd(W*.04,W*.96),y:rnd(H*.16,HZ-24),vy:0,vt:0,sw:rnd(4,12),ph:rnd(0,6.3),st:'rise',t:0,flame:1,inflate:1,ring:-1,hl:0,...opt};
+    L.vt=(9+L.s*12); L.vy=L.vt; lans.push(L); return L;
+  }
+  function respawn(L){L.st='rise'; L.t=0; L.y=HZ+6; L.x=rnd(W*.04,W*.96); L.vy=L.vt; L.inflate=1; L.flame=1;}
+  function build(){ lans=[]; for(let i=0;i<7;i++) make(''); wishes.slice(-10).forEach(w=>make(w)); }
+  const elastic=t=>t>=1?1:1-Math.pow(2,-8*t)*Math.cos(t*Math.PI*3.2);
+  function update(dt){
+    T+=dt;
+    for(const L of lans){
+      L.ph+=dt*.9;
+      if(L.st==='wait'){L.t+=dt; if(L.t>=L.wait){L.st='birth'; L.t=0;}}
+      else if(L.st==='birth'){L.t+=dt; L.inflate=elastic(Math.min(1,L.t/1)); L.flame=L.t>.75?Math.min(1,(L.t-.75)/.35):0;
+        if(L.t>.75&&L.ring<0){L.ring=0; try{chime();}catch(e){}}
+        if(L.t>1.9){L.st='rise'; L.vy=3;}}
+      else if(L.st==='rise'){L.vy+=(L.vt*(L.text&&L.s>1?1.5:1)-L.vy)*Math.min(1,dt*.6); L.y-=L.vy*dt; if(L.y<H*.09){L.st='star'; L.t=0;}}
+      else if(L.st==='star'){L.t+=dt; if(L.t>1.8){ if(L.s>1) L.s=rnd(.86,.98), L.vt=9+L.s*12; respawn(L);} }
+      if(L.ring>=0){L.ring+=dt/1.4; if(L.ring>1) L.ring=-2;}
+    }
+    ripples=ripples.filter(r=>T-r.t<4);
+  }
+  function lantern(c,L){
+    if(L.st==='wait') return;
+    const persp=.55+.45*Math.max(0,Math.min(1,L.y/HZ)), k=L.s*persp*(W<720?.85:1);
+    let a=1; if(L.st==='rise'&&L.y>HZ-36) a=Math.max(0,(HZ-L.y)/36);
+    const x=L.x+Math.sin(L.ph)*L.sw, y=L.y;
+    if(L.st==='star'){ const p=L.t/1.8; a=Math.max(0,1-p*2.2);
+      const sp=Math.sin(Math.PI*Math.min(1,p*1.3)), R=(5+16*sp)*Math.max(.6,k), fade=p<.75?1:1-(p-.75)/.25;
+      c.save(); c.globalCompositeOperation='lighter'; c.translate(x,y);
+      const g=c.createRadialGradient(0,0,0,0,0,R*2.4); g.addColorStop(0,`rgba(255,236,190,${.85*fade})`); g.addColorStop(1,'rgba(255,220,150,0)'); c.fillStyle=g; c.beginPath(); c.arc(0,0,R*2.4,0,6.283); c.fill();
+      c.rotate(p*1.2); c.fillStyle=`rgba(255,250,230,${fade})`; c.beginPath();
+      for(let i=0;i<4;i++){const an=i*Math.PI/2; c.lineTo(Math.cos(an)*R,Math.sin(an)*R); c.lineTo(Math.cos(an+Math.PI/4)*R*.16,Math.sin(an+Math.PI/4)*R*.16);} c.closePath(); c.fill(); c.restore();
+      if(a<=0) return; }
+    const fl=L.flame*(.86+.14*Math.sin(T*9+L.ph*3)*Math.sin(T*5.3+L.ph)), w=38*k, h=50*k*(.18+.82*L.inflate), sc=L.st==='star'?Math.max(0,1-L.t/0.8):1;
+    c.save(); c.translate(x,y); c.rotate(Math.sin(L.ph*1.3)*.06); c.scale(sc,sc);
+    if(fl>0){ c.globalCompositeOperation='lighter'; const R=(62+L.hl*40)*k, g=c.createRadialGradient(0,h*.1,0,0,h*.1,R);
+      g.addColorStop(0,`rgba(255,196,110,${(.4+L.hl*.25)*fl*a})`); g.addColorStop(1,'rgba(255,170,80,0)'); c.fillStyle=g; c.beginPath(); c.arc(0,h*.1,R,0,6.283); c.fill(); c.globalCompositeOperation='source-over'; }
+    if(L.ring>=0){ c.strokeStyle=`rgba(255,224,160,${(1-L.ring)*.7})`; c.lineWidth=1.5; c.beginPath(); c.arc(0,h*.1,(16+110*L.ring)*k,0,6.283); c.stroke(); }
+    c.globalAlpha=a;
+    c.beginPath(); c.moveTo(-w*.5,-h*.36); c.quadraticCurveTo(0,-h*.74,w*.5,-h*.36); c.lineTo(w*.36,h*.5); c.quadraticCurveTo(0,h*.6,-w*.36,h*.5); c.closePath();
+    const lt=.42+.58*fl, bg=c.createLinearGradient(0,-h*.6,0,h*.5);
+    bg.addColorStop(0,`rgb(${255*lt|0},${234*lt|0},${176*lt|0})`); bg.addColorStop(.6,`rgb(${246*lt|0},${172*lt|0},${92*lt|0})`); bg.addColorStop(1,`rgb(${214*lt|0},${112*lt|0},${52*lt|0})`);
+    c.fillStyle=bg; c.fill();
+    if(fl>0){ const ig=c.createRadialGradient(0,h*.4,0,0,h*.4,h*.8); ig.addColorStop(0,`rgba(255,251,220,${.72*fl})`); ig.addColorStop(1,'rgba(255,230,160,0)'); c.fillStyle=ig; c.fill(); }
+    c.strokeStyle='rgba(150,70,25,.26)'; c.lineWidth=Math.max(.6,k*.8);
+    [-.2,.2].forEach(f=>{c.beginPath(); c.moveTo(w*f*1.35,-h*.5); c.lineTo(w*f,h*.53); c.stroke();});
+    c.fillStyle='rgba(105,52,24,.92)'; c.fillRect(-w*.2,h*.5,w*.4,Math.max(1.4,2.6*k));
+    if(fl>0){ c.fillStyle=`rgba(255,246,205,${fl})`; c.beginPath(); c.ellipse(0,h*.5+3.4*k,2.3*k,3.6*k*(.8+.2*Math.sin(T*12+L.ph)),0,0,6.283); c.fill(); }
+    if(L.text&&L.inflate>.6&&k>.42){
+      const ch=[...L.text], cols=Math.ceil(ch.length/5), per=Math.ceil(ch.length/cols), fs=Math.min(11*k,h*.72/(per*1.06));
+      c.fillStyle=`rgba(105,44,16,${.88*Math.min(1,(L.inflate-.6)/.4)})`; c.font=`${fs.toFixed(1)}px "ZCOOL XiaoWei","Songti SC",serif`; c.textAlign='center'; c.textBaseline='middle';
+      for(let ci=0;ci<cols;ci++){ const seg=ch.slice(ci*per,(ci+1)*per), cx=(cols-1)/2*fs*1.15-ci*fs*1.15;
+        seg.forEach((g,i)=>c.fillText(g,cx,-h*.06+(i-(seg.length-1)/2)*fs*1.06)); }
+    }
+    c.restore();
+  }
+  function draw(){
+    if(!W) return;
+    sx.clearRect(0,0,W,H);
+    if(imgOk){ const ia=img.width/img.height, ca=W/HZ; let dw,dh; if(ia>ca){dh=HZ; dw=HZ*ia;} else {dw=W; dh=W/ia;} sx.drawImage(img,(W-dw)/2,HZ-dh,dw,dh); }
+    else { const g=sx.createLinearGradient(0,0,0,HZ); g.addColorStop(0,'#141A2A'); g.addColorStop(1,'#2A2F4A'); sx.fillStyle=g; sx.fillRect(0,0,W,HZ); }
+    let g=sx.createLinearGradient(0,0,0,HZ); g.addColorStop(0,'rgba(18,22,40,.38)'); g.addColorStop(.8,'rgba(40,42,74,.12)'); g.addColorStop(1,'rgba(241,200,150,.10)'); sx.fillStyle=g; sx.fillRect(0,0,W,HZ);
+    g=sx.createLinearGradient(0,0,Math.min(W,640),0); g.addColorStop(0,'rgba(12,15,28,.62)'); g.addColorStop(1,'rgba(12,15,28,0)'); sx.fillStyle=g; sx.fillRect(0,0,W,HZ);
+    for(const st of stars){ const tw=.35+.65*(.5+.5*Math.sin(T*st.sp+st.ph)); sx.fillStyle=`rgba(255,250,236,${(tw*st.o).toFixed(3)})`; sx.beginPath(); sx.arc(st.x,st.y,st.r,0,6.283); sx.fill(); }
+    lans.slice().sort((a,b)=>a.s-b.s).forEach(L=>lantern(sx,L));
+    ctx.clearRect(0,0,W,H);
+    ctx.drawImage(sky,0,0,W*D,HZ*D,0,0,W,HZ);
+    const rows=H-HZ;
+    for(let y=0;y<rows;y++){
+      const dep=y/rows; let off=Math.sin(y*.38-T*2.3)*(.5+dep*3.4)+Math.sin(y*.07+T*.8)*dep*2.4;
+      for(const r of ripples){ const age=T-r.t, dy=Math.abs(HZ+y-r.y); off+=Math.sin(dy*.28-age*7.5)*Math.exp(-age*.95)*Math.exp(-dy/38)*7; }
+      const sy=HZ-1-y*1.05; if(sy<0) break;
+      ctx.drawImage(sky,0,Math.round(sy*D),W*D,Math.max(1,Math.round(D)),off,HZ+y,W,1);
+    }
+    g=ctx.createLinearGradient(0,HZ,0,H); g.addColorStop(0,'rgba(16,22,42,.30)'); g.addColorStop(1,'rgba(8,11,24,.86)'); ctx.fillStyle=g; ctx.fillRect(0,HZ,W,rows);
+    g=ctx.createLinearGradient(0,HZ-2,0,HZ+3); g.addColorStop(0,'rgba(241,217,155,0)'); g.addColorStop(.5,'rgba(241,217,155,.18)'); g.addColorStop(1,'rgba(241,217,155,0)'); ctx.fillStyle=g; ctx.fillRect(0,HZ-2,W,5);
+    for(const r of ripples){ const age=T-r.t; for(let i=0;i<3;i++){ const rr=(age-i*.28)*70; if(rr<=0||age>3) continue;
+      ctx.strokeStyle=`rgba(241,217,155,${(.55*(1-age/3)).toFixed(3)})`; ctx.lineWidth=1; ctx.beginPath(); ctx.ellipse(r.x,r.y,rr,rr*.2,0,0,6.283); ctx.stroke(); } }
+  }
+  function loop(now){ const dt=Math.min(.1,(now-last)/1000); last=now; if(visible&&!RM){ update(dt); draw(); } requestAnimationFrame(loop); }
+  new IntersectionObserver(es=>es.forEach(e=>visible=e.isIntersecting),{rootMargin:'100px'}).observe(night);
+  addEventListener('resize',()=>{const ow=W; resize(); if(Math.abs(ow-W)>40) build();});
+  resize(); build(); requestAnimationFrame(loop);
+
+  const local=e=>{const r=night.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top];};
+  night.addEventListener('pointermove',e=>{
+    const [px,py]=local(e); let best=null, bd=1e9;
+    for(const L of lans){ if(!L.text||L.st!=='rise') continue; const k=L.s*(.55+.45*Math.max(0,Math.min(1,L.y/HZ))); const dx=px-(L.x+Math.sin(L.ph)*L.sw), dy=py-L.y, d=Math.hypot(dx,dy); if(d<34*k+8&&d<bd){bd=d; best=L;} }
+    lans.forEach(L=>L.hl=L===best?1:0);
+    if(best){ tip.textContent='「'+best.text+'」'; tip.style.left=(best.x+Math.sin(best.ph)*best.sw)+'px'; tip.style.top=(best.y-34*best.s)+'px'; tip.classList.add('on'); night.style.cursor='pointer'; }
+    else { tip.classList.remove('on'); night.style.cursor=''; }
+    if(RM) draw();
+  });
+  night.addEventListener('pointerleave',()=>{tip.classList.remove('on'); lans.forEach(L=>L.hl=0);});
+  night.addEventListener('click',e=>{ if(e.target.closest('form,button,input')) return; const [px,py]=local(e); if(py>HZ+4){ ripples.push({x:px,y:py,t:T}); if(RM) draw(); } });
+
+  function flyText(text,tx,ty){
+    const ir=$('#wishInput').getBoundingClientRect(), nr=night.getBoundingClientRect(), ch=[...text];
+    const x0=ir.left-nr.left+20, y0=ir.top-nr.top+ir.height/2-12;
+    ch.forEach((g,i)=>{ const sp=document.createElement('span'); sp.className='flych'; sp.textContent=g; night.appendChild(sp);
+      const sx0=x0+i*16, mx=(sx0+tx)/2+rnd(-50,50), my=Math.min(y0,ty)-rnd(70,140);
+      const an=sp.animate([{transform:`translate(${sx0}px,${y0}px) scale(1)`,opacity:0},{transform:`translate(${sx0}px,${y0-8}px) scale(1.15)`,opacity:1,offset:.14},
+        {transform:`translate(${mx}px,${my}px) scale(1.3) rotate(${rnd(-25,25)}deg)`,opacity:1,offset:.55},{transform:`translate(${tx-9}px,${ty-12}px) scale(.25)`,opacity:0}],
+        {duration:1200,delay:i*75,easing:'cubic-bezier(.45,.05,.3,1)',fill:'both'});
+      an.onfinish=()=>sp.remove(); });
+    return (1200+ch.length*75)/1000;
+  }
+  function wishCount(){ const n=wishes.length; $('#wishCount').innerHTML=n?`你已经放飞了 ${n} 盏灯。<button type="button" id="wishClear">收回全部</button>`:'天上还没有你的灯。';
+    const c=$('#wishClear'); if(c) c.addEventListener('click',()=>{wishes=[]; store.set('wishes',wishes); lans=lans.filter(L=>!L.text); wishCount(); if(RM) draw();}); }
+  wishCount();
+  $('#wishForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#wishInput').value.trim(); if(!v) return;
+    wishes.push(v); store.set('wishes',wishes); $('#wishInput').value=''; wishCount();
+    const tx=launchX(), ty=HZ-46;
+    if(RM){ make(v,{x:tx,y:ty,s:1.25}); draw(); return; }
+    const wait=flyText(v,tx,ty)-.25;
+    const L=make(v,{x:tx,y:ty,s:1.25,st:'wait',wait,t:0,inflate:0,flame:0,sw:3});
+    L.vt=14;
+  });
+})();
 
 /* ---------- reveal, ribbon, nav, cursor ---------- */
 if(!RM && 'IntersectionObserver' in window){
