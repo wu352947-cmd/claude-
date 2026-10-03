@@ -470,11 +470,12 @@ function compose(M) {
     const motif = [['D3', 'D2'], ['A3', 'A2'], ['E4', 'E3'], ['F#4', 'F#3']];
     bs.forEach((b, k) => {
       const [hi, lo] = motif[k];
+      const v = k === 3 ? 0.6 : 1;   // the F# lands on the densest moment of the cluster
       at(b.t - 0.05, () => {
-        I.bell(M, pan(M, BUS.big(), (k - 1.5) * 0.25), b.t, hz(hi) * 2, { kind: 'church', dur: 10, amp: 0.22, bright: 0.9, strike: 0.4, seed: 'cm' + k });
-        I.bell(M, pan(M, BUS.bells(), -(k - 1.5) * 0.3), b.t, hz(hi) * 4, { kind: 'bronze', dur: 5, amp: 0.07, seed: 'cmb' + k });
-        I.braam(M, BUS.big(), b.t, [hz(lo), hz(hi)], { amp: 0.14, dur: 3.5, open: 2200, seed: 'cmbr' + k });
-        I.impact(M, BUS.big(), b.t, { amp: 0.17, seed: 'cmi' + k });
+        I.bell(M, pan(M, BUS.big(), (k - 1.5) * 0.25), b.t, hz(hi) * 2, { kind: 'church', dur: 10, amp: 0.22 * v, bright: 0.9, strike: 0.4, seed: 'cm' + k });
+        I.bell(M, pan(M, BUS.bells(), -(k - 1.5) * 0.3), b.t, hz(hi) * 4, { kind: 'bronze', dur: 5, amp: 0.07 * v, seed: 'cmb' + k });
+        I.braam(M, BUS.big(), b.t, [hz(lo), hz(hi)], { amp: 0.14 * v, dur: 3.5, open: 2200, seed: 'cmbr' + k });
+        I.impact(M, BUS.big(), b.t, { amp: 0.17 * v, seed: 'cmi' + k });
       });
     });
   }

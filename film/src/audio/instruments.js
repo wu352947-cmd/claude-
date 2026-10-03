@@ -32,9 +32,11 @@ export function bell(M, out, g, f, { kind = 'church', dur = 6, amp = 0.3, bright
     // doublet (two slightly split modes) for natural beating
     const split = beat * (0.3 + r()) * (ratio < 1 ? 0.5 : 1);
     for (const [k, w] of [[1, 0.62], [-1, 0.38]]) {
-      const o = osc(M, 'sine', fp + k * split / 2, g, g + tau * 9 + 0.1);
+      // stagger mode onsets by a few ms: natural strike smear, and the partials never peak together
+      const gs = g + r() * 0.006;
+      const o = osc(M, 'sine', fp + k * split / 2, gs, gs + tau * 9 + 0.1);
       const e = gain(M, 0);
-      last = Math.max(last, perc(M, e.gain, g, { a: att, peak: aa * w, tau }));
+      last = Math.max(last, perc(M, e.gain, gs, { a: att, peak: aa * w, tau }));
       o.connect(e).connect(sum);
     }
   }
