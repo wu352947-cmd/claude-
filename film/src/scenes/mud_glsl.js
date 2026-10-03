@@ -19,7 +19,7 @@ vec3 skyBase(vec3 d){
   float g = pow(1. - h, 5.);
   vec3 c = mix(uZen, uHor, g);
   float sd = max(dot(d, uSunDir), 0.);
-  c += uGlow * (pow(sd, 5.) * 0.45 + pow(sd, 40.) * 0.8) * (0.35 + 0.65 * g);
+  c += uGlow * (pow(sd, 10.) * 0.22 + pow(sd, 120.) * 0.7) * (0.35 + 0.65 * g);
   // earth-shadow / belt of Venus opposite the sun near the horizon at twilight
   float as = max(dot(normalize(vec3(-uSunDir.x, 0., -uSunDir.z)), normalize(vec3(d.x, 0., d.z))), 0.);
   float tw = clamp(1. - abs(uSunDir.y + 0.02) * 9., 0., 1.);

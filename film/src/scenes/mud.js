@@ -116,7 +116,7 @@ void main(){
   vP = vec3(xz.x, h, xz.y);
   // shadows are evaluated per vertex (1 m grid on the structure) and interpolated
   vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
-  vSh = hfShadow(vP + vec3(0., 0.2, 0.), L);
+  vSh = hfShadow(vP + vNs * 0.9 + vec3(0., 0.3, 0.), L);
   gl_Position = projectionMatrix * viewMatrix * vec4(vP, 1.);
 }`;
 const HF_FS = /* glsl */`
@@ -729,12 +729,12 @@ export default {
     const K = [
       [-0.40, [0.006, 0.008, 0.024], [0.020, 0.024, 0.050], [0, 0, 0]],
       [-0.14, [0.012, 0.014, 0.045], [0.050, 0.040, 0.085], [0, 0, 0]],
-      [-0.05, [0.040, 0.034, 0.100], [0.300, 0.140, 0.140], [0, 0, 0]],
-      [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
-      [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.9, 1.50, 0.62]],
-      [0.17, [0.160, 0.170, 0.330], [0.850, 0.560, 0.300], [2.7, 1.75, 0.85]],
-      [0.32, [0.150, 0.190, 0.360], [0.560, 0.420, 0.250], [2.2, 1.65, 1.0]],
-      [1.00, [0.130, 0.190, 0.380], [0.500, 0.390, 0.250], [2.2, 1.75, 1.15]],
+      [-0.05, [0.035, 0.030, 0.090], [0.220, 0.110, 0.115], [0, 0, 0]],
+      [0.015, [0.070, 0.060, 0.170], [0.520, 0.230, 0.110], [2.2, 0.85, 0.28]],
+      [0.09, [0.120, 0.120, 0.260], [0.700, 0.420, 0.220], [2.5, 1.35, 0.55]],
+      [0.17, [0.140, 0.150, 0.300], [0.600, 0.430, 0.240], [2.1, 1.40, 0.70]],
+      [0.32, [0.120, 0.150, 0.300], [0.420, 0.320, 0.190], [1.7, 1.25, 0.72]],
+      [1.00, [0.110, 0.150, 0.310], [0.380, 0.300, 0.190], [1.75, 1.32, 0.80]],
     ];
     const pal = i => { let k = 0; while (k < K.length - 2 && e > K[k + 1][0]) k++; const u = clamp((e - K[k][0]) / (K[k + 1][0] - K[k][0])); const s = u * u * (3 - 2 * u); return K[k][i].map((v, j) => lerp(v, K[k + 1][i][j], s)); };
     const zen = pal(1), hor = pal(2), sunc = pal(3);
@@ -746,7 +746,7 @@ export default {
       U.uAmb.value.set(lerp(zen[0], g, ds) * 0.5 + hor[0] * 0.06, lerp(zen[1], g, ds) * 0.5 + hor[1] * 0.06, lerp(zen[2], g, ds) * 0.5 + hor[2] * 0.06); }
     U.uBounce.value.fromArray(sunc).multiplyScalar(0.11 * smoothstep(-0.03, 0.1, e)).add(new S.THREE.Vector3(0.004, 0.003, 0.003));
     U.uNight.value = night;
-    U.uMoonCol.value.set(0.11, 0.145, 0.24).multiplyScalar(night * 1.5);
+    U.uMoonCol.value.set(0.11, 0.145, 0.24).multiplyScalar(night * (1.5 + 1.1 * smoothstep(23.5, 27, t)));
     U.uStarI.value = night * 1.1;
 
     // ---------------- construction
@@ -833,7 +833,7 @@ export default {
 
   grade(S, t) {
     return {
-      exposure: 1.05,
+      exposure: 1.05 - 0.2 * (1 - S.util.smoothstep(7, 9, t)),
       saturation: 1.02,
       contrast: 1.04,
       tint: [1.02, 1.0, 0.97],
