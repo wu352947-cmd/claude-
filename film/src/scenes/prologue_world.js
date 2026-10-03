@@ -76,16 +76,14 @@ varying vec3 vW;
 void main(){
   vec3 V = vW - uCam; float dist = length(V); vec3 dir = V / dist;
   vec2 p = vW.xz;
-  // broad swells (finite-difference normal) + wind ripples (analytic)
-  float e = 1.5;
-  float n0 = snoise(vec3(p * .018, 0.));
-  float nx = snoise(vec3((p + vec2(e, 0.)) * .018, 0.));
-  float nz = snoise(vec3((p + vec2(0., e)) * .018, 0.));
-  vec2 g = vec2(nx - n0, nz - n0) / e * 2.2;
+  // broad swells (analytic gradient of crossed sines) + wind ripples (analytic)
+  float sa = p.x * .021 + sin(p.y * .017) * 2.1, sb = p.y * .013 + 1.3 + sin(p.x * .009) * 1.4;
+  vec2 g = vec2(cos(sa) * .021 * sin(sb) + sin(sa) * cos(sb) * .009 * 1.4 * cos(p.x * .009),
+                cos(sa) * cos(p.y * .017) * .017 * 2.1 * sin(sb) + sin(sa) * cos(sb) * .013) * 2.4;
   float warp = snoise(vec3(p * .045, 3.));
   vec2 wdir = normalize(vec2(.85, -.53) + vec2(warp * .35, 0.));
   float ph = dot(p, wdir) * 1.7 + warp * 7.;
-  float patchy = snoise(vec3(p * .025, 9.));
+  float patchy = sin(p.x * .05 + warp * 2.) * sin(p.y * .061 - warp);
   float amp = .16 * (1. - smoothstep(12., 80., dist)) * smoothstep(-.4, .6, patchy);
   g += wdir * cos(ph) * 2.1 * amp * (sin(ph) > 0. ? .6 : 1.4);
   vec3 N = normalize(vec3(-g.x, 1., -g.y));
@@ -101,7 +99,7 @@ void main(){
   // warm pool of light under the falling grains
   vec2 pd = (p - uPool.xy) / uPool.z;
   float pool = exp(-dot(pd, pd) * 1.6) * uPool.w;
-  col += alb * vec3(.20, .085, .035) * pool * (.6 + .8 * dif + .3 * snoise(vec3(p * .7, 2.)));
+  col += alb * vec3(.20, .085, .035) * pool * (.6 + .8 * dif + .3 * warp);
   float fog = 1. - exp(-dist * .0021);
   col = mix(col, hazeCol(dir), fog);
   gl_FragColor = vec4(col, 1.);

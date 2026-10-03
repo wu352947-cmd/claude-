@@ -306,7 +306,7 @@ export default {
       minX = Math.min(minX, px); maxX = Math.max(maxX, px);
     }
     const nG = pos.length / 3;
-    console.log("prologue grains", nG);
+    console.warn("prologue grains", nG);
     for (let i = 0; i < nG; i++) {
       const xn = (dat[i * 4 + 2] - minX) / (maxX - minX);
       dat[i * 4 + 2] = SHED0 + xn * SHED_DUR + (R() - 0.5) * 0.45 + (R() < 0.04 ? -0.3 * R() : 0);
