@@ -18,7 +18,7 @@ import { formantVoice, babble } from './voices.js';
 import * as A from './ambience.js';
 
 const LAT = 288;                  // DynamicsCompressor look-ahead (frames at any rate: Chrome uses 6 ms @ 48k → measured 288)
-const MASTER_GAIN = db(0);        // calibrated against EBU R128 (see tools/audio.mjs output)
+const MASTER_GAIN = db(0.5);        // calibrated against EBU R128 (see tools/audio.mjs output)
 const CEILING = db(-1.3);         // true-peak ceiling (4× oversampled detection)
 
 // ------------------------------------------------------------------ segments
@@ -216,7 +216,7 @@ function compose(M) {
   at(HITS.braam - 0.05, () => {
     const g = HITS.braam;
     I.braam(M, BUS.big(), g, [hz('D2'), hz('A2'), hz('D3')], { amp: 0.3, dur: 8, open: 2600 });
-    I.subDrop(M, BUS.sub(), g, { f0: 75, f1: 28, dur: 2.4, amp: 0.55 });
+    I.subDrop(M, BUS.sub(), g, { f0: 75, f1: 28, dur: 2.4, amp: 0.34 });
     I.impact(M, BUS.big(), g, { amp: 0.42 });
     I.bell(M, BUS.big(), g, hz('D4'), { kind: 'church', dur: 9, amp: 0.1, bright: 0.8 });
   });
@@ -389,7 +389,7 @@ function compose(M) {
     const g = HITS.liftoff;
     I.impact(M, BUS.big(), g, { amp: 0.22, tone: 0.6, seed: 'lift' });
     I.braam(M, BUS.big(), g, [hz('A1'), hz('D2'), hz('A2')], { amp: 0.16, dur: 7, open: 800, seed: 'liftbraam' });
-    I.subDrop(M, BUS.sub(), g, { f0: 50, f1: 30, dur: 4, amp: 0.3 });
+    I.subDrop(M, BUS.sub(), g, { f0: 50, f1: 30, dur: 4, amp: 0.22 });
   });
   at(163, () => {
     [[62, 'f', -0.3, 0.02], [69, 'f', 0.3, 0.018], [50, 'm', -0.1, 0.02], [57, 'm', 0.1, 0.018]].forEach(([m, sex, p, a], k) =>
@@ -436,7 +436,7 @@ function compose(M) {
     const g = HITS.towerErupt;
     I.braam(M, BUS.big(), g, [hz('D2'), hz('A2'), hz('D3'), hz('E3')], { amp: 0.34, dur: 8, open: 3000, seed: 'erupt' });
     I.impact(M, BUS.big(), g, { amp: 0.4, seed: 'erupt' });
-    I.subDrop(M, BUS.sub(), g, { f0: 80, f1: 30, dur: 2.5, amp: 0.5 });
+    I.subDrop(M, BUS.sub(), g, { f0: 80, f1: 30, dur: 2.5, amp: 0.32 });
   });
   // choir & organ: the twelve tongues pile up
   at(189, () => {
@@ -471,10 +471,10 @@ function compose(M) {
     bs.forEach((b, k) => {
       const [hi, lo] = motif[k];
       at(b.t - 0.05, () => {
-        I.bell(M, pan(M, BUS.big(), (k - 1.5) * 0.25), b.t, hz(hi) * 2, { kind: 'church', dur: 10, amp: 0.3, bright: 0.9, strike: 0.4, seed: 'cm' + k });
-        I.bell(M, pan(M, BUS.bells(), -(k - 1.5) * 0.3), b.t, hz(hi) * 4, { kind: 'bronze', dur: 5, amp: 0.12, seed: 'cmb' + k });
-        I.braam(M, BUS.big(), b.t, [hz(lo), hz(hi)], { amp: 0.2, dur: 3.5, open: 2200, seed: 'cmbr' + k });
-        I.impact(M, BUS.big(), b.t, { amp: 0.25, seed: 'cmi' + k });
+        I.bell(M, pan(M, BUS.big(), (k - 1.5) * 0.25), b.t, hz(hi) * 2, { kind: 'church', dur: 10, amp: 0.22, bright: 0.9, strike: 0.4, seed: 'cm' + k });
+        I.bell(M, pan(M, BUS.bells(), -(k - 1.5) * 0.3), b.t, hz(hi) * 4, { kind: 'bronze', dur: 5, amp: 0.07, seed: 'cmb' + k });
+        I.braam(M, BUS.big(), b.t, [hz(lo), hz(hi)], { amp: 0.14, dur: 3.5, open: 2200, seed: 'cmbr' + k });
+        I.impact(M, BUS.big(), b.t, { amp: 0.17, seed: 'cmi' + k });
       });
     });
   }

@@ -42,7 +42,7 @@ export function bell(M, out, g, f, { kind = 'church', dur = 6, amp = 0.3, bright
     const n = M.noise('white', g, 0.25, seed);
     const bp = biquad(M, 'bandpass', Math.min(9000, f * 2.4), 0.9);
     const e = gain(M, 0);
-    perc(M, e.gain, g, { a: 0.0006, peak: strike, tau: kind === 'church' ? 0.012 : 0.006 });
+    perc(M, e.gain, g, { a: 0.0015, peak: strike * (kind === 'church' ? 0.45 : 1), tau: kind === 'church' ? 0.012 : 0.006 });
     n.connect(bp).connect(e).connect(sum);
   }
   return last;
@@ -208,7 +208,7 @@ export function braam(M, out, g, freqs, { amp = 0.4, dur = 7, open = 2400, seed 
   lp.frequency.setTargetAtTime(260, T + 0.5, dur * 0.25);
   const e = gain(M, 0);
   e.gain.setValueAtTime(0, T - 0.02);
-  e.gain.linearRampToValueAtTime(amp, T + 0.05);
+  e.gain.linearRampToValueAtTime(amp * 0.8, T + 0.12);
   e.gain.setTargetAtTime(amp * 0.55, T + 0.3, 0.6);
   e.gain.setTargetAtTime(0, T + dur * 0.45, dur * 0.18);
   mixIn.connect(sh).connect(lp).connect(lp2).connect(e).connect(out);
@@ -222,13 +222,13 @@ export function subDrop(M, out, g, { f0 = 72, f1 = 27, dur = 2.2, amp = 0.6 } = 
 export function impact(M, out, g, { amp = 0.6, tone = 1, seed = 'imp' } = {}) {
   const o = osc(M, 'sine', 130 * tone, g, g + 2);
   eramp(M, o.frequency, [[g, 130 * tone], [g + 0.12, 38 * tone]]);
-  const e = gain(M, 0); perc(M, e.gain, g, { a: 0.001, peak: amp, tau: 0.25 });
-  const sh = shaper(M, 3.5, 'hard');
+  const e = gain(M, 0); perc(M, e.gain, g, { a: 0.004, peak: amp * 0.5, tau: 0.22 });
+  const sh = shaper(M, 2.5, 'tanh');
   o.connect(sh).connect(e).connect(out);
   const n = M.noise('pink', g, 1.5, seed);
   const lp = biquad(M, 'lowpass', 3000, 0.8);
   eramp(M, lp.frequency, [[g, 4500], [g + 0.5, 300]]);
-  const ne = gain(M, 0); perc(M, ne.gain, g, { a: 0.001, peak: amp * 0.9, tau: 0.12 });
+  const ne = gain(M, 0); perc(M, ne.gain, g, { a: 0.003, peak: amp * 0.6, tau: 0.12 });
   n.connect(lp).connect(ne).connect(out);
 }
 // noise + pitch riser ending at g1 (abrupt)
