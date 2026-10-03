@@ -1,0 +1,1375 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+</head>
+<body>
+<title>拾光手帐</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Klee+One:wght@400;600&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600&family=ZCOOL+XiaoWei&display=swap">
+<style>
+/* Layout: 一本摊开的方眼手帐 —— 竖排书法标题 + 圆窗月景，下面是贴着和纸胶带的便笺、节气罗盘、可拖动的拾物板、翻转诗笺与夜里的心愿灯。 */
+:root{
+  --paper:#EEF1EC;      /* 月白 */
+  --card:#FBFCF8;
+  --board:#E4E8E1;
+  --ink:#2C3442;        /* 黛 */
+  --ink-soft:#677184;
+  --line:rgba(44,52,66,.13);
+  --dot:rgba(44,52,66,.12);
+  --sakura:#E7B3B6;     /* 退红 */
+  --sakura-soft:#F5DCDC;
+  --fuji:#A79AC8;       /* 藤紫 */
+  --fuji-soft:#E3DEF0;
+  --celadon:#93BAA6;    /* 青瓷 */
+  --celadon-soft:#D7E7DD;
+  --gold:#D6A246;       /* 桂花 */
+  --gold-soft:#F2E2BE;
+  --sky:#9DBBD3;
+  --shu:#C4473A;        /* 朱砂 印泥 */
+  --bark:#7A6656;
+  --snow:#B9C6D6;
+  --shadow:rgba(44,52,66,.28);
+  --grain:.07;
+  --sky-top:#DCE6EC; --sky-bot:#F3EEE6;
+  --mt1:#8FA79C; --mt2:#B7C7BF; --mt3:#D2DCD8; --water:#C9D7DC;
+  --star:.25; --moon-dark:rgba(44,52,66,.08);
+  --night-1:#141A2A; --night-2:#2A2F4A; --night-ink:#F3EEE3;
+
+  --f-brush:"Ma Shan Zheng","STKaiti","KaiTi","Kaiti SC",serif;
+  --f-display:"ZCOOL XiaoWei","Songti SC","STSong","SimSun",serif;
+  --f-body:"Noto Serif SC","Songti SC","Source Han Serif SC","SimSun",serif;
+  --f-kana:"Klee One","Hiragino Mincho ProN","Yu Mincho",serif;
+  --f-latin:"Cormorant Garamond","Iowan Old Style",Georgia,serif;
+
+  --ease:cubic-bezier(.22,.8,.24,1);
+  --spring:cubic-bezier(.34,1.56,.64,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#161B25; --card:#1E2431; --board:#1A202B; --ink:#ECE8DF; --ink-soft:#A2A9B7;
+    --line:rgba(236,232,223,.12); --dot:rgba(236,232,223,.08);
+    --sakura:#D99CA3; --sakura-soft:#3A2B33; --fuji:#A99DD6; --fuji-soft:#2C2A40;
+    --celadon:#84AE9B; --celadon-soft:#21332D; --gold:#E3B65E; --gold-soft:#3A3122; --sky:#7FA0BC;
+    --shu:#DA5B4C; --bark:#A08A78; --snow:#EEF2F8; --shadow:rgba(0,0,0,.55); --grain:.05;
+    --sky-top:#18203A; --sky-bot:#38365A; --mt1:#2C3A44; --mt2:#3A4757; --mt3:#4B5468; --water:#232C40;
+    --star:1; --moon-dark:rgba(255,255,255,.06);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#161B25; --card:#1E2431; --board:#1A202B; --ink:#ECE8DF; --ink-soft:#A2A9B7;
+  --line:rgba(236,232,223,.12); --dot:rgba(236,232,223,.08);
+  --sakura:#D99CA3; --sakura-soft:#3A2B33; --fuji:#A99DD6; --fuji-soft:#2C2A40;
+  --celadon:#84AE9B; --celadon-soft:#21332D; --gold:#E3B65E; --gold-soft:#3A3122; --sky:#7FA0BC;
+  --shu:#DA5B4C; --bark:#A08A78; --snow:#EEF2F8; --shadow:rgba(0,0,0,.55); --grain:.05;
+  --sky-top:#18203A; --sky-bot:#38365A; --mt1:#2C3A44; --mt2:#3A4757; --mt3:#4B5468; --water:#232C40;
+  --star:1; --moon-dark:rgba(255,255,255,.06);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background-color:var(--paper);
+  background-image:radial-gradient(var(--dot) 1.1px, transparent 1.5px);
+  background-size:22px 22px;
+  color:var(--ink);
+  font-family:var(--f-body);
+  font-size:16px; line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+  transition:background-color .6s var(--ease), color .6s var(--ease);
+}
+body::before{ /* 纸纹 */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:60; opacity:var(--grain);
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  mix-blend-mode:overlay;
+}
+::selection{background:var(--sakura-soft); color:var(--ink)}
+a{color:inherit}
+button,input{font:inherit; color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px dashed var(--fuji); outline-offset:3px; border-radius:6px}
+.sr{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap}
+
+#petals{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0}
+main, header.nav, footer{position:relative; z-index:1}
+.wrap{max-width:1180px; margin:0 auto; padding-inline:clamp(16px,4vw,48px)}
+
+/* ---------- nav ---------- */
+.nav{position:sticky; top:env(safe-area-inset-top,0px); z-index:30; backdrop-filter:blur(10px) saturate(1.2); -webkit-backdrop-filter:blur(10px) saturate(1.2);
+  background:color-mix(in srgb, var(--paper) 72%, transparent); border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex; align-items:center; gap:16px; height:58px}
+.logo{display:flex; align-items:center; gap:10px; text-decoration:none}
+.logo .seal-mini{width:30px; height:30px; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-size:20px; border-radius:6px; transform:rotate(-6deg); box-shadow:inset 0 0 0 2px var(--shu), inset 0 0 0 3.5px var(--card)}
+.logo b{font-family:var(--f-display); font-weight:400; font-size:20px; letter-spacing:.12em}
+.nav ul{display:flex; gap:clamp(8px,2vw,26px); list-style:none; margin:0 0 0 auto; padding:0}
+.nav ul a{position:relative; text-decoration:none; font-family:var(--f-display); font-size:15px; letter-spacing:.14em; color:var(--ink-soft); padding:6px 0; transition:color .3s}
+.nav ul a::after{content:""; position:absolute; left:0; right:.14em; bottom:0; height:6px; border-radius:6px; background:var(--sakura); opacity:.55; transform:scaleX(0); transform-origin:left; transition:transform .5s var(--ease)}
+.nav ul a:hover, .nav ul a.on{color:var(--ink)}
+.nav ul a:hover::after, .nav ul a.on::after{transform:scaleX(1)}
+.theme-btn{width:38px; height:38px; border-radius:50%; border:1px solid var(--line); background:var(--card); display:grid; place-items:center; transition:transform .6s var(--spring)}
+.theme-btn:hover{transform:rotate(-24deg) scale(1.06)}
+.theme-btn svg{width:20px; height:20px}
+@media (max-width:760px){ .nav ul{display:none} .theme-btn{margin-left:auto} }
+
+/* ---------- ribbon bookmark ---------- */
+.ribbon{position:fixed; right:clamp(8px,2.4vw,30px); top:calc(env(safe-area-inset-top,0px) + 58px); width:14px; z-index:29; pointer-events:none;
+  height:calc(40px + var(--p,0) * 46vh);
+  background:linear-gradient(90deg, rgba(0,0,0,.08), transparent 30%, rgba(255,255,255,.18) 50%, transparent 70%), var(--shu);
+  clip-path:polygon(0 0,100% 0,100% 100%,50% calc(100% - 8px),0 100%); transition:height .25s linear; opacity:.9}
+@media (max-width:760px){.ribbon{width:9px}}
+
+/* ---------- ink cursor ---------- */
+.cursor{position:fixed; left:0; top:0; width:30px; height:30px; margin:-15px 0 0 -15px; border-radius:50%; pointer-events:none; z-index:70;
+  border:1.5px solid var(--fuji); opacity:0; transition:width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), opacity .3s, background-color .3s}
+.cursor.big{width:58px; height:58px; margin:-29px 0 0 -29px; background:color-mix(in srgb, var(--sakura) 22%, transparent); border-color:var(--sakura)}
+@media (hover:none){.cursor{display:none}}
+
+/* ---------- shared bits ---------- */
+.tape{position:absolute; height:24px; width:96px; opacity:.88; z-index:3; box-shadow:0 1px 2px rgba(0,0,0,.06);
+  clip-path:polygon(2% 10%,5% 0,10% 12%,14% 0,100% 0,97% 30%,100% 55%,96% 78%,100% 100%,8% 100%,4% 86%,0 100%,3% 60%,0 40%);
+  background-color:var(--sakura-soft)}
+.tape.stripe{background-image:repeating-linear-gradient(-45deg, var(--sakura) 0 6px, transparent 6px 12px); background-color:var(--sakura-soft)}
+.tape.dots{background-image:radial-gradient(var(--card) 2px, transparent 2.5px); background-size:10px 10px; background-color:var(--celadon)}
+.tape.check{background-image:conic-gradient(var(--fuji) 25%, transparent 0 50%, var(--fuji) 0 75%, transparent 0); background-size:12px 12px; background-color:var(--fuji-soft)}
+.tape.gold{background-image:repeating-linear-gradient(90deg, var(--gold) 0 2px, transparent 2px 9px); background-color:var(--gold-soft)}
+.tape.sky{background-color:color-mix(in srgb, var(--sky) 55%, var(--card))}
+
+.note{position:relative; background:var(--card); border-radius:4px 4px 8px 8px; padding:clamp(20px,3vw,30px);
+  box-shadow:0 1px 0 var(--line), 0 18px 40px -26px var(--shadow); transform:rotate(var(--r,0deg));
+  transition:transform .7s var(--ease), box-shadow .7s var(--ease), background-color .6s}
+.note:hover{transform:rotate(0deg) translateY(-4px); box-shadow:0 1px 0 var(--line), 0 26px 50px -26px var(--shadow)}
+
+.sec{padding-block:clamp(64px,10vw,120px) 0}
+.sec-head{display:flex; align-items:flex-end; justify-content:space-between; gap:24px; margin-bottom:clamp(28px,4vw,48px); flex-wrap:wrap}
+.eyebrow{font-family:var(--f-kana); font-size:14px; letter-spacing:.3em; color:var(--ink-soft); display:flex; align-items:center; gap:10px}
+.eyebrow::before{content:""; width:28px; height:1px; background:currentColor}
+.sec-title{font-family:var(--f-display); font-weight:400; font-size:clamp(32px,4.6vw,52px); line-height:1.2; margin:8px 0 0; letter-spacing:.08em; text-wrap:balance; position:relative; display:inline-block}
+.sec-title .ul{position:absolute; left:-4%; bottom:-10px; width:108%; height:18px; overflow:visible; pointer-events:none}
+.sec-title .ul path{fill:none; stroke:var(--sakura); stroke-width:7; stroke-linecap:round; opacity:.6; stroke-dasharray:400; stroke-dashoffset:400; transition:stroke-dashoffset 1.6s var(--ease) .2s}
+.in .sec-title .ul path, .sec-title.drawn .ul path{stroke-dashoffset:0}
+.sec-sub{color:var(--ink-soft); max-width:34em; margin:14px 0 0; font-size:15px}
+
+/* reveal: 始于可见状态，只轻轻浮起 */
+.rv{transition:opacity 1.1s var(--ease), transform 1.1s var(--ease), filter 1.1s var(--ease)}
+.rv.pre{opacity:.2; transform:translateY(34px); filter:blur(4px)}
+
+.btn{display:inline-flex; align-items:center; gap:10px; border:0; text-decoration:none; font-family:var(--f-display); font-size:16px; letter-spacing:.14em;
+  padding:13px 24px 13px 30px; border-radius:4px 22px 22px 4px; position:relative; transition:transform .5s var(--spring), box-shadow .5s var(--ease), background-color .4s}
+.btn::before{content:""; position:absolute; left:11px; top:50%; width:7px; height:7px; margin-top:-3.5px; border-radius:50%; background:var(--paper); box-shadow:inset 0 0 0 1px var(--line)}
+.btn.ink{background:var(--ink); color:var(--paper)}
+.btn.soft{background:var(--card); color:var(--ink); box-shadow:0 0 0 1px var(--line)}
+.btn:hover{transform:translateY(-3px) rotate(-1.5deg); box-shadow:0 14px 24px -14px var(--shadow)}
+.btn svg{width:18px; height:18px; transition:transform .5s var(--ease)}
+.btn:hover svg{transform:translateX(4px)}
+
+/* ---------- hero ---------- */
+.hero{padding-block:clamp(36px,6vw,80px) clamp(20px,4vw,40px)}
+.hero .wrap{display:grid; grid-template-columns:1.05fr .95fr; gap:clamp(24px,5vw,72px); align-items:center}
+.hero-l{display:grid; grid-template-columns:auto 1fr; gap:clamp(18px,3vw,40px); align-items:start; min-width:0}
+.vtitle{position:relative; font-family:var(--f-brush); font-size:clamp(72px,10.5vw,138px); line-height:1.02; letter-spacing:.06em; margin:0; font-weight:400; color:var(--ink)}
+.vtitle .ink{display:flex; flex-direction:column; align-items:center; animation:brush 1.7s cubic-bezier(.7,0,.2,1) .25s both}
+.vtitle .seal{position:absolute; left:-14px; bottom:-18px; width:58px; height:58px; display:grid; grid-template:1fr 1fr/1fr 1fr; place-items:center;
+  background:var(--shu); color:var(--card); font-size:21px; line-height:1; border-radius:8px; padding:6px;
+  box-shadow:inset 0 0 0 2px var(--shu), inset 0 0 0 4px var(--card); transform:rotate(-8deg);
+  animation:stamp .7s var(--spring) 1.55s both}
+@keyframes brush{from{clip-path:inset(0 0 100% 0); opacity:.3} to{clip-path:inset(0 0 -10% 0); opacity:1}}
+@keyframes stamp{0%{transform:scale(2.2) rotate(-24deg); opacity:0} 55%{transform:scale(.92) rotate(-6deg); opacity:1} 100%{transform:scale(1) rotate(-8deg); opacity:.96}}
+.hero-meta{display:flex; flex-direction:column; gap:18px; padding-top:8px; min-width:0}
+.dateline{font-family:var(--f-display); font-size:15px; letter-spacing:.18em; color:var(--ink-soft); display:flex; flex-wrap:wrap; gap:4px 14px}
+.dateline span + span::before{content:"·"; margin-right:14px; color:var(--sakura)}
+.hero-lead{font-family:var(--f-display); font-size:clamp(22px,2.6vw,30px); line-height:1.6; margin:0; letter-spacing:.06em; text-wrap:balance}
+.hero-lead em{font-style:normal; background:linear-gradient(transparent 62%, var(--sakura-soft) 62% 92%, transparent 92%); padding:0 2px}
+.kana-line{font-family:var(--f-kana); color:var(--ink-soft); font-size:15px; letter-spacing:.12em; margin:0}
+.moon-chip{display:inline-flex; align-items:center; gap:10px; font-size:14px; color:var(--ink-soft); background:var(--card); padding:6px 14px 6px 8px; border-radius:30px; box-shadow:0 0 0 1px var(--line); width:max-content; max-width:100%}
+.moon-chip svg{width:22px; height:22px; flex:none}
+.hero-cta{display:flex; flex-wrap:wrap; gap:14px; margin-top:6px}
+.hero-l .ink-in{animation:rise 1.1s var(--ease) both}
+@keyframes rise{from{opacity:0; transform:translateY(18px)} to{opacity:1; transform:none}}
+
+.gate-wrap{position:relative; max-width:100%; aspect-ratio:1/1; width:min(100%,520px); justify-self:center}
+.gate{width:100%; height:100%; overflow:visible; display:block}
+.gate .frame{fill:none; stroke:var(--ink); stroke-width:2.2; stroke-dasharray:1200; stroke-dashoffset:1200; animation:draw 2.2s var(--ease) .2s forwards}
+.gate .frame2{fill:none; stroke:var(--ink); stroke-width:.8; opacity:.45; stroke-dasharray:1260; stroke-dashoffset:1260; animation:draw 2.4s var(--ease) .45s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.gate .scene{animation:fadeScene 1.6s var(--ease) .6s both}
+@keyframes fadeScene{from{opacity:0; transform:scale(1.05)} to{opacity:1; transform:none}}
+.gate .scene{transform-origin:200px 200px}
+.gate .layer{transition:transform .2s linear}
+.star{fill:#fff; opacity:calc(var(--star) * .8); animation:twinkle 3.4s ease-in-out infinite}
+@keyframes twinkle{50%{opacity:calc(var(--star) * .2)}}
+.cloud{fill:var(--card); opacity:.75; animation:drift 26s linear infinite}
+.cloud.c2{animation-duration:38s; animation-delay:-14s; opacity:.55}
+@keyframes drift{from{transform:translateX(-120px)} to{transform:translateX(420px)}}
+.bird{fill:none; stroke:var(--ink); stroke-width:1.4; stroke-linecap:round; opacity:.6; animation:fly 22s linear infinite}
+@keyframes fly{0%{transform:translate(-40px,150px)} 100%{transform:translate(440px,70px)}}
+.wing{animation:flap .9s ease-in-out infinite; transform-origin:center; transform-box:fill-box}
+@keyframes flap{50%{transform:scaleY(.4)}}
+.shimmer line{stroke:var(--gold); stroke-width:2; stroke-linecap:round; opacity:.55; animation:shim 3s ease-in-out infinite}
+@keyframes shim{50%{opacity:.12; transform:translateX(6px)}}
+.boat{animation:bob 4.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translate(-6px,2px) rotate(-1.4deg)}}
+.lamp-glow{fill:var(--gold); animation:glow 2.6s ease-in-out infinite}
+@keyframes glow{50%{opacity:.45}}
+.branch{transform-origin:-10px 30px; animation:sway 7s ease-in-out infinite}
+@keyframes sway{50%{transform:rotate(2.2deg)}}
+.branch .bud{fill:var(--gold)}
+.branch .leaf{fill:var(--celadon)}
+.branch .twig{fill:none; stroke:var(--bark); stroke-linecap:round}
+
+.furin{position:absolute; right:4%; top:-4%; width:16%; min-width:56px; cursor:pointer; border:0; background:none; padding:0;
+  transform-origin:50% 0; animation:drop 1.4s var(--spring) 1.1s both}
+@keyframes drop{from{transform:translateY(-40px); opacity:0}}
+.furin svg{width:100%; display:block; overflow:visible}
+.furin .hint{position:absolute; left:50%; top:100%; transform:translateX(-50%); font-family:var(--f-kana); font-size:12px; color:var(--ink-soft); white-space:nowrap; opacity:0; transition:opacity .4s}
+.furin:hover .hint, .furin:focus-visible .hint{opacity:1}
+.hero-tape-1{top:-10px; left:16%; transform:rotate(-7deg); width:110px}
+.hero-tape-2{bottom:6%; right:-2%; transform:rotate(12deg)}
+.hero .tape{animation:tape .9s var(--ease) both}
+.hero-tape-1{animation-delay:1.3s!important} .hero-tape-2{animation-delay:1.45s!important}
+@keyframes tape{from{clip-path:polygon(0 0,0 0,0 100%,0 100%)}}
+
+@media (max-width:900px){
+  .hero .wrap{grid-template-columns:1fr}
+  .gate-wrap{width:min(100%,420px)}
+}
+@media (max-width:480px){
+  .hero-l{grid-template-columns:1fr}
+  .vtitle{font-size:clamp(58px,17vw,80px)} .vtitle .ink{flex-direction:row}
+  .vtitle .ink{animation-name:brushH}
+  .vtitle .seal{left:auto; right:0; bottom:auto; top:4px}
+}
+@keyframes brushH{from{clip-path:inset(0 100% 0 0); opacity:.3} to{clip-path:inset(0 -10% 0 0); opacity:1}}
+
+/* ---------- today ---------- */
+.postmark{width:118px; height:118px; color:var(--fuji); transform:rotate(-12deg); flex:none}
+.postmark text{fill:currentColor; font-family:var(--f-latin)}
+.today-grid{display:grid; grid-template-columns:repeat(12,minmax(0,1fr)); gap:clamp(18px,2.6vw,32px); align-items:start}
+.today-grid > *{min-width:0}
+.c-mood{grid-column:span 5; --r:-1.2deg}
+.c-todo{grid-column:span 7; --r:.8deg}
+.c-cal{grid-column:span 7; --r:-.6deg}
+.c-water{grid-column:span 5; --r:1.1deg}
+@media (max-width:900px){ .c-mood,.c-todo,.c-cal,.c-water{grid-column:span 12} }
+.note h3{font-family:var(--f-display); font-weight:400; font-size:22px; letter-spacing:.1em; margin:0; display:flex; align-items:baseline; gap:10px; flex-wrap:wrap}
+.note h3 small{font-family:var(--f-kana); font-size:13px; color:var(--ink-soft); letter-spacing:.14em}
+.note .meta{font-size:14px; color:var(--ink-soft); margin:6px 0 0}
+
+.c-mood{background:color-mix(in srgb, var(--mood, var(--sakura)) 14%, var(--card))}
+.moods{display:flex; justify-content:space-between; gap:6px; margin:22px 0 14px}
+.mood{border:0; background:none; padding:4px; border-radius:50%; display:grid; justify-items:center; gap:4px; flex:1; transition:transform .5s var(--spring)}
+.mood svg{width:100%; max-width:62px; filter:saturate(.85); transition:transform .5s var(--spring), filter .4s}
+.mood span{font-size:12px; color:var(--ink-soft); letter-spacing:.1em}
+.mood:hover svg{transform:translateY(-5px) rotate(-6deg)}
+.mood[aria-pressed="true"] svg{transform:scale(1.18); filter:saturate(1.1) drop-shadow(0 8px 10px var(--shadow))}
+.mood[aria-pressed="true"] span{color:var(--ink)}
+.mood.pop svg{animation:pop .7s var(--spring)}
+@keyframes pop{30%{transform:scale(.8) rotate(8deg)} 100%{transform:scale(1.18)}}
+.face .bg{transition:fill .4s}
+.face .st{fill:none; stroke:var(--ink); stroke-width:2.4; stroke-linecap:round; stroke-linejoin:round}
+.face .ck{fill:var(--sakura); opacity:.75}
+.mood-say{font-family:var(--f-display); font-size:18px; letter-spacing:.08em; margin:0; min-height:1.8em}
+.mood-say b{font-weight:400; color:var(--shu)}
+
+.todo-top{display:flex; justify-content:space-between; gap:16px; align-items:flex-start}
+.plant{width:76px; height:86px; flex:none; overflow:visible}
+.plant .pot{fill:var(--sakura)} .plant .pot2{fill:var(--sakura-soft)}
+.plant .stem{stroke:var(--celadon); stroke-width:3; stroke-linecap:round; fill:none; transform-origin:38px 62px; transform-box:view-box; transform:scaleY(var(--grow,.15)); transition:transform 1s var(--spring)}
+.plant .lf{fill:var(--celadon); transform-box:fill-box; transform:scale(0); transition:transform .8s var(--spring)}
+.plant .lf.l1{transform-origin:100% 100%} .plant .lf.l2{transform-origin:0 100%} .plant .lf.l3{transform-origin:100% 100%}
+.plant .fl{transform-box:fill-box; transform-origin:center; transform:scale(0) rotate(-90deg); transition:transform 1s var(--spring)}
+.plant .fl circle.pt{fill:var(--sakura)} .plant .fl circle.cn{fill:var(--gold)}
+.plant.s1 .l1, .plant.s2 .l1, .plant.s2 .l2, .plant.s3 .lf, .plant.s4 .lf{transform:scale(1)}
+.plant.s4 .fl{transform:scale(1) rotate(0)}
+.todo-list{list-style:none; margin:16px 0 0; padding:0}
+.todo-list li{display:flex; align-items:center; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); animation:liIn .6s var(--ease) both}
+@keyframes liIn{from{opacity:0; transform:translateX(-14px)}}
+.todo-list li.out{animation:liOut .45s var(--ease) forwards}
+@keyframes liOut{to{opacity:0; transform:translateX(30px); height:0; padding:0}}
+.chk{flex:none; width:26px; height:26px; border:0; background:none; padding:0}
+.chk svg{width:26px; height:26px; overflow:visible}
+.chk .box{fill:none; stroke:var(--ink-soft); stroke-width:1.6}
+.chk .tick{fill:none; stroke:var(--shu); stroke-width:3; stroke-linecap:round; stroke-linejoin:round; stroke-dasharray:30; stroke-dashoffset:30; transition:stroke-dashoffset .5s var(--ease)}
+.chk[aria-checked="true"] .tick{stroke-dashoffset:0}
+.todo-txt{flex:0 1 auto; margin-right:auto; min-width:0; position:relative; overflow-wrap:anywhere; transition:color .4s}
+.todo-txt::after{content:""; position:absolute; left:-2px; right:-2px; top:55%; height:2px; border-radius:2px; background:var(--sakura); transform:scaleX(0); transform-origin:left; transition:transform .55s var(--ease)}
+li.done .todo-txt{color:var(--ink-soft)}
+li.done .todo-txt::after{transform:scaleX(1)}
+.del{border:0; background:none; color:var(--ink-soft); width:28px; height:28px; border-radius:50%; opacity:0; transition:opacity .3s, background-color .3s; font-size:18px; line-height:1}
+li:hover .del, .del:focus-visible{opacity:1}
+.del:hover{background:var(--sakura-soft)}
+@media (hover:none){.del{opacity:.6}}
+.todo-add{display:flex; gap:10px; margin-top:16px}
+.todo-add input{flex:1; min-width:0; border:0; border-bottom:1.5px solid var(--line); background:transparent; padding:8px 2px; outline:none; transition:border-color .3s}
+.todo-add input:focus{border-color:var(--fuji)}
+.todo-add input::placeholder{color:var(--ink-soft); opacity:.7}
+.mini-btn{border:0; background:var(--fuji-soft); color:var(--ink); border-radius:20px; padding:6px 16px; font-family:var(--f-display); letter-spacing:.1em; transition:transform .4s var(--spring), background-color .3s}
+.mini-btn:hover{transform:translateY(-2px); background:var(--sakura-soft)}
+
+.cal{display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:6px; margin-top:18px; text-align:center}
+.cal .wd{font-family:var(--f-display); font-size:13px; color:var(--ink-soft); padding-bottom:4px}
+.cal .wd:first-child, .cal .wd:last-child{color:var(--shu); opacity:.8}
+.day{position:relative; height:clamp(38px,4.4vw,50px); border:0; background:none; border-radius:10px; font-family:var(--f-latin); font-size:17px; font-variant-numeric:tabular-nums; display:grid; place-items:center; transition:background-color .3s}
+.day:hover{background:var(--fuji-soft)}
+.day.today::before{content:""; position:absolute; inset:3px; border:2px solid var(--shu); border-radius:48% 52% 46% 54%/55% 45% 55% 45%; transform:rotate(-8deg); opacity:.8}
+.day svg{position:absolute; left:50%; top:50%; width:34px; height:34px; margin:-17px 0 0 -17px; pointer-events:none; animation:stampIn .5s var(--spring) both}
+.day.has{color:transparent}
+@keyframes stampIn{from{transform:scale(1.9) rotate(-30deg); opacity:0}}
+.cal-foot{display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:12px; font-size:13px; color:var(--ink-soft); flex-wrap:wrap}
+
+.cups{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px 8px; margin:20px 0 10px}
+.cup{border:0; background:none; padding:2px; transition:transform .4s var(--spring)}
+.cup:hover{transform:translateY(-4px) rotate(-3deg)}
+.cup svg{width:100%; max-width:58px; display:block; margin:0 auto; overflow:visible}
+.cup .glass{fill:none; stroke:var(--ink-soft); stroke-width:1.6}
+.cup .wat{fill:var(--sky); opacity:.75; transform-box:fill-box; transform-origin:bottom; transform:scaleY(0); transition:transform .9s var(--spring)}
+.cup.full .wat{transform:scaleY(1)}
+.cup .wave{fill:var(--sky); opacity:.9; animation:wave 2.4s linear infinite}
+@keyframes wave{to{transform:translateX(-16px)}}
+.water-say{font-family:var(--f-display); font-size:17px; letter-spacing:.06em; margin:0}
+.water-say b{font-family:var(--f-latin); font-size:26px; font-weight:500; color:var(--sky); font-variant-numeric:tabular-nums}
+
+/* ---------- jieqi ---------- */
+.jq{display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); gap:clamp(24px,5vw,64px); align-items:center}
+@media (max-width:900px){ .jq{grid-template-columns:1fr} }
+.wheel-box{position:relative; width:min(100%,560px); aspect-ratio:1; max-width:100%; justify-self:center; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab}
+.wheel-box:active{cursor:grabbing}
+.wheel-box > svg:not(.pointer){width:100%; height:100%; overflow:visible; display:block}
+.wheel-box .lbl{font-family:var(--f-display); font-size:17px; fill:var(--ink-soft); transition:fill .4s}
+.wheel-box .lbl.on{fill:var(--shu)}
+.wheel-box .tk{stroke:var(--ink); opacity:.35}
+.wheel-box .tk.major{opacity:.7}
+.wheel-box .ssn{font-family:var(--f-brush); font-size:22px; fill:var(--card)}
+.wheel-center{position:absolute; inset:28%; border-radius:50%; display:grid; place-content:center; text-align:center; pointer-events:none}
+.wheel-center .nm{font-family:var(--f-brush); font-size:clamp(46px,7vw,76px); line-height:1; letter-spacing:.04em}
+.wheel-center .py{font-family:var(--f-latin); font-style:italic; font-size:17px; color:var(--ink-soft); margin-top:6px}
+.pointer{position:absolute; left:50%; top:-3%; width:30px; transform:translateX(-50%); z-index:2}
+.jq-card{--r:.6deg}
+.jq-card .big{font-family:var(--f-brush); font-size:clamp(54px,7vw,84px); line-height:1; margin:0}
+.jq-card .row{display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin:10px 0 4px}
+.chip{display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:3px 12px; border-radius:20px; background:var(--soft,var(--celadon-soft)); letter-spacing:.1em}
+.jq-card .date{font-family:var(--f-latin); font-size:20px; font-variant-numeric:tabular-nums}
+.hou{list-style:none; padding:0; margin:18px 0; display:grid; gap:10px}
+.hou li{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:baseline}
+.hou b{font-family:var(--f-display); font-weight:400; font-size:13px; letter-spacing:.14em; color:var(--card); background:var(--ink); padding:1px 8px; border-radius:3px}
+.hou span{font-family:var(--f-display); font-size:19px; letter-spacing:.08em}
+.jq-note{font-family:var(--f-kana); margin:0; padding-top:14px; border-top:1px dashed var(--line); color:var(--ink-soft)}
+.jq-ctrl{display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; align-items:center}
+.round{width:42px; height:42px; border-radius:50%; border:1px solid var(--line); background:var(--card); display:grid; place-items:center; transition:transform .4s var(--spring)}
+.round:hover{transform:scale(1.08)}
+.round svg{width:18px; height:18px}
+.swap{animation:swapIn .7s var(--ease)}
+@keyframes swapIn{from{opacity:0; transform:translateY(10px); filter:blur(3px)}}
+.countdown{font-size:14px; color:var(--ink-soft)}
+.countdown b{font-family:var(--f-latin); font-size:22px; color:var(--shu); font-weight:500}
+
+/* ---------- scrapbook ---------- */
+.board{position:relative; height:600px; border-radius:14px; font-size:16px; overflow:hidden;
+  background-color:var(--board);
+  background-image:linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size:30px 30px; box-shadow:inset 0 0 0 1px var(--line), inset 0 20px 40px -30px var(--shadow)}
+.board-hint{position:absolute; left:18px; bottom:14px; font-family:var(--f-kana); font-size:13px; color:var(--ink-soft); display:flex; gap:8px; align-items:center; z-index:0}
+.board-hint svg{width:16px; height:16px; color:var(--gold)}
+.it{position:absolute; left:var(--x); top:var(--y); transform:rotate(var(--r,0deg)); touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none;
+  filter:drop-shadow(0 8px 10px color-mix(in srgb, var(--shadow) 60%, transparent)); transition:filter .4s, scale .4s var(--spring)}
+.it.lift{cursor:grabbing; scale:1.06; filter:drop-shadow(0 22px 22px var(--shadow)); transition:filter .4s, scale .4s var(--spring)}
+.it.settle{transition:transform .8s var(--spring), filter .4s, scale .4s var(--spring)}
+@media (max-width:720px){
+  .board{height:800px; font-size:12.5px}
+  .it{left:var(--mx); top:var(--my)}
+}
+.polaroid{background:var(--card); padding:.6em .6em 2.4em; width:11em; border-radius:2px}
+.polaroid svg{display:block; width:100%; border-radius:1px}
+.polaroid p{position:absolute; left:0; right:0; bottom:.55em; margin:0; text-align:center; font-family:var(--f-kana); font-size:.9em}
+.ticket{width:15em; display:grid; grid-template-columns:3.4em 1fr; background:var(--fuji-soft); border-radius:6px;
+  -webkit-mask:radial-gradient(circle at 3.4em 0, #0000 .5em, #000 .55em) top/100% 51% no-repeat, radial-gradient(circle at 3.4em 100%, #0000 .5em, #000 .55em) bottom/100% 51% no-repeat;
+          mask:radial-gradient(circle at 3.4em 0, #0000 .5em, #000 .55em) top/100% 51% no-repeat, radial-gradient(circle at 3.4em 100%, #0000 .5em, #000 .55em) bottom/100% 51% no-repeat}
+.ticket .stub{writing-mode:vertical-rl; display:grid; place-items:center; border-right:2px dashed color-mix(in srgb, var(--fuji) 60%, transparent); font-family:var(--f-display); letter-spacing:.3em; font-size:.9em; color:var(--fuji); padding:.6em 0}
+.ticket .body{padding:.8em 1em; line-height:1.4}
+.ticket .route{font-family:var(--f-display); font-size:1.4em; letter-spacing:.08em; display:flex; align-items:center; gap:.4em}
+.ticket .route svg{width:1.6em; color:var(--fuji)}
+.ticket .tmeta{font-size:.78em; color:var(--ink-soft); display:flex; justify-content:space-between; margin-top:.4em; font-variant-numeric:tabular-nums}
+.ticket .tmeta b{font-family:var(--f-latin); font-size:1.4em; color:var(--ink); font-weight:500}
+.stamp{width:100px; height:120px; font-size:16px; padding:10px; background:var(--card);
+  -webkit-mask:linear-gradient(#000 0 0) center/calc(100% - 10px) calc(100% - 10px) no-repeat, radial-gradient(circle, #0000 3.2px, #000 3.6px) -5px -5px/10px 10px;
+          mask:linear-gradient(#000 0 0) center/calc(100% - 10px) calc(100% - 10px) no-repeat, radial-gradient(circle, #0000 3.2px, #000 3.6px) -5px -5px/10px 10px}
+.stamp svg{width:100%; height:100%; display:block}
+.stamp-wrap{scale:1}
+@media (max-width:720px){ .stamp-wrap{scale:.82} }
+.pressed{background:var(--card); width:10em; padding:1.2em 1em .8em; border-radius:3px}
+.pressed svg{width:100%; display:block}
+.pressed p{margin:.3em 0 0; font-family:var(--f-kana); font-size:.8em; color:var(--ink-soft); text-align:center; line-height:1.5}
+.pressed .tape{width:5em; height:1.2em; top:-.5em}
+.lined{width:12.5em; padding:1em 1.1em; background:var(--card); border-radius:3px;
+  background-image:linear-gradient(transparent calc(1.9em - 1px), color-mix(in srgb, var(--sky) 50%, transparent) 0); background-size:100% 1.9em; background-position:0 .85em}
+.lined p{margin:0; font-family:var(--f-display); font-size:1.08em; line-height:1.9em; letter-spacing:.06em}
+.lined .pin{position:absolute; top:-.45em; left:50%; width:1em; height:1em; margin-left:-.5em; border-radius:50%; background:radial-gradient(circle at 35% 35%, #fff8, transparent 40%), var(--sakura); box-shadow:0 2px 3px var(--shadow)}
+.letter{width:13em; height:8.6em; position:relative; perspective:600px}
+.letter .back{position:absolute; inset:0; background:color-mix(in srgb, var(--gold-soft) 85%, var(--card)); border-radius:4px}
+.letter .paper{position:absolute; left:.8em; right:.8em; top:.6em; height:7.4em; background:var(--card); border-radius:3px; padding:.8em 1em; font-family:var(--f-kana); font-size:.86em; line-height:1.7; transition:transform .9s var(--ease) .15s; z-index:1; box-shadow:0 1px 3px var(--line)}
+.letter .front{position:absolute; inset:0; z-index:2; border-radius:4px; pointer-events:none;
+  background:linear-gradient(to top right, color-mix(in srgb, var(--gold-soft) 92%, var(--ink)) 50%, transparent 50.5%) left/50% 100% no-repeat,
+             linear-gradient(to top left, color-mix(in srgb, var(--gold-soft) 96%, var(--ink)) 50%, transparent 50.5%) right/50% 100% no-repeat}
+.letter .flap{position:absolute; left:0; right:0; top:0; height:58%; z-index:3; transform-origin:top; transition:transform .8s var(--ease), z-index 0s .4s;
+  background:color-mix(in srgb, var(--gold-soft) 80%, var(--ink)); clip-path:polygon(0 0,100% 0,50% 100%); pointer-events:none}
+.letter .wax{position:absolute; left:50%; top:46%; width:2.4em; height:2.4em; margin:-1.2em 0 0 -1.2em; z-index:4; border-radius:46% 54% 50% 50%; background:var(--shu); color:var(--card);
+  display:grid; place-items:center; font-family:var(--f-brush); font-size:1.15em; box-shadow:inset 0 0 0 .2em color-mix(in srgb, var(--shu) 70%, #000), 0 2px 3px var(--shadow); transition:opacity .4s, transform .6s var(--spring); pointer-events:none}
+.letter.open .flap{transform:rotateX(180deg); z-index:0; transition:transform .8s var(--ease), z-index 0s .4s}
+.letter.open .wax{opacity:0; transform:scale(.4) rotate(40deg)}
+.letter.open .paper{transform:translateY(-5.6em)}
+.letter .tip{position:absolute; bottom:-1.8em; left:0; right:0; text-align:center; font-family:var(--f-kana); font-size:.75em; color:var(--ink-soft)}
+.crane{width:9em}
+.crane svg{width:100%; display:block}
+
+/* ---------- poems ---------- */
+.poems{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(16px,2.4vw,28px)}
+@media (max-width:960px){ .poems{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:440px){ .poems{grid-template-columns:1fr} }
+.pcard{perspective:1100px; aspect-ratio:3/4; max-width:100%; border:0; background:none; padding:0; text-align:inherit; --rx:0deg; --ry:0deg; --flip:0deg}
+.pcard .inner{position:relative; width:100%; height:100%; transform-style:preserve-3d; transform:rotateX(var(--rx)) rotateY(calc(var(--ry) + var(--flip))); transition:transform .9s var(--ease)}
+.pcard.flipped{--flip:180deg}
+.pcard .face2{position:absolute; inset:0; backface-visibility:hidden; -webkit-backface-visibility:hidden; border-radius:10px; overflow:hidden; background:var(--card);
+  box-shadow:0 1px 0 var(--line), 0 24px 40px -28px var(--shadow)}
+.pcard .front{display:grid; place-items:center; color:var(--pc)}
+.pcard .front > svg.pat{position:absolute; inset:0; width:100%; height:100%; opacity:.6}
+.pcard .front::after{content:""; position:absolute; inset:0; background:radial-gradient(circle at var(--mx,50%) var(--my,30%), rgba(255,255,255,.35), transparent 50%); opacity:0; transition:opacity .4s}
+.pcard:hover .front::after{opacity:1}
+.pcard .tag{position:relative; background:var(--card); padding:22px 14px; border-radius:4px; writing-mode:vertical-rl; display:flex; gap:12px; align-items:center;
+  box-shadow:0 0 0 1px var(--line), 0 0 0 6px var(--card), 0 0 0 7px color-mix(in srgb, var(--pc) 50%, transparent)}
+.pcard .tag b{font-family:var(--f-brush); font-weight:400; font-size:clamp(30px,3.4vw,40px); color:var(--ink); letter-spacing:.1em}
+.pcard .tag small{font-family:var(--f-kana); font-size:13px; color:var(--ink-soft); letter-spacing:.2em}
+.pcard .flip-hint{position:absolute; bottom:12px; right:14px; font-family:var(--f-kana); font-size:11px; color:var(--ink); background:var(--card); padding:2px 10px; border-radius:10px; opacity:.85}
+.pcard .back{transform:rotateY(180deg); padding:22px 18px; display:flex; flex-direction:column; gap:10px;
+  background:linear-gradient(color-mix(in srgb, var(--pc) 12%, var(--card)), var(--card))}
+.pcard .verse{writing-mode:vertical-rl; flex:1; min-height:0; font-family:var(--f-display); font-size:clamp(17px,1.7vw,20px); line-height:2; letter-spacing:.16em; margin:0 auto; overflow:hidden}
+.pcard .verse.jp{font-family:var(--f-kana); font-size:clamp(18px,1.9vw,22px)}
+.pcard .by{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-soft); gap:8px}
+.pcard .by i{font-style:normal; width:26px; height:26px; flex:none; border-radius:4px; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-size:14px}
+.pcard .tr{font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin:0}
+
+/* ---------- wish lanterns ---------- */
+.night{position:relative; margin-top:clamp(64px,10vw,120px); border-radius:22px; overflow:hidden; min-height:560px; color:var(--night-ink);
+  background:radial-gradient(ellipse at 70% 0%, #3b3f66 0%, transparent 60%), linear-gradient(var(--night-1), var(--night-2)); isolation:isolate}
+.night .skyfx{position:absolute; inset:0; z-index:0}
+.night .tw{position:absolute; width:2px; height:2px; border-radius:50%; background:#fff; animation:tw 3s ease-in-out infinite}
+@keyframes tw{50%{opacity:.15; transform:scale(.6)}}
+.night .moon2{position:absolute; right:9%; top:12%; width:74px; height:74px; border-radius:50%; background:radial-gradient(circle at 40% 40%, #FFF6DD, #F1D99B); box-shadow:0 0 50px 14px rgba(241,217,155,.28)}
+.night .hills{position:absolute; left:0; right:0; bottom:0; width:100%; height:140px; z-index:1}
+.night .lan-layer{position:absolute; inset:0; z-index:2; pointer-events:none}
+.lan{position:absolute; left:0; top:0; width:58px; will-change:transform, opacity}
+.lan svg{width:100%; display:block; overflow:visible}
+.lan .w{position:absolute; left:50%; top:20%; transform:translateX(-50%); writing-mode:vertical-rl; font-family:var(--f-display); font-size:11px; letter-spacing:.1em; color:#6A3A1F; max-height:60%; overflow:hidden; line-height:1.3}
+.night .inner2{position:relative; z-index:3; padding:clamp(28px,5vw,56px); display:flex; flex-direction:column; gap:14px; max-width:560px}
+.night .eyebrow{color:#C9C3D9}
+.night .sec-title{color:var(--night-ink)}
+.night .sec-sub{color:#C9C3D9}
+.wish-form{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap}
+.wish-form input{flex:1 1 220px; min-width:0; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18); color:var(--night-ink); border-radius:24px; padding:12px 20px; outline:none; transition:border-color .3s, background-color .3s}
+.wish-form input::placeholder{color:#A9A3BC}
+.wish-form input:focus{border-color:#F1D99B; background:rgba(255,255,255,.12)}
+.wish-form button{border:0; border-radius:24px; padding:12px 22px; background:#F1D99B; color:#3A2A14; font-family:var(--f-display); letter-spacing:.14em; transition:transform .4s var(--spring), box-shadow .4s}
+.wish-form button:hover{transform:translateY(-2px); box-shadow:0 0 30px rgba(241,217,155,.5)}
+.wish-count{font-size:13px; color:#C9C3D9; margin:0}
+.wish-count button{border:0; background:none; color:#F1D99B; text-decoration:underline; text-underline-offset:3px; font-size:13px; padding:0 4px}
+
+/* ---------- footer ---------- */
+footer{padding-block:clamp(70px,10vw,120px) 50px; text-align:center}
+footer .bigbrush{font-family:var(--f-brush); font-size:clamp(80px,16vw,180px); line-height:1; color:var(--ink); opacity:.08; margin:0; letter-spacing:.1em}
+footer .line{font-family:var(--f-display); font-size:clamp(18px,2.2vw,24px); letter-spacing:.12em; margin:-.9em 0 18px; text-wrap:balance}
+footer .credit{font-size:13px; color:var(--ink-soft); max-width:40em; margin:18px auto 0}
+footer .seal-row{display:flex; justify-content:center; gap:14px; align-items:center}
+footer .seal-sq{width:44px; height:44px; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-size:22px; border-radius:6px; transform:rotate(-5deg); box-shadow:inset 0 0 0 2px var(--shu), inset 0 0 0 3.5px var(--card)}
+footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-items:center; border:2px solid var(--shu); color:var(--shu); font-family:var(--f-brush); font-size:20px; transform:rotate(8deg)}
+
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
+  #petals,.cursor{display:none}
+}
+</style>
+
+<!-- shared vector defs: 纹样 / 印章 -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <pattern id="p-sei" width="40" height="20" patternUnits="userSpaceOnUse">
+      <g fill="var(--card)" stroke="var(--celadon)" stroke-width="1.4">
+        <g transform="translate(20 0)"><circle r="19"/><circle r="14"/><circle r="9"/><circle r="4"/></g>
+        <g transform="translate(0 10)"><circle r="19"/><circle r="14"/><circle r="9"/><circle r="4"/></g>
+        <g transform="translate(40 10)"><circle r="19"/><circle r="14"/><circle r="9"/><circle r="4"/></g>
+        <g transform="translate(20 20)"><circle r="19"/><circle r="14"/><circle r="9"/><circle r="4"/></g>
+      </g>
+    </pattern>
+    <pattern id="p-shippo" width="24" height="24" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="var(--sakura)" stroke-width="1.3"><circle cx="0" cy="0" r="12"/><circle cx="24" cy="0" r="12"/><circle cx="0" cy="24" r="12"/><circle cx="24" cy="24" r="12"/><circle cx="12" cy="12" r="12"/></g>
+    </pattern>
+    <pattern id="p-ichi" width="18" height="18" patternUnits="userSpaceOnUse">
+      <rect width="9" height="9" fill="var(--gold)" opacity=".45"/><rect x="9" y="9" width="9" height="9" fill="var(--gold)" opacity=".45"/>
+    </pattern>
+    <pattern id="p-dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="5" cy="5" r="3.2" fill="var(--fuji)" opacity=".6"/><circle cx="15" cy="15" r="2" fill="var(--fuji)" opacity=".45"/>
+    </pattern>
+    <symbol id="st-flower" viewBox="0 0 40 40"><g fill="var(--sakura)"><circle cx="20" cy="9" r="8"/><circle cx="30.5" cy="16.6" r="8"/><circle cx="26.5" cy="29" r="8"/><circle cx="13.5" cy="29" r="8"/><circle cx="9.5" cy="16.6" r="8"/></g><circle cx="20" cy="20" r="5" fill="var(--gold)"/></symbol>
+    <symbol id="st-star" viewBox="0 0 40 40"><path d="M20 3l4.9 10.6 11.6 1.3-8.6 7.9 2.4 11.4L20 28.4 9.7 34.2l2.4-11.4-8.6-7.9 11.6-1.3z" fill="var(--gold)" stroke="var(--gold)" stroke-width="3" stroke-linejoin="round"/></symbol>
+    <symbol id="st-heart" viewBox="0 0 40 40"><path d="M20 35S4 25 4 14.5A8.5 8.5 0 0 1 20 10a8.5 8.5 0 0 1 16 4.5C36 25 20 35 20 35z" fill="var(--celadon)"/></symbol>
+    <linearGradient id="lan-g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE7A6"/><stop offset=".55" stop-color="#F6B25C"/><stop offset="1" stop-color="#E07A3C"/></linearGradient>
+    <radialGradient id="lan-glow"><stop offset="0" stop-color="#FFD58A" stop-opacity=".75"/><stop offset="1" stop-color="#FFD58A" stop-opacity="0"/></radialGradient>
+  </defs>
+</svg>
+
+<canvas id="petals" aria-hidden="true"></canvas>
+<div class="cursor" aria-hidden="true"></div>
+<div class="ribbon" aria-hidden="true"></div>
+
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#top" aria-label="拾光手帐 回到顶部"><span class="seal-mini" aria-hidden="true">拾</span><b>拾光手帐</b></a>
+    <ul>
+      <li><a href="#today">今日</a></li>
+      <li><a href="#jieqi">节气</a></li>
+      <li><a href="#collect">拾物</a></li>
+      <li><a href="#poems">诗笺</a></li>
+      <li><a href="#wish">心愿</a></li>
+    </ul>
+    <button class="theme-btn" id="themeBtn" aria-label="切换日夜">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path id="themeIcon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <!-- ========== HERO ========== -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-l">
+        <h1 class="vtitle" aria-label="拾光手帐"><span class="ink" aria-hidden="true"><span>拾</span><span>光</span><span>手</span><span>帐</span></span><span class="seal" aria-hidden="true"><span>月</span><span>白</span><span>小</span><span>记</span></span></h1>
+        <div class="hero-meta">
+          <div class="dateline ink-in" style="animation-delay:.5s"><span id="dGreg">二〇二六年十月三日</span><span id="dLunar">丙午年八月廿三</span><span id="dWeek">星期六</span></div>
+          <p class="hero-lead ink-in" style="animation-delay:.7s">把日子写成<em>一页一页</em>温柔的纸，<br>收好今天的风、月光与一杯热茶。</p>
+          <p class="kana-line ink-in" style="animation-delay:.85s">きょうも、いい日でありますように。</p>
+          <div class="moon-chip ink-in" style="animation-delay:1s"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="var(--moon-dark)" stroke="var(--line)"/><path id="moonMini" fill="var(--gold)"/></svg><span id="moonTxt">今夜月相</span></div>
+          <div class="hero-cta ink-in" style="animation-delay:1.15s">
+            <a class="btn ink" href="#today">翻开今天 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h15M14 6l6 6-6 6"/></svg></a>
+            <a class="btn soft" href="#jieqi">看看节气</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="gate-wrap" id="gate">
+        <span class="tape check hero-tape-1" aria-hidden="true"></span>
+        <span class="tape gold hero-tape-2" aria-hidden="true"></span>
+        <svg class="gate" viewBox="0 0 400 400" role="img" aria-label="圆窗里的秋夜：月亮、远山、湖上小舟与一枝桂花">
+          <defs>
+            <clipPath id="gateClip"><circle cx="200" cy="200" r="184"/></clipPath>
+            <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky-top)"/><stop offset="1" style="stop-color:var(--sky-bot)"/></linearGradient>
+            <radialGradient id="moonGlow"><stop offset="0" style="stop-color:var(--gold)" stop-opacity=".45"/><stop offset="1" style="stop-color:var(--gold)" stop-opacity="0"/></radialGradient>
+            <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--card)" stop-opacity="0"/><stop offset=".5" style="stop-color:var(--card)" stop-opacity=".55"/><stop offset="1" style="stop-color:var(--card)" stop-opacity="0"/></linearGradient>
+          </defs>
+          <g class="scene" clip-path="url(#gateClip)">
+            <rect width="400" height="400" fill="url(#skyG)"/>
+            <g class="layer" data-depth="0.15">
+              <circle class="star" cx="80" cy="90" r="1.4"/><circle class="star" cx="140" cy="60" r="1" style="animation-delay:-1s"/><circle class="star" cx="190" cy="110" r="1.2" style="animation-delay:-2s"/>
+              <circle class="star" cx="330" cy="60" r="1.1" style="animation-delay:-.5s"/><circle class="star" cx="110" cy="150" r=".9" style="animation-delay:-2.6s"/><circle class="star" cx="355" cy="170" r="1.3" style="animation-delay:-1.7s"/>
+            </g>
+            <g class="layer" data-depth="0.3">
+              <circle cx="275" cy="118" r="80" fill="url(#moonGlow)"/>
+              <circle cx="275" cy="118" r="36" fill="var(--moon-dark)"/>
+              <path id="moonLit" fill="var(--gold)" opacity=".92"/>
+            </g>
+            <g class="layer" data-depth="0.45">
+              <path class="cloud" d="M0 150c8-12 26-12 32-2 6-10 24-10 28 2 10-2 18 4 18 10H-6c-2-6 0-9 6-10z"/>
+              <path class="cloud c2" d="M0 205c6-9 20-9 25-1 5-8 19-8 22 2 8-2 14 3 14 8H-5c-1-5 0-8 5-9z"/>
+            </g>
+            <g class="bird"><path class="wing" d="M0 0q5-5 10 0q5-5 10 0"/><path class="wing" d="M18 10q4-4 8 0q4-4 8 0" style="animation-delay:-.3s"/></g>
+            <g class="layer" data-depth="0.6"><path fill="var(--mt3)" d="M0 250C40 215 70 205 110 225S170 190 210 210S290 175 330 205S380 220 400 210V400H0Z"/></g>
+            <rect y="230" width="400" height="70" fill="url(#mist)"/>
+            <g class="layer" data-depth="0.9"><path fill="var(--mt2)" d="M0 285C50 255 90 262 130 275S200 245 245 265S320 280 360 258S395 262 400 266V400H0Z"/></g>
+            <rect y="328" width="400" height="80" fill="var(--water)"/>
+            <g class="shimmer"><line x1="262" y1="342" x2="290" y2="342"/><line x1="268" y1="352" x2="284" y2="352" style="animation-delay:-1s"/><line x1="258" y1="362" x2="292" y2="362" style="animation-delay:-2s"/><line x1="270" y1="372" x2="282" y2="372" style="animation-delay:-.5s"/></g>
+            <g class="layer" data-depth="1.3"><path fill="var(--mt1)" d="M0 300C45 288 95 300 150 332H0Z"/></g>
+            <g class="layer" data-depth="1.5"><g class="boat">
+              <circle class="lamp-glow" cx="186" cy="330" r="9" opacity=".3"/>
+              <path d="M150 340Q172 350 198 340L194 346Q172 353 154 346Z" fill="var(--ink)"/>
+              <path d="M170 340V324M168 326l8 6" stroke="var(--ink)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+              <circle cx="170" cy="321" r="3" fill="var(--ink)"/>
+              <path d="M164 324l12-4 0 3z" fill="var(--ink)"/>
+              <line x1="186" y1="333" x2="186" y2="340" stroke="var(--ink)" stroke-width="1"/>
+              <circle cx="186" cy="331" r="2.6" fill="var(--gold)"/>
+            </g></g>
+          </g>
+          <circle class="frame" cx="200" cy="200" r="184"/>
+          <circle class="frame2" cx="200" cy="200" r="194"/>
+          <g class="layer" data-depth="2.1"><g class="branch">
+            <path class="twig" stroke-width="4" d="M-10 30C30 40 70 46 120 74S170 96 196 98"/>
+            <path class="twig" stroke-width="2.4" d="M60 46C64 64 76 78 92 86M120 74C126 60 140 52 156 50"/>
+            <g class="leaf">
+              <ellipse cx="44" cy="52" rx="15" ry="6" transform="rotate(28 44 52)"/><ellipse cx="80" cy="36" rx="14" ry="5.5" transform="rotate(-24 80 36)"/>
+              <ellipse cx="102" cy="92" rx="15" ry="6" transform="rotate(48 102 92)"/><ellipse cx="146" cy="70" rx="14" ry="5.5" transform="rotate(14 146 70)"/>
+              <ellipse cx="170" cy="46" rx="13" ry="5" transform="rotate(-18 170 46)"/><ellipse cx="184" cy="108" rx="13" ry="5" transform="rotate(30 184 108)"/>
+            </g>
+            <g class="bud">
+              <circle cx="62" cy="50" r="3"/><circle cx="67" cy="54" r="2.6"/><circle cx="58" cy="56" r="2.4"/><circle cx="64" cy="60" r="2"/>
+              <circle cx="122" cy="80" r="3"/><circle cx="127" cy="74" r="2.4"/><circle cx="117" cy="86" r="2.6"/><circle cx="125" cy="86" r="2"/>
+              <circle cx="158" cy="52" r="2.6"/><circle cx="162" cy="58" r="2.2"/><circle cx="153" cy="57" r="2"/>
+              <circle cx="190" cy="96" r="2.6"/><circle cx="196" cy="102" r="2"/>
+            </g>
+          </g></g>
+        </svg>
+        <button class="furin" id="furin" aria-label="风铃，点一下听听">
+          <svg viewBox="0 0 60 170" aria-hidden="true">
+            <line x1="30" y1="0" x2="30" y2="40" stroke="var(--ink-soft)" stroke-width="1"/>
+            <g id="furinBody">
+              <path d="M10 66C10 46 18 38 30 38S50 46 50 66Z" fill="var(--sky)" opacity=".55" stroke="var(--ink)" stroke-width="1.2"/>
+              <path d="M16 56c4-8 10-11 14-11" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/>
+              <path d="M14 60q4-4 8 0t8 0 8 0 8 0" stroke="var(--shu)" stroke-width="1.4" fill="none"/>
+              <circle cx="22" cy="52" r="2" fill="var(--sakura)"/><circle cx="36" cy="49" r="1.6" fill="var(--sakura)"/>
+              <line x1="30" y1="66" x2="30" y2="96" stroke="var(--ink-soft)" stroke-width="1"/>
+              <circle cx="30" cy="62" r="3" fill="var(--ink)"/>
+              <g id="furinStrip">
+                <rect x="20" y="96" width="20" height="62" rx="1.5" fill="var(--sakura-soft)" stroke="var(--sakura)" stroke-width="1"/>
+                <text x="30" y="118" text-anchor="middle" font-family="Ma Shan Zheng, KaiTi, serif" font-size="15" fill="var(--ink)">秋</text>
+                <text x="30" y="140" text-anchor="middle" font-family="Ma Shan Zheng, KaiTi, serif" font-size="15" fill="var(--ink)">風</text>
+              </g>
+            </g>
+          </svg>
+          <span class="hint">りん…</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== TODAY ========== -->
+  <section class="sec" id="today">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <div class="eyebrow">きょうのページ</div>
+          <h2 class="sec-title">今日 · 小记<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12C60 4 120 15 180 8S270 6 296 10"/></svg></h2>
+          <p class="sec-sub">心情、待办、喝水和打卡，记在这一页。内容只保存在你自己的浏览器里。</p>
+        </div>
+        <svg class="postmark rv" viewBox="0 0 120 120" aria-hidden="true">
+          <defs><path id="pmArc" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1 -88 0"/></defs>
+          <circle cx="60" cy="60" r="54" fill="none" stroke="currentColor" stroke-width="2"/>
+          <circle cx="60" cy="60" r="34" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <text font-size="10.5" letter-spacing="2.2"><textPath href="#pmArc">SHIGUANG · 拾光郵便 · TOKYO ⁄ HANGZHOU ·</textPath></text>
+          <text id="pmDate" x="60" y="58" text-anchor="middle" font-size="17">10.03</text>
+          <text id="pmYear" x="60" y="75" text-anchor="middle" font-size="12" letter-spacing="2">2026</text>
+          <path d="M8 98q10-6 20 0t20 0 20 0 20 0 20 0" fill="none" stroke="currentColor" stroke-width="1.2"/>
+          <path d="M8 106q10-6 20 0t20 0 20 0 20 0 20 0" fill="none" stroke="currentColor" stroke-width="1.2"/>
+        </svg>
+      </div>
+
+      <div class="today-grid">
+        <article class="note c-mood rv" id="moodCard">
+          <span class="tape stripe" style="top:-11px;left:24px;transform:rotate(-4deg)" aria-hidden="true"></span>
+          <h3>今日心情 <small>きもち</small></h3>
+          <div class="moods" id="moods" role="group" aria-label="选择今日心情"></div>
+          <p class="mood-say" id="moodSay" aria-live="polite">点一张小脸，记下此刻的心情。</p>
+        </article>
+
+        <article class="note c-todo rv">
+          <span class="tape dots" style="top:-12px;right:40px;transform:rotate(5deg)" aria-hidden="true"></span>
+          <div class="todo-top">
+            <div>
+              <h3>今日待办 <small>やること</small></h3>
+              <p class="meta" id="todoMeta">已完成 0 / 0，小苗在等你浇水。</p>
+            </div>
+            <svg class="plant" id="plant" viewBox="0 0 76 86" aria-hidden="true">
+              <path class="stem" d="M38 62V18"/>
+              <path class="lf l1" d="M38 48c-12 0-18-6-18-12 10 0 18 4 18 12z"/>
+              <path class="lf l2" d="M38 38c12 0 18-6 18-12-10 0-18 4-18 12z"/>
+              <path class="lf l3" d="M38 28c-9 0-14-5-14-10 8 0 14 3 14 10z"/>
+              <g class="fl"><circle class="pt" cx="38" cy="10" r="5"/><circle class="pt" cx="44" cy="15" r="5"/><circle class="pt" cx="32" cy="15" r="5"/><circle class="pt" cx="41" cy="21" r="5"/><circle class="pt" cx="35" cy="21" r="5"/><circle class="cn" cx="38" cy="16" r="3.4"/></g>
+              <path class="pot" d="M20 60h36l-4 22H24z"/><rect class="pot2" x="17" y="57" width="42" height="7" rx="2"/>
+            </svg>
+          </div>
+          <ul class="todo-list" id="todoList"></ul>
+          <form class="todo-add" id="todoForm">
+            <label class="sr" for="todoInput">新的待办</label>
+            <input id="todoInput" maxlength="40" placeholder="再写一件小事……" autocomplete="off">
+            <button class="mini-btn" type="submit">写下</button>
+          </form>
+        </article>
+
+        <article class="note c-cal rv">
+          <span class="tape check" style="top:-12px;left:46%;transform:rotate(-2deg)" aria-hidden="true"></span>
+          <h3><span id="calTitle">十月</span> · 打卡 <small>スタンプ</small></h3>
+          <div class="cal" id="cal"></div>
+          <div class="cal-foot"><span>点一下日期，盖一枚小印章；再点一下换个花样。</span><span id="calCount">本月 0 枚</span></div>
+        </article>
+
+        <article class="note c-water rv">
+          <span class="tape sky" style="top:-11px;right:28px;transform:rotate(3deg)" aria-hidden="true"></span>
+          <h3>今日饮水 <small>おみず</small></h3>
+          <div class="cups" id="cups" role="group" aria-label="今日饮水杯数"></div>
+          <p class="water-say" id="waterSay"><b>0</b> / 8 杯</p>
+          <p class="meta">每杯约 250ml。点第几杯，就记到第几杯。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== JIEQI ========== -->
+  <section class="sec" id="jieqi">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <div class="eyebrow">にじゅうしせっき</div>
+          <h2 class="sec-title">二十四节气 · 罗盘<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 10C70 15 130 4 200 10S270 13 296 8"/></svg></h2>
+          <p class="sec-sub">拖动或点击罗盘转到任一节气，看它的三候。背景里飘落的东西也会跟着季节变化：春樱、夏萤、秋叶与桂花、冬雪。</p>
+        </div>
+      </div>
+      <div class="jq">
+        <div class="wheel-box rv" id="wheelBox" tabindex="0" aria-label="节气罗盘，可用左右方向键旋转">
+          <svg class="pointer" viewBox="0 0 30 26" aria-hidden="true"><path d="M15 26L3 6Q15-2 27 6Z" fill="var(--shu)"/><circle cx="15" cy="8" r="3" fill="var(--card)"/></svg>
+          <svg viewBox="0 0 520 520" aria-hidden="true"><g id="wheel"></g></svg>
+          <div class="wheel-center"><div class="nm" id="wcName">秋分</div><div class="py" id="wcPy">qiū fēn</div></div>
+        </div>
+        <article class="note jq-card rv" id="jqCard" aria-live="polite">
+          <span class="tape gold" style="top:-12px;left:30px;transform:rotate(-5deg)" aria-hidden="true"></span>
+          <div id="jqBody">
+            <p class="big" id="jqName">秋分</p>
+            <div class="row"><span class="date" id="jqDate">9月23日前后</span><span class="chip" id="jqSeason">秋 · 第四个节气</span></div>
+            <ul class="hou" id="jqHou"></ul>
+            <p class="jq-note" id="jqNote"></p>
+          </div>
+          <div class="jq-ctrl">
+            <button class="round" id="jqPrev" aria-label="上一个节气"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <button class="round" id="jqNext" aria-label="下一个节气"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 5l7 7-7 7"/></svg></button>
+            <button class="mini-btn" id="jqToday">回到当下</button>
+            <span class="countdown" id="jqCount"></span>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== COLLECT ========== -->
+  <section class="sec" id="collect">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <div class="eyebrow">たからもの</div>
+          <h2 class="sec-title">拾物 · 小收藏<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 8C60 14 140 4 200 11S270 9 296 12"/></svg></h2>
+          <p class="sec-sub">一张车票、一枚邮票、一枝压干的桂花。拖动它们，摆成你喜欢的样子；点一下信封，拆开来读。</p>
+        </div>
+      </div>
+      <div class="board rv" id="board">
+        <div class="board-hint"><svg viewBox="0 0 40 40" aria-hidden="true"><use href="#st-star"/></svg>可以拖动 · 位置会被记住</div>
+
+        <div class="it" id="it-latte" style="--x:3%;--y:7%;--mx:4%;--my:2%;--r:-6deg">
+          <div class="polaroid">
+            <svg viewBox="0 0 160 150" aria-hidden="true">
+              <rect width="160" height="150" fill="var(--sakura-soft)"/>
+              <circle cx="128" cy="30" r="40" fill="var(--card)" opacity=".5"/>
+              <rect x="0" y="112" width="160" height="38" fill="var(--board)"/>
+              <path d="M52 40h56l-6 76a6 6 0 0 1-6 5H64a6 6 0 0 1-6-5z" fill="var(--card)" opacity=".75" stroke="var(--ink-soft)" stroke-width="1.2"/>
+              <path d="M56 78h48l-3 38a6 6 0 0 1-6 5H65a6 6 0 0 1-6-5z" fill="var(--celadon)"/>
+              <path d="M55 64h50l-1 14H56z" fill="#F7F1E6"/>
+              <path d="M53 50h54l-1 14H54z" fill="#F7F1E6" opacity=".7"/>
+              <rect x="88" y="16" width="5" height="62" rx="2" transform="rotate(14 90 47)" fill="var(--sakura)"/>
+              <circle cx="66" cy="94" r="5" fill="#F7F1E6" opacity=".5"/><circle cx="90" cy="104" r="4" fill="#F7F1E6" opacity=".4"/>
+              <path d="M76 58c-4-6 4-9 4-3 0-6 8-3 4 3l-4 4z" fill="var(--sakura)"/>
+            </svg>
+            <p>15:00 の抹茶ラテ</p>
+          </div>
+        </div>
+
+        <div class="it" id="it-ticket" style="--x:28%;--y:6%;--mx:44%;--my:3%;--r:4deg">
+          <div class="ticket">
+            <div class="stub">乘车券</div>
+            <div class="body">
+              <div class="route">嵐山 <svg viewBox="0 0 30 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M1 6h26M22 1l5 5-5 5"/></svg> 嵯峨</div>
+              <div class="tmeta"><span>2026 · 09 · 27</span><span>一号车厢 07番</span></div>
+              <div class="tmeta"><span>小火车 · 片道</span><b>¥240</b></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="it stamp-wrap" id="it-stamp" style="--x:61%;--y:8%;--mx:62%;--my:24%;--r:-3deg">
+          <div class="stamp">
+            <svg viewBox="0 0 80 100" aria-hidden="true">
+              <rect width="80" height="100" fill="var(--celadon-soft)"/>
+              <circle cx="54" cy="34" r="18" fill="var(--shu)" opacity=".85"/>
+              <path d="M8 74c14-8 22-2 34-6s20-12 30-6v38H8z" fill="var(--celadon)"/>
+              <path d="M14 46l14 4 10-12 2 12 14 2-12 4 4 10-8-8-14 6z" fill="var(--card)" stroke="var(--ink)" stroke-width=".8" stroke-linejoin="round"/>
+              <circle cx="40" cy="41" r="1.6" fill="var(--shu)"/>
+              <text x="6" y="14" font-family="ZCOOL XiaoWei, serif" font-size="9" fill="var(--ink)">月白郵便</text>
+              <text x="74" y="94" text-anchor="end" font-family="Cormorant Garamond, serif" font-size="18" fill="var(--ink)">84</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="it" id="it-letter" style="--x:76%;--y:38%;--mx:30%;--my:64%;--r:5deg" data-click="letter">
+          <div class="letter" id="letter">
+            <div class="back"></div>
+            <div class="paper">致十月的自己：<br>慢一点也没关系，<br>花会开，月会圆。</div>
+            <div class="front"></div>
+            <div class="flap"></div>
+            <div class="wax">封</div>
+            <div class="tip">点一下拆信</div>
+          </div>
+        </div>
+
+        <div class="it" id="it-flower" style="--x:5%;--y:56%;--mx:4%;--my:36%;--r:3deg">
+          <div class="pressed">
+            <span class="tape stripe" style="left:2.6em;transform:rotate(-8deg)" aria-hidden="true"></span>
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <path d="M20 110C40 80 60 60 100 20" stroke="var(--bark)" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+              <path d="M50 74C40 64 30 62 22 64M70 52C82 46 92 48 100 52" stroke="var(--bark)" stroke-width="1.4" fill="none"/>
+              <g fill="var(--celadon)"><ellipse cx="32" cy="70" rx="14" ry="5" transform="rotate(20 32 70)"/><ellipse cx="88" cy="44" rx="14" ry="5" transform="rotate(-10 88 44)"/><ellipse cx="62" cy="86" rx="13" ry="5" transform="rotate(50 62 86)"/><ellipse cx="82" cy="66" rx="12" ry="4.6" transform="rotate(40 82 66)"/></g>
+              <g fill="var(--gold)"><circle cx="52" cy="66" r="3.4"/><circle cx="58" cy="70" r="3"/><circle cx="56" cy="62" r="2.6"/><circle cx="72" cy="46" r="3.2"/><circle cx="76" cy="52" r="2.6"/><circle cx="68" cy="52" r="2.4"/><circle cx="96" cy="26" r="3"/><circle cx="92" cy="30" r="2.4"/><circle cx="40" cy="86" r="2.8"/><circle cx="46" cy="90" r="2.2"/></g>
+            </svg>
+            <p>九月廿五 · 中秋<br>院子里的桂花</p>
+          </div>
+        </div>
+
+        <div class="it" id="it-note" style="--x:36%;--y:48%;--mx:52%;--my:44%;--r:-4deg">
+          <div class="lined"><span class="pin" aria-hidden="true"></span><p>桂花开了，<br>香气跟了我一路。<br>晚饭想吃栗子饭。</p></div>
+        </div>
+
+        <div class="it" id="it-crane" style="--x:58%;--y:56%;--mx:62%;--my:84%;--r:-8deg">
+          <div class="crane">
+            <svg viewBox="0 0 140 110" aria-hidden="true">
+              <path d="M70 60L20 10l44 30z" fill="var(--sakura)"/>
+              <path d="M70 60L64 40l-44-30z" fill="color-mix(in srgb, var(--sakura) 75%, var(--ink))"/>
+              <path d="M70 60l58-48-40 36z" fill="var(--fuji)"/>
+              <path d="M70 60l18-12 40-36z" fill="color-mix(in srgb, var(--fuji) 75%, var(--ink))"/>
+              <path d="M70 60l-40 30 26-4z" fill="var(--sakura)"/>
+              <path d="M30 90l-8-10 8 2z" fill="color-mix(in srgb, var(--sakura) 70%, var(--ink))"/>
+              <path d="M70 60l40 20-28 4z" fill="var(--fuji)"/>
+              <path d="M70 60l12 24-26 2z" fill="color-mix(in srgb, var(--sakura) 85%, var(--ink))"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== POEMS ========== -->
+  <section class="sec" id="poems">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <div class="eyebrow">うたのしおり</div>
+          <h2 class="sec-title">诗笺 · 四枚<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12C80 6 140 14 210 8S275 10 296 9"/></svg></h2>
+          <p class="sec-sub">两首俳句，两首唐诗。每张背面印着纹样：青海波、七宝、市松、水玉。点开翻面。</p>
+        </div>
+      </div>
+      <div class="poems">
+        <button class="pcard rv" style="--pc:var(--celadon)" aria-label="诗笺：古池，松尾芭蕉。点按翻面">
+          <div class="inner">
+            <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-sei)"/></svg>
+              <div class="tag"><b>古池</b><small>松尾芭蕉</small></div><span class="flip-hint">青海波</span></div>
+            <div class="face2 back">
+              <p class="verse jp">古池や<br>蛙飛びこむ<br>水の音</p>
+              <p class="tr">古池塘，青蛙跳入，水的声音。</p>
+              <div class="by"><span>芭蕉 · 一六八六</span><i>俳</i></div>
+            </div>
+          </div>
+        </button>
+        <button class="pcard rv" style="--pc:var(--sakura)" aria-label="诗笺：露之世，小林一茶。点按翻面">
+          <div class="inner">
+            <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-shippo)"/></svg>
+              <div class="tag"><b>露の世</b><small>小林一茶</small></div><span class="flip-hint">七宝</span></div>
+            <div class="face2 back">
+              <p class="verse jp">露の世は<br>露の世ながら<br>さりながら</p>
+              <p class="tr">露水的世呀，虽然是露水的世，虽然是如此。（周作人 译）</p>
+              <div class="by"><span>一茶 · 一八一九</span><i>俳</i></div>
+            </div>
+          </div>
+        </button>
+        <button class="pcard rv" style="--pc:var(--gold)" aria-label="诗笺：山行，杜牧。点按翻面">
+          <div class="inner">
+            <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-ichi)"/></svg>
+              <div class="tag"><b>山行</b><small>唐 · 杜牧</small></div><span class="flip-hint">市松</span></div>
+            <div class="face2 back">
+              <p class="verse">远上寒山石径斜<br>白云生处有人家<br>停车坐爱枫林晚<br>霜叶红于二月花</p>
+              <div class="by"><span>七言绝句</span><i>诗</i></div>
+            </div>
+          </div>
+        </button>
+        <button class="pcard rv" style="--pc:var(--fuji)" aria-label="诗笺：山居秋暝，王维。点按翻面">
+          <div class="inner">
+            <div class="face2 front"><svg class="pat" aria-hidden="true"><rect width="100%" height="100%" fill="url(#p-dots)"/></svg>
+              <div class="tag"><b>秋暝</b><small>唐 · 王维</small></div><span class="flip-hint">水玉</span></div>
+            <div class="face2 back">
+              <p class="verse">空山新雨后<br>天气晚来秋<br>明月松间照<br>清泉石上流</p>
+              <div class="by"><span>《山居秋暝》前四句</span><i>诗</i></div>
+            </div>
+          </div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== WISH ========== -->
+  <section id="wish">
+    <div class="wrap">
+      <div class="night rv">
+        <div class="skyfx" id="skyfx" aria-hidden="true"><div class="moon2"></div></div>
+        <svg class="hills" viewBox="0 0 1200 140" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M0 80C150 40 260 70 380 60S600 20 760 50 1000 40 1200 60V140H0Z" fill="#20253D"/>
+          <path d="M0 110C200 80 330 104 520 96S860 70 1200 100V140H0Z" fill="#171B2E"/>
+        </svg>
+        <div class="lan-layer" id="lanLayer" aria-hidden="true"></div>
+        <div class="inner2">
+          <div class="eyebrow">ねがいごと</div>
+          <h2 class="sec-title">心愿 · 放一盏灯<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 10C70 4 150 14 210 9S275 7 296 11"/></svg></h2>
+          <p class="sec-sub">写一个小小的心愿，把它装进纸灯里，看它慢慢飘上夜空。灯会一直在这片天上转着。</p>
+          <form class="wish-form" id="wishForm">
+            <label class="sr" for="wishInput">我的心愿</label>
+            <input id="wishInput" maxlength="14" placeholder="例如：想去看一次初雪" autocomplete="off">
+            <button type="submit">放一盏灯</button>
+          </form>
+          <p class="wish-count" id="wishCount">天上还没有你的灯。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="bigbrush" aria-hidden="true">拾光</p>
+    <p class="line">日子一页一页翻过去，愿每一页都有一点光。</p>
+    <div class="seal-row" aria-hidden="true"><span class="seal-sq">月</span><span class="seal-rd">安</span></div>
+    <p class="credit">页面中的插画、纹样与印章均为手绘矢量。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+"use strict";
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const SVGNS='http://www.w3.org/2000/svg';
+const store={
+  get(k,d){try{const v=localStorage.getItem('shiguang.'+k);return v==null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('shiguang.'+k,JSON.stringify(v))}catch(e){}}
+};
+const now=new Date();
+const CN='〇一二三四五六七八九';
+const cnNum=n=>String(n).split('').map(d=>CN[d]).join('');
+const cnDay=n=>n<=10?(n===10?'十':CN[n]):n<20?'十'+CN[n-10]:(n%10===0?CN[n/10]+'十':CN[Math.floor(n/10)]+'十'+CN[n%10]);
+const dayKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const todayKey=dayKey(now);
+
+/* ---------- theme ---------- */
+const root=document.documentElement;
+const themeBtn=$('#themeBtn'), themeIcon=$('#themeIcon');
+const isDark=()=>root.dataset.theme?root.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches;
+function paintIcon(){themeIcon.setAttribute('d',isDark()
+  ?'M12 4V2M12 22v-2M4 12H2M22 12h-2M5.6 5.6 4.2 4.2M19.8 19.8l-1.4-1.4M5.6 18.4l-1.4 1.4M19.8 4.2l-1.4 1.4M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10z'
+  :'M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z');}
+const savedTheme=store.get('theme',null); if(savedTheme) root.dataset.theme=savedTheme;
+paintIcon();
+themeBtn.addEventListener('click',()=>{root.dataset.theme=isDark()?'light':'dark';store.set('theme',root.dataset.theme);paintIcon();readColors();});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{paintIcon();readColors();});
+
+/* ---------- dates & moon ---------- */
+const week='日一二三四五六';
+$('#dGreg').textContent=cnNum(now.getFullYear())+'年'+cnDay(now.getMonth()+1).replace(/^一十/,'十')+'月'+cnDay(now.getDate())+'日';
+$('#dWeek').textContent='星期'+week[now.getDay()];
+try{
+  const parts=new Intl.DateTimeFormat('zh-CN-u-ca-chinese',{year:'numeric',month:'long',day:'numeric'}).formatToParts(now);
+  const g=t=>(parts.find(p=>p.type===t)||{}).value||'';
+  let y=g('yearName')||g('relatedYear'); let m=g('month'); let d=g('day');
+  if(/^\d+$/.test(d)){const n=+d; d=n===10?'初十':n<=10?'初'+CN[n]:n<20?'十'+CN[n-10]:n===20?'二十':n<30?'廿'+CN[n-20]:'三十';}
+  if(y&&m&&d) $('#dLunar').textContent=(/年$/.test(y)?y:y+'年')+m+d;
+}catch(e){}
+$('#pmDate').textContent=String(now.getMonth()+1).padStart(2,'0')+'.'+String(now.getDate()).padStart(2,'0');
+$('#pmYear').textContent=now.getFullYear();
+$('#footYear').textContent=cnNum(now.getFullYear());
+
+const SYN=29.530588853, age=(((now-Date.UTC(2000,0,6,18,14))/864e5)%SYN+SYN)%SYN, ph=age/SYN;
+const illum=(1-Math.cos(2*Math.PI*ph))/2;
+function moonPath(cx,cy,r){
+  const rx=Math.abs(Math.cos(2*Math.PI*ph))*r, wax=ph<.5, cres=illum<.5;
+  if(illum<.02) return '';
+  if(wax) return `M${cx} ${cy-r}A${r} ${r} 0 0 1 ${cx} ${cy+r}A${rx} ${r} 0 0 ${cres?0:1} ${cx} ${cy-r}Z`;
+  return `M${cx} ${cy-r}A${r} ${r} 0 0 0 ${cx} ${cy+r}A${rx} ${r} 0 0 ${cres?1:0} ${cx} ${cy-r}Z`;
+}
+$('#moonLit').setAttribute('d',moonPath(275,118,36));
+$('#moonMini').setAttribute('d',moonPath(20,20,16));
+const mName=age<1.85?'新月':age<7.38?'蛾眉月':age<9.23?'上弦月':age<14.77?'盈凸月':age<16.61?'满月':age<22.15?'亏凸月':age<23.99?'下弦月':'残月';
+$('#moonTxt').textContent=`今夜月相 · ${mName} · 月光约 ${Math.round(illum*100)}%`;
+
+/* ---------- particles ---------- */
+const cv=$('#petals'), ctx=cv.getContext('2d');
+let W=0,H=0,DPR=1, season=2, parts=[], colors={};
+function readColors(){const cs=getComputedStyle(root);['sakura','gold','celadon','snow','shu','fuji'].forEach(k=>colors[k]=cs.getPropertyValue('--'+k).trim());}
+readColors();
+function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
+resize(); addEventListener('resize',resize);
+const mouse={x:-999,y:-999};
+addEventListener('pointermove',e=>{mouse.x=e.clientX;mouse.y=e.clientY},{passive:true});
+function kindFor(s){if(s===0)return'sakura';if(s===1)return'firefly';if(s===3)return'snow';return Math.random()<.55?'ginkgo':Math.random()<.6?'osman':'maple';}
+function spawn(p,top){
+  p.kind=kindFor(season); p.x=Math.random()*W; p.y=top?-30-Math.random()*H*.3:Math.random()*H;
+  p.size=p.kind==='osman'?3+Math.random()*2:p.kind==='snow'?1.6+Math.random()*2.8:p.kind==='firefly'?1.6+Math.random()*1.6:7+Math.random()*7;
+  p.vy=p.kind==='firefly'?(Math.random()-.5)*.2:(p.kind==='snow'?.35:.5)+Math.random()*.6;
+  p.vx=(Math.random()-.3)*.4; p.rot=Math.random()*6.28; p.vr=(Math.random()-.5)*.03; p.ph=Math.random()*6.28; p.a=0; p.dying=false; p.flip=Math.random()*6.28;
+  if(p.kind==='firefly'){p.y=H*.3+Math.random()*H*.7;}
+  return p;
+}
+function initParts(){const n=Math.round(Math.min(46,Math.max(18,W/34)));parts=[];for(let i=0;i<n;i++)parts.push(spawn({},false));}
+initParts();
+function setSeason(s){if(s===season)return;season=s;parts.forEach(p=>p.dying=true);}
+function drawP(p){
+  ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.globalAlpha=p.a;
+  const s=p.size, sx=Math.cos(p.flip);
+  switch(p.kind){
+    case 'sakura':
+      ctx.scale(sx,1); ctx.fillStyle=colors.sakura; ctx.beginPath();
+      ctx.moveTo(0,s); ctx.bezierCurveTo(s*.9,s*.4,s*.7,-s*.8,s*.18,-s*.9); ctx.lineTo(0,-s*.55); ctx.lineTo(-s*.18,-s*.9);
+      ctx.bezierCurveTo(-s*.7,-s*.8,-s*.9,s*.4,0,s); ctx.fill(); break;
+    case 'ginkgo':
+      ctx.scale(sx,1); ctx.fillStyle=colors.gold; ctx.beginPath(); ctx.moveTo(0,s*.9);
+      ctx.quadraticCurveTo(-s*1.1,-s*.1,-s*.8,-s*.7); ctx.quadraticCurveTo(-s*.1,-s*1.05,0,-s*.6); ctx.quadraticCurveTo(s*.1,-s*1.05,s*.8,-s*.7);
+      ctx.quadraticCurveTo(s*1.1,-s*.1,0,s*.9); ctx.fill(); ctx.strokeStyle=colors.gold; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(0,s*.8); ctx.lineTo(0,s*1.5); ctx.stroke(); break;
+    case 'maple':
+      ctx.scale(sx,1); ctx.fillStyle=colors.shu; ctx.globalAlpha=p.a*.75; ctx.beginPath();
+      for(let i=0;i<5;i++){const a=-Math.PI/2+(i-2)*0.62, r1=s*(i===2?1:.82); ctx.lineTo(Math.cos(a)*r1,Math.sin(a)*r1); const b=a+.31; ctx.lineTo(Math.cos(b)*s*.38,Math.sin(b)*s*.38);} ctx.lineTo(0,s*.3); ctx.closePath(); ctx.fill(); break;
+    case 'osman':
+      ctx.fillStyle=colors.gold; for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(Math.cos(i*1.57)*s*.55,Math.sin(i*1.57)*s*.55,s*.55,0,6.28);ctx.fill();} break;
+    case 'snow':
+      ctx.fillStyle=colors.snow; ctx.beginPath(); ctx.arc(0,0,s,0,6.28); ctx.fill(); break;
+    case 'firefly':{
+      const fl=.55+.45*Math.sin(p.ph*3); ctx.globalAlpha=p.a*fl;
+      const g=ctx.createRadialGradient(0,0,0,0,0,s*7); g.addColorStop(0,'rgba(232,240,150,.95)'); g.addColorStop(.25,'rgba(214,226,120,.35)'); g.addColorStop(1,'rgba(214,226,120,0)');
+      ctx.fillStyle=g; ctx.beginPath(); ctx.arc(0,0,s*7,0,6.28); ctx.fill(); break;}
+  }
+  ctx.restore();
+}
+let t0=performance.now();
+function tick(t){
+  const dt=Math.min(3,(t-t0)/16.67); t0=t;
+  ctx.clearRect(0,0,W,H);
+  for(const p of parts){
+    p.ph+=.02*dt;
+    if(p.kind==='firefly'){p.vx+=(Math.random()-.5)*.04;p.vy+=(Math.random()-.5)*.04;p.vx*=.98;p.vy*=.98;}
+    p.x+=(p.vx+Math.sin(p.ph)*.35)*dt; p.y+=p.vy*dt; p.rot+=p.vr*dt; p.flip+=.03*dt;
+    const dx=p.x-mouse.x, dy=p.y-mouse.y, d2=dx*dx+dy*dy;
+    if(d2<12000){const f=(1-d2/12000)*1.6; const d=Math.sqrt(d2)||1; p.x+=dx/d*f*dt; p.y+=dy/d*f*dt;}
+    if(p.dying){p.a-=.02*dt; if(p.a<=0) spawn(p,true);}
+    else if(p.a<1) p.a=Math.min(1,p.a+.015*dt);
+    if(p.y>H+30||p.x<-40||p.x>W+40||(p.kind==='firefly'&&p.y<-30)) spawn(p,true);
+    drawP(p);
+  }
+  requestAnimationFrame(tick);
+}
+if(!RM) requestAnimationFrame(tick);
+
+/* ---------- hero parallax & furin ---------- */
+const gate=$('#gate'), layers=$$('.layer',gate).map(el=>({el,d:+el.dataset.depth}));
+let gx=0,gy=0,tx=0,ty=0;
+gate.addEventListener('pointermove',e=>{const r=gate.getBoundingClientRect();tx=((e.clientX-r.left)/r.width-.5)*2;ty=((e.clientY-r.top)/r.height-.5)*2;});
+gate.addEventListener('pointerleave',()=>{tx=0;ty=0;});
+const furin=$('#furin'), fBody=$('#furinBody'), fStrip=$('#furinStrip');
+let fa=0, fv=0, fa2=0, fv2=0;
+furin.addEventListener('pointerenter',()=>{fv+=.035;});
+let actx=null;
+function chime(){
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const tt=actx.currentTime, base=[2093,2637,3136,3951];
+    base.forEach((f,i)=>{const o=actx.createOscillator(), g=actx.createGain(); o.type='sine'; o.frequency.value=f*(1+(Math.random()-.5)*.01);
+      g.gain.setValueAtTime(0,tt+i*.05); g.gain.linearRampToValueAtTime(.06/(i+1),tt+i*.05+.01); g.gain.exponentialRampToValueAtTime(.0001,tt+i*.05+2.6);
+      o.connect(g).connect(actx.destination); o.start(tt+i*.05); o.stop(tt+i*.05+2.7);});
+  }catch(e){}
+}
+furin.addEventListener('click',()=>{fv+=.09;fv2-=.12;chime();});
+function heroLoop(){
+  gx+=(tx-gx)*.06; gy+=(ty-gy)*.06;
+  for(const l of layers) l.el.setAttribute('transform',`translate(${(-gx*l.d*7).toFixed(2)} ${(-gy*l.d*4).toFixed(2)})`);
+  fv+=(-fa*.012 + Math.sin(performance.now()/1400)*.0004); fv*=.985; fa+=fv;
+  fv2+=(-fa2*.02 - fv*.4); fv2*=.96; fa2+=fv2;
+  fBody.setAttribute('transform',`rotate(${(fa*57).toFixed(2)} 30 40)`);
+  fStrip.setAttribute('transform',`rotate(${(fa2*57).toFixed(2)} 30 96)`);
+  requestAnimationFrame(heroLoop);
+}
+if(!RM) heroLoop();
+
+/* ---------- mood ---------- */
+const MOODS=[
+  {k:'happy',n:'开心',jp:'うれしい',c:'--gold',eyes:'M21 29q4-6 8 0M35 29q4-6 8 0',mouth:'M24 38q8 10 16 0',ck:1},
+  {k:'calm',n:'平静',jp:'おだやか',c:'--celadon',eyes:'M21 30h8M35 30h8',mouth:'M27 40q5 3 10 0',ck:0},
+  {k:'sweet',n:'小确幸',jp:'しあわせ',c:'--sakura',eyes:'M21 31q4-6 8 0M35 31q4-6 8 0',mouth:'M27 39q2.5 3 5 0q2.5 3 5 0',ck:2},
+  {k:'tired',n:'有点累',jp:'つかれた',c:'--fuji',eyes:'M21 30q4 4 8 0M35 30q4 4 8 0',mouth:'M28 42h8',ck:0,drop:1},
+  {k:'blue',n:'想哭',jp:'なきたい',c:'--sky',eyes:'M24 30v1M40 30v1',mouth:'M26 43q6-6 12 0',ck:0,tear:1}
+];
+const moodsEl=$('#moods'); const moodState=store.get('mood',{});
+MOODS.forEach(m=>{
+  const b=document.createElement('button'); b.className='mood'; b.setAttribute('aria-pressed','false'); b.dataset.k=m.k;
+  b.innerHTML=`<svg class="face" viewBox="0 0 64 64" aria-hidden="true"><path class="bg" fill="var(${m.c})" d="M32 5c16 0 27 10 27 27S48 59 32 59 5 49 5 32 16 5 32 5z"/>
+  ${m.ck?`<ellipse class="ck" cx="18" cy="38" rx="${m.ck>1?5:4}" ry="3"/><ellipse class="ck" cx="46" cy="38" rx="${m.ck>1?5:4}" ry="3"/>`:''}
+  <path class="st" d="${m.eyes}"/><path class="st" d="${m.mouth}"/>
+  ${m.drop?'<path d="M50 14q4 6 0 8q-4-2 0-8z" fill="var(--sky)"/>':''}${m.tear?'<path d="M40 35q3 5 0 7q-3-2 0-7z" fill="var(--card)" opacity=".9"/>':''}</svg><span>${m.n}</span>`;
+  b.addEventListener('click',()=>{setMood(m.k,true);});
+  moodsEl.appendChild(b);
+});
+function setMood(k,anim){
+  const m=MOODS.find(x=>x.k===k); if(!m) return;
+  $$('.mood',moodsEl).forEach(b=>{const on=b.dataset.k===k; b.setAttribute('aria-pressed',on); if(on&&anim){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}});
+  $('#moodCard').style.setProperty('--mood',`var(${m.c})`);
+  $('#moodSay').innerHTML=`今天的心情是 <b>${m.n}</b> · <span style="font-family:var(--f-kana)">${m.jp}</span>`;
+  if(anim) store.set('mood',{day:todayKey,k});
+}
+if(moodState.day===todayKey) setMood(moodState.k,false);
+
+/* ---------- todo ---------- */
+const DEFAULT_TODO=[
+  {t:'给阳台的薄荷浇水',d:true},{t:'去巷口买一袋糖炒栗子',d:false},{t:'给远方的朋友写一张明信片',d:false},{t:'读完《枕草子》秋之一段',d:false},{t:'十一点前放下手机',d:false}
+];
+let todos=store.get('todos',DEFAULT_TODO);
+const list=$('#todoList'), plant=$('#plant');
+function saveTodos(){store.set('todos',todos);}
+function renderTodos(){
+  list.innerHTML='';
+  todos.forEach((td,i)=>{
+    const li=document.createElement('li'); if(td.d) li.classList.add('done'); li.style.animationDelay=(i*.06)+'s';
+    li.innerHTML=`<button class="chk" role="checkbox" aria-checked="${td.d}"><svg viewBox="0 0 26 26"><rect class="box" x="2" y="2" width="22" height="22" rx="6"/><path class="tick" d="M6 13.5l5 5 10-12"/></svg></button><span class="todo-txt"></span><button class="del" aria-label="删除">×</button>`;
+    $('.todo-txt',li).textContent=td.t; $('.chk',li).setAttribute('aria-label','完成：'+td.t);
+    $('.chk',li).addEventListener('click',e=>{td.d=!td.d; e.currentTarget.setAttribute('aria-checked',td.d); li.classList.toggle('done',td.d); saveTodos(); updatePlant();});
+    $('.del',li).addEventListener('click',()=>{li.classList.add('out'); setTimeout(()=>{todos.splice(todos.indexOf(td),1); saveTodos(); renderTodos();},420);});
+    list.appendChild(li);
+  });
+  updatePlant();
+}
+function updatePlant(){
+  const n=todos.length, d=todos.filter(x=>x.d).length, p=n?d/n:0;
+  plant.style.setProperty('--grow',(.15+p*.85).toFixed(2));
+  plant.setAttribute('class','plant'+(p>=1&&n?' s4':p>=.66?' s3':p>=.33?' s2':p>0?' s1':''));
+  $('#todoMeta').textContent=n?`已完成 ${d} / ${n}，`+(p>=1?'小苗开花啦。':p>=.5?'小苗长出新叶了。':'小苗在等你浇水。'):'今天还没有待办，写一件小事吧。';
+}
+$('#todoForm').addEventListener('submit',e=>{e.preventDefault(); const v=$('#todoInput').value.trim(); if(!v) return; todos.push({t:v,d:false}); saveTodos(); $('#todoInput').value=''; renderTodos();});
+renderTodos();
+
+/* ---------- calendar ---------- */
+const y=now.getFullYear(), mo=now.getMonth(), calKey='cal.'+y+'-'+(mo+1);
+let stamps=store.get(calKey,null);
+if(!stamps){stamps={}; for(let d=1; d<now.getDate() && d<=3; d++) stamps[d]=['flower','star','heart'][d%3];}
+const calEl=$('#cal');
+$('#calTitle').textContent=['一','二','三','四','五','六','七','八','九','十','十一','十二'][mo]+'月';
+'日一二三四五六'.split('').forEach(w=>{const s=document.createElement('div');s.className='wd';s.textContent=w;calEl.appendChild(s);});
+const first=new Date(y,mo,1).getDay(), days=new Date(y,mo+1,0).getDate();
+for(let i=0;i<first;i++) calEl.appendChild(document.createElement('span'));
+const KINDS=['flower','star','heart'];
+function paintDay(b,d){
+  const k=stamps[d]; b.classList.toggle('has',!!k); const old=$('svg',b); if(old) old.remove();
+  if(k){const s=document.createElementNS(SVGNS,'svg'); s.setAttribute('viewBox','0 0 40 40'); const u=document.createElementNS(SVGNS,'use'); u.setAttribute('href','#st-'+k); s.appendChild(u); b.appendChild(s);}
+  b.setAttribute('aria-label',`${mo+1}月${d}日`+(k?'，已盖章':''));
+}
+function calCount(){$('#calCount').textContent=`本月 ${Object.keys(stamps).length} 枚`;}
+for(let d=1; d<=days; d++){
+  const b=document.createElement('button'); b.className='day'+(d===now.getDate()?' today':''); b.textContent=d;
+  paintDay(b,d);
+  b.addEventListener('click',()=>{
+    const cur=stamps[d]; const idx=cur?KINDS.indexOf(cur):-1;
+    if(idx===KINDS.length-1) delete stamps[d]; else stamps[d]=KINDS[idx+1];
+    store.set(calKey,stamps); paintDay(b,d); calCount();
+  });
+  calEl.appendChild(b);
+}
+calCount();
+
+/* ---------- water ---------- */
+const cupsEl=$('#cups'); let water=store.get('water',{day:todayKey,n:3}); if(water.day!==todayKey) water={day:todayKey,n:0};
+for(let i=0;i<8;i++){
+  const b=document.createElement('button'); b.className='cup'; b.setAttribute('aria-label',`第 ${i+1} 杯`);
+  b.innerHTML=`<svg viewBox="0 0 50 60" aria-hidden="true"><defs><clipPath id="cupc${i}"><path d="M8 8h34l-4 46a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4z"/></clipPath></defs>
+  <g clip-path="url(#cupc${i})"><g class="wat"><rect x="0" y="16" width="50" height="44"/><path class="wave" d="M0 16q4-4 8 0t8 0 8 0 8 0 8 0 8 0 8 0 8 0V20H0z"/></g></g>
+  <path class="glass" d="M8 8h34l-4 46a4 4 0 0 1-4 4H16a4 4 0 0 1-4-4z"/><path d="M14 14l-1 12" stroke="var(--card)" stroke-width="2.4" stroke-linecap="round" opacity=".8"/></svg>`;
+  b.addEventListener('click',()=>{water.n=(water.n===i+1)?i:i+1; store.set('water',water); paintWater();});
+  cupsEl.appendChild(b);
+}
+function paintWater(){$$('.cup',cupsEl).forEach((c,i)=>{c.classList.toggle('full',i<water.n);c.setAttribute('aria-pressed',i<water.n);});
+  $('#waterSay').innerHTML=`<b>${water.n}</b> / 8 杯 · 约 ${water.n*250}ml`+(water.n>=8?' · 今天的水喝够啦':'');}
+paintWater();
+
+/* ---------- jieqi ---------- */
+const JQ=[
+ ['立春','lì chūn',2,4,'东风解冻','蛰虫始振','鱼陟负冰','风变软了，适合写下新一年的第一页。'],
+ ['雨水','yǔ shuǐ',2,19,'獭祭鱼','候雁北','草木萌动','细雨润物，泡一壶热茶听檐声。'],
+ ['惊蛰','jīng zhé',3,5,'桃始华','仓庚鸣','鹰化为鸠','春雷一响，万物都伸了个懒腰。'],
+ ['春分','chūn fēn',3,20,'玄鸟至','雷乃发声','始电','昼夜平分，把心也放得平平的。'],
+ ['清明','qīng míng',4,5,'桐始华','田鼠化为鴽','虹始见','踏青去，带一枚青团和一句想念。'],
+ ['谷雨','gǔ yǔ',4,20,'萍始生','鸣鸠拂其羽','戴胜降于桑','雨生百谷，牡丹开在晚春最后一程。'],
+ ['立夏','lì xià',5,5,'蝼蝈鸣','蚯蚓出','王瓜生','风里有了栀子的味道。'],
+ ['小满','xiǎo mǎn',5,21,'苦菜秀','靡草死','麦秋至','小满即安，不求十分圆满。'],
+ ['芒种','máng zhòng',6,5,'螳螂生','鵙始鸣','反舌无声','忙着播种，也忙着长大。'],
+ ['夏至','xià zhì',6,21,'鹿角解','蜩始鸣','半夏生','一年里最长的白昼，适合慢慢浪费。'],
+ ['小暑','xiǎo shǔ',7,7,'温风至','蟋蟀居宇','鹰始挚','蝉声起，西瓜要冰过才好吃。'],
+ ['大暑','dà shǔ',7,22,'腐草为萤','土润溽暑','大雨时行','傍晚的萤火，是夏天写给夜的信。'],
+ ['立秋','lì qiū',8,7,'凉风至','白露降','寒蝉鸣','第一片落叶，是秋天递来的明信片。'],
+ ['处暑','chǔ shǔ',8,23,'鹰乃祭鸟','天地始肃','禾乃登','暑气到此为止，晚风开始变凉。'],
+ ['白露','bái lù',9,7,'鸿雁来','玄鸟归','群鸟养羞','清晨的草叶上，挂着一颗颗月光。'],
+ ['秋分','qiū fēn',9,23,'雷始收声','蛰虫坯户','水始涸','秋色平分，桂花香得正好。'],
+ ['寒露','hán lù',10,8,'鸿雁来宾','雀入大水为蛤','菊有黄华','露气寒冷，菊花开了，记得添衣。'],
+ ['霜降','shuāng jiàng',10,23,'豺乃祭兽','草木黄落','蛰虫咸俯','霜叶红于二月花，柿子也甜了。'],
+ ['立冬','lì dōng',11,7,'水始冰','地始冻','雉入大水为蜃','围炉煮茶，冬天正式开门。'],
+ ['小雪','xiǎo xuě',11,22,'虹藏不见','天气上升地气下降','闭塞而成冬','雪还小，心事也小小的。'],
+ ['大雪','dà xuě',12,7,'鹖鴠不鸣','虎始交','荔挺出','大雪封门，在被窝里读一本旧书。'],
+ ['冬至','dōng zhì',12,21,'蚯蚓结','麋角解','水泉动','冬至大如年，吃一碗热汤圆。'],
+ ['小寒','xiǎo hán',1,5,'雁北乡','鹊始巢','雉始雊','最冷的日子里，梅花开始打苞。'],
+ ['大寒','dà hán',1,20,'鸡始乳','征鸟厉疾','水泽腹坚','寒到极处，春就在门外。']
+];
+const SEASONS=[['春','--celadon','--celadon-soft'],['夏','--sakura','--sakura-soft'],['秋','--gold','--gold-soft'],['冬','--fuji','--fuji-soft']];
+const termDate=(i,yr)=>new Date(yr,JQ[i][2]-1,JQ[i][3]);
+function currentTerm(){
+  const t0=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  let best=null;
+  for(const yr of [now.getFullYear()-1,now.getFullYear()]) JQ.forEach((_,i)=>{const yy=i>=22?yr+1:yr; const d=termDate(i,yy); if(d<=t0&&(!best||d>best.d)) best={i,d};});
+  let nextI=(best.i+1)%24, nyr=best.d.getFullYear(); if(nextI===22) nyr=best.d.getFullYear()+1; if(nextI===0&&best.i===23) nyr=best.d.getFullYear();
+  const nd=termDate(nextI,nyr);
+  return {i:best.i, next:nextI, days:Math.round((nd-t0)/864e5)};
+}
+const CUR=currentTerm();
+const wheel=$('#wheel'), C=260;
+const pol=(r,a)=>[C+r*Math.sin(a*Math.PI/180), C-r*Math.cos(a*Math.PI/180)];
+function arc(r1,r2,a1,a2){const [x1,y1]=pol(r2,a1),[x2,y2]=pol(r2,a2),[x3,y3]=pol(r1,a2),[x4,y4]=pol(r1,a1); const lg=a2-a1>180?1:0;
+  return `M${x1} ${y1}A${r2} ${r2} 0 ${lg} 1 ${x2} ${y2}L${x3} ${y3}A${r1} ${r1} 0 ${lg} 0 ${x4} ${y4}Z`;}
+const el=(tag,attrs,parent)=>{const e=document.createElementNS(SVGNS,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); (parent||wheel).appendChild(e); return e;};
+el('circle',{cx:C,cy:C,r:250,fill:'var(--card)',stroke:'var(--ink)','stroke-width':1.6});
+el('circle',{cx:C,cy:C,r:244,fill:'none',stroke:'var(--ink)','stroke-width':.6,opacity:.5});
+el('circle',{cx:C,cy:C,r:176,fill:'none',stroke:'var(--line)','stroke-width':1});
+for(let i=0;i<72;i++){const a=i*5-7.5, major=i%3===0; const [x1,y1]=pol(major?226:236,a),[x2,y2]=pol(244,a); el('line',{x1,y1,x2,y2,class:'tk'+(major?' major':''),'stroke-width':major?1.4:.8});}
+SEASONS.forEach((s,i)=>{const a1=i*90-7.5, a2=a1+90; el('path',{d:arc(150,172,a1+1.2,a2-1.2),fill:`var(${s[1]})`,opacity:.85});
+  const [x,y]=pol(161,a1+45); el('text',{x,y,class:'ssn','text-anchor':'middle','dominant-baseline':'central',transform:`rotate(${a1+45} ${x} ${y})`}).textContent=s[0];});
+el('circle',{cx:C,cy:C,r:146,fill:'var(--paper)',opacity:.6});
+const labels=JQ.map((j,i)=>{const a=i*15; const g=el('g',{transform:`rotate(${a} ${C} ${C})`,style:'cursor:pointer'});
+  el('rect',{x:C-16,y:C-228,width:32,height:52,fill:'transparent'},g);
+  const t1=el('text',{x:C,y:C-208,class:'lbl','text-anchor':'middle','dominant-baseline':'central'},g); t1.textContent=j[0][0];
+  const t2=el('text',{x:C,y:C-188,class:'lbl','text-anchor':'middle','dominant-baseline':'central'},g); t2.textContent=j[0][1];
+  g.addEventListener('click',()=>{if(!dragMoved) goTo(i);});
+  return [t1,t2];});
+let sel=CUR.i, rot=-sel*15, target=rot, dragging=false, dragMoved=false;
+function goTo(i){const diff=((i-sel)%24+36)%24-12; target-=diff*15; sel=((i%24)+24)%24; showTerm(true);}
+function showTerm(anim){
+  const j=JQ[sel], s=Math.floor(sel/6);
+  labels.forEach((l,i)=>l.forEach(t=>t.classList.toggle('on',i===sel)));
+  $('#wcName').textContent=j[0]; $('#wcPy').textContent=j[1];
+  $('#jqName').textContent=j[0]; $('#jqDate').textContent=`${j[2]}月${j[3]}日前后`;
+  const chip=$('#jqSeason'); chip.textContent=`${SEASONS[s][0]} · 第${'一二三四五六'[sel%6]}个节气`; chip.style.setProperty('--soft',`var(${SEASONS[s][2]})`);
+  $('#jqHou').innerHTML=['一候','二候','三候'].map((h,k)=>`<li><b>${h}</b><span>${j[4+k]}</span></li>`).join('');
+  $('#jqNote').textContent=j[7];
+  const cnt=$('#jqCount');
+  if(sel===CUR.i) cnt.innerHTML=`此刻正值${j[0]}，距${JQ[CUR.next][0]}还有 <b>${CUR.days}</b> 天`;
+  else cnt.textContent=`此刻是${JQ[CUR.i][0]}`;
+  if(anim){const b=$('#jqBody'); b.classList.remove('swap'); void b.offsetWidth; b.classList.add('swap');}
+  setSeason(s);
+}
+function wheelLoop(){ if(!dragging) rot+=(target-rot)*.1; wheel.setAttribute('transform',`rotate(${rot.toFixed(3)} ${C} ${C})`); requestAnimationFrame(wheelLoop); }
+const wb=$('#wheelBox'); let startA=0, startRot=0;
+const angleAt=e=>{const r=wb.getBoundingClientRect(); return Math.atan2(e.clientX-(r.left+r.width/2), -(e.clientY-(r.top+r.height/2)))*180/Math.PI;};
+wb.addEventListener('pointerdown',e=>{dragging=true; dragMoved=false; startA=angleAt(e); startRot=rot;});
+wb.addEventListener('pointermove',e=>{if(!dragging) return; let d=angleAt(e)-startA; if(d>180)d-=360; if(d<-180)d+=360; if(Math.abs(d)>2&&!dragMoved){dragMoved=true; try{wb.setPointerCapture(e.pointerId)}catch(_){}} if(dragMoved) rot=startRot+d;});
+const endDrag=()=>{if(!dragging) return; dragging=false; if(dragMoved){ const idx=Math.round(-rot/15); target=-idx*15; sel=((idx%24)+24)%24; showTerm(true);} setTimeout(()=>dragMoved=false,0);};
+wb.addEventListener('pointerup',endDrag); wb.addEventListener('pointercancel',endDrag);
+wb.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown'){goTo(sel+1);e.preventDefault();} if(e.key==='ArrowLeft'||e.key==='ArrowUp'){goTo(sel-1);e.preventDefault();}});
+$('#jqPrev').addEventListener('click',()=>goTo(sel-1));
+$('#jqNext').addEventListener('click',()=>goTo(sel+1));
+$('#jqToday').addEventListener('click',()=>goTo(CUR.i));
+season=Math.floor(CUR.i/6); initParts(); showTerm(false);
+if(RM){ (function f(){if(!dragging) rot=target; wheel.setAttribute('transform',`rotate(${rot} ${C} ${C})`); requestAnimationFrame(f);})(); } else wheelLoop();
+
+/* ---------- scrapbook drag ---------- */
+const board=$('#board'); let z=10;
+const savedPos=store.get('board',{});
+const narrow=()=>innerWidth<=720;
+const posKey=()=>narrow()?'m':'d';
+function applyPos(){ $$('.it',board).forEach(it=>{const p=(savedPos[posKey()]||{})[it.id]; if(p){it.style.left=p[0]+'%'; it.style.top=p[1]+'%';} else {it.style.left=''; it.style.top='';}}); }
+applyPos(); let lastNarrow=narrow(); addEventListener('resize',()=>{if(narrow()!==lastNarrow){lastNarrow=narrow();applyPos();}});
+$$('.it',board).forEach(it=>{
+  let sx,sy,ox,oy,moved=false,active=false,lastX=0,vx=0,baseR=getComputedStyle(it).getPropertyValue('--r').trim()||'0deg';
+  it.addEventListener('pointerdown',e=>{
+    active=true; moved=false; it.setPointerCapture(e.pointerId); it.style.zIndex=++z; it.classList.add('lift'); it.classList.remove('settle');
+    const br=board.getBoundingClientRect(); sx=e.clientX; sy=e.clientY; ox=it.offsetLeft; oy=it.offsetTop; lastX=e.clientX;
+  });
+  it.addEventListener('pointermove',e=>{
+    if(!active) return; const dx=e.clientX-sx, dy=e.clientY-sy; if(Math.abs(dx)+Math.abs(dy)>4) moved=true; if(!moved) return;
+    const maxX=board.clientWidth-it.offsetWidth*.4, maxY=board.clientHeight-it.offsetHeight*.4;
+    const nx=Math.max(-it.offsetWidth*.3,Math.min(maxX,ox+dx)), ny=Math.max(-it.offsetHeight*.2,Math.min(maxY,oy+dy));
+    it.style.left=nx+'px'; it.style.top=ny+'px';
+    vx=vx*.7+(e.clientX-lastX)*.3; lastX=e.clientX;
+    it.style.transform=`rotate(calc(${baseR} + ${Math.max(-14,Math.min(14,vx*1.2)).toFixed(1)}deg))`;
+  });
+  const end=()=>{
+    if(!active) return; active=false; it.classList.remove('lift'); it.classList.add('settle'); it.style.transform='';
+    if(moved){ const px=it.offsetLeft/board.clientWidth*100, py=it.offsetTop/board.clientHeight*100;
+      it.style.left=px+'%'; it.style.top=py+'%'; (savedPos[posKey()]=savedPos[posKey()]||{})[it.id]=[+px.toFixed(2),+py.toFixed(2)]; store.set('board',savedPos);}
+    else if(it.dataset.click==='letter'){ $('#letter').classList.toggle('open'); }
+  };
+  it.addEventListener('pointerup',end); it.addEventListener('pointercancel',end);
+});
+
+/* ---------- poem cards ---------- */
+$$('.pcard').forEach(c=>{
+  c.addEventListener('click',()=>c.classList.toggle('flipped'));
+  c.addEventListener('pointermove',e=>{ if(e.pointerType!=='mouse') return; const r=c.getBoundingClientRect(), px=(e.clientX-r.left)/r.width, py=(e.clientY-r.top)/r.height;
+    c.style.setProperty('--ry',((px-.5)*16).toFixed(1)+'deg'); c.style.setProperty('--rx',((.5-py)*12).toFixed(1)+'deg');
+    c.style.setProperty('--mx',(px*100)+'%'); c.style.setProperty('--my',(py*100)+'%');});
+  c.addEventListener('pointerleave',()=>{c.style.setProperty('--ry','0deg'); c.style.setProperty('--rx','0deg');});
+});
+
+/* ---------- wish lanterns ---------- */
+const sky=$('#skyfx');
+for(let i=0;i<70;i++){const s=document.createElement('span'); s.className='tw'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*75+'%';
+  const sz=Math.random()<.15?3:Math.random()<.5?2:1.2; s.style.width=s.style.height=sz+'px'; s.style.animationDelay=(-Math.random()*3)+'s'; s.style.animationDuration=(2+Math.random()*3)+'s'; s.style.opacity=.4+Math.random()*.6; sky.appendChild(s);}
+const lanLayer=$('#lanLayer'), night=$('.night'); let lans=[]; let wishes=store.get('wishes',[]);
+const LAN_SVG=`<svg viewBox="0 0 60 84"><ellipse cx="30" cy="42" rx="44" ry="50" fill="url(#lan-glow)"/><path d="M12 14Q30 4 48 14L52 66Q30 74 8 66Z" fill="url(#lan-g)"/><path d="M14 18Q30 10 46 18M10 60Q30 68 50 60" stroke="#C0622E" stroke-width="1" fill="none" opacity=".6"/><path d="M22 70h16v4H22z" fill="#8A4A24"/><ellipse cx="30" cy="72" rx="3" ry="4" fill="#FFF3C4"/></svg>`;
+function makeLan(text,big,fromForm){
+  const d=document.createElement('div'); d.className='lan'; d.innerHTML=LAN_SVG+(text?`<span class="w"></span>`:''); if(text) $('.w',d).textContent=text; lanLayer.appendChild(d);
+  const L={el:d,text,x:fromForm?.28:(.08+Math.random()*.84),y:0,sp:.25+Math.random()*.25,amp:6+Math.random()*10,ph:Math.random()*6.28,sc:big?1.25:(text?.95:.55+Math.random()*.3),born:fromForm};
+  resetLan(L,!fromForm); if(fromForm) L.y=night.clientHeight-120; lans.push(L); return L;
+}
+function resetLan(L,scatter){const h=night.clientHeight; L.y=scatter?Math.random()*h:h+40; if(!L.born) L.x=.06+Math.random()*.88; L.born=false;}
+function lanLoop(){
+  const h=night.clientHeight, w=night.clientWidth;
+  for(const L of lans){
+    L.y-=L.sp; L.ph+=.012;
+    if(L.y<-110) resetLan(L,false);
+    const prog=1-L.y/h, sc=L.sc*(1-prog*.35), op=Math.max(0,Math.min(1,(1-prog)*3, prog*6+.1));
+    L.el.style.opacity=op.toFixed(3);
+    L.el.style.transform=`translate(${(L.x*w+Math.sin(L.ph)*L.amp).toFixed(1)}px,${L.y.toFixed(1)}px) rotate(${(Math.sin(L.ph*1.3)*4).toFixed(2)}deg) scale(${sc.toFixed(3)})`;
+  }
+  requestAnimationFrame(lanLoop);
+}
+for(let i=0;i<6;i++) makeLan('',false,false);
+wishes.slice(-8).forEach(w=>makeLan(w,false,false));
+function wishCount(){ const n=wishes.length; $('#wishCount').innerHTML=n?`你已经放飞了 ${n} 盏灯。<button type="button" id="wishClear">收回全部</button>`:'天上还没有你的灯。';
+  const c=$('#wishClear'); if(c) c.addEventListener('click',()=>{wishes=[]; store.set('wishes',wishes); lans=lans.filter(L=>{if(L.text){L.el.remove();return false}return true}); wishCount();}); }
+wishCount();
+$('#wishForm').addEventListener('submit',e=>{e.preventDefault(); const v=$('#wishInput').value.trim(); if(!v) return; wishes.push(v); store.set('wishes',wishes); $('#wishInput').value='';
+  const L=makeLan(v,true,true); L.sp=.7; setTimeout(()=>{L.sp=.35; L.sc=.95;},4000); wishCount(); chime();});
+if(RM){ lans.forEach(L=>{L.sp=0}); } lanLoop();
+
+/* ---------- reveal, ribbon, nav, cursor ---------- */
+if(!RM && 'IntersectionObserver' in window){
+  const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ en.target.classList.remove('pre'); en.target.classList.add('in'); io.unobserve(en.target);} }),{threshold:.12, rootMargin:'0px 0px -6% 0px'});
+  $$('.rv').forEach((r,i)=>{ const b=r.getBoundingClientRect(); if(b.top>innerHeight){ r.classList.add('pre'); r.style.transitionDelay=((i%4)*.08)+'s'; io.observe(r);} else r.classList.add('in'); });
+} else $$('.rv').forEach(r=>r.classList.add('in'));
+const ribbon=$('.ribbon'); const navLinks=$$('.nav ul a'); const secs=navLinks.map(a=>$(a.getAttribute('href')));
+function onScroll(){
+  const max=document.documentElement.scrollHeight-innerHeight; ribbon.style.setProperty('--p',max>0?(scrollY/max).toFixed(3):0);
+  let on=-1; secs.forEach((s,i)=>{ if(s && s.getBoundingClientRect().top<innerHeight*.45) on=i; });
+  navLinks.forEach((a,i)=>a.classList.toggle('on',i===on));
+}
+addEventListener('scroll',onScroll,{passive:true}); onScroll();
+const cur=$('.cursor');
+if(matchMedia('(hover:hover)').matches && !RM){
+  let cx=0,cy=0,mx=0,my=0;
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;cur.style.opacity=.9;},{passive:true});
+  document.documentElement.addEventListener('mouseleave',()=>cur.style.opacity=0);
+  document.addEventListener('pointerover',e=>{cur.classList.toggle('big',!!e.target.closest('a,button,.it,.wheel-box,input'));});
+  (function f(){cx+=(mx-cx)*.18; cy+=(my-cy)*.18; cur.style.transform=`translate(${cx}px,${cy}px)`; requestAnimationFrame(f);})();
+}
+})();
+</script>
+
+</body>
+</html>
