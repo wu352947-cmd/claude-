@@ -376,8 +376,11 @@ export function createEarth(renderer, { segments = 256 } = {}) {
   const lg = new THREE.BufferGeometry();
   lg.setAttribute('position', new THREE.BufferAttribute(B.locPos, 3));
   lg.setAttribute('aB', new THREE.BufferAttribute(B.locB, 1));
-  const locMat = cityMat.clone();
-  locMat.uniforms = { ...cityMat.uniforms, uSize: { value: 0.0042 }, uVis: { value: 1 } };
+  const locMat = new THREE.ShaderMaterial({
+    vertexShader: CITY_VERT, fragmentShader: CITY_FRAG,
+    uniforms: { ...cityMat.uniforms, uSize: { value: 0.0042 }, uVis: { value: 1 } },
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
+  });
   const local = new THREE.Points(lg, locMat);
   local.renderOrder = 1; local.frustumCulled = false;
   group.add(local);

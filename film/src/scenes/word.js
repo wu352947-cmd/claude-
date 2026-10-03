@@ -291,13 +291,13 @@ export default {
     T.uFront.value = fr;
     const endFade = 1 - smoothstep(223.6, 226.4, g);
     T.uFade.value = N4 ? endFade : 1;
-    T.uBright.value = N4 ? 1.1 : 1.5;
+    T.uBright.value = N4 ? 1.3 : 2.1;
     st.T.glyphs.visible = st.T.rampMesh.visible = st.T.core.visible = g >= G_ERUPT;
     // stream
     const SU = st.ST.U;
     SU.uVis.value = (g < G_ERUPT ? 0 : smoothstep(G_ERUPT + 0.5, G_ERUPT + 3, g)) * (N4 ? endFade : 1);
     SU.uApex.value = N4 ? 1 : 0;
-    SU.uBright.value = N4 ? 1.0 : 0.9;
+    SU.uBright.value = N4 ? 0.45 : 1.3;
     // stars fade to black at the very end
     st.S.mat.uniforms.uVis.value = N4 ? 1 - smoothstep(222.5, 225.5, g) : 1;
     st.E.group.visible = !(N4 && g > 226.3);

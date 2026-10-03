@@ -110,7 +110,7 @@ void main(){
   float sun=along>0.?1.:smoothstep(uR*.995,uR*1.02,perp);
   float hot=exp(-max(uTime-iA.y,0.)*1.6);
   float pulse=pow(.5+.5*sin(iP.y*9.-uTime*3.2+iA.z*2.),6.);
-  vCol=mix(iC*vec3(1.,.8,.5),vec3(1.,.97,.9),.35+.3*sun)*(uBright*(1.+.7*pulse+sun*.5)+hot*3.);
+  vCol=mix(iC*vec3(1.,.74,.42),vec3(1.,.93,.8),.22+.3*sun)*(uBright*(1.+.7*pulse+sun*.5)+hot*3.);
   vA=step(0.,uTime-iA.y)*uFade*(.75+.5*iA.z);
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
   gl_Position=projectionMatrix*viewMatrix*w;
@@ -155,7 +155,7 @@ void main(){
   float s=iP.w*mix(1.,.6+.4*(1.-ph),uApex);
   mv.xy+=position.xy*s;
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
-  vCol=mix(iC,vec3(1.,.95,.85),.5)*uBright*(1.+mix(2.,.4,uApex)*smoothstep(.85,1.,ph));
+  vCol=iC*vec3(1.,.8,.5)*uBright*(1.+mix(2.,.4,uApex)*smoothstep(.85,1.,ph));
   vA=fade*uVis;
   gl_Position=projectionMatrix*mv;
 }`;

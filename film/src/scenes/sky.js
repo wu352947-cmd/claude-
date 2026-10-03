@@ -7,6 +7,7 @@ import * as THREE from 'three';
 import { HITS } from '../cues.js';
 import { createEarth, createStars, n1Pose, aimCamera, bake, R, SUN } from './sky_earth.js';
 import { createPuffs } from './sky_puffs.js';
+import { FullScreenQuad } from 'three/addons/postprocessing/Pass.js';
 import { rng, smoothstep, clamp, lerp, track, ease, noise3, fbm3 } from '../engine/util.js';
 
 const T0 = 153.5;
@@ -253,11 +254,12 @@ function buildLaunch(detail) {
 
   const puffs = createPuffs(1500, detail);
   puffs.mesh.renderOrder = 5;
-  scene.add(puffs.mesh);
+  const puffScene = new THREE.Scene();
+  puffScene.add(puffs.mesh);
   const r = rng(1969);
   const PUFF = [];
-  for (let i = 0; i < 1250; i++) {
-    const kind = i < 560 ? 'side' : i < 900 ? 'base' : 'curtain';
+  for (let i = 0; i < 760; i++) {
+    const kind = i < 330 ? 'side' : i < 540 ? 'base' : 'curtain';
     const p = { kind, seed: r(), b: 0, o: new THREE.Vector3(), dir: new THREE.Vector3(), v: 0, s0: 0, g: 0, life: 0, rise: 0 };
     if (kind === 'side') {
       const s = r() < 0.5 ? -1 : 1;
@@ -304,8 +306,8 @@ void main(){
   p.z+= cos(p.y*.05+s*9.)*uTau*1.2;
   vec4 mv=modelViewMatrix*vec4(p,1.);
   float d=-mv.z;
-  float sz=(.10+.22*aSeed.y)*uPx/max(d,.1);
-  vA=uAlpha*smoothstep(.5,4.,d)*(1.-smoothstep(100.,180.,d)); vS=aSeed.y;
+  float sz=(.06+.15*aSeed.y)*uPx/max(d,.1);
+  vA=uAlpha*smoothstep(2.,8.,d)*(1.-smoothstep(100.,180.,d)); vS=aSeed.y;
   if(sz<1.4){ vA*=sz*sz/1.96; sz=1.4; }
   gl_PointSize=min(sz,40.);
   gl_Position=projectionMatrix*mv;
@@ -313,13 +315,14 @@ void main(){
     fragmentShader: /* glsl */`
 precision highp float; uniform vec3 uCol; varying float vA; varying float vS;
 void main(){ vec2 d=gl_PointCoord-.5; float r=length(d)*2.; float a=smoothstep(1.,.3,r)*vA*.85;
-  vec3 c=uCol*(.55+.9*vS); gl_FragColor=vec4(c*a,a); }`,
+  vec3 c=uCol*(.35+1.1*fract(vS*7.31)); gl_FragColor=vec4(c*a,a); }`,
   }));
   ash.frustumCulled = false;
   ash.renderOrder = 8;
-  scene.add(ash);
+  const ashScene = new THREE.Scene();
+  ashScene.add(ash);
 
-  return { scene, U, skyU, sky, rocket, flame, flame2, flameU, arms, puffs, PUFF, ash, ashU, ROCKET_BASE };
+  return { scene, puffScene, ashScene, U, skyU, sky, rocket, flame, flame2, flameU, arms, puffs, PUFF, ash, ashU, ROCKET_BASE };
 }
 
 // rocket altitude above its pad position (m), τ = seconds since liftoff (slow motion, then away)
@@ -420,7 +423,7 @@ function buildMoon(detail) {
     ua.setXY(v, (x - X0) / (X1 - X0), (z - Z0) / (Z1 - Z0));
   }
   geo.computeVertexNormals();
-  const mU = { uTex: { value: dt }, uNoise: { value: detail }, uSun: { value: SUN.clone() }, uCam: { value: new THREE.Vector3() }, uSunI: { value: 1.9 }, uPatch: { value: 1 } };
+  const mU = { uTex: { value: dt }, uNoise: { value: detail }, uSun: { value: SUN.clone() }, uCam: { value: new THREE.Vector3() }, uSunI: { value: 1.35 }, uPatch: { value: 1 } };
   const vert = /* glsl */`varying vec3 vW; varying vec3 vN; varying vec2 vUv;
     void main(){ vUv=uv; vec4 w=modelMatrix*vec4(position,1.); vW=w.xyz; vN=normalize(mat3(modelMatrix)*normal); gl_Position=projectionMatrix*viewMatrix*w; }`;
   const patch = new THREE.Mesh(geo, new THREE.ShaderMaterial({ vertexShader: vert, fragmentShader: MOON_FRAG, uniforms: mU }));
@@ -470,8 +473,8 @@ function updateK1(st, t, g) {
   const clear = smoothstep(1.4, 4.0, t);
   const deep = smoothstep(L_LIFT + 1.5, L_LIFT + 5.5, t);
   const black = smoothstep(L_LIFT + 4.5, L_LIFT + 6.6, t);
-  const hor = new THREE.Vector3(.29, .29, .29).lerp(new THREE.Vector3(.50, .55, .62), clear).lerp(new THREE.Vector3(.16, .26, .50), deep).lerp(new THREE.Vector3(.0, .0, .004), black);
-  const zen = new THREE.Vector3(.27, .27, .27).lerp(new THREE.Vector3(.16, .27, .52), clear).lerp(new THREE.Vector3(.02, .06, .22), deep).lerp(new THREE.Vector3(0, 0, 0), black);
+  const hor = new THREE.Vector3(.29, .29, .29).lerp(new THREE.Vector3(.40, .48, .62), clear).lerp(new THREE.Vector3(.16, .26, .50), deep).lerp(new THREE.Vector3(.0, .0, .004), black);
+  const zen = new THREE.Vector3(.27, .27, .27).lerp(new THREE.Vector3(.10, .21, .50), clear).lerp(new THREE.Vector3(.02, .06, .22), deep).lerp(new THREE.Vector3(0, 0, 0), black);
   K.skyU.uHor.value.copy(hor); K.skyU.uZen.value.copy(zen);
   _v.set(0, 2, 0).sub(cam.position).normalize();
   K.skyU.uGlowDir.value.copy(_v);
@@ -480,12 +483,12 @@ function updateK1(st, t, g) {
   U.uGnd.value.copy(hor).multiplyScalar(0.25);
   U.uKeyCol.value.set(1.0, 0.93, 0.82).multiplyScalar(0.9 * clear * (1 - black * 0.3));
   U.uFogCol.value.copy(hor).multiplyScalar(lerp(1, 0.85, deep));
-  U.uFogDens.value = lerp(0.010, 0.0007, smoothstep(0.8, 4.4, t));
+  U.uFogDens.value = lerp(0.010, 0.0005, smoothstep(0.8, 4.0, t));
   st.S1.mat.uniforms.uVis.value = smoothstep(L_LIFT + 4.8, L_LIFT + 6.8, t);
 
   K.flameU.uTime.value = g;
   const fl = smoothstep(-0.4, 0.4, tau) * ign;
-  K.flameU.uInt.value = 10 * fl * lerp(1, 0.06, smoothstep(150, 1500, h));
+  K.flameU.uInt.value = 7 * fl * lerp(1, 0.08, smoothstep(50, 500, h));
   const flen = lerp(14, 80, smoothstep(0, 4, tau)) + h * 0.06;
   const fw = 1 + smoothstep(2, 6, tau) * 0.8;
   K.flame.scale.set(fw, flen, fw);
@@ -546,13 +549,13 @@ function updateK1(st, t, g) {
   pu.uKeyCol.value.copy(U.uKeyCol.value).multiplyScalar(1.25);
   pu.uKeyDir.value.copy(U.uKeyDir.value);
   pu.uTime.value = T;
-  pu.uAlbedo.value.set(0.75, 0.73, 0.71);
+  pu.uAlbedo.value.set(0.7, 0.68, 0.66);
 
   const ashTau = Math.max(0, t - 0.95);
   K.ashU.uTau.value = ashTau * ashTau * 0.5;
   K.ashU.uAlpha.value = 1 - smoothstep(2.6, 4.2, t);
   K.ashU.uPx.value = st.H / (2 * Math.tan(THREE.MathUtils.degToRad(cam.fov) / 2));
-  K.ashU.uCol.value.set(0.42, 0.42, 0.42).lerp(new THREE.Vector3(0.9, 0.6, 0.4), ign * 0.6);
+  K.ashU.uCol.value.set(0.62, 0.62, 0.62).lerp(new THREE.Vector3(0.9, 0.6, 0.4), ign * 0.6);
 }
 
 // the K1 camera orientation at the switch instant
@@ -641,7 +644,16 @@ export default {
     scene2.add(S2.points);
     const M = buildMoon(B.detail);
     scene2.add(M.group);
-    return { camera, cam2, K1, S1, scene2, E, S2, M, W, H, scene: K1.scene, mode: 1 };
+    const half = new THREE.WebGLRenderTarget(Math.ceil(W / 2), Math.ceil(H / 2), { type: THREE.HalfFloatType, depthBuffer: true });
+    const comp = new FullScreenQuad(new THREE.ShaderMaterial({
+      uniforms: { tex: { value: null } },
+      vertexShader: `varying vec2 vUv; void main(){ vUv=uv; gl_Position=vec4(position.xy,0.,1.); }`,
+      fragmentShader: `uniform sampler2D tex; varying vec2 vUv; void main(){ gl_FragColor=texture2D(tex,vUv); }`,
+      transparent: true, depthTest: false, depthWrite: false,
+      blending: THREE.CustomBlending, blendSrc: THREE.OneFactor, blendDst: THREE.OneMinusSrcAlphaFactor,
+      blendSrcAlpha: THREE.ZeroFactor, blendDstAlpha: THREE.OneFactor,
+    }));
+    return { half, comp, camera, cam2, K1, S1, scene2, E, S2, M, W, H, scene: K1.scene, mode: 1 };
   },
 
   update(st, t, info) {
@@ -653,8 +665,27 @@ export default {
   draw(st, r, target) {
     r.setRenderTarget(target);
     r.setClearColor(0, 1); r.clear();
-    if (st.mode === 1) r.render(st.K1.scene, st.camera);
-    else r.render(st.scene2, st.cam2);
+    if (st.mode === 2) { r.render(st.scene2, st.cam2); return; }
+    // K1: opaque world at full res; the exhaust clouds at half res (depth-tested against a half-res
+    // depth pre-pass), composited premultiplied; ash on top at full res.
+    const K = st.K1;
+    const ac = r.autoClear;
+    r.autoClear = false;
+    r.render(K.scene, st.camera);
+    if (K.puffs.mesh.geometry.instanceCount > 0) {
+      r.setRenderTarget(st.half);
+      r.setClearColor(0, 0); r.clear();
+      K.sky.visible = false;
+      r.render(K.scene, st.camera);
+      K.sky.visible = true;
+      r.clear(true, false, false);
+      r.render(K.puffScene, st.camera);
+      r.setRenderTarget(target);
+      st.comp.material.uniforms.tex.value = st.half.texture;
+      st.comp.render(r);
+    }
+    r.render(K.ashScene, st.camera);
+    r.autoClear = ac;
   },
 
   grade(st, t) {

@@ -118,7 +118,12 @@ export class Mix {
     const ctx = this.ctx;
     this.events.sort((a, b) => a[0] - b[0]);
     this.running = true; this.pos = 0;
-    const flush = until => { while (this.pos < this.events.length && this.events[this.pos][0] < until) this.events[this.pos++][1](); };
+    const flush = until => {
+      while (this.pos < this.events.length && this.events[this.pos][0] < until) {
+        const [g, fn] = this.events[this.pos++];
+        try { fn(); } catch (e) { console.error(`score event @${g.toFixed(3)} (segment ${this.g0}): ${e.message}\n${e.stack.split('\n').slice(1, 4).join('\n')}`); }
+      }
+    };
     const LOOK = 2.0;
     flush(this.g0 + LOOK);
     const dur = lengthFrames / this.sr;
