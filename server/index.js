@@ -13,6 +13,8 @@ import { loadKey, makeCodec } from './crypto.js';
 import { smsConfig, sendCode, validPhone, maskPhone, newCode, codeHash, sameHash } from './sms.js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { weatherConfig, createWeather } from './weather.js';
+import { moderationConfig, localCheck, machineCheck, loadBlocklist } from './moderation.js';
+import { timingSafeEqual } from 'node:crypto';
 import { CITY_MAP } from '../public/app/js/cities.js';
 import { termOf, moonOf, parseDay, isDayKey, SEASON_CN } from '../public/app/js/calendar.js';
 
@@ -33,6 +35,9 @@ export function createApp(opts = {}) {
   for (const r of db.prepare("SELECT id, body FROM letters WHERE body NOT LIKE 'enc1:%'").all()) db.prepare('UPDATE letters SET body = ? WHERE id = ?').run(enc(r.body), r.id);
   const AI_DAILY = Number(env.AI_DAILY_LIMIT || 3);
   const wx = weatherConfig(env), getWeather = wx.enabled ? createWeather(wx) : null;
+  const mod = moderationConfig(env), ADMIN = env.ADMIN_TOKEN || '';
+  let blocklist = loadBlocklist(DATA); setInterval(() => { blocklist = loadBlocklist(DATA); }, 300_000).unref();
+  const LANTERN_DAYS = 7, LANTERN_DAILY = Number(env.LANTERN_DAILY_LIMIT || 3), REPORT_HIDE = 3;
   const ICP = env.SITE_ICP || '';
   const COOKIE_SECURE = (env.COOKIE_SECURE || 'auto').toLowerCase();
   const MOODS = new Set(['', 'happy', 'calm', 'sweet', 'tired', 'blue']);
@@ -121,7 +126,7 @@ export function createApp(opts = {}) {
     const need = () => { if (!user) throw Object.assign(new Error('请先登录'), { status: 401 }); };
 
     if (p === '/api/health') return send(res, 200, { ok: true });
-    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES, sms: sms.enabled, weather: wx.enabled });
+    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES, sms: sms.enabled, weather: wx.enabled, lake: true });
 
     if (p === '/api/auth/sms/send' && m === 'POST') {
       if (!sms.enabled) return fail(res, 503, '短信服务尚未开启');
@@ -254,6 +259,84 @@ export function createApp(opts = {}) {
       setSession(req, res, '', 0);
       return send(res, 200, { ok: true });
     }
+    // ---------- 灯海 ----------
+    const lanternOut = (r, mine, warmed) => ({ id: r.id, text: r.text, hue: r.hue, at: r.created_at, warmth: r.warmth, warmed: !!warmed, mine: !!mine, ...(mine ? { status: r.status } : {}) });
+    if (p === '/api/lanterns' && m === 'GET') {
+      need();
+      const since = now() - LANTERN_DAYS * 864e5;
+      const warmed = new Set(db.prepare("SELECT lantern_id FROM lantern_marks WHERE user_id = ? AND kind = 'warm'").all(user.id).map(r => r.lantern_id));
+      const others = db.prepare("SELECT * FROM lanterns WHERE status = 'visible' AND created_at > ? AND user_id != ? ORDER BY created_at DESC LIMIT 60").all(since, user.id);
+      const older = db.prepare("SELECT * FROM lanterns WHERE status = 'visible' AND created_at > ? AND user_id != ? ORDER BY RANDOM() LIMIT 20").all(since, user.id).filter(r => !others.some(o => o.id === r.id));
+      const mine = db.prepare("SELECT * FROM lanterns WHERE user_id = ? AND created_at > ? AND status != 'hidden' ORDER BY created_at DESC LIMIT 10").all(user.id, since);
+      return send(res, 200, { lanterns: [...mine.map(r => lanternOut(r, true)), ...[...others, ...older].map(r => lanternOut(r, false, warmed.has(r.id)))], days: LANTERN_DAYS });
+    }
+    if (p === '/api/lanterns' && m === 'POST') {
+      need();
+      const b = await readJson(req), text = str(b.text, 200).replace(/\s+/g, ' ').trim();
+      const bad = localCheck(text, blocklist); if (bad) return fail(res, 400, bad);
+      if (limited('lantern:' + user.id, 1, 20_000)) return fail(res, 429, '灯还在水面上晃，等一会儿再放下一盏');
+      const today = db.prepare('SELECT COUNT(*) n FROM lanterns WHERE user_id = ? AND created_at > ?').get(user.id, now() - 864e5).n;
+      if (today >= LANTERN_DAILY) return fail(res, 429, `每天最多放 ${LANTERN_DAILY} 盏灯，明天再来吧`);
+      let status, crisis = false;
+      if (crisisSignal(text)) { status = 'private'; crisis = true; } // 只给自己看，同时给出求助渠道
+      else {
+        const verdict = await machineCheck(mod, text);
+        if (verdict === 'block') return fail(res, 400, '这盏灯没能放出去，换个温柔一点的说法吧');
+        // 机器审核通过 → 放行；机器拿不准 → 人工；没接机器审核时按 LANTERN_REVIEW（默认先审后发）
+        status = verdict === 'pass' ? 'visible' : !mod.provider && mod.review === 'post' ? 'visible' : 'pending';
+      }
+      const hue = Number.isInteger(b.hue) && b.hue >= 0 && b.hue < 5 ? b.hue : Math.floor(Math.random() * 5);
+      const id = Number(db.prepare('INSERT INTO lanterns (user_id, text, hue, status, created_at) VALUES (?,?,?,?,?)').run(user.id, text, hue, status, now()).lastInsertRowid);
+      return send(res, 201, { lantern: lanternOut(db.prepare('SELECT * FROM lanterns WHERE id = ?').get(id), true), crisis, hotlines: crisis ? HOTLINES : undefined });
+    }
+    let lm;
+    if ((lm = p.match(/^\/api\/lanterns\/(\d+)(\/warm|\/report)?$/))) {
+      need();
+      const row = db.prepare('SELECT * FROM lanterns WHERE id = ?').get(Number(lm[1]));
+      const isMine = row && row.user_id === user.id;
+      if (!row || (!isMine && row.status !== 'visible')) return fail(res, 404, '这盏灯已经漂远了');
+      if (!lm[2] && m === 'DELETE') {
+        if (!isMine) return fail(res, 403, '只能收回自己的灯');
+        db.prepare('DELETE FROM lanterns WHERE id = ?').run(row.id); return send(res, 200, { ok: true });
+      }
+      if (lm[2] === '/warm' && m === 'POST') {
+        if (isMine) return fail(res, 400, '这是你自己的灯');
+        const r = db.prepare("INSERT OR IGNORE INTO lantern_marks (lantern_id, user_id, kind, created_at) VALUES (?,?,'warm',?)").run(row.id, user.id, now());
+        if (r.changes) db.prepare('UPDATE lanterns SET warmth = warmth + 1 WHERE id = ?').run(row.id);
+        return send(res, 200, { warmth: db.prepare('SELECT warmth FROM lanterns WHERE id = ?').get(row.id).warmth, warmed: true });
+      }
+      if (lm[2] === '/report' && m === 'POST') {
+        if (isMine) return fail(res, 400, '这是你自己的灯');
+        const b = await readJson(req);
+        const r = db.prepare("INSERT OR IGNORE INTO lantern_marks (lantern_id, user_id, kind, reason, created_at) VALUES (?,?,'report',?,?)").run(row.id, user.id, str(b.reason, 40), now());
+        if (r.changes) {
+          db.prepare('UPDATE lanterns SET reports = reports + 1 WHERE id = ?').run(row.id);
+          // 多人举报先隐藏，等人工复核
+          db.prepare("UPDATE lanterns SET status = 'reported' WHERE id = ? AND status = 'visible' AND reports >= ?").run(row.id, REPORT_HIDE);
+        }
+        return send(res, 200, { ok: true });
+      }
+    }
+    // 人工审核：请求头带 x-admin-token（ADMIN_TOKEN）；未配置时整个入口关闭
+    if (p.startsWith('/api/admin/')) {
+      const tok = String(req.headers['x-admin-token'] || '');
+      if (!ADMIN || tok.length !== ADMIN.length || !timingSafeEqual(Buffer.from(tok), Buffer.from(ADMIN))) return fail(res, 403, '没有权限');
+      if (p === '/api/admin/lanterns' && m === 'GET') {
+        const st = ['pending', 'reported', 'visible', 'hidden'].includes(url.searchParams.get('status')) ? url.searchParams.get('status') : 'pending';
+        const rows = db.prepare('SELECT id, text, status, warmth, reports, created_at FROM lanterns WHERE status = ? ORDER BY created_at DESC LIMIT 200').all(st);
+        const counts = Object.fromEntries(db.prepare('SELECT status, COUNT(*) n FROM lanterns GROUP BY status').all().map(r => [r.status, r.n]));
+        return send(res, 200, { lanterns: rows, counts });
+      }
+      if ((lm = p.match(/^\/api\/admin\/lanterns\/(\d+)$/)) && m === 'POST') {
+        const { action } = await readJson(req);
+        const to = { approve: 'visible', hide: 'hidden' }[action];
+        if (!to) return fail(res, 400, '未知操作');
+        const r = db.prepare("UPDATE lanterns SET status = ?, reviewed_at = ? WHERE id = ? AND status != 'private'").run(to, now(), Number(lm[1]));
+        return r.changes ? send(res, 200, { ok: true }) : fail(res, 404, '没有这盏灯');
+      }
+      return fail(res, 404, '没有这个接口');
+    }
+
     if (p === '/api/export' && m === 'GET') {
       need();
       const data = {
@@ -261,7 +344,8 @@ export function createApp(opts = {}) {
         user: publicUser(user),
         entries: db.prepare('SELECT * FROM entries WHERE user_id = ? ORDER BY day').all(user.id).map(entryOut),
         letters: db.prepare('SELECT * FROM letters WHERE user_id = ? ORDER BY created_at').all(user.id).map(r => ({ ...letterOut(r), body: dec(r.body) })),
-        photos: db.prepare('SELECT id, mime, size, created_at FROM uploads WHERE user_id = ?').all(user.id)
+        photos: db.prepare('SELECT id, mime, size, created_at FROM uploads WHERE user_id = ?').all(user.id),
+        lanterns: db.prepare('SELECT text, status, warmth, created_at FROM lanterns WHERE user_id = ? ORDER BY created_at').all(user.id)
       };
       return send(res, 200, data, { 'Content-Disposition': `attachment; filename="shiguang-${new Date().toISOString().slice(0, 10)}.json"` });
     }

@@ -9,6 +9,7 @@ import { bookView } from './views/book.js';
 import { lettersView } from './views/letters.js';
 import { settingsView } from './views/settings.js';
 import { scrollView } from './views/scroll.js';
+import { lakeView } from './views/lake.js';
 import { mountCalm } from './calm.js';
 import { wxIcon } from './weather.js';
 
@@ -47,6 +48,7 @@ async function route() {
     day: () => todayView(root, /^\d{4}-\d{2}-\d{2}$/.test(arg || '') ? arg : undefined),
     book: () => bookView(root, arg),
     scroll: () => scrollView(root, arg),
+    lake: () => lakeView(root),
     letters: () => lettersView(root),
     settings: () => settingsView(root)
   };

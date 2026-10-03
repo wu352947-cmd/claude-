@@ -72,7 +72,7 @@ async function handle(method, path, q, b) {
   const u = me();
   const need = () => { if (!u) throw err(401, '请先登录'); };
   let m;
-  if (path === '/api/config') return { ai: true, aiDaily: 3, icp: '', hotlines: HOTLINES, sms: true, weather: true, demo: true };
+  if (path === '/api/config') return { ai: true, aiDaily: 3, icp: '', hotlines: HOTLINES, sms: true, weather: true, lake: true, demo: true };
   if (path === '/api/auth/register' && method === 'POST') {
     if (!validName(b.username)) throw err(400, '用户名需为 2–20 位中文、字母、数字或下划线');
     if (typeof b.password !== 'string' || b.password.length < 8) throw err(400, '密码长度需在 8–72 位之间');
@@ -142,6 +142,7 @@ async function handle(method, path, q, b) {
     useCode(b.phone, 'bind', b.code); u.phone = b.phone; save(); return { user: pub(u) };
   }
   if (path === '/api/weather') { need(); const c = CITY_MAP[u.settings.city]; return { weather: c ? { city: c.name, ...mockWeather(c), at: now() } : null }; }
+  if (path.startsWith('/api/lanterns')) { need(); return lake(method, path, b, u); }
   if (path === '/api/export') { need(); return { exportedAt: new Date().toISOString(), site: '拾光手帐（试玩版）', user: pub(u), entries: Object.entries(entriesOf(u)).sort().map(([d, e]) => entryOut(d, e)), letters: db.letters.filter(l => l.uid === u.id).map(l => ({ ...letterOut(l), body: l.body })) }; }
 
   if (path === '/api/entries' && method === 'GET') {
@@ -271,4 +272,43 @@ function mockWeather(city, t = new Date()) {
   const text = { sun: '晴', cloud: '多云', rain: '小雨', snow: '小雪', thunder: '雷阵雨', fog: '薄雾', wind: '有风' }[kind] + '（模拟）';
   const h = t.getHours(), base = [4, 6, 11, 17, 22, 26, 29, 28, 24, 18, 11, 6][m] - (city.lat - 30) * .6;
   return { kind, text, temp: Math.round(base + Math.sin((h - 9) / 24 * Math.PI * 2) * 4), isDay: h >= 6 && h < 18 };
+}
+
+// ---------- 灯海（示例） ----------
+const WISHES = ['希望妈妈的手术一切顺利', '考研上岸！', '愿明年的这个时候，我已经学会对自己温柔一点', '想和奶奶再看一次海', '希望小猫团子在喵星过得好',
+  '新工作顺利，别再加班到十点了', '愿所有失眠的人今晚都能好好睡一觉', '今年想学会游泳', '愿弟弟高考发挥稳定', '想攒够钱带爸妈去一趟云南',
+  '希望我的小店能撑过这个冬天', '愿你也被这个世界温柔以待', '想重新开始画画', '愿外公的记性慢一点变差', '希望下次体检一切正常', '想养一只柴犬',
+  '愿我们都能成为自己喜欢的大人', '今年想把拖了三年的那本书读完', '希望朋友早日走出低谷', '愿考试不挂科（拜托了）', '想在海边住一个月',
+  '希望能和她和好', '想学会做外婆的红烧肉', '愿每个漂在外地的人都有一盏等他的灯', '希望自己勇敢一点，去面试那家公司', '愿宝宝健康长大',
+  '想在三十岁前去一次冰岛', '希望失业的日子快点过去', '愿今年的桂花开得久一点', '想把阳台种满花', '愿所有努力都不被辜负', '祝自己生日快乐，二十五岁也要好好的'];
+const BAD = [/https?:|www\.|\.(com|cn)\b/i, /\d{6,}/, /(微信|vx|v信|wx|加我|qq|二维码)/i, /(傻逼|操你|尼玛|妈的|贱人|约炮|赌博|贷款)/];
+function lake(method, path, b, u) {
+  if (!db.lake) {
+    db.lake = WISHES.map((text, i) => ({ id: 9000 + i, uid: 0, text, hue: i % 5, at: now() - Math.random() * 6.5 * 864e5, warmth: Math.floor(Math.random() ** 2 * 24), status: 'visible' }));
+    db.lakeMarks = {}; save();
+  }
+  const out = l => ({ id: l.id, text: l.text, hue: l.hue, at: l.at, warmth: l.warmth, warmed: !!db.lakeMarks[`${l.id}|w|${u.id}`], mine: l.uid === u.id, ...(l.uid === u.id ? { status: l.status } : {}) });
+  const since = now() - 7 * 864e5;
+  if (path === '/api/lanterns' && method === 'GET')
+    return { lanterns: [...db.lake.filter(l => l.uid === u.id && l.at > since), ...db.lake.filter(l => l.uid !== u.id && l.status === 'visible' && l.at > since)].map(out), days: 7 };
+  if (path === '/api/lanterns' && method === 'POST') {
+    const text = String(b.text || '').replace(/\s+/g, ' ').trim();
+    if ([...text].length < 2) throw err(400, '写一两句心愿吧');
+    if ([...text].length > 50) throw err(400, '心愿最多 50 个字');
+    if (BAD.slice(0, 3).some(r => r.test(text))) throw err(400, '灯上不能留联系方式或链接哦');
+    if (BAD[3].test(text)) throw err(400, '这盏灯没能放出去，换个温柔一点的说法吧');
+    if (db.lake.filter(l => l.uid === u.id && l.at > now() - 864e5).length >= 3) throw err(429, '每天最多放 3 盏灯，明天再来吧');
+    const c = crisis(text);
+    const l = { id: db.seq++, uid: u.id, text, hue: Number.isInteger(b.hue) ? b.hue % 5 : 0, at: now(), warmth: 0, status: c ? 'private' : 'visible' };
+    db.lake.push(l); save();
+    return [201, { lantern: out(l), crisis: c, hotlines: c ? HOTLINES : undefined }];
+  }
+  const m = path.match(/^\/api\/lanterns\/(\d+)(\/warm|\/report)?$/);
+  const l = m && db.lake.find(x => x.id === Number(m[1]));
+  if (!l || (l.uid !== u.id && l.status !== 'visible')) throw err(404, '这盏灯已经漂远了');
+  if (!m[2] && method === 'DELETE') { if (l.uid !== u.id) throw err(403, '只能收回自己的灯'); db.lake = db.lake.filter(x => x !== l); save(); return { ok: true }; }
+  if (l.uid === u.id) throw err(400, '这是你自己的灯');
+  if (m[2] === '/warm') { const k = `${l.id}|w|${u.id}`; if (!db.lakeMarks[k]) { db.lakeMarks[k] = 1; l.warmth++; save(); } return { warmth: l.warmth, warmed: true }; }
+  if (m[2] === '/report') { db.lakeMarks[`${l.id}|r|${u.id}`] = 1; l.status = 'reported'; save(); return { ok: true }; }
+  throw err(404, '没有这个接口');
 }

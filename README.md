@@ -20,6 +20,7 @@
 | 设置 | 昵称、日 / 夜 / 跟随系统、安静模式、每日提醒（生成每天重复的日历事件，国内手机都能用）、让月亮记得最近的事（默认关闭）、绑定手机 / 设置密码、导出全部数据、注销账号 |
 | 声景与呼吸 | 左下角的小月亮打开声景：听雨、风铃、虫鸣、围炉、颂钵五种，全部用 Web Audio 在设备上现场合成（没有音频文件、没有版权问题），按节气推荐当季的一种。“跟着圆窗呼吸”有平静 4-6、方块 4-4-4-4、入眠 4-7-8 三种节奏，圆窗随呼吸缩放，光点聚散，换气时有轻柔提示音；手帐里出现沉重的内容时，关怀提示里也会给出这个入口 |
 | 天气 | 设置里选城市（不读取定位），背景随当地实况下雨、打雷、下雪、起雾、飘云，晴天有斜照的光、晴夜有月晕和星星，大风时飘落物被吹得更快；侧栏显示“杭州 · 小雨 18°”，今天第一次动笔时天气字自动落在纸上 |
+| 灯海 | 大家匿名放下的心愿灯漂在同一片夜湖上：画布绘制的夜空、远山、月亮与碎在水里的倒影、远处成片的灯火；每盏河灯按远近缩放、漂移、起伏，点开能读到心愿，可以“添一点光”（光点飞向那盏灯）或举报；自己的灯标着“我的”，能看到收到了多少温暖、随时收回。七天后漂远 |
 | 季节 | 全站强调色与飘落物随当前节气所在季节自动变化（春樱 · 夏萤 · 秋叶 · 冬雪） |
 
 ## 关怀与合规设计
@@ -94,13 +95,25 @@ WEATHER_PROVIDER=open-meteo                                                     
 
 天气按城市缓存 20 分钟，所有用户共用，调用量只与城市数有关。可选城市在 `public/app/js/cities.js`。
 
+## 灯海的审核
+
+灯海是公开的用户内容，上线前务必把审核接好：
+
+1. **本地规则**（始终开启）：2–50 字；拦下链接、6 位以上数字、微信 / QQ 等联系方式；拦下基础词表（`server/moderation.js`），运营方可在 `DATA_DIR/blocklist.txt` 每行追加一个词，5 分钟内生效。
+2. **机器审核**：`MODERATION_PROVIDER=aliyun` 接入阿里云内容安全文本审核增强版（服务 `comment_detection_pro`，按 `RiskLevel` 判断）。无风险直接放行，高风险拒绝，中低风险转人工。接入后请先在控制台确认服务名与返回字段，并用几条样例验证。
+3. **人工审核**：设置 `ADMIN_TOKEN` 后打开 `/admin.html`。没接机器审核时默认先审后发（`LANTERN_REVIEW=pre`），待审的灯只有作者自己看得见。
+4. **举报**：3 人举报自动隐藏，进入“被举报”队列复核。
+5. **危机内容**：涉及自伤的心愿不公开，只在作者自己的湖上亮着，并弹出 12356 求助信息与呼吸练习入口。
+
+每人每天最多 3 盏（`LANTERN_DAILY_LIMIT`），两盏之间至少间隔 20 秒。
+
 ## 目录
 
 ```
-server/           服务端：index.js（路由与静态文件）、db.js、auth.js、ai.js、safety.js、sms.js、crypto.js、weather.js
+server/           服务端：index.js（路由与静态文件）、db.js、auth.js、ai.js、safety.js、sms.js、crypto.js、weather.js、moderation.js、aliyun.js
 public/           网站根目录
   index.html      落地页（由 src/journal.html 生成，勿直接修改）
-  app/            手帐应用：index.html、app.css、js/（main、page、stickers、calendar、coach、sound、calm、views/today|book|scroll|letters|settings|auth）
+  app/            手帐应用：index.html、app.css、js/（main、page、stickers、calendar、coach、sound、calm、views/today|book|scroll|lake|letters|settings|auth）
   assets/         图片
   fonts/          自托管字体
 src/journal.html  落地页源文件，同时也是在线展示版（Artifact）

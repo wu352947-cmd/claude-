@@ -207,3 +207,49 @@ test('城市与天气', async () => {
   assert.equal(typeof w.temp, 'number');
   assert.equal((await client()('GET', '/api/weather')).status, 401);
 });
+
+test('灯海：审核、放行、温暖、举报、匿名', async () => {
+  const { createApp: mk } = await import('../server/index.js');
+  const d2 = mkdtempSync(join(tmpdir(), 'sg-lake-'));
+  const srv = mk({ env: { DATA_DIR: d2, DB_FILE: join(d2, 't.db'), COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', APP_SECRET: 's', ENTRY_KEY: 'b'.repeat(64), ADMIN_TOKEN: 'admin-secret-token' } });
+  await new Promise(r => srv.listen(0, r));
+  const b2 = `http://127.0.0.1:${srv.address().port}`;
+  const mkc = () => { let cookie = ''; return async (method, path, body, headers = {}) => {
+    const res = await fetch(b2 + path, { method, headers: { 'x-sg': '1', cookie, ...(body ? { 'content-type': 'application/json' } : {}), ...headers }, body: body ? JSON.stringify(body) : undefined });
+    const sc = res.headers.get('set-cookie'); if (sc) cookie = sc.split(';')[0];
+    return { status: res.status, data: await res.json() };
+  }; };
+  try {
+    const users = [];
+    for (let i = 0; i < 4; i++) { const c = mkc(); await c('POST', '/api/auth/register', { username: 'lake' + i, password: 'lanterns88', agree: true }); users.push(c); }
+    const [a, b, c, d] = users;
+    assert.equal((await a('POST', '/api/lanterns', { text: '加我微信 abc12345678' })).status, 400, '联系方式被拦下');
+    assert.equal((await a('POST', '/api/lanterns', { text: '你这个傻逼' })).status, 400, '脏话被拦下');
+    const ok = await a('POST', '/api/lanterns', { text: '希望外婆的腿早点好起来' });
+    assert.equal(ok.status, 201);
+    assert.equal(ok.data.lantern.status, 'pending', '默认先审后发');
+    assert.equal((await a('POST', '/api/lanterns', { text: '再放一盏' })).status, 429, '放灯有间隔');
+    assert.equal((await b('GET', '/api/lanterns')).data.lanterns.length, 0, '待审的灯别人看不到');
+    assert.equal((await a('GET', '/api/lanterns')).data.lanterns[0].status, 'pending', '自己看得到');
+    const id = ok.data.lantern.id;
+    assert.equal((await b('POST', `/api/admin/lanterns/${id}`, { action: 'approve' }, { 'x-admin-token': 'wrong-token-xxxxxx' })).status, 403);
+    assert.equal((await b('POST', `/api/admin/lanterns/${id}`, { action: 'approve' }, { 'x-admin-token': 'admin-secret-token' })).status, 200);
+    const seen = (await b('GET', '/api/lanterns')).data.lanterns;
+    assert.equal(seen.length, 1);
+    assert.equal(seen[0].mine, false);
+    assert.equal(seen[0].status, undefined, '别人看不到审核状态');
+    assert.ok(!JSON.stringify(seen).includes('lake0'), '不暴露作者');
+    await b('POST', `/api/lanterns/${id}/warm`); await b('POST', `/api/lanterns/${id}/warm`);
+    assert.equal((await c('POST', `/api/lanterns/${id}/warm`)).data.warmth, 2, '同一人只暖一次');
+    assert.equal((await a('POST', `/api/lanterns/${id}/warm`)).status, 400, '不能暖自己的灯');
+    for (const u of [b, c, d]) await u('POST', `/api/lanterns/${id}/report`, { reason: '不适宜' });
+    assert.equal((await b('GET', '/api/lanterns')).data.lanterns.length, 0, '多人举报后暂时隐藏');
+    const q = await b('GET', '/api/admin/lanterns?status=reported', null, { 'x-admin-token': 'admin-secret-token' });
+    assert.equal(q.data.lanterns[0].id, id);
+    const crisis = await b('POST', '/api/lanterns', { text: '我真的不想活了' });
+    assert.equal(crisis.data.crisis, true);
+    assert.equal(crisis.data.lantern.status, 'private', '危机内容不公开');
+    assert.equal((await b('DELETE', `/api/lanterns/${crisis.data.lantern.id}`)).status, 200, '能收回自己的灯');
+    assert.equal((await c('DELETE', `/api/lanterns/${id}`)).status, 404);
+  } finally { srv.close(); }
+});

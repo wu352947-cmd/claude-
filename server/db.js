@@ -69,6 +69,30 @@ export function openDb(file) {
       PRIMARY KEY (phone, purpose)
     );
   `);
+  // 灯海：匿名心愿灯（不加密：本就是公开内容）；status = pending 待审 / visible 已放行 / reported 被举报暂隐 / hidden 已下架 / private 仅自己可见
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS lanterns (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      text        TEXT NOT NULL,
+      hue         INTEGER NOT NULL DEFAULT 0,
+      status      TEXT NOT NULL DEFAULT 'pending',
+      warmth      INTEGER NOT NULL DEFAULT 0,
+      reports     INTEGER NOT NULL DEFAULT 0,
+      created_at  INTEGER NOT NULL,
+      reviewed_at INTEGER
+    );
+    CREATE INDEX IF NOT EXISTS lanterns_status ON lanterns(status, created_at);
+    CREATE INDEX IF NOT EXISTS lanterns_user ON lanterns(user_id, created_at);
+    CREATE TABLE IF NOT EXISTS lantern_marks (
+      lantern_id  INTEGER NOT NULL REFERENCES lanterns(id) ON DELETE CASCADE,
+      user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      kind        TEXT NOT NULL CHECK (kind IN ('warm','report')),
+      reason      TEXT NOT NULL DEFAULT '',
+      created_at  INTEGER NOT NULL,
+      PRIMARY KEY (lantern_id, user_id, kind)
+    );
+  `);
   // 迁移：手机号（可为空，非空时唯一）
   const cols = db.prepare('PRAGMA table_info(users)').all().map(c => c.name);
   if (!cols.includes('phone')) db.exec('ALTER TABLE users ADD COLUMN phone TEXT');

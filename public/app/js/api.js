@@ -40,5 +40,10 @@ export const api = {
   bindPhone: b => call('POST', '/api/me/phone', b),
   deleteMeByCode: code => call('DELETE', '/api/me', { code }),
   demoSeed: () => call('POST', '/api/demo/seed', {}),
-  weather: () => call('GET', '/api/weather')
+  weather: () => call('GET', '/api/weather'),
+  lanterns: () => call('GET', '/api/lanterns'),
+  sendLantern: b => call('POST', '/api/lanterns', b),
+  warmLantern: id => call('POST', `/api/lanterns/${id}/warm`, {}),
+  reportLantern: (id, reason) => call('POST', `/api/lanterns/${id}/report`, { reason }),
+  deleteLantern: id => call('DELETE', `/api/lanterns/${id}`)
 };
