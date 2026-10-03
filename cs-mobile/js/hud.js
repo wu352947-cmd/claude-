@@ -158,6 +158,7 @@ export class HUD {
     if (this.scoreOpen) this.renderScore();
     // spectate label
     $('spectate').style.display = !P.alive && g.spectate && g.mode === 'defuse' ? 'block' : 'none';
+    if (!P.alive && g.spectate && (this._specHp !== g.spectate.hp || this._spec !== g.spectate)) { this._specHp = g.spectate.hp; this._spec = g.spectate; this.spectating(g.spectate); }
     if (!P.alive && g.mode === 'tdm' && P.respawnT) { $('respawn').style.display = 'block'; $('respawn').textContent = `${Math.max(0, P.respawnT - g.time).toFixed(1)} 秒后重生`; } else $('respawn').style.display = 'none';
     // fps
     this.fpsAcc = (this.fpsAcc || 0) + dt; this.fpsN = (this.fpsN || 0) + 1;

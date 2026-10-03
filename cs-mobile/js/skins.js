@@ -74,6 +74,7 @@ export function applySkin(root, skin, assets, team) {
     const uni = {
       uMap: { value: (skin && skin.tex && assets.skins[skin.tex]) || null }, uMode: { value: 0 }, uTint: { value: new THREE.Color(1, 1, 1) }, uTint2: { value: new THREE.Color(1, 1, 1) },
       uScale: { value: 2 }, uWear: { value: 0 }, uTeam: { value: new THREE.Color(team === 'CT' ? 0x2b3a55 : 0x5a4a30) }, uArms: { value: isArms ? 1 : 0 },
+      uDetail: { value: assets.skins[isArms ? 'denim_fabric' : 'rusty_painted_metal'] || null }, uDetailScale: { value: isArms ? 7 : 3.2 },
     };
     if (skin && !isArms) {
       uni.uMode.value = skin.mode === 'tex' ? (skin.c1 ? 4 : 1) : skin.mode === 'fade' ? (skin.tex ? 5 : 2) : 3;
@@ -86,18 +87,24 @@ export function applySkin(root, skin, assets, team) {
       sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vOP; varying vec3 vON;')
         .replace('#include <begin_vertex>', '#include <begin_vertex>\nvOP = position; vON = normal;');
       sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
-varying vec3 vOP; varying vec3 vON; uniform sampler2D uMap; uniform int uMode; uniform vec3 uTint; uniform vec3 uTint2; uniform float uScale; uniform float uWear; uniform vec3 uTeam; uniform float uArms;
+varying vec3 vOP; varying vec3 vON; uniform sampler2D uMap; uniform sampler2D uDetail; uniform float uDetailScale; uniform int uMode; uniform vec3 uTint; uniform vec3 uTint2; uniform float uScale; uniform float uWear; uniform vec3 uTeam; uniform float uArms;
 vec3 tri(vec3 p, vec3 n){ vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x+w.y+w.z+1e-4);
-  return texture2D(uMap, p.yz*uScale).rgb*w.x + texture2D(uMap, p.xz*uScale).rgb*w.y + texture2D(uMap, p.xy*uScale).rgb*w.z; }`)
+  return texture2D(uMap, p.yz*uScale).rgb*w.x + texture2D(uMap, p.xz*uScale).rgb*w.y + texture2D(uMap, p.xy*uScale).rgb*w.z; }
+float triD(vec3 p, vec3 n){ vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x+w.y+w.z+1e-4); float s = uDetailScale;
+  vec3 c = texture2D(uDetail, p.yz*s).rgb*w.x + texture2D(uDetail, p.xz*s).rgb*w.y + texture2D(uDetail, p.xy*s).rgb*w.z; return dot(c, vec3(0.333)); }`)
         .replace('#include <color_fragment>', `#include <color_fragment>
 {
   vec3 base = diffuseColor.rgb;
   float lum = dot(base, vec3(0.299,0.587,0.114));
+  float det = triD(vOP, vON);
   if (uArms > 0.5) {
-    // recolor jacket sleeves by team, keep skin tones
+    // recolor jacket sleeves by team, keep skin tones; add fabric weave
     float isJacket = step(base.r, base.g * 1.2) * step(lum, 0.25);
-    diffuseColor.rgb = mix(base, uTeam * (0.6 + lum * 3.0), isJacket);
-  } else if (uMode > 0) {
+    diffuseColor.rgb = mix(base, uTeam * (0.6 + lum * 3.0) * (0.55 + det * 0.9), isJacket);
+  } else if (uMode == 0) {
+    // stock finish: subtle grime / wear from a real painted-metal scan
+    diffuseColor.rgb = base * (0.78 + det * 0.5);
+  } else {
     float cover = mix(0.55, 1.0, smoothstep(0.02, 0.12, lum));
     vec3 c = base;
     vec3 p = vOP;
@@ -110,7 +117,7 @@ vec3 tri(vec3 p, vec3 n){ vec3 w = pow(abs(n), vec3(4.0)); w /= (w.x+w.y+w.z+1e-
   }
 }`);
     };
-    m.customProgramCacheKey = () => 'skin' + uni.uMode.value + (isArms ? 'a' : 'g');
+    m.customProgramCacheKey = () => 'skin2' + uni.uMode.value + (isArms ? 'a' : 'g');
     o.material = m;
   });
 }

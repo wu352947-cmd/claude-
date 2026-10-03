@@ -340,6 +340,17 @@ export class Game {
       if (h) ahits.push({ t: h.t, agent: b, group: h.group });
     }
     const events = hits.map(h => ({ ...h, kind: 'w' })).concat(ahits.map(h => ({ ...h, kind: 'a' }))).sort((p, q) => p.t - q.t);
+    // near-miss "whiz/crack" for the local player
+    const P = this.player;
+    if (a !== P && P.alive && a.team !== P.team && (!this._whizT || this.time - this._whizT > 0.12)) {
+      const eye = P.eye(_d); const ex = eye.x - origin.x, ey = eye.y - origin.y, ez = eye.z - origin.z;
+      const t = ex * dir.x + ey * dir.y + ez * dir.z; const firstWall = hits.length ? hits[0].t : 1e9;
+      if (t > 3 && t < firstWall) {
+        const px = origin.x + dir.x * t - eye.x, py = origin.y + dir.y * t - eye.y, pz = origin.z + dir.z * t - eye.z;
+        const miss = Math.hypot(px, py, pz);
+        if (miss < 1.6 && !ahits.some(h => h.agent === P)) { this._whizT = this.time; this.audio.play(Math.random() < 0.5 ? 'swish1' : 'swish2', { pos: { x: eye.x + px, y: eye.y + py, z: eye.z + pz }, volume: 0.9 - miss * 0.4, rate: 2.2 + Math.random() * 0.8, occlude: false }); if (miss < 0.8) this.shake = Math.max(this.shake || 0, 0.12); }
+      }
+    }
     let mult = 1, budget = (d.pen || 1) * 0.42, wall = false; let end = null, hitAgent = false;
     for (const ev of events) {
       if (ev.kind === 'a') {
@@ -520,9 +531,10 @@ export class Game {
     a.inv[slot] = null;
     const mesh = weaponWorldModel(this.assets, ws.id);
     const eye = a.eye(_v);
-    mesh.position.copy(eye); this.scene.add(mesh);
-    const f = a.forward(_d);
-    const drop = { ws, mesh, pos: eye.clone(), vel: new THREE.Vector3(f.x * 3, 2, f.z * 3), t: 0, rest: false, rot: Math.random() * 6 };
+    const f = a.forward(_d); const fl = Math.hypot(f.x, f.z) || 1;
+    const start = eye.clone(); start.y -= 0.45; start.x += f.x / fl * 0.6; start.z += f.z / fl * 0.6;
+    mesh.position.copy(start); this.scene.add(mesh);
+    const drop = { ws, mesh, pos: start, vel: new THREE.Vector3(f.x / fl * 4.2, 1.6, f.z / fl * 4.2), t: 0, rest: false, rot: Math.random() * 6 };
     this.drops.push(drop);
     if (this.drops.length > 24) { const o = this.drops.shift(); this.scene.remove(o.mesh); }
     if (a.cur === slot) a.switchTo(a.inv.primary ? 'primary' : a.inv.secondary ? 'secondary' : 'knife', true);
@@ -592,6 +604,7 @@ export class Game {
     // planting
     for (const a of this.agents) {
       if (!a.alive) continue;
+      if (a.inv.c4 && a.cur !== 'c4' && a.input.use && this.inSite(a.pos) && this.phase === 'live') { a.switchTo('c4', true); if (a === this.player) this.equipVM(); }
       if (a.inv.c4 && a.cur === 'c4' && a.input.use && a.onGround && this.inSite(a.pos) && this.phase === 'live') {
         a.plantT = (a.plantT || 0) + dt; a.input.mx = a.input.mf = 0;
         if (a === this.player) this.hud.progress('正在安放炸弹', a.plantT / 3.2);
