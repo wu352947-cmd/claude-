@@ -8,6 +8,7 @@ import { openLetter } from './letters.js';
 import { state, refreshCounts } from '../main.js';
 import { startCoach } from '../coach.js';
 import { MOOD_MAP, faceSvg } from '../faces.js';
+import { breathe } from '../calm.js';
 
 export async function todayView(root, day = dayKey(new Date())) {
   const today = dayKey(new Date());
@@ -81,8 +82,9 @@ export async function todayView(root, day = dayKey(new Date())) {
   function showCare() {
     const key = 'sg.care.' + day;
     try { if (sessionStorage.getItem(key)) return; sessionStorage.setItem(key, '1'); } catch {}
-    const c = h(`<div class="care" role="note"><div><b>这一页好像很沉。</b><br>如果你此刻很难受，可以拨打全国统一心理援助热线 <span class="num">12356</span>，有人愿意听你说；紧急情况请拨打 110 或 120。</div><button aria-label="收起">×</button></div>`);
-    c.querySelector('button').addEventListener('click', () => c.remove());
+    const c = h(`<div class="care" role="note"><div><b>这一页好像很沉。</b><br>如果你此刻很难受，可以拨打全国统一心理援助热线 <span class="num">12356</span>，有人愿意听你说；紧急情况请拨打 110 或 120。<br><button type="button" class="linkish" data-breathe>先和圆窗一起，慢慢呼吸一分钟</button></div><button aria-label="收起" data-x>×</button></div>`);
+    c.querySelector('[data-x]').addEventListener('click', () => c.remove());
+    c.querySelector('[data-breathe]').addEventListener('click', () => breathe());
     root.querySelector('#care').replaceChildren(c);
   }
 

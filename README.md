@@ -18,6 +18,7 @@
 | 信箱 | 月亮的回信与时光信。时光信可寄往一个月、半年、一年、三年后或任意日期，到期前无法拆开；拆信有揭火漆、信纸展开、逐段落墨的动画 |
 | 仪式 | 新用户第一次进来，用聚光灯带着选心情、写一句、贴贴纸、盖第一枚印；今日页会飘出泛黄的“一年前的今天” |
 | 设置 | 昵称、日 / 夜 / 跟随系统、安静模式、每日提醒（生成每天重复的日历事件，国内手机都能用）、让月亮记得最近的事（默认关闭）、绑定手机 / 设置密码、导出全部数据、注销账号 |
+| 声景与呼吸 | 左下角的小月亮打开声景：听雨、风铃、虫鸣、围炉、颂钵五种，全部用 Web Audio 在设备上现场合成（没有音频文件、没有版权问题），按节气推荐当季的一种。“跟着圆窗呼吸”有平静 4-6、方块 4-4-4-4、入眠 4-7-8 三种节奏，圆窗随呼吸缩放，光点聚散，换气时有轻柔提示音；手帐里出现沉重的内容时，关怀提示里也会给出这个入口 |
 | 季节 | 全站强调色与飘落物随当前节气所在季节自动变化（春樱 · 夏萤 · 秋叶 · 冬雪） |
 
 ## 关怀与合规设计
@@ -89,7 +90,7 @@ AI_PROVIDER=openai-compatible AI_BASE_URL=https://... AI_MODEL=... AI_API_KEY=..
 server/           服务端：index.js（路由与静态文件）、db.js、auth.js、ai.js、safety.js、sms.js、crypto.js
 public/           网站根目录
   index.html      落地页（由 src/journal.html 生成，勿直接修改）
-  app/            手帐应用：index.html、app.css、js/（main、page、stickers、calendar、coach、views/today|book|scroll|letters|settings|auth）
+  app/            手帐应用：index.html、app.css、js/（main、page、stickers、calendar、coach、sound、calm、views/today|book|scroll|letters|settings|auth）
   assets/         图片
   fonts/          自托管字体
 src/journal.html  落地页源文件，同时也是在线展示版（Artifact）

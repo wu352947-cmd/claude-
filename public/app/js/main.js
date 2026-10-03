@@ -9,6 +9,7 @@ import { bookView } from './views/book.js';
 import { lettersView } from './views/letters.js';
 import { settingsView } from './views/settings.js';
 import { scrollView } from './views/scroll.js';
+import { mountCalm } from './calm.js';
 
 export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {}, navDir: 0 };
 const root = document.getElementById('view');
@@ -56,6 +57,7 @@ async function route() {
 function enter(user, fresh) {
   state.user = user; applyPrefs();
   document.getElementById('topbar').hidden = false;
+  mountCalm();
   document.getElementById('termChip').innerHTML = `<b>${'春夏秋冬'[term.season]}</b>${term.name} · ${term.hou}${state.config.demo ? '<em class="demo-chip">试玩版</em>' : ''}`;
   if (fresh) toast(`欢迎，${user.nickname}。这是你手帐的第一页。`, { seal: '拾' });
   if (!location.hash || location.hash === '#/register' || location.hash === '#/login') location.hash = '#/today'; else route();
