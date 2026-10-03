@@ -58,6 +58,23 @@ void main(){
   // furnace light (gears machine room)
   vec3 lf = uFurnace - vW; float df = length(lf);
   col += base * uFurnaceCol * max(dot(n, lf / df), 0.0) * 9.0 / (1.0 + df * df * 0.08);
+#ifndef USE_INSTANCING
+  // gears: polished iron — warm furnace rim from behind, cool sky sheen on bevels and tooth tips
+  float prox = 1.0 / (1.0 + df * df * 0.03);
+  vec3 hf = normalize(normalize(vec3(-0.35, 0.6, 1.0)) + v);
+  float side = 1.0 - abs(n.z);                    // bevels, flanks, tooth tips
+  col = base * 0.55 * (amb + uKeyCol * k) + uAmbTop * fill * base * 0.6;
+  col += uAmbTop * 2.2 * pow(max(dot(n, hf), 0.0), 60.0) * (0.35 + 0.65 * side);
+  col += uFurnaceCol * 2.4 * pow(1.0 - max(dot(n, v), 0.0), 2.5) * prox;
+  vec3 hw = normalize(lf / df + v);
+  col += uFurnaceCol * 1.6 * pow(max(dot(n, hw), 0.0), 30.0) * prox * (0.4 + 0.6 * side);
+  // brushed face: faint circular streaks catch the light
+  float br = sin(length(vW.xy - vec2(0.0, 8.0)) * 38.0 + vSeed) * 0.5 + 0.5;
+  col *= 1.0 + 0.2 * (br - 0.5) * (1.0 - side) * uHaze;
+  // depth haze in the machine room: back gears recede into warm dust
+  float hz = clamp((1.4 - vW.z) / 4.5, 0.0, 1.0) * uHaze;
+  col = mix(col, vec3(0.07, 0.06, 0.055) + uFurnaceCol * 0.06, hz * 0.7);
+#endif
   // rivet heat at the freshly placed end
   float hot = vHeat * (0.35 + 0.65 * smoothstep(0.4, 1.0, vAlong));
   col += vec3(4.0, 1.25, 0.32) * hot * hot * 1.6;

@@ -49,7 +49,7 @@ function presence(n, t) {
 const activePCs = t => ORDER.filter(n => presence(n, t) > 0.5);
 // section level of the drone (global keyframes)
 const DRONE_LVL = [
-  [0, 0], [1, 0], [7, 0.11], [16, 0.13], [24, 0.22], [31, 0.28], [33, 0.7], [37, 0.45], [46, 0.55], [60, 0.5], [67, 0.75],
+  [0, 0], [1, 0], [7, 0.16], [16, 0.2], [24, 0.3], [31, 0.35], [33, 0.8], [37, 0.55], [46, 0.55], [60, 0.5], [67, 0.75],
   [76, 0.85], [81, 0.55], [89, 0.55], [90.5, 0.7], [92.0, 0.12], [93.2, 0],
   [93.8, 0], [96, 0.3], [107.6, 0.3], [108.4, 0.2], [120, 0.28], [127, 0.32], [129, 0.5], [140, 0.65], [146, 0.85],
   [146.01, 0], [160, 0], [164, 0.22], [176, 0.3], [180, 0.55], [196, 0.8], [208, 1.0],
@@ -140,7 +140,7 @@ function compose(M) {
     const segLvl = x => keyAt(DRONE_LVL, x);
     for (const n of ORDER) {
       const f = hz(VOICING[n]);
-      const ampFn = x => 0.11 * VLEVEL[n] * presence(n, x) * segLvl(x);
+      const ampFn = x => 0.06 * VLEVEL[n] * presence(n, x) * segLvl(x);
       // first moment it sounds within this segment
       let s = null, e = M.g1;
       for (let x = M.g0; x < M.g1; x += 0.25) if (ampFn(x) > 1e-4) { s = Math.max(M.g0, x - 0.3); break; }
@@ -150,7 +150,7 @@ function compose(M) {
       if (n === 'D') at(s, () => {   // sub-octave hum
         const o = osc(M, 'sine', f / 2, s, e + 0.1);
         const g = gain(M, 0);
-        curve(M, g.gain, s, e, x => ampFn(x) * 1.6, 20);
+        curve(M, g.gain, s, e, x => ampFn(x) * 0.8, 20);
         o.connect(g).connect(M.bus('sub', { send: {} }));
       });
     }
@@ -208,8 +208,8 @@ function compose(M) {
   });
   // wind: plains, dust devil, mud, stone
   at(19.5, () => A.wind(M, BUS.amb(), 19.5, 93.4, [
-    [19.5, 0], [24, 0.065], [30, 0.085], [32.6, 0.2], [33.2, 0.15], [36, 0.22], [39.5, 0.14], [42, 0.05], [56, 0.05], [60, 0.1],
-    [64, 0.2], [68, 0.24], [72, 0.16], [76, 0.2], [77, 0.06], [82, 0.03], [84, 0], [93.4, 0]], { seed: 'windA', gust: 0.7, center: 480, whistle: 0.25 }));
+    [19.5, 0], [24, 0.065], [30, 0.085], [32.6, 0.2], [33.2, 0.15], [36, 0.22], [39.5, 0.14], [42, 0.05], [56, 0.05], [60, 0.06],
+    [64, 0.1], [68, 0.12], [72, 0.08], [76, 0.1], [77, 0.04], [82, 0.03], [84, 0], [93.4, 0]], { seed: 'windA', gust: 0.7, center: 480, whistle: 0.25 }));
   // gust riser into the title
   at(30.2, () => I.riser(M, BUS.sfx(), 30.2, HITS.braam, { amp: 0.09, f0: 250, f1: 3200, pitch: null, seed: 'gust', release: 0.15 }));
   // BRAAM — title
@@ -231,7 +231,7 @@ function compose(M) {
     const down = i % 4 === 0;
     if (grp === 0) {
       // hands on wet clay; three builders slightly apart
-      const lvl = keyAt([[38, 0.3], [46, 0.38], [58, 0.48], [62, 0.45], [66.9, 0.06]], t) * (down ? 1.25 : 1);
+      const lvl = keyAt([[38, 0.15], [46, 0.19], [58, 0.24], [62, 0.22], [66.9, 0.03]], t) * (down ? 1.25 : 1);
       const r = R('hands' + i);
       for (let h = 0; h < 3; h++) {
         const tt = t + (h ? (r() - 0.3) * 0.03 : 0);
@@ -245,7 +245,7 @@ function compose(M) {
   at(39, () => {
     const parts = [[50, 39, 'm', -0.3], [45, 39.5, 'm', 0.3], [50, 40.2, 'm', 0.1], [45, 41, 'm', -0.1], [52, 46.5, 'm', 0.45], [52, 47.2, 'm', -0.45]];
     parts.forEach(([m, g0, sex, p], k) => {
-      const a = 0.05;
+      const a = 0.06;
       choirVoice(M, pan(M, BUS.choir(), p), g0, 66, [[g0, m, a, 'a'], [52, m, a * 1.3, 'o'], [58, m, a * 1.5, 'a'], [62, m, a * 0.8, 'o']], { sex, seed: 'mudch' + k, vib: 12, breath: 0.12, attack: 3, release: 3 });
     });
   });
@@ -264,10 +264,10 @@ function compose(M) {
   at(67.3, () => I.whoosh(M, BUS.sfx(), 67.3, 2.0, { amp: 0.1, f0: 400, f1: 3500, pan0: -0.95, pan1: 0.95, q: 0.5, seed: 'sandwall' }));
 
   // ---------- STONE 67.5 – 83
-  at(68, () => A.wind(M, BUS.amb(), 68, 77.6, [[68, 0], [69.5, 0.1], [75.6, 0.14], [76.2, 0.04], [77.6, 0]], { seed: 'rush', gust: 0.95, center: 1100, gustRate: 3.2, whistle: 0.05 }));
+  at(68, () => A.wind(M, BUS.amb(), 68, 77.6, [[68, 0], [69.5, 0.06], [75.6, 0.09], [76.2, 0.03], [77.6, 0]], { seed: 'rush', gust: 0.95, center: 1100, gustRate: 3.2, whistle: 0.05 }));
   at(75.2, () => I.whoosh(M, BUS.sfx(), 75.2, 2.2, { amp: 0.12, f0: 300, f1: 2200, pan0: 0.2, pan1: -0.3, q: 0.6, seed: 'apex' }));
   at(69, () => {
-    const v = [[50, 'm', -0.5, 0.045], [57, 'm', 0.5, 0.04], [62, 'f', -0.25, 0.03], [69, 'f', 0.25, 0.026], [50, 'm', 0.1, 0.03]];
+    const v = [[50, 'm', -0.5, 0.055], [57, 'm', 0.5, 0.05], [62, 'f', -0.25, 0.036], [69, 'f', 0.25, 0.03], [50, 'm', 0.1, 0.036]];
     v.forEach(([m, sex, p, a], k) => choirVoice(M, pan(M, BUS.choir(), p), 69 + k * 0.4, 82.5,
       [[69 + k * 0.4, m, a, 'o'], [76, m, a * 1.35, 'a'], [80, m, a * 0.9, 'a']], { sex, seed: 'stone' + k, vib: 16, attack: 3.5, release: 2.2 }));
   });

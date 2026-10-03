@@ -210,15 +210,15 @@ void main(){
   float building = step(vR + 0.03, vHz) * uBuild * (1. - vE.x);
   if (building > 0.) {
     float top = smoothstep(vR - 0.5, vR - 0.05, y);
-    float edge = exp(-max(vHz - vR, 0.) / 1.1);
+    float edge = exp(-max(vHz - vR, 0.) / 0.6);
     float sweep = 0.5 + 0.5 * sin(atan(P.z, P.x) * 2. - uWavePh);
     float rows = 0.85 + 0.15 * sin(dot(P.xz, vec2(1.)) * 3.);
     alb = mix(alb, vec3(0.22, 0.15, 0.10) * rows, 0.85 * top);
-    emit = vec3(1.0, 0.40, 0.12) * (2.4 * edge * (0.35 + 0.65 * sweep) + 0.05) * top * building;
+    emit = vec3(1.0, 0.40, 0.12) * (1.1 * edge * (0.3 + 0.7 * sweep) + 0.03) * top * building * (0.35 + 0.65 * uNight);
   }
   // a band of glowing fresh courses on the walls just below the working level
   float wallBand = isWall * exp(-max(vR - y, 0.) / 0.9) * step(y, vR + 0.05) * uBuild * step(vHz, vR + 0.03) * built * step(3.5, y);
-  emit += vec3(1.0, 0.42, 0.13) * 0.9 * wallBand * (0.5 + 0.5 * sin(atan(P.z, P.x) * 2. - uWavePh));
+  emit += vec3(1.0, 0.42, 0.13) * 0.45 * (0.35 + 0.65 * uNight) * wallBand * (0.5 + 0.5 * sin(atan(P.z, P.x) * 2. - uWavePh));
   // freshly built courses are darker until they dry
   float wet = exp(-max(uLevel - y, 0.) / 5.) * uBuild * built * (1. - building);
   alb *= 1. - 0.25 * wet;
@@ -367,12 +367,13 @@ void main(){
     // M1: scattered over the fresh platform; M2: a ring on the working edge of the rising tier
     vec2 home = (aA.yz - 0.5) * 2. * vec2(${(TERRACE.ax - 14).toFixed(1)}, ${(TERRACE.az - 14).toFixed(1)});
     home += vec2(sin(uTime * 0.3 + aB.y * 20.), cos(uTime * 0.27 + aB.y * 17.)) * 4.;
-    float s = fract(aA.y + uTime * 0.004) * 2. * (uRing.x + uRing.y);
-    vec2 ring = s < uRing.x * 2. ? vec2(s - uRing.x, -uRing.y) : s < uRing.x * 2. + uRing.y * 2. ? vec2(uRing.x, s - uRing.x * 2. - uRing.y) : vec2(0.);
-    float s2 = s - 2. * (uRing.x + uRing.y) * 0.5;
-    if (s >= uRing.x * 2. + uRing.y * 2.) ring = vec2(-uRing.x, uRing.y);
-    // simple: mirror half the workers to the other two sides
-    if (aA.w > 0.) ring = -ring;
+    float ax = uRing.x, az = uRing.y;
+    float s = fract(aA.y + uTime * 0.004) * 4. * (ax + az);
+    vec2 ring;
+    if (s < 2. * ax) ring = vec2(-ax + s, -az);
+    else if (s < 2. * ax + 2. * az) ring = vec2(ax, -az + (s - 2. * ax));
+    else if (s < 4. * ax + 2. * az) ring = vec2(ax - (s - 2. * ax - 2. * az), az);
+    else ring = vec2(-ax, az - (s - 4. * ax - 2. * az));
     float onRing = smoothstep(8.4, 9.2, uTime);
     xz = mix(home, ring * (1. - 0.04 * aA.z), onRing);
     vis = step(aB.x, uWorkers);
@@ -539,7 +540,7 @@ export default {
       uTime: { value: 0 }, uCam: v3(),
       uSunDir: v3(0, 1, 0), uSunCol: v3(), uMoonDir: v3(0.35, 0.72, -0.6), uMoonCol: v3(),
       uZen: v3(), uHor: v3(), uGlow: v3(), uAmb: v3(), uBounce: v3(),
-      uFogDen: { value: 0.00065 }, uNight: { value: 0 },
+      uFogDen: { value: 0.0007 }, uNight: { value: 0 },
       uHF: { value: hfTex }, uHFRect: { value: new THREE.Vector4(HF.x0 - G.res / 2, HF.z0 - G.res / 2, G.nx * G.res, G.nz * G.res) },
       uLevel: { value: 3 }, uWaveA: { value: 0 }, uWavePh: { value: 0 }, uWaveCS: { value: new THREE.Vector2(1, 0) },
       uCity: { value: cityTex }, uCityExt: { value: CITY_EXT }, uErode: { value: 0 }, uBuild: { value: 0 },
@@ -623,7 +624,7 @@ export default {
     for (let j = 0; j < NK; j++) {
       const i = NW + NR + j;
       tA.set([0, R(), R(), R() < 0.5 ? 1 : -1], i * 4);
-      tB.set([R(), R(), 0, 2], i * 4);
+      tB.set([R() * R(), R(), 0, 2], i * 4);
     }
     const tGeo2 = new THREE.BufferGeometry();
     tGeo2.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NT * 3), 3));
@@ -699,8 +700,8 @@ export default {
       [-0.40, [0.006, 0.008, 0.024], [0.020, 0.024, 0.050], [0, 0, 0]],
       [-0.14, [0.012, 0.014, 0.045], [0.050, 0.040, 0.085], [0, 0, 0]],
       [-0.05, [0.040, 0.034, 0.100], [0.300, 0.140, 0.140], [0, 0, 0]],
-      [0.015, [0.110, 0.095, 0.230], [1.050, 0.460, 0.190], [2.0, 0.85, 0.30]],
-      [0.09, [0.180, 0.190, 0.360], [1.150, 0.700, 0.380], [3.0, 1.75, 0.85]],
+      [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
+      [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.8, 1.45, 0.62]],
       [0.32, [0.240, 0.350, 0.600], [0.920, 0.800, 0.620], [3.6, 3.0, 2.2]],
       [1.00, [0.210, 0.360, 0.680], [0.850, 0.820, 0.720], [4.0, 3.6, 3.0]],
     ];
@@ -729,7 +730,7 @@ export default {
       S.torchU.uRing.value.set(ax, az, y); }
     S.tU.uTempLevel.value = track([[0, TEMPLE.y0 - 0.1], [17.7, TEMPLE.y0 - 0.1], [18.8, TEMPLE.y0 + 12]], t);
     const fire = smoothstep(18.9, 19.6, t) * (1 - smoothstep(24.2, 25.4, t));
-    U.uFireI.value = fire * (60 + 12 * Math.sin(t * 17) + 8 * Math.sin(t * 29.3)) * (0.35 + 0.65 * night);
+    U.uFireI.value = fire * (7 + 1.2 * Math.sin(t * 17) + 0.8 * Math.sin(t * 29.3)) * (0.35 + 0.65 * night);
     S.flameU.uI.value = fire * (1.0 + 0.12 * Math.sin(t * 23));
     S.emberU.uI.value = fire;
 
@@ -746,7 +747,7 @@ export default {
     S.torchU.uTauD0.value = S.tau(S.torchU.uDispT0.value);
     S.torchU.uDensity.value = track([[0, 0.38], [8.5, 0.45], [19.5, 1.0]], t);
     S.torchU.uTorchI.value = lerp(0.6, 1.0, Math.max(night, smoothstep(0.12, -0.02, e)));
-    S.torchU.uWorkers.value = track([[0, 0.5], [8, 0.5], [9, 1], [17.5, 1], [19.5, 0]], t);
+    S.torchU.uWorkers.value = track([[0, 0.12], [8, 0.16], [9, 1], [17.5, 1], [19.5, 0]], t);
 
     // ---------------- camera (orbit parameters around the platform centre)
     const deg = Math.PI / 180;

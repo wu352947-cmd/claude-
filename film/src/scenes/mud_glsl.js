@@ -38,7 +38,7 @@ vec3 applyFog(vec3 col, vec3 P){
   float y0 = uCam.y, y1 = P.y;
   float dens = abs(y1 - y0) > 0.5 ? (exp(-k * max(min(y0, y1), 0.)) - exp(-k * max(max(y0, y1), 0.))) / (k * abs(y1 - y0)) : exp(-k * max(y0, 0.));
   float f = 1. - exp(-dist * uFogDen * dens);
-  return mix(col, fogColor(d), f);
+  return mix(col, fogColor(d) * mix(0.6, 1., smoothstep(-0.4, 0.02, d.y)), f);
 }
 
 // ---- heightfield (ziggurat) as currently shown
@@ -124,7 +124,7 @@ vec3 shade(vec3 P, vec3 N, vec3 alb, float ao, float sh, float shm, float rough)
   // shrine fire
   if (uFireI > 0.001) {
     vec3 Lf = uFirePos - P; float d2 = dot(Lf, Lf); Lf *= inversesqrt(d2);
-    c += alb * vec3(1., 0.45, 0.16) * uFireI * max(dot(N, Lf) * 0.8 + 0.2, 0.) / (1. + d2 * 0.004);
+    c += alb * vec3(1., 0.45, 0.16) * uFireI * max(dot(N, Lf) * 0.8 + 0.2, 0.) / (1. + d2 * 0.02);
   }
   return c;
 }

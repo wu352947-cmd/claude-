@@ -5,6 +5,7 @@ import { GLSL } from '../engine/util.js';
 export function makeUniforms(THREE) {
   return {
     uTime: { value: 0 },        // local scene time (s)
+    uHaze: { value: 1 },
     uTau: { value: 0 },         // warped time of the after-world (I3), freezes at the end
     uMode: { value: 0 },        // 0 = I1 dusk, 1 = I2 night, 2 = I3 ash
     uNight: { value: 0 },       // 0 dusk → 1 night
@@ -29,7 +30,7 @@ export function makeUniforms(THREE) {
 }
 
 export const UNI_DECL = /* glsl */`
-uniform float uTime, uTau, uMode, uNight, uAsh, uFogDen, uFront, uPx;
+uniform float uHaze, uTime, uTau, uMode, uNight, uAsh, uFogDen, uFront, uPx;
 uniform vec3 uCam, uFogCol, uFogLow, uSkyZen, uSkyHor, uSkyBand, uKeyDir, uKeyCol, uAmbTop, uAmbBot, uRimCol, uFurnace, uFurnaceCol;
 `;
 

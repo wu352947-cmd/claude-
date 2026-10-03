@@ -438,19 +438,31 @@ export function frameAt(P) {
   return { up, fwd: towardSun, side };
 }
 
-// N1 camera path (global time g), Earth-centred coordinates.
-export function n1Pose(P, g) {
+// Tower-local frame at P: origin on the surface, Y = up (radial), Z = away from the sun (fwd = -Z), X = side.
+export function tlFrame(P) {
   const { up, fwd, side } = frameAt(P);
-  const u = clamp((g - 174) / 14);
-  // high & behind → lower & closer, drifting forward
-  const alt = lerp(3.4, 1.15, Math.pow(u, 0.9));
-  const back = lerp(4.6, 1.9, u);
-  const lat = lerp(-0.6, -0.25, u);
-  const base = P.clone().multiplyScalar(R);
-  const pos = base.clone().addScaledVector(fwd, -back).addScaledVector(side, lat);
-  pos.normalize().multiplyScalar(R + alt);
-  const target = base.clone().addScaledVector(fwd, lerp(1.6, 0.25, u)).addScaledVector(side, lerp(-0.1, 0, u));
-  return { pos, target, up: pos.clone().normalize(), fov: 34 };
+  return { o: P.clone().multiplyScalar(R), X: side, Y: up, Z: fwd.clone().negate(), P: P.clone() };
+}
+export function tlToWorld(F, x, y, z, out = new THREE.Vector3()) {
+  return out.copy(F.o).addScaledVector(F.X, x).addScaledVector(F.Y, y).addScaledVector(F.Z, z);
+}
+// point `alt` above the true sphere surface beneath tangent-plane coords (x, z)
+export function surfaceTL(F, x, z, alt, out = new THREE.Vector3()) {
+  out.copy(F.o).addScaledVector(F.X, x).addScaledVector(F.Z, z);
+  return out.normalize().multiplyScalar(R + alt);
+}
+
+// N1 camera path (global time g): high over the night side, descending toward P until 188.
+export const N1_END = { back: 1.0, alt: 0.2 };
+export function n1Pose(P, g) {
+  const F = tlFrame(P);
+  const u = clamp((g - 176) / 12);
+  const alt = 3.4 * Math.pow(N1_END.alt / 3.4, Math.pow(u, 1.25));
+  const back = 4.8 * Math.pow(N1_END.back / 4.8, Math.pow(u, 1.1));
+  const lat = -0.9 * (1 - (u * u * (3 - 2 * u)));
+  const pos = surfaceTL(F, lat, back, alt);
+  const target = surfaceTL(F, 0, -0.6 * (1 - u), 0);
+  return { pos, target, up: pos.clone().normalize(), fov: 34, sx: 0.5, sy: lerp(0.56, 0.66, u) };
 }
 
 // Orient `cam` at `pos` so that world point `target` lands at screen fraction (sx, sy) (top-left origin).

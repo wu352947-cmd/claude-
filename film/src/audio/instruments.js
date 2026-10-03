@@ -340,7 +340,7 @@ export function strings(M, out, g0, g1, notes, { n = 5, spread = 11, cutoff = 24
 // ---------------------------------------------------------------- drone voice (one pitch of the tower)
 export function droneVoice(M, out, g0, g1, f, ampFn, { seed = 'dr', bright = 6, detune = 7, pans = [-0.7, 0, 0.7], rate = 20 } = {}) {
   const r = R(seed + f);
-  const w = wave(M, 'tower', 28, n => Math.pow(n, -1.45) * (n % 2 ? 1 : 0.75));
+  const w = wave(M, 'tower', 28, n => Math.pow(n, -1.15) * (n % 2 ? 1 : 0.75));
   const lp = biquad(M, 'lowpass', f * bright, 0.7);
   const fn = (seed + 'lfo');
   const sA = r() * 1000, sB = r() * 1000;

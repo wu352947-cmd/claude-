@@ -118,11 +118,12 @@ void main(){
   gl_PointSize = Sc;
   float tw = .6 + .4 * sin(uT * (5. + 9. * s2) + s1 * 80.);
   float val = aD.x * smoothstep(uT16 - .01, uT16 + .2, uT) * (1. + .2 * sin(uT * 9. + s1 * 60.) * br * pre);
-  val = mix(val, aC * 1.25, rel) * (1. + rel * (.6 + 1.6 * tw * tw)) / (1. + .2 * tau) * smoothstep(1.2, 4., dist + (1. - rel) * 9.);
+  val = mix(val, aC * (.3 + .9 * smoothstep(1., 4.5, tau)), rel) * (1. + rel * (.6 + 1.6 * tw * tw)) / (1. + .2 * tau) * smoothstep(1.2, 4., dist + (1. - rel) * 9.);
   val *= 1. - land;
   // grains warm toward sand as they fall
-  vC = mix(vec3(${INK_LIN.join(',')}), vec3(1., .64, .36), rel * .65) * (1. + (1. - smoothstep(0., .08, land)) * smoothstep(0., .4, under + .4) * 0.);
-  vA = val * .249 * S * S / max(.249 * Sc * Sc, 1.);
+  vC = mix(vec3(${INK_LIN.join(',')}), vec3(1., .70, .36), rel * .7);
+  float Se = min(S, 3.);   // near grains defocus rather than flare
+  vA = val * .249 * Se * Se / max(.249 * Sc * Sc, 1.);
 }`;
 
 const STREAK_VERT = /* glsl */`
@@ -235,13 +236,14 @@ void main(){
   gl_Position = projectionMatrix * vec4(p, 1.);
   // motion-blurred streaks: length ∝ screen speed (≈ constant in normalised coords), thin
   float L = uPx * hw * sp * .016 / d * (.7 + .6 * fract(s * 11.7));
-  float th = uPx * (.0015 + .004 * pow(fract(s * 7.9), 3.)) / d;
+  float th = uPx * (.0008 + .0025 * pow(fract(s * 7.9), 4.)) / d;
   float Sc = clamp(L, 2., 90.);
   gl_PointSize = Sc;
   vK = clamp(Sc / max(th, .8), 1., 60.);
   float on = smoothstep(-1.4, -1.05, xn) * smoothstep(1.4, 1.05, xn);
   vC = mix(vec3(1., .52, .22), vec3(1., .72, .45), fract(s * 2.3)) * 1.1;
-  vA = on * (.25 + .75 * fract(s * 17.)) * smoothstep(0., .15, uC) * min(th / .8, 1.) * .9;
+  float band = .35 + .65 * smoothstep(-.2, .9, sin(yn * 5.3 + 1.7) * .6 + sin(yn * 13.1 - xn * 1.3 + 4.) * .4);
+  vA = on * band * (.2 + .8 * fract(s * 17.)) * smoothstep(0., .15, uC) * min(th / .8, 1.) * .38;
 }`;
 
 function points(THREE, n, attrs, vert, frag, uniforms, blending) {
@@ -332,7 +334,7 @@ export default {
     scene.add(devil);
 
     // ---- sand curtain across the lens (camera space) ----
-    const NC = 40000, cd = new Float32Array(NC * 4), r4 = rng(909);
+    const NC = 26000, cd = new Float32Array(NC * 4), r4 = rng(909);
     for (let i = 0; i < NC * 4; i++) cd[i] = r4();
     const cU = { uT: { value: 0 }, uPx: { value: uPx }, uC: { value: 0 } };
     const curtain = points(THREE, NC, [['position', new Float32Array(NC * 3), 3], ['aD', cd, 4]], CURTAIN_VERT, STREAK_FRAG, cU);

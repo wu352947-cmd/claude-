@@ -596,7 +596,7 @@ function updateK2(st, t, g) {
     const e = ease.inOutCubic(u);
     const n1 = n1Pose(E.P, 176.0);
     const n1Cam = new THREE.PerspectiveCamera(n1.fov, cam.aspect);
-    n1Cam.position.copy(n1.pos); n1Cam.up.copy(n1.up); n1Cam.lookAt(n1.target);
+    aimCamera(n1Cam, n1.pos, n1.target, n1.up, n1.sx, n1.sy);
     const p0 = rig, p3 = n1.pos;
     const fwd0 = new THREE.Vector3(0, 0, -1).applyQuaternion(qRise);
     const fwd3 = new THREE.Vector3(0, 0, -1).applyQuaternion(n1Cam.quaternion);
@@ -615,7 +615,7 @@ function updateK2(st, t, g) {
   cam.position.copy(pos); cam.quaternion.copy(q);
   if (t >= L_FLY1) {
     const n1 = n1Pose(E.P, g);
-    cam.fov = n1.fov; cam.position.copy(n1.pos); cam.up.copy(n1.up); cam.lookAt(n1.target);
+    cam.fov = n1.fov; aimCamera(cam, n1.pos, n1.target, n1.up, n1.sx, n1.sy);
   }
   cam.updateProjectionMatrix();
   cam.updateMatrixWorld();

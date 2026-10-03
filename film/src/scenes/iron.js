@@ -37,7 +37,7 @@ const LOOK = {
   },
   night: {
     zen: [0.003, 0.009, 0.016], hor: [0.025, 0.055, 0.07], band: [0.12, 0.06, 0.018],
-    fog: [0.018, 0.04, 0.05], fogLow: [0.045, 0.03, 0.016], den: 0.0017,
+    fog: [0.022, 0.05, 0.075], fogLow: [0.035, 0.04, 0.05], den: 0.0036,
     key: [0.04, 0.06, 0.08], ambTop: [0.05, 0.08, 0.1], ambBot: [0.06, 0.035, 0.015], rim: [0.06, 0.12, 0.16],
   },
   ash: {
@@ -105,9 +105,10 @@ function camI1(t) {
   const s2 = Math.pow(s, 0.9);
   const d = 15.8 * Math.pow(268 / 15.8, s2);
   const lat = -24 * s * s;
-  const y = 8 + 22 * Math.pow(s, 1.6);
+  const y = 8 + 22 * Math.pow(s, 1.6) - 1.5 * sstep(1.0, 2.6, t) * (1 - sstep(4.6, 7.0, t));
   const pos = P(lat, y, d);
-  const tgt = P(4 * s, 8 + 56 * Math.pow(s, 1.35), -12 * s);
+  const card = sstep(1.0, 2.6, t) * (1 - sstep(4.6, 7.0, t));
+  const tgt = P(4 * s, 8 + 56 * Math.pow(s, 1.35) + 5.5 * card, -12 * s);
   return { pos, tgt, fov: 30 };
 }
 const lerp3 = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
@@ -200,6 +201,7 @@ export default {
     U.uFogDen.value = ash ? LOOK.ash.den : mix(LOOK.dusk.den, LOOK.night.den, night);
     U.uKeyDir.value.set(ash ? 0.2 : 0.35, ash ? 1.0 : 0.32, ash ? 0.3 : -1).normalize();
     const furn = (1 - sstep(5.5, 8.5, t)) * (1 - ash);
+    U.uHaze.value = 1 - sstep(3.0, 6.0, t);
     U.uFurnaceCol.value.setRGB(1.0 * furn, 0.42 * furn, 0.11 * furn);
 
     // camera
@@ -249,7 +251,7 @@ export default {
         gain: [1, 1, 1],
         vignette: 0.42,
         grain: 0.05,
-        bloom: { strength: mix(0.75, 0.95, n), radius: 0.55, threshold: mix(0.85, 0.8, n) },
+        bloom: { strength: mix(0.75, 0.55, n), radius: mix(0.55, 0.4, n), threshold: mix(0.85, 0.95, n) },
       };
     }
     // the after-world: overexposed under the MASTER white, settling into near-monochrome grey
@@ -263,7 +265,7 @@ export default {
       gamma: [1.02, 1.02, 1.02],
       gain: [1, 1, 1],
       vignette: 0.32,
-      grain: 0.055,
+      grain: 0.035,
       bloom: { strength: mix(1.6, 0.35, f), radius: 0.7, threshold: mix(0.3, 0.9, f) },
     };
   },

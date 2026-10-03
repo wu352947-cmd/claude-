@@ -36,12 +36,12 @@ float vnoise(vec3 p){
 // Dissolve time (in warped after-world time τ) of a point on a building.
 export function dissolveAt(x, y, z) {
   const sweep = Math.min(Math.max((x + 260) / 560, 0), 1);
-  return 1.4 + sweep * 2.4 + (1 - Math.min(y / 240, 1)) * 0.4 + 1.2 * vnoise(x * 0.12, y * 0.12, z * 0.12) + 0.6 * vnoise(x * 0.55 + 7.1, y * 0.55, z * 0.55);
+  return 1.5 + sweep * 3.0 + (1 - Math.min(y / 240, 1)) * 0.9 + 0.35 * vnoise(x * 0.12, y * 0.12, z * 0.12) + 0.22 * vnoise(x * 0.7 + 7.1, y * 0.7, z * 0.7);
 }
 export const DISSOLVE_GLSL = VNOISE_GLSL + /* glsl */`
 float dissolveAt(vec3 p){
   float sweep = clamp((p.x + 260.0) / 560.0, 0.0, 1.0);
-  return 1.4 + sweep * 2.4 + (1.0 - min(p.y / 240.0, 1.0)) * 0.4 + 1.2 * vnoise(p * 0.12) + 0.6 * vnoise(p * 0.55 + vec3(7.1, 0.0, 0.0));
+  return 1.5 + sweep * 3.0 + (1.0 - min(p.y / 240.0, 1.0)) * 0.9 + 0.35 * vnoise(p * 0.12) + 0.22 * vnoise(p * 0.7 + vec3(7.1, 0.0, 0.0));
 }
 `;
 
@@ -213,7 +213,7 @@ varying float vHc, vG, vTH, vY0;
 varying vec4 vBld;
 void main(){
   vec3 n = normalize(vN);
-  float bid = vBld.x, seed = vBld.y, onT = vBld.z;
+  float bid = floor(vBld.x + 0.5), seed = vBld.y, onT = vBld.z;
   float pat = floor(fract(seed * 13.7) * 4.0);
   float isPyr = step(3.5, vBld.w);
   float w2 = vBld.w - 4.0 * isPyr;
@@ -223,7 +223,7 @@ void main(){
   if (uAsh > 0.5) {
     float td = dissolveAt(vW);
     if (uTau > td) discard;
-    dissolveEdge = 1.0 - smoothstep(0.0, 0.35, td - uTau);
+    dissolveEdge = 1.0 - smoothstep(0.0, 0.14, td - uTau);
   }
   vec3 V = normalize(uCam - vW);
   float isRoof = step(0.5, n.y);
@@ -237,42 +237,46 @@ void main(){
   float u = abs(n.x) > 0.5 ? vL.z * sign(n.x) : vL.x * -sign(n.z);
   float v = vL.y;
   if (isRoof < 0.5 && isPyr < 0.5) {
-    vec2 cs = vec2(1.35, 1.6);
+    vec2 cs = vec2(2.7, 3.3);
     vec2 q = vec2(u, v) / cs;
     vec2 cell = floor(q), f = fract(q);
     vec2 fw = fwidth(q);
-    float face = floor(n.x * 2.0 + n.z * 3.0 + 6.0);
+    float face = floor(n.x * 2.0 + n.z * 3.0 + 6.5);
     float h1 = hash12(cell + vec2(bid * 13.7 + face * 101.0, bid * 3.1));
     float h2 = hash12(cell.yx * 1.31 + vec2(bid * 7.9, face * 17.0 + 3.0));
+    // clustered occupancy: whole regions (offices) lit or dark, plus fully dark floors
+    float rh = hash12(floor(cell / vec2(3.0, 2.0)) + vec2(bid * 5.3 + face * 9.1, bid * 1.7));
+    float rowDark = step(hash12(vec2(cell.y * 1.7, bid * 2.3 + face * 0.7)), 0.38);
+    float occ = step(rh, 0.42 + 0.2 * seed) * (1.0 - rowDark) * step(h1, 0.72);
     // when does this window switch on?
     float tOn = onT;
     if (pat < 0.5) tOn += v / 120.0 * 2.2 + h2 * 0.4;
-    else if (pat < 1.5) tOn += h2 * 3.0;
+    else if (pat < 1.5) tOn += rh * 3.0 + h2 * 0.3;
     else if (pat < 2.5) tOn += fract(cell.x * 0.137 + face * 0.3) * 1.6 + h2 * 0.3;
     else tOn += fract((cell.x + cell.y) * 0.125) * 1.8 + h2 * 0.3;
-    float dens = mix(0.12, 0.2 + 0.26 * seed, uNight);
-    float lit = step(h1, dens) * smoothstep(tOn, tOn + 0.08, uTime);
-    if (uMode < 0.5) lit = step(h1, 0.10 + 0.08 * seed) * smoothstep(1.0, 3.0, uTime + h2 * 4.0);
-    // window rectangle with analytic AA
-    vec2 wx = smoothstep(vec2(0.16, 0.2) - fw, vec2(0.16, 0.2) + fw, f) * (1.0 - smoothstep(vec2(0.84, 0.74) - fw, vec2(0.84, 0.74) + fw, f));
+    float dens = 0.25;
+    float lit = occ * smoothstep(tOn, tOn + 0.08, uTime);
+    if (uMode < 0.5) lit = step(h1, 0.12 + 0.08 * seed) * step(rh, 0.6) * smoothstep(1.0, 3.0, uTime + h2 * 4.0);
+    // window rectangle with thick mullions, analytic AA
+    vec2 wx = smoothstep(vec2(0.24, 0.28) - fw, vec2(0.24, 0.28) + fw, f) * (1.0 - smoothstep(vec2(0.76, 0.72) - fw, vec2(0.76, 0.72) + fw, f));
     float win = wx.x * wx.y;
-    vec3 wc = mix(vec3(1.0, 0.56, 0.22), vec3(0.62, 0.86, 1.0), step(0.78, h2));
-    wc = mix(wc, vec3(1.0, 0.82, 0.55), step(0.55, h2) * step(h2, 0.78));
-    float inten = (0.35 + 1.1 * h2 * h2 * h2) * mix(0.9, 1.0, uNight);
-    vec3 glass = vec3(0.012, 0.016, 0.022) + uSkyHor * 0.05 * pow(1.0 - max(dot(n, V), 0.0), 3.0);
+    vec3 wc = mix(vec3(1.0, 0.55, 0.2), vec3(1.0, 0.78, 0.5), step(0.6, h2));
+    wc = mix(wc, vec3(0.6, 0.85, 1.0), step(0.92, h2));
+    float inten = (0.8 + 1.5 * h2 * h2 * h2) * mix(0.7, 1.0, uNight);
+    vec3 glass = vec3(0.01, 0.014, 0.02) + uSkyHor * 0.06 * pow(1.0 - max(dot(n, V), 0.0), 3.0);
     vec3 wcol = mix(glass, wc * inten, lit);
     // far away: average the grid instead of aliasing
-    float far = smoothstep(0.25, 0.7, max(fw.x, fw.y));
-    float avgLit = dens * smoothstep(onT, onT + 2.5, uTime) * 0.33;
-    if (uMode < 0.5) avgLit = (0.10 + 0.08 * seed) * 0.33 * smoothstep(1.0, 4.0, uTime);
-    vec3 avg = mix(glass * 0.4, vec3(1.0, 0.62, 0.3) * 0.9, avgLit);
-    col = mix(mix(col, wcol, win), mix(col, avg, 0.6), far);
+    float far = smoothstep(0.3, 0.8, max(fw.x, fw.y));
+    float avgLit = 0.2 * smoothstep(onT, onT + 2.5, uTime) * 0.28;
+    if (uMode < 0.5) avgLit = 0.1 * 0.28 * smoothstep(1.0, 4.0, uTime);
+    vec3 avg = mix(glass * 0.5, vec3(1.0, 0.62, 0.3) * 1.8, avgLit);
+    col = mix(mix(col, wcol, win), avg, far * 0.85);
   }
   // floodlit crowns
   if (flood > 0.5) {
     float fl = exp(-clamp((vL.y - vY0) / max(vTH, 1.0), 0.0, 1.0) * 1.6);
     vec3 fcol = spire ? vec3(1.0, 0.86, 0.66) : vec3(0.85, 0.9, 1.0);
-    col += base * fcol * 3.5 * fl * uNight * smoothstep(onT, onT + 1.0, uTime) * (isPyr > 0.5 ? 0.8 : 1.0);
+    col += base * fcol * 2.0 * fl * uNight * smoothstep(onT, onT + 1.0, uTime) * (isPyr > 0.5 ? 0.8 : 1.0);
     if (isPyr > 0.5) col += fcol * 0.025 * uNight * pow(max(dot(n, normalize(vec3(0.3, 1.0, 0.5))), 0.0), 2.0);
   }
   // crystal growth front: a cold glowing seam at the top while growing
@@ -280,14 +284,8 @@ void main(){
   col += vec3(0.5, 0.85, 1.2) * 0.4 * growing * smoothstep(vHc - 0.7, vHc, vL.y) * (1.0 - isRoof);
   // the after-world
   if (uAsh > 0.5) {
-    vec3 g = vec3(0.10, 0.10, 0.105) * (0.55 + 0.45 * (n.y * 0.5 + 0.5)) * (0.75 + 0.25 * k);
-    // dead windows: darker grid
-    vec2 q = vec2(u, v) / vec2(1.35, 1.6);
-    vec2 f = fract(q); vec2 fw2 = fwidth(q);
-    float far2 = smoothstep(0.25, 0.7, max(fw2.x, fw2.y));
-    float win = step(0.18, f.x) * step(f.x, 0.82) * step(0.22, f.y) * step(f.y, 0.74) * (1.0 - isRoof) * (1.0 - isPyr);
-    g *= mix(1.0 - 0.35 * win, 0.85, far2);
-    g += vec3(0.22) * dissolveEdge * dissolveEdge;
+    vec3 g = vec3(0.105, 0.105, 0.11) * (0.8 + 0.2 * (n.y * 0.5 + 0.5)) * (0.9 + 0.1 * k);
+    g += vec3(0.32) * dissolveEdge;
     col = g;
   }
   gl_FragColor = vec4(applyFog(col, vW), 1.0);
