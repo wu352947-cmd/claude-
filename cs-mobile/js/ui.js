@@ -6,7 +6,7 @@ const RANKS = ['白银 I', '白银 II', '白银 III', '白银精英', '黄金新
 const KEY = 'csdust_profile_v1';
 const SET_KEY = 'csdust_settings_v1';
 
-export const DEFAULT_SETTINGS = { sens: 1, scopeSens: 0.8, gyro: false, gyroSens: 1, autoFire: false, crouchHold: false, fov: 74, quality: 'med', volume: 0.9, musicVolume: 0.7, showFps: true, leftFire: true, friendlyFire: false, invertY: false };
+export const DEFAULT_SETTINGS = { sens: 1, scopeSens: 0.8, gyro: false, gyroSens: 1, autoFire: false, aimAssist: true, crouchHold: false, fov: 74, quality: 'med', volume: 0.9, musicVolume: 0.7, showFps: true, leftFire: true, friendlyFire: false, invertY: false };
 
 export function loadSettings() { try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SET_KEY) || '{}') }; } catch (e) { return { ...DEFAULT_SETTINGS }; } }
 export function saveSettings(s) { try { localStorage.setItem(SET_KEY, JSON.stringify(s)); } catch (e) { } }
@@ -163,7 +163,7 @@ export class UI {
     const rng = (k, label, min, max, step) => `<div class="set"><span>${label} <b id="v-${k}">${s[k]}</b></span><input type="range" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${s[k]}"></div>`;
     const tg = (k, label) => `<div class="set"><span>${label}</span><button class="toggle ${s[k] ? 'on' : ''}" data-t="${k}"></button></div>`;
     body.innerHTML = `<div class="settings">${rng('sens', '视角灵敏度', 0.2, 3, 0.05)}${rng('scopeSens', '开镜灵敏度', 0.2, 2, 0.05)}${rng('fov', '视野 FOV', 60, 95, 1)}${rng('volume', '音效音量', 0, 1, 0.05)}${rng('musicVolume', '音乐音量', 0, 1, 0.05)}
-      ${tg('autoFire', '自动开火（准星对准敌人时）')}${tg('gyro', '陀螺仪瞄准')}${rng('gyroSens', '陀螺仪灵敏度', 0.2, 3, 0.1)}${tg('crouchHold', '按住下蹲（关闭为切换）')}
+      ${tg('aimAssist', '瞄准辅助（准星在敌人身上时减速）')}${tg('autoFire', '自动开火（准星对准敌人时）')}${tg('gyro', '陀螺仪瞄准')}${rng('gyroSens', '陀螺仪灵敏度', 0.2, 3, 0.1)}${tg('crouchHold', '按住下蹲（关闭为切换）')}
       ${tg('leftFire', '显示左侧开火键')}${tg('showFps', '显示帧率')}${tg('invertY', '反转 Y 轴')}
       <div class="set"><span>画质</span><div class="seg" style="width:60%">${['low', 'med', 'high'].map(q => `<button data-q="${q}" class="${s.quality === q ? 'on' : ''}">${{ low: '流畅', med: '均衡', high: '高清' }[q]}</button>`).join('')}</div></div>
       <div class="set"><span>玩家名称</span><input id="set-name" value="${this.p.name}" maxlength="12" style="background:#222;border:1px solid #444;color:#fff;padding:6px;border-radius:6px;width:55%;user-select:text;-webkit-user-select:text"></div></div>`;

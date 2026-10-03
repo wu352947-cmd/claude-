@@ -160,19 +160,20 @@ export class Input {
     inp.reload = this.reload; this.reload = false;
     inp.fire2 = this.scope; this.scope = false;
     inp.use = this.use || !!k.KeyE;
-    // look
+    // look (with optional aim friction when the crosshair is on an enemy)
     const ws = a.ws; const zoom = game.camera.fov / (game.settings.fov || 74);
-    const sens = (this.s.sens || 1) * 0.0032 * (game.scoped ? zoom * (this.s.scopeSens || 1) : 1);
+    let onEnemy = false;
+    if ((this.s.aimAssist || this.s.autoFire) && ws && ws.def.type !== 'knife') {
+      const eye = a.eye(); const f = a.forward();
+      const wh = game.world.raycast(eye, f, 120); const maxT = wh ? wh.t : 120;
+      for (const b of game.agents) { if (b.team === a.team || !b.alive) continue; if (game.rayAgent(eye, f, b, maxT)) { onEnemy = true; break; } }
+    }
+    const friction = onEnemy && this.s.aimAssist && !this.pointerLocked ? 0.55 : 1;
+    const sens = (this.s.sens || 1) * 0.0032 * friction * (game.scoped ? zoom * (this.s.scopeSens || 1) : 1);
     a.yaw -= this.lookDX * sens; a.pitch -= this.lookDY * sens * (this.s.invertY ? -1 : 1);
     a.pitch = Math.max(-1.5, Math.min(1.5, a.pitch));
     this.lookDX = 0; this.lookDY = 0;
-    // auto-fire: shoot when the crosshair is on an enemy (mobile assist option)
-    let auto = false;
-    if (this.s.autoFire && ws && ws.def.type !== 'knife' && game.phase !== 'freeze') {
-      const eye = a.eye(); const f = a.forward();
-      const wh = game.world.raycast(eye, f, 120); const maxT = wh ? wh.t : 120;
-      for (const b of game.agents) { if (b.team === a.team || !b.alive) continue; const h = game.rayAgent(eye, f, b, maxT); if (h) { auto = true; break; } }
-    }
+    const auto = this.s.autoFire && onEnemy && game.phase !== 'freeze';
     inp.fire = this.fire || this.mouseFire || auto;
     if (this.slotReq) {
       if (this.slotReq === 'last') a.switchTo(a.prevSlot);

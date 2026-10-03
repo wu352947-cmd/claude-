@@ -64,6 +64,9 @@ export class Bot {
     inp.fire = false; inp.fire2 = false; inp.reload = false; inp.jump = false; inp.use = false;
     if (g.freeze) { inp.mx = inp.mf = 0; this.buyThink(); return; }
     if (this.nade && this.runNade(dt)) return;
+    // step out of fire
+    const fire = g.inFire(a.pos);
+    if (fire) { const dx = a.pos.x - fire.x, dz = a.pos.z - fire.z, L = Math.hypot(dx, dz) || 1; this.moveToward(a.pos.x + dx / L * 4, a.pos.z + dz / L * 4, 1); if (this.target) this.combat(dt); const k = Math.min(1, dt * 10); a.yaw += angDiff(this.lookYaw, a.yaw) * k; a.pitch += (this.lookPitch - a.pitch) * k; return; }
     this.thinkT -= dt;
     if (this.thinkT <= 0) { this.thinkT = 0.09 + Math.random() * 0.04; this.think(); }
 
@@ -254,7 +257,7 @@ export class Bot {
         h.handled = true;
         this.setGoal(h.x, h.z, 'search');
       }
-      if (!h.naded && dist > 12 && dist < 32 && Math.random() < 0.02 && a.inv.grenades.includes('he')) { h.naded = true; this.throwAt(h.x, h.y - 1.2, h.z, 'he'); }
+      if (!h.naded && dist > 12 && dist < 32 && Math.random() < 0.02) { const nid = ['he', 'incgrenade', 'molotov'].find(x => a.inv.grenades.includes(x)); if (nid) { h.naded = true; this.throwAt(h.x, h.y - 1.2, h.z, nid); } }
       if (g.time - h.t > 5) this.heard = null;
     }
 
@@ -455,7 +458,7 @@ export class Planner {
       if (bot.ri > stage && g.time < P.executeT && !bot.lurk) { bot.goal = null; bot.idleLook(0.1); a.input.mx = a.input.mf = 0; return; }
       if (bot.ri > stage && !bot.lurk && (P.utility || 0) < 3 && g.time < P.executeT + 6) {
         const hs = HOLDS[P.site]; const h = hs[(P.utility || 0) % hs.length];
-        const id = a.inv.grenades.includes('smoke') ? 'smoke' : a.inv.grenades.includes('flash') ? 'flash' : null;
+        const id = a.inv.grenades.includes('smoke') ? 'smoke' : a.inv.grenades.includes('molotov') ? 'molotov' : a.inv.grenades.includes('flash') ? 'flash' : null;
         if (id && bot.throwAt(h[0], 1, h[1], id)) { P.utility = (P.utility || 0) + 1; return; }
       }
       const p = r[bot.ri];

@@ -53,6 +53,7 @@ export class IconMaker {
       out[id] = this.render(weaponWorldModel(this.assets, id), 200, 64, true);
     }
     const g = makeGrenade(); g.scale.setScalar(4); out.he = out.flash = out.smoke = this.render(g, 64, 64, true);
+    const mo = makeGrenade(); mo.children[0].scale.set(0.8, 1.6, 0.8); mo.scale.setScalar(4); out.molotov = out.incgrenade = this.render(mo, 64, 64, true);
     const c4 = makeC4(); out.c4 = this.render(c4, 96, 64, true);
     return out;
   }

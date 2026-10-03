@@ -79,6 +79,8 @@ export const WEAPONS = {
   he: { id: 'he', name: '高爆手雷', slot: 'grenade', type: 'grenade', price: 300, damage: 98, speed: 245, reward: 300 },
   flash: { id: 'flash', name: '闪光弹', slot: 'grenade', type: 'grenade', price: 200, speed: 245, reward: 300 },
   smoke: { id: 'smoke', name: '烟雾弹', slot: 'grenade', type: 'grenade', price: 300, speed: 245, reward: 300 },
+  molotov: { id: 'molotov', name: '燃烧瓶', slot: 'grenade', type: 'grenade', team: 'T', price: 400, damage: 40, speed: 245, reward: 300 },
+  incgrenade: { id: 'incgrenade', name: '燃烧弹', slot: 'grenade', type: 'grenade', team: 'CT', price: 600, damage: 40, speed: 245, reward: 300 },
 };
 
 export const EQUIP = {
@@ -91,7 +93,7 @@ export const BUY_MENU = [
   { cat: '手枪', items: ['glock', 'usp', 'deagle', 'r8'] },
   { cat: '冲锋枪/霰弹', items: ['ump45', 'nova', 'xm1014'] },
   { cat: '步枪', items: ['ak47', 'm4a4', 'awp'] },
-  { cat: '装备', items: ['vest', 'vesthelm', 'kit', 'he', 'flash', 'smoke'] },
+  { cat: '装备', items: ['vest', 'vesthelm', 'kit', 'he', 'flash', 'smoke', 'molotov', 'incgrenade'] },
 ];
 
 export function unitsToM(u) { return u * U; }

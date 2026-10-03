@@ -3,6 +3,7 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { MAP_SIZE, CELL, FLOORS, PLATFORMS, STAIRS, ROOFS, WALLS, PROPS, DECOR } from './mapdata.js';
 
 const HALF = MAP_SIZE / 2;
+const WIRE = new THREE.MeshStandardMaterial({ color: 0x1a1612, roughness: 0.8 });
 // painted letters: [text, sub, color, x, y, z, rotY, size]
 const SIGNS = [
   ['A', '', '#d8752a', 44, 3.0, -65.94, 0, 5], ['A', '', '#d8752a', 65.94, 3.0, -58, -Math.PI / 2, 5],
@@ -409,8 +410,41 @@ export class World {
     };
     for (const [type, x, z, rot, scale, stack] of PROPS) place(type, x, z, rot, scale, stack);
     for (const [type, x, z, rot] of DECOR) place(type, x, z, rot, 1, 1, type !== 'lamp' && type !== 'aircon');
+    this.addDressing(assets);
     this.mergeStatic();
     this.buildNav();   // props changed walkability
+  }
+
+  // cloth canopies and hanging wires (Dust-style market dressing)
+  addDressing(assets) {
+    const fab = assets.skins.quatrefoil_jacquard_fabric, den = assets.skins.denim_fabric;
+    const cloth = (tex, color) => { const t = tex.clone(); t.needsUpdate = true; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(2, 2); return new THREE.MeshStandardMaterial({ map: t, color, side: THREE.DoubleSide, roughness: 0.95, emissive: color, emissiveMap: t, emissiveIntensity: 0.45 }); };
+    const mats = [cloth(fab, 0xc0392b), cloth(den, 0x2e5c8a), cloth(fab, 0xd8a24a), cloth(den, 0x7a2e5c)];
+    const canopies = [
+      [26, 57.5, 33, 64.5, 4.0], [43, 40, 49, 47, 4.2], [-5, 34, 1, 42, 4.4], [-56, 44, -50, 52, 4.0],
+      [56, -64, 64, -58, 3.8], [-70, -52, -64, -46, 3.6], [12, -74, 20, -68, 3.6], [-28, 58, -22, 64, 4.0],
+    ];
+    canopies.forEach(([x0, z0, x1, z1, y], i) => {
+      const w = x1 - x0, d = z1 - z0;
+      const g = new THREE.PlaneGeometry(w, d, 8, 8); g.rotateX(-Math.PI / 2);
+      const P = g.attributes.position;
+      for (let k = 0; k < P.count; k++) { const u = P.getX(k) / w * 2, v = P.getZ(k) / d * 2; P.setY(k, -0.35 * (1 - u * u) * (1 - v * v) * 2 + (Math.random() - 0.5) * 0.03); }
+      g.computeVertexNormals();
+      const m = new THREE.Mesh(g, mats[i % mats.length]); m.position.set((x0 + x1) / 2, y, (z0 + z1) / 2);
+      m.castShadow = true; m.receiveShadow = true; this.group.add(m);
+      // corner ropes
+      for (const [cx, cz] of [[x0, z0], [x1, z0], [x0, z1], [x1, z1]]) {
+        const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.8, 4), WIRE); pole.position.set(cx, y + 0.35, cz); this.group.add(pole);
+      }
+    });
+    // sagging power lines between rooftops
+    const wires = [[-24, 50, 24, 50, 7], [42, 30, 60, 30, 7.5], [-10, 10, 10, 10, 7], [24, -46, 24, -66, 6.5], [-50, -36, -60, -36, 6.5], [-30, -50, -30, -64, 6], [42, -10, 60, -10, 7], [-54, 26, -70, 26, 6.5]];
+    for (const [x0, z0, x1, z1, y] of wires) {
+      const pts = []; for (let k = 0; k <= 16; k++) { const t = k / 16; pts.push(new THREE.Vector3(x0 + (x1 - x0) * t, y - Math.sin(t * Math.PI) * 1.4, z0 + (z1 - z0) * t)); }
+      const tube = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 24, 0.02, 4, false), WIRE);
+      tube.castShadow = true; this.group.add(tube);
+      const t2 = tube.clone(); t2.position.y -= 0.35; t2.position.x += 0.1; this.group.add(t2);
+    }
   }
 
   // merge all static prop meshes that share a material into single draw calls

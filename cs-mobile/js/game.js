@@ -126,7 +126,7 @@ export class Game {
     this.phaseT = this.mode === 'tdm' ? 3 : (this.round === 1 ? 10 : 8);
     this.roundTime = 115; this.buyTimeLeft = 20;
     this.hotSite = null; this.roundEndReason = null; this.firstBlood = false;
-    for (const p of this.projectiles) this.scene.remove(p.mesh); this.projectiles = [];
+    for (const p of this.projectiles) this.scene.remove(p.mesh); this.projectiles = []; this.fires = [];
     for (const d of this.drops) this.scene.remove(d.mesh); this.drops = [];
     if (this.bomb.mesh) this.scene.remove(this.bomb.mesh);
     this.bomb = { planted: false, dropped: false, carrier: null, pos: new THREE.Vector3(), site: null, timer: 0, defuser: null, defuseT: 0, mesh: null, beepT: 0 };
@@ -252,6 +252,7 @@ export class Game {
     if (m() >= 300 && Math.random() < 0.7) this.buy(a, 'he');
     if (m() >= 300 && Math.random() < 0.6) this.buy(a, 'smoke');
     if (m() >= 200 && Math.random() < 0.6) this.buy(a, 'flash');
+    if (m() >= 600 && Math.random() < 0.45) this.buy(a, a.team === 'T' ? 'molotov' : 'incgrenade');
     if (a.inv.primary) a.switchTo('primary', true);
   }
 
@@ -662,13 +663,15 @@ export class Game {
     const mesh = makeGrenade(); mesh.scale.setScalar(2.2);
     if (id === 'flash') mesh.children[0].material = new THREE.MeshStandardMaterial({ color: 0x8a9aa8, metalness: 0.5, roughness: 0.4 });
     if (id === 'smoke') mesh.children[0].material = new THREE.MeshStandardMaterial({ color: 0x9aa070, metalness: 0.2, roughness: 0.6 });
+    if (id === 'molotov') { mesh.children[0].material = new THREE.MeshStandardMaterial({ color: 0x2f6b2a, metalness: 0.1, roughness: 0.15, transparent: true, opacity: 0.85 }); mesh.children[0].scale.set(0.8, 1.6, 0.8); }
+    if (id === 'incgrenade') mesh.children[0].material = new THREE.MeshStandardMaterial({ color: 0x8a3a2a, metalness: 0.4, roughness: 0.5 });
     this.scene.add(mesh);
     const speed = 17;
     const p = { id, owner: a, mesh, pos: eye.clone().addScaledVector(f, 0.5), vel: f.clone().multiplyScalar(speed).add(new THREE.Vector3(0, 2.2, 0)).addScaledVector(a.vel, 0.8), t: 0, fuse: id === 'smoke' ? 2.2 : 1.6, still: 0, spin: new THREE.Vector3(Math.random() * 10, Math.random() * 10, 0) };
     this.projectiles.push(p);
     this.sound(a, 'swish2', 0.5);
     if (a === this.player) this.vm.throwAnim();
-    if (a.team === this.player.team && a !== this.player) this.hud.radio(a, { he: '投掷手雷！', flash: '投掷闪光弹！', smoke: '投掷烟雾弹！' }[id]);
+    if (a.team === this.player.team && a !== this.player) this.hud.radio(a, { he: '投掷手雷！', flash: '投掷闪光弹！', smoke: '投掷烟雾弹！', molotov: '投掷燃烧瓶！', incgrenade: '投掷燃烧弹！' }[id]);
   }
 
   updateProjectiles(dt) {
@@ -685,18 +688,21 @@ export class Game {
             const n = _d.set(hit.normal[0], hit.normal[1], hit.normal[2]);
             p.pos.addScaledVector(dir, Math.max(0, hit.t - 0.05));
             const vn = p.vel.dot(n); p.vel.addScaledVector(n, -1.55 * vn); p.vel.multiplyScalar(0.55);
+            if (n.y > 0.7) p.landed = true;
             if (Math.abs(vn) > 2) this.audio.play('clink2', { pos: p.pos, volume: 0.5, maxDist: 30, rate: 1.1 });
           } else p.pos.addScaledVector(p.vel, h);
         }
       }
       if (p.vel.length() < 0.5) p.still += dt;
       p.mesh.position.copy(p.pos); p.mesh.rotation.x += p.spin.x * dt * (p.still ? 0 : 1); p.mesh.rotation.y += p.spin.y * dt * (p.still ? 0 : 1);
-      const detonate = p.id === 'smoke' ? (p.still > 0.4 || p.t > 3) : p.t > p.fuse;
+      const fireNade = p.id === 'molotov' || p.id === 'incgrenade';
+      const detonate = p.id === 'smoke' ? (p.still > 0.4 || p.t > 3) : fireNade ? (p.landed || p.t > 2) : p.t > p.fuse;
       if (detonate) {
         this.projectiles.splice(i, 1); this.scene.remove(p.mesh);
         if (p.id === 'he') this.explode(p.pos.x, p.pos.y, p.pos.z, 98, 11, p.owner, false);
         if (p.id === 'flash') this.flashbang(p.pos, p.owner);
         if (p.id === 'smoke') { this.effects.smokeGrenade(p.pos.x, p.pos.y, p.pos.z); this.audio.play('explosion_far', { pos: p.pos, volume: 0.25, rate: 2.2 }); }
+        if (fireNade) this.ignite(p.pos, p.owner);
       }
     }
   }
@@ -719,6 +725,50 @@ export class Game {
       if (dmg >= 1) this.damage(a, owner, isBomb ? { id: 'c4', name: 'C4', reward: 0 } : WEAPONS.he, Math.round(dmg), 'chest', { dir: _d.set(a.pos.x - x, 0, a.pos.z - z).normalize().clone(), noArmor: true });
     }
   }
+
+  ignite(pos, owner) {
+    const g = this.world.groundAt(pos.x, pos.z, 0.3, pos.y + 0.5);
+    // a fire can't burn inside a smoke
+    for (const sm of this.effects.smokeVolumes) if (Math.hypot(sm.x - pos.x, sm.z - pos.z) < sm.r + 1) { this.audio.play('swish2', { pos, volume: 0.5, rate: 0.6 }); return; }
+    const f = { x: pos.x, y: g, z: pos.z, r: 0.5, t: 0, life: 7, owner, tick: 0 };
+    this.fires = this.fires || []; this.fires.push(f);
+    this.audio.play('explosion_far', { pos, volume: 0.7, rate: 1.4 });
+    this.audio.play('clink2', { pos, volume: 0.7, rate: 0.7 });
+    this.effects.scorch.add(pos.x, g + 0.01, pos.z, 0, 1, 0, 6);
+  }
+
+  updateFires(dt) {
+    if (!this.fires || !this.fires.length) return;
+    for (let i = this.fires.length - 1; i >= 0; i--) {
+      const f = this.fires[i]; f.t += dt;
+      f.r = Math.min(3.4, 0.5 + f.t * 6);
+      // smoke extinguishes fire
+      if (this.effects.smokeVolumes.some(sm => sm.r > 1 && Math.hypot(sm.x - f.x, sm.z - f.z) < sm.r + f.r * 0.5)) f.t = Math.max(f.t, f.life - 0.3);
+      const k = f.t > f.life - 1 ? (f.life - f.t) : 1;
+      // flames
+      const n = Math.ceil(dt * 120 * k);
+      for (let j = 0; j < n; j++) {
+        const a = Math.random() * 6.283, rr = Math.sqrt(Math.random()) * f.r;
+        this.effects.fire.add({ x: f.x + Math.cos(a) * rr, y: f.y + 0.1, z: f.z + Math.sin(a) * rr, vy: 1.5 + Math.random() * 2, vx: (Math.random() - 0.5) * 0.5, vz: (Math.random() - 0.5) * 0.5, life: 0.5 + Math.random() * 0.4, size: 1.0 + Math.random() * 1.2, grow: 1.2, spin: (Math.random() - 0.5) * 2, r: 1, g: 0.5 + Math.random() * 0.25, b: 0.15, a: 0.9 });
+      }
+      if (Math.random() < dt * 6) this.effects.bigSmoke.add({ x: f.x + (Math.random() - 0.5) * f.r, y: f.y + 1.2, z: f.z + (Math.random() - 0.5) * f.r, vy: 1.2, life: 3, size: 1.5, grow: 1.5, r: 0.15, g: 0.13, b: 0.12, a: 0.5, fade: 'in-out' });
+      this.effects.light.position.set(f.x, f.y + 1, f.z); if (this.effects.lightT <= 0) { this.effects.light.intensity = 25 * k + Math.random() * 6; this.effects.light.distance = 12; }
+      // damage ticks
+      f.tick -= dt;
+      if (f.tick <= 0) {
+        f.tick = 0.25;
+        for (const a of this.agents) {
+          if (!a.alive || Math.abs(a.pos.y - f.y) > 1.5) continue;
+          if (Math.hypot(a.pos.x - f.x, a.pos.z - f.z) < f.r) {
+            if (f.owner && f.owner.team === a.team && f.owner !== a && !this.settings.friendlyFire) continue;
+            this.damage(a, f.owner, WEAPONS.molotov, 8, 'legs', { dir: new THREE.Vector3(0, 0, 1), noArmor: true });
+          }
+        }
+      }
+      if (f.t >= f.life) this.fires.splice(i, 1);
+    }
+  }
+  inFire(p) { return (this.fires || []).find(f => Math.hypot(p.x - f.x, p.z - f.z) < f.r + 0.4 && Math.abs(p.y - f.y) < 1.5); }
 
   flashbang(pos, owner) {
     this.effects.flashBurst(pos.x, pos.y, pos.z);
@@ -776,6 +826,7 @@ export class Game {
     // TDM respawns
     if (this.mode === 'tdm') for (const a of this.agents) if (!a.alive && a.respawnT && this.time > a.respawnT) this.respawnTDM(a);
     this.updateProjectiles(dt);
+    this.updateFires(dt);
     this.updateDrops(dt);
     if (this.mode === 'defuse') this.updateBomb(dt);
     this.effects.update(dt, this.world);
