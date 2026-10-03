@@ -36,6 +36,7 @@
   --sky-top:#DCE6EC; --sky-bot:#F3EEE6;
   --mt1:#8FA79C; --mt2:#B7C7BF; --mt3:#D2DCD8; --water:#C9D7DC;
   --star:.25; --moon-dark:rgba(44,52,66,.08);
+  --ph-day:1; --ph-night:0; --img-dim:1; --mount:#E7E0CF; --mount-2:#D8CDB4;
   --night-1:#141A2A; --night-2:#2A2F4A; --night-ink:#F3EEE3;
 
   --f-brush:"Ma Shan Zheng","STKaiti","KaiTi","Kaiti SC",serif;
@@ -56,6 +57,7 @@
     --shu:#DA5B4C; --bark:#A08A78; --snow:#EEF2F8; --shadow:rgba(0,0,0,.55); --grain:.05;
     --sky-top:#18203A; --sky-bot:#38365A; --mt1:#2C3A44; --mt2:#3A4757; --mt3:#4B5468; --water:#232C40;
     --star:1; --moon-dark:rgba(255,255,255,.06);
+    --ph-day:0; --ph-night:1; --img-dim:.86; --mount:#2B2C38; --mount-2:#3A3A48;
     color-scheme:dark;
   }
 }
@@ -67,6 +69,7 @@
   --shu:#DA5B4C; --bark:#A08A78; --snow:#EEF2F8; --shadow:rgba(0,0,0,.55); --grain:.05;
   --sky-top:#18203A; --sky-bot:#38365A; --mt1:#2C3A44; --mt2:#3A4757; --mt3:#4B5468; --water:#232C40;
   --star:1; --moon-dark:rgba(255,255,255,.06);
+  --ph-day:0; --ph-night:1; --img-dim:.86; --mount:#2B2C38; --mount-2:#3A3A48;
   color-scheme:dark;
 }
 
@@ -97,6 +100,7 @@ button{cursor:pointer}
 
 #petals{position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0}
 main, header.nav, footer{position:relative; z-index:1}
+main{overflow-x:clip}
 .wrap{max-width:1180px; margin:0 auto; padding-inline:clamp(16px,4vw,48px)}
 
 /* ---------- nav ---------- */
@@ -157,6 +161,7 @@ main, header.nav, footer{position:relative; z-index:1}
 /* reveal: 始于可见状态，只轻轻浮起 */
 .rv{transition:opacity 1.1s var(--ease), transform 1.1s var(--ease), filter 1.1s var(--ease)}
 .rv.pre{opacity:.2; transform:translateY(34px); filter:blur(4px)}
+.handscroll.rv.pre{opacity:1; transform:none; filter:none}
 
 .btn{display:inline-flex; align-items:center; gap:10px; border:0; text-decoration:none; font-family:var(--f-display); font-size:16px; letter-spacing:.14em;
   padding:13px 24px 13px 30px; border-radius:4px 22px 22px 4px; position:relative; transition:transform .5s var(--spring), box-shadow .5s var(--ease), background-color .4s}
@@ -202,14 +207,13 @@ main, header.nav, footer{position:relative; z-index:1}
 .gate .layer{transition:transform .2s linear}
 .star{fill:#fff; opacity:calc(var(--star) * .8); animation:twinkle 3.4s ease-in-out infinite}
 @keyframes twinkle{50%{opacity:calc(var(--star) * .2)}}
-.cloud{fill:var(--card); opacity:.75; animation:drift 26s linear infinite}
-.cloud.c2{animation-duration:38s; animation-delay:-14s; opacity:.55}
-@keyframes drift{from{transform:translateX(-120px)} to{transform:translateX(420px)}}
-.bird{fill:none; stroke:var(--ink); stroke-width:1.4; stroke-linecap:round; opacity:.6; animation:fly 22s linear infinite}
+.ph{transition:opacity 1s var(--ease); filter:saturate(.9)}
+.ph-day{opacity:var(--ph-day)} .ph-night{opacity:var(--ph-night)}
+.bird{fill:none; stroke:#2C3442; stroke-width:1.4; stroke-linecap:round; opacity:.6; animation:fly 22s linear infinite}
 @keyframes fly{0%{transform:translate(-40px,150px)} 100%{transform:translate(440px,70px)}}
 .wing{animation:flap .9s ease-in-out infinite; transform-origin:center; transform-box:fill-box}
 @keyframes flap{50%{transform:scaleY(.4)}}
-.shimmer line{stroke:var(--gold); stroke-width:2; stroke-linecap:round; opacity:.55; animation:shim 3s ease-in-out infinite}
+.shimmer line{stroke:#F6E3B0; stroke-width:2; stroke-linecap:round; opacity:.6; animation:shim 3s ease-in-out infinite}
 @keyframes shim{50%{opacity:.12; transform:translateX(6px)}}
 .boat{animation:bob 4.8s ease-in-out infinite}
 @keyframes bob{50%{transform:translate(-6px,2px) rotate(-1.4deg)}}
@@ -338,7 +342,7 @@ li:hover .del, .del:focus-visible{opacity:1}
 @media (max-width:900px){ .jq{grid-template-columns:1fr} }
 .wheel-box{position:relative; width:min(100%,560px); aspect-ratio:1; max-width:100%; justify-self:center; touch-action:none; user-select:none; -webkit-user-select:none; cursor:grab}
 .wheel-box:active{cursor:grabbing}
-.wheel-box > svg:not(.pointer){width:100%; height:100%; overflow:visible; display:block}
+.wheel-box > svg:not(.pointer){width:100%; height:100%; overflow:hidden; display:block}
 .wheel-box .lbl{font-family:var(--f-display); font-size:17px; fill:var(--ink-soft); transition:fill .4s}
 .wheel-box .lbl.on{fill:var(--shu)}
 .wheel-box .tk{stroke:var(--ink); opacity:.35}
@@ -383,7 +387,8 @@ li:hover .del, .del:focus-visible{opacity:1}
   .it{left:var(--mx); top:var(--my)}
 }
 .polaroid{background:var(--card); padding:.6em .6em 2.4em; width:11em; border-radius:2px}
-.polaroid svg{display:block; width:100%; border-radius:1px}
+.polaroid img{display:block; width:100%; height:auto; aspect-ratio:56/52; object-fit:cover; border-radius:1px; pointer-events:none; filter:saturate(.88) contrast(.96) sepia(.06) brightness(var(--img-dim))}
+.polaroid.small{width:9.6em}
 .polaroid p{position:absolute; left:0; right:0; bottom:.55em; margin:0; text-align:center; font-family:var(--f-kana); font-size:.9em}
 .ticket{width:15em; display:grid; grid-template-columns:3.4em 1fr; background:var(--fuji-soft); border-radius:6px;
   -webkit-mask:radial-gradient(circle at 3.4em 0, #0000 .5em, #000 .55em) top/100% 51% no-repeat, radial-gradient(circle at 3.4em 100%, #0000 .5em, #000 .55em) bottom/100% 51% no-repeat;
@@ -421,9 +426,8 @@ li:hover .del, .del:focus-visible{opacity:1}
 .letter.open .flap{transform:rotateX(180deg); z-index:0; transition:transform .8s var(--ease), z-index 0s .4s}
 .letter.open .wax{opacity:0; transform:scale(.4) rotate(40deg)}
 .letter.open .paper{transform:translateY(-5.6em)}
+.letter:not(.open) .paper{color:transparent}
 .letter .tip{position:absolute; bottom:-1.8em; left:0; right:0; text-align:center; font-family:var(--f-kana); font-size:.75em; color:var(--ink-soft)}
-.crane{width:9em}
-.crane svg{width:100%; display:block}
 
 /* ---------- poems ---------- */
 .poems{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:clamp(16px,2.4vw,28px)}
@@ -450,6 +454,26 @@ li:hover .del, .del:focus-visible{opacity:1}
 .pcard .by{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-soft); gap:8px}
 .pcard .by i{font-style:normal; width:26px; height:26px; flex:none; border-radius:4px; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-size:14px}
 .pcard .tr{font-size:12.5px; color:var(--ink-soft); line-height:1.6; margin:0}
+
+/* ---------- handscroll ---------- */
+.handscroll{position:relative; margin:0; padding-inline:26px}
+.handscroll .paint{position:relative; height:clamp(220px,30vw,380px); overflow:hidden; background:var(--mount-2); cursor:grab; touch-action:pan-y;
+  box-shadow:0 0 0 12px var(--mount), 0 0 0 13px var(--line), 0 34px 50px -30px var(--shadow);
+  transition:clip-path 1.9s var(--ease)}
+.handscroll .paint:active{cursor:grabbing}
+.handscroll .paint img{height:100%; width:auto; max-width:none; display:block; user-select:none; -webkit-user-select:none; pointer-events:none;
+  transform:translate3d(var(--px,0px),0,0); filter:brightness(var(--img-dim)) saturate(.95)}
+.handscroll .paint::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(40,28,18,.28), transparent 6%, transparent 94%, rgba(40,28,18,.28))}
+.roller{position:absolute; top:-26px; bottom:-26px; width:22px; z-index:2; border-radius:11px;
+  background:linear-gradient(90deg,#4A2F20,#9C6C46 38%,#C89A6C 50%,#7A4E32 70%,#4A2F20);
+  box-shadow:0 10px 18px -8px var(--shadow); transition:left 1.9s var(--ease), right 1.9s var(--ease)}
+.roller::before,.roller::after{content:""; position:absolute; left:-3px; right:-3px; height:16px; border-radius:6px; background:radial-gradient(circle at 35% 35%, #fff9, transparent 45%), var(--celadon)}
+.roller::before{top:-8px} .roller::after{bottom:-8px}
+.roller.l{left:0} .roller.r{right:0}
+.handscroll.pre .paint{clip-path:inset(0 50% 0 50%)}
+.handscroll.pre .roller.l{left:calc(50% - 22px)} .handscroll.pre .roller.r{right:calc(50% - 22px)}
+.handscroll figcaption{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:34px; font-size:13px; color:var(--ink-soft); letter-spacing:.06em}
+.drag-hint{font-family:var(--f-kana)}
 
 /* ---------- wish lanterns ---------- */
 .night{position:relative; margin-top:clamp(64px,10vw,120px); border-radius:22px; overflow:hidden; min-height:560px; color:var(--night-ink);
@@ -532,6 +556,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
       <li><a href="#jieqi">节气</a></li>
       <li><a href="#collect">拾物</a></li>
       <li><a href="#poems">诗笺</a></li>
+      <li><a href="#scroll">画卷</a></li>
       <li><a href="#wish">心愿</a></li>
     </ul>
     <button class="theme-btn" id="themeBtn" aria-label="切换日夜">
@@ -566,30 +591,26 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
             <clipPath id="gateClip"><circle cx="200" cy="200" r="184"/></clipPath>
             <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--sky-top)"/><stop offset="1" style="stop-color:var(--sky-bot)"/></linearGradient>
             <radialGradient id="moonGlow"><stop offset="0" style="stop-color:var(--gold)" stop-opacity=".45"/><stop offset="1" style="stop-color:var(--gold)" stop-opacity="0"/></radialGradient>
-            <linearGradient id="mist" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--card)" stop-opacity="0"/><stop offset=".5" style="stop-color:var(--card)" stop-opacity=".55"/><stop offset="1" style="stop-color:var(--card)" stop-opacity="0"/></linearGradient>
+            <radialGradient id="veil" cx=".5" cy=".45" r=".6"><stop offset=".55" style="stop-color:var(--paper)" stop-opacity="0"/><stop offset="1" style="stop-color:var(--ink)" stop-opacity=".28"/></radialGradient>
           </defs>
           <g class="scene" clip-path="url(#gateClip)">
             <rect width="400" height="400" fill="url(#skyG)"/>
+            <g class="layer" data-depth="0.5">
+              <image class="ph ph-day" href="assets/gate-dawn.jpg" x="-16" y="-16" width="432" height="432" preserveAspectRatio="xMidYMid slice"/>
+              <image class="ph ph-night" href="assets/gate-dusk.jpg" x="-16" y="-16" width="432" height="432" preserveAspectRatio="xMidYMid slice"/>
+            </g>
+            <rect width="400" height="400" fill="url(#veil)"/>
             <g class="layer" data-depth="0.15">
               <circle class="star" cx="80" cy="90" r="1.4"/><circle class="star" cx="140" cy="60" r="1" style="animation-delay:-1s"/><circle class="star" cx="190" cy="110" r="1.2" style="animation-delay:-2s"/>
               <circle class="star" cx="330" cy="60" r="1.1" style="animation-delay:-.5s"/><circle class="star" cx="110" cy="150" r=".9" style="animation-delay:-2.6s"/><circle class="star" cx="355" cy="170" r="1.3" style="animation-delay:-1.7s"/>
             </g>
             <g class="layer" data-depth="0.3">
-              <circle cx="275" cy="118" r="80" fill="url(#moonGlow)"/>
-              <circle cx="275" cy="118" r="36" fill="var(--moon-dark)"/>
-              <path id="moonLit" fill="var(--gold)" opacity=".92"/>
-            </g>
-            <g class="layer" data-depth="0.45">
-              <path class="cloud" d="M0 150c8-12 26-12 32-2 6-10 24-10 28 2 10-2 18 4 18 10H-6c-2-6 0-9 6-10z"/>
-              <path class="cloud c2" d="M0 205c6-9 20-9 25-1 5-8 19-8 22 2 8-2 14 3 14 8H-5c-1-5 0-8 5-9z"/>
+              <circle cx="275" cy="110" r="70" fill="url(#moonGlow)"/>
+              <circle cx="275" cy="110" r="30" fill="var(--moon-dark)"/>
+              <path id="moonLit" fill="#F6E3B0" opacity=".95"/>
             </g>
             <g class="bird"><path class="wing" d="M0 0q5-5 10 0q5-5 10 0"/><path class="wing" d="M18 10q4-4 8 0q4-4 8 0" style="animation-delay:-.3s"/></g>
-            <g class="layer" data-depth="0.6"><path fill="var(--mt3)" d="M0 250C40 215 70 205 110 225S170 190 210 210S290 175 330 205S380 220 400 210V400H0Z"/></g>
-            <rect y="230" width="400" height="70" fill="url(#mist)"/>
-            <g class="layer" data-depth="0.9"><path fill="var(--mt2)" d="M0 285C50 255 90 262 130 275S200 245 245 265S320 280 360 258S395 262 400 266V400H0Z"/></g>
-            <rect y="328" width="400" height="80" fill="var(--water)"/>
-            <g class="shimmer"><line x1="262" y1="342" x2="290" y2="342"/><line x1="268" y1="352" x2="284" y2="352" style="animation-delay:-1s"/><line x1="258" y1="362" x2="292" y2="362" style="animation-delay:-2s"/><line x1="270" y1="372" x2="282" y2="372" style="animation-delay:-.5s"/></g>
-            <g class="layer" data-depth="1.3"><path fill="var(--mt1)" d="M0 300C45 288 95 300 150 332H0Z"/></g>
+            <g class="shimmer"><line x1="262" y1="342" x2="290" y2="342"/><line x1="268" y1="352" x2="284" y2="352" style="animation-delay:-1s"/><line x1="258" y1="362" x2="292" y2="362" style="animation-delay:-2s"/></g>
             <g class="layer" data-depth="1.5"><g class="boat">
               <circle class="lamp-glow" cx="186" cy="330" r="9" opacity=".3"/>
               <path d="M150 340Q172 350 198 340L194 346Q172 353 154 346Z" fill="var(--ink)"/>
@@ -762,18 +783,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
 
         <div class="it" id="it-latte" style="--x:3%;--y:7%;--mx:4%;--my:2%;--r:-6deg">
           <div class="polaroid">
-            <svg viewBox="0 0 160 150" aria-hidden="true">
-              <rect width="160" height="150" fill="var(--sakura-soft)"/>
-              <circle cx="128" cy="30" r="40" fill="var(--card)" opacity=".5"/>
-              <rect x="0" y="112" width="160" height="38" fill="var(--board)"/>
-              <path d="M52 40h56l-6 76a6 6 0 0 1-6 5H64a6 6 0 0 1-6-5z" fill="var(--card)" opacity=".75" stroke="var(--ink-soft)" stroke-width="1.2"/>
-              <path d="M56 78h48l-3 38a6 6 0 0 1-6 5H65a6 6 0 0 1-6-5z" fill="var(--celadon)"/>
-              <path d="M55 64h50l-1 14H56z" fill="#F7F1E6"/>
-              <path d="M53 50h54l-1 14H54z" fill="#F7F1E6" opacity=".7"/>
-              <rect x="88" y="16" width="5" height="62" rx="2" transform="rotate(14 90 47)" fill="var(--sakura)"/>
-              <circle cx="66" cy="94" r="5" fill="#F7F1E6" opacity=".5"/><circle cx="90" cy="104" r="4" fill="#F7F1E6" opacity=".4"/>
-              <path d="M76 58c-4-6 4-9 4-3 0-6 8-3 4 3l-4 4z" fill="var(--sakura)"/>
-            </svg>
+            <img src="assets/matcha.jpg" alt="一杯拉花抹茶拿铁" draggable="false" width="560" height="520">
             <p>15:00 の抹茶ラテ</p>
           </div>
         </div>
@@ -803,7 +813,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           </div>
         </div>
 
-        <div class="it" id="it-letter" style="--x:76%;--y:38%;--mx:30%;--my:64%;--r:5deg" data-click="letter">
+        <div class="it" id="it-letter" style="--x:76%;--y:38%;--mx:44%;--my:64%;--r:5deg" data-click="letter">
           <div class="letter" id="letter">
             <div class="back"></div>
             <div class="paper">致十月的自己：<br>慢一点也没关系，<br>花会开，月会圆。</div>
@@ -831,20 +841,14 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <div class="lined"><span class="pin" aria-hidden="true"></span><p>桂花开了，<br>香气跟了我一路。<br>晚饭想吃栗子饭。</p></div>
         </div>
 
-        <div class="it" id="it-crane" style="--x:58%;--y:56%;--mx:62%;--my:84%;--r:-8deg">
-          <div class="crane">
-            <svg viewBox="0 0 140 110" aria-hidden="true">
-              <path d="M70 60L20 10l44 30z" fill="var(--sakura)"/>
-              <path d="M70 60L64 40l-44-30z" fill="color-mix(in srgb, var(--sakura) 75%, var(--ink))"/>
-              <path d="M70 60l58-48-40 36z" fill="var(--fuji)"/>
-              <path d="M70 60l18-12 40-36z" fill="color-mix(in srgb, var(--fuji) 75%, var(--ink))"/>
-              <path d="M70 60l-40 30 26-4z" fill="var(--sakura)"/>
-              <path d="M30 90l-8-10 8 2z" fill="color-mix(in srgb, var(--sakura) 70%, var(--ink))"/>
-              <path d="M70 60l40 20-28 4z" fill="var(--fuji)"/>
-              <path d="M70 60l12 24-26 2z" fill="color-mix(in srgb, var(--sakura) 85%, var(--ink))"/>
-            </svg>
+        <div class="it" id="it-momiji" style="--x:57%;--y:52%;--mx:4%;--my:76%;--r:6deg">
+          <div class="polaroid small">
+            <span class="tape gold" style="top:-.7em;left:3em;width:5em;height:1.2em;transform:rotate(-6deg)" aria-hidden="true"></span>
+            <img src="assets/momiji.jpg" alt="蓝天下的红叶枝" draggable="false" width="560" height="520">
+            <p>嵐山の紅葉</p>
           </div>
         </div>
+      </div>
       </div>
     </div>
   </section>
@@ -906,6 +910,25 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
     </div>
   </section>
 
+  <!-- ========== HANDSCROLL ========== -->
+  <section class="sec" id="scroll">
+    <div class="wrap">
+      <div class="sec-head rv">
+        <div>
+          <div class="eyebrow">えまき</div>
+          <h2 class="sec-title">千里江山 · 一卷<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 9C70 14 150 5 210 10S275 12 296 8"/></svg></h2>
+          <p class="sec-sub">北宋王希孟十八岁时画下的青绿山水，原卷近十二米长。这里取有长桥的一段，随页面滚动缓缓展开，也可以左右拖动细看。</p>
+        </div>
+      </div>
+      <figure class="handscroll rv" id="handscroll">
+        <span class="roller l" aria-hidden="true"></span>
+        <div class="paint" id="paint"><img src="assets/qianli-jiangshan.jpg" alt="《千里江山图》局部：青绿山峦之间，一座长桥横跨江面" draggable="false" width="2622" height="560"></div>
+        <span class="roller r" aria-hidden="true"></span>
+        <figcaption><span>北宋 · 王希孟《千里江山图》局部 · 绢本设色 · 51.3 × 1191.5 cm · 故宫博物院藏</span><span class="drag-hint">⟵ 拖动 ⟶</span></figcaption>
+      </figure>
+    </div>
+  </section>
+
   <!-- ========== WISH ========== -->
   <section id="wish">
     <div class="wrap">
@@ -937,7 +960,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
     <p class="bigbrush" aria-hidden="true">拾光</p>
     <p class="line">日子一页一页翻过去，愿每一页都有一点光。</p>
     <div class="seal-row" aria-hidden="true"><span class="seal-sq">月</span><span class="seal-rd">安</span></div>
-    <p class="credit">页面中的插画、纹样与印章均为手绘矢量。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
+    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、抹茶拿铁、红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
   </div>
 </footer>
 
@@ -993,7 +1016,7 @@ function moonPath(cx,cy,r){
   if(wax) return `M${cx} ${cy-r}A${r} ${r} 0 0 1 ${cx} ${cy+r}A${rx} ${r} 0 0 ${cres?0:1} ${cx} ${cy-r}Z`;
   return `M${cx} ${cy-r}A${r} ${r} 0 0 0 ${cx} ${cy+r}A${rx} ${r} 0 0 ${cres?1:0} ${cx} ${cy-r}Z`;
 }
-$('#moonLit').setAttribute('d',moonPath(275,118,36));
+$('#moonLit').setAttribute('d',moonPath(275,110,30));
 $('#moonMini').setAttribute('d',moonPath(20,20,16));
 const mName=age<1.85?'新月':age<7.38?'蛾眉月':age<9.23?'上弦月':age<14.77?'盈凸月':age<16.61?'满月':age<22.15?'亏凸月':age<23.99?'下弦月':'残月';
 $('#moonTxt').textContent=`今夜月相 · ${mName} · 月光约 ${Math.round(illum*100)}%`;
@@ -1316,6 +1339,24 @@ $$('.pcard').forEach(c=>{
   c.addEventListener('pointerleave',()=>{c.style.setProperty('--ry','0deg'); c.style.setProperty('--rx','0deg');});
 });
 
+/* ---------- handscroll pan ---------- */
+const hs=$('#handscroll'), paint=$('#paint'), pimg=$('img',paint);
+let pCur=0, dragOff=0, pDrag=null;
+const pMax=()=>Math.max(0,pimg.getBoundingClientRect().width-paint.clientWidth);
+paint.addEventListener('pointerdown',e=>{pDrag={x:e.clientX,o:dragOff}; paint.setPointerCapture(e.pointerId);});
+paint.addEventListener('pointermove',e=>{if(pDrag) dragOff=pDrag.o+(e.clientX-pDrag.x);});
+const pEnd=()=>{pDrag=null;}; paint.addEventListener('pointerup',pEnd); paint.addEventListener('pointercancel',pEnd);
+(function panLoop(){
+  const r=hs.getBoundingClientRect(), max=pMax();
+  if(r.bottom>-200 && r.top<innerHeight+200){
+    const prog=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight+r.height)));
+    let t=-prog*max+dragOff; if(t>0){dragOff-=t; t=0;} if(t<-max){dragOff+=(-max-t); t=-max;}
+    pCur+= RM ? (t-pCur) : (t-pCur)*.08;
+    pimg.style.setProperty('--px',pCur.toFixed(1)+'px');
+  }
+  requestAnimationFrame(panLoop);
+})();
+
 /* ---------- wish lanterns ---------- */
 const sky=$('#skyfx');
 for(let i=0;i<70;i++){const s=document.createElement('span'); s.className='tw'; s.style.left=Math.random()*100+'%'; s.style.top=Math.random()*75+'%';
@@ -1365,7 +1406,7 @@ if(matchMedia('(hover:hover)').matches && !RM){
   let cx=0,cy=0,mx=0,my=0;
   addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;cur.style.opacity=.9;},{passive:true});
   document.documentElement.addEventListener('mouseleave',()=>cur.style.opacity=0);
-  document.addEventListener('pointerover',e=>{cur.classList.toggle('big',!!e.target.closest('a,button,.it,.wheel-box,input'));});
+  document.addEventListener('pointerover',e=>{cur.classList.toggle('big',!!e.target.closest('a,button,.it,.wheel-box,input,.paint'));});
   (function f(){cx+=(mx-cx)*.18; cy+=(my-cy)*.18; cur.style.transform=`translate(${cx}px,${cy}px)`; requestAnimationFrame(f);})();
 }
 })();
