@@ -461,8 +461,7 @@ li:hover .del, .del:focus-visible{opacity:1}
   box-shadow:0 0 0 12px var(--mount), 0 0 0 13px var(--line), 0 34px 50px -30px var(--shadow);
   transition:clip-path 1.9s var(--ease)}
 .handscroll .paint:active{cursor:grabbing}
-.handscroll .paint img{height:100%; width:auto; max-width:none; display:block; user-select:none; -webkit-user-select:none; pointer-events:none;
-  transform:translate3d(var(--px,0px),0,0); filter:brightness(var(--img-dim)) saturate(.95)}
+.handscroll .paint img{height:100%; width:auto; max-width:none; display:block; user-select:none; -webkit-user-select:none; pointer-events:none; filter:brightness(var(--img-dim)) saturate(.95)}
 .handscroll .paint::after{content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(90deg, rgba(40,28,18,.28), transparent 6%, transparent 94%, rgba(40,28,18,.28))}
 .roller{position:absolute; top:-26px; bottom:-26px; width:22px; z-index:2; border-radius:11px;
   background:linear-gradient(90deg,#4A2F20,#9C6C46 38%,#C89A6C 50%,#7A4E32 70%,#4A2F20);
@@ -474,6 +473,52 @@ li:hover .del, .del:focus-visible{opacity:1}
 .handscroll.pre .roller.l{left:calc(50% - 22px)} .handscroll.pre .roller.r{right:calc(50% - 22px)}
 .handscroll figcaption{display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:34px; font-size:13px; color:var(--ink-soft); letter-spacing:.06em}
 .drag-hint{font-family:var(--f-kana)}
+
+/* ---------- image fx ---------- */
+.gate-gl{position:absolute; left:4%; top:4%; width:92%; height:92%; border-radius:50%; z-index:0; opacity:0; transition:opacity .6s}
+.gate-wrap.gl .gate-gl{opacity:1}
+.gate{position:relative; z-index:1}
+.gate-wrap.gl .phl, .gate-wrap.gl .skyrect{display:none}
+.gate-wrap{cursor:crosshair}
+.season-photo{position:relative; aspect-ratio:16/10; max-width:100%; margin:0 0 18px; border-radius:6px; overflow:hidden; background:var(--fuji-soft);
+  box-shadow:0 0 0 1px var(--line), 0 14px 30px -22px var(--shadow)}
+.season-photo canvas{position:absolute; inset:0; width:100%; height:100%; display:block; opacity:0; transition:opacity .5s}
+.season-photo.gl canvas{opacity:1}
+.sp-fb img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 1.2s var(--ease); filter:brightness(var(--img-dim))}
+.sp-fb img.on{opacity:1}
+.season-photo.gl .sp-fb{display:none}
+.sp-cap{position:absolute; left:14px; bottom:12px; display:flex; align-items:center; gap:8px; padding:4px 12px 4px 4px; border-radius:20px;
+  background:color-mix(in srgb, var(--card) 70%, transparent); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); font-size:13px; letter-spacing:.14em}
+.sp-cap b{width:26px; height:26px; border-radius:50%; display:grid; place-items:center; background:var(--shu); color:var(--card); font-family:var(--f-brush); font-weight:400; font-size:16px; letter-spacing:0}
+.sp-cap i{font-style:normal; font-family:var(--f-kana)}
+.sp-cap.swap{animation:capIn .9s var(--ease)}
+@keyframes capIn{from{opacity:0; transform:translateY(8px)}}
+
+.shot{position:relative; overflow:hidden; border-radius:1px}
+.shot::after{content:""; position:absolute; inset:-20%; pointer-events:none; opacity:var(--sheen,0);
+  background:linear-gradient(115deg, transparent 35%, rgba(255,255,255,.55) 50%, transparent 65%); transform:translateX(var(--sx,-60%))}
+.polaroid p{transition:opacity .5s}
+.polaroid p.wip{font-size:.78em; color:var(--ink-soft); letter-spacing:.12em}
+
+.paint .track{position:relative; height:100%; width:max-content; transform:translate3d(var(--px,0px),0,0)}
+.handscroll .paint .track img{transform:none}
+.spot{position:absolute; left:var(--x); top:var(--y); width:16px; height:16px; margin:-8px 0 0 -8px; border-radius:50%; border:0; padding:0; z-index:2; cursor:pointer;
+  background:var(--shu); box-shadow:0 0 0 3px rgba(255,248,235,.85), 0 4px 10px rgba(0,0,0,.35)}
+.spot::before{content:""; position:absolute; inset:-3px; border-radius:50%; border:2px solid rgba(255,248,235,.9); animation:ping 2.4s var(--ease) infinite}
+@keyframes ping{0%{transform:scale(1); opacity:.9} 100%{transform:scale(3.2); opacity:0}}
+.spot .tip{position:absolute; left:50%; bottom:calc(100% + 14px); width:max-content; max-width:13em; transform:translate(-50%,8px) scale(.92); transform-origin:50% 100%;
+  opacity:0; pointer-events:none; background:var(--card); color:var(--ink); padding:8px 12px; border-radius:6px; font-size:12.5px; line-height:1.55; text-align:left;
+  box-shadow:0 10px 24px -8px rgba(0,0,0,.4); transition:opacity .35s, transform .45s var(--spring)}
+.spot .tip b{display:block; font-family:var(--f-brush); font-weight:400; font-size:18px; color:var(--shu)}
+.spot:hover .tip, .spot:focus-visible .tip, .spot.on .tip{opacity:1; transform:translate(-50%,0) scale(1)}
+.spot:hover, .spot.on{z-index:3}
+.loupe{position:absolute; left:0; top:0; width:190px; height:190px; border-radius:50%; pointer-events:none; z-index:4; opacity:0; scale:.5;
+  background-image:url("assets/qianli-jiangshan.jpg"); background-repeat:no-repeat;
+  box-shadow:0 0 0 2px #E9D3A0, 0 0 0 7px rgba(60,40,20,.55), 0 0 0 8px #C9A86A, 0 22px 40px rgba(0,0,0,.45), inset 0 0 36px rgba(0,0,0,.35);
+  transition:opacity .35s, scale .5s var(--spring)}
+.loupe.on{opacity:1; scale:1}
+.loupe span{position:absolute; right:14px; bottom:18px; font-family:var(--f-latin); font-style:italic; font-size:13px; color:#FFF6E0; text-shadow:0 1px 3px rgba(0,0,0,.6)}
+@media (hover:none){.loupe{display:none}}
 
 /* ---------- wish lanterns ---------- */
 .night{position:relative; margin-top:clamp(64px,10vw,120px); border-radius:22px; overflow:hidden; min-height:560px; color:var(--night-ink);
@@ -584,6 +629,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
       </div>
 
       <div class="gate-wrap" id="gate">
+        <canvas class="gate-gl" id="gateGL" aria-hidden="true"></canvas>
         <span class="tape check hero-tape-1" aria-hidden="true"></span>
         <span class="tape gold hero-tape-2" aria-hidden="true"></span>
         <svg class="gate" viewBox="0 0 400 400" role="img" aria-label="圆窗里的秋夜：月亮、远山、湖上小舟与一枝桂花">
@@ -594,8 +640,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
             <radialGradient id="veil" cx=".5" cy=".45" r=".6"><stop offset=".55" style="stop-color:var(--paper)" stop-opacity="0"/><stop offset="1" style="stop-color:var(--ink)" stop-opacity=".28"/></radialGradient>
           </defs>
           <g class="scene" clip-path="url(#gateClip)">
-            <rect width="400" height="400" fill="url(#skyG)"/>
-            <g class="layer" data-depth="0.5">
+            <rect class="skyrect" width="400" height="400" fill="url(#skyG)"/>
+            <g class="layer phl" data-depth="0.5">
               <image class="ph ph-day" href="assets/gate-dawn.jpg" x="-16" y="-16" width="432" height="432" preserveAspectRatio="xMidYMid slice"/>
               <image class="ph ph-night" href="assets/gate-dusk.jpg" x="-16" y="-16" width="432" height="432" preserveAspectRatio="xMidYMid slice"/>
             </g>
@@ -751,6 +797,11 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         </div>
         <article class="note jq-card rv" id="jqCard" aria-live="polite">
           <span class="tape gold" style="top:-12px;left:30px;transform:rotate(-5deg)" aria-hidden="true"></span>
+          <div class="season-photo" id="seasonPhoto">
+            <canvas id="seasonGL" aria-hidden="true"></canvas>
+            <div class="sp-fb" aria-hidden="true"><img src="assets/season-spring.jpg" alt=""><img src="assets/season-summer.jpg" alt=""><img src="assets/season-autumn.jpg" alt=""><img src="assets/season-winter.jpg" alt=""></div>
+            <span class="sp-cap" id="spCap"><b>秋</b><i>紅葉</i></span>
+          </div>
           <div id="jqBody">
             <p class="big" id="jqName">秋分</p>
             <div class="row"><span class="date" id="jqDate">9月23日前后</span><span class="chip" id="jqSeason">秋 · 第四个节气</span></div>
@@ -775,7 +826,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         <div>
           <div class="eyebrow">たからもの</div>
           <h2 class="sec-title">拾物 · 小收藏<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 8C60 14 140 4 200 11S270 9 296 12"/></svg></h2>
-          <p class="sec-sub">一张车票、一枚邮票、一枝压干的桂花。拖动它们，摆成你喜欢的样子；点一下信封，拆开来读。</p>
+          <p class="sec-sub">一张车票、一枚邮票、一枝压干的桂花。拖动它们，摆成你喜欢的样子；拍立得会慢慢显影，拖着它摇一摇会快一些；点一下信封，拆开来读。</p>
         </div>
       </div>
       <div class="board rv" id="board">
@@ -783,8 +834,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
 
         <div class="it" id="it-latte" style="--x:3%;--y:7%;--mx:4%;--my:2%;--r:-6deg">
           <div class="polaroid">
-            <img src="assets/matcha.jpg" alt="一杯拉花抹茶拿铁" draggable="false" width="560" height="520">
-            <p>15:00 の抹茶ラテ</p>
+            <div class="shot"><img src="assets/matcha.jpg" alt="一杯拉花抹茶拿铁" draggable="false" width="560" height="520"></div>
+            <p data-cap="15:00 の抹茶ラテ">15:00 の抹茶ラテ</p>
           </div>
         </div>
 
@@ -844,8 +895,8 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         <div class="it" id="it-momiji" style="--x:57%;--y:52%;--mx:4%;--my:76%;--r:6deg">
           <div class="polaroid small">
             <span class="tape gold" style="top:-.7em;left:3em;width:5em;height:1.2em;transform:rotate(-6deg)" aria-hidden="true"></span>
-            <img src="assets/momiji.jpg" alt="蓝天下的红叶枝" draggable="false" width="560" height="520">
-            <p>嵐山の紅葉</p>
+            <div class="shot"><img src="assets/momiji.jpg" alt="蓝天下的红叶枝" draggable="false" width="560" height="520"></div>
+            <p data-cap="嵐山の紅葉">嵐山の紅葉</p>
           </div>
         </div>
       </div>
@@ -917,14 +968,14 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         <div>
           <div class="eyebrow">えまき</div>
           <h2 class="sec-title">千里江山 · 一卷<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 9C70 14 150 5 210 10S275 12 296 8"/></svg></h2>
-          <p class="sec-sub">北宋王希孟十八岁时画下的青绿山水，原卷近十二米长。这里取有长桥的一段，随页面滚动缓缓展开，也可以左右拖动细看。</p>
+          <p class="sec-sub">北宋王希孟十八岁时画下的青绿山水，原卷近十二米长。这里取有长桥的一段：随页面滚动缓缓展开，可以左右拖动，鼠标移上去是一枚放大镜，朱红小点是我加的注。</p>
         </div>
       </div>
       <figure class="handscroll rv" id="handscroll">
         <span class="roller l" aria-hidden="true"></span>
-        <div class="paint" id="paint"><img src="assets/qianli-jiangshan.jpg" alt="《千里江山图》局部：青绿山峦之间，一座长桥横跨江面" draggable="false" width="2622" height="560"></div>
+        <div class="paint" id="paint"><div class="track" id="track"><img src="assets/qianli-jiangshan.jpg" alt="《千里江山图》局部：青绿山峦之间，一座长桥横跨江面" draggable="false" width="3840" height="820"><button class="spot" style="--x:7.4%;--y:83.0%" aria-label="江畔柳林：岸边一排垂柳，枝叶用细笔点染"><span class="tip"><b>江畔柳林</b>岸边一排垂柳，枝叶用细笔点染</span></button><button class="spot" style="--x:24.2%;--y:60.0%" aria-label="山间飞瀑：白练从两峰之间落下"><span class="tip"><b>山间飞瀑</b>白练从两峰之间落下</span></button><button class="spot" style="--x:55.2%;--y:23.0%" aria-label="青绿主峰：石青、石绿层层罩染，九百年仍鲜亮"><span class="tip"><b>青绿主峰</b>石青、石绿层层罩染，九百年仍鲜亮</span></button><button class="spot" style="--x:78.1%;--y:10.5%" aria-label="鉴藏印：历代收藏者钤下的朱印"><span class="tip"><b>鉴藏印</b>历代收藏者钤下的朱印</span></button><button class="spot" style="--x:81.2%;--y:80.5%" aria-label="长桥卧波：桥心一座亭阁，是全卷最有名的一处"><span class="tip"><b>长桥卧波</b>桥心一座亭阁，是全卷最有名的一处</span></button></div><div class="loupe" id="loupe" aria-hidden="true"><span>×2.2</span></div></div>
         <span class="roller r" aria-hidden="true"></span>
-        <figcaption><span>北宋 · 王希孟《千里江山图》局部 · 绢本设色 · 51.3 × 1191.5 cm · 故宫博物院藏</span><span class="drag-hint">⟵ 拖动 ⟶</span></figcaption>
+        <figcaption><span>北宋 · 王希孟《千里江山图》局部 · 绢本设色 · 51.3 × 1191.5 cm · 故宫博物院藏</span><span class="drag-hint">拖动画卷 · 鼠标悬停放大 · 点朱点看注</span></figcaption>
       </figure>
     </div>
   </section>
@@ -960,7 +1011,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
     <p class="bigbrush" aria-hidden="true">拾光</p>
     <p class="line">日子一页一页翻过去，愿每一页都有一点光。</p>
     <div class="seal-row" aria-hidden="true"><span class="seal-sq">月</span><span class="seal-rd">安</span></div>
-    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、抹茶拿铁、红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
+    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、四季风物、抹茶拿铁与红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
   </div>
 </footer>
 
@@ -1024,7 +1075,7 @@ $('#moonTxt').textContent=`今夜月相 · ${mName} · 月光约 ${Math.round(il
 /* ---------- particles ---------- */
 const cv=$('#petals'), ctx=cv.getContext('2d');
 let W=0,H=0,DPR=1, season=2, parts=[], colors={};
-function readColors(){const cs=getComputedStyle(root);['sakura','gold','celadon','snow','shu','fuji'].forEach(k=>colors[k]=cs.getPropertyValue('--'+k).trim());}
+function readColors(){const cs=getComputedStyle(root);['sakura','gold','celadon','snow','shu','fuji','paper','ink'].forEach(k=>colors[k]=cs.getPropertyValue('--'+k).trim()); document.dispatchEvent(new Event('sg-theme'));}
 readColors();
 function resize(){DPR=Math.min(2,devicePixelRatio||1);W=innerWidth;H=innerHeight;cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);}
 resize(); addEventListener('resize',resize);
@@ -1285,6 +1336,7 @@ function showTerm(anim){
   else cnt.textContent=`此刻是${JQ[CUR.i][0]}`;
   if(anim){const b=$('#jqBody'); b.classList.remove('swap'); void b.offsetWidth; b.classList.add('swap');}
   setSeason(s);
+  if(window.__seasonShow) window.__seasonShow(s);
 }
 function wheelLoop(){ if(!dragging) rot+=(target-rot)*.1; wheel.setAttribute('transform',`rotate(${rot.toFixed(3)} ${C} ${C})`); requestAnimationFrame(wheelLoop); }
 const wb=$('#wheelBox'); let startA=0, startRot=0;
@@ -1318,7 +1370,7 @@ $$('.it',board).forEach(it=>{
     const maxX=board.clientWidth-it.offsetWidth*.4, maxY=board.clientHeight-it.offsetHeight*.4;
     const nx=Math.max(-it.offsetWidth*.3,Math.min(maxX,ox+dx)), ny=Math.max(-it.offsetHeight*.2,Math.min(maxY,oy+dy));
     it.style.left=nx+'px'; it.style.top=ny+'px';
-    vx=vx*.7+(e.clientX-lastX)*.3; lastX=e.clientX;
+    vx=vx*.7+(e.clientX-lastX)*.3; lastX=e.clientX; if(it._dev) it._dev.shake(Math.abs(e.movementX||0)+Math.abs(e.movementY||0));
     it.style.transform=`rotate(calc(${baseR} + ${Math.max(-14,Math.min(14,vx*1.2)).toFixed(1)}deg))`;
   });
   const end=()=>{
@@ -1339,12 +1391,177 @@ $$('.pcard').forEach(c=>{
   c.addEventListener('pointerleave',()=>{c.style.setProperty('--ry','0deg'); c.style.setProperty('--rx','0deg');});
 });
 
+/* ---------- WebGL 水墨晕染 ---------- */
+const FRAG=`#ifdef GL_FRAGMENT_PRECISION_HIGH
+precision highp float;
+#else
+precision mediump float;
+#endif
+varying vec2 v;
+uniform sampler2D t0,t1;
+uniform vec2 ar0,ar1,mouse,par;
+uniform float prog,time,intro,mAmp,wl0,wl1,ripple,mist,zoom,aspect,seed;
+uniform vec3 paper,ink,click;
+float h(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);return mix(mix(h(i),h(i+vec2(1.,0.)),u.x),mix(h(i+vec2(0.,1.)),h(i+vec2(1.,1.)),u.x),u.y);}
+float fbm(vec2 p){float s=0.,a=.5;for(int i=0;i<5;i++){s+=a*n2(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+vec2 cov(vec2 p,vec2 ar){return (p-.5)*ar*zoom+.5;}
+void main(){
+  vec2 uv=v; vec2 q=vec2(uv.x*aspect,uv.y);
+  float wl=mix(wl0,wl1,step(.5,prog));
+  float water=(1.-smoothstep(wl-.07,wl,uv.y))*ripple;
+  float d=distance(q,vec2(mouse.x*aspect,mouse.y));
+  float cd=distance(q,vec2(click.x*aspect,click.y));
+  float ring=sin(cd*85.-click.z*10.)*exp(-click.z*1.4)*exp(-cd*4.5)*step(0.,click.z);
+  vec2 off=vec2(sin(uv.y*120.+time*1.5)*.0009+sin(d*70.-time*6.)*.006*exp(-d*8.)*mAmp+ring*.007, ring*.006)*water;
+  vec2 p=uv+par*.012+off;
+  vec3 a=texture2D(t0,cov(p,ar0)).rgb, b=texture2D(t1,cov(p,ar1)).rgb;
+  float n=fbm(q*3.2+seed+vec2(time*.02,0.));
+  float th=mix(.12,.86,prog);
+  float k=1.-smoothstep(th-.04,th+.04,n);
+  vec3 col=mix(a,b,k);
+  float run=step(.001,prog)*step(prog,.999);
+  col=mix(col,ink,exp(-pow((n-th)/.028,2.))*.55*run);
+  col=mix(col,col*.82,exp(-pow((n-th-.05)/.05,2.))*.5*run);
+  float m=fbm(vec2(q.x*2.1-time*.035,uv.y*5.2+time*.01)+seed);
+  col=mix(col,vec3(1.),m*mist*smoothstep(.12,.4,uv.y)*(1.-smoothstep(.5,.85,uv.y))*.42);
+  float n3=fbm(q*2.3+7.+seed)*.6+distance(uv,vec2(.5,.5))*.95;
+  float ti=intro*1.3-.12;
+  float ki=1.-smoothstep(ti-.05,ti+.05,n3);
+  col=mix(paper,col,ki);
+  col=mix(col,ink,exp(-pow((n3-ti)/.03,2.))*.5*step(intro,.999));
+  gl_FragColor=vec4(col,1.);
+}`;
+const hex2rgb=hx=>{hx=(hx||'#eeeeee').replace('#','');if(hx.length===3)hx=hx.split('').map(c=>c+c).join('');const n=parseInt(hx,16);return[(n>>16&255)/255,(n>>8&255)/255,(n&255)/255];};
+const easeIO=t=>-(Math.cos(Math.PI*t)-1)/2;
+function InkGL(canvas,o){
+  const gl=canvas.getContext('webgl',{antialias:false,premultipliedAlpha:false,preserveDrawingBuffer:false});
+  if(!gl) throw new Error('nogl');
+  const sh=(t,src)=>{const x=gl.createShader(t);gl.shaderSource(x,src);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(x));return x;};
+  const pg=gl.createProgram();
+  gl.attachShader(pg,sh(gl.VERTEX_SHADER,'attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;gl_Position=vec4(p,0.,1.);}'));
+  gl.attachShader(pg,sh(gl.FRAGMENT_SHADER,FRAG)); gl.linkProgram(pg);
+  if(!gl.getProgramParameter(pg,gl.LINK_STATUS)) throw new Error('link');
+  gl.useProgram(pg);
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(pg,'p'); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const U={}; ['t0','t1','ar0','ar1','mouse','par','prog','time','intro','mAmp','wl0','wl1','ripple','mist','zoom','aspect','paper','ink','click','seed'].forEach(n=>U[n]=gl.getUniformLocation(pg,n));
+  gl.uniform1i(U.t0,0); gl.uniform1i(U.t1,1);
+  const S={from:o.start||0,to:o.start||0,prog:0,tw:null,intro:RM?1:0,introStart:null,mouse:[.5,.5],mAmp:0,par:[0,0],tpar:[0,0],click:[-1,-1,-1],clickAt:0,visible:true,ready:false,dead:false};
+  const texs=[]; let loaded=0;
+  const fail=()=>{S.dead=true; o.onFail&&o.onFail();};
+  o.urls.forEach((u,i)=>{const im=new Image(); im.onload=()=>{ if(S.dead) return;
+    const t=gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D,t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true);
+    try{gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,im);}catch(e){fail();return;}
+    [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(k=>gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE));
+    gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+    texs[i]={t,a:im.naturalWidth/im.naturalHeight}; if(++loaded===o.urls.length){S.ready=true; o.onReady&&o.onReady();}
+  }; im.onerror=fail; im.src=u;});
+  let W=0,H=0;
+  function size(){const r=canvas.getBoundingClientRect(), d=Math.min(1.6,devicePixelRatio||1); const w=Math.max(2,Math.round(r.width*d)), h=Math.max(2,Math.round(r.height*d)); if(w!==W||h!==H){W=canvas.width=w;H=canvas.height=h;gl.viewport(0,0,w,h);}}
+  const ar=(ia,ca)=>ia>ca?[ca/ia,1]:[1,ia/ca];
+  let paperC=hex2rgb(colors.paper), inkC=hex2rgb(colors.ink);
+  document.addEventListener('sg-theme',()=>{paperC=hex2rgb(colors.paper); inkC=[.17,.2,.26];});
+  inkC=[.17,.2,.26];
+  const io=new IntersectionObserver(es=>es.forEach(e=>S.visible=e.isIntersecting),{rootMargin:'120px'}); io.observe(canvas);
+  const t0=performance.now();
+  function frame(now){
+    if(S.dead) return;
+    requestAnimationFrame(frame);
+    if(!S.ready||!S.visible) return;
+    size();
+    const time=(now-t0)/1000;
+    if(S.introStart===null) S.introStart=now;
+    if(!RM) S.intro=Math.min(1,(now-S.introStart)/(o.introDur||2200));
+    if(S.tw){const k=Math.min(1,(now-S.tw.s)/S.tw.d); S.prog=easeIO(k); if(k>=1){S.from=S.to; S.prog=0; S.tw=null;}}
+    S.mAmp*=.965; S.par[0]+=(S.tpar[0]-S.par[0])*.06; S.par[1]+=(S.tpar[1]-S.par[1])*.06;
+    const A=texs[S.from], B=texs[S.to], ca=W/H;
+    gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,A.t);
+    gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,B.t);
+    gl.uniform2fv(U.ar0,ar(A.a,ca)); gl.uniform2fv(U.ar1,ar(B.a,ca));
+    gl.uniform2fv(U.mouse,S.mouse); gl.uniform2fv(U.par,S.par);
+    gl.uniform1f(U.prog,S.prog); gl.uniform1f(U.time,RM?0:time); gl.uniform1f(U.intro,S.intro); gl.uniform1f(U.mAmp,S.mAmp);
+    const wl=o.waterline||[];
+    gl.uniform1f(U.wl0,wl[S.from]||0); gl.uniform1f(U.wl1,wl[S.to]||0);
+    gl.uniform1f(U.ripple,o.ripple?1:0); gl.uniform1f(U.mist,o.mist||0);
+    gl.uniform1f(U.zoom,(o.zoom||.94)-(o.kenburns&&!RM?.025*(1+Math.sin(time*.12)):0)); gl.uniform1f(U.aspect,ca); gl.uniform1f(U.seed,o.seed||0);
+    gl.uniform3fv(U.paper,paperC); gl.uniform3fv(U.ink,inkC);
+    gl.uniform3f(U.click,S.click[0],S.click[1],S.clickAt?(now-S.clickAt)/1000:-1);
+    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  }
+  requestAnimationFrame(frame);
+  return {
+    show(i,dur){ if(i===S.to&&!S.tw) return; if(S.tw){ if(S.prog>.5) S.from=S.to; } if(i===S.from){S.to=i;S.tw=null;S.prog=0;return;} S.to=i; S.tw={s:performance.now(),d:RM?1:(dur||1700)}; },
+    pointer(x,y){S.mouse=[x,1-y]; S.mAmp=Math.min(1,S.mAmp+.12); S.tpar=[(x-.5)*-2,(.5-y)*-2];},
+    leave(){S.tpar=[0,0];},
+    drop(x,y){S.click=[x,1-y]; S.clickAt=performance.now();},
+    get ok(){return !S.dead;}
+  };
+}
+
+/* hero gate: dawn ↔ dusk */
+(function(){
+  const cv=$('#gateGL'), wrap=$('#gate');
+  let fx;
+  try{
+    fx=InkGL(cv,{urls:['assets/gate-dawn.jpg','assets/gate-dusk.jpg'],start:isDark()?1:0,ripple:true,mist:1,waterline:[.2,.44],zoom:.95,introDur:2600,
+      onReady:()=>wrap.classList.add('gl'), onFail:()=>wrap.classList.remove('gl')});
+  }catch(e){return;}
+  document.addEventListener('sg-theme',()=>fx.show(isDark()?1:0,2600));
+  wrap.addEventListener('pointermove',e=>{const r=cv.getBoundingClientRect(); fx.pointer((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);});
+  wrap.addEventListener('pointerleave',()=>fx.leave());
+  wrap.addEventListener('click',e=>{ if(e.target.closest('#furin')) return; const r=cv.getBoundingClientRect(); fx.drop((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);});
+})();
+
+/* season photo in jieqi card */
+(function(){
+  const box=$('#seasonPhoto'), cap=$('#spCap'), fb=$$('.sp-fb img',box);
+  const CAP=[['春','枝垂桜'],['夏','蓮の蕾'],['秋','紅葉'],['冬','雪の社']];
+  let cur=Math.floor(sel/6), fx=null;
+  const paintCap=i=>{cap.innerHTML=`<b>${CAP[i][0]}</b><i>${CAP[i][1]}</i>`; cap.classList.remove('swap'); void cap.offsetWidth; cap.classList.add('swap');};
+  const fbShow=i=>fb.forEach((im,k)=>im.classList.toggle('on',k===i));
+  fbShow(cur); paintCap(cur);
+  try{
+    fx=InkGL($('canvas',box),{urls:['assets/season-spring.jpg','assets/season-summer.jpg','assets/season-autumn.jpg','assets/season-winter.jpg'],start:cur,zoom:.97,kenburns:true,introDur:2000,seed:3.7,
+      onReady:()=>box.classList.add('gl'), onFail:()=>box.classList.remove('gl')});
+  }catch(e){fx=null;}
+  box.addEventListener('pointermove',e=>{ if(!fx) return; const r=box.getBoundingClientRect(); fx.pointer((e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height);});
+  box.addEventListener('pointerleave',()=>fx&&fx.leave());
+  window.__seasonShow=i=>{ if(i===cur) return; cur=i; paintCap(i); fbShow(i); fx&&fx.show(i,2000); };
+})();
+
+/* polaroid developing */
+(function(){
+  const items=$$('.it').filter(it=>$('.polaroid .shot',it));
+  const st=items.map(it=>{const shot=$('.shot',it), img=$('img',shot), cap=$('p',it);
+    const d={it,shot,img,cap,v:RM?1:0,run:false,done:RM};
+    d.shake=amt=>{ if(!d.done&&d.run) d.v=Math.min(1,d.v+amt*.0009); };
+    it._dev=d; return d;});
+  const apply=d=>{
+    const e=1-Math.pow(1-d.v,2.2);
+    const L=(a,b)=>(a+(b-a)*e).toFixed(3);
+    d.img.style.filter=`brightness(calc(${L(.42,1)} * var(--img-dim))) saturate(${L(0,.88)}) contrast(${L(.55,.96)}) sepia(${L(.55,.06)}) blur(${L(1.4,0)}px)`;
+    d.shot.style.setProperty('--sheen',d.done?0:(.7*Math.sin(Math.PI*d.v)).toFixed(3));
+    d.shot.style.setProperty('--sx',(-60+d.v*120).toFixed(1)+'%');
+    if(!d.done && d.cap.dataset.mode!=='wip'){d.cap.dataset.mode='wip'; d.cap.classList.add('wip'); d.cap.textContent='显影中 · 摇一摇';}
+    if(d.v>=1&&!d.done){d.done=true; d.cap.style.opacity=0; setTimeout(()=>{d.cap.classList.remove('wip'); d.cap.textContent=d.cap.dataset.cap; d.cap.dataset.mode=''; d.cap.style.opacity=1; d.img.style.filter='';},420);}
+  };
+  if(RM) return;
+  st.forEach(apply);
+  const io=new IntersectionObserver(es=>es.forEach(en=>{ if(en.isIntersecting){ const d=st.find(x=>x.it===en.target); setTimeout(()=>d.run=true, st.indexOf(d)*700); io.unobserve(en.target);} }),{threshold:.5});
+  st.forEach(d=>io.observe(d.it));
+  let last=performance.now();
+  (function loop(now){ const dt=now-last; last=now; st.forEach(d=>{ if(d.run&&!d.done){ d.v=Math.min(1,d.v+dt/4200); apply(d);} }); if(st.some(d=>!d.done)) requestAnimationFrame(loop); })(last);
+})();
+
 /* ---------- handscroll pan ---------- */
-const hs=$('#handscroll'), paint=$('#paint'), pimg=$('img',paint);
-let pCur=0, dragOff=0, pDrag=null;
-const pMax=()=>Math.max(0,pimg.getBoundingClientRect().width-paint.clientWidth);
-paint.addEventListener('pointerdown',e=>{pDrag={x:e.clientX,o:dragOff}; paint.setPointerCapture(e.pointerId);});
-paint.addEventListener('pointermove',e=>{if(pDrag) dragOff=pDrag.o+(e.clientX-pDrag.x);});
+const hs=$('#handscroll'), paint=$('#paint'), track=$('#track'), pimg=$('img',paint), loupe=$('#loupe');
+let pCur=0, dragOff=0, pDrag=null; const lp={x:0,y:0,tx:0,ty:0};
+const pMax=()=>Math.max(0,track.offsetWidth-paint.clientWidth);
+paint.addEventListener('pointerdown',e=>{if(e.target.closest('.spot')) return; pDrag={x:e.clientX,o:dragOff,moved:false}; paint.setPointerCapture(e.pointerId); loupe.classList.remove('on');});
+paint.addEventListener('pointermove',e=>{if(pDrag){dragOff=pDrag.o+(e.clientX-pDrag.x); return;} if(e.pointerType==='mouse'&&!RM){lp.tx=e.clientX; lp.ty=e.clientY; loupe.classList.toggle('on',!e.target.closest('.spot'));}});
+paint.addEventListener('pointerleave',()=>loupe.classList.remove('on'));
+$$('.spot',paint).forEach(sp=>sp.addEventListener('click',()=>{const on=!sp.classList.contains('on'); $$('.spot',paint).forEach(x=>x.classList.remove('on')); sp.classList.toggle('on',on);}));
 const pEnd=()=>{pDrag=null;}; paint.addEventListener('pointerup',pEnd); paint.addEventListener('pointercancel',pEnd);
 (function panLoop(){
   const r=hs.getBoundingClientRect(), max=pMax();
@@ -1352,7 +1569,14 @@ const pEnd=()=>{pDrag=null;}; paint.addEventListener('pointerup',pEnd); paint.ad
     const prog=Math.max(0,Math.min(1,(innerHeight-r.top)/(innerHeight+r.height)));
     let t=-prog*max+dragOff; if(t>0){dragOff-=t; t=0;} if(t<-max){dragOff+=(-max-t); t=-max;}
     pCur+= RM ? (t-pCur) : (t-pCur)*.08;
-    pimg.style.setProperty('--px',pCur.toFixed(1)+'px');
+    track.style.setProperty('--px',pCur.toFixed(1)+'px');
+    if(loupe.classList.contains('on')){
+      lp.x+=(lp.tx-lp.x)*.22; lp.y+=(lp.ty-lp.y)*.22;
+      const pr=paint.getBoundingClientRect(), ir=pimg.getBoundingClientRect(), Z=2.2, L=190;
+      loupe.style.transform=`translate(${(lp.x-pr.left-L/2).toFixed(1)}px,${(lp.y-pr.top-L/2).toFixed(1)}px)`;
+      loupe.style.backgroundSize=`${(ir.width*Z).toFixed(0)}px ${(ir.height*Z).toFixed(0)}px`;
+      loupe.style.backgroundPosition=`${(-((lp.x-ir.left)*Z-L/2)).toFixed(1)}px ${(-((lp.y-ir.top)*Z-L/2)).toFixed(1)}px`;
+    }
   }
   requestAnimationFrame(panLoop);
 })();
