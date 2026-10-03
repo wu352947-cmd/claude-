@@ -6,6 +6,8 @@ import { STICKERS, CATS } from '../stickers.js';
 import { dayKey, parseDay, termOf, JQ, cnDate } from '../calendar.js';
 import { openLetter } from './letters.js';
 import { state, refreshCounts } from '../main.js';
+import { startCoach } from '../coach.js';
+import { MOOD_MAP, faceSvg } from '../faces.js';
 
 export async function todayView(root, day = dayKey(new Date())) {
   const today = dayKey(new Date());
@@ -145,7 +147,32 @@ export async function todayView(root, day = dayKey(new Date())) {
     }
   });
 
-  return () => { leave(); removeEventListener('pagehide', leave); document.removeEventListener('keydown', onKey); page.destroy(); };
+  // 第一次来：新手仪式
+  if (isToday && !state.user.settings?.onboarded && !entry && !state.counts.entries) {
+    setTimeout(() => startCoach({ root, page, onFinish: async () => {
+      try { const r = await api.updateMe({ settings: { onboarded: true } }); state.user = r.user; } catch {}
+    } }), quiet() ? 0 : 700);
+  } else if (isToday) lastYear(day);
+
+  return () => { leave(); removeEventListener('pagehide', leave); document.removeEventListener('keydown', onKey); page.destroy(); document.querySelector('.memory-card')?.remove(); };
+}
+
+// 去年今日：一年前的这一天写过的话，泛黄地飘出来
+async function lastYear(day) {
+  const d = parseDay(day); if (d.getMonth() === 1 && d.getDate() === 29) return;
+  const ly = dayKey(new Date(d.getFullYear() - 1, d.getMonth(), d.getDate()));
+  const key = 'sg.ly.' + day;
+  try { if (sessionStorage.getItem(key)) return; } catch {}
+  let entry; try { ({ entry } = await api.entry(ly)); } catch { return; }
+  if (!entry || !location.hash.match(/^#\/today|^$/)) return;
+  try { sessionStorage.setItem(key, '1'); } catch {}
+  const m = MOOD_MAP[entry.mood];
+  const card = h(`<aside class="memory-card" aria-label="一年前的今天"><button type="button" class="x" aria-label="收起">×</button>
+    <p class="mc-eyebrow">一年前的今天</p><p class="mc-date">${d.getFullYear() - 1} 年 ${d.getMonth() + 1} 月 ${d.getDate()} 日 ${m ? faceSvg(m) : ''}</p>
+    <p class="mc-text">${esc((entry.body || '那天只留下了心情和贴纸。').slice(0, 90))}</p><a class="btn small" href="#/day/${ly}">翻开那一页</a></aside>`);
+  setTimeout(() => document.body.append(card), quiet() ? 0 : 1600);
+  const bye = () => { card.classList.add('out'); setTimeout(() => card.remove(), 500); };
+  card.querySelector('.x').addEventListener('click', bye); card.querySelector('a').addEventListener('click', bye);
 }
 
 function shift(day, n) { const t = parseDay(day); t.setDate(t.getDate() + n); return dayKey(t); }

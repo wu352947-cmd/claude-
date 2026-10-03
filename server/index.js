@@ -217,6 +217,9 @@ export function createApp(opts = {}) {
       if (b.settings && typeof b.settings === 'object') {
         if (['auto', 'light', 'dark'].includes(b.settings.theme)) settings.theme = b.settings.theme;
         if (typeof b.settings.quiet === 'boolean') settings.quiet = b.settings.quiet;
+        if (typeof b.settings.onboarded === 'boolean') settings.onboarded = b.settings.onboarded;
+        if (typeof b.settings.memory === 'boolean') settings.memory = b.settings.memory;
+        if (typeof b.settings.reminder === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(b.settings.reminder)) settings.reminder = b.settings.reminder;
       }
       const nickname = b.nickname !== undefined ? (str(b.nickname, 20).trim() || user.username) : user.nickname;
       db.prepare('UPDATE users SET nickname = ?, settings = ? WHERE id = ?').run(nickname, JSON.stringify(settings), user.id);

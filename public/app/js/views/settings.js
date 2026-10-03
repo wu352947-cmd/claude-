@@ -15,6 +15,8 @@ export function settingsView(root) {
       <div class="seg" id="theme">${[['auto', '跟随系统'], ['light', '日'], ['dark', '夜']].map(([k, n]) => `<button type="button" data-v="${k}" class="${(s.theme || 'auto') === k ? 'on' : ''}">${n}</button>`).join('')}</div></section>
     <section class="paper set-row"><div><h4>安静模式</h4><p>关掉飘落物和大部分动画，只留下纸和字</p></div>
       <div class="seg" id="quiet"><button type="button" data-v="0" class="${s.quiet ? '' : 'on'}">关</button><button type="button" data-v="1" class="${s.quiet ? 'on' : ''}">开</button></div></section>
+    <section class="paper set-row"><div><h4>每日提醒</h4><p>选一个时间，加入手机日历；到点会轻轻提醒你写一页</p></div>
+      <div style="display:flex;gap:8px;align-items:center"><label class="sr" for="rmd">提醒时间</label><input type="time" id="rmd" value="${esc(s.reminder || '22:00')}" class="time-in"><button class="btn small" id="ics">加入日历</button></div></section>
     <section class="paper set-row"><div><h4>导出我的手帐</h4><p>下载全部文字、心情、贴纸布局与信件（JSON）</p></div><button class="btn small" id="exp">导出</button></section>
     <section class="paper set-row"><div><h4>月亮回信</h4><p>${state.config.ai ? `已开启 · 每天最多 ${state.config.aiDaily} 封 · 回信由 AI 生成` : '尚未开启'}</p></div></section>
     <section class="paper set-row"><div><h4>手机号</h4><p>${u.phone ? `已绑定 ${esc(u.phone)}，可用验证码登录与找回密码` : '绑定后可以用验证码登录、找回密码'}</p></div>
@@ -30,6 +32,21 @@ export function settingsView(root) {
   }));
   seg('theme', v => save({ settings: { theme: v } }));
   seg('quiet', v => save({ settings: { quiet: v === '1' } }));
+  root.querySelector('#ics').addEventListener('click', async () => {
+    const t = root.querySelector('#rmd').value || '22:00';
+    await save({ settings: { reminder: t } });
+    const [hh, mm] = t.split(':'), d = new Date(), p2 = n => String(n).padStart(2, '0');
+    const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '');
+    const start = `${d.getFullYear()}${p2(d.getMonth() + 1)}${p2(d.getDate())}T${hh}${mm}00`;
+    const ics = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//shiguang//journal//CN', 'CALSCALE:GREGORIAN', 'BEGIN:VEVENT',
+      `UID:shiguang-reminder-${Date.now()}@${location.host}`, `DTSTAMP:${stamp}`, `DTSTART:${start}`, 'DURATION:PT10M', 'RRULE:FREQ=DAILY',
+      'SUMMARY:写一页拾光手帐', `DESCRIPTION:今天的纸还空着，写一句也好。\\n${location.origin}/app/`, `URL:${location.origin}/app/`,
+      'BEGIN:VALARM', 'TRIGGER:PT0M', 'ACTION:DISPLAY', 'DESCRIPTION:写一页拾光手帐', 'END:VALARM', 'END:VEVENT', 'END:VCALENDAR'].join('\r\n');
+    const url = URL.createObjectURL(new Blob([ics], { type: 'text/calendar;charset=utf-8' }));
+    const a = h(`<a href="${url}" download="拾光手帐提醒.ics"></a>`); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast(`已生成每天 ${t} 的日历提醒，打开文件即可加入日历`);
+  });
   root.querySelector('#exp').addEventListener('click', async () => {
     try {
       const data = await api.exportAll();
