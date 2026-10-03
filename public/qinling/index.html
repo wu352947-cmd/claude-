@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#050403">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="description" content="骊山·地宫：以《史记》记载为蓝本的秦始皇陵第一人称恐怖探险网页游戏，支持手机触控。">
+<title>骊山 · 地宫</title>
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="stylesheet" href="/fonts/lxgw/lxgw.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three.min.js" } }</script>
+<style>
+:root {
+  --ink: #050403; --bone: #d9cdb4; --bronze: #b8945a; --bronze-d: #6e5530; --cinnabar: #a3241b; --jade: #6f9c86;
+  --brush: 'Ma Shan Zheng', 'STXingkai', 'KaiTi', serif;
+  --kai: 'LXGW WenKai Screen', 'KaiTi', 'STKaiti', serif;
+  --song: 'ZCOOL XiaoWei', 'Songti SC', 'SimSun', serif;
+  --sat: env(safe-area-inset-top, 0px); --sab: env(safe-area-inset-bottom, 0px); --sal: env(safe-area-inset-left, 0px); --sar: env(safe-area-inset-right, 0px);
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; height: 100%; background: var(--ink); color: var(--bone); overflow: hidden; font-family: var(--kai);
+  -webkit-user-select: none; user-select: none; touch-action: none; overscroll-behavior: none; }
+canvas#gl { position: fixed; inset: 0; display: block; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.layer { position: fixed; inset: 0; display: none; }
+.layer.on { display: flex; }
+
+/* ---------- 载入 ---------- */
+#loading { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; background: var(--ink); z-index: 50; transition: opacity 1.2s; }
+#loading.gone { opacity: 0; pointer-events: none; }
+#loading .seal { width: 76px; height: 76px; border: 3px solid var(--cinnabar); color: var(--cinnabar); font: 34px/1 var(--brush);
+  display: grid; grid-template-columns: 1fr 1fr; place-items: center; padding: 4px; border-radius: 6px; transform: rotate(-4deg); }
+#loading .track { width: min(260px, 60vw); height: 2px; background: #2a231a; }
+#loadBar { height: 100%; width: 0; background: linear-gradient(90deg, var(--bronze-d), var(--bronze)); transition: width .2s; }
+#loadText { font-size: 13px; letter-spacing: .2em; color: #8a7b62; }
+
+/* ---------- 主菜单 ---------- */
+#menu { z-index: 20; flex-direction: column; justify-content: center; padding: calc(24px + var(--sat)) calc(24px + var(--sar)) calc(24px + var(--sab)) calc(28px + var(--sal));
+  background: radial-gradient(ellipse at 70% 50%, transparent 30%, rgba(0,0,0,.75) 85%), linear-gradient(90deg, rgba(0,0,0,.82), rgba(0,0,0,.1) 60%); }
+#menu h1 { margin: 0; font: clamp(56px, 13vw, 132px)/1 var(--brush); letter-spacing: .06em; color: #e8dcc0;
+  text-shadow: 0 0 18px rgba(255,140,60,.25), 0 0 2px #000; }
+#menu h1 em { font-style: normal; color: var(--cinnabar); font-size: .5em; vertical-align: middle; margin: 0 .1em; }
+#menu .sub { margin: 10px 0 34px; font-size: clamp(13px, 2.4vw, 16px); letter-spacing: .5em; color: #9c8a68; }
+#menu nav { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+#menu nav button { font: clamp(20px, 3.6vw, 26px)/1.6 var(--song); letter-spacing: .3em; padding: 4px 0 4px 18px; position: relative; color: #cbbd9f; transition: color .2s, letter-spacing .3s; }
+#menu nav button::before { content: ''; position: absolute; left: 0; top: 50%; width: 6px; height: 6px; background: var(--cinnabar); transform: translateY(-50%) rotate(45deg) scale(0); transition: transform .2s; }
+#menu nav button:hover, #menu nav button:focus-visible { color: #fff2d6; letter-spacing: .38em; outline: none; }
+#menu nav button:hover::before, #menu nav button:focus-visible::before { transform: translateY(-50%) rotate(45deg) scale(1); }
+#menu .foot { position: absolute; bottom: calc(14px + var(--sab)); left: calc(28px + var(--sal)); right: 24px; font-size: 11px; color: #6c604c; letter-spacing: .12em; line-height: 1.7; }
+#menu .tip { color: #8d7b5c; }
+
+/* ---------- 通用面板 ---------- */
+.panel { z-index: 30; align-items: center; justify-content: center; background: rgba(3,2,1,.86); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); padding: 20px; }
+.panel .box { width: min(520px, 100%); max-height: 88vh; overflow: auto; border: 1px solid #3a2f20; background: linear-gradient(#120e0a, #0b0907); padding: 26px 24px; position: relative; }
+.panel h2 { margin: 0 0 16px; font: 28px var(--brush); letter-spacing: .2em; color: #e3d4b0; }
+.panel p { line-height: 1.85; font-size: 14px; color: #b9aa8c; margin: .5em 0; }
+.btns { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+.btn { border: 1px solid var(--bronze-d); padding: 10px 22px; letter-spacing: .3em; font-family: var(--song); font-size: 16px; color: #e6d6b2; background: linear-gradient(#1d160e, #110c08); }
+.btn:hover { border-color: var(--bronze); color: #fff3d8; }
+.btn.red { border-color: #6e1b14; background: linear-gradient(#2a0d0a, #170605); }
+label.row { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 14px 0; font-size: 15px; }
+select, input[type=range] { accent-color: var(--bronze); }
+select { background: #1a140d; color: var(--bone); border: 1px solid #4a3c28; padding: 6px 10px; font: inherit; }
+#sNote { font-size: 12px; color: #8a7b62; min-height: 1em; }
+
+/* ---------- 序章 / 章节卡 / 结局 ---------- */
+#prologue, #card, #ending { z-index: 40; background: #000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 30px; }
+#prologueText p, #endingText p { margin: .55em 0; font-size: clamp(15px, 3.2vw, 20px); letter-spacing: .14em; opacity: 0; animation: rise 1.6s forwards; color: #cbbd9f; }
+#prologueText p:first-child { font-family: var(--brush); font-size: clamp(20px, 4.4vw, 30px); color: #e8dcc0; }
+@keyframes rise { from { opacity: 0; transform: translateY(8px); filter: blur(3px); } to { opacity: 1; transform: none; filter: none; } }
+#card { animation: cardIn 1.4s; }
+@keyframes cardIn { from { opacity: 0; } }
+#cardTitle { font: clamp(42px, 10vw, 96px)/1.1 var(--brush); color: #eadcbd; letter-spacing: .12em; text-shadow: 0 0 24px rgba(200,90,40,.3); }
+#cardPlace { margin-top: 10px; letter-spacing: .6em; font-size: clamp(12px, 2.4vw, 15px); color: #8e7c5c; }
+#card .rule { width: 60px; height: 1px; background: var(--cinnabar); margin: 26px auto; }
+#cardQuote { font: clamp(17px, 3.6vw, 24px)/1.8 var(--kai); color: #c9b892; max-width: 34em; letter-spacing: .1em; }
+#cardSource { margin-top: 8px; font-size: 13px; color: #7d6c50; letter-spacing: .2em; }
+#card .skip { position: absolute; bottom: calc(18px + var(--sab)); font-size: 11px; color: #4f4536; letter-spacing: .3em; }
+#endingStats { display: flex; gap: 22px; flex-wrap: wrap; justify-content: center; margin: 30px 0 10px; font-size: 13px; letter-spacing: .15em; color: #9a8866; opacity: 0; animation: rise 1.5s 6s forwards; }
+#ending .btns { opacity: 0; animation: rise 1.5s 7s forwards; }
+#ending .disc { margin-top: 26px; max-width: 32em; font-size: 11px; line-height: 1.8; color: #5c5040; opacity: 0; animation: rise 1.5s 7.5s forwards; }
+
+/* ---------- HUD ---------- */
+#hud { z-index: 10; pointer-events: none; display: none; }
+#hud.on { display: block; }
+#hud .tl { position: absolute; top: calc(12px + var(--sat)); left: calc(14px + var(--sal)); max-width: 62vw; }
+#objective { font-size: clamp(13px, 2.6vw, 15px); letter-spacing: .1em; color: #d8c9a6; text-shadow: 0 1px 3px #000, 0 0 10px #000; padding-left: 12px; border-left: 2px solid var(--cinnabar); }
+#objective.flash { animation: obj 2.4s; }
+@keyframes obj { 0% { color: #fff; text-shadow: 0 0 12px rgba(255,180,90,.9); } 100% { } }
+.bars { margin-top: 10px; display: grid; grid-template-columns: auto 92px auto; gap: 5px 8px; align-items: center; font-size: 11px; color: #a39371; text-shadow: 0 1px 2px #000; }
+.bar { height: 4px; background: rgba(255,255,255,.08); position: relative; overflow: hidden; }
+.bar i { position: absolute; inset: 0 auto 0 0; transition: width .25s; }
+#barHp { background: linear-gradient(90deg, #6b1510, #c0392b); }
+#barSan { background: linear-gradient(90deg, #2c4d55, #7fb2b0); }
+#barBat { background: linear-gradient(90deg, #6b5a2a, #e0c070); }
+#barSta { background: linear-gradient(90deg, #444, #aaa); }
+#spares { color: #e0c070; font-size: 11px; }
+#hud.lowhp #barHp { animation: pulse .7s infinite alternate; }
+@keyframes pulse { to { opacity: .35; } }
+#vapor { display: none; margin-top: 8px; font-size: 11px; color: #9ab7b2; letter-spacing: .1em; }
+#vapor.on { display: block; animation: pulse 1.6s infinite alternate; }
+#hud .tr { position: absolute; top: calc(10px + var(--sat)); right: calc(10px + var(--sar)); display: flex; gap: 8px; pointer-events: auto; }
+.ibtn { width: 40px; height: 40px; border: 1px solid rgba(184,148,90,.35); border-radius: 50%; display: grid; place-items: center; background: rgba(10,8,6,.45); color: #d8c7a0; font-family: var(--song); font-size: 15px; }
+.cross { position: absolute; left: 50%; top: 50%; width: 4px; height: 4px; margin: -2px; border-radius: 50%; background: rgba(240,225,190,.55); box-shadow: 0 0 3px #000; }
+#prompt { position: absolute; left: 50%; top: calc(50% + 34px); transform: translateX(-50%); font-size: 15px; letter-spacing: .2em; color: #f2e4c2; padding: 6px 16px;
+  background: linear-gradient(90deg, transparent, rgba(0,0,0,.65), transparent); opacity: 0; transition: opacity .2s; white-space: nowrap; }
+#prompt.on { opacity: 1; }
+#subtitle { position: absolute; left: 50%; bottom: calc(22% + var(--sab)); transform: translateX(-50%); max-width: 80vw; text-align: center; font-size: clamp(14px, 3vw, 18px); letter-spacing: .12em;
+  color: #e6d8b8; text-shadow: 0 0 8px #000, 0 1px 2px #000; opacity: 0; transition: opacity .6s; font-style: italic; }
+#subtitle.on { opacity: 1; }
+#toasts { position: absolute; left: 50%; top: calc(16% + var(--sat)); transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.toast { font-size: 14px; letter-spacing: .12em; padding: 6px 18px; color: #f1e2bf; background: linear-gradient(90deg, transparent, rgba(20,14,8,.85) 20%, rgba(20,14,8,.85) 80%, transparent);
+  animation: rise .4s; transition: opacity .7s; white-space: nowrap; }
+.toast.out { opacity: 0; }
+#timer { position: absolute; top: calc(12px + var(--sat)); left: 50%; transform: translateX(-50%); font: 30px var(--song); color: #ff6a4a; letter-spacing: .1em; text-shadow: 0 0 12px rgba(255,60,30,.7); display: none; }
+#timer.on { display: block; animation: pulse .5s infinite alternate; }
+
+/* ---------- 触控 ---------- */
+#touch { position: fixed; inset: 0; z-index: 9; touch-action: none; }
+#stick { position: fixed; width: 112px; height: 112px; margin: -56px 0 0 -56px; border-radius: 50%; border: 1px solid rgba(220,200,160,.25); background: radial-gradient(rgba(255,255,255,.05), transparent 70%); display: none; pointer-events: none; }
+#stick.on { display: block; }
+#knob { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; border-radius: 50%; background: rgba(230,210,170,.22); border: 1px solid rgba(230,210,170,.4); transform: translate(-50%,-50%); }
+#acts { position: fixed; z-index: 11; right: calc(18px + var(--sar)); bottom: calc(22px + var(--sab)); display: none; gap: 14px; align-items: flex-end; }
+body.touch #hud.on ~ #acts { display: flex; }
+.abtn { width: 62px; height: 62px; border-radius: 50%; border: 1px solid rgba(220,195,150,.35); background: rgba(12,9,6,.5); color: #e4d3ae; font: 16px var(--song); letter-spacing: .1em; display: grid; place-items: center; }
+.abtn.big { width: 78px; height: 78px; font-size: 18px; }
+.abtn.ready { border-color: #e6c27a; color: #fff1d0; box-shadow: 0 0 18px rgba(230,180,90,.45); animation: pulse .8s infinite alternate; }
+.abtn.on { background: rgba(140,110,60,.4); }
+#btnLight.off { opacity: .5; }
+#acts .col { display: flex; flex-direction: column; gap: 14px; }
+#moveHint { position: fixed; left: calc(30px + var(--sal)); bottom: calc(40px + var(--sab)); z-index: 10; font-size: 11px; color: rgba(220,200,160,.35); letter-spacing: .2em; pointer-events: none; display: none; }
+body.touch #hud.on ~ #moveHint { display: block; }
+
+/* ---------- 惊吓 ---------- */
+#scare { z-index: 45; pointer-events: none; display: flex; align-items: center; justify-content: center; background: #000; opacity: 0; }
+#scare.on { display: flex; opacity: 1; animation: scare .38s steps(3) forwards; }
+#scare img { height: 115vh; filter: contrast(1.4) brightness(1.1); }
+@keyframes scare { 0% { transform: scale(1.3); } 60% { transform: scale(1.05) translateX(-2%); } 100% { transform: scale(1.12); opacity: .2; } }
+
+/* ---------- 阅读 ---------- */
+#reader { z-index: 35; align-items: center; justify-content: center; background: rgba(0,0,0,.82); padding: calc(14px + var(--sat)) 14px calc(14px + var(--sab)); flex-direction: column; gap: 14px; }
+#reader .sheet { width: min(560px, 100%); max-height: 78vh; overflow: auto; position: relative; padding: 30px 30px 26px; box-shadow: 0 20px 60px #000; touch-action: pan-x pan-y; }
+#readerTitle { font: 24px var(--brush); letter-spacing: .15em; margin: 0 0 16px; }
+#readerText { white-space: pre-wrap; font-size: 16px; line-height: 2; letter-spacing: .05em; }
+#reader.letter .sheet { background: radial-gradient(ellipse at 30% 20%, #e1d2ae, #c6b182 70%, #a58d5e); color: #2b2016; transform: rotate(-.6deg); }
+#reader.letter .sheet::after { content: ''; position: absolute; inset: 0; background: radial-gradient(circle at 85% 90%, rgba(90,40,10,.35), transparent 30%), radial-gradient(circle at 10% 70%, rgba(60,30,10,.2), transparent 25%); pointer-events: none; }
+#reader.letter #readerTitle { color: #4a2a16; }
+#reader.hist .sheet { background: #e9e3d3; color: #26211b; border-top: 6px solid var(--cinnabar); }
+#reader.hist #readerTitle { color: var(--cinnabar); }
+#reader.slip .sheet { width: min(760px, 100%); background: repeating-linear-gradient(90deg, #c9a868 0 30px, #b59050 30px 33px, #2a1c10 33px 36px); color: #2a1a0c; padding: 26px 18px; overflow-x: auto; }
+#reader.slip #readerTitle { writing-mode: vertical-rl; float: right; margin: 0 0 0 10px; color: #6e1d12; height: 100%; }
+#reader.slip #readerText { writing-mode: vertical-rl; height: min(56vh, 460px); font-size: 19px; line-height: 36px; letter-spacing: .12em; font-family: var(--kai); }
+#reader.carve .sheet { background: radial-gradient(ellipse at 50% 40%, #6d5538, #3a2b1a 80%); color: #e7d6b4; }
+#reader.carve #readerText { font-family: var(--brush); font-size: 22px; line-height: 1.9; text-shadow: 1px 1px 0 #1d140b, -1px -1px 0 rgba(255,240,210,.15); }
+#reader.carve #readerTitle { color: #c9b28a; }
+
+/* ---------- 手记 ---------- */
+#journal .box { width: min(620px, 100%); }
+#journalList { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.jitem { text-align: left; padding: 10px 12px; border: 1px solid #3a2f20; font-size: 14px; letter-spacing: .05em; color: #d6c6a2; background: #15100b; }
+.jitem.letter { border-left: 3px solid #a58d5e; } .jitem.slip { border-left: 3px solid #b59050; } .jitem.hist { border-left: 3px solid var(--cinnabar); } .jitem.carve { border-left: 3px solid #6d5538; }
+.jitem.locked { color: #4c4234; cursor: default; }
+#invList { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+#invList span { font-size: 13px; padding: 4px 10px; border: 1px solid #5a4528; color: #e1c890; }
+#invList em { color: #6a5d48; font-size: 13px; }
+.h3 { font-size: 13px; letter-spacing: .3em; color: #8a7a5c; margin: 18px 0 8px; display: flex; justify-content: space-between; }
+
+#death { z-index: 38; background: radial-gradient(ellipse, rgba(40,0,0,.6), #000 75%); flex-direction: column; align-items: center; justify-content: center; text-align: center; animation: cardIn 2s; }
+#death h2 { font: clamp(46px, 11vw, 90px) var(--brush); color: #9c1c12; margin: 0; letter-spacing: .2em; text-shadow: 0 0 30px rgba(160,20,10,.5); }
+#deathCause { margin: 14px 0 26px; letter-spacing: .25em; color: #a89574; }
+.portrait-tip { display: none; }
+@media (orientation: portrait) and (pointer: coarse) { .portrait-tip { display: inline; } }
+</style>
+</head>
+<body>
+<canvas id="gl"></canvas>
+<div id="touch"></div>
+
+<div id="loading" class="layer on">
+  <div class="seal"><span>骊</span><span>山</span><span>地</span><span>宫</span></div>
+  <div class="track"><div id="loadBar"></div></div>
+  <div id="loadText">正在掘开封土……</div>
+</div>
+
+<div id="menu" class="layer">
+  <h1>骊山<em>·</em>地宫</h1>
+  <div class="sub">秦陵盗墓 · 第一人称恐怖探险</div>
+  <nav>
+    <button id="btnContinue" hidden>继续</button>
+    <button id="btnStart">下墓</button>
+    <button id="btnSettings">设置</button>
+    <button id="btnAbout">史料与说明</button>
+  </nav>
+  <div class="foot"><span class="tip">戴上耳机，关灯游玩。<span class="portrait-tip">横屏体验更佳。</span></span><br>本作纯属虚构。秦始皇陵受《文物保护法》保护，地宫至今未经发掘；任何盗掘古墓葬的行为都是犯罪。</div>
+</div>
+
+<div id="about" class="layer panel"><div class="box">
+  <h2>史料与说明</h2>
+  <p>游戏的五个章节依《史记·秦始皇本纪》对骊山陵的记载展开：“穿三泉，下铜而致椁”“令匠作机弩矢”“以水银为百川江河大海，机相灌输，上具天文，下具地理”“以人鱼膏为烛”“闭中羡，下外羡门，尽闭工匠臧者”。兵马俑坑的过洞与棚木、陶俑的彩绘与偏右的发髻、石铠甲坑、封土中的汞异常等细节取自已公开的考古发现；地宫内部的样貌则是想象。</p>
+  <p><b>操作 · 手机</b>：左半屏拖动移动（推到底即奔跑），右半屏滑动转视角；右下角按钮为互动、手电与奔跑。</p>
+  <p><b>操作 · 电脑</b>：点击画面锁定鼠标；WASD 移动，Shift 奔跑，E 互动，F 手电，J 手记，Esc 暂停。</p>
+  <p><b>生存</b>：理智在黑暗中流失，靠近灯火会恢复；手电会耗电；地宫里的汞蒸气会慢慢侵蚀身体。陶俑只在没人看着的时候移动；工匠的亡魂会被光与奔跑的脚步声吸引。</p>
+  <p>所有贴图、模型与声音都由程序即时生成，不含任何外部素材。</p>
+  <div class="btns"><button class="btn" id="aboutClose">知道了</button></div>
+</div></div>
+
+<div id="settings" class="layer panel"><div class="box">
+  <h2>设置</h2>
+  <label class="row">画质
+    <select id="sQuality"><option value="low">流畅</option><option value="mid">均衡</option><option value="high">精致</option></select></label>
+  <label class="row">亮度 <input id="sBright" type="range" min="0.8" max="2.2" step="0.05"></label>
+  <label class="row">视角灵敏度 <input id="sSens" type="range" min="0.3" max="2.5" step="0.1"></label>
+  <label class="row">音量 <input id="sVol" type="range" min="0" max="1" step="0.05"></label>
+  <div id="sNote"></div>
+  <div class="btns"><button class="btn" id="sClose">好</button></div>
+</div></div>
+
+<div id="prologue" class="layer"><div id="prologueText"></div></div>
+
+<div id="card" class="layer">
+  <div id="cardTitle"></div><div id="cardPlace"></div>
+  <div class="rule"></div>
+  <div id="cardQuote"></div><div id="cardSource"></div>
+  <div class="skip">轻触继续</div>
+</div>
+
+<div id="hud">
+  <div class="tl">
+    <div id="objective"></div>
+    <div class="bars">
+      <span>血</span><div class="bar"><i id="barHp"></i></div><span></span>
+      <span>神</span><div class="bar"><i id="barSan"></i></div><span></span>
+      <span>电</span><div class="bar"><i id="barBat"></i></div><span id="spares"></span>
+      <span>气</span><div class="bar"><i id="barSta"></i></div><span></span>
+    </div>
+    <div id="vapor">汞气弥漫 · 不宜久留</div>
+  </div>
+  <div class="tr"><button class="ibtn" id="btnJournal" aria-label="手记">记</button><button class="ibtn" id="btnPause" aria-label="暂停">停</button></div>
+  <div class="cross"></div>
+  <div id="prompt"></div>
+  <div id="toasts"></div>
+  <div id="subtitle"></div>
+  <div id="timer"></div>
+</div>
+<div id="acts">
+  <button class="abtn" id="btnRun">跑</button>
+  <div class="col"><button class="abtn" id="btnLight">灯</button><button class="abtn big" id="btnUse">互动</button></div>
+</div>
+<div id="moveHint">← 拖动行走 →</div>
+<div id="stick"><div id="knob"></div></div>
+
+<div id="scare" class="layer"><img id="scareImg" alt=""></div>
+
+<div id="reader" class="layer">
+  <div class="sheet"><h3 id="readerTitle"></h3><div id="readerText"></div></div>
+  <button class="btn" id="readerClose">收起</button>
+</div>
+
+<div id="journal" class="layer panel"><div class="box">
+  <h2>手记</h2>
+  <div class="h3"><span>随身之物</span></div>
+  <div id="invList"></div>
+  <div class="h3"><span>史料与遗书</span><span id="journalCount"></span></div>
+  <div id="journalList"></div>
+  <div class="btns"><button class="btn" id="journalClose">合上</button></div>
+</div></div>
+
+<div id="pause" class="layer panel"><div class="box">
+  <h2>暂停</h2>
+  <p>黑暗还在原地等你。</p>
+  <div class="btns"><button class="btn" id="pResume">继续</button><button class="btn" id="pSettings">设置</button><button class="btn red" id="pMenu">回到地面</button></div>
+</div></div>
+
+<div id="death" class="layer">
+  <h2>殁</h2>
+  <div id="deathCause"></div>
+  <div class="btns"><button class="btn" id="dRetry">再下一次</button><button class="btn red" id="dMenu">回到地面</button></div>
+</div>
+
+<div id="ending" class="layer">
+  <div id="endingText"></div>
+  <div id="endingStats"></div>
+  <div class="btns"><button class="btn" id="eMenu">回到地面</button></div>
+  <div class="disc">本作纯属虚构。秦始皇陵是世界文化遗产，地宫至今未经发掘。愿它继续安睡。</div>
+</div>
+
+<script>
+  if ('ontouchstart' in window || navigator.maxTouchPoints > 0) document.body.classList.add('touch');
+  document.addEventListener('gesturestart', e => e.preventDefault());
+  document.addEventListener('contextmenu', e => e.preventDefault());
+</script>
+<script type="module" src="./js/main.js"></script>
+</body>
+</html>
