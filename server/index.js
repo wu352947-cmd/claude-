@@ -9,6 +9,8 @@ import { openDb, now, parseJson } from './db.js';
 import { hashPassword, verifyPassword, createSession, userFromToken, destroySession, validCredentials, COOKIE } from './auth.js';
 import { aiConfig, writeReply } from './ai.js';
 import { crisisSignal, CRISIS_LETTER, HOTLINES } from './safety.js';
+import { smsConfig, sendCode, validPhone, maskPhone, newCode, codeHash, sameHash } from './sms.js';
+import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { termOf, moonOf, parseDay, isDayKey, SEASON_CN } from '../public/app/js/calendar.js';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -20,6 +22,8 @@ export function createApp(opts = {}) {
   const UPLOADS = join(DATA, 'uploads');
   const db = opts.db || openDb(env.DB_FILE || join(DATA, 'shiguang.db'));
   const ai = aiConfig(env);
+  const sms = smsConfig(env);
+  const SECRET = env.APP_SECRET || loadSecret(DATA);
   const AI_DAILY = Number(env.AI_DAILY_LIMIT || 3);
   const ICP = env.SITE_ICP || '';
   const COOKIE_SECURE = (env.COOKIE_SECURE || 'auto').toLowerCase();
@@ -61,7 +65,23 @@ export function createApp(opts = {}) {
   };
   setInterval(() => { const t = now(); for (const [k, b] of buckets) if (t > b.reset) buckets.delete(k); }, 600_000).unref();
 
-  const publicUser = u => ({ id: u.id, username: u.username, nickname: u.nickname || u.username, settings: parseJson(u.settings, {}), createdAt: u.created_at });
+  const publicUser = u => ({ id: u.id, username: u.username, nickname: u.nickname || u.username, settings: parseJson(u.settings, {}), createdAt: u.created_at,
+    phone: maskPhone(u.phone), hasPassword: String(u.pass_hash).startsWith('scrypt$') });
+
+  // ---------- 短信验证码 ----------
+  const PURPOSES = new Set(['login', 'reset', 'bind', 'delete']);
+  function checkCode(phone, purpose, code) {
+    const row = db.prepare('SELECT * FROM sms_codes WHERE phone = ? AND purpose = ?').get(phone, purpose);
+    if (!row || row.expires_at < now()) return '验证码已过期，请重新获取';
+    if (row.attempts >= 5) return '错误次数太多，请重新获取验证码';
+    if (!sameHash(row.code_hash, codeHash(SECRET, phone, purpose, String(code || '').trim()))) {
+      db.prepare('UPDATE sms_codes SET attempts = attempts + 1 WHERE phone = ? AND purpose = ?').run(phone, purpose);
+      return '验证码不对';
+    }
+    db.prepare('DELETE FROM sms_codes WHERE phone = ? AND purpose = ?').run(phone, purpose);
+    return null;
+  }
+  const userByPhone = phone => db.prepare('SELECT * FROM users WHERE phone = ?').get(phone);
 
   // ---------- page sanitizing ----------
   const num = (v, lo, hi, d = 0) => { const n = Number(v); return Number.isFinite(n) ? Math.min(hi, Math.max(lo, n)) : d; };
@@ -92,7 +112,66 @@ export function createApp(opts = {}) {
     const need = () => { if (!user) throw Object.assign(new Error('请先登录'), { status: 401 }); };
 
     if (p === '/api/health') return send(res, 200, { ok: true });
-    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES });
+    if (p === '/api/config' && m === 'GET') return send(res, 200, { ai: ai.enabled, aiDaily: AI_DAILY, icp: ICP, hotlines: HOTLINES, sms: sms.enabled });
+
+    if (p === '/api/auth/sms/send' && m === 'POST') {
+      if (!sms.enabled) return fail(res, 503, '短信服务尚未开启');
+      const { phone, purpose } = await readJson(req);
+      if (!validPhone(phone)) return fail(res, 400, '请输入正确的手机号');
+      if (!PURPOSES.has(purpose)) return fail(res, 400, '请求不正确');
+      if ((purpose === 'bind' || purpose === 'delete') && !user) return fail(res, 401, '请先登录');
+      if (purpose === 'reset' && !userByPhone(phone)) return fail(res, 404, '这个手机号还没有绑定手帐');
+      if (purpose === 'bind' && userByPhone(phone)) return fail(res, 409, '这个手机号已经绑定了别的手帐');
+      if (purpose === 'delete' && user.phone !== phone) return fail(res, 400, '请使用账号绑定的手机号');
+      if (limited('smsip:' + clientIp(req), 20, 3600_000)) return fail(res, 429, '获取验证码太频繁了，请稍后再试');
+      const last = db.prepare('SELECT created_at FROM sms_codes WHERE phone = ? AND purpose = ?').get(phone, purpose);
+      if (last && now() - last.created_at < 60_000) return fail(res, 429, '验证码已发送，请 60 秒后再试', { cooldown: Math.ceil((60_000 - (now() - last.created_at)) / 1000) });
+      if (limited('smsday:' + phone, 10, 864e5)) return fail(res, 429, '今天获取验证码的次数用完了');
+      const code = newCode();
+      try { await sendCode(sms, phone, code); } catch (err) { console.error('[sms]', err.message); return fail(res, 502, '短信没能发出，请稍后再试'); }
+      db.prepare(`INSERT INTO sms_codes (phone, purpose, code_hash, attempts, created_at, expires_at) VALUES (?,?,?,0,?,?)
+                  ON CONFLICT(phone, purpose) DO UPDATE SET code_hash = excluded.code_hash, attempts = 0, created_at = excluded.created_at, expires_at = excluded.expires_at`)
+        .run(phone, purpose, codeHash(SECRET, phone, purpose, code), now(), now() + 300_000);
+      return send(res, 200, { ok: true, cooldown: 60, ...(sms.debug ? { debugCode: code } : {}) });
+    }
+    if (p === '/api/auth/sms/login' && m === 'POST') {
+      const { phone, code, agree, nickname } = await readJson(req);
+      if (!validPhone(phone)) return fail(res, 400, '请输入正确的手机号');
+      let u = userByPhone(phone);
+      if (!u && !agree) return fail(res, 400, '请先阅读并同意用户协议与隐私政策');
+      const bad = checkCode(phone, 'login', code); if (bad) return fail(res, 400, bad);
+      let fresh = false;
+      if (!u) {
+        let username; do { username = 'yue' + phone.slice(-4) + String(Math.floor(Math.random() * 1e4)).padStart(4, '0'); } while (db.prepare('SELECT 1 FROM users WHERE username = ?').get(username));
+        const r = db.prepare('INSERT INTO users (username, pass_hash, nickname, phone, created_at) VALUES (?,?,?,?,?)')
+          .run(username, '!nopass', str(nickname, 20).trim() || '拾光人', phone, now());
+        u = db.prepare('SELECT * FROM users WHERE id = ?').get(r.lastInsertRowid); fresh = true;
+      }
+      const s = createSession(db, u.id);
+      setSession(req, res, s.token, s.maxAge);
+      return send(res, fresh ? 201 : 200, { user: publicUser(u), fresh });
+    }
+    if (p === '/api/auth/reset' && m === 'POST') {
+      const { phone, code, password } = await readJson(req);
+      if (!validPhone(phone)) return fail(res, 400, '请输入正确的手机号');
+      if (typeof password !== 'string' || password.length < 8 || password.length > 72) return fail(res, 400, '密码长度需在 8–72 位之间');
+      const u = userByPhone(phone); if (!u) return fail(res, 404, '这个手机号还没有绑定手帐');
+      const bad = checkCode(phone, 'reset', code); if (bad) return fail(res, 400, bad);
+      db.prepare('UPDATE users SET pass_hash = ? WHERE id = ?').run(hashPassword(password), u.id);
+      db.prepare('DELETE FROM sessions WHERE user_id = ?').run(u.id);
+      const s = createSession(db, u.id);
+      setSession(req, res, s.token, s.maxAge);
+      return send(res, 200, { user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(u.id)) });
+    }
+    if (p === '/api/me/phone' && m === 'POST') {
+      if (!user) return fail(res, 401, '请先登录');
+      const { phone, code } = await readJson(req);
+      if (!validPhone(phone)) return fail(res, 400, '请输入正确的手机号');
+      if (userByPhone(phone)) return fail(res, 409, '这个手机号已经绑定了别的手帐');
+      const bad = checkCode(phone, 'bind', code); if (bad) return fail(res, 400, bad);
+      db.prepare('UPDATE users SET phone = ? WHERE id = ?').run(phone, user.id);
+      return send(res, 200, { user: publicUser(db.prepare('SELECT * FROM users WHERE id = ?').get(user.id)) });
+    }
 
     if (p === '/api/auth/register' && m === 'POST') {
       if (limited('reg:' + clientIp(req), Number(env.REGISTER_LIMIT_PER_HOUR || 10), 3600_000)) return fail(res, 429, '注册太频繁了，请稍后再试');
@@ -109,7 +188,7 @@ export function createApp(opts = {}) {
     if (p === '/api/auth/login' && m === 'POST') {
       const { username, password } = await readJson(req);
       if (limited('login:' + clientIp(req) + ':' + String(username).toLowerCase(), 8, 900_000)) return fail(res, 429, '尝试次数太多，请 15 分钟后再试');
-      const u = db.prepare('SELECT * FROM users WHERE username = ?').get(String(username || ''));
+      const u = validPhone(username) ? userByPhone(username) : db.prepare('SELECT * FROM users WHERE username = ?').get(String(username || ''));
       if (!u || !verifyPassword(String(password || ''), u.pass_hash)) return fail(res, 401, '用户名或密码不对');
       const s = createSession(db, u.id);
       setSession(req, res, s.token, s.maxAge);
@@ -145,8 +224,9 @@ export function createApp(opts = {}) {
     }
     if (p === '/api/me' && m === 'DELETE') {
       need();
-      const { password } = await readJson(req);
-      if (!verifyPassword(String(password || ''), user.pass_hash)) return fail(res, 401, '密码不对，账号没有删除');
+      const { password, code } = await readJson(req);
+      if (code !== undefined) { const bad = user.phone ? checkCode(user.phone, 'delete', code) : '账号没有绑定手机号'; if (bad) return fail(res, 400, bad); }
+      else if (!verifyPassword(String(password || ''), user.pass_hash)) return fail(res, 401, '密码不对，账号没有删除');
       const files = db.prepare('SELECT id, mime FROM uploads WHERE user_id = ?').all(user.id);
       for (const f of files) await unlink(join(UPLOADS, f.id + extOf(f.mime))).catch(() => {});
       db.prepare('DELETE FROM users WHERE id = ?').run(user.id);
@@ -350,6 +430,14 @@ export function createApp(opts = {}) {
       if (!err.status) console.error(err);
     }
   });
+}
+
+// 验证码哈希用的服务端密钥：优先 APP_SECRET，否则首次启动时生成并保存在数据目录
+function loadSecret(dir) {
+  const f = join(dir, 'secret.key');
+  try { return readFileSync(f, 'utf8').trim(); } catch {}
+  mkdirSync(dir, { recursive: true });
+  const k = randomBytes(32).toString('hex'); writeFileSync(f, k, { mode: 0o600 }); return k;
 }
 
 const extOf = mime => ({ 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp' }[mime] || '.bin');

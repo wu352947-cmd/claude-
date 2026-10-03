@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { createApp } from '../server/index.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'sg-'));
-const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100' } });
+const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', SMS_PROVIDER: 'mock', SMS_DEBUG: '1', APP_SECRET: 'test-secret' } });
 await new Promise(r => server.listen(0, r));
 const base = `http://127.0.0.1:${server.address().port}`;
 test.after(() => server.close());
@@ -117,4 +117,38 @@ test('静态文件与安全头', async () => {
   assert.equal(res.status, 200);
   assert.match(res.headers.get('content-security-policy'), /default-src 'self'/);
   assert.equal((await fetch(base + '/../server/index.js')).status !== 200, true);
+});
+
+test('手机号：验证码登录、自动注册、冷却、密码登录与重置', async () => {
+  const a = client();
+  assert.equal((await a('POST', '/api/auth/sms/send', { phone: '12345', purpose: 'login' })).status, 400);
+  const s1 = await a('POST', '/api/auth/sms/send', { phone: '13800138000', purpose: 'login' });
+  assert.equal(s1.status, 200); assert.match(s1.data.debugCode, /^\d{6}$/);
+  assert.equal((await a('POST', '/api/auth/sms/send', { phone: '13800138000', purpose: 'login' })).status, 429, '60 秒冷却');
+  assert.equal((await a('POST', '/api/auth/sms/login', { phone: '13800138000', code: s1.data.debugCode })).status, 400, '新用户需同意协议');
+  assert.equal((await a('POST', '/api/auth/sms/login', { phone: '13800138000', code: '000000', agree: true })).status, 400, '错误验证码');
+  const lg = await a('POST', '/api/auth/sms/login', { phone: '13800138000', code: s1.data.debugCode, agree: true, nickname: '阿桂' });
+  assert.equal(lg.status, 201); assert.equal(lg.data.user.phone, '138****8000'); assert.equal(lg.data.user.hasPassword, false);
+  assert.equal((await a('POST', '/api/auth/sms/login', { phone: '13800138000', code: s1.data.debugCode, agree: true })).status, 400, '验证码只能用一次');
+  await a('POST', '/api/auth/logout');
+  // 忘记密码 → 设置密码 → 用手机号 + 密码登录
+  const s2 = await a('POST', '/api/auth/sms/send', { phone: '13800138000', purpose: 'reset' });
+  assert.equal((await a('POST', '/api/auth/reset', { phone: '13800138000', code: s2.data.debugCode, password: 'osmanthus9' })).status, 200);
+  await a('POST', '/api/auth/logout');
+  const pl = await a('POST', '/api/auth/login', { username: '13800138000', password: 'osmanthus9' });
+  assert.equal(pl.status, 200); assert.equal(pl.data.user.hasPassword, true);
+  assert.equal((await a('POST', '/api/auth/sms/send', { phone: '13900139000', purpose: 'reset' })).status, 404, '未绑定的号码不能重置');
+});
+
+test('手机号：绑定与验证码注销', async () => {
+  const a = client();
+  await a('POST', '/api/auth/register', { username: 'bindme', password: 'binding123', agree: true });
+  const s = await a('POST', '/api/auth/sms/send', { phone: '13700137000', purpose: 'bind' });
+  assert.equal((await a('POST', '/api/me/phone', { phone: '13700137000', code: s.data.debugCode })).data.user.phone, '137****7000');
+  const b = client();
+  await b('POST', '/api/auth/register', { username: 'other2', password: 'binding456', agree: true });
+  assert.equal((await b('POST', '/api/auth/sms/send', { phone: '13700137000', purpose: 'bind' })).status, 409, '号码已被占用');
+  const d = await a('POST', '/api/auth/sms/send', { phone: '13700137000', purpose: 'delete' });
+  assert.equal((await a('DELETE', '/api/me', { code: d.data.debugCode })).status, 200);
+  assert.equal((await a('POST', '/api/auth/login', { username: 'bindme', password: 'binding123' })).status, 401);
 });

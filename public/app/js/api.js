@@ -32,5 +32,10 @@ export const api = {
   sendLetter: b => call('POST', '/api/letters', b),
   openLetter: id => call('POST', `/api/letters/${id}/open`, {}),
   deleteLetter: id => call('DELETE', `/api/letters/${id}`),
-  upload: (blob, type) => call('POST', '/api/uploads', blob, type)
+  upload: (blob, type) => call('POST', '/api/uploads', blob, type),
+  smsSend: (phone, purpose) => call('POST', '/api/auth/sms/send', { phone, purpose }),
+  smsLogin: b => call('POST', '/api/auth/sms/login', b),
+  resetPassword: b => call('POST', '/api/auth/reset', b),
+  bindPhone: b => call('POST', '/api/me/phone', b),
+  deleteMeByCode: code => call('DELETE', '/api/me', { code })
 };
