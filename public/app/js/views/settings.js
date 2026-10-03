@@ -19,6 +19,8 @@ export function settingsView(root) {
       <div style="display:flex;gap:8px;align-items:center"><label class="sr" for="rmd">提醒时间</label><input type="time" id="rmd" value="${esc(s.reminder || '22:00')}" class="time-in"><button class="btn small" id="ics">加入日历</button></div></section>
     <section class="paper set-row"><div><h4>导出我的手帐</h4><p>下载全部文字、心情、贴纸布局与信件（JSON）</p></div><button class="btn small" id="exp">导出</button></section>
     <section class="paper set-row"><div><h4>月亮回信</h4><p>${state.config.ai ? `已开启 · 每天最多 ${state.config.aiDaily} 封 · 回信由 AI 生成` : '尚未开启'}</p></div></section>
+    <section class="paper set-row"><div><h4>让月亮记得最近的事</h4><p>开启后，回信时会参考你最近 30 天里写过的几页，像老朋友一样问问后来怎样了。<br>这些内容只在你请求回信时发送给 AI 服务，随时可以关闭。</p></div>
+      <div class="seg" id="memory"><button type="button" data-v="0" class="${s.memory ? '' : 'on'}">关</button><button type="button" data-v="1" class="${s.memory ? 'on' : ''}">开</button></div></section>
     <section class="paper set-row"><div><h4>手机号</h4><p>${u.phone ? `已绑定 ${esc(u.phone)}，可用验证码登录与找回密码` : '绑定后可以用验证码登录、找回密码'}</p></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">${!u.phone && state.config.sms ? '<button class="btn small" id="bind">绑定手机号</button>' : ''}${u.phone && state.config.sms ? `<button class="btn small" id="setpw">${u.hasPassword ? '修改密码' : '设置密码'}</button>` : ''}</div></section>
     <section class="paper set-row"><div><h4>账号</h4><p>${esc(u.username)} · ${new Date(u.createdAt).getFullYear()} 年加入</p></div>
@@ -32,6 +34,7 @@ export function settingsView(root) {
   }));
   seg('theme', v => save({ settings: { theme: v } }));
   seg('quiet', v => save({ settings: { quiet: v === '1' } }));
+  seg('memory', async v => { if (await save({ settings: { memory: v === '1' } })) toast(v === '1' ? '月亮会记得你最近写过的事' : '月亮只读当天这一页'); });
   root.querySelector('#ics').addEventListener('click', async () => {
     const t = root.querySelector('#rmd').value || '22:00';
     await save({ settings: { reminder: t } });

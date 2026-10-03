@@ -9,6 +9,7 @@ import { openDb, now, parseJson } from './db.js';
 import { hashPassword, verifyPassword, createSession, userFromToken, destroySession, validCredentials, COOKIE } from './auth.js';
 import { aiConfig, writeReply } from './ai.js';
 import { crisisSignal, CRISIS_LETTER, HOTLINES } from './safety.js';
+import { loadKey, makeCodec } from './crypto.js';
 import { smsConfig, sendCode, validPhone, maskPhone, newCode, codeHash, sameHash } from './sms.js';
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { termOf, moonOf, parseDay, isDayKey, SEASON_CN } from '../public/app/js/calendar.js';
@@ -24,10 +25,15 @@ export function createApp(opts = {}) {
   const ai = aiConfig(env);
   const sms = smsConfig(env);
   const SECRET = env.APP_SECRET || loadSecret(DATA);
+  const { enc, dec } = makeCodec(loadKey(env, DATA));
+  // 一次性迁移：把还没加密的旧内容加密
+  for (const r of db.prepare("SELECT rowid, body FROM entries WHERE body != '' AND body NOT LIKE 'enc1:%'").all()) db.prepare('UPDATE entries SET body = ? WHERE rowid = ?').run(enc(r.body), r.rowid);
+  for (const r of db.prepare("SELECT id, body FROM letters WHERE body NOT LIKE 'enc1:%'").all()) db.prepare('UPDATE letters SET body = ? WHERE id = ?').run(enc(r.body), r.id);
   const AI_DAILY = Number(env.AI_DAILY_LIMIT || 3);
   const ICP = env.SITE_ICP || '';
   const COOKIE_SECURE = (env.COOKIE_SECURE || 'auto').toLowerCase();
   const MOODS = new Set(['', 'happy', 'calm', 'sweet', 'tired', 'blue']);
+  const MOOD_CN = { happy: '开心', calm: '平静', sweet: '小确幸', tired: '有点累', blue: '想哭' };
 
   // ---------- helpers ----------
   const send = (res, status, body, headers = {}) => {
@@ -99,11 +105,11 @@ export function createApp(opts = {}) {
     const weather = str(p.weather, 12);
     return { stickers, photos, weather };
   }
-  const entryOut = r => r && ({ day: r.day, mood: r.mood, body: r.body, page: parseJson(r.page, {}), sealedAt: r.sealed_at, updatedAt: r.updated_at });
+  const entryOut = r => r && ({ day: r.day, mood: r.mood, body: dec(r.body), page: parseJson(r.page, {}), sealedAt: r.sealed_at, updatedAt: r.updated_at });
   const letterOut = (r, t = now()) => {
     const due = r.deliver_at <= t;
     return { id: r.id, kind: r.kind, day: r.day, title: r.title, createdAt: r.created_at, deliverAt: r.deliver_at, openedAt: r.opened_at,
-      due, body: due ? r.body : null, meta: parseJson(r.meta, {}) };
+      due, body: due ? dec(r.body) : null, meta: parseJson(r.meta, {}) };
   };
 
   // ---------- API ----------
@@ -242,7 +248,7 @@ export function createApp(opts = {}) {
         exportedAt: new Date().toISOString(), site: '拾光手帐',
         user: publicUser(user),
         entries: db.prepare('SELECT * FROM entries WHERE user_id = ? ORDER BY day').all(user.id).map(entryOut),
-        letters: db.prepare('SELECT * FROM letters WHERE user_id = ? ORDER BY created_at').all(user.id).map(r => ({ ...letterOut(r), body: r.body })),
+        letters: db.prepare('SELECT * FROM letters WHERE user_id = ? ORDER BY created_at').all(user.id).map(r => ({ ...letterOut(r), body: dec(r.body) })),
         photos: db.prepare('SELECT id, mime, size, created_at FROM uploads WHERE user_id = ?').all(user.id)
       };
       return send(res, 200, data, { 'Content-Disposition': `attachment; filename="shiguang-${new Date().toISOString().slice(0, 10)}.json"` });
@@ -265,7 +271,7 @@ export function createApp(opts = {}) {
       const day = mm[1];
       if (!isDayKey(day)) return fail(res, 400, '日期不正确');
       if (parseDay(day) > new Date(now() + 864e5)) return fail(res, 400, '还不能写未来的手帐');
-      const row = () => db.prepare('SELECT * FROM entries WHERE user_id = ? AND day = ?').get(user.id, day);
+      const row = () => { const r = db.prepare('SELECT * FROM entries WHERE user_id = ? AND day = ?').get(user.id, day); if (r) r.body = dec(r.body); return r; };
       if (!mm[2] && m === 'GET') {
         const reply = db.prepare("SELECT * FROM letters WHERE user_id = ? AND kind = 'reply' AND day = ? ORDER BY id DESC LIMIT 1").get(user.id, day);
         return send(res, 200, { entry: entryOut(row()) || null, reply: reply ? letterOut(reply) : null });
@@ -277,7 +283,7 @@ export function createApp(opts = {}) {
         const page = JSON.stringify(cleanPage(b.page, user.id));
         db.prepare(`INSERT INTO entries (user_id, day, mood, body, page, updated_at) VALUES (?,?,?,?,?,?)
                     ON CONFLICT(user_id, day) DO UPDATE SET mood = excluded.mood, body = excluded.body, page = excluded.page, updated_at = excluded.updated_at`)
-          .run(user.id, day, mood, body, page, now());
+          .run(user.id, day, mood, enc(body), page, now());
         return send(res, 200, { entry: entryOut(row()), crisis: crisisSignal(body) });
       }
       if (!mm[2] && m === 'DELETE') {
@@ -297,7 +303,7 @@ export function createApp(opts = {}) {
         const t = now();
         const insert = (title, body, meta) => {
           const r = db.prepare('INSERT INTO letters (user_id, kind, day, title, body, meta, created_at, deliver_at) VALUES (?,?,?,?,?,?,?,?)')
-            .run(user.id, 'reply', day, title, body, JSON.stringify(meta), t, t);
+            .run(user.id, 'reply', day, title, enc(body), JSON.stringify(meta), t, t);
           return letterOut(db.prepare('SELECT * FROM letters WHERE id = ?').get(r.lastInsertRowid));
         };
         if (crisisSignal(e.body)) return send(res, 201, { letter: insert(CRISIS_LETTER.title, CRISIS_LETTER.body, { crisis: true, hotlines: HOTLINES }) });
@@ -307,10 +313,17 @@ export function createApp(opts = {}) {
         if (used >= AI_DAILY) return fail(res, 429, `今天的回信已经寄出 ${AI_DAILY} 封了，明天再来吧`);
         if (limited('ai:' + user.id, 2, 60_000)) return fail(res, 429, '月亮正在写上一封信，请稍等一会儿');
         const d = parseDay(day), term = termOf(d), moon = moonOf(d);
+        // 回信记忆（用户主动开启）：附上最近 30 天里的几页摘要
+        const recentFor = dd => {
+          if (!parseJson(user.settings, {}).memory) return [];
+          const from = new Date(parseDay(dd) - 30 * 864e5); const fk = `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, '0')}-${String(from.getDate()).padStart(2, '0')}`;
+          return db.prepare('SELECT day, mood, body FROM entries WHERE user_id = ? AND day < ? AND day >= ? ORDER BY day DESC LIMIT 4').all(user.id, dd, fk)
+            .map(r => ({ day: r.day, mood: MOOD_CN[r.mood] || '', text: [...dec(r.body).replace(/\s+/g, ' ')].slice(0, 120).join('') })).filter(r => r.text);
+        };
         let text;
         try {
           text = await writeReply(ai, { nickname: user.nickname, day: `${d.getMonth() + 1}月${d.getDate()}日`, term: term.name,
-            moon: `月相是${moon.name}`, mood: { happy: '开心', calm: '平静', sweet: '小确幸', tired: '有点累', blue: '想哭' }[e.mood] || '', body: e.body });
+            moon: `月相是${moon.name}`, mood: MOOD_CN[e.mood] || '', body: e.body, recent: recentFor(day) });
         } catch (err) {
           console.error('[ai]', err.message);
           return fail(res, 502, '月亮暂时没能写好回信，过一会儿再试试');
@@ -329,8 +342,8 @@ export function createApp(opts = {}) {
       const replies = new Set(db.prepare("SELECT day FROM letters WHERE user_id = ? AND kind = 'reply' AND day LIKE ?").all(user.id, y + '-%').map(r => r.day));
       const years = db.prepare("SELECT DISTINCT substr(day, 1, 4) y FROM entries WHERE user_id = ? ORDER BY y").all(user.id).map(r => r.y);
       const days = rows.map(r => {
-        const pg = parseJson(r.page, {}), text = r.body.replace(/\s+/g, ' ').trim();
-        return { day: r.day, mood: r.mood, chars: [...r.body.replace(/\s/g, '')].length, sealed: !!r.sealed_at, stickers: (pg.stickers || []).length,
+        const pg = parseJson(r.page, {}), body = dec(r.body), text = body.replace(/\s+/g, ' ').trim();
+        return { day: r.day, mood: r.mood, chars: [...body.replace(/\s/g, '')].length, sealed: !!r.sealed_at, stickers: (pg.stickers || []).length,
           photos: (pg.photos || []).length, weather: pg.weather || '', reply: replies.has(r.day), excerpt: [...text].slice(0, 48).join('') };
       });
       return send(res, 200, { year: Number(y), years, days, letters: db.prepare("SELECT COUNT(*) n FROM letters WHERE user_id = ? AND kind = 'reply' AND day LIKE ?").get(user.id, y + '-%').n });
@@ -354,7 +367,7 @@ export function createApp(opts = {}) {
       const count = db.prepare("SELECT COUNT(*) n FROM letters WHERE user_id = ? AND kind = 'future' AND deliver_at > ?").get(user.id, now()).n;
       if (count >= 50) return fail(res, 400, '在路上的信已经很多了，等它们先寄到吧');
       const r = db.prepare('INSERT INTO letters (user_id, kind, title, body, meta, created_at, deliver_at) VALUES (?,?,?,?,?,?,?)')
-        .run(user.id, 'future', title || '给未来的自己', body, '{}', now(), deliverAt);
+        .run(user.id, 'future', title || '给未来的自己', enc(body), '{}', now(), deliverAt);
       return send(res, 201, { letter: letterOut(db.prepare('SELECT * FROM letters WHERE id = ?').get(r.lastInsertRowid)) });
     }
     if ((mm = p.match(/^\/api\/letters\/(\d+)(\/open)?$/))) {

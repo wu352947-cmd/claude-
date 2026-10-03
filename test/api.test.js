@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { createApp } from '../server/index.js';
 
 const dir = mkdtempSync(join(tmpdir(), 'sg-'));
-const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', SMS_PROVIDER: 'mock', SMS_DEBUG: '1', APP_SECRET: 'test-secret' } });
+const server = createApp({ env: { DATA_DIR: dir, DB_FILE: join(dir, 't.db'), AI_PROVIDER: 'mock', AI_DAILY_LIMIT: '2', COOKIE_SECURE: 'false', REGISTER_LIMIT_PER_HOUR: '100', SMS_PROVIDER: 'mock', SMS_DEBUG: '1', APP_SECRET: 'test-secret', ENTRY_KEY: 'a'.repeat(64) } });
 await new Promise(r => server.listen(0, r));
 const base = `http://127.0.0.1:${server.address().port}`;
 test.after(() => server.close());
@@ -162,4 +162,33 @@ test('年度画卷数据', async () => {
   assert.equal(r.status, 200);
   assert.deepEqual(r.data.days[0], { day: today, mood: 'happy', chars: 8, sealed: true, stickers: 1, photos: 0, weather: '晴', reply: false, excerpt: '一二三四五 六七八' });
   assert.deepEqual(r.data.years, [today.slice(0, 4)]);
+});
+
+test('内容在数据库中加密存储', async () => {
+  const { DatabaseSync } = await import('node:sqlite');
+  const a = client();
+  await a('POST', '/api/auth/register', { username: 'mimi', password: 'secretly99', agree: true });
+  await a('PUT', `/api/entries/${today}`, { body: '只有我知道的秘密：桂花树下埋了一封信。' });
+  await a('POST', '/api/letters', { body: '未来的我，你还记得那封信吗', deliverAt: Date.now() + 864e5 * 30 });
+  const raw = new DatabaseSync(join(dir, 't.db'));
+  const e = raw.prepare("SELECT body FROM entries WHERE body LIKE '%' ORDER BY rowid DESC LIMIT 1").get();
+  assert.match(e.body, /^enc1:/); assert.doesNotMatch(e.body, /桂花/);
+  assert.match(raw.prepare('SELECT body FROM letters ORDER BY id DESC LIMIT 1').get().body, /^enc1:/);
+  raw.close();
+  assert.equal((await a('GET', `/api/entries/${today}`)).data.entry.body, '只有我知道的秘密：桂花树下埋了一封信。');
+  assert.match(JSON.stringify((await a('GET', '/api/export')).data), /桂花树下/);
+});
+
+test('回信记忆：仅在用户开启后参考最近几页', async () => {
+  const a = client();
+  await a('POST', '/api/auth/register', { username: 'jiyi', password: 'remember12', agree: true });
+  const y = new Date(Date.now() - 2 * 864e5); const yd = `${y.getFullYear()}-${String(y.getMonth() + 1).padStart(2, '0')}-${String(y.getDate()).padStart(2, '0')}`;
+  await a('PUT', `/api/entries/${yd}`, { body: '面试结束了，不知道结果会怎样。' });
+  await a('PUT', `/api/entries/${today}`, { body: '今天在楼下看见一只橘猫，晒着太阳睡着了。' });
+  const r1 = await a('POST', `/api/entries/${today}/reply`);
+  assert.doesNotMatch(r1.data.letter.body, /面试/, '默认不记得');
+  await a('PATCH', '/api/me', { settings: { memory: true } });
+  await a('DELETE', `/api/letters/${r1.data.letter.id}`);
+  const r2 = await a('POST', `/api/entries/${today}/reply`);
+  assert.match(r2.data.letter.body, /面试结束了/);
 });

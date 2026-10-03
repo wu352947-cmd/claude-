@@ -33,15 +33,17 @@ const SYSTEM = `你是“拾光手帐”里的月亮，会给写手帐的人回�
 - 结尾给一个很小、今晚或明天就能做到的温柔提议，然后落款“月亮”。
 - 如果对方流露出伤害自己或活不下去的念头，请认真回应，并明确建议拨打全国统一心理援助热线 12356，紧急时拨打 110 或 120。`;
 
-export function buildPrompt({ nickname, day, term, moon, mood, body }) {
+export function buildPrompt({ nickname, day, term, moon, mood, body, recent = [] }) {
   const who = nickname ? `写信人的昵称是“${nickname}”。` : '';
+  const mem = recent.length ? `\n这个人最近几天写过的（仅供参考，可以自然地提起其中一件，不要逐条复述，也不要说“我记得你的记录”这类话）：
+${recent.map(r => `- ${r.day}${r.mood ? `（${r.mood}）` : ''}：${r.text}`).join('\n')}\n` : '';
   return `${who}今天是 ${day}，节气在${term}附近，${moon}。
 今天的心情：${mood || '没有标注'}。
 今天的手帐内容：
 """
 ${String(body || '').slice(0, 2000)}
 """
-请写一封回信。`;
+${mem}请写一封回信。`;
 }
 
 async function viaOpenAICompatible(cfg, user) {
@@ -95,6 +97,7 @@ function viaMock(_cfg, _user, ctx) {
   return [
     `读到你写的“${first.slice(0, 24)}”，我在云后面停了一会儿。`,
     `${ctx.term}前后的夜晚，风会比白天诚实一些。你把今天认认真真地记了下来，这件事本身就很好。`,
+    ...(ctx.recent?.length ? [`前几天你写到“${ctx.recent[0].text.slice(0, 16)}”，后来怎么样了？`] : []),
     '今晚早一点关灯吧，把窗帘留一道缝，我会在那里。',
     '月亮'
   ].join('\n\n');
