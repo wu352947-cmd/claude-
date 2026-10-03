@@ -15,7 +15,7 @@ const files = fs.readdirSync(dir).filter(f => f.endsWith('.png')).sort();
 const font = '/usr/share/fonts/truetype/wqy/wqy-zenhei.ttc';
 const labeled = files.map(f => {
   const t = parseFloat(f.slice(1, -4));
-  const tc = `${Math.floor(t / 60)}:${(t % 60).toFixed(1).padStart(4, '0')}`;
+  const tc = `${Math.floor(t / 60)}\\:${(t % 60).toFixed(1).padStart(4, '0')}`;
   const o = path.join(dir, 'L' + f);
   execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', path.join(dir, f), '-vf', `drawtext=fontfile=${font}:text='${tc}':x=8:y=8:fontsize=16:fontcolor=yellow:box=1:boxcolor=black@0.5`, o]);
   return o;
