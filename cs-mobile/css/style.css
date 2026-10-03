@@ -65,7 +65,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .btn-start:active { transform: scale(.98); }
 .lb-map { position: absolute; left: 50%; bottom: 14px; transform: translateX(-50%); font-family: Teko; letter-spacing: 6px; color: rgba(255, 235, 200, .6); font-size: 18px; }
 
-#panel { position: fixed; inset: 0; z-index: 20; background: rgba(5, 6, 8, .7); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+#panel { position: fixed; inset: 0; z-index: 45; background: rgba(5, 6, 8, .7); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
 .pn-box { width: min(980px, 94vw); height: min(560px, 90vh); background: linear-gradient(180deg, #181b21, #101216); border: 1px solid var(--line); border-radius: 14px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, .6); }
 .pn-head { display: flex; align-items: center; padding: 10px 16px; border-bottom: 1px solid var(--line); }
 .pn-head h2 { margin: 0; font-family: Teko; letter-spacing: 3px; font-weight: 500; font-size: 26px; }

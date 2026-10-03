@@ -161,8 +161,9 @@ export class HUD {
     if (!P.alive && g.spectate && (this._specHp !== g.spectate.hp || this._spec !== g.spectate)) { this._specHp = g.spectate.hp; this._spec = g.spectate; this.spectating(g.spectate); }
     if (!P.alive && g.mode === 'tdm' && P.respawnT) { $('respawn').style.display = 'block'; $('respawn').textContent = `${Math.max(0, P.respawnT - g.time).toFixed(1)} 秒后重生`; } else $('respawn').style.display = 'none';
     // fps
-    this.fpsAcc = (this.fpsAcc || 0) + dt; this.fpsN = (this.fpsN || 0) + 1;
-    if (this.fpsAcc > 0.5) { $('fps').textContent = Math.round(this.fpsN / this.fpsAcc) + ' FPS'; this.fpsAcc = 0; this.fpsN = 0; }
+    const now = performance.now(); this.fpsN = (this.fpsN || 0) + 1;
+    if (!this.fpsT0) this.fpsT0 = now;
+    if (now - this.fpsT0 > 500) { $('fps').textContent = Math.round(this.fpsN * 1000 / (now - this.fpsT0)) + ' FPS'; this.fpsT0 = now; this.fpsN = 0; }
   }
 
   // ---------------- events ----------------

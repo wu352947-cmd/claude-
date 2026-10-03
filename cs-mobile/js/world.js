@@ -409,7 +409,32 @@ export class World {
     };
     for (const [type, x, z, rot, scale, stack] of PROPS) place(type, x, z, rot, scale, stack);
     for (const [type, x, z, rot] of DECOR) place(type, x, z, rot, 1, 1, type !== 'lamp' && type !== 'aircon');
+    this.mergeStatic();
     this.buildNav();   // props changed walkability
+  }
+
+  // merge all static prop meshes that share a material into single draw calls
+  mergeStatic() {
+    const groups = new Map(); const remove = [];
+    this.group.updateMatrixWorld(true);
+    this.group.traverse(o => {
+      if (!o.isMesh || o.parent === this.group || o.isInstancedMesh) return;
+      const key = o.material.uuid;
+      if (!groups.has(key)) groups.set(key, { mat: o.material, geos: [] });
+      const g = o.geometry.clone(); g.applyMatrix4(o.matrixWorld);
+      // keep only attributes every prop has
+      for (const a of Object.keys(g.attributes)) if (!['position', 'normal', 'uv'].includes(a)) g.deleteAttribute(a);
+      if (!g.index) g.setIndex([...Array(g.attributes.position.count).keys()]);
+      groups.get(key).geos.push(g); remove.push(o);
+    });
+    for (const o of remove) o.parent.remove(o);
+    for (const { mat, geos } of groups.values()) {
+      const merged = mergeGeometries(geos.filter(g => g.attributes.uv && g.attributes.normal), false); if (!merged) continue;
+      const m = new THREE.Mesh(merged, mat); m.castShadow = true; m.receiveShadow = true; m.matrixAutoUpdate = false;
+      this.group.add(m);
+    }
+    // drop now-empty prop pivots
+    for (const c of [...this.group.children]) if (c.isGroup && !c.children.some(x => x.isMesh || x.children.length)) this.group.remove(c);
   }
 
   // ---------- navigation ----------
