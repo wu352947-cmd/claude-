@@ -72,12 +72,12 @@ export async function buildAtlas() {
 // ---------------------------------------------------------------- tower geometry
 export const HT = 3.3;              // tower height
 export const RB = 0.42;             // base radius
-export const NCOL = 120, ROWS = 8;
+export const NCOL = 150, ROWS = 9;
 export function radiusAt(y) {
   const u = clamp(y / HT, 0, 1);
   // Bruegel: broad stepped base, then a long tapering spire
   const tier = 1 - 0.035 * smoothstep(0.55, 1, ((y / 0.11) % 1)) * (1 - u);
-  return RB * Math.pow(1 - u * 0.93, 0.92) * tier + 0.012;
+  return RB * Math.pow(1 - u * 0.985, 0.95) * tier + 0.006;
 }
 
 const GLYPH_VERT = /* glsl */`
@@ -92,13 +92,14 @@ uniform float uR;
 varying vec2 vUv; varying vec3 vCol; varying float vA;
 void main(){
   float th=iA.x;
+  if(uTime<iA.y||uFade<.003){ gl_Position=vec4(0.,0.,-2.,1.); return; }
   float k=clamp((uTime-iA.y)/.55,0.,1.);
   float e=1.-pow(1.-k,3.);
   vec3 tgt=iP.xyz;
   vec3 src=vec3(0.,iP.y-.35,0.);
   vec3 p=mix(src,tgt,e);
   vec3 rad=vec3(cos(th),0.,sin(th));
-  vec3 right=vec3(-sin(th),0.,cos(th));
+  vec3 right=vec3(sin(th),0.,-cos(th));
   float s=iP.w*(.4+.6*e);
   vec3 lp=p+right*position.x*s+vec3(0.,1.,0.)*position.y*s+rad*.002;
   vec4 w=uTowerW*vec4(lp,1.);
@@ -133,7 +134,7 @@ uniform float uTime, uFront, uVis, uApex, uBright;
 uniform vec3 uApexPos;
 uniform mat4 uTowerW;
 varying vec2 vUv; varying vec3 vCol; varying float vA;
-float rAt(float y){ float u=clamp(y/${HT.toFixed(3)},0.,1.); return ${RB.toFixed(3)}*pow(1.-u*.93,.92)+.012; }
+float rAt(float y){ float u=clamp(y/${HT.toFixed(3)},0.,1.); return ${RB.toFixed(3)}*pow(1.-u*.985,.95)+.006; }
 void main(){
   float ph=fract(uTime*iA.x+iA.y);
   vec3 p;
@@ -154,15 +155,27 @@ void main(){
   float s=iP.w*mix(1.,.6+.4*(1.-ph),uApex);
   mv.xy+=position.xy*s;
   vUv=iUV.xy+(position.xy+.5)*iUV.zw;
-  vCol=mix(iC,vec3(1.,.95,.85),.5)*uBright*(1.+2.*smoothstep(.85,1.,ph));
+  vCol=mix(iC,vec3(1.,.95,.85),.5)*uBright*(1.+mix(2.,.4,uApex)*smoothstep(.85,1.,ph));
   vA=fade*uVis;
   gl_Position=projectionMatrix*mv;
 }`;
 
-function quadGeo() {
-  const b = new THREE.PlaneGeometry(1, 1);
-  const g = new THREE.InstancedBufferGeometry();
-  g.index = b.index; g.setAttribute('position', b.getAttribute('position'));
+// Instancing is pathologically slow on SwiftShader (~10 µs per instance), so quads are expanded into a
+// plain indexed geometry: 4 vertices per quad, each carrying a copy of the per-quad attributes.
+function quadMesh(n, attrs) {
+  const g = new THREE.BufferGeometry();
+  const pos = new Float32Array(n * 12);
+  const C = [[-0.5, -0.5], [0.5, -0.5], [0.5, 0.5], [-0.5, 0.5]];
+  for (let i = 0; i < n; i++) for (let k = 0; k < 4; k++) { pos[(i * 4 + k) * 3] = C[k][0]; pos[(i * 4 + k) * 3 + 1] = C[k][1]; }
+  g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  for (const [name, data, size] of attrs) {
+    const out = new Float32Array(n * 4 * size);
+    for (let i = 0; i < n; i++) for (let k = 0; k < 4; k++) for (let c = 0; c < size; c++) out[(i * 4 + k) * size + c] = data[i * size + c];
+    g.setAttribute(name, new THREE.BufferAttribute(out, size));
+  }
+  const idx = new Uint32Array(n * 6);
+  for (let i = 0; i < n; i++) idx.set([i * 4, i * 4 + 1, i * 4 + 2, i * 4, i * 4 + 2, i * 4 + 3], i * 6);
+  g.setIndex(new THREE.BufferAttribute(idx, 1));
   return g;
 }
 
@@ -199,19 +212,14 @@ export function buildTower(atlas, frontFn, t0, t1) {
     yb += pitch / NCOL;
   }
   const N = P.length / 4;
-  const g = quadGeo();
-  g.setAttribute('iP', new THREE.InstancedBufferAttribute(new Float32Array(P), 4));
-  g.setAttribute('iA', new THREE.InstancedBufferAttribute(new Float32Array(A), 4));
-  g.setAttribute('iUV', new THREE.InstancedBufferAttribute(new Float32Array(UV), 4));
-  g.setAttribute('iC', new THREE.InstancedBufferAttribute(new Float32Array(C), 3));
-  g.instanceCount = N;
+  const g = quadMesh(N, [['iP', P, 4], ['iA', A, 4], ['iUV', UV, 4], ['iC', C, 3]]);
   const U = {
     uAtlas: { value: atlas.tex }, uTime: { value: 0 }, uBright: { value: 1.6 }, uFade: { value: 1 }, uFront: { value: 0 },
     uSunL: { value: new THREE.Vector3(1, 0, 0) }, uTowerW: { value: new THREE.Matrix4() }, uR: { value: 10 },
   };
   const glyphs = new THREE.Mesh(g, new THREE.ShaderMaterial({
     vertexShader: GLYPH_VERT, fragmentShader: GLYPH_FRAG, uniforms: U,
-    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.FrontSide,
   }));
   glyphs.frustumCulled = false;
 
@@ -258,7 +266,7 @@ export function buildTower(atlas, frontFn, t0, t1) {
         float dif=max(dot(Nw,L),0.)*sun;
         float band=.5+.5*sin(vL.y*140.);
         vec3 c=vec3(.012,.01,.014)+vec3(.35,.22,.1)*dif*.6+vec3(.08,.05,.02)*band;
-        c+=vec3(1.,.7,.35)*smoothstep(.06,0.,uFront-vL.y)*1.2;
+        c+=vec3(1.,.7,.35)*smoothstep(.04,0.,uFront-vL.y)*step(uFront,3.29)*.6;
         gl_FragColor=vec4(c*uFade,1.); }`,
   }));
   core.frustumCulled = false;
@@ -271,18 +279,13 @@ export function buildStream(atlas, U, count = 16000) {
   const P = [], A = [], UV = [], C = [];
   for (let i = 0; i < count; i++) {
     const si = Math.floor(r() * SCRIPTS.length), [s0, sn] = atlas.starts[si];
-    const rho = 0.45 + Math.pow(r(), 1.6) * 2.6;
+    const rho = 0.45 + Math.pow(r(), 1.3) * 4.0;
     P.push(rho, r() * Math.PI * 2, Math.pow(r(), 0.8), 0.006 + 0.012 * r());
     A.push(0.05 + 0.12 * r(), r(), 0.8 + 2.2 * r(), 0);
     UV.push(...atlas.uv(s0 + Math.floor(r() * sn)));
     C.push(...SCRIPTS[si][2]);
   }
-  const g = quadGeo();
-  g.setAttribute('iP', new THREE.InstancedBufferAttribute(new Float32Array(P), 4));
-  g.setAttribute('iA', new THREE.InstancedBufferAttribute(new Float32Array(A), 4));
-  g.setAttribute('iUV', new THREE.InstancedBufferAttribute(new Float32Array(UV), 4));
-  g.setAttribute('iC', new THREE.InstancedBufferAttribute(new Float32Array(C), 3));
-  g.instanceCount = count;
+  const g = quadMesh(count, [['iP', P, 4], ['iA', A, 4], ['iUV', UV, 4], ['iC', C, 3]]);
   const SU = { ...U, uVis: { value: 0 }, uApex: { value: 0 }, uApexPos: { value: new THREE.Vector3(0, HT, 0) }, uBright: { value: 1.4 } };
   const mesh = new THREE.Mesh(g, new THREE.ShaderMaterial({
     vertexShader: STREAM_VERT, fragmentShader: GLYPH_FRAG, uniforms: SU,

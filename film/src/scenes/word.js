@@ -16,7 +16,7 @@ import { rng, smoothstep, clamp, lerp, track, ease } from '../engine/util.js';
 const T0 = 176;
 const G_ERUPT = HITS.towerErupt;   // 188
 const G_BLACK0 = 208.05, G_BLACK1 = 215.3;
-const CURSOR_ANCHOR = HITS.cursorIn;
+const CURSOR_ANCHOR = -1e9;   // same idle phase as the epilogue (cursorVisible(globalT))
 const CUR_H = 0.05;                 // world height of the apex cursor (tower units)
 const CUR_W = CUR_H * CURSOR.w / CURSOR.h;
 
@@ -25,6 +25,7 @@ function front(g) {
   if (g < G_ERUPT) return 0;
   return Math.min(HT, track([[G_ERUPT, 0], [G_ERUPT + 1.2, 0.45, 'outCubic'], [193, 0.9], [198, 1.6], [203, 2.55], [207.2, HT]], g, 'linear'));
 }
+const PHI_TOT = 2 * Math.PI / 0.946 + 0.32;   // the spiral faces the sunrise (-Z) at ~204
 // camera altitude along the tower in N2 (exponential climb)
 function camY(g) { return N1_END.alt * Math.pow(17, clamp((g - G_ERUPT) / 19.6)); }
 
@@ -148,20 +149,14 @@ function towerCam(st, g, cam) {
   let rho, phi, y, yt, sx, sy, fov = 34;
   if (g < 212) {
     const u = clamp((g - G_ERUPT) / 20);
-    y = camY(g);
-    const r = radiusAt(y);
-    rho = lerp(N1_END.back, lerp(0.35 + 5.0 * r, 0.15 + 2.6 * r, smoothstep(0.55, 0.95, u)), smoothstep(0, 0.4, u));
-    fov = lerp(34, 40, smoothstep(0, 0.3, u));
-    phi = -(Math.PI * 2 * 1.45) * ease.inOutSine(u) * 0.98;
-    // keep the horizon low in frame: pitch follows the horizon dip
-    const dip = Math.acos(R / (R + y));
-    const pitch = lerp(-0.2, -dip + lerp(0.22, 0.42, smoothstep(0.4, 0.9, u)), smoothstep(0, 0.25, u));
-    yt = y + rho * Math.tan(pitch);
-    sx = lerp(0.5, 0.44, smoothstep(0, 0.3, u)); sy = lerp(0.66, 0.5, smoothstep(0, 0.25, u));
-    if (g < G_ERUPT + 1.5) {   // eruption: the column punches up out of frame; hold P low in frame
-      const e = smoothstep(G_ERUPT, G_ERUPT + 1.5, g);
-      yt = lerp(0, yt, e); sy = lerp(0.66, sy, e);
-    }
+    // keyed spiral: low at the eruption → wide (whole tower rising over the Earth's curve) → close near the top
+    rho = track([[G_ERUPT, N1_END.back], [190, 1.75], [194, 2.3], [198.5, 3.0], [202, 2.4], [205, 1.6], [208, 1.0]], g);
+    y = track([[G_ERUPT, N1_END.alt], [190, 0.26], [194, 0.58], [198.5, 0.95], [202, 1.6], [205, 2.35], [208, 2.95]], g);
+    yt = track([[G_ERUPT, 0], [189.5, 0.5], [194, 0.8], [198.5, 1.0], [202, 1.45], [204, 1.75], [205.5, 2.15], [207, 2.9], [208, 3.25]], g);
+    fov = track([[G_ERUPT, 34], [192, 42], [204, 42], [208, 38]], g);
+    phi = -PHI_TOT * ease.inOutSine(u);
+    sx = lerp(0.5, 0.46, smoothstep(0, 0.3, u));
+    sy = track([[G_ERUPT, 0.66], [190, 0.6], [194, 0.55], [200, 0.5]], g);
   } else {
     // N4: top of the tower; crest the edge, then push in on the cursor
     const apexY = HT + 0.02 + CUR_H / 2;
@@ -170,7 +165,7 @@ function towerCam(st, g, cam) {
     const dEnd = CUR_H * 804 / (CURSOR.h * 2 * Math.tan(THREE.MathUtils.degToRad(fov) / 2));
     y = lerp(lerp(HT - 0.5, apexY + 0.07, crest), apexY, push);
     rho = lerp(lerp(0.95, 0.62, crest), dEnd, push);
-    phi = -(Math.PI * 2 * 1.45) * 0.98 - 0.7 + 0.7 * crest + 0.12 * push;
+    phi = -PHI_TOT - 0.7 + 0.7 * crest + 0.12 * push;
     yt = lerp(lerp(HT - 1.15, apexY, Math.pow(crest, 0.8)), apexY, push);
     sx = lerp(0.5, CURSOR.x + (CURSOR.w / 2) / REF_W, push);
     sy = lerp(lerp(0.5, 0.45, crest), CURSOR.y, push);
@@ -208,7 +203,7 @@ export default {
     T.U.uR.value = R;
     scene.add(T.core, T.rampMesh, T.glyphs);
     T.core.renderOrder = 1; T.rampMesh.renderOrder = 2; T.glyphs.renderOrder = 7;
-    const ST = buildStream(atlas, T.U, 11000);
+    const ST = buildStream(atlas, T.U, 36000);
     ST.mesh.renderOrder = 8;
     scene.add(ST.mesh);
 
@@ -232,7 +227,7 @@ export default {
     const apexGlow = glowSprite([1, 0.92, 0.82], 10);
     apexGlow.position.copy(tlToWorld(F, 0, HT + 0.02 + CUR_H / 2, 0));
     scene.add(apexGlow);
-    const curMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.93 * 3, 0.89 * 3, 0.83 * 3), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
+    const curMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.93 * 1.6, 0.89 * 1.6, 0.83 * 1.6), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false });
     const cursor3d = new THREE.Mesh(new THREE.PlaneGeometry(CUR_W, CUR_H), curMat);
     cursor3d.renderOrder = 11;
     scene.add(cursor3d);
@@ -269,19 +264,20 @@ export default {
     const N4 = g > 212;
     // arcs
     st.arcs.U.uTime.value = g;
-    st.arcs.U.uFade.value = 1 - smoothstep(188.3, 191.5, g);
+    st.arcs.U.uFade.value = (1 - 0.7 * smoothstep(188.3, 191.5, g)) * (1 - smoothstep(196, 199.4, g));
     st.arcs.mesh.visible = g < 199.5;
     // convergence glow & eruption
     const conv = smoothstep(184, 188, g);
     const flash = g >= G_ERUPT ? Math.exp(-(g - G_ERUPT) * 2.2) : 0;
     st.pGlow.material.uniforms.uI.value = (conv * conv * 0.9 + flash * 4) * (1 - smoothstep(192, 196, g));
     const ps = (0.04 + conv * 0.14 + flash * 0.6);
+    st.pGlow.visible = st.pGlow.material.uniforms.uI.value > 0.002;
     st.pGlow.scale.set(ps, ps, 1);
     st.pGlow.material.uniforms.uCore.value = 30;
     // column of light shooting up
     const colLen = g >= G_ERUPT ? Math.min(6, (g - G_ERUPT) * 9) : 0;
-    st.column.material.uniforms.uI.value = g >= G_ERUPT ? 2.2 * Math.exp(-(g - G_ERUPT) * 0.7) : 0;
-    st.column.visible = g >= G_ERUPT && g < 196;
+    st.column.material.uniforms.uI.value = g >= G_ERUPT ? 2.2 * Math.exp(-(g - G_ERUPT) * 0.7) * (1 - smoothstep(190.5, 192.4, g)) : 0;
+    st.column.visible = g >= G_ERUPT && g < 192.5;
     st.column.matrix.copy(st.towerW).multiply(new THREE.Matrix4().makeScale(1, Math.max(colLen, 1e-3), 1));
     // earth ground glow at the base
     const em = st.E.earthMat.uniforms;
@@ -295,13 +291,13 @@ export default {
     T.uFront.value = fr;
     const endFade = 1 - smoothstep(223.6, 226.4, g);
     T.uFade.value = N4 ? endFade : 1;
-    T.uBright.value = N4 ? 0.8 : 0.95;
+    T.uBright.value = N4 ? 1.1 : 1.5;
     st.T.glyphs.visible = st.T.rampMesh.visible = st.T.core.visible = g >= G_ERUPT;
     // stream
     const SU = st.ST.U;
     SU.uVis.value = (g < G_ERUPT ? 0 : smoothstep(G_ERUPT + 0.5, G_ERUPT + 3, g)) * (N4 ? endFade : 1);
     SU.uApex.value = N4 ? 1 : 0;
-    SU.uBright.value = N4 ? 0.9 : 0.6;
+    SU.uBright.value = N4 ? 1.0 : 0.9;
     // stars fade to black at the very end
     st.S.mat.uniforms.uVis.value = N4 ? 1 - smoothstep(222.5, 225.5, g) : 1;
     st.E.group.visible = !(N4 && g > 226.3);
@@ -320,7 +316,7 @@ export default {
       st.cursor3d.position.copy(tlToWorld(F, 0, HT + 0.02 + CUR_H / 2, 0));
       st.cursor3d.quaternion.copy(cam.quaternion);
       st.cursor3d.material.opacity = blink * (1 - smoothstep(225, 226.5, g));
-      st.apexGlow.material.uniforms.uI.value = (0.06 + 0.16 * blink) * (1 - smoothstep(224.5, 226.5, g));
+      st.apexGlow.material.uniforms.uI.value = (0.03 + 0.08 * blink) * (1 - smoothstep(224.5, 226.5, g));
       st.apexGlow.scale.set(0.3, 0.3, 1);
       st.apexGlow.material.uniforms.uCore.value = 60;
     }
@@ -360,11 +356,11 @@ export default {
 
   grade(st, t, info) {
     const g = info.global;
-    const peak = smoothstep(188, 192, g) * (1 - smoothstep(207, 208, g));
+    const peak = smoothstep(188, 192, g) * (g < 212 ? 1 : 0.6);
     return {
       exposure: 1.0 + 0.1 * peak, saturation: 1.0, contrast: 1.05,
       tint: [1.0, 0.99, 1.02], lift: [0, 0, 0.004], vignette: 0.45, grain: 0.04,
-      bloom: { strength: 0.75 + 0.45 * peak, radius: 0.65, threshold: 0.72 },
+      bloom: { strength: 0.8 + 0.6 * peak, radius: 0.7, threshold: 0.66 },
     };
   },
 
@@ -384,7 +380,7 @@ export default {
     const cy = (yTop + yBot) / 2;
     let x = cx - CURSOR.w * k / 2, y = cy;
     // land exactly on the epilogue's spot in the final second
-    const lock = smoothstep(225.6, 226.4, g);
+    const lock = smoothstep(224.6, 225.5, g);
     x = lerp(x, CURSOR.x * REF_W, lock); y = lerp(y, CURSOR.y * REF_H, lock);
     const kk = lerp(k, 1, lock);
     const a = cursorAlpha(g, CURSOR_ANCHOR) * smoothstep(216.5, 218.5, g);

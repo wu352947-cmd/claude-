@@ -398,7 +398,7 @@ export function createEarth(renderer, { segments = 256 } = {}) {
       const near = smoothstep(9, 3.5, alt);
       locMat.uniforms.uVis.value = near;
       earthMat.uniforms.uCityTex.value = lerp(0.5, 0.12, near);
-      common.uExpo.value = lerp(0.45, 1.0, smoothstep(0.25, 2.5, alt));
+      common.uExpo.value = lerp(0.28, 1.0, smoothstep(0.25, 2.5, alt));
     },
   };
 }

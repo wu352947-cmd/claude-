@@ -8,7 +8,7 @@ import { track, smoothstep, clamp, lerp, rng, noise3, GLSL } from '../engine/uti
 const SEG0 = 81.5;
 const QUAKE = HITS.quake - SEG0;     // 9.0
 const EMBER = HITS.emberOut - SEG0;  // 11.5
-const FIRE = new THREE.Vector3(0, 92.2, 0);
+const FIRE = new THREE.Vector3(0, 110.4, 0);
 const BEAM_HALF = THREE.MathUtils.degToRad(5.2);
 const BEAM_W = THREE.MathUtils.degToRad(36);   // rad/s
 const BEAM_FLASH = 7.05;                       // beam crosses the lens
@@ -18,13 +18,13 @@ const SKY_GLSL = /* glsl */`
 uniform vec3 uFire; uniform float uFireI;
 vec3 skyCol(vec3 d, vec3 eye){
   float h = d.y;
-  vec3 zen = vec3(0.0016, 0.0026, 0.0060);
-  vec3 hor = vec3(0.011, 0.020, 0.027);
+  vec3 zen = vec3(0.0018, 0.0034, 0.0095);
+  vec3 hor = vec3(0.010, 0.020, 0.034);
   vec3 c = mix(hor, zen, smoothstep(-0.01, 0.42, h));
   c = mix(c, hor*0.85, smoothstep(0.0, -0.08, h));
   vec3 fd = normalize(uFire - eye);
   float g = max(dot(d, fd), 0.);
-  c += vec3(1.0, 0.42, 0.13) * uFireI * (pow(g, 14.) * 0.03 + pow(g, 90.) * 0.2 + pow(g, 4.) * 0.004);
+  c += vec3(1.0, 0.42, 0.13) * uFireI * (pow(g, 60.) * 0.025 + pow(g, 300.) * 0.25 + pow(g, 8.) * 0.0012);
   return c;
 }`;
 
@@ -77,25 +77,27 @@ void main(){
   col += alb * vec3(1.0, 0.45, 0.12) * uSparkI * 600. / (s2 + 80.) * max(dot(N, normalize(Sv)) * 0.7 + 0.3, 0.);
   // cool mist ambient (hemisphere)
   col += alb * mix(vec3(0.004, 0.007, 0.010), vec3(0.010, 0.017, 0.024), N.y * 0.5 + 0.5) * uDark;
+  // cool moonlight from high left so the stages read
+  col += alb * vec3(0.04, 0.055, 0.09) * max(dot(N, normalize(vec3(-0.6, 0.5, 0.45))), 0.) * uDark;
   // rim from the misty horizon behind
   col += alb * vec3(0.010, 0.018, 0.024) * pow(1. - max(dot(N, V), 0.), 3.) * uDark;
   // windows of the keepers: warm slits on the base
   if (uWin > 0.0 && abs(N.y) < 0.5) {
-    vec2 wc = vec2(tang / 4.2, vO.y / 5.2);
+    vec2 wc = vec2(tang / 3.0, vW.y / 4.2);
     vec2 wi = floor(wc); vec2 wf = fract(wc);
-    float on = step(0.62, hash12(wi + 3.1)) * step(14., vO.y) * step(vO.y, 58.);
-    float slit = smoothstep(0.08, 0.0, abs(wf.x - 0.5) - 0.05) * smoothstep(0.08, 0.0, abs(wf.y - 0.5) - 0.18);
+    float on = step(0.7, hash12(wi + 3.1)) * step(13., vW.y) * step(vW.y, 98.) * (1. - step(68.5, vW.y) * step(vW.y, 74.5));
+    float slit = smoothstep(0.08, 0.0, abs(wf.x - 0.5) - 0.09) * smoothstep(0.08, 0.0, abs(wf.y - 0.5) - 0.16);
     float fl = 0.75 + 0.25 * sin(uTime * (5. + 4. * hash12(wi)) + hash12(wi) * 30.);
-    col += vec3(1.0, 0.46, 0.14) * 3.2 * on * slit * fl * uWin;
+    col += vec3(1.0, 0.46, 0.14) * 2.2 * on * slit * fl * uWin;
   }
   // earthquake cracks: ridged noise, spreading upward from the ground
   if (uCrackI > 0.001) {
     float n1 = snoise(vO * vec3(0.045, 0.022, 0.045) + 3.7);
     float n2 = snoise(vO * vec3(0.13, 0.07, 0.13) + 1.3);
     float n = n1 + 0.45 * n2;
-    float w = 0.010 + 0.016 * smoothstep(0., 30., uCrackY - vO.y) ;
+    float w = 0.010 + 0.016 * smoothstep(0., 30., uCrackY - vW.y) ;
     float line = smoothstep(w, 0., abs(n));
-    float front = smoothstep(uCrackY + 3., uCrackY - 6., vO.y);
+    float front = smoothstep(uCrackY + 3., uCrackY - 6., vW.y);
     float heat = line * front;
     col = mix(col, col * 0.3, heat);
     col += vec3(1.0, 0.33, 0.07) * heat * uCrackI * (6. + 10. * smoothstep(0.012, 0., abs(n)));
@@ -288,25 +290,27 @@ float waveH(vec2 p, float t){
     const add = (geo, mat, y = 0, rotY = 0, parent = tower) => { const m = new THREE.Mesh(geo, mat); m.position.y = y; m.rotation.y = rotY; parent.add(m); return m; };
     const sq = (hwTop, hwBot, h) => flat(new THREE.CylinderGeometry(hwTop * Math.SQRT2, hwBot * Math.SQRT2, h, 4, 1));
     // podium
-    add(sq(22, 23, 5), plainMat, 6.5, Math.PI / 4);
-    add(sq(20.5, 20.5, 1.2), plainMat, 9.6, Math.PI / 4);
+    add(sq(25, 26, 5), plainMat, 6.5, Math.PI / 4);
+    add(sq(23.5, 23.5, 1.2), plainMat, 9.6, Math.PI / 4);
     // stage 1 — square, battered
-    add(sq(10.2, 12, 52), towerMat, 10 + 26, Math.PI / 4);
-    add(sq(11.4, 11.4, 1.4), plainMat, 62.4, Math.PI / 4);     // cornice
-    add(sq(10.8, 10.8, 1.6), plainMat, 63.8, Math.PI / 4);     // parapet
+    add(sq(13.6, 16.2, 60), towerMat, 10 + 30, Math.PI / 4);
+    add(sq(14.8, 14.8, 1.6), plainMat, 70.6, Math.PI / 4);     // cornice
+    add(sq(14.2, 14.2, 1.8), plainMat, 72.2, Math.PI / 4);     // parapet
     // corner tritons (abstract figures)
     for (let i = 0; i < 4; i++) {
       const a = Math.PI / 4 + i * Math.PI / 2;
-      const f = add(new THREE.CylinderGeometry(0.55, 0.9, 4.4, 6), plainMat, 66.8);
-      f.position.x = Math.cos(a) * 14.6; f.position.z = Math.sin(a) * 14.6;
-      const h = add(new THREE.SphereGeometry(0.6, 8, 6), plainMat, 69.4); h.position.copy(f.position).setY(69.4);
+      const f = add(new THREE.CylinderGeometry(0.7, 1.1, 5.2, 6), plainMat, 75.5);
+      f.position.x = Math.cos(a) * 19.0; f.position.z = Math.sin(a) * 19.0;
+      const h = add(new THREE.SphereGeometry(0.75, 8, 6), plainMat, 78.6); h.position.copy(f.position).setY(78.6);
     }
     // stage 2 — octagonal
-    add(flat(new THREE.CylinderGeometry(5.9, 6.7, 20, 8, 1)), towerMat, 64.6 + 10, Math.PI / 8);
-    add(flat(new THREE.CylinderGeometry(6.6, 6.6, 1.0, 8, 1)), plainMat, 85.1, Math.PI / 8);
+    const octMat = stoneMat(U, [0.78, 0.72, 0.6], { win: 1 }); this._octMat = octMat;
+    add(flat(new THREE.CylinderGeometry(7.2, 8.4, 28, 8, 1)), octMat, 73.1 + 14, Math.PI / 8);
+    add(flat(new THREE.CylinderGeometry(8.0, 8.0, 1.0, 8, 1)), plainMat, 101.4, Math.PI / 8);
+    add(new THREE.CylinderGeometry(5.0, 5.4, 1.6, 32), plainMat, 102.4);
     // stage 3 — lantern (falls in the quake)
     const top = new THREE.Group(); tower.add(top);
-    top.position.set(0, 85.6, 0);
+    top.position.set(0, 103.8, 0);
     add(new THREE.CylinderGeometry(4.6, 4.6, 0.9, 32), plainMat, 0.0, 0, top);
     for (let i = 0; i < 10; i++) {
       const a = i / 10 * Math.PI * 2;
@@ -358,7 +362,7 @@ float waveH(vec2 p, float t){
       vertexShader: `varying vec2 vP; void main(){ vP=position.xy; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
       fragmentShader: `uniform float uI, uGlint; uniform vec3 uCol; varying vec2 vP;
         void main(){ vec2 p=vP; float r=length(p);
-          float h=exp(-r*r*0.0016)*0.12+exp(-r*0.12)*0.9+0.02/(r*r*0.01+0.02)*0.4;
+          float h=exp(-r*0.32)*1.1+exp(-r*r*0.002)*0.02+0.02/(r*r*0.01+0.02)*0.35;
           float gl=(exp(-abs(p.y)*1.6)*exp(-abs(p.x)*0.045)+exp(-abs(p.x)*1.6)*exp(-abs(p.y)*0.045))*uGlint*2.2;
           vec3 c=uCol*h*uI+mix(uCol,vec3(1.,0.86,0.7),0.6)*gl;
           gl_FragColor=vec4(c,1.); }`,
@@ -409,7 +413,7 @@ float waveH(vec2 p, float t){
             vec3 d=p-uApex; float al=dot(d,uBeamDir); float rad=length(d-uBeamDir*al);
             float b=al>0.? exp(-pow(rad/(al*${Math.tan(BEAM_HALF * 1.15).toFixed(4)}+2.),2.)*2.)*exp(-al/1100.):0.;
             vec3 df=p-uFire; float fg=uFireI*900./(dot(df,df)+300.);
-            vC=vec3(1.0,0.66,0.32)*b*uBeamI*0.06 + vec3(1.0,0.45,0.15)*fg*0.014 + vec3(0.10,0.16,0.19)*0.0022*uDark;
+            vC=vec3(1.0,0.66,0.32)*b*uBeamI*0.06 + vec3(1.0,0.45,0.15)*fg*0.005 + vec3(0.10,0.16,0.19)*0.0022*uDark;
             vec4 mv=modelViewMatrix*vec4(p,1.);
             float size=(14.+aS.w*40.);
             gl_PointSize=min(size*uPx/-mv.z, 260.);
@@ -423,17 +427,19 @@ float waveH(vec2 p, float t){
 
     // ---------------------------------------------------------------- small lights: keepers, harbour
     {
-      const N = 70, pos = new Float32Array(N * 3), sd = new Float32Array(N);
+      const N = 340, pos = new Float32Array(N * 3), sd = new Float32Array(N);
       for (let i = 0; i < N; i++) {
-        const a = R() * Math.PI * 2, r = 24 + R() * 30;
-        pos.set([Math.cos(a) * r, 5 + R() * 4, Math.sin(a) * r * 0.85], i * 3); sd[i] = R();
+        const a = R() * Math.PI * 2; const q = R();
+        if (q < 0.45) { const s = (R() * 2 - 1) * 23; const side = Math.floor(R() * 4); const c = [[s, 23.6], [s, -23.6], [23.6, s], [-23.6, s]][side]; pos.set([c[0], 9.9 + R() * 0.3, c[1]], i * 3); }
+        else { const r = 30 + R() * 16; pos.set([Math.cos(a) * r, 2.5 + R() * 3, Math.sin(a) * r * 0.85], i * 3); }
+        sd[i] = R();
       }
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       g.setAttribute('aS', new THREE.BufferAttribute(sd, 1));
       const lights = new THREE.Points(g, new THREE.ShaderMaterial({
         uniforms: { ...U, uOn: { value: 1 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-        vertexShader: `attribute float aS; uniform float uTime, uOn; varying float vB; void main(){ vB=uOn*(0.6+0.4*sin(uTime*(4.+aS*5.)+aS*40.)); vec4 mv=modelViewMatrix*vec4(position,1.); gl_PointSize=max(2.5, 900./-mv.z); gl_Position=projectionMatrix*mv; }`,
+        vertexShader: `attribute float aS; uniform float uTime, uOn; varying float vB; void main(){ vB=uOn*(0.6+0.4*sin(uTime*(4.+aS*5.)+aS*40.)); vec4 mv=modelViewMatrix*vec4(position,1.); gl_PointSize=clamp(260./-mv.z,1.4,4.); gl_Position=projectionMatrix*mv; }`,
         fragmentShader: `varying float vB; void main(){ vec2 p=gl_PointCoord*2.-1.; float r=dot(p,p); gl_FragColor=vec4(vec3(1.,0.5,0.16)*vB*exp(-r*4.)*2.2,1.); }`,
       }));
       lights.frustumCulled = false;
@@ -477,9 +483,9 @@ float waveH(vec2 p, float t){
         scene.add(s);
         return s;
       };
-      ships.push({ g: mk(1.0, true), x0: -128, x1: -82, z: 222, ry: 0.75, ph: 0.0 });
-      ships.push({ g: mk(1.0, true), x0: 165, x1: 128, z: 90, ry: -0.8, ph: 1.7 });
-      ships.push({ g: mk(1.0, false), x0: -330, x1: -300, z: -200, ry: 0.6, ph: 3.1 });
+      ships.push({ g: mk(0.62, true), x0: -118, x1: -84, z: 150, ry: 0.75, ph: 0.0 });
+      ships.push({ g: mk(0.6, true), x0: 92, x1: 70, z: 62, ry: -0.8, ph: 1.7 });
+      ships.push({ g: mk(0.6, false), x0: -64, x1: -50, z: 58, ry: 0.4, ph: 3.1 });
       ships.push({ g: mk(0.9, true), x0: 420, x1: 395, z: -420, ry: -0.2, ph: 4.4 });
       // ship lamps
       const N = ships.length * 2, pos = new Float32Array(N * 3);
@@ -546,10 +552,10 @@ float waveH(vec2 p, float t){
     // falling stones
     const chunks = new THREE.InstancedMesh(flat(new THREE.BoxGeometry(1, 1, 1)), plainMat, 46);
     const chunkData = [];
-    for (let i = 0; i < 46; i++) chunkData.push({ a: R() * Math.PI * 2, r: 3 + R() * 6, y: 82 + R() * 12, t0: QUAKE + 0.4 + R() * 1.2, v: 2 + R() * 6, s: 0.6 + R() * 1.8, spin: [R() * 4, R() * 4, R() * 4] });
+    for (let i = 0; i < 46; i++) chunkData.push({ a: R() * Math.PI * 2, r: 3 + R() * 6, y: 100 + R() * 12, t0: QUAKE + 0.4 + R() * 1.2, v: 2 + R() * 6, s: 0.6 + R() * 1.8, spin: [R() * 4, R() * 4, R() * 4] });
     scene.add(chunks);
 
-    return { scene, camera, clearColor: 0x000000, U, towerMat, tower, top, mirror, flames, flameMat, halo, glowMat, beam, ships, chunks, chunkData, sea: this._sea, sparks: this._sparks, lamps: this._lamps, isle: this._isleLights, stars: this._stars };
+    return { scene, camera, clearColor: 0x000000, U, towerMat, octMat: this._octMat, tower, top, mirror, flames, flameMat, halo, glowMat, beam, ships, chunks, chunkData, sea: this._sea, sparks: this._sparks, lamps: this._lamps, isle: this._isleLights, stars: this._stars };
   },
 
   update(S, t) {
@@ -557,7 +563,7 @@ float waveH(vec2 p, float t){
     U.uTime.value = t;
     // --------------------------------------------------- fire & light timeline
     const quakeK = clamp((t - QUAKE) / 1.6);
-    const fireI = (0.25 + 0.75 * smoothstep(0.6, 3.0, t)) * (1 - smoothstep(QUAKE + 0.5, QUAKE + 1.7, t)) * (1 + 0.3 * Math.exp(-Math.max(0, t - QUAKE) * 3) * (t > QUAKE ? 1 : 0))
+    const fireI = (0.25 + 0.75 * smoothstep(0.6, 3.0, t)) * (1 - smoothstep(QUAKE + 0.5, QUAKE + 1.7, t)) * (1 + 0.12 * Math.exp(-Math.max(0, t - QUAKE) * 3) * (t > QUAKE ? 1 : 0))
       * (0.93 + 0.07 * noise3(t * 3.1, 0.3, 0));
     U.uFireI.value = fireI;
     const dark = smoothstep(0.0, 2.6, t) * (1 - 0.75 * smoothstep(QUAKE + 1.5, EMBER + 0.6, t));
@@ -566,30 +572,31 @@ float waveH(vec2 p, float t){
     S.isle.material.uniforms.uOn.value = dark * (1 - smoothstep(QUAKE + 0.4, QUAKE + 2.0, t) * 0.85);
 
     S.towerMat.uniforms.uWin.value = 1 - smoothstep(QUAKE + 0.2, QUAKE + 1.4, t);
+    S.octMat.uniforms.uWin.value = S.towerMat.uniforms.uWin.value;
     // lantern collapse: tilts toward the lens/right and drops into the tower
     const fall = smoothstep(QUAKE + 0.5, QUAKE + 2.4, t);
     const ff = fall * fall;
-    S.top.position.set(ff * 6, 85.6 - ff * 30, ff * 4);
+    S.top.position.set(ff * 6, 103.8 - ff * 30, ff * 4);
     S.top.rotation.set(ff * 0.45, 0, -ff * 0.7);
     // spark light follows the cascade downwards
     const sk = clamp((t - QUAKE - 0.2) / 2.4);
-    U.uSpark.value.set(4, 88 - 85 * sk * sk, 9);
+    U.uSpark.value.set(4, 106 - 103 * sk * sk, 9);
     U.uSparkI.value = smoothstep(QUAKE, QUAKE + 0.4, t) * (1 - smoothstep(QUAKE + 1.6, EMBER + 0.2, t)) * 0.6;
-    U.uCrackY.value = 6 + 95 * smoothstep(QUAKE - 0.05, QUAKE + 1.4, t);
+    U.uCrackY.value = 6 + 112 * smoothstep(QUAKE - 0.05, QUAKE + 1.4, t);
     U.uCrackI.value = smoothstep(QUAKE, QUAKE + 0.25, t) * (0.25 + 0.75 * Math.exp(-Math.max(0, t - QUAKE - 0.6) * 1.0)) * (1 - smoothstep(EMBER - 1.2, EMBER + 0.6, t) * 0.97);
     S.sea.material.uniforms.uQuakeSea.value = 0.8 * smoothstep(QUAKE, QUAKE + 0.8, t) * Math.exp(-Math.max(0, t - QUAKE - 0.8) * 0.6);
 
     // --------------------------------------------------- camera
     const pull = smoothstep(1.2, 8.2, t);
     const pe = pull * pull * (3 - 2 * pull) * 0.5 + pull * 0.5;
-    const dist = lerp(150, 318, pe) + t * 1.6;
-    const h = lerp(91, 4.6, Math.pow(pe, 0.85));
+    const dist = lerp(170, 292, pe) + t * 1.4;
+    const h = lerp(110, 3.2, Math.pow(pe, 0.85));
     const az = THREE.MathUtils.degToRad(lerp(4, -7, pe) - t * 0.25);
-    camera.fov = lerp(24, 31, pe);
+    camera.fov = lerp(24, 34, pe);
     camera.updateProjectionMatrix();
     const pos = new THREE.Vector3(Math.sin(az) * dist, h, Math.cos(az) * dist);
     const sx = lerp(0.5, 0.64, smoothstep(1.2, 4.2, t));
-    const sy = lerp(0.32, 0.25, smoothstep(1.4, 7.5, t));
+    const sy = lerp(0.32, 0.2, smoothstep(1.4, 7.5, t));
     // earthquake: heavy low-frequency shake
     const qa = t > QUAKE ? Math.min(1, (t - QUAKE) / 0.08) * Math.exp(-(t - QUAKE) * 0.85) : 0;
     const shx = qa * (noise3(t * 4.2, 1.1, 0) * 0.012 + noise3(t * 9, 2.2, 0) * 0.004);
@@ -650,7 +657,7 @@ float waveH(vec2 p, float t){
 
     // --------------------------------------------------- sparks & stones
     const su = S.sparks.material.uniforms;
-    su.uOrigin.value.set(0, 89, 0);
+    su.uOrigin.value.set(0, 107, 0);
     const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), v = new THREE.Vector3(), sc3 = new THREE.Vector3();
     S.chunkData.forEach((c, i) => {
       const age = t - c.t0;

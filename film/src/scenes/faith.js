@@ -34,12 +34,27 @@ const GLASS = /* glsl */`
 ${GLSL.hash}
 // stained glass colour for a pane coordinate (in metres) inside a window; seed varies per window
 vec3 glassCol(vec2 q, float seed){
-  vec2 c=floor(q*vec2(3.4,2.6)); float h=hash12(c+seed*13.7); float h2=hash12(c*1.7+seed*3.1+7.);
-  vec3 ruby=vec3(1.0,0.04,0.06), cobalt=vec3(0.07,0.16,1.0), gold=vec3(1.0,0.62,0.08), green=vec3(0.1,0.6,0.25), pale=vec3(0.85,0.8,0.65);
-  vec3 col = h<0.5? cobalt : h<0.79? ruby : h<0.91? gold : h<0.96? green : pale;
-  vec2 f=fract(q*vec2(3.4,2.6));
-  float lead=smoothstep(0.06,0.0,min(min(f.x,1.-f.x),min(f.y,1.-f.y)));
-  return col*(0.65+0.7*h2)*(1.-0.85*lead);
+  vec3 cob=vec3(0.035,0.11,1.0), ruby=vec3(1.0,0.03,0.045), gold=vec3(1.0,0.58,0.08), wht=vec3(0.92,0.88,0.74);
+  float lx=mod(q.x+2.9,1.45)-0.725;
+  float my=mod(q.y+seed*0.37,2.3)-1.15;
+  float d=length(vec2(lx,my*0.9));
+  vec2 cg=floor(vec2(lx,q.y)*vec2(4.,3.2));
+  float h=hash12(cg+seed*7.1);
+  vec3 col=cob*(0.75+0.45*h);
+  float edge=0.725-abs(lx);
+  if(edge<0.14){ col=ruby*(0.8+0.3*h); if(fract(q.y*2.5)<0.22) col=mix(col,wht,0.6); }
+  if(d<0.5){
+    col=ruby*(0.8+0.3*hash12(floor(vec2(lx,my)*5.)+seed));
+    float fig=step(length(vec2(lx*2.4,(my+0.06)*0.95)),0.3)+step(length(vec2(lx,my-0.3)),0.075);
+    col=mix(col, mix(gold,wht,step(0.55,hash12(vec2(seed,floor(my*3.))))), clamp(fig,0.,1.));
+  } else if(d<0.58) col=gold*0.85;
+  vec2 f=fract(vec2(lx,q.y)*vec2(4.,3.2));
+  float lead=smoothstep(0.1,0.0,min(min(f.x,1.-f.x),min(f.y,1.-f.y)))*step(0.58,d);
+  lead=max(lead, smoothstep(0.04,0.0,abs(d-0.5)));
+  lead=max(lead, smoothstep(0.04,0.0,abs(d-0.58)));
+  lead=max(lead, smoothstep(0.035,0.0,abs(edge-0.14)));
+  float arm=smoothstep(0.075,0.035,abs(abs(my)-1.15));
+  return col*(1.-0.92*max(lead*0.85,arm));
 }
 // clerestory window: zl in [-2.9,2.9] centred in bay, y absolute. returns mask (glass=1) and stone tracery
 float clerestory(float zl, float y){
@@ -85,12 +100,14 @@ vec3 stained(vec3 p, vec3 N){
   // trace back along the sun direction to the +x clerestory plane
   float t=(${XW.toFixed(2)}-p.x)/(-uSun.x);
   if(t<0.3) return vec3(0.);
+  float ndl=max(dot(N,-uSun),0.);
+  if(ndl<=0.) return vec3(0.);
   vec3 q=p-uSun*t;
   float zl=bayLocal(q.z);
+  if(mod(bayIdx(q.z),2.)<0.5) return vec3(0.);
   float m=clerestory(zl,q.y);
   if(m<0.01) return vec3(0.);
-  float ndl=max(dot(N,-uSun),0.);
-  return glassCol(vec2(zl,q.y), bayIdx(q.z))*m*ndl*0.7;
+  return glassCol(vec2(zl,q.y), bayIdx(q.z))*m*ndl*1.6;
 }
 void main(){
   vec3 N=normalize(vN); if(!gl_FrontFacing) N=-N;
@@ -102,17 +119,17 @@ void main(){
     float az=abs(zl);
     float hw=2.55, ys=15.0;
     float arc = p.y<ys ? step(az,hw) : step((az+hw)*(az+hw)+(p.y-ys)*(p.y-ys),(2.*hw)*(2.*hw));
-    if(arc>0.5) discard;
+    if(arc>0.5){ float gy=smoothstep(0.,16.,p.y); vec3 ac=mix(vec3(0.008,0.009,0.014),vec3(0.022,0.025,0.038),gy)+vec3(0.10,0.05,0.12)*0.06*(0.5+0.5*sin(p.z*0.84))*uSide; gl_FragColor=vec4(mix(ac,vec3(0.010,0.011,0.016),1.-exp(-length(cameraPosition-p)*0.006)),1.); return; }
     // triforium: 4 small glazed arches per bay
     if(p.y>20.6 && p.y<25.6){
       float u=fract((zl+3.4)/1.7); float uz=(u-0.5)*1.7; float a=abs(uz);
       float ins = p.y<24.2 ? step(a,0.62) : step((a+0.62)*(a+0.62)+(p.y-24.2)*(p.y-24.2),1.24*1.24);
       ins*=step(az,3.3)*step(21.0,p.y);
-      em+=glassCol(vec2(zl*2.,p.y*2.),bi+40.)*ins*0.22*uGlass*mix(0.5,1.,uSide);
+      if(ins>0.) em+=glassCol(vec2(zl*2.,p.y*2.),bi+40.)*ins*0.22*uGlass*mix(0.5,1.,uSide);
       alb*=1.-0.75*ins;
     }
-    float g=clerestory(zl,p.y), gi=clerestoryIn(zl,p.y);
-    em+=glassCol(vec2(zl,p.y),bi+uSide*17.)*g*uGlass*mix(1.1,2.0,uSide);
+    float gi=clerestoryIn(zl,p.y);
+    if(gi>0.){ float g=clerestory(zl,p.y); em+=glassCol(vec2(zl,p.y),bi+uSide*17.)*g*uGlass*mix(1.1,2.0,uSide); }
     alb*=1.-0.8*gi;
     // horizontal string courses
     alb*=1.+0.25*smoothstep(0.12,0.,abs(p.y-20.4))+0.2*smoothstep(0.1,0.,abs(p.y-26.6));
@@ -128,7 +145,7 @@ void main(){
     em+=glassCol(vec2(p.x*2.,p.y),70.)*ins*0.9*uGlass;
     float portal=step(abs(p.x),2.6)*step(p.y,9.+sqrt(max(0.,9.-p.x*p.x)));
     alb*=(1.-0.8*ins)*(1.-0.9*portal);
-  } else if(uMode>3.5){                       // floor: worn slabs
+  } else if(uMode>3.5 && uMode<4.5){          // floor: worn slabs
     vec2 f=fract(p.xz/1.25); float j=smoothstep(0.03,0.0,min(min(f.x,1.-f.x),min(f.y,1.-f.y)));
     float h=hash12(floor(p.xz/1.25));
     alb=vec3(0.24,0.24,0.26)*(0.8+0.3*h)*(1.-0.4*j);
@@ -137,8 +154,9 @@ void main(){
   float n=cn(p*vec3(1.6,0.9,1.6));
   alb*=0.85+0.25*n;
   // light: cool window fill (stronger high in the nave), candles near the floor, stained sun patches
-  vec3 amb=mix(vec3(0.018,0.020,0.028), vec3(0.085,0.090,0.115), smoothstep(2.,40.,p.y))*(0.65+0.35*max(N.y*-1.,0.)+0.3*abs(N.x));
-  amb+=vec3(0.030,0.034,0.060)*max(-N.x,0.)*smoothstep(6.,35.,p.y);      // facing the sunlit side
+  vec3 amb=mix(vec3(0.032,0.036,0.05), vec3(0.11,0.12,0.15), smoothstep(2.,40.,p.y))*(0.65+0.35*max(N.y*-1.,0.)+0.3*abs(N.x));
+  amb+=vec3(0.030,0.034,0.060)*max(-N.x,0.)*smoothstep(6.,35.,p.y)+vec3(0.022,0.026,0.04)*abs(N.x)*smoothstep(0.,25.,p.y);
+  if(uMode>4.5){ alb=vec3(0.52,0.52,0.55); amb+=vec3(0.05,0.055,0.07)*(0.5+0.5*max(-N.y,0.)); }      // facing the sunlit side
   float cz=smoothstep(46.,38.,abs(p.z))*smoothstep(9.,4.,abs(p.x));
   vec3 cand=vec3(1.0,0.5,0.2)*uCand*(0.05*exp(-p.y/2.2)*cz + 0.008*exp(-p.y/9.)*smoothstep(50.,30.,abs(p.z)));
   vec3 c=alb*(amb+cand+stained(p,N)*uGlass);
@@ -189,7 +207,7 @@ export default {
     // aisle ceilings (simple barrel) and the wall above the arcade seen from the aisles
     for (const s of [-1, 1]) {
       // flat soffit band
-      const b = new THREE.Mesh(new THREE.PlaneGeometry(XA - XW, L).rotateX(Math.PI / 2), sGen); b.position.set(s * (XW + XA) / 2, 19.8, 0); // (soffit omitted: reads as a black slab)
+      const b = new THREE.Mesh(new THREE.PlaneGeometry(XA - XW, L).rotateX(Math.PI / 2), sGen); b.position.set(s * (XW + XA) / 2, 20.8, 0);
     }
 
     // ---------------------------------------------------------------- vault
@@ -217,7 +235,7 @@ export default {
       }
       tube(u => { const x = -W + 2 * W * u; return new THREE.Vector3(x, YS + hL(x) - 0.2, Z0 + NB * BAY); }, 0.32);
       tube(u => new THREE.Vector3(0, YS + APEX - 0.25, Z0 + u * L), 0.16, 120);
-      nave.add(new THREE.Mesh(mergeGeos(geos), stone(0)));
+      nave.add(new THREE.Mesh(mergeGeos(geos), stone(5)));
     }
 
     // ---------------------------------------------------------------- clustered piers
@@ -238,6 +256,7 @@ export default {
         const sc = Math.abs(x) > XW ? 0.62 : 1;
         m4.makeScale(sc, Math.abs(x) > XW ? 15.8 / YS : 1, sc).setPosition(x, 0, Z0 + b * BAY); im.setMatrixAt(n++, m4);
       }
+      im.renderOrder = -2;
       nave.add(im);
     }
 
@@ -249,20 +268,20 @@ export default {
         uniforms: { ...U, uB: { value: 1 } }, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide,
         vertexShader: `attribute float aSeed; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying float vSeed; void main(){ vSeed=aSeed; vL=position; vec4 w=modelMatrix*instanceMatrix*vec4(position,1.); vW=w.xyz; vN=normalize(mat3(modelMatrix*instanceMatrix)*normal); gl_Position=projectionMatrix*viewMatrix*w; }`,
         fragmentShader: `uniform float uTime, uB, uGlass; varying vec3 vW; varying vec3 vN; varying vec3 vL; varying float vSeed; ${GLASS} float cn(vec3 p){ return 0.5+0.25*sin(p.x*1.7+sin(p.z*1.3+p.y*0.7))*sin(p.z*1.9+sin(p.y*1.1+p.x*0.7)) + 0.25*sin(p.y*2.3+sin(p.x*1.1))*sin(p.x*2.9-p.z*1.3); }
-          void main(){ vec3 V=normalize(cameraPosition-vW); float f=pow(abs(dot(normalize(vN),V)),3.2);
+          void main(){ vec3 V=normalize(cameraPosition-vW); float f=pow(abs(dot(normalize(vN),V)),2.4);
             float a=vL.y;
-            vec3 col=glassCol(vec2(vL.x*2.6, 31.+vL.z*4.5), floor(vW.z*0.13)+3.);
+            vec3 col=vec3(1.);
             float fall=smoothstep(0.,0.06,a)*mix(1.,0.25,a);
             float n=cn(vW*0.35+vec3(0.,-uTime*0.25,uTime*0.1));
             float dc=length(cameraPosition-vW);
             vec3 dom = vSeed<0.5? vec3(1.0,0.05,0.07) : vSeed<1.5? vec3(0.08,0.18,1.0) : vSeed<2.5? vec3(1.0,0.6,0.12) : vec3(0.6,0.1,0.5);
-            col=mix(dom,col,0.3)*1.1;
-            vec3 c=col*f*fall*mix(0.35,1.35,n)*0.06*uB*uGlass*smoothstep(3.,14.,dc);
+            col=mix(dom, vec3(1.0,0.95,0.9), 0.15+0.35*f);
+            vec3 c=col*f*fall*mix(0.7,1.15,n)*0.13*uB*uGlass*smoothstep(8.,30.,dc);
             gl_FragColor=vec4(c,1.); }`,
       });
       const zs = [];
-      for (let b = 1; b < NB - 1; b++) zs.push(Z0 + (b + 0.5) * BAY);
-      geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(new Float32Array(zs.map((z, i) => [0, 1, 2, 1, 0, 3, 2, 1][i % 8])), 1));
+      for (let b = 1; b < NB - 1; b += 2) zs.push(Z0 + (b + 0.5) * BAY);
+      geo.setAttribute('aSeed', new THREE.InstancedBufferAttribute(new Float32Array(zs.map((z, i) => [1, 0, 1, 2, 1, 0, 1][i % 7])), 1));
       const im = new THREE.InstancedMesh(geo, mat, zs.length);
       const len = 31 / -SUN.y + 4;
       const ax = SUN.clone(), a1 = new THREE.Vector3(0, 0, 1).sub(SUN.clone().multiplyScalar(SUN.z)).normalize(), a2 = new THREE.Vector3().crossVectors(a1, ax).normalize();
@@ -283,7 +302,7 @@ export default {
         const u = Math.pow(R(), 0.8) * len, rx = (R() * 2 - 1), rz = (R() * 2 - 1);
         const p = new THREE.Vector3(XW + 0.2, 31.5, z).addScaledVector(ax, u).addScaledVector(a1, rx * 2.3).addScaledVector(a2, rz * 4.1);
         pos.set([p.x, p.y, p.z], i * 3);
-        col.set(tmpC([Math.floor(rx * 3), Math.floor(rz * 4)], z), i * 3);
+        { const zi = zs.indexOf(z) % 7; const dom = [[0.1, 0.25, 1.0], [1.0, 0.15, 0.15], [0.1, 0.25, 1.0], [1.0, 0.7, 0.25], [0.1, 0.25, 1.0], [1.0, 0.15, 0.15], [0.1, 0.25, 1.0]][zi]; col.set(dom.map(c => c * 0.55 + 0.45), i * 3); }
         sd.set([R(), R(), R(), u / len], i * 4);
       }
       const g = new THREE.BufferGeometry();
@@ -295,7 +314,7 @@ export default {
         vertexShader: `attribute vec3 aC; attribute vec4 aS; uniform float uTime, uPx, uGlass; varying vec3 vC;
           void main(){ vec3 p=position+vec3(sin(uTime*0.3+aS.x*30.)*0.4, sin(uTime*0.21+aS.y*20.)*0.5-uTime*0.05*aS.z, sin(uTime*0.25+aS.z*40.)*0.4);
             float tw=0.5+0.5*sin(uTime*(1.+aS.y*3.)+aS.x*60.);
-            vC=aC*(0.5+tw)*mix(1.,0.3,aS.w)*0.9*uGlass;
+            vC=aC*(0.5+tw)*mix(1.,0.3,aS.w)*0.7*uGlass;
             vec4 mv=modelViewMatrix*vec4(p,1.); gl_PointSize=clamp(0.05*uPx/-mv.z,1.,6.); vC*=smoothstep(1.,4.,-mv.z);
             gl_Position=projectionMatrix*mv; }`,
         fragmentShader: `varying vec3 vC; void main(){ vec2 p=gl_PointCoord*2.-1.; float r=dot(p,p); if(r>1.) discard; gl_FragColor=vec4(vC*exp(-r*3.),1.); }`,
@@ -382,9 +401,18 @@ export default {
           float holes=0.;
           if(M>0.01){ float hs=mod(si,4.); float hc=step(0.5,hs); holes=0.; }
           // ---- glass
-          vec3 g=glassCol(vec2(a*3.2, r*9.), 5.);
+          vec3 cob=vec3(0.035,0.11,1.0), ruby=vec3(1.0,0.03,0.045), gold=vec3(1.0,0.58,0.08), wht=vec3(0.92,0.88,0.74);
+          vec3 g;
+          float odd=mod(si,2.);
+          if(r<0.17) g=gold; else if(r<0.24) g=ruby;
+          else if(r<0.74){ g= odd<0.5? ruby: cob; float pm=length(vec2(sf*2.*PI/NS*r, (r-0.52)*0.7)); if(pm<0.045) g=gold; else if(pm<0.06) g=wht; }
+          else if(r<0.95){ g=cob; if(abs(r-0.88)<0.035) g= odd<0.5? gold: ruby; }
+          else g=ruby;
+          float cr=fract(r*14.), ca=fract(sec*2.);
+          float ld=smoothstep(0.1,0.,min(min(cr,1.-cr),min(ca,1.-ca)));
+          g*=(0.8+0.3*hash12(floor(vec2(sec*2.,r*14.))))*(1.-0.85*ld);
           float rad=1.-smoothstep(0.8,1.,r)*0.3;
-          vec3 glow=g*1.25*rad*uGlass;
+          vec3 glow=g*1.05*rad*uGlass;
           // steel when morphing: glass dims to dark smoked steel with sodium-warm sheen
           vec3 steel=(vec3(0.05,0.06,0.07)+vec3(1.0,0.5,0.15)*0.05)*(0.4+0.6*fract(sin(si*12.9)*437.));
           vec3 stoneC=mix(vec3(0.010,0.011,0.013), vec3(0.016,0.019,0.024), M);
@@ -526,7 +554,7 @@ export default {
     const pB = new THREE.Vector3(0, ROSE.y, ZWEST + 24);
     const pos = new THREE.Vector3(0, lerp(pA.y, pB.y, ua * 0.6 + ue * 0.4), lerp(pA.z, pB.z, ue));
     pos.z = lerp(pos.z, ZWEST + 19.5, smoothstep(15.6, 20.5, t));
-    const tA = new THREE.Vector3(0, lerp(17, 38, smoothstep(CUT + 0.4, 4.2, t)), lerp(-20, 6, smoothstep(CUT + 0.4, 4.2, t))), tB = new THREE.Vector3(0, ROSE.y, ZWEST);
+    const tA = new THREE.Vector3(0, lerp(17, 38, smoothstep(CUT + 0.1, 3.4, t)), lerp(-20, 6, smoothstep(CUT + 0.1, 3.4, t))), tB = new THREE.Vector3(0, ROSE.y, ZWEST);
     const tgt = tA.clone().lerp(tB, smoothstep(8.6, 15.2, t));
     camera.fov = lerp(36, 30, smoothstep(9, 17, t)); camera.updateProjectionMatrix();
     camera.position.copy(pos); camera.up.set(0, 1, 0); camera.lookAt(tgt);

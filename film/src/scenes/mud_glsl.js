@@ -100,8 +100,8 @@ float cityShadow(vec3 P, vec3 L){
   vec2 dir = normalize(L.xz);
   float maxD = min(10. / tanE, 70.);
   float res = 1.;
-  for (int i = 1; i <= 7; i++) {
-    float s = maxD * pow(float(i) / 7., 1.4);
+  for (int i = 1; i <= 6; i++) {
+    float s = maxD * pow(float(i) / 6., 1.4);
     float rh = P.y + s * tanE;
     float h = cityH(P.xz + dir * s);
     res = min(res, clamp((rh - h) * 0.7 + 0.5, 0., 1.));

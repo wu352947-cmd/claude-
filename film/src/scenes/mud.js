@@ -49,7 +49,7 @@ vec3 waterShade(vec3 P, float sand){
   vec3 V = normalize(uCam - P);
   vec3 Rr = reflect(-V, vec3(0., 1., 0.));
   vec3 sunH = normalize(vec3(uSunDir.x, 0.12, uSunDir.z));
-  Rr = normalize(mix(normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z)), sunH, 0.45 * (1. - uNight)));
+  Rr = normalize(mix(normalize(vec3(Rr.x, Rr.y * 0.45, Rr.z)), sunH, 0.75 * (1. - uNight)));
   float fr = 0.04 + 0.96 * pow(1. - max(V.y, 0.), 5.);
   vec3 c = vec3(0.012, 0.018, 0.02) + skyBase(Rr) * (0.35 + 0.65 * fr);
   float sp = pow(max(dot(Rr, uSunDir), 0.), 600.) * 30. + pow(max(dot(Rr, uSunDir), 0.), 60.) * 0.6;
@@ -85,7 +85,7 @@ void main(){
   vec2 uv = (P.xz - uHFRect.xy) / uHFRect.zw;
   if (uv.x > 0.002 && uv.y > 0.002 && uv.x < 0.998 && uv.y < 0.998) discard;
   vec4 m = groundMask(P.xz);
-  float sand = sandAt(P.xz);
+  float sand = uSandCover > 0. ? sandAt(P.xz) : 0.;
   vec3 alb = groundAlb(P.xz, m, sand);
   // wind streaks on the sand
   float st = vnoise(vec2(P.x * 0.02 - uTime * 3.0, P.z * 0.25));
@@ -102,7 +102,7 @@ const HF_VS = /* glsl */`
 ${COMMON}
 attribute vec4 aH;   // built, softened, dune, erosion threshold
 attribute vec4 aG;   // gradients of softened (xy) and dune (zw)
-varying vec3 vP; varying vec3 vNs; varying vec3 vE; varying float vHz; varying float vR;
+varying vec3 vP; varying vec3 vNs; varying vec3 vE; varying float vHz; varying float vR; varying float vSh;
 void main(){
   vec2 xz = position.xz;
   float R = revealAt(xz);
@@ -114,12 +114,15 @@ void main(){
   vE = vec3(e, aH.w);
   vHz = aH.x; vR = R;
   vP = vec3(xz.x, h, xz.y);
+  // shadows are evaluated per vertex (1 m grid on the structure) and interpolated
+  vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
+  vSh = hfShadow(vP + vec3(0., 0.2, 0.), L);
   gl_Position = projectionMatrix * viewMatrix * vec4(vP, 1.);
 }`;
 const HF_FS = /* glsl */`
 ${COMMON}
 ${GROUND}
-varying vec3 vP; varying vec3 vNs; varying vec3 vE; varying float vHz; varying float vR;
+varying vec3 vP; varying vec3 vNs; varying vec3 vE; varying float vHz; varying float vR; varying float vSh;
 float aaLine(float x, float w, float fw){ // 1 inside a periodic line of width w (period 1), filtered
   float f = fract(x);
   float d = min(f, 1. - f);
@@ -168,14 +171,16 @@ void main(){
   N = normalize(N + T * (e2 - e1) * 0.9 * tierWall * ribFade * (1. - soft));
   alb *= mix(1., mix(0.8, 1.04, ribOn), tierWall * (1. - soft) * mix(0.5, 1., ribFade));
   // grime: rain streaks below each tier top, salt bloom at the feet
-  float streak = vnoise(vec2(u * 0.9, y * 0.06));
-  float salt = vnoise(vec2(u * 0.35, y * 1.5)) * (1. - smoothstep(0., 1.6, fract((y - 3.) / 9.) * 9.));
-  alb *= mix(1., 0.78 + 0.22 * streak, isWall);
-  alb = mix(alb, vec3(0.74, 0.70, 0.62), salt * 0.35 * isWall * built);
+  if (isWall > 0.01) {
+    float streak = vnoise(vec2(u * 0.9, y * 0.06));
+    float salt = vnoise(vec2(u * 0.35, y * 1.5)) * (1. - smoothstep(0., 1.6, fract((y - 3.) / 9.) * 9.));
+    alb *= mix(1., 0.78 + 0.22 * streak, isWall);
+    alb = mix(alb, vec3(0.74, 0.70, 0.62), salt * 0.35 * isWall * built);
+  }
   // dust on terraces
   alb = mix(alb, vec3(0.58, 0.48, 0.35), (1. - isWall) * 0.35 * built);
   // the freshly laid platform: slabs of mud drying at different rates
-  if (abs(vHz - 3.) < 0.05 && N.y > 0.9 && uTime < 12.) {
+  if (abs(y - 3.) < 0.06 && N.y > 0.9 && uTime < 12.) {
     vec2 cell = floor(P.xz / vec2(11., 8.5));
     float hs = hash12(cell);
     vec2 fc = fract(P.xz / vec2(11., 8.5));
@@ -202,15 +207,19 @@ void main(){
     alb *= mix(1., mix(1.0, 0.75, riser), sf);
   }
   // plain at the edge of the region: same as the ground
-  vec4 m = groundMask(P.xz);
-  float sand = sandAt(P.xz);
   float plain = 1. - smoothstep(0.05, 0.4, vHz);
-  alb = mix(alb, groundAlb(P.xz, m, sand), plain);
+  vec4 m = vec4(0.);
+  float sand = 0.;
+  if (plain > 0.001) {
+    m = groundMask(P.xz);
+    sand = uSandCover > 0. ? sandAt(P.xz) : 0.;
+    alb = mix(alb, groundAlb(P.xz, m, sand), plain);
+  }
   // --- erosion: everything becomes sand with wind ripples
   float er = clamp(vE.x * 0.7 + vE.y * 0.6, 0., 1.);
   float rip = sin((P.x * 0.9 + P.z * 0.35) * 3.2 + vnoise(P.xz * 0.15) * 4.);
   N = normalize(N + vec3(0.9, 0., 0.35) * rip * 0.06 * vE.y);
-  alb = mix(alb, vec3(0.60, 0.48, 0.34) * (0.95 + 0.08 * rip), er);
+  alb = mix(alb, vec3(0.72, 0.60, 0.45) * (0.95 + 0.08 * rip), er);
   // --- construction: fresh wet mud and a glowing edge band
   vec3 emit = vec3(0.);
   float building = step(vR + 0.03, vHz) * uBuild * (1. - vE.x);
@@ -232,7 +241,8 @@ void main(){
   float ao = 1.;
   // shadows
   vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
-  float sh = hfShadow(P + N * 0.15, L);
+  // self-shadowing of faces turned away from the light is handled by N·L; the march adds cast shadows
+  float sh = clamp(vSh, 0., 1.);
   vec3 c = shade(P, N, alb, ao, uSunDir.y > 0. ? sh : 1., uSunDir.y > 0. ? 1. : sh, 0.85);
   c += emit;
   float w = m.r * (1. - sand) * plain;
@@ -429,8 +439,8 @@ void main(){
   vec2 q = gl_PointCoord - 0.5;
   float d2 = dot(q, q) * 4.;
   float a = exp(-d2 * 3.5);
-  vec3 col = mix(vec3(1.0, 0.48, 0.16), vec3(1.0, 0.68, 0.32), vS);
-  gl_FragColor = vec4(col * vI * a * 3.2, 1.);
+  vec3 col = mix(vec3(1.0, 0.36, 0.09), vec3(1.0, 0.55, 0.2), vS);
+  gl_FragColor = vec4(col * vI * a * 2.3, 1.);
 }`;
 
 const FLAME_VS = /* glsl */`
@@ -546,7 +556,7 @@ export default {
     gTex.colorSpace = THREE.NoColorSpace; gTex.anisotropy = 4; gTex.minFilter = THREE.LinearMipmapLinearFilter;
     const U = {
       uTime: { value: 0 }, uCam: v3(),
-      uSunDir: v3(0, 1, 0), uSunCol: v3(), uMoonDir: v3(0.82, 0.47, 0.33), uMoonCol: v3(),
+      uSunDir: v3(0, 1, 0), uSunCol: v3(), uMoonDir: v3(0.62, 0.42, -0.66), uMoonCol: v3(),
       uZen: v3(), uHor: v3(), uGlow: v3(), uAmb: v3(), uBounce: v3(),
       uFogDen: { value: 0.0007 }, uNight: { value: 0 },
       uHF: { value: hfTex }, uHFRect: { value: new THREE.Vector4(HF.x0 - G.res / 2, HF.z0 - G.res / 2, G.nx * G.res, G.nz * G.res) },
@@ -720,17 +730,18 @@ export default {
       [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
       [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.9, 1.50, 0.62]],
       [0.17, [0.170, 0.190, 0.360], [1.050, 0.720, 0.420], [3.4, 2.10, 0.95]],
-      [0.32, [0.240, 0.350, 0.600], [0.920, 0.800, 0.620], [3.6, 3.0, 2.2]],
-      [1.00, [0.210, 0.360, 0.680], [0.850, 0.820, 0.720], [4.0, 3.6, 3.0]],
+      [0.32, [0.200, 0.300, 0.560], [0.780, 0.640, 0.480], [3.6, 3.0, 2.2]],
+      [1.00, [0.170, 0.300, 0.620], [0.700, 0.660, 0.580], [4.0, 3.6, 3.0]],
     ];
     const pal = i => { let k = 0; while (k < K.length - 2 && e > K[k + 1][0]) k++; const u = clamp((e - K[k][0]) / (K[k + 1][0] - K[k][0])); const s = u * u * (3 - 2 * u); return K[k][i].map((v, j) => lerp(v, K[k + 1][i][j], s)); };
     const zen = pal(1), hor = pal(2), sunc = pal(3);
     const night = smoothstep(-0.02, -0.16, e);
     U.uZen.value.fromArray(zen); U.uHor.value.fromArray(hor);
     U.uSunCol.value.fromArray(sunc).multiplyScalar(smoothstep(-0.03, 0.02, e));
-    U.uGlow.value.set(hor[0] * 0.9, hor[1] * 0.55, hor[2] * 0.35).multiplyScalar(1 - night);
-    U.uAmb.value.set(zen[0] * 0.45 + hor[0] * 0.06, zen[1] * 0.45 + hor[1] * 0.06, zen[2] * 0.45 + hor[2] * 0.06);
-    U.uBounce.value.fromArray(sunc).multiplyScalar(0.06 * smoothstep(-0.03, 0.1, e)).add(new S.THREE.Vector3(0.004, 0.003, 0.003));
+    U.uGlow.value.set(hor[0] * 0.9, hor[1] * 0.55, hor[2] * 0.35).multiplyScalar((1 - night) * lerp(1, 0.35, smoothstep(0.1, 0.5, e)));
+    { const g = (zen[0] + zen[1] + zen[2]) / 3; const ds = 0.55;
+      U.uAmb.value.set(lerp(zen[0], g, ds) * 0.5 + hor[0] * 0.06, lerp(zen[1], g, ds) * 0.5 + hor[1] * 0.06, lerp(zen[2], g, ds) * 0.5 + hor[2] * 0.06); }
+    U.uBounce.value.fromArray(sunc).multiplyScalar(0.11 * smoothstep(-0.03, 0.1, e)).add(new S.THREE.Vector3(0.004, 0.003, 0.003));
     U.uNight.value = night;
     U.uMoonCol.value.set(0.11, 0.145, 0.24).multiplyScalar(night * 1.5);
     U.uStarI.value = night * 1.1;
@@ -766,11 +777,11 @@ export default {
     S.torchU.uTau.value = S.tau(t);
     S.lagCopies.forEach(p => p.visible = t > S.torchU.uDispT0.value + 0.1);
     S.torchU.uTauD0.value = S.tau(S.torchU.uDispT0.value);
-    S.torchU.uDensity.value = track([[0, 0.38], [8.5, 0.45], [19.5, 1.0]], t);
+    S.torchU.uDensity.value = track([[0, 0.55], [8.5, 0.6], [19.5, 1.0]], t);
     S.torchU.uProc.value = track([[0, 0], [16.5, 0], [19, 1]], t);
     S.torchU.uTorchI.value = lerp(0.6, 1.0, Math.max(night, smoothstep(0.12, -0.02, e))) * (1 + 0.6 * smoothstep(23.8, 25, t));
     { const ring = S.torchU.uRing.value; const per = 4 * (ring.x + ring.y);
-      S.torchU.uWorkers.value = track([[0, 0.12], [8, 0.16], [9, 1], [17.5, 1], [19.5, 0]], t) * (t > 8.6 ? Math.min(1, per / 2.4 / 1800) : 1); }
+      S.torchU.uWorkers.value = track([[0, 0.07], [8, 0.1], [9, 1], [17.5, 1], [19.5, 0]], t) * (t > 8.6 ? Math.min(1, per / 2.4 / 1800) : 1); }
 
     // ---------------- camera (orbit parameters around the platform centre)
     const deg = Math.PI / 180;

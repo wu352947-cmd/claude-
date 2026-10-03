@@ -113,11 +113,11 @@ export function buildHeightMesh(G) {
     add(bx, s * GATE.hw); add(bx, s * (GATE.hw + 0.25));
   }
   for (const v of [STAIR_C.z0, STAIR_C.z0 - 0.25, STAIR_S.z0, STAIR_S.z0 - 0.25, GATE.z0, GATE.z0 - 0.25, GATE.z1, GATE.z1 + 0.25, STAIR_C.z1]) add(bz, v);
-  const axis = (lo, hi, B) => {
+  const axis = (lo, hi, B, core) => {
     const out = [...B].filter(v => v > lo && v < hi);
     for (let v = lo; v <= hi + 1e-6; ) {
       out.push(v);
-      v += 1.0;
+      v += Math.abs(v) < core ? 1.0 : 3.0;
     }
     out.sort((a, b) => a - b);
     const ded = [];
@@ -125,7 +125,7 @@ export function buildHeightMesh(G) {
     else if (B.has(Math.round(v * 100) / 100)) ded[ded.length - 1] = v;
     return ded;
   };
-  const xs = axis(HF.x0, HF.x0 + HF.sx, bx), zs = axis(HF.z0, HF.z0 + HF.sz, bz);
+  const xs = axis(HF.x0, HF.x0 + HF.sx, bx, 67), zs = axis(HF.z0, HF.z0 + HF.sz, bz, 70);
   const NX = xs.length, NZ = zs.length, N = NX * NZ;
   const pos = new Float32Array(N * 3), aH = new Float32Array(N * 4), aG = new Float32Array(N * 4);
   const e = 0.6;

@@ -434,7 +434,7 @@ export default {
     const bells = [];
     {
       const prof = [[0.0, 0.0], [0.34, 0.02], [0.36, 0.08], [0.3, 0.2], [0.24, 0.5], [0.22, 0.72], [0.15, 0.82], [0.06, 0.86], [0.06, 1.0], [0.0, 1.02]];
-      const bg = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y - 1.02)), 18);
+      const bg = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y - 1.02)), 40);
       // wind plate (风摆) and hanger
       const plate = new THREE.BoxGeometry(0.26, 0.4, 0.03); plate.translate(0, -1.45, 0);
       const rod = new THREE.CylinderGeometry(0.015, 0.015, 0.6, 4); rod.translate(0, -1.15, 0);
@@ -446,12 +446,12 @@ export default {
           void main(){ vec4 w=modelMatrix*instanceMatrix*vec4(position,1.); vW=w.xyz; vN=normalize(mat3(modelMatrix*instanceMatrix)*normal); vR=aRing; gl_Position=projectionMatrix*viewMatrix*w; }`,
         fragmentShader: `${LIGHT_GLSL} varying vec3 vW; varying vec3 vN; varying float vR;
           void main(){ vec3 N=normalize(vN); if(!gl_FrontFacing) N=-N; vec3 V=normalize(cameraPosition-vW);
-            vec3 alb=vec3(0.30,0.20,0.10);
-            vec3 c=alb*(ambient(N)*1.2+lanternLight(vW,N)*1.6);
+            vec3 alb=vec3(0.16,0.10,0.05);
+            vec3 c=alb*(ambient(N)*0.8+lanternLight(vW,N)*0.3);
             vec3 Rf=reflect(-V,N);
-            c+=vec3(0.03,0.04,0.06)*pow(max(Rf.y,0.),3.)*uDark;
-            c+=vec3(1.0,0.62,0.28)*pow(1.-max(dot(N,V),0.),3.)*0.06*uDark;
-            c+=vec3(1.0,0.75,0.4)*vR*(0.4+1.6*pow(1.-max(dot(N,V),0.),2.));
+            c+=vec3(0.02,0.026,0.04)*pow(max(Rf.y,0.),3.)*uDark;
+            c+=vec3(1.0,0.55,0.22)*pow(1.-max(dot(N,V),0.),5.)*0.3*uDark;
+            c+=vec3(1.0,0.75,0.4)*vR*(0.08+1.2*pow(1.-max(dot(N,V),0.),3.));
             gl_FragColor=vec4(fogit(c,vW),1.); }`,
       });
       const ring = new Float32Array(48);
@@ -472,9 +472,9 @@ export default {
       gg.setAttribute('aI', new THREE.BufferAttribute(gi, 1));
       const glints = new THREE.Points(gg, new THREE.ShaderMaterial({
         uniforms: U, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
-        vertexShader: `attribute float aI; uniform float uPx; varying float vI; void main(){ vI=aI; vec4 mv=modelViewMatrix*vec4(position,1.); gl_PointSize=clamp(7.*uPx/-mv.z,2.,300.)*step(0.01,aI); gl_Position=projectionMatrix*mv; }`,
+        vertexShader: `attribute float aI; uniform float uPx; varying float vI; void main(){ vI=aI; vec4 mv=modelViewMatrix*vec4(position,1.); gl_PointSize=clamp(1.7*uPx/-mv.z,2.,60.)*step(0.01,aI); gl_Position=projectionMatrix*mv; }`,
         fragmentShader: `varying float vI; void main(){ vec2 p=gl_PointCoord*2.-1.; float st=exp(-abs(p.x)*22.)*exp(-abs(p.y)*2.5)+exp(-abs(p.y)*22.)*exp(-abs(p.x)*2.5); float r=dot(p,p);
-          gl_FragColor=vec4(vec3(1.,0.82,0.55)*vI*(st*1.4+exp(-r*12.)*1.2),1.); }`,
+          gl_FragColor=vec4(vec3(1.,0.82,0.55)*vI*(st*0.9+exp(-r*10.)*1.6),1.); }`,
       }));
       glints.frustumCulled = false;
       scene.add(glints);
@@ -559,18 +559,18 @@ export default {
       const dt = t - T;
       let ang = 0.07 * Math.sin(t * b.f + b.ph) + 0.04 * Math.sin(t * 2.7 + b.ph * 2);
       let ring = 0;
-      if (dt > 0) { ang += 0.42 * Math.exp(-dt * 1.3) * Math.sin(dt * 7.5 + 0.3 * b.j); ring = Math.exp(-dt * 3.2) * (b.j === 0 ? 1.4 : 0.8); }
+      if (dt > 0) { ang += 0.42 * Math.exp(-dt * 1.3) * Math.sin(dt * 7.5 + 0.3 * b.j); ring = Math.exp(-dt * 6) * (b.j === 0 ? 1.0 : 0.6); }
       // the final bell: swings into the lens
-      if (b.k === 5 && b.j === 0) { const e = smoothstep(13.3, 14.5, t); ang = lerp(ang, -0.85, e); }
+      if (b.k === 5 && b.j === 0) { const e = smoothstep(13.1, 14.1, t); ang = lerp(ang, -0.95, e); }
       ax.set(Math.cos(b.th), 0, -Math.sin(b.th));   // tangent axis
       q.setFromAxisAngle(ax, ang);
       q2.setFromAxisAngle(up, b.th);
       q.multiply(q2);
-      m4.compose(b.anchor, q, new THREE.Vector3(1, 1, 1));
-      if (b.k === 5 && b.j === 0) S.finalBell = new THREE.Vector3(0, -0.6, 0).applyQuaternion(q).add(b.anchor);
+      m4.compose(b.anchor, q, new THREE.Vector3(1.25, 1.25, 1.25));
+      if (b.k === 5 && b.j === 0) S.finalBell = new THREE.Vector3(0, -0.75, 0).applyQuaternion(q).add(b.anchor);
       S.bellIM.setMatrixAt(i, m4);
       ringA.setX(i, ring);
-      const gl = new THREE.Vector3(0, -0.75, 0.3).applyQuaternion(q).add(b.anchor);
+      const gl = new THREE.Vector3(0, -0.95, 0.38).applyQuaternion(q).add(b.anchor);
       gp.setXYZ(i, gl.x, gl.y, gl.z); gi.setX(i, dt > 0 ? Math.exp(-dt * 4) * 1.6 * (dt < 0.05 ? dt / 0.05 : 1) : 0);
     });
     S.bellIM.instanceMatrix.needsUpdate = true; ringA.needsUpdate = true; gp.needsUpdate = true; gi.needsUpdate = true;
@@ -586,7 +586,7 @@ export default {
       pos = new THREE.Vector3(Math.sin(az) * d, lerp(16.5, 15.5, u), Math.cos(az) * d);
       tgt = new THREE.Vector3(0, 41, 0); sx = 0.68; sy = 0.5; fov = 38;
     } else {
-      const keys = [5.4, ...BELLS, 13.75, 14.5];
+      const keys = [5.4, ...BELLS, 13.45, 13.95];
       // camera pose per key: [azDeg, dist, camY, target(Vector3), sx, sy, fov]
       const poses = [
         [-24, 132, 15.5, new THREE.Vector3(0, 41, 0), 0.68, 0.5, 38],
@@ -597,7 +597,7 @@ export default {
         [0, 44, 43.5, bellPos(4), 0.5, 0.46, 32],
         [0, 42, 54.0, new THREE.Vector3(0, 66, 0), 0.5, 0.40, 32],
         [0, 30, 59.0, bellPos(5), 0.5, 0.50, 30],
-        [0, 18.1, bellPos(5).y + 0.25, bellPos(5).add(new THREE.Vector3(0, -0.15, 0)), 0.5, 0.5, 30],
+        [0, 18.4, bellPos(5).y + 0.3, bellPos(5).add(new THREE.Vector3(0, -0.15, 0)), 0.5, 0.5, 30],
       ];
       let i = 1; while (i < keys.length - 1 && t > keys[i]) i++;
       const k0 = keys[i - 1], k1 = keys[i];
