@@ -919,8 +919,14 @@ window.__game = game;
 
 function bindUI() {
   const on = (sel, fn) => $(sel).addEventListener('click', e => { e.preventDefault(); game.audio.init(); fn(e); });
-  on('#btnStart', () => {
-    if (game.save.level > 0 && !confirm('重新开始会清除当前进度，确定吗？')) return;
+  on('#btnStart', e => {
+    const btn = e.currentTarget;
+    if (game.save.level > 0 && !btn.dataset.sure) {
+      btn.dataset.sure = '1'; btn.textContent = '再点一次 · 清除进度重下';
+      setTimeout(() => { delete btn.dataset.sure; btn.textContent = '下墓'; }, 4000);
+      return;
+    }
+    delete btn.dataset.sure; btn.textContent = '下墓';
     game.newGame(0);
   });
   on('#btnContinue', () => game.newGame(game.save.level));
