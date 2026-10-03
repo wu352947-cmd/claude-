@@ -69,10 +69,15 @@ export class Mix {
   // global → context time
   t(g) { return g - this.g0; }
   // A channel strip: input gain → stereo pan → dry + reverb sends. Returns the input node.
-  ch({ pan = 0, gain = 1, dry = 1, send = {} } = {}) {
+  ch({ pan = 0, gain = 1, dry = 1, send = {}, eq = [] } = {}) {
     const ctx = this.ctx;
     const inp = ctx.createGain(); inp.gain.value = gain;
     let node = inp;
+    // optional EQ chain: [[type, freq, Q, gainDb], ...]
+    for (const [type, f, Q = 0.707, g = 0] of eq) {
+      const b = ctx.createBiquadFilter(); b.type = type; b.frequency.value = f; b.Q.value = Q; b.gain.value = g;
+      node.connect(b); node = b;
+    }
     if (pan !== 0) { const p = ctx.createStereoPanner(); p.pan.value = clamp(pan, -1, 1); inp.connect(p); node = p; }
     if (dry > 0) {
       if (dry === 1) node.connect(this.out);

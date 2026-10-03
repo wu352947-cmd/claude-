@@ -42,7 +42,7 @@ vec3 groundAlb(vec2 xz, vec4 m, float sand){
   a = mix(a, vec3(0.52, 0.43, 0.31), clamp(m.b * 1.4, 0., 0.7));   // paths
   // wet dark banks along water
   a *= 1. - 0.35 * smoothstep(0.0, 0.5, m.r);
-  vec3 s = vec3(0.68, 0.56, 0.42) * (0.92 + 0.12 * n2);
+  vec3 s = vec3(0.76, 0.57, 0.37) * (0.92 + 0.12 * n2);
   return mix(a, s, sand);
 }
 vec3 waterShade(vec3 P, float sand){
@@ -219,7 +219,7 @@ void main(){
   float er = clamp(vE.x * 0.7 + vE.y * 0.6, 0., 1.);
   float rip = sin((P.x * 0.9 + P.z * 0.35) * 3.2 + vnoise(P.xz * 0.15) * 4.);
   N = normalize(N + vec3(0.9, 0., 0.35) * rip * 0.06 * vE.y);
-  alb = mix(alb, vec3(0.68, 0.56, 0.42) * (0.95 + 0.08 * rip), er);
+  alb = mix(alb, vec3(0.80, 0.60, 0.38) * (0.95 + 0.08 * rip), er);
   // --- construction: fresh wet mud and a glowing edge band
   vec3 emit = vec3(0.);
   float building = step(vR + 0.03, vHz) * uBuild * (1. - vE.x);
@@ -529,8 +529,11 @@ void main(){
   float cover = max(coverF, coverB);
   float dens = cover * (0.82 + 0.18 * n);
   float rim = exp(-pow((vUv.x - edgeF) / 0.06, 2.)) * coverF + exp(-pow((vUv.x - edgeB) / 0.06, 2.)) * coverB;
-  vec3 c = mix(uCol2, uCol, 0.5 + 0.5 * n) * (0.85 + 0.3 * vUv.y) + uCol * rim * 0.6;
-  gl_FragColor = vec4(c, clamp(dens * uOp, 0., 1.));
+  float streak = snoise(vec3(p.x * 0.8 - uTime * 14., p.y * 90., 3.)) * 0.5 + 0.5;
+  vec2 gp = floor(vec2(p.x * 700. - uTime * 2600., p.y * 420.));
+  float gr = step(0.985, fract(sin(dot(gp, vec2(12.9898, 78.233))) * 43758.5453));
+  vec3 c = mix(uCol2, uCol, 0.35 + 0.45 * n + 0.35 * streak) * (0.8 + 0.35 * vUv.y) + uCol * rim * 0.8 + uCol * gr * 1.6;
+  gl_FragColor = vec4(c, clamp(dens * uOp * (0.8 + 0.2 * streak), 0., 1.));
 }`;
 
 export default {
@@ -714,9 +717,9 @@ export default {
     // ---------------- day phase (cycles; 0 sunrise, .25 noon, .5 sunset, .75 midnight)
     const ramp = (x, a, d) => { const u = clamp((x - a) / d); return d * (u * u * u - u * u * u * u / 2) + Math.max(0, x - a - d); };
     const t0 = 8.3, t1 = 20.4, du = 1.2, dd = 1.8;
-    const vmax = (7.242 + 0.4820 - 0.4700) / ((t1 - t0) - (du + dd) / 2);
+    const vmax = (7.242 + 0.4820 - 0.4935) / ((t1 - t0) - (du + dd) / 2);
     const integ = x => ramp(x, t0, du) - ramp(x, t1 - dd, dd);   // ∫ speed profile (unit height)
-    const phi = 0.4700 + vmax * integ(clamp(t, 0, 40)) + (t < t0 ? (t - 4) * 0.0012 : 0);
+    const phi = 0.4935 + vmax * integ(clamp(t, 0, 40)) + (t < t0 ? (t - 4) * 0.0005 : 0);
     const a = phi * Math.PI * 2;
     const lat = 0.54;
     const sun = new S.THREE.Vector3(Math.cos(a), Math.sin(a) * Math.cos(lat), -Math.sin(a) * Math.sin(lat)).normalize();
@@ -729,9 +732,9 @@ export default {
       [-0.05, [0.040, 0.034, 0.100], [0.300, 0.140, 0.140], [0, 0, 0]],
       [0.015, [0.100, 0.085, 0.210], [0.950, 0.400, 0.170], [2.0, 0.80, 0.28]],
       [0.09, [0.150, 0.150, 0.300], [1.050, 0.600, 0.320], [2.9, 1.50, 0.62]],
-      [0.17, [0.170, 0.190, 0.360], [1.050, 0.720, 0.420], [3.4, 2.10, 0.95]],
-      [0.32, [0.170, 0.250, 0.480], [0.640, 0.520, 0.390], [2.8, 2.25, 1.6]],
-      [1.00, [0.140, 0.250, 0.520], [0.560, 0.520, 0.450], [2.9, 2.5, 2.0]],
+      [0.17, [0.160, 0.170, 0.330], [0.850, 0.560, 0.300], [2.7, 1.75, 0.85]],
+      [0.32, [0.150, 0.190, 0.360], [0.560, 0.420, 0.250], [2.2, 1.65, 1.0]],
+      [1.00, [0.130, 0.190, 0.380], [0.500, 0.390, 0.250], [2.2, 1.75, 1.15]],
     ];
     const pal = i => { let k = 0; while (k < K.length - 2 && e > K[k + 1][0]) k++; const u = clamp((e - K[k][0]) / (K[k + 1][0] - K[k][0])); const s = u * u * (3 - 2 * u); return K[k][i].map((v, j) => lerp(v, K[k + 1][i][j], s)); };
     const zen = pal(1), hor = pal(2), sunc = pal(3);
@@ -785,11 +788,11 @@ export default {
 
     // ---------------- camera (orbit parameters around the platform centre)
     const deg = Math.PI / 180;
-    const az = track([[0, -58], [8, -63], [17, -92], [20, -97], [23.6, -93], [25.6, -82], [28, -64], [31, -58]], t) * deg;
-    const dist = track([[0, 585], [8, 545], [14, 400], [17, 230], [20, 118], [23.6, 104], [25.6, 300], [28, 560], [31, 600]], t);
-    const hgt = track([[0, 830], [8, 775], [14, 200], [17, 75], [20, 47], [23.6, 45], [25.6, 190], [28, 800], [31, 850]], t);
-    const tgt = track([[0, [0, 0, -10]], [8, [0, 0, -10]], [14, [0, 14, 0]], [17, [0, 36, 10]], [20, [0, 62, 60]], [23.6, [0, 66, 66]], [25.6, [0, 12, 10]], [28, [0, 0, -10]], [31, [0, 0, -10]]], t);
-    const fov = track([[0, 31], [8, 30], [17, 34], [20, 38], [23.6, 39], [25.6, 34], [28, 31]], t);
+    const az = track([[0, 6], [8, -4], [13, -55], [17, -92], [20, -97], [23.6, -93], [25.6, -82], [28, -64], [31, -58]], t) * deg;
+    const dist = track([[0, 1500], [8, 1330], [14, 400], [17, 230], [20, 118], [23.6, 104], [25.6, 300], [28, 560], [31, 600]], t);
+    const hgt = track([[0, 330], [8, 300], [14, 200], [17, 75], [20, 47], [23.6, 45], [25.6, 190], [28, 800], [31, 850]], t);
+    const tgt = track([[0, [-760, 0, -60]], [8, [-640, 0, 60]], [14, [0, 14, 0]], [17, [0, 36, 10]], [20, [0, 62, 60]], [23.6, [0, 66, 66]], [25.6, [0, 12, 10]], [28, [0, 0, -10]], [31, [0, 0, -10]]], t);
+    const fov = track([[0, 30], [8, 30], [17, 34], [20, 38], [23.6, 39], [25.6, 34], [28, 31]], t);
     camera.position.set(Math.cos(az) * dist, hgt, Math.sin(az) * dist);
     camera.lookAt(tgt[0], tgt[1], tgt[2]);
     camera.fov = fov; camera.updateProjectionMatrix();
@@ -812,9 +815,9 @@ export default {
     V.uBack.value = track([[0, -0.25], [1.7, 1.35]], t, 'inOutSine');
     V.uFront.value = track([[0, -1], [28.7, -0.35], [30.0, 1.4]], t, 'inQuad');
     V.uOp.value = t < 2 ? 1 : t > 28.6 ? 1 : 0;
-    const veilCol = t < 5 ? [0.40, 0.29, 0.19] : [0.20, 0.21, 0.25];
+    const veilCol = t < 5 ? [0.40, 0.29, 0.19] : [0.62, 0.42, 0.22];
     V.uCol.value.fromArray(veilCol);
-    V.uCol2.value.fromArray(veilCol.map(x => x * 0.45));
+    V.uCol2.value.fromArray(veilCol.map(x => x * 0.35));
   },
 
   draw(S, r, target, t) {

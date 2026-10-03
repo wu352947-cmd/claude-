@@ -575,7 +575,7 @@ export default {
     return {
       exposure: (t < CUT ? 1.15 : 1.6) + pulse * 0.35,
       contrast: 1.06,
-      saturation: 1.1,
+      saturation: t < CUT ? 1.1 : 0.88,
       tint: [0.97, 0.99, 1.05],
       lift: [0.002, 0.003, 0.008],
       gamma: [1.0, 1.0, 1.02],

@@ -9,6 +9,9 @@ import * as util from './util.js';
 import * as text from './text.js';
 import { Overlay } from './overlay.js';
 
+// Global grain trim: the delivery encode is ~2.6 Mbps, and grain is what bitrate starvation turns to mush.
+const GRAIN_SCALE = 0.65;
+
 export const DEFAULT_GRADE = {
   exposure: 1.0,
   contrast: 1.0,
@@ -190,7 +193,7 @@ export class Film {
     u.tDiffuse.value = src.texture;
     u.exposure.value = grade.exposure; u.contrast.value = grade.contrast; u.saturation.value = grade.saturation;
     u.tint.value.fromArray(grade.tint); u.lift.value.fromArray(grade.lift); u.gamma.value.fromArray(grade.gamma); u.gain.value.fromArray(grade.gain);
-    u.vignette.value = grade.vignette; u.grain.value = grade.grain; u.aberration.value = grade.aberration;
+    u.vignette.value = grade.vignette; u.grain.value = grade.grain * GRAIN_SCALE; u.aberration.value = grade.aberration;
     u.black.value = track(MASTER.black, t); u.white.value = track(MASTER.white, t);
     u.frame.value = frameIndex;
     r.setRenderTarget(null);

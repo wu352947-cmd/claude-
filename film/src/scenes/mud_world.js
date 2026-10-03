@@ -41,15 +41,17 @@ export function Hzig(x, z) {
 }
 
 function duneH(x, z) {
-  // wind from the west (−x): long windward slope, steeper lee to the east
-  const cx = 12, cz = -6;
-  const dx = x - cx, dz = z - cz;
-  const rx = dx < 0 ? 128 : 92, rz = 98;
-  const q = (dx / rx) ** 2 + (dz / rz) ** 2;
-  let h = q < 1 ? 27 * Math.pow(1 - q, 1.6) : 0;
-  const n = fbm3(x * 0.012, z * 0.012, 3.1, 4);
-  h += (q < 1.3 ? (1 - smoothstep(0.6, 1.3, q)) : 0) * (n * 6 + 2.5 * Math.sin((x * 0.9 + z * 0.35) * 0.09 + n * 3));
-  // fade to zero at region edges
+  // crescent dune, wind from the west (−x): long windward ramp, crisp crest, steep lee slip face
+  const cz = -6, rz = 108, dz = (z - cz) / rz;
+  const lat = Math.max(0, 1 - dz * dz);
+  if (lat <= 0) return 0;
+  const crestX = 22 - 38 * dz * dz + 4 * Math.sin(z * 0.03);
+  const Hc = 30 * Math.pow(lat, 0.7);
+  const wind = Hc * Math.max(0, (x - (crestX - 135)) / 135);
+  const lee = Hc - Math.max(0, x - crestX) * 0.78;
+  let h = Math.max(0, Math.min(wind, lee));
+  const n = fbm3(x * 0.02, z * 0.02, 3.1, 3);
+  h += h > 0.5 ? n * 1.6 + 0.35 * Math.sin((x * 0.9 + z * 0.3) * 0.5) * Math.min(1, h / 6) : 0;
   const ex = Math.min(x - HF.x0, HF.x0 + HF.sx - x), ez = Math.min(z - HF.z0, HF.z0 + HF.sz - z);
   return Math.max(0, h) * smoothstep(0, 18, Math.min(ex, ez));
 }

@@ -120,17 +120,17 @@ function compose(M) {
 
   // ---------- buses
   const BUS = {
-    typing: () => M.bus('typing', { send: { room: 0.5, hall: 0.1 } }),
-    drone: () => M.bus('drone', { send: { hall: 0.35, cathedral: M.g0 >= 93 && M.g0 < 146 ? 0.15 : 0.08 } }),
+    typing: () => M.bus('typing', { eq: [['peaking', 3500, 0.8, 4]], send: { room: 0.5, hall: 0.1 } }),
+    drone: () => M.bus('drone', { eq: [['lowshelf', 70, 0.7, -6], ['peaking', 190, 0.8, -3]], send: { hall: 0.35, cathedral: M.g0 >= 93 && M.g0 < 146 ? 0.15 : 0.08 } }),
     murmur: () => M.bus('murmur', { send: { hall: 0.55, desert: 0.3 }, dry: 0.6 }),
-    choir: () => M.bus('choir', { send: { hall: 0.55, cathedral: M.g0 > 90 ? 0.35 : 0.1, desert: 0.15 }, dry: 0.75 }),
-    bells: () => M.bus('bells', { send: { hall: 0.45, cathedral: 0.25 }, dry: 0.85 }),
-    big: () => M.bus('big', { send: { hall: 0.3, cathedral: 0.55 }, dry: 0.9 }),
+    choir: () => M.bus('choir', { eq: [['peaking', 220, 0.8, -2.5], ['peaking', 3000, 0.7, 3.5]], send: { hall: 0.55, cathedral: M.g0 > 90 ? 0.35 : 0.1, desert: 0.15 }, dry: 0.75 }),
+    bells: () => M.bus('bells', { eq: [['peaking', 3200, 0.7, 3.5]], send: { hall: 0.45, cathedral: 0.25 }, dry: 0.85 }),
+    big: () => M.bus('big', { eq: [['peaking', 200, 0.8, -2], ['peaking', 3000, 0.8, 2]], send: { hall: 0.3, cathedral: 0.55 }, dry: 0.9 }),
     sfx: () => M.bus('sfx', { send: { hall: 0.15, desert: 0.25 } }),
-    amb: () => M.bus('amb', { send: { desert: 0.15, hall: 0.05 } }),
-    labour: () => M.bus('labour', { send: { desert: 0.35, hall: 0.18 } }),
-    strings: () => M.bus('strings', { send: { hall: 0.45, cathedral: 0.1 }, dry: 0.85 }),
-    organ: () => M.bus('organ', { send: { cathedral: 0.7, hall: 0.2 }, dry: 0.7 }),
+    amb: () => M.bus('amb', { eq: [['lowshelf', 80, 0.7, -5]], send: { desert: 0.15, hall: 0.05 } }),
+    labour: () => M.bus('labour', { eq: [['peaking', 200, 0.9, -3.5], ['peaking', 3500, 0.8, 2]], send: { desert: 0.35, hall: 0.18 } }),
+    strings: () => M.bus('strings', { eq: [['lowshelf', 80, 0.7, -4], ['peaking', 220, 0.8, -3]], send: { hall: 0.45, cathedral: 0.1 }, dry: 0.85 }),
+    organ: () => M.bus('organ', { eq: [['lowshelf', 70, 0.7, -6], ['peaking', 200, 0.8, -3]], send: { cathedral: 0.7, hall: 0.2 }, dry: 0.7 }),
     sub: () => M.bus('sub', { send: {} }),
     arp: () => { if (!M._arp) M._arp = delayBus(M, M.bus('arpOut', { send: { hall: 0.35 } }), 0.375 * 0.75, 0.38, 0.45); return M._arp; },
   };
@@ -150,8 +150,8 @@ function compose(M) {
       if (n === 'D') at(s, () => {   // sub-octave hum
         const o = osc(M, 'sine', f / 2, s, e + 0.1);
         const g = gain(M, 0);
-        curve(M, g.gain, s, e, x => ampFn(x) * 0.8, 20);
-        o.connect(g).connect(M.bus('sub', { send: {} }));
+        curve(M, g.gain, s, e, x => ampFn(x) * 0.4, 20);
+        o.connect(g).connect(M.bus('hum', {}));
       });
     }
   }
@@ -280,7 +280,7 @@ function compose(M) {
   });
 
   // ---------- FIRE 81.5 – 94.5
-  at(82, () => A.sea(M, M.bus('sea', { send: { hall: 0.12 } }), 82, 93.6, [[82, 0], [83.8, 0.22], [90, 0.26], [90.5, 0.3], [92.4, 0.14], [93.5, 0]], { seed: 'pharos' }));
+  at(82, () => A.sea(M, M.bus('sea', { eq: [['lowshelf', 90, 0.7, -5]], send: { hall: 0.12 } }), 82, 93.6, [[82, 0], [83.8, 0.22], [90, 0.26], [90.5, 0.3], [92.4, 0.14], [93.5, 0]], { seed: 'pharos' }));
   at(83, () => {
     const parts = [[38, -0.5], [45, 0.5], [50, -0.2], [54, 0.25], [57, 0]];
     parts.forEach(([m, p], k) => {
@@ -382,7 +382,7 @@ function compose(M) {
 
   // ---------- SKY 153.5 – 176.5
   at(SKY0, () => I.riser(M, BUS.sfx(), SKY0, HITS.liftoff, { amp: 0.08, f0: 120, f1: 900, pitch: null, seed: 'revswell', release: 0.8 }));
-  at(154.4, () => A.rocket(M, M.bus('rocket', { send: { hall: 0.25 } }), 154.4, 169,
+  at(154.4, () => A.rocket(M, M.bus('rocket', { eq: [['lowshelf', 70, 0.7, -5]], send: { hall: 0.25 } }), 154.4, 169,
     [[154.4, 0], [156.2, 0.05], [157, 0.22], [159, 0.25], [161, 0.21], [163, 0.11], [166, 0.03], [169, 0]],
     [[154.4, 250], [157, 1100], [159, 900], [162, 350], [165, 130], [169, 70]]));
   at(HITS.liftoff, () => {
@@ -487,19 +487,19 @@ function compose(M) {
     I.droneVoice(M, BUS.drone(), g0, g1, hz('D2'), lvl, { seed: 'hum', bright: 3 });
     I.droneVoice(M, BUS.drone(), g0, g1, hz('A2'), x => lvl(x) * 0.35, { seed: 'hum5', bright: 3 });
     const o = osc(M, 'sine', hz('D1'), g0, g1 + 0.1); const g = gain(M, 0);
-    curve(M, g.gain, g0, g1, x => lvl(x) * 1.0, 20); o.connect(g).connect(M.bus('sub', {}));
+    curve(M, g.gain, g0, g1, x => lvl(x) * 0.5, 20); o.connect(g).connect(M.bus('hum', {}));
     A.textStream(M, M.bus('text', { send: { hall: 0.5 } }), g0 + 0.2, 227, [[216, 0], [217.5, 22], [222, 30], [225.5, 10], [227, 0]], { amp: 0.018 });
   });
   typing(TYPING_EPILOGUE, 'typeE');
 
   // ---------- CODA 237.6 – 260
-  at(HITS.lowBellD, () => I.bell(M, M.bus('lowbell', { send: { hall: 0.5, cathedral: 0.45 }, dry: 0.9 }), HITS.lowBellD, hz('D3'), { kind: 'church', dur: 24, amp: 0.15, bright: 0.7, strike: 0.2, seed: 'lowD' }));
+  at(HITS.lowBellD, () => I.bell(M, M.bus('lowbell', { eq: [['lowshelf', 55, 0.7, -4]], send: { hall: 0.5, cathedral: 0.45 }, dry: 0.9 }), HITS.lowBellD, hz('D3'), { kind: 'church', dur: 24, amp: 0.15, bright: 0.7, strike: 0.2, seed: 'lowD' }));
   at(240.5, () => {
     // the many tongues return, then converge one by one on a single D-major chord
     const bus = gain(M, 0);
     ramp(M, bus.gain, [[240.5, 0], [244, 1], [258.3, 1], [259.85, 0]]);
     const lp = biquad(M, 'lowpass', 5000, 0.5);
-    bus.connect(lp).connect(M.bus('coda', { send: { hall: 0.6, cathedral: 0.25 }, dry: 0.8 }));
+    bus.connect(lp).connect(M.bus('coda', { eq: [['peaking', 220, 0.8, -2], ['peaking', 3000, 0.7, 3]], send: { hall: 0.6, cathedral: 0.25 }, dry: 0.8 }));
     const targets = [[50, 'm'], [69, 'f'], [57, 'm'], [62, 'f'], [54, 'm'], [66, 'f'], [45, 'm'], [74, 'f'], [50, 'm'], [62, 'f'], [57, 'm'], [69, 'f']];
     targets.forEach(([m, sex], i) => {
       const r = R('coda' + i);
