@@ -31,7 +31,7 @@ const run = args => execFileSync('ffmpeg', ['-y', '-hide_banner', '-loglevel', '
 
 if (master) {
   const m = out.replace(/\.mp4$/, '.master.mp4');
-  run([...inputs, ...common, '-crf', '16', ...audioArgs, '-movflags', '+faststart', m]);
+  run([...inputs, ...common, '-crf', '14', '-preset', 'slow', ...audioArgs.map(a => a === '192k' ? '320k' : a), '-movflags', '+faststart', m]);
   console.log('wrote', m);
 } else {
   const audioKbps = hasAudio ? 192 : 0;
