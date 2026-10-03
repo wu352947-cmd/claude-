@@ -1,0 +1,19 @@
+<!doctype html><html><head><script type="importmap">{"imports":{"three":"../lib/three.module.min.js","three/addons/":"../lib/addons/"}}</script></head>
+<body style="margin:0"><script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {CharacterModel} from '../js/character.js';
+const q=new URLSearchParams(location.search);
+const L=new GLTFLoader();const assets={models:{}};
+assets.models.soldier=await L.loadAsync('../assets/models/soldier.glb');
+const W=q.get('w')||'ak47';assets.models['w_'+W]=await L.loadAsync('../assets/models/w_'+W+'.glb');
+const r=new THREE.WebGLRenderer({antialias:true});r.setSize(1200,600);document.body.appendChild(r.domElement);
+const s=new THREE.Scene();s.background=new THREE.Color(0x9ab);s.add(new THREE.HemisphereLight(0xffffff,0x665544,2.5));const d=new THREE.DirectionalLight(0xffffff,2);d.position.set(3,5,4);s.add(d);
+s.add(new THREE.AxesHelper(1));
+const ch=new CharacterModel(assets,'T',s);ch.setWeapon(assets,W);
+const yaw=+(q.get('yaw')||0), pitch=+(q.get('p')||0), cr=+(q.get('c')||0);
+for(let f=0;f<10;f++)ch.update(1/30,new THREE.Vector3(),yaw,pitch,+(q.get('spd')||0),cr,false,false);
+const views=[[2.2,1.5,-2.2],[0,1.4,-2.6],[2.6,1.4,0],[0.01,4,0]];
+r.setScissorTest(true);
+views.forEach((p,i)=>{const cam=new THREE.PerspectiveCamera(35,1,0.1,50);cam.position.set(...p);cam.lookAt(0,1.1,0);r.setViewport(i*300,150,300,300);r.setScissor(i*300,150,300,300);r.render(s,cam);});
+document.title='done';
+</script></body></html>

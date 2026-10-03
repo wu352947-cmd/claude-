@@ -1,0 +1,18 @@
+<!doctype html><html><head><script type="importmap">{"imports":{"three":"../lib/three.module.min.js","three/addons/":"../lib/addons/"}}</script></head>
+<body><script type="module">
+import * as THREE from 'three';import {GLTFLoader} from 'three/addons/loaders/GLTFLoader.js';
+import {CharacterModel} from '../js/character.js';
+const L=new GLTFLoader();const assets={models:{}};
+assets.models.soldier=await L.loadAsync('../assets/models/soldier.glb');
+assets.models.w_ak47=await L.loadAsync('../assets/models/w_ak47.glb');
+const s=new THREE.Scene();const ch=new CharacterModel(assets,'T',s);ch.setWeapon(assets,'ak47');
+const P=v=>v.toArray().map(x=>x.toFixed(2)).join(',');
+for(const yaw of [-Math.PI/2, Math.PI]){
+for(let f=0;f<5;f++)ch.update(1/30,new THREE.Vector3(),yaw,0,0,0,false,false);
+const B=ch.bones;const w=n=>B[n].getWorldPosition(new THREE.Vector3());
+const gm=ch.gun.matrixWorld;const len=ch.gun.userData.len;
+console.log('yaw',yaw.toFixed(2),'Lsh',P(w('LeftArm')),'Lel',P(w('LeftForeArm')),'Lhand',P(w('LeftHand')),'Rhand',P(w('RightHand')),'fore',P(new THREE.Vector3(0,-0.03,-len*0.62).applyMatrix4(gm)),'grip',P(new THREE.Vector3(0,-0.06,-len*0.3).applyMatrix4(gm)),'len',len.toFixed(2));
+console.log('bones', Object.keys(B).join(' '));
+}
+document.title='done';
+</script></body></html>

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0e1013">
+<title>反恐行动：沙城</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="stylesheet" href="css/style.css">
+<script type="importmap">{"imports":{"three":"./lib/three.module.min.js","three/addons/":"./lib/addons/"}}</script>
+</head>
+<body>
+<canvas id="game-canvas"></canvas>
+
+<!-- loading -->
+<div id="loading">
+  <div class="ld-logo"><span class="ld-a">反恐行动</span><span class="ld-b">COUNTER STRIKE · DUST</span></div>
+  <div class="ld-bar"><i id="ld-fill"></i></div>
+  <div id="ld-text">正在加载资源…</div>
+  <div class="ld-tip" id="ld-tip"></div>
+</div>
+
+<!-- rotate hint -->
+<div id="rotate"><div class="rot-phone"></div><p>请将手机横屏以获得最佳体验</p></div>
+
+<!-- lobby -->
+<div id="lobby" class="hidden">
+  <div class="lb-top">
+    <div class="lb-profile">
+      <div class="rankbadge" id="lb-rank"></div>
+      <div><div id="lb-name" class="lb-name"></div><div class="lb-lv"><span id="lb-level"></span><i><b id="lb-xp"></b></i></div></div>
+    </div>
+    <div class="lb-currency"><span class="coin"></span><b id="lb-coins">0</b></div>
+    <div class="lb-icons"><button class="iconbtn" data-panel="settings" title="设置">⚙</button></div>
+  </div>
+  <div class="lb-left">
+    <button class="lb-menu" data-panel="inventory"><b>仓库</b><small>武器皮肤 · 装备</small></button>
+    <button class="lb-menu" data-panel="cases"><b>武器箱</b><small>开启获取稀有皮肤</small></button>
+    <button class="lb-menu" data-panel="stats"><b>战绩</b><small>生涯数据</small></button>
+    <button class="lb-menu" data-panel="help"><b>操作说明</b><small>新手指南</small></button>
+  </div>
+  <div class="lb-right">
+    <div class="modes">
+      <button class="mode active" data-mode="defuse"><b>爆破模式</b><small>5v5 · 先赢 8 回合 · 经济系统</small></button>
+      <button class="mode" data-mode="tdm"><b>团队竞技</b><small>5v5 · 即时重生 · 50 击杀</small></button>
+    </div>
+    <div class="opts">
+      <div class="seg" id="seg-team"><span>阵营</span><button data-v="T">恐怖分子</button><button data-v="CT" class="on">反恐精英</button><button data-v="R">随机</button></div>
+      <div class="seg" id="seg-diff"><span>人机难度</span><button data-v="normal">普通</button><button data-v="hard" class="on">困难</button><button data-v="expert">专家</button></div>
+    </div>
+    <button id="btn-start" class="btn-start">开始游戏<small>地图：沙城 Dust</small></button>
+  </div>
+  <div class="lb-map">MAP · 沙城 DUST II</div>
+</div>
+
+<!-- lobby panels -->
+<div id="panel" class="hidden"><div class="pn-box"><div class="pn-head"><h2 id="pn-title"></h2><button class="pn-close">✕</button></div><div id="pn-body"></div></div></div>
+
+<!-- case opening -->
+<div id="caseopen" class="hidden">
+  <div class="co-strip-wrap"><div class="co-marker"></div><div id="co-strip"></div></div>
+  <div id="co-result"></div>
+</div>
+
+<!-- HUD -->
+<div id="hud" class="hidden">
+  <div id="topbar">
+    <div class="tb-side t"><div id="alive-t" class="pips"></div><b id="score-t">0</b></div>
+    <div class="tb-mid"><div id="timer">1:55</div><div id="bombicon"></div><div id="roundno"></div></div>
+    <div class="tb-side ct"><b id="score-ct">0</b><div id="alive-ct" class="pips"></div></div>
+  </div>
+  <div id="radarbox"><canvas id="radar" width="168" height="168"></canvas><div id="zone"></div></div>
+  <div id="fps"></div>
+  <div id="killfeed"></div>
+  <div id="radiolog"></div>
+  <div id="crosshair"><i id="ch-t"></i><i id="ch-b"></i><i id="ch-l"></i><i id="ch-r"></i><i class="dot"></i></div>
+  <div id="hitmarker"><i></i><i></i><i></i><i></i></div>
+  <div id="dmgdirs"></div>
+  <div id="scope"><div class="sc-ring"></div><i class="sc-h"></i><i class="sc-v"></i></div>
+  <div id="hurt"></div>
+  <div id="flashov"></div>
+  <div id="center"></div>
+  <div id="toast"></div>
+  <div id="killbanner"></div>
+  <div id="freeze"></div>
+  <div id="progress"><span></span><b><i></i></b></div>
+  <div id="bombplanted"></div>
+  <div id="roundend"></div>
+  <div id="deathinfo"></div>
+  <div id="spectate"></div>
+  <div id="respawn"></div>
+  <div id="status">
+    <div class="st-hp"><span class="ic-hp">✚</span><b id="hp">100</b><div class="hpbar"><i id="hpbar"></i></div></div>
+    <div class="st-ar"><span class="ic-ar" id="helm">⛨</span><b id="armor">0</b></div>
+    <div class="st-money" id="money">$800</div>
+  </div>
+  <div id="ammobox"><div id="wname"></div><div><b id="ammo">30</b><span id="reserve">/ 90</span></div><div id="reloadhint">换弹中…</div></div>
+  <div id="buymenu"><div class="bm-head"><b>购买</b><span id="buymoney"></span><span id="buytime"></span><button class="bm-close" data-close>✕</button></div><div id="buymenu-items"></div></div>
+  <div id="scoreboard"></div>
+</div>
+
+<!-- touch controls -->
+<div id="touch" class="hidden">
+  <div id="stick"><div id="knob"></div></div>
+  <div class="tc-hint">左侧拖动移动 · 右侧滑动瞄准</div>
+  <button class="tbtn fire" data-act="fire"><span>开火</span></button>
+  <button class="tbtn fire2" data-act="fire" id="btn-fire-left"><span>开火</span></button>
+  <button class="tbtn scope" data-act="scope">瞄准</button>
+  <button class="tbtn jump" data-act="jump">跳</button>
+  <button class="tbtn crouch" data-act="crouch">蹲</button>
+  <button class="tbtn reload" data-act="reload">换弹</button>
+  <button class="tbtn walk" data-act="walk">静步</button>
+  <button class="tbtn inspect" data-act="inspect">检视</button>
+  <button class="tbtn use" id="btn-use" data-act="use">安放</button>
+  <button class="tbtn pick" id="btn-pick" data-act="pick">拾取</button>
+  <button class="tbtn buy" id="btn-buy" data-act="buy">购买</button>
+  <button class="tbtn score" data-act="score">☰</button>
+  <button class="tbtn menu" data-act="menu">❚❚</button>
+  <div id="slots">
+    <button class="slot" id="slot-primary" data-act="slot" data-slot="primary"></button>
+    <button class="slot" id="slot-secondary" data-act="slot" data-slot="secondary"></button>
+    <button class="slot" id="slot-knife" data-act="slot" data-slot="knife"></button>
+    <button class="slot" id="slot-grenade" data-act="slot" data-slot="grenade"></button>
+    <button class="slot" id="slot-c4" data-act="slot" data-slot="c4"></button>
+  </div>
+</div>
+
+<div id="pause" class="hidden"><div class="pa-box"><h2>暂停</h2><button class="btn primary" id="pa-resume">继续游戏</button><button class="btn" id="pa-settings">设置</button><button class="btn danger" id="pa-quit">退出到大厅</button></div></div>
+<div id="matchover"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
