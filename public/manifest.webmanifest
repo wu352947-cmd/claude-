@@ -1,0 +1,2 @@
+{ "name": "拾光手帐", "short_name": "拾光手帐", "start_url": "/app/", "display": "standalone", "background_color": "#EEF1EC", "theme_color": "#EEF1EC", "lang": "zh-CN",
+  "icons": [{ "src": "/assets/favicon.svg", "sizes": "any", "type": "image/svg+xml" }] }

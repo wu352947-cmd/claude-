@@ -6,9 +6,10 @@
 </head>
 <body>
 <title>拾光手帐</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Klee+One:wght@400;600&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;600&family=ZCOOL+XiaoWei&display=swap">
+<link rel="stylesheet" href="/fonts/fonts.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="description" content="拾光手帐：日系与中式审美的个人手帐。每天一页，节气为序，月亮回信。">
 <style>
 /* Layout: 一本摊开的方眼手帐 —— 竖排书法标题 + 圆窗月景，下面是贴着和纸胶带的便笺、节气罗盘、可拖动的拾物板、翻转诗笺与夜里的心愿灯。 */
 :root{
@@ -604,6 +605,9 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
   *,*::before,*::after{animation-duration:.01ms!important; animation-iteration-count:1!important; transition-duration:.01ms!important}
   #petals,.cursor{display:none}
 }
+.nav-cta{margin-left:6px;padding:7px 16px;border-radius:18px;background:var(--ink);color:var(--paper);text-decoration:none;font-family:var(--f-display);font-size:14px;letter-spacing:.12em;white-space:nowrap;transition:transform .4s var(--spring)}
+.nav-cta:hover{transform:translateY(-2px)}
+@media (max-width:760px){.nav-cta{margin-left:auto}.theme-btn{margin-left:0}}
 </style>
 
 <!-- shared vector defs: 纹样 / 印章 -->
@@ -649,6 +653,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
       <li><a href="#scroll">画卷</a></li>
       <li><a href="#wish">心愿</a></li>
     </ul>
+    <a class="nav-cta" href="/app/">登录 · 开始写</a>
     <button class="theme-btn" id="themeBtn" aria-label="切换日夜">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path id="themeIcon" d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></svg>
     </button>
@@ -667,7 +672,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
           <p class="kana-line ink-in" style="animation-delay:.85s">きょうも、いい日でありますように。</p>
           <div class="moon-chip ink-in" style="animation-delay:1s"><svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="16" fill="var(--moon-dark)" stroke="var(--line)"/><path id="moonMini" fill="var(--gold)"/></svg><span id="moonTxt">今夜月相</span></div>
           <div class="hero-cta ink-in" style="animation-delay:1.15s">
-            <a class="btn ink" href="#today">翻开今天 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h15M14 6l6 6-6 6"/></svg></a>
+            <a class="btn ink" href="/app/#/register">开始写我的手帐 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 12h15M14 6l6 6-6 6"/></svg></a>
             <a class="btn soft" href="#jieqi">看看节气</a>
           </div>
         </div>
@@ -760,7 +765,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
         <div>
           <div class="eyebrow">きょうのページ</div>
           <h2 class="sec-title">今日 · 小记<svg class="ul" viewBox="0 0 300 18" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12C60 4 120 15 180 8S270 6 296 10"/></svg></h2>
-          <p class="sec-sub">心情、待办、喝水和打卡，记在这一页。内容只保存在你自己的浏览器里。</p>
+          <p class="sec-sub">这是试玩页，内容只存在这台设备的浏览器里。<a href="/app/#/register">新建一本手帐</a>，就能每天一页、云端同步、请月亮回信。</p>
         </div>
         <svg class="postmark rv" viewBox="0 0 120 120" aria-hidden="true">
           <defs><path id="pmArc" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1 -88 0"/></defs>
@@ -1056,7 +1061,7 @@ footer .seal-rd{width:44px; height:44px; border-radius:50%; display:grid; place-
     <p class="bigbrush" aria-hidden="true">拾光</p>
     <p class="line">日子一页一页翻过去，愿每一页都有一点光。</p>
     <div class="seal-row" aria-hidden="true"><span class="seal-sq">月</span><span class="seal-rd">安</span></div>
-    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、四季风物、诗笺小景、心愿灯星空、抹茶拿铁与红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><span id="footYear">二〇二六</span> · 秋</p>
+    <p class="credit">插画、纹样与印章为手绘矢量；圆窗晨雾与湖景、四季风物、诗笺小景、心愿灯星空、抹茶拿铁与红叶摄影来自 <a href="https://www.pexels.com" target="_blank" rel="noopener">Pexels</a>（Pexels License）；画卷为北宋王希孟《千里江山图》局部，公有领域，取自 <a href="https://commons.wikimedia.org/wiki/Category:A_Thousand_Li_of_Rivers_and_Mountains" target="_blank" rel="noopener">Wikimedia Commons</a>。诗句出自松尾芭蕉、小林一茶、杜牧与王维；节气三候依《逸周书·时训解》。<br><a href="/privacy.html">隐私政策</a> · <a href="/terms.html">用户协议</a> · 心里难受时可拨打心理援助热线 12356 %%ICP%%<br><span id="footYear">二〇二六</span> · 秋</p>
   </div>
 </footer>
 

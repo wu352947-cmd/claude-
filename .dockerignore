@@ -1,0 +1,9 @@
+node_modules
+data
+.git
+.env
+*.png
+!public/**/*.png
+test
+tools
+src

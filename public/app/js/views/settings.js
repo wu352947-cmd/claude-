@@ -1,0 +1,49 @@
+// 设置：昵称、外观、安静模式、导出、注销
+import { api } from '../api.js';
+import { h, esc, toast, modal, confirmBox } from '../ui.js';
+import { state, applyPrefs } from '../main.js';
+
+export function settingsView(root) {
+  const u = state.user, s = u.settings || {};
+  root.innerHTML = `<div class="wrap view-in"><p class="h-eyebrow">せってい</p><h1 class="h-title">设置</h1>
+  <div class="settings" style="margin-top:24px">
+    <section class="paper set-row"><div><h4>昵称</h4><p>月亮回信时会这样称呼你</p></div>
+      <form id="nickF" style="display:flex;gap:8px;align-items:center"><div class="field"><label class="sr" for="nick">昵称</label><input id="nick" maxlength="20" value="${esc(u.nickname)}"></div><button class="btn small">保存</button></form></section>
+    <section class="paper set-row"><div><h4>纸张颜色</h4><p>跟随系统，或固定为日间 / 夜间</p></div>
+      <div class="seg" id="theme">${[['auto', '跟随系统'], ['light', '日'], ['dark', '夜']].map(([k, n]) => `<button type="button" data-v="${k}" class="${(s.theme || 'auto') === k ? 'on' : ''}">${n}</button>`).join('')}</div></section>
+    <section class="paper set-row"><div><h4>安静模式</h4><p>关掉飘落物和大部分动画，只留下纸和字</p></div>
+      <div class="seg" id="quiet"><button type="button" data-v="0" class="${s.quiet ? '' : 'on'}">关</button><button type="button" data-v="1" class="${s.quiet ? 'on' : ''}">开</button></div></section>
+    <section class="paper set-row"><div><h4>导出我的手帐</h4><p>下载全部文字、心情、贴纸布局与信件（JSON）</p></div><button class="btn small" id="exp">导出</button></section>
+    <section class="paper set-row"><div><h4>月亮回信</h4><p>${state.config.ai ? `已开启 · 每天最多 ${state.config.aiDaily} 封 · 回信由 AI 生成` : '尚未开启'}</p></div></section>
+    <section class="paper set-row"><div><h4>账号</h4><p>${esc(u.username)} · ${new Date(u.createdAt).getFullYear()} 年加入</p></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn small" id="logout">退出登录</button><button class="btn small danger" id="del">注销账号</button></div></section>
+    <p class="muted" style="font-size:13px"><a href="/privacy.html">隐私政策</a> · <a href="/terms.html">用户协议</a> · 心里难受时可拨打全国统一心理援助热线 12356</p>
+  </div></div>`;
+  const save = async patch => { try { const r = await api.updateMe(patch); state.user = r.user; applyPrefs(); return true; } catch (e) { toast(e.message); return false; } };
+  root.querySelector('#nickF').addEventListener('submit', async e => { e.preventDefault(); if (await save({ nickname: root.querySelector('#nick').value })) toast('好的，记住啦'); });
+  const seg = (id, fn) => root.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener('click', async () => {
+    root.querySelectorAll(`#${id} button`).forEach(x => x.classList.toggle('on', x === b)); await fn(b.dataset.v);
+  }));
+  seg('theme', v => save({ settings: { theme: v } }));
+  seg('quiet', v => save({ settings: { quiet: v === '1' } }));
+  root.querySelector('#exp').addEventListener('click', async () => {
+    try {
+      const data = await api.exportAll();
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }));
+      const a = h(`<a href="${url}" download="拾光手帐-${new Date().toISOString().slice(0, 10)}.json"></a>`); document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 5000); toast(`已导出 ${data.entries.length} 页手帐`);
+    } catch (e) { toast(e.message); }
+  });
+  root.querySelector('#logout').addEventListener('click', async () => { if (await confirmBox('要退出登录吗？', '手帐都安全地存在云端，下次登录就能看到。', '退出')) { await api.logout().catch(() => {}); location.hash = ''; location.reload(); } });
+  root.querySelector('#del').addEventListener('click', () => {
+    const m = modal(`<button class="x" data-close aria-label="关闭">×</button><h3 class="danger">注销账号</h3>
+      <p class="muted">账号、全部手帐、照片和信件都会被永久删除，无法恢复。建议先导出一份。</p>
+      <form style="display:grid;gap:12px"><div class="field"><label for="dp">输入密码确认</label><input id="dp" type="password" autocomplete="current-password" required></div><p class="err"></p>
+      <div class="row" style="margin-top:0"><button type="button" class="btn" data-close>再想想</button><button class="btn shu">永久注销</button></div></form>`);
+    m.el.querySelector('form').addEventListener('submit', async e => {
+      e.preventDefault();
+      try { await api.deleteMe(m.el.querySelector('#dp').value); location.href = '/'; }
+      catch (err) { m.el.querySelector('.err').textContent = err.message; }
+    });
+  });
+}
