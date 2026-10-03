@@ -81,7 +81,7 @@ export function clayThump(M, out, g, amp = 0.5, seed = 'clay') {
   const r = R(seed + g);
   const f0 = 120 + r() * 40;
   const o = osc(M, 'sine', f0, g, g + 0.6);
-  eramp(M, o.frequency, [[g, f0], [g + 0.08, 48 + r() * 8]]);
+  eramp(M, o.frequency, [[g, f0], [g + 0.08, 58 + r() * 8]]);
   const e = gain(M, 0); perc(M, e.gain, g, { a: 0.002, peak: amp, tau: 0.075 });
   o.connect(e).connect(out);
   // the slap
@@ -113,7 +113,7 @@ export function chisel(M, out, g, amp = 0.2, seed = 'chisel') {
 export function piston(M, out, g, amp = 0.5, seed = 'piston') {
   const r = R(seed + g);
   const o = osc(M, 'sine', 95, g, g + 0.6);
-  eramp(M, o.frequency, [[g, 95], [g + 0.06, 42]]);
+  eramp(M, o.frequency, [[g, 95], [g + 0.06, 56]]);
   const sh = shaper(M, 2.5);
   const e = gain(M, 0); perc(M, e.gain, g, { a: 0.001, peak: amp, tau: 0.09 });
   o.connect(sh).connect(e).connect(out);
@@ -173,7 +173,7 @@ export function blip(M, out, g, f, amp = 0.05, tau = 0.012) {
 // soft synthetic pulse kick for the data age
 export function softKick(M, out, g, amp = 0.4) {
   const o = osc(M, 'sine', 110, g, g + 0.7);
-  eramp(M, o.frequency, [[g, 110], [g + 0.09, 44]]);
+  eramp(M, o.frequency, [[g, 110], [g + 0.09, 54]]);
   const e = gain(M, 0); perc(M, e.gain, g, { a: 0.002, peak: amp, tau: 0.12 });
   o.connect(e).connect(out);
 }

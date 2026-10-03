@@ -90,7 +90,10 @@ void main(){
   sand = max(sand, smoothstep(0.62, 0.9, flow) * smoothstep(sf + 30., sf, P.y) * uFlow);
   float grain = hash12(floor(vec2(tx, P.y) * 9.)) * 0.12;
   float rip = sin(P.y * 7. + vnoise(vec2(tx, P.y) * 0.8) * 6. + uTime * 3.) * 0.5 + 0.5;
-  alb = mix(alb, vec3(0.50, 0.41, 0.30) * (0.65 + 0.45 * flow + grain + 0.12 * rip), sand);
+  float streams = smoothstep(0.3, 0.7, vnoise(vec2(tx * 0.3, P.y * 0.03 + uTime * 1.2)));
+  sand *= mix(1., streams, smoothstep(sf - 30., sf, P.y) * uFlow);
+  float sparkle = step(0.992, hash12(floor(vec2(tx * 30., P.y * 14. + uTime * 160.))));
+  alb = mix(alb, vec3(0.56, 0.44, 0.30) * (0.55 + 0.6 * flow + grain + 0.12 * rip + sparkle * 0.9), sand);
   Nb = normalize(mix(Nb, N + vec3((flow - 0.5) * 0.3, 0., 0.), sand));
   // lighting
   vec3 V = normalize(uCam - P);
@@ -101,6 +104,8 @@ void main(){
   vec3 c = alb * (uMoonCol * ndl + uAmb * (0.6 + 0.4 * Nb.y));
   c += uMoonCol * spec * (0.6 + 0.4 * hb);
   c += skyCol(reflect(-V, Nb)) * fr * 0.5 * (1. - sand);
+  float cap = uHoles * smoothstep(${(HP - 7).toFixed(1)}, ${(HP - 1).toFixed(1)}, P.y);
+  c += vec3(1.0, 0.9, 0.72) * cap * (0.35 + 1.4 * pow(max(dot(reflect(-V, N), uMoonDir), 0.), 6.));
   gl_FragColor = vec4(fog(c, P), 1.);
 }`;
 
@@ -176,16 +181,19 @@ const SKY_VS = /* glsl */`varying vec3 vDir; void main(){ vDir = position; vec4 
 const SKY_FS = /* glsl */`
 ${COMMON}
 ${GLSL.snoise}
-uniform vec3 uMWPole;
+uniform vec3 uMWPole, uNeb;
 varying vec3 vDir;
 void main(){
   vec3 d = normalize(vDir);
   vec3 c = skyCol(d);
   // faint winter Milky Way: a soft band around a great circle, mottled
   float b = dot(d, uMWPole);
-  float band = exp(-b * b * 14.);
+  float band = exp(-b * b * 40.);
   float n = snoise(d * 6.) * 0.5 + snoise(d * 15.) * 0.25 + 0.5;
-  c += vec3(0.020, 0.024, 0.036) * band * (0.4 + 0.8 * n) * smoothstep(0.0, 0.25, d.y);
+  float n2 = snoise(d * 40.) * 0.5 + 0.5;
+  c += vec3(0.012, 0.014, 0.020) * band * (0.3 + 0.6 * n + 0.5 * n2 * n) * smoothstep(0.0, 0.25, d.y);
+  float nd = 1. - dot(d, uNeb);
+  c += vec3(0.10, 0.045, 0.085) * exp(-nd / 0.000035) * (0.7 + 0.3 * n) + vec3(0.03, 0.02, 0.035) * exp(-nd / 0.00025);
   // moon disc
   c += vec3(1.6, 1.7, 1.85) * smoothstep(0.99990, 0.99994, dot(d, uMoonDir));
   gl_FragColor = vec4(c, 1.);
@@ -244,7 +252,7 @@ void main(){
   vec3 p = vec3(aS.x, 0., -${A.toFixed(2)}) + U * s + Nn * (0.2 + 1.8 * aS.w * age + sin(age * 6. + aS.x) * 0.2);
   vec4 mv = viewMatrix * vec4(p, 1.);
   vI = uI * smoothstep(0., 0.1, ph) * (1. - smoothstep(0.7, 1., ph)) * step(0., s);
-  vC = vec3(0.60, 0.62, 0.70);
+  vC = vec3(0.78, 0.66, 0.50);
   gl_PointSize = uPx * clamp(14. / -mv.z, 0.8, 5.);
   gl_Position = projectionMatrix * mv;
 }`;
@@ -301,7 +309,7 @@ export default {
 
     // ---------- sky
     const mwPole = new THREE.Vector3(-0.55, 0.35, 0.76).normalize();
-    const sky = new THREE.Mesh(new THREE.SphereGeometry(20000, 48, 24), mat(SKY_VS, SKY_FS, { uMWPole: { value: mwPole } }, { side: THREE.BackSide, depthWrite: false }));
+    const sky = new THREE.Mesh(new THREE.SphereGeometry(20000, 48, 24), mat(SKY_VS, SKY_FS, { uMWPole: { value: mwPole }, uNeb: { value: new THREE.Vector3(0, 1, 0) } }, { side: THREE.BackSide, depthWrite: false }));
     sky.renderOrder = 10; sky.frustumCulled = false;
     scene.add(sky);
 
@@ -373,7 +381,7 @@ export default {
       // N(<m) ∝ 10^(0.45 m) between m = 0.5 and 7.2
       const u = R(), m0 = 2.2, m1 = 7.4, k = 0.45 * Math.LN10;
       const m = Math.log(Math.exp(k * m0) + u * (Math.exp(k * m1) - Math.exp(k * m0))) / k;
-      const flux = Math.pow(10, -0.4 * (m - 1.5)) * 4.0 + 0.06;
+      const flux = Math.pow(10, -0.4 * (m - 1.5)) * 2.6 + 0.05;
       const bv = Math.min(1, Math.max(0, 0.35 + util.rng(i + 5)() * 0.0 + (R() - 0.45) * 0.7));
       sa.set([flux, bv, R(), 0], i * 4);
     }
@@ -386,14 +394,14 @@ export default {
     // Orion, built in a tangent frame around Alnilam's direction (set in update from the final framing)
     const og = new THREE.BufferGeometry();
     const op = new Float32Array(ORION.length * 3), oa = new Float32Array(ORION.length * 4);
-    ORION.forEach((s, i) => { oa.set([Math.pow(10, -0.4 * (s[2] - 1.5)) * 4.0 * (i < 3 ? 2.2 : 1.2), Math.min(1, Math.max(0, (s[3] + 0.3) / 2.1)), R(), 0], i * 4); });
+    ORION.forEach((s, i) => { oa.set([Math.pow(10, -0.4 * (s[2] - 1.5)) * 4.0 * (i < 3 ? 2.8 : i < 9 ? 3.0 : 1.0), Math.min(1, Math.max(0, (s[3] + 0.3) / 2.1)), R(), 0], i * 4); });
     og.setAttribute('position', new THREE.BufferAttribute(op, 3)); og.setAttribute('aS', new THREE.BufferAttribute(oa, 4));
     const orion = new THREE.Points(og, starMat); orion.frustumCulled = false; orion.renderOrder = 11;
     starGroup.add(orion);
     scene.add(starGroup);
 
     // ---------- sliding sand grains
-    const NG = 9000, gs = new Float32Array(NG * 4);
+    const NG = 22000, gs = new Float32Array(NG * 4);
     for (let i = 0; i < NG; i++) gs.set([(R() - 0.5) * 180, R(), R(), R()], i * 4);
     const gg = new THREE.BufferGeometry();
     gg.setAttribute('position', new THREE.BufferAttribute(new Float32Array(NG * 3), 3)); gg.setAttribute('aS', new THREE.BufferAttribute(gs, 4));
@@ -405,7 +413,7 @@ export default {
     // ---------- screen-space layers: sand veil, star glint
     const ovScene = new THREE.Scene(), ovCam = new THREE.OrthographicCamera(0, 1, 1, 0, -1, 1);
     const qv = `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`;
-    const veilU = { uTime: { value: 0 }, uBack: { value: 0 }, uOp: { value: 1 }, uAspect: { value: aspect }, uCol: v3(0.20, 0.21, 0.25) };
+    const veilU = { uTime: { value: 0 }, uBack: { value: 0 }, uOp: { value: 1 }, uAspect: { value: aspect }, uCol: v3(0.55, 0.38, 0.21) };
     const veil = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).translate(0.5, 0.5, 0), new THREE.ShaderMaterial({ uniforms: veilU, vertexShader: qv, fragmentShader: VEIL_FS, transparent: true, depthTest: false, depthWrite: false }));
     veil.renderOrder = 1;
     const glintU = { uI: { value: 0 }, uSpike: { value: 0 }, uAspect: { value: aspect }, uWarm: { value: 0 }, uPos: { value: new THREE.Vector2(0.5, 0.68) }, uRes: { value: new THREE.Vector2(1920, 804) } };
@@ -426,23 +434,22 @@ export default {
     const pos = track([
       [0, P(26, 50, 7)],
       [2.6, P(60, 22, 8)],
-      [6.3, P(130, 2, 10)],
-      [7.6, P(158, 0, 7)],
-      [8.7, [0, HP + 3.5, -1]],
-      [15.5, [0, HP + 6.5, 5]],
+      [5.2, P(118, 3, 9)],
+      [6.6, P(136, 0, 11)],
+      [8.5, [0, 121, -33]],
+      [15.5, [0, 112, -50]],
     ], t, 'inOutSine');
     const ypr = track([
       [0, [64, 4, 2]],
       [1.8, [50, 14, 1]],
       [3.0, [8, 47, 0]],
       [3.6, [0, 52, 0]],
-      [6.3, [0, 52, 0]],
-      [7.6, [0, 49, 0]],
-      [8.7, [0, 50, 0]],
-      [14.0, [0, 58, 0], 'inOutCubic'],
-      [15.5, [0, 58, 0]],
+      [6.6, [0, 51, 0]],
+      [8.5, [0, 45, 0]],
+      [14.0, [0, 48, 0], 'inOutCubic'],
+      [15.5, [0, 48, 0]],
     ], t, 'inOutSine');
-    const fov = track([[0, 40], [3, 36], [8.6, 34]], t);
+    const fov = track([[0, 40], [3, 36], [6.6, 36], [9.5, 40]], t);
     return { pos, ypr, fov };
   },
 
@@ -480,6 +487,9 @@ export default {
       });
       S.orion.geometry.attributes.position.needsUpdate = true;
       S.alnilam = ndc.clone();
+      const b = ndc.clone().addScaledVector(east, Math.tan(15 * deg)).normalize();
+      S.sky.material.uniforms.uMWPole.value.crossVectors(b, north).normalize();
+      S.sky.material.uniforms.uNeb.value.set(S.op[27], S.op[28], S.op[29]).normalize();
       S.orionPlaced = true;
     }
 
@@ -487,7 +497,7 @@ export default {
     const sandY = track([[0, 95], [0.6, 88], [3.2, -8]], t, 'inQuad');
     U.uSandY.value = sandY;
     U.uFlow.value = 1 - smoothstep(2.5, 4.5, t);
-    S.grainU.uI.value = (1 - smoothstep(2.8, 4.2, t)) * 1.4;
+    S.grainU.uI.value = (1 - smoothstep(2.8, 4.2, t)) * 2.2;
     S.grains.visible = t < 4.3;
 
     // veil: the mud scene's sand wall passing on to the right

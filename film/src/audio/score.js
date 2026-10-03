@@ -128,7 +128,7 @@ function compose(M) {
     big: () => M.bus('big', { eq: [['peaking', 200, 0.8, -2], ['peaking', 3000, 0.8, 2]], send: { hall: 0.3, cathedral: 0.55 }, dry: 0.9 }),
     sfx: () => M.bus('sfx', { send: { hall: 0.15, desert: 0.25 } }),
     amb: () => M.bus('amb', { eq: [['lowshelf', 80, 0.7, -5]], send: { desert: 0.15, hall: 0.05 } }),
-    labour: () => M.bus('labour', { eq: [['peaking', 200, 0.9, -3.5], ['peaking', 3500, 0.8, 2]], send: { desert: 0.35, hall: 0.18 } }),
+    labour: () => M.bus('labour', { eq: [['lowshelf', 65, 0.7, -6], ['peaking', 200, 0.9, -3.5], ['peaking', 3500, 0.8, 2]], send: { desert: 0.35, hall: 0.18 } }),
     strings: () => M.bus('strings', { eq: [['lowshelf', 80, 0.7, -4], ['peaking', 220, 0.8, -3]], send: { hall: 0.45, cathedral: 0.1 }, dry: 0.85 }),
     organ: () => M.bus('organ', { eq: [['lowshelf', 70, 0.7, -6], ['peaking', 200, 0.8, -3]], send: { cathedral: 0.7, hall: 0.2 }, dry: 0.7 }),
     sub: () => M.bus('sub', { send: {} }),
@@ -215,7 +215,7 @@ function compose(M) {
   // BRAAM — title
   at(HITS.braam - 0.05, () => {
     const g = HITS.braam;
-    I.braam(M, BUS.big(), g, [hz('D1'), hz('D2'), hz('A2'), hz('D3')], { amp: 0.3, dur: 8, open: 2600 });
+    I.braam(M, BUS.big(), g, [hz('D2'), hz('A2'), hz('D3')], { amp: 0.3, dur: 8, open: 2600 });
     I.subDrop(M, BUS.sub(), g, { f0: 75, f1: 28, dur: 2.4, amp: 0.55 });
     I.impact(M, BUS.big(), g, { amp: 0.42 });
     I.bell(M, BUS.big(), g, hz('D4'), { kind: 'church', dur: 9, amp: 0.1, bright: 0.8 });
@@ -388,7 +388,7 @@ function compose(M) {
   at(HITS.liftoff, () => {
     const g = HITS.liftoff;
     I.impact(M, BUS.big(), g, { amp: 0.22, tone: 0.6, seed: 'lift' });
-    I.braam(M, BUS.big(), g, [hz('D1'), hz('A1'), hz('D2')], { amp: 0.16, dur: 7, open: 800, seed: 'liftbraam' });
+    I.braam(M, BUS.big(), g, [hz('A1'), hz('D2'), hz('A2')], { amp: 0.16, dur: 7, open: 800, seed: 'liftbraam' });
     I.subDrop(M, BUS.sub(), g, { f0: 50, f1: 30, dur: 4, amp: 0.3 });
   });
   at(163, () => {
@@ -434,7 +434,7 @@ function compose(M) {
   at(184, () => I.riser(M, BUS.sfx(), 184, HITS.towerErupt, { amp: 0.11, f0: 200, f1: 6000, pitch: [hz('A1'), hz('A3')], seed: 'r188', release: 0.05 }));
   at(HITS.towerErupt - 0.05, () => {
     const g = HITS.towerErupt;
-    I.braam(M, BUS.big(), g, [hz('D1'), hz('D2'), hz('A2'), hz('D3'), hz('E3')], { amp: 0.34, dur: 8, open: 3000, seed: 'erupt' });
+    I.braam(M, BUS.big(), g, [hz('D2'), hz('A2'), hz('D3'), hz('E3')], { amp: 0.34, dur: 8, open: 3000, seed: 'erupt' });
     I.impact(M, BUS.big(), g, { amp: 0.4, seed: 'erupt' });
     I.subDrop(M, BUS.sub(), g, { f0: 80, f1: 30, dur: 2.5, amp: 0.5 });
   });
@@ -541,7 +541,8 @@ async function renderSegment(seg, sr, until, solo) {
   const comp = ctx.createDynamicsCompressor();
   comp.threshold.value = -20; comp.knee.value = 12; comp.ratio.value = 2.2; comp.attack.value = 0.025; comp.release.value = 0.35;
   const mg = gain(M, MASTER_GAIN);
-  M.out.connect(hp1).connect(hp2).connect(comp).connect(mg).connect(ctx.destination);
+  const lsh = biquad(M, 'lowshelf', 50, 0.7, -3);
+  M.out.connect(hp1).connect(hp2).connect(lsh).connect(comp).connect(mg).connect(ctx.destination);
   compose(M);
   const t0 = performance.now();
   const buf = await M.render(frames + LAT);
@@ -586,8 +587,9 @@ function limit(L, Rr, sr, ceiling) {
   let acc = 0, minG = 1;
   const sm = new Float32Array(n);
   for (let i = 0; i < n; i++) { acc += m[i]; if (i >= Lk) acc -= m[i - Lk]; sm[i] = acc / Math.min(i + 1, Lk); }
-  for (let i = 0; i < n; i++) { const gg = sm[i]; L[i] *= gg; Rr[i] *= gg; if (gg < minG) minG = gg; }
-  return { over, minGain: minG };
+  const worst = [];
+  for (let i = 0; i < n; i++) { const gg = sm[i]; L[i] *= gg; Rr[i] *= gg; if (gg < minG) minG = gg; if (gg < 0.8 && (!worst.length || i - worst[worst.length - 1][0] > sr * 0.5)) worst.push([i, gg]); }
+  return { over, minGain: minG, grDb: +(-20 * Math.log10(minG)).toFixed(2), over2dB: worst.map(([i, g]) => [+(i / sr).toFixed(2), +(-20 * Math.log10(g)).toFixed(1)]) };
 }
 
 export async function renderScore({ sampleRate = 48000, from = 0, to = DURATION, solo = null } = {}) {

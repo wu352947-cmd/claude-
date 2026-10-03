@@ -93,6 +93,7 @@ void main(){
   vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
   float sh = min(hfShadow(P + vec3(0., 0.05, 0.), L), cityShadow(P + vec3(0., 0.05, 0.), L));
   vec3 c = shade(P, vec3(0., 1., 0.), alb, 1., uSunDir.y > 0. ? sh : 1., uSunDir.y > 0. ? 1. : sh, 0.9);
+  c *= mix(vec3(1.), vec3(1.4, 1.05, 0.72), sand * uNight * 0.85);
   float w = m.r * (1. - sand);
   if (w > 0.01) c = mix(c, waterShade(P, sand) * mix(1., 0.4, 1. - sh), smoothstep(0.05, 0.6, w));
   gl_FragColor = vec4(applyFog(c, P), 1.);
@@ -245,6 +246,7 @@ void main(){
   float sh = clamp(vSh, 0., 1.);
   vec3 c = shade(P, N, alb, ao, uSunDir.y > 0. ? sh : 1., uSunDir.y > 0. ? 1. : sh, 0.85);
   c += emit;
+  c *= mix(vec3(1.), vec3(1.4, 1.05, 0.72), er * uNight * 0.85);
   float w = m.r * (1. - sand) * plain;
   if (w > 0.01) c = mix(c, waterShade(P, sand), smoothstep(0.05, 0.6, w));
   gl_FragColor = vec4(applyFog(c, P), 1.);
@@ -300,6 +302,7 @@ void main(){
   vec3 L = uSunDir.y > 0. ? uSunDir : uMoonDir;
   float sh = min(hfShadow(vP + N * 0.2, L), cityShadow(vP + N * 0.7 + vec3(0., 0.1, 0.), L));
   vec3 c = shade(vP, N, alb, 1., uSunDir.y > 0. ? sh : 1., uSunDir.y > 0. ? 1. : sh, 0.9);
+  c *= mix(vec3(1.), vec3(1.4, 1.05, 0.72), smoothstep(0.2, 0.9, vI.y) * uNight * 0.85);
   c += emit + vec3(1.0, 0.55, 0.25) * vI.x * 1.6;     // crystal flash at birth
   gl_FragColor = vec4(applyFog(c, vP), 1.);
 }`;
@@ -746,6 +749,7 @@ export default {
       U.uAmb.value.set(lerp(zen[0], g, ds) * 0.5 + hor[0] * 0.06, lerp(zen[1], g, ds) * 0.5 + hor[1] * 0.06, lerp(zen[2], g, ds) * 0.5 + hor[2] * 0.06); }
     U.uBounce.value.fromArray(sunc).multiplyScalar(0.11 * smoothstep(-0.03, 0.1, e)).add(new S.THREE.Vector3(0.004, 0.003, 0.003));
     U.uNight.value = night;
+    U.uFogDen.value = lerp(0.0007, 0.00045, smoothstep(0.15, 0.4, e));
     U.uMoonCol.value.set(0.11, 0.145, 0.24).multiplyScalar(night * (1.5 + 1.1 * smoothstep(23.5, 27, t)));
     U.uStarI.value = night * 1.1;
 
@@ -791,7 +795,7 @@ export default {
     const az = track([[0, 6], [8, -4], [13, -55], [17, -92], [20, -97], [23.6, -93], [25.6, -82], [28, -64], [31, -58]], t) * deg;
     const dist = track([[0, 1500], [8, 1330], [14, 400], [17, 230], [20, 118], [23.6, 104], [25.6, 300], [28, 560], [31, 600]], t);
     const hgt = track([[0, 330], [8, 300], [14, 200], [17, 75], [20, 47], [23.6, 45], [25.6, 190], [28, 800], [31, 850]], t);
-    const tgt = track([[0, [-760, 0, -60]], [8, [-640, 0, 60]], [14, [0, 14, 0]], [17, [0, 36, 10]], [20, [0, 62, 60]], [23.6, [0, 66, 66]], [25.6, [0, 12, 10]], [28, [0, 0, -10]], [31, [0, 0, -10]]], t);
+    const tgt = track([[0, [-1300, 0, -110]], [8, [-1150, 0, 80]], [14, [0, 14, 0]], [17, [0, 36, 10]], [20, [0, 62, 60]], [23.6, [0, 66, 66]], [25.6, [0, 12, 10]], [28, [0, 0, -10]], [31, [0, 0, -10]]], t);
     const fov = track([[0, 30], [8, 30], [17, 34], [20, 38], [23.6, 39], [25.6, 34], [28, 31]], t);
     camera.position.set(Math.cos(az) * dist, hgt, Math.sin(az) * dist);
     camera.lookAt(tgt[0], tgt[1], tgt[2]);
@@ -834,7 +838,7 @@ export default {
   grade(S, t) {
     return {
       exposure: 1.05 - 0.2 * (1 - S.util.smoothstep(7, 9, t)),
-      saturation: 1.02,
+      saturation: 1.1,
       contrast: 1.04,
       tint: [1.02, 1.0, 0.97],
       lift: [0.008, 0.004, 0.016],
