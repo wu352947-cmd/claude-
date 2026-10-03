@@ -14,6 +14,8 @@ export class AudioEngine {
     this.reverb = c.createConvolver(); this.reverb.buffer = this.makeIR(1.8, 2.6);
     this.revGain = c.createGain(); this.revGain.gain.value = 0.32;
     this.reverb.connect(this.revGain); this.revGain.connect(this.master);
+    this.music = c.createGain(); this.music.gain.value = 0.5; this.music.connect(c.destination);
+    this.amb = c.createGain(); this.amb.gain.value = 0.35; this.amb.connect(this.master);
     this.listener = { x: 0, y: 0, z: 0, fx: 0, fz: -1 };
     this.occlusion = null; // fn(x,y,z) -> bool occluded
     this.sfxVolume = 1;
@@ -38,6 +40,20 @@ export class AudioEngine {
     const r = await fetch(url); const ab = await r.arrayBuffer();
     this.buffers[name] = await new Promise((res, rej) => this.ctx.decodeAudioData(ab, res, rej));
   }
+
+  // looping music / ambience with fades
+  loop(name, bus = 'music', vol = 1, fade = 1.5) {
+    const buf = this.buffers[name]; if (!buf) return null;
+    const c = this.ctx; const src = c.createBufferSource(); src.buffer = buf; src.loop = true;
+    const g = c.createGain(); g.gain.setValueAtTime(0, c.currentTime); g.gain.linearRampToValueAtTime(vol, c.currentTime + fade);
+    src.connect(g); g.connect(bus === 'music' ? this.music : this.amb); src.start();
+    return { src, g };
+  }
+  stopLoop(h, fade = 1) {
+    if (!h) return; const c = this.ctx;
+    try { h.g.gain.cancelScheduledValues(c.currentTime); h.g.gain.setValueAtTime(h.g.gain.value, c.currentTime); h.g.gain.linearRampToValueAtTime(0, c.currentTime + fade); h.src.stop(c.currentTime + fade + 0.05); } catch (e) { }
+  }
+  playMusic(name, vol, bus = 'music') { this.unlock(); const h = this.loop(name, bus, vol); return h; }
 
   unlock() { if (this.ctx.state !== 'running') this.ctx.resume(); }
 

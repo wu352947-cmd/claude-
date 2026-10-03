@@ -52,6 +52,7 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
 .modes { display: flex; gap: 8px; }
 .mode { flex: 1; text-align: left; padding: 10px 12px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line); }
 .mode b { display: block; font-size: 17px; } .mode small { color: var(--dim); font-size: 11px; }
+.modes.small .mode { padding: 6px 12px; } .modes.small .mode b { font-size: 14px; }
 .mode.active { border-color: var(--acc); background: linear-gradient(160deg, rgba(245, 166, 35, .28), rgba(20, 22, 27, .85)); box-shadow: 0 0 18px rgba(245, 166, 35, .2); }
 .opts { display: flex; flex-direction: column; gap: 6px; }
 .seg { display: flex; align-items: center; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 4px; }

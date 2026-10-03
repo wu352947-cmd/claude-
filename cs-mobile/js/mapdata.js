@@ -30,7 +30,7 @@ export const FLOORS = [
   [24, -66, 66, -36, 'cobble', 'A点'],             // A site
   [-40, -44, -10, -36, 'concrete', 'B门'],         // B doors corridor from CT mid
   [-38, -64, -30, -50, 'ground', 'B窗'],           // CT -> B
-  [-72, -72, -38, -38, 'tiles', 'B点'],            // B site
+  [-72, -72, -38, -38, 'ground2', 'B点'],            // B site
 ];
 
 // Raised walkable platforms: [x0,z0,x1,z1, topY, material]

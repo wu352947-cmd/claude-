@@ -51,6 +51,10 @@ class App {
     $('ld-fill').style.width = '100%';
     $('loading').style.opacity = 0; setTimeout(() => $('loading').remove(), 650);
     this.toLobby();
+    // lobby music loads in the background (not needed to start playing)
+    this.audio.load('music_lobby', 'assets/sounds/music_lobby.mp3').then(() => { if (this.state === 'lobby') this.startMusic(); }).catch(() => { });
+    const kick = () => { this.audio.unlock(); if (this.state === 'lobby' && !this.musicH) this.startMusic(); };
+    window.addEventListener('touchend', kick); window.addEventListener('click', kick);
     $('pa-resume').onclick = () => this.pause(false);
     $('pa-quit').onclick = () => { this.pause(false); this.toLobby(); };
     $('pa-settings').onclick = () => { this.ui.openPanel('settings'); };
@@ -72,6 +76,7 @@ class App {
   applySettings(changed) {
     const s = this.settings; saveSettings(s);
     this.audio.master.gain.value = s.volume;
+    this.audio.music.gain.value = 0.55 * s.musicVolume;
     $('fps').style.display = s.showFps ? 'block' : 'none';
     $('btn-fire-left').style.display = s.leftFire ? 'grid' : 'none';
     if (changed === 'quality') { this.resize(); this.renderer.shadowMap.enabled = s.quality !== 'low'; this.renderer.shadowMap.needsUpdate = true; this.game.scene.traverse(o => { if (o.material) o.material.needsUpdate = true; }); }
@@ -99,8 +104,15 @@ class App {
     this.showcase.root.visible = true;
   }
 
+  startMusic() {
+    if (this.musicH || !this.audio.buffers.music_lobby || this.audio.ctx.state !== 'running') return;
+    this.musicH = this.audio.loop('music_lobby', 'music', 1, 2.5);
+  }
+
   toLobby() {
     this.state = 'lobby';
+    this.audio.stopLoop(this.windH, 1); this.windH = null;
+    this.startMusic();
     if (this.game.agents.length) this.game.clearMatch();
     $('hud').classList.add('hidden'); $('touch').classList.add('hidden'); $('lobby').classList.remove('hidden'); $('matchover').classList.remove('show');
     this.input.enabled = false; this.input.reset();
@@ -112,6 +124,8 @@ class App {
 
   startMatch(opts) {
     this.showcase.root.visible = false;
+    this.audio.stopLoop(this.musicH, 1.2); this.musicH = null;
+    this.windH = this.audio.loop('amb_wind', 'amb', 1, 3);
     this.state = 'match';
     $('lobby').classList.add('hidden'); $('panel').classList.add('hidden'); $('hud').classList.remove('hidden'); $('touch').classList.remove('hidden');
     this.settings.desktop = !matchMedia('(pointer: coarse)').matches;

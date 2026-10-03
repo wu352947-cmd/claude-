@@ -273,10 +273,10 @@ export class Agent {
     ws.inaccFire = Math.min(ws.inaccFire + (d.inacc?.fire || 0.5), 6);
     this.kickVY += 9 * (d.punch || 1) * (0.8 + Math.random() * 0.4); this.kickVX += (Math.random() - 0.5) * 6 * (d.punch || 1);
     this.game.fireWeapon(this, ws, inacc);
-    if (d.scope && ws.scoped) { const keep = ws.scoped; ws.scoped = 0; ws.rescope = keep; setTimeout(() => { if (this.ws === ws && !ws.reloading && this.alive) ws.scoped = ws.rescope; }, 60000 / d.rpm * 0.95); }
-    if (d.id === 'nova') setTimeout(() => this.alive && this.game.sound(this, 'pump', 0.55), 330);
-    if (d.id === 'awp') setTimeout(() => this.alive && this.game.sound(this, 'bolt', 0.6), 380);
-    if (d.id === 'r8') setTimeout(() => this.alive && this.game.sound(this, 'cock', 0.4), 250);
+    if (d.scope && ws.scoped) { const keep = ws.scoped; ws.scoped = 0; ws.rescope = keep; this.game.later(60 / d.rpm * 0.95, () => { if (this.ws === ws && !ws.reloading && this.alive) ws.scoped = ws.rescope; }); }
+    if (d.id === 'nova') this.game.later(0.33, () => this.alive && this.game.sound(this, 'pump', 0.55));
+    if (d.id === 'awp') this.game.later(0.38, () => this.alive && this.game.sound(this, 'bolt', 0.6));
+    if (d.id === 'r8') this.game.later(0.25, () => this.alive && this.game.sound(this, 'cock', 0.4));
   }
 
   // final aim direction including recoil & spread

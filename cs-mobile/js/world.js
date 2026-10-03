@@ -3,6 +3,14 @@ import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { MAP_SIZE, CELL, FLOORS, PLATFORMS, STAIRS, ROOFS, WALLS, PROPS, DECOR } from './mapdata.js';
 
 const HALF = MAP_SIZE / 2;
+// painted letters: [text, sub, color, x, y, z, rotY, size]
+const SIGNS = [
+  ['A', '', '#d8752a', 44, 3.0, -65.94, 0, 5], ['A', '', '#d8752a', 65.94, 3.0, -58, -Math.PI / 2, 5],
+  ['B', '', '#c8402a', -55, 3.0, -71.94, 0, 5], ['B', '', '#c8402a', -71.94, 3.0, -56, Math.PI / 2, 5],
+  ['A', '→', '#d8752a', 41.94, 2.2, 14, Math.PI / 2, 2.6], ['A', '↑', '#d8752a', 10.06, 2.2, 0, Math.PI / 2, 2.4],
+  ['B', '←', '#c8402a', -9.94, 2.2, 20, -Math.PI / 2, 2.4], ['B', '↓', '#c8402a', -50.06, 2.2, 12, -Math.PI / 2, 2.4],
+  ['A', '', '#d8752a', 60.06, 2.6, 40, -Math.PI / 2, 2.6], ['B', '', '#c8402a', -40, 2.2, -43.94, 0, 2.4],
+];
 const GRID = 4;                       // collision broadphase cell (m)
 const GN = Math.ceil(MAP_SIZE / GRID);
 const RN = MAP_SIZE / CELL;           // raster cells per side
@@ -183,7 +191,7 @@ export class World {
     for (const [x0, z0, x1, z1, y, m] of PLATFORMS) {
       this.addSolid(x0, 0, z0, x1, y, z1, m, 'platform');
       push(m, boxGeo(x0, 0, z0, x1, y - 0.12, z1, 2.5, { bottom: false, top: false }));
-      push('tiles', boxGeo(x0, y - 0.12, z0, x1, y, z1, 3, { bottom: false }));
+      push('cobble', boxGeo(x0, y - 0.12, z0, x1, y, z1, 3, { bottom: false }));
     }
     // stairs
     for (const [x0, z0, x1, z1, dir, y0, y1] of STAIRS) {
@@ -230,6 +238,7 @@ export class World {
       this.group.add(mesh);
     }
     this.buildSkyline(mats);
+    this.paintSigns();
     this.buildNav();
     return this.group;
   }
@@ -246,6 +255,7 @@ export class World {
         if (!s.test(a)) continue;
         const r = hash(i * 31 + a * 7 + s.n[0] * 3, j * 17 + a * 5 + s.n[2] * 11);
         const [cx, cz] = s.at(a);
+        if (SIGNS.some(g => Math.hypot(g[3] - cx, g[5] - cz) < g[7] * 0.6 + 1.2)) continue;
         const nx = s.n[0], nz = s.n[2];
         const along = nx === 0;
         if (r < 0.12) {           // wooden door
@@ -284,6 +294,35 @@ export class World {
     s.min[2] = cz - Math.max(0.1, (s.max[2] - s.min[2]) * 0.35); s.max[2] = cz + Math.max(0.1, (s.max[2] - cz) * 0.7);
   }
 
+  // spray-painted bomb site letters and route arrows (like CS maps)
+  paintSigns() {
+    const mk = (text, sub, color) => {
+      const c = document.createElement('canvas'); c.width = 256; c.height = 256; const x = c.getContext('2d');
+      x.fillStyle = color; x.strokeStyle = color; x.textAlign = 'center'; x.textBaseline = 'middle';
+      x.font = `900 ${sub ? 150 : 190}px Impact, "Arial Black", sans-serif`;
+      x.globalAlpha = 0.92; x.fillText(text, 128, sub ? 110 : 128);
+      if (sub) { x.font = '900 70px Impact, "Arial Black", sans-serif'; x.fillText(sub, 128, 210); }
+      // overspray + drips
+      x.globalAlpha = 0.25; for (let i = 0; i < 400; i++) { const r = Math.random() * 2; x.beginPath(); x.arc(40 + Math.random() * 176, 30 + Math.random() * 196, r, 0, 7); x.fill(); }
+      x.globalAlpha = 0.6; for (let i = 0; i < 6; i++) { const px = 70 + Math.random() * 120, py = 150 + Math.random() * 30; x.fillRect(px, py, 3, 20 + Math.random() * 40); }
+      const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+      return new THREE.MeshStandardMaterial({ map: t, transparent: true, roughness: 0.9, polygonOffset: true, polygonOffsetFactor: -2, depthWrite: false });
+    };
+    const signs = SIGNS;
+    const _unused = [
+      ['A', '', '#d8752a', 44, 3.2, -65.92, 0, 4], ['A', '', '#d8752a', 65.92, 3.0, -58, -Math.PI / 2, 4],
+      ['B', '', '#c8402a', -55, 3.2, -71.92, 0, 4], ['B', '', '#c8402a', -71.92, 3.0, -56, Math.PI / 2, 4],
+      ['A', '→', '#d8752a', 41.92, 2.2, 14, Math.PI / 2, 2.2], ['A', '↑', '#d8752a', 10.08, 2.2, 0, Math.PI / 2, 2],
+      ['B', '←', '#c8402a', -9.92, 2.2, 20, -Math.PI / 2, 2], ['B', '↓', '#c8402a', -50.08, 2.2, 12, -Math.PI / 2, 2],
+      ['A', '', '#d8752a', 60.08, 2.6, 40, -Math.PI / 2, 2], ['B', '', '#c8402a', -40, 2.2, -43.92, 0, 2],
+    ];
+    for (const [t, sub, col, x, y, z, ry, size] of signs) {
+      const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size), mk(t, sub, col));
+      m.position.set(x, y, z); m.rotation.y = ry; m.renderOrder = 3; m.receiveShadow = true;
+      this.group.add(m);
+    }
+  }
+
   buildSkyline(mats) {
     // distant buildings + dunes beyond the playable area (no collision)
     const gs = { sand_blocks: [], plaster: [], ground: [] };
@@ -317,7 +356,7 @@ export class World {
     };
     const mats = {
       sand_blocks: mk('sand_blocks', { color: 0xfff2dc }), plaster: mk('plaster', { color: 0xf4dcb4 }), plaster2: mk('plaster2', { color: 0xf8e8c8 }),
-      stone: mk('stone'), old_sand: mk('old_sand', { color: 0xf0e0c0 }), ground: mk('ground', { color: 0xf4e0bc }), ground2: mk('ground2'),
+      stone: mk('stone'), old_sand: mk('old_sand', { color: 0xf0e0c0 }), ground: mk('ground', { color: 0xf4e0bc }), ground2: mk('ground2', { color: 0xf2e2c4 }),
       cobble: mk('cobble', { color: 0xf0dcc0 }), concrete: mk('concrete', { color: 0xd8ccb8 }), door: mk('door'), pine: mk('pine'), tin: mk('tin', { metal: true }),
       planks: mk('planks'), tiles: mk('tiles', { color: 0xf2d2b8 }), bconcrete: mk('bconcrete'),
       window: new THREE.MeshStandardMaterial({ color: 0x1d2228, roughness: 0.15, metalness: 0.6 }),

@@ -6,7 +6,7 @@ const RANKS = ['白银 I', '白银 II', '白银 III', '白银精英', '黄金新
 const KEY = 'csdust_profile_v1';
 const SET_KEY = 'csdust_settings_v1';
 
-export const DEFAULT_SETTINGS = { sens: 1, scopeSens: 0.8, gyro: false, gyroSens: 1, autoFire: false, crouchHold: false, fov: 74, quality: 'med', volume: 0.9, showFps: true, leftFire: true, friendlyFire: false, invertY: false };
+export const DEFAULT_SETTINGS = { sens: 1, scopeSens: 0.8, gyro: false, gyroSens: 1, autoFire: false, crouchHold: false, fov: 74, quality: 'med', volume: 0.9, musicVolume: 0.7, showFps: true, leftFire: true, friendlyFire: false, invertY: false };
 
 export function loadSettings() { try { return { ...DEFAULT_SETTINGS, ...JSON.parse(localStorage.getItem(SET_KEY) || '{}') }; } catch (e) { return { ...DEFAULT_SETTINGS }; } }
 export function saveSettings(s) { try { localStorage.setItem(SET_KEY, JSON.stringify(s)); } catch (e) { } }
@@ -36,10 +36,10 @@ export class UI {
   }
 
   bindLobby() {
-    document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.mode').forEach(x => x.classList.remove('active')); b.classList.add('active'); this.mode = b.dataset.mode; this.click(); }));
+    document.querySelectorAll('.mode').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.mode').forEach(x => x.classList.remove('active')); b.classList.add('active'); this.mode = b.dataset.mode; this.variant = b.dataset.variant || null; this.click(); }));
     const seg = (id, key) => document.querySelectorAll(`#${id} button`).forEach(b => b.addEventListener('click', () => { document.querySelectorAll(`#${id} button`).forEach(x => x.classList.remove('on')); b.classList.add('on'); this[key] = b.dataset.v; this.click(); }));
     seg('seg-team', 'team'); seg('seg-diff', 'diff');
-    $('btn-start').addEventListener('click', () => { this.click(); const team = this.team === 'R' ? (Math.random() < 0.5 ? 'T' : 'CT') : this.team; this.app.startMatch({ mode: this.mode, team, difficulty: this.diff, playerName: this.p.name, skins: this.equippedSkins(), teamSize: 5 }); });
+    $('btn-start').addEventListener('click', () => { this.click(); const team = this.team === 'R' ? (Math.random() < 0.5 ? 'T' : 'CT') : this.team; this.app.startMatch({ mode: this.mode, variant: this.variant, team, difficulty: this.diff, playerName: this.p.name, skins: this.equippedSkins(), teamSize: 5 }); });
     document.querySelectorAll('[data-panel]').forEach(b => b.addEventListener('click', () => { this.click(); this.openPanel(b.dataset.panel); }));
     document.querySelector('.pn-close').addEventListener('click', () => this.closePanel());
     $('panel').addEventListener('click', e => { if (e.target.id === 'panel') this.closePanel(); });
@@ -162,7 +162,7 @@ export class UI {
     const s = this.s; const body = $('pn-body');
     const rng = (k, label, min, max, step) => `<div class="set"><span>${label} <b id="v-${k}">${s[k]}</b></span><input type="range" data-k="${k}" min="${min}" max="${max}" step="${step}" value="${s[k]}"></div>`;
     const tg = (k, label) => `<div class="set"><span>${label}</span><button class="toggle ${s[k] ? 'on' : ''}" data-t="${k}"></button></div>`;
-    body.innerHTML = `<div class="settings">${rng('sens', '视角灵敏度', 0.2, 3, 0.05)}${rng('scopeSens', '开镜灵敏度', 0.2, 2, 0.05)}${rng('fov', '视野 FOV', 60, 95, 1)}${rng('volume', '音量', 0, 1, 0.05)}
+    body.innerHTML = `<div class="settings">${rng('sens', '视角灵敏度', 0.2, 3, 0.05)}${rng('scopeSens', '开镜灵敏度', 0.2, 2, 0.05)}${rng('fov', '视野 FOV', 60, 95, 1)}${rng('volume', '音效音量', 0, 1, 0.05)}${rng('musicVolume', '音乐音量', 0, 1, 0.05)}
       ${tg('autoFire', '自动开火（准星对准敌人时）')}${tg('gyro', '陀螺仪瞄准')}${rng('gyroSens', '陀螺仪灵敏度', 0.2, 3, 0.1)}${tg('crouchHold', '按住下蹲（关闭为切换）')}
       ${tg('leftFire', '显示左侧开火键')}${tg('showFps', '显示帧率')}${tg('invertY', '反转 Y 轴')}
       <div class="set"><span>画质</span><div class="seg" style="width:60%">${['low', 'med', 'high'].map(q => `<button data-q="${q}" class="${s.quality === q ? 'on' : ''}">${{ low: '流畅', med: '均衡', high: '高清' }[q]}</button>`).join('')}</div></div>

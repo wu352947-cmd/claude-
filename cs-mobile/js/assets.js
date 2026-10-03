@@ -13,7 +13,7 @@ const SOUNDS = [
   'step_stone_L1', 'step_stone_L2', 'step_stone_L3', 'step_stone_R1', 'step_stone_R2', 'step_stone_R3', 'land',
   'explosion', 'explosion_far', 'hit_body1', 'hit_body2', 'imp_metal', 'imp_stone', 'imp_wood', 'headshot', 'clink2',
   'knife_hit', 'swish1', 'swish2', 'ui_click', 'ui_hover', 'ui_buy', 'beep', 'metal_hit', 'wood_hit', 'casing',
-  'grunt0', 'grunt1', 'grunt2', 'grunt3', 'grunt4', 'grunt5', 'grunt6', 'grunt7', 'grunt8', 'grunt9',
+  'amb_wind', 'sting_win', 'sting_lose', 'grunt0', 'grunt1', 'grunt2', 'grunt3', 'grunt4', 'grunt5', 'grunt6', 'grunt7', 'grunt8', 'grunt9',
 ];
 
 export const Assets = { tex: {}, models: {}, fx: {}, skins: {}, sounds: {}, soldier: null };

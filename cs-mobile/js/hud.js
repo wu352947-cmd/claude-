@@ -180,7 +180,7 @@ export class HUD {
     const txt = { elim: '全部消灭', bomb: '炸弹已爆炸', defuse: '炸弹已拆除', time: '时间耗尽' }[reason] || '';
     el.className = 'show ' + (winner === 'T' ? 't' : 'ct');
     el.innerHTML = `<div class="re-title">${TEAMNAME[winner]}获胜</div><div class="re-sub">${txt}</div>${mvp ? `<div class="re-mvp">★ MVP：${mvp.name} <small>${mvp.roundKills} 击杀</small></div>` : ''}`;
-    if (winner === g.player.team) this.audio.play('ui_buy', { volume: 0.6, rate: 1.2 });
+    this.audio.play(winner === g.player.team ? 'sting_win' : 'sting_lose', { volume: 0.55 });
   }
 
   killFeed(att, vic, weapon, hs, wall, assist) {

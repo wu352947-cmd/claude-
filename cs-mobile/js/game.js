@@ -17,7 +17,7 @@ export class Game {
     this.renderer = renderer; this.assets = assets; this.audio = audio; this.hud = hud; this.settings = settings;
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(70, 1, 0.05, 900);
-    this.time = 0; this.agents = []; this.projectiles = []; this.drops = [];
+    this.time = 0; this.agents = []; this.projectiles = []; this.drops = []; this.timers = [];
     this.setupScene();
     this.world = new World();
     this.scene.add(this.world.build(assets));
@@ -60,7 +60,7 @@ export class Game {
     this.mode = opts.mode; this.opts = opts;
     this.skill = SKILL[opts.difficulty] ?? SKILL.hard;
     this.score = { T: 0, CT: 0 }; this.round = 0; this.lossStreak = { T: 1, CT: 1 }; this.history = [];
-    this.winTarget = opts.mode === 'tdm' ? 50 : 8; this.tdmTime = 6 * 60;
+    this.winTarget = opts.mode === 'tdm' ? (opts.variant === 'knife' ? 25 : opts.variant === 'awp' ? 30 : 50) : 8; this.tdmTime = 6 * 60;
     const n = opts.teamSize || 5;
     const names = BOT_NAMES.slice().sort(() => Math.random() - 0.5);
     this.player = this.addAgent({ name: opts.playerName || '你', team: opts.team, isPlayer: true, skins: opts.skins || {} });
@@ -116,7 +116,7 @@ export class Game {
     this.drops = [];
     if (this.bomb.mesh) this.scene.remove(this.bomb.mesh);
     this.bomb = { planted: false, dropped: false, carrier: null, pos: new THREE.Vector3(), site: null, timer: 0, defuser: null, defuseT: 0, mesh: null };
-    this.effects.clear();
+    this.effects.clear(); this.timers = [];
   }
 
   // ------------------------------------------------------------------ rounds
@@ -158,6 +158,9 @@ export class Game {
   }
 
   tdmLoadout(a) {
+    const v = this.opts.variant;
+    if (v === 'knife') { a.inv.primary = null; a.inv.secondary = null; a.inv.grenades = []; a.armor = 100; a.helmet = true; a.switchTo('knife', true); return; }
+    if (v === 'awp') { if (!a.inv.primary || a.inv.primary.id !== 'awp') a.giveWeapon('awp'); a.inv.primary.ammo = 5; a.inv.primary.reserve = 30; if (!a.inv.secondary) a.giveWeapon('deagle'); a.armor = 100; a.helmet = true; a.switchTo('primary', true); return; }
     const pick = a.isPlayer ? (this.tdmPick || (a.team === 'T' ? 'ak47' : 'm4a4')) : (Math.random() < 0.18 ? 'awp' : a.team === 'T' ? 'ak47' : 'm4a4');
     if (!a.inv.primary || a.inv.primary.id !== pick) a.giveWeapon(pick);
     a.armor = 100; a.helmet = true;
@@ -180,7 +183,6 @@ export class Game {
       if (mvp) mvp.mvps++;
       this.history.push(winner);
       this.hud.onRoundEnd(this, winner, reason, mvp);
-      this.audio.play(winner === this.player.team ? 'ui_buy' : 'clink2', { volume: 0.6 });
     }
   }
 
@@ -195,6 +197,7 @@ export class Game {
   buy(a, id) {
     const W = WEAPONS[id], E = EQUIP[id];
     if (this.mode === 'defuse' && !this.canBuy(a)) return false;
+    if (this.opts && this.opts.variant) return false;
     const item = W || E; if (!item) return false;
     if (item.team && item.team !== a.team) return false;
     const price = this.mode === 'tdm' ? 0 : item.price;
@@ -220,6 +223,7 @@ export class Game {
   }
 
   canBuy(a) {
+    if (this.opts && this.opts.variant) return false;
     if (this.mode === 'tdm') return true;
     if (!a.alive) return false;
     if (this.phase === 'freeze') return true;
@@ -386,16 +390,16 @@ export class Game {
       // backstab check
       const bf = best.forward(_v2); const back = (f.x * bf.x + f.z * bf.z) > 0.5;
       const dmg = heavy ? (back ? 180 : 65) : (back ? 90 : 40);
-      setTimeout(() => {
+      this.later(heavy ? 0.18 : 0.09, () => {
         if (!best.alive || !a.alive) return;
         this.audio.play('knife_hit', { pos: best.eye(_v), volume: 0.9 });
         this.effects.bloodHit(best.pos.x, best.pos.y + 1.3, best.pos.z, f.x, 0, f.z, false, this.world);
         const died = this.damage(best, a, WEAPONS.knife, dmg, 'chest', { dir: f.clone(), noArmor: true });
         if (a === this.player) this.hud.hitMarker(false, died);
-      }, heavy ? 180 : 90);
+      });
     } else {
       const h = this.world.raycast(eye, f, 1.8);
-      if (h && h.solid) setTimeout(() => this.audio.play('metal_hit', { pos: eye, volume: 0.4, rate: 1.3 }), 90);
+      if (h && h.solid) this.later(0.09, () => this.audio.play('metal_hit', { pos: eye, volume: 0.4, rate: 1.3 }));
     }
   }
 
@@ -599,7 +603,7 @@ export class Game {
     B.timer -= dt;
     B.beepT -= dt;
     const rate = B.timer > 20 ? 1 : B.timer > 10 ? 0.6 : B.timer > 5 ? 0.35 : 0.15;
-    if (B.beepT <= 0) { B.beepT = rate; this.audio.play('beep', { pos: B.pos, volume: 0.9, ref: 6, roll: 0.6, maxDist: 90 }); if (B.led) B.led.material.color.set(0xff0000); setTimeout(() => B.led && B.led.material.color.set(0x330000), 100); }
+    if (B.beepT <= 0) { B.beepT = rate; this.audio.play('beep', { pos: B.pos, volume: 0.9, ref: 6, roll: 0.6, maxDist: 90 }); if (B.led) B.led.material.color.set(0xff0000); this.later(0.1, () => B.led && B.led.material.color.set(0x330000)); }
     // defusing
     let defuser = null;
     for (const a of this.agents) if (a.alive && a.team === 'CT' && a.input.use && Math.hypot(a.pos.x - B.pos.x, a.pos.z - B.pos.z) < 1.6 && Math.abs(a.pos.y - B.pos.y) < 1.2) { defuser = a; break; }
@@ -686,7 +690,7 @@ export class Game {
 
   explode(x, y, z, maxDmg, radius, owner, isBomb) {
     this.effects.explosion(x, y, z, isBomb ? 1.8 : 1);
-    if (isBomb) { for (let i = 0; i < 4; i++) setTimeout(() => this.effects.explosion(x + (Math.random() - 0.5) * 9, y + Math.random() * 3, z + (Math.random() - 0.5) * 9, 1.3), 90 + i * 140); }
+    if (isBomb) { for (let i = 0; i < 4; i++) this.later(0.09 + i * 0.14, () => this.effects.explosion(x + (Math.random() - 0.5) * 9, y + Math.random() * 3, z + (Math.random() - 0.5) * 9, 1.3)); }
     const c = this.camera.position; const d = Math.hypot(c.x - x, c.y - y, c.z - z);
     this.audio.play(d < 40 ? 'explosion' : 'explosion_far', { pos: { x, y, z }, volume: isBomb ? 1.4 : 1.1, ref: 15, roll: 0.5, reverb: 0.6, bass: 1.0, occlude: false });
     this.shake = Math.max(this.shake || 0, Math.max(0, 1 - d / (radius * 3)) * (isBomb ? 1.5 : 0.8));
@@ -719,8 +723,18 @@ export class Game {
   }
 
   // ------------------------------------------------------------------ main loop
+  // game-time scheduler (pauses with the game, deterministic in fast-forward)
+  later(delay, fn) { this.timers.push({ t: this.time + delay, fn }); }
+  runTimers() {
+    if (!this.timers.length) return;
+    const due = this.timers.filter(x => x.t <= this.time); if (!due.length) return;
+    this.timers = this.timers.filter(x => x.t > this.time);
+    for (const x of due) { try { x.fn(); } catch (e) { console.warn(e); } }
+  }
+
   update(dt, input) {
     this.time += dt;
+    this.runTimers();
     const P = this.player;
     // phases
     if (this.phase === 'freeze') {
@@ -745,6 +759,7 @@ export class Game {
     for (const a of this.agents) if (a.brain && a.alive) a.brain.update(dt);
     if (this.freeze) for (const a of this.agents) { a.input.mx = a.input.mf = 0; a.input.jump = false; a.input.fire = this.freeze ? false : a.input.fire; }
     for (const a of this.agents) a.update(dt);
+    this.separateAgents();
     // TDM respawns
     if (this.mode === 'tdm') for (const a of this.agents) if (!a.alive && a.respawnT && this.time > a.respawnT) this.respawnTDM(a);
     this.updateProjectiles(dt);
@@ -761,6 +776,23 @@ export class Game {
       a.blob.position.set(a.pos.x, a.pos.y + 0.03, a.pos.z); a.blob.visible = a.alive && a !== P;
     }
     this.renderCam(dt);
+  }
+
+  // players can't walk through each other
+  separateAgents() {
+    const A = this.agents, R2 = (RADIUS * 2) ** 2;
+    for (let i = 0; i < A.length; i++) {
+      const a = A[i]; if (!a.alive) continue;
+      for (let j = i + 1; j < A.length; j++) {
+        const b = A[j]; if (!b.alive) continue;
+        const dx = b.pos.x - a.pos.x, dz = b.pos.z - a.pos.z; const d2 = dx * dx + dz * dz;
+        if (d2 >= R2 || Math.abs(a.pos.y - b.pos.y) > 1.6) continue;
+        const d = Math.sqrt(d2) || 0.01, push = (RADIUS * 2 - d) * 0.5;
+        const nx = d2 > 1e-6 ? dx / d : 1, nz = d2 > 1e-6 ? dz / d : 0;
+        a.pos.x -= nx * push; a.pos.z -= nz * push; b.pos.x += nx * push; b.pos.z += nz * push;
+        this.world.collide(a.pos, RADIUS, a.height, 0.5); this.world.collide(b.pos, RADIUS, b.height, 0.5);
+      }
+    }
   }
 
   respawnTDM(a) {

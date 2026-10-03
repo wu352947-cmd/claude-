@@ -24,7 +24,7 @@ const SNIPER = pattern([[0, 0], [0, 4.8], [0, 4.5], [0, 4.0], [0, 4.0], [0, 4.0]
 export const WEAPONS = {
   knife: {
     id: 'knife', name: '匕首', slot: 'knife', type: 'knife', price: 0, damage: 40, damage2: 65, rpm: 120, mag: 0, reserve: 0,
-    speed: 250, reward: 1500, range: 2.0, deploy: 0.6, icon: 'knife',
+    speed: 250, reward: 1500, range: 2.0, deploy: 0.6, icon: 'knife', auto: true,
   },
   glock: {
     id: 'glock', name: '格洛克 18', slot: 'secondary', type: 'pistol', team: 'T', price: 200, damage: 30, ap: 0.47, rpm: 400, mag: 20, reserve: 120,
