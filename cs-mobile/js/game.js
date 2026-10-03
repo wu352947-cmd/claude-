@@ -7,7 +7,7 @@ import { Effects } from './effects.js';
 import { ViewModel, makeGrenade, makeC4 } from './viewmodel.js';
 import { WEAPONS, EQUIP, computeDamage } from './weapons.js';
 import { SPAWNS, SITES } from './mapdata.js';
-import { SKINS, SKIN_BY_ID } from './skins.js';
+import { SKINS, SKIN_BY_ID, applySkin } from './skins.js';
 
 const BOT_NAMES = ['Zeus', 'Ghost', 'Viper', 'Falcon', 'Shadow', 'Blaze', 'Raven', 'Cobra', 'Nomad', 'Wolf', 'Titan', 'Hawk', 'Storm', 'Jackal', 'Rook', 'Spectre', 'Bandit', 'Echo'];
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _d = new THREE.Vector3();
@@ -834,7 +834,7 @@ export class Game {
     for (const a of this.agents) {
       const ws = a.ws; const def = a.currentDef();
       a.char.setWeapon(this.assets, def.type === 'grenade' ? null : def.id === 'c4' ? null : def.id);
-      if (a.char.gun && !a.char.gun.userData.skinned) { a.char.gun.userData.skinned = true; const sk = ws ? (ws.skin || a.skins[ws.id]) : null; if (sk) import('./skins.js').then(m => { const s = sk.split('#'); m.applySkin(a.char.gun, { ...SKIN_BY_ID[s[0]], wear: +s[1] || 0 }, this.assets, a.team); }); }
+      if (a.char.gun && !a.char.gun.userData.skinned) { a.char.gun.userData.skinned = true; const sk = ws ? (ws.skin || a.skins[ws.id]) : null; if (sk) { const s = sk.split('#'); if (SKIN_BY_ID[s[0]]) applySkin(a.char.gun, { ...SKIN_BY_ID[s[0]], wear: +s[1] || 0 }, this.assets, a.team); } }
       const firing = ws && this.time - ws.lastShot < 0.15;
       if (a !== P || !P.alive) a.char.update(dt, a.pos, a.yaw, a.alive ? a.pitch : 0, a.speed2D(), a.crouchT, firing, ws && ws.reloading);
       a.blob.position.set(a.pos.x, a.pos.y + 0.03, a.pos.z); a.blob.visible = a.alive && a !== P;

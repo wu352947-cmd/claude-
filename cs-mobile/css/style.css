@@ -288,3 +288,21 @@ button { font: inherit; color: inherit; border: 0; background: none; cursor: poi
   .inv-side { overflow: auto; } #preview { aspect-ratio: 16/8; } .inv-info h3 { font-size: 16px; }
   .card img { height: 48px; } .casecard { width: 200px; padding: 10px; } .casecard .box { height: 70px; }
 }
+
+/* ---------- versus loading screen ---------- */
+#versus { position: fixed; inset: 0; z-index: 60; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: linear-gradient(90deg, rgba(120, 90, 20, .55), rgba(10, 10, 12, .85) 45%, rgba(10, 10, 12, .85) 55%, rgba(20, 60, 120, .55)), rgba(8, 9, 11, .55); backdrop-filter: blur(3px); }
+#versus .vs-map { font-family: Teko; font-size: 40px; letter-spacing: 8px; line-height: 1; }
+#versus .vs-mode { color: var(--dim); font-size: 14px; letter-spacing: 2px; }
+#versus .vs-teams { display: flex; align-items: center; gap: 26px; }
+#versus .vs-col { display: flex; flex-direction: column; gap: 5px; width: min(270px, 36vw); }
+#versus .vs-row { display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 6px; background: rgba(255, 255, 255, .06); font-size: 15px; animation: vsin .4s both; }
+#versus .vs-col.t .vs-row { border-left: 3px solid var(--t); } #versus .vs-col.ct .vs-row { border-right: 3px solid var(--ct); flex-direction: row-reverse; text-align: right; }
+#versus .vs-row.me { background: rgba(245, 166, 35, .22); }
+#versus .vs-row small { color: var(--dim); font-size: 11px; margin-left: auto; } #versus .vs-col.ct .vs-row small { margin-left: 0; margin-right: auto; }
+#versus .vs-x { font-family: Teko; font-size: 64px; color: var(--acc); text-shadow: 0 0 20px rgba(245, 166, 35, .6); }
+#versus .vs-bar { width: min(420px, 60vw); height: 4px; background: rgba(255, 255, 255, .1); border-radius: 2px; overflow: hidden; }
+#versus .vs-bar i { display: block; height: 100%; width: 0; background: var(--acc); animation: vsbar 2.2s linear forwards; }
+@keyframes vsin { from { opacity: 0; transform: translateX(var(--dx, -20px)); } }
+@keyframes vsbar { to { width: 100%; } }
+@media (max-height: 420px) { #versus .vs-row { padding: 3px 8px; font-size: 13px; } #versus .vs-x { font-size: 44px; } #versus .vs-map { font-size: 30px; } }

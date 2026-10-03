@@ -110,7 +110,7 @@ class App {
   }
 
   toLobby() {
-    this.state = 'lobby';
+    this.state = 'lobby'; this._vsOn = false; $('versus').classList.add('hidden');
     this.audio.stopLoop(this.windH, 1); this.windH = null;
     this.startMusic();
     if (this.game.agents.length) this.game.clearMatch();
@@ -134,9 +134,23 @@ class App {
     this.input.enabled = true; this.input.reset();
     this.game.start(opts);
     this.hud.bind(this.game);
+    this.showVersus(opts);
     // compile shaders for characters / viewmodels up-front to avoid hitches
     try { this.renderer.compile(this.game.scene, this.game.camera); this.renderer.compile(this.game.vm.scene, this.game.vm.camera); } catch (e) { }
     this.resize();
+  }
+
+  showVersus(opts) {
+    const g = this.game, el = $('versus');
+    const ranks = ['白银 II', '白银精英', '黄金新星 I', '黄金新星 III', '守护者 I', '守护精英', '传奇之鹰', '无上之星'];
+    const col = team => g.agents.filter(a => a.team === team).map((a, i) => `<div class="vs-row ${a.isPlayer ? 'me' : ''}" style="animation-delay:${i * 0.08}s;--dx:${team === 'T' ? -20 : 20}px"><b>${a.name}</b><small>${a.isPlayer ? this.ui.p.level ? 'Lv.' + this.ui.p.level : '' : ranks[(a.id * 7) % ranks.length]}</small></div>`).join('');
+    const mode = opts.variant === 'awp' ? '狙击对决' : opts.variant === 'knife' ? '刀战' : opts.mode === 'tdm' ? '团队竞技' : '爆破模式';
+    el.innerHTML = `<div class="vs-map">沙城 · DUST</div><div class="vs-mode">${mode} · 人机难度 ${{ normal: '普通', hard: '困难', expert: '专家' }[opts.difficulty] || ''}</div>
+      <div class="vs-teams"><div class="vs-col t">${col('T')}</div><div class="vs-x">VS</div><div class="vs-col ct">${col('CT')}</div></div><div class="vs-bar"><i></i></div>`;
+    el.classList.remove('hidden');
+    this.paused = true;
+    this.audio.play('ui_buy', { volume: 0.5, rate: 0.8 });
+    this._vsStart = null; this._vsOn = true;
   }
 
   pause(v) {
@@ -162,8 +176,13 @@ class App {
       if (this.preview.active) this.preview.render(dt);
       return;
     }
+    if (this.state === 'match' && this._vsOn) {
+      // versus screen stays up for 2.2s of *rendered* time (hides first-frame shader compile)
+      if (this._vsStart === null) this._vsStart = now;
+      else if (now - this._vsStart > 2200) { this._vsOn = false; $('versus').classList.add('hidden'); this.paused = false; this.audio.play('cock', { volume: 0.6 }); }
+    }
     if (this.state === 'match') {
-      if (this.input.menuReq) { this.input.menuReq = false; this.pause(!this.paused); }
+      if (this.input.menuReq) { this.input.menuReq = false; if ($('versus').classList.contains('hidden')) this.pause(!this.paused); }
       if (!this.paused) { this.game.update(dt, this.input); this.hud.update(dt); }
       this.game.render();
     }
