@@ -8,6 +8,7 @@ import { todayView } from './views/today.js';
 import { bookView } from './views/book.js';
 import { lettersView } from './views/letters.js';
 import { settingsView } from './views/settings.js';
+import { scrollView } from './views/scroll.js';
 
 export const state = { user: null, config: { ai: false, aiDaily: 3, hotlines: [] }, counts: {}, navDir: 0 };
 const root = document.getElementById('view');
@@ -43,6 +44,7 @@ async function route() {
     today: () => todayView(root),
     day: () => todayView(root, /^\d{4}-\d{2}-\d{2}$/.test(arg || '') ? arg : undefined),
     book: () => bookView(root, arg),
+    scroll: () => scrollView(root, arg),
     letters: () => lettersView(root),
     settings: () => settingsView(root)
   };

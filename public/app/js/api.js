@@ -27,6 +27,7 @@ export const api = {
   seal: day => call('POST', `/api/entries/${day}/seal`, {}),
   reply: day => call('POST', `/api/entries/${day}/reply`, {}),
   month: m => call('GET', `/api/entries?month=${m}`),
+  year: y => call('GET', `/api/year/${y}`),
   days: () => call('GET', '/api/entries'),
   letters: () => call('GET', '/api/letters'),
   sendLetter: b => call('POST', '/api/letters', b),

@@ -152,3 +152,14 @@ test('手机号：绑定与验证码注销', async () => {
   assert.equal((await a('DELETE', '/api/me', { code: d.data.debugCode })).status, 200);
   assert.equal((await a('POST', '/api/auth/login', { username: 'bindme', password: 'binding123' })).status, 401);
 });
+
+test('年度画卷数据', async () => {
+  const a = client();
+  await a('POST', '/api/auth/register', { username: 'juan', password: 'scroll1234', agree: true });
+  await a('PUT', `/api/entries/${today}`, { mood: 'happy', body: '一二三四五 六七八', page: { stickers: [{ k: 'maple', x: .5, y: .5 }], weather: '晴' } });
+  await a('POST', `/api/entries/${today}/seal`);
+  const r = await a('GET', `/api/year/${today.slice(0, 4)}`);
+  assert.equal(r.status, 200);
+  assert.deepEqual(r.data.days[0], { day: today, mood: 'happy', chars: 8, sealed: true, stickers: 1, photos: 0, weather: '晴', reply: false, excerpt: '一二三四五 六七八' });
+  assert.deepEqual(r.data.years, [today.slice(0, 4)]);
+});

@@ -318,6 +318,21 @@ export function createApp(opts = {}) {
       }
     }
 
+    // 年度画卷：一年里每一页的摘要
+    if ((mm = p.match(/^\/api\/year\/(\d{4})$/)) && m === 'GET') {
+      need();
+      const y = mm[1];
+      const rows = db.prepare('SELECT day, mood, body, page, sealed_at FROM entries WHERE user_id = ? AND day LIKE ? ORDER BY day').all(user.id, y + '-%');
+      const replies = new Set(db.prepare("SELECT day FROM letters WHERE user_id = ? AND kind = 'reply' AND day LIKE ?").all(user.id, y + '-%').map(r => r.day));
+      const years = db.prepare("SELECT DISTINCT substr(day, 1, 4) y FROM entries WHERE user_id = ? ORDER BY y").all(user.id).map(r => r.y);
+      const days = rows.map(r => {
+        const pg = parseJson(r.page, {}), text = r.body.replace(/\s+/g, ' ').trim();
+        return { day: r.day, mood: r.mood, chars: [...r.body.replace(/\s/g, '')].length, sealed: !!r.sealed_at, stickers: (pg.stickers || []).length,
+          photos: (pg.photos || []).length, weather: pg.weather || '', reply: replies.has(r.day), excerpt: [...text].slice(0, 48).join('') };
+      });
+      return send(res, 200, { year: Number(y), years, days, letters: db.prepare("SELECT COUNT(*) n FROM letters WHERE user_id = ? AND kind = 'reply' AND day LIKE ?").get(user.id, y + '-%').n });
+    }
+
     // letters
     if (p === '/api/letters' && m === 'GET') {
       need();
