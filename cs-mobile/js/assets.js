@@ -16,6 +16,9 @@ const SOUNDS = [
   'amb_wind', 'sting_win', 'sting_lose', 'grunt0', 'grunt1', 'grunt2', 'grunt3', 'grunt4', 'grunt5', 'grunt6', 'grunt7', 'grunt8', 'grunt9',
 ];
 
+// model location (the hosted build serves models as embedded glTF JSON)
+const MP = window.__MODEL_PATH || 'assets/models/', MX = window.__MODEL_EXT || '.glb';
+
 export const Assets = { tex: {}, models: {}, fx: {}, skins: {}, sounds: {}, soldier: null };
 
 export async function loadAll(audio, onProgress) {
@@ -35,9 +38,9 @@ export async function loadAll(audio, onProgress) {
   for (const n of SKIN_TEX) jobs.push(tex(`assets/skins/${n}.jpg`, true).then(t => { Assets.skins[n] = t; tick(); }));
   jobs.push(tex('assets/sky/sky.jpg', true, false).then(t => { Assets.sky = t; tick(); }));
   const model = (name, url) => jobs.push(gltf.loadAsync(url).then(g => { Assets.models[name] = g; tick(); }).catch(e => { console.warn('model fail', url, e); tick(); }));
-  for (const w of WEAPON_IDS) { model('vm_' + w, `assets/models/vm_${w}.glb`); model('w_' + w, `assets/models/w_${w}.glb`); }
-  for (const p of PROPS) model('p_' + p, `assets/models/p_${p}.glb`);
-  model('soldier', 'assets/models/soldier.glb');
+  for (const w of WEAPON_IDS) { model('vm_' + w, MP + `vm_${w}` + MX); model('w_' + w, MP + `w_${w}` + MX); }
+  for (const p of PROPS) model('p_' + p, MP + `p_${p}` + MX);
+  model('soldier', MP + 'soldier' + MX);
   for (const s of SOUNDS) jobs.push(audio.load(s, `assets/sounds/${s}.mp3`).then(tick, tick));
   await Promise.all(jobs);
   return Assets;
