@@ -429,35 +429,109 @@ const Navy = (() => {
     return { group, spec: S };
   }
   function rr(a, b) { return a + rnd() * (b - a); }
+  // a ski-jump ramp to bolt onto a flat-deck model: K = { x0, x1, h }, deck top at Y. Curved non-skid top with the
+  // two take-off lines, tapered towards the bow, plated sides and a front face down to the deck edge
+  let rampMats = null;
+  function skiRamp(K, Y) {
+    if (!rampMats) {
+      const t = tex(256, 512, (g, w, h) => {
+        noisy(g, w, h, '#53575b', 0.08);
+        for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(18,18,18,${rnd() * 0.12})`; g.fillRect(rnd() * w, rnd() * h, rr(8, 60), rr(20, 120)); }
+        g.strokeStyle = '#e8e6dc'; g.lineWidth = 5; g.beginPath(); g.moveTo(w * 0.04, 0); g.lineTo(w * 0.04, h); g.moveTo(w * 0.96, 0); g.lineTo(w * 0.96, h); g.stroke();
+        g.strokeStyle = '#e3c23a'; g.lineWidth = 4; g.setLineDash([26, 18]);
+        for (const u of [0.38, 0.62]) { g.beginPath(); g.moveTo(w * u, 0); g.lineTo(w * u, h); g.stroke(); }
+        g.setLineDash([]);
+      });
+      rampMats = { top: new THREE.MeshStandardMaterial({ map: t, roughness: 0.9 }), side: new THREE.MeshStandardMaterial({ color: 0x7d858c, roughness: 0.7, metalness: 0.2 }) };
+    }
+    const n = 16, P = [], S = [], UV = [];
+    const ws = u => lerp(30, 21, u * u) / 2;                       // half width, narrowing to the bow
+    const ys = u => Y + 0.12 + K.h * u * u;
+    const quad = (A, a, b, c, d) => A.push(...a, ...b, ...c, ...a, ...c, ...d);
+    for (let i = 0; i < n; i++) {
+      const u0 = i / n, u1 = (i + 1) / n, x0 = lerp(K.x0, K.x1, u0), x1 = lerp(K.x0, K.x1, u1);
+      quad(P, [x0, ys(u0), -ws(u0)], [x0, ys(u0), ws(u0)], [x1, ys(u1), ws(u1)], [x1, ys(u1), -ws(u1)]);
+      UV.push(0, u0, 1, u0, 1, u1, 0, u0, 1, u1, 0, u1);
+      for (const s of [1, -1]) quad(S, [x0, Y - 0.5, s * ws(u0)], [x1, Y - 0.5, s * ws(u1)], [x1, ys(u1), s * ws(u1)], [x0, ys(u0), s * ws(u0)]);
+    }
+    const we = ws(1), ye = ys(1);
+    quad(S, [K.x1, Y - 6, -we], [K.x1, Y - 6, we], [K.x1, ye, we], [K.x1, ye, -we]);        // bow face
+    const top = new THREE.BufferGeometry(); top.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); top.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2)); top.computeVertexNormals();
+    const side = new THREE.BufferGeometry(); side.setAttribute('position', new THREE.Float32BufferAttribute(S, 3)); side.computeVertexNormals();
+    const g = new THREE.Group();
+    for (const [geo, mat] of [[top, rampMats.top], [side, rampMats.side]]) { const m = new THREE.Mesh(geo, mat); m.material.side = THREE.DoubleSide; m.castShadow = m.receiveShadow = true; g.add(m); }
+    return g;
+  }
 
   /* ---------- submarines ---------- */
-  // teardrop pressure hull, sail with diving planes, cruciform (093B) or X (Virginia style) stern planes; anechoic black
+  // teardrop pressure hull in anechoic tiles, a teardrop sail with fairwater planes, flank-array panels and a
+  // shrouded pump-jet; 093B carries the VLS hump abaft the sail, Virginia the sail fillet and end-plated stern planes
   const SUBS = {
-    t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 14, h: 7.5, w: 4 }, xtail: false, number: '' },
-    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.8, w: 3.6 }, xtail: true, number: '' }
+    t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 15, h: 7.2, w: 3.8 }, hump: { x: 4, l: 20, h: 1.4 }, fillet: false, number: '' },
+    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.6, w: 3.4 }, hump: null, fillet: true, number: '' }
   };
+  let subMats = null;
   function submarine(cls) {
     const S = SUBS[cls], L = S.L, R = S.B / 2;
-    const skin = new THREE.MeshStandardMaterial({ color: 0x1a1d20, roughness: 0.85, metalness: 0.1, side: THREE.DoubleSide });
-    const P = [];
+    if (!subMats) {
+      const tiles = tex(256, 256, (g, w, h) => {
+        noisy(g, w, h, '#1c1f22', 0.05);
+        g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 1.2;
+        for (let i = 0; i <= 16; i++) { g.beginPath(); g.moveTo(i * 16, 0); g.lineTo(i * 16, h); g.stroke(); g.beginPath(); g.moveTo(0, i * 16 + (i % 2) * 4); g.lineTo(w, i * 16 + (i % 2) * 4); g.stroke(); }
+        for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? '60,64,66' : '8,9,10'},${0.3 + rnd() * 0.4})`; g.fillRect(Math.floor(rnd() * 16) * 16 + 1, Math.floor(rnd() * 16) * 16 + 1, 14, 14); }
+      });
+      tiles.wrapS = tiles.wrapT = THREE.RepeatWrapping;
+      subMats = {
+        skin: new THREE.MeshStandardMaterial({ color: 0xffffff, map: tiles, roughness: 0.88, metalness: 0.05, side: THREE.DoubleSide }),
+        panel: new THREE.MeshStandardMaterial({ color: 0x2b3034, roughness: 0.7, metalness: 0.1 }),
+        dark: new THREE.MeshStandardMaterial({ color: 0x0b0c0d, roughness: 0.6 }),
+        mast: new THREE.MeshStandardMaterial({ color: 0x3a3f43, roughness: 0.5, metalness: 0.4 })
+      };
+    }
+    const M = subMats, P = [];
+    // hull: elliptical bow, parallel midbody, long conical stern
     const prof = [];
-    for (let i = 0; i <= 40; i++) {
-      const u = i / 40, x = -L / 2 + u * L;
-      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(Math.max(0, 1 - (u - 0.7) / 0.3), 1.25) + 0.15 : R;
-      prof.push(new THREE.Vector2(Math.max(r, 0.01), x));
+    for (let i = 0; i <= 64; i++) {
+      const u = i / 64, x = -L / 2 + u * L;
+      let r;
+      if (u > 0.86) r = R * Math.sqrt(Math.max(0, 1 - Math.pow((u - 0.86) / 0.14, 2)));
+      else if (u < 0.32) r = R * (0.12 + 0.88 * Math.pow(Math.sin(Math.PI / 2 * u / 0.32), 0.9));
+      else r = R;
+      prof.push(new THREE.Vector2(Math.max(r, 0.02), x));
     }
-    const hullG = new THREE.LatheGeometry(prof, 28); hullG.rotateZ(-Math.PI / 2);
-    P.push([hullG, skin]);
-    const sl = S.sail;
-    P.push([block(sl.x, 0, sl.l, sl.w, sl.l * 0.75, sl.w * 0.85, R * 0.6, sl.h + R * 0.4, -0.8), skin]);
-    for (const sg of [1, -1]) P.push([box(3, 0.3, 4.5, sl.x + 2, R + sl.h * 0.7, sg * (sl.w / 2 + 2.2)), skin]);
-    const tx = -L / 2 + 6;
+    prof.unshift(new THREE.Vector2(0.01, -L / 2));
+    const hullG = new THREE.LatheGeometry(prof, 36); hullG.rotateZ(-Math.PI / 2); hullG.rotateX(Math.PI / 2);
+    { const uv = hullG.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 2 * Math.PI * R / 6, uv.getY(i) * L / 6); }
+    P.push([hullG, M.skin]);
+    // flank arrays: long panels along both sides of the midbody
+    for (const sg of [1, -1]) { const f = new THREE.CylinderGeometry(R + 0.04, R + 0.04, L * 0.42, 10, 1, true, sg > 0 ? Math.PI * 0.02 : Math.PI * 0.82, Math.PI * 0.16); f.rotateZ(-Math.PI / 2); f.translate(-L * 0.04, 0, 0); P.push([f, M.panel]); }
+    // sail: teardrop planform extruded upward, a cap, fairwater planes and masts
+    const sl = S.sail, sh = new THREE.Shape(), hw = sl.w / 2;
+    sh.moveTo(sl.l / 2, 0);
+    sh.absarc(sl.l / 2 - hw, 0, hw, 0, Math.PI / 2, false);
+    sh.bezierCurveTo(0, hw * 1.02, -sl.l / 4, hw * 0.9, -sl.l / 2, hw * 0.2);
+    sh.lineTo(-sl.l / 2, -hw * 0.2);
+    sh.bezierCurveTo(-sl.l / 4, -hw * 0.9, 0, -hw * 1.02, sl.l / 2 - hw, -hw);
+    sh.absarc(sl.l / 2 - hw, 0, hw, -Math.PI / 2, 0, false);
+    const sailG = new THREE.ExtrudeGeometry(sh, { depth: sl.h + R * 0.5, bevelEnabled: true, bevelThickness: 0.35, bevelSize: 0.3, bevelSegments: 3, curveSegments: 10 });
+    sailG.rotateX(-Math.PI / 2); sailG.translate(sl.x, R * 0.5, 0);
+    P.push([sailG, M.skin]);
+    const top = R + sl.h + 0.3;
+    for (const sg of [1, -1]) { const pl = block(sl.x + sl.l * 0.18, sg * (hw + 1.9), 3.2, 3.4, 2.0, 3.0, top - sl.h * 0.38, 0.32, -0.6); P.push([pl, M.skin]); }
+    for (const [dx, hh, r] of [[2.6, 3.2, 0.32], [0.6, 4.4, 0.24], [-1.6, 2.6, 0.4], [-3.4, 3.6, 0.2]]) P.push([cyl(r, r * 1.1, hh, sl.x + dx, top + hh / 2, 0, 8), M.mast]);
+    if (S.fillet) P.push([block(sl.x + sl.l / 2 + 1.6, 0, 6, sl.w * 0.9, 0.6, sl.w * 0.5, R * 0.75, 2.6, -2.6), M.skin]);
+    if (S.hump) { const hm = new THREE.SphereGeometry(1, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2); hm.scale(S.hump.l / 2, S.hump.h, R * 0.62); hm.translate(S.hump.x, R * 0.82, 0); P.push([hm, M.skin]);
+      for (let i = 0; i < 6; i++) for (const sg of [1, -1]) P.push([cyl(0.62, 0.62, 0.08, S.hump.x - 6 + i * 2.4, R * 0.82 + S.hump.h - 0.05 - Math.abs(i - 2.5) * 0.08, sg * 1.0, 12), M.panel]); }
+    // stern planes: cruciform (Virginia's carry end plates); pump-jet shroud and stator ring
+    const tx = -L / 2 + 9;
     for (let k = 0; k < 4; k++) {
-      const a = (S.xtail ? Math.PI / 4 : 0) + k * Math.PI / 2;
-      const f = new THREE.BoxGeometry(5, 0.35, 4.2); f.translate(0, 0, 2.4 + R * 0.25);
-      f.rotateX(a); f.translate(tx, 0, 0); P.push([f, skin]);
+      const a = k * Math.PI / 2, span = R * 0.5 + (k % 2 ? 3.8 : 3.4);
+      const f = block(0, 0, 6.4, 0.44, 3.4, 0.22, 0, span, -1.6); f.rotateX(-Math.PI / 2 + a); f.translate(tx, 0, 0);
+      P.push([f, M.skin]);
+      if (S.fillet && k % 2 === 0) P.push([box(3.2, 2.4, 0.24, tx - 1.7, 0, (k === 0 ? -1 : 1) * span), M.skin]);   // end plates
     }
-    P.push([cyl(0.5, 0.5, 3, sl.x, R + sl.h + 1.6, 0, 6), skin]);
+    const shroud = new THREE.CylinderGeometry(R * 0.32, R * 0.4, 3.2, 24, 1, true); shroud.rotateZ(-Math.PI / 2); shroud.translate(-L / 2 + 0.6, 0, 0); P.push([shroud, M.skin]);
+    const stator = new THREE.CylinderGeometry(R * 0.3, R * 0.3, 0.2, 24); stator.rotateZ(-Math.PI / 2); stator.translate(-L / 2 - 0.9, 0, 0); P.push([stator, M.dark]);
     const group = assemble(P);
     return { group, spec: Object.assign({ L, B: S.B, T: R * 2, sub: true }, S) };
   }
@@ -504,25 +578,53 @@ const Navy = (() => {
     const cp = new THREE.BoxGeometry(1.4, 0.5, 1.4); cp.translate(7.6, 0.85, 0); add(cp, M.glass);
     return { obj: F22.bake({ group }), exhausts: [[-0.6, 0.5, 4], [-0.6, 0.5, -4]], radius: 12 };
   }
-  // Tu-16 layout medium bomber
+  // H-6K: the Tu-16 airframe re-engined with turbofans in the wing roots, a solid radome in place of the glazed
+  // nose, Tupolev gear pods trailing the wings, six pylons (two YJ-12 inboard) and an EW fairing in the old tail turret
   function h6k() {
-    const M = Craft.materials('h6', 0xe6e9ec, 4), group = new THREE.Group(), add = Craft.adder(group);
-    const W = curve([[17, 0], [16, 0.8], [13, 1.4], [8, 1.65], [0, 1.7], [-8, 1.5], [-14, 1.0], [-17, 0.4]]);
-    Craft.body(add, M.skin, W, curve([[17, 0], [16, 0.8], [13, 1.4], [8, 1.7], [0, 1.7], [-8, 1.5], [-14, 1.1], [-17, 0.5]]), curve([[17, 0], [16, -0.8], [12, -1.5], [0, -1.6], [-10, -1.3], [-17, -0.4]]), 17, -17, 2.2, 60, 20);
-    Craft.surface(add, M.skin, { le: z => 3.5 - (z - 1.5) * Math.tan(37 * D2R), te: z => -3.8 - (z - 1.5) * Math.tan(22 * D2R), th: Craft.lin(1.5, 16.5, 0.9, 0.18), y: z => -0.3 - (z - 1.5) * 0.04 }, 1.5, 16.5, 10);
+    const M = Craft.materials('h6', 0xdde1e4, 4), group = new THREE.Group(), add = Craft.adder(group), lin = Craft.lin;
+    const W = curve([[17.4, 0], [17, 0.45], [16, 0.95], [14.5, 1.35], [12, 1.62], [8, 1.72], [0, 1.72], [-6, 1.6], [-11, 1.3], [-15, 0.85], [-17.2, 0.45]]);
+    const TOP = curve([[17.4, 0], [17, 0.42], [16, 0.9], [14.6, 1.42], [13.4, 1.92], [12, 2.02], [9, 1.85], [0, 1.75], [-6, 1.7], [-12, 1.5], [-15.5, 1.1], [-17.2, 0.55]]);
+    const BOT = curve([[17.4, 0], [17, -0.4], [16, -0.85], [14, -1.35], [10, -1.6], [0, -1.65], [-8, -1.5], [-13, -1.1], [-17.2, -0.35]]);
+    Craft.body(add, M.skin, W, TOP, BOT, 17.4, -17.4, 2.2, 72, 22);
+    const k = 1.012, radome = new THREE.MeshStandardMaterial({ color: 0x8d949a, roughness: 0.6, metalness: 0.1, side: THREE.DoubleSide });
+    Craft.body(add, radome, x => W(x) * k, x => TOP(x) * k, x => BOT(x) * k, 17.45, 15.7, 2.2, 12, 22);
+    Craft.canopy(add, M, TOP, 14.6, 12.2, 1.05, 0.32, 0.35);
+    for (const sg of [1, -1]) for (const [x, y] of [[13.6, 1.55], [12.7, 1.6]]) P0(add, new THREE.BoxGeometry(0.7, 0.32, 0.04), M.glass, x, y, sg * (W(x) + 0.01));
+    P0(add, new THREE.SphereGeometry(0.36, 12, 8), M.dark, 15.2, -1.0, 0);                     // EO turret under the nose
+    const tc = new THREE.ConeGeometry(0.46, 1.8, 14); tc.rotateZ(Math.PI / 2); tc.translate(-18.1, 0.45, 0); add(tc, M.skin);
+    for (const [x, h] of [[5, 0.55], [-2, 0.45], [-8, 0.5]]) P0(add, new THREE.BoxGeometry(0.7, h, 0.06), M.dark, x, TOP(x) + h / 2 - 0.05, 0);
+    // wing: 35 degree sweep, slight anhedral, low-mid set; fences on the upper surface
+    const wy = z => -0.5 - (z - 1.6) * 0.052;
+    Craft.surface(add, M.skin, { le: z => 3.8 - (z - 1.6) * Math.tan(37 * D2R), te: z => -4.2 - (z - 1.6) * Math.tan(21 * D2R), th: lin(1.6, 16.5, 1.0, 0.18), y: wy }, 1.6, 16.5, 12);
+    for (const sg of [1, -1]) for (const z of [8.8, 12.6]) P0(add, new THREE.BoxGeometry(3.4, 0.28, 0.05), M.skin, 3.8 - (z - 1.6) * 0.754 - 1.4, wy(z) + 0.28, sg * z);
     const exhausts = [];
-    for (const s of [1, -1]) {
-      const n = new THREE.CylinderGeometry(1.0, 0.85, 10, 16); n.rotateZ(-Math.PI / 2); n.translate(0.2, -0.3, 2.4 * s); add(n, M.skin);
-      Craft.nozzle(add, M, -4.8, -5.6, -0.3, 2.4 * s, 0.8, 0.7);
-      exhausts.push([-5.7, -0.3, 2.4 * s]);
-      // YJ-12 under the wing
-      const m = new THREE.CylinderGeometry(0.33, 0.33, 7, 10); m.rotateZ(-Math.PI / 2); m.translate(-1, -1.3, 7 * s); add(m, M.white);
+    const loft = (x0, x1, yc, zc, rf, n = 18) => { const rings = []; for (let i = 0; i <= n; i++) { const t = i / n, x = lerp(x0, x1, t), r = rf(t); rings.push(Craft.ring(x, yc, zc, r, r, r, 2, 18)); } add(gridGeometry(rings), M.skin); return rings; };
+    for (const sg of [1, -1]) {
+      // root engine nacelle with the intake lip just ahead of the leading edge
+      const ze = 2.35 * sg, ye = -0.35;
+      const rings = loft(6.6, -6.4, ye, ze, t => t < 0.12 ? lerp(0.98, 1.15, t / 0.12) : lerp(1.15, 0.78, Math.pow((t - 0.12) / 0.88, 1.6)));
+      add(capGeometry(rings[0].slice(0, -1), p => [p[2], p[1]]), M.dark);
+      Craft.nozzle(add, M, -6.4, -7.1, ye, ze, 0.74, 0.66);
+      exhausts.push([-7.2, ye, ze]);
+      // Tupolev main-gear pod trailing the wing
+      const zp = 7.0 * sg;
+      loft(0.8, -9.2, wy(7) - 0.55, zp, t => 0.66 * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.75)), 0.5) + 0.02, 16);
+      // pylons: YJ-12 inboard, an empty one outboard
+      for (const [z, msl] of [[4.6, true], [10.4, false]]) {
+        const zz = z * sg, xle = 3.8 - (z - 1.6) * 0.754;
+        P0(add, new THREE.BoxGeometry(3.2, 0.55, 0.16), M.skin, xle - 2.6, wy(z) - 0.42, zz);
+        if (msl) {
+          const b = new THREE.CylinderGeometry(0.32, 0.32, 5.6, 14); b.rotateZ(-Math.PI / 2); P0(add, b, M.white, xle - 2.4, wy(z) - 1.05, zz);
+          const n = new THREE.ConeGeometry(0.32, 1.3, 14); n.rotateZ(-Math.PI / 2); P0(add, n, M.white, xle + 1.1, wy(z) - 1.05, zz);
+          for (const a of [Math.PI / 4, -Math.PI / 4]) { const f = new THREE.BoxGeometry(0.9, 0.04, 1.3); f.rotateX(a); P0(add, f, M.white, xle - 4.8, wy(z) - 1.05, zz); }
+        }
+      }
     }
-    Craft.fins(add, M.skin, group, { z: 0, y: 1.2, le: -9.5, te: -15, h: 6, sLE: 42, sTE: 10, th0: 0.45, th1: 0.12 });
-    Craft.surface(add, M.skin, { le: Craft.lin(0.5, 6, -12.8, -16), te: Craft.lin(0.5, 6, -16.8, -17.8), th: Craft.lin(0.5, 6, 0.3, 0.1), y: () => 0.6 }, 0.5, 6, 6);
-    const glass = new THREE.SphereGeometry(1.0, 12, 8); glass.scale(1.6, 0.9, 1.0); glass.translate(15.4, 0, 0); add(glass, M.glass);
+    Craft.fins(add, M.skin, group, { z: 0, y: 1.3, le: -9.0, te: -15.6, h: 6.2, sLE: 44, sTE: 14, th0: 0.45, th1: 0.12 });
+    Craft.surface(add, M.skin, { le: z => -12.2 - (z - 0.5) * 0.9, te: z => -15.9 - (z - 0.5) * 0.32, th: lin(0.5, 5.6, 0.3, 0.1), y: () => 0.85 }, 0.5, 5.6, 6);
     return { obj: F22.bake({ group }), exhausts, radius: 15 };
   }
+  const P0 = (add, geo, mat, x, y, z) => { const m = add(geo, mat); m.position.set(x, y, z); return m; };
   const cache = {};
   function plane(type) {
     if (cache[type]) { const c = cache[type]; return { obj: c.obj.clone(), exhausts: c.exhausts, radius: c.radius }; }
@@ -550,5 +652,5 @@ const Navy = (() => {
   }
 
   function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
-  return { ship, plane, ashmGeometry, SPECS, CARRIERS, SUBS };
+  return { ship, plane, ashmGeometry, skiRamp, SPECS, CARRIERS, SUBS };
 })();

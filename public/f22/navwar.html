@@ -259,6 +259,119 @@
     .screen { align-items: flex-start; background: rgba(6, 10, 14, 0.82); }
     .stats { grid-template-columns: repeat(2, auto); }
   }
+
+  /* ---------- joint command: the planning screen, the joint operations centre, staff proposals, decision points ---------- */
+  .card.wide { width: min(1080px, 100%); }
+  .pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .psec { background: rgba(8, 14, 20, 0.82); border: 1px solid var(--line); padding: 10px 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .psec.span2 { grid-column: 1 / -1; }
+  .psec h3 { margin: 0; font: 700 13px/1.3 var(--f-body); color: var(--gold); letter-spacing: 0.06em; }
+  #plan-map { width: 100%; height: 170px; display: block; border: 1px solid var(--line); }
+  .pnote { margin: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted); }
+  .pnote b { color: var(--fg); font-weight: 600; }
+  .prow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .prow > i { font: 600 11px/1 var(--f-body); font-style: normal; color: var(--muted); width: 56px; flex: none; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--line); }
+  .seg button { appearance: none; cursor: pointer; font: 600 12px/1 var(--f-body); color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); padding: 8px 10px; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--gold); color: #1c1407; }
+  .seg.fixed button { cursor: default; }
+  .concepts { display: grid; gap: 6px; }
+  .concept { appearance: none; cursor: pointer; text-align: left; font: inherit; color: var(--fg); background: rgba(8, 14, 20, 0.5); border: 1px solid var(--line); padding: 8px 10px; display: grid; gap: 4px; }
+  .concept.on { border-color: var(--gold); background: rgba(227, 178, 87, 0.12); }
+  .concept b { font: 700 13px/1.2 var(--f-body); }
+  .concept small { font-size: 11px; line-height: 1.5; color: var(--muted); }
+  .chain { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; font-size: 11px; }
+  .chain em { font-style: normal; background: rgba(143, 200, 255, 0.12); color: #cfe8ff; padding: 2px 6px; }
+  .chain s { text-decoration: none; color: var(--muted); }
+  .orbat { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; }
+  .orow { display: grid; grid-template-columns: minmax(120px, auto) 1fr; grid-template-rows: auto auto; gap: 1px 8px; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(238, 243, 245, 0.06); }
+  .orow b { font-size: 12.5px; } .orow span { font-size: 10.5px; color: var(--muted); grid-column: 1; }
+  .orow .seg { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
+  .orow .seg button { padding: 6px 7px; font-size: 11px; }
+  .sliders { display: grid; gap: 6px; }
+  .sliders label { display: grid; grid-template-columns: 78px 1fr 40px; align-items: center; gap: 8px; font-size: 12px; }
+  .sliders label small { grid-column: 2 / -1; font-size: 10px; color: var(--muted); margin-top: -4px; }
+  .sliders i { font-style: normal; color: var(--muted); }
+  .sliders b { font: 600 12px/1 var(--f-mono); text-align: right; }
+  .sliders input { width: 100%; accent-color: var(--gold); }
+  .sliders .resv { border-top: 1px solid var(--line); padding-top: 6px; }
+  .staffnote { margin: 0; padding-left: 16px; display: grid; gap: 3px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .staffnote b { color: #ffd28a; font-weight: 600; margin-right: 4px; }
+  #cmdbar button.lead { border-color: var(--gold); background: rgba(227, 178, 87, 0.25); }
+  #jcc { position: fixed; z-index: 14; top: calc(8px + env(safe-area-inset-top, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); right: calc(8px + env(safe-area-inset-right, 0px));
+    width: min(760px, calc(100vw - 16px)); background: rgba(5, 10, 15, 0.94); border: 1px solid rgba(227, 178, 87, 0.45); display: grid; grid-template-rows: auto auto 1fr; pointer-events: auto; }
+  #jcc[hidden] { display: none; }
+  .jhead { display: flex; align-items: center; gap: 10px; padding: 9px 10px 7px 14px; border-bottom: 1px solid var(--line); }
+  .jhead b { font: 700 14px/1 var(--f-body); color: var(--gold); letter-spacing: 0.08em; white-space: nowrap; }
+  .jhead span { flex: 1; font: 500 11px/1.3 var(--f-mono); color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jhead button { appearance: none; cursor: pointer; font: 600 13px/1 var(--f-body); color: var(--fg); background: transparent; border: 1px solid var(--line); padding: 7px 10px; }
+  .jtabs { display: flex; gap: 4px; padding: 7px 10px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .jtabs button { appearance: none; cursor: pointer; flex: none; font: 700 12px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 8px 11px; }
+  .jtabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
+  #jcc-body { overflow-y: auto; padding: 10px 14px 14px; display: grid; gap: 10px; align-content: start; font-size: 12px; -webkit-user-select: none; user-select: none; touch-action: pan-y; }
+  #jcc-body h4 { margin: 4px 0 0; font: 700 12px/1.3 var(--f-body); color: var(--gold); }
+  #jcc-body h4 small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+  #jcc-body button, .dopts button, .pacts button { appearance: none; cursor: pointer; font: 600 11.5px/1 var(--f-body); color: var(--fg); background: rgba(8, 14, 20, 0.6); border: 1px solid rgba(227, 178, 87, 0.6); padding: 7px 9px; }
+  #jcc-body .seg button { border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); }
+  #jcc-body .seg button.on { background: var(--gold); color: #1c1407; }
+  #jcc-body select { font: 500 11px/1 var(--f-body); color: var(--fg); background: #0b141c; border: 1px solid var(--line); padding: 4px; }
+  .jnote { margin: 0; color: var(--muted); line-height: 1.55; }
+  .jnote b { color: var(--fg); }
+  .jphase { display: grid; gap: 5px; background: rgba(227, 178, 87, 0.08); border: 1px solid rgba(227, 178, 87, 0.35); padding: 9px 11px; }
+  .jphase b { font: 700 14px/1.2 var(--f-body); color: var(--gold); }
+  .jphase em { font-style: normal; color: var(--muted); font-size: 11px; }
+  .jphase button { justify-self: start; }
+  .jbar { display: block; height: 6px; background: rgba(238, 243, 245, 0.1); min-width: 60px; }
+  .jbar i { display: block; height: 100%; }
+  .jgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px 14px; }
+  .jgrid > div { display: grid; gap: 3px; align-content: start; }
+  .jgrid i { font-style: normal; color: var(--muted); font-size: 11px; }
+  .jgrid b { font: 600 12.5px/1.3 var(--f-body); }
+  .jlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .jlist li { padding: 4px 6px; border-left: 2px solid rgba(143, 200, 255, 0.4); background: rgba(238, 243, 245, 0.03); line-height: 1.4; }
+  .jlist li.hi { border-left-color: #ffd28a; } .jlist li.crit { border-left-color: #ff5a4f; color: #ffb4a8; }
+  .jlist em { font: 500 10.5px/1 var(--f-mono); font-style: normal; color: var(--muted); margin-right: 8px; }
+  .jtab { width: 100%; border-collapse: collapse; }
+  .jtab th { text-align: left; font: 600 10.5px/1 var(--f-mono); color: var(--muted); padding: 4px; border-bottom: 1px solid var(--line); }
+  .jtab td { padding: 5px 4px; border-bottom: 1px solid rgba(238, 243, 245, 0.06); vertical-align: middle; }
+  .jtab td small { display: block; color: var(--muted); font-size: 10px; }
+  .jtab tr.main td { background: rgba(227, 178, 87, 0.1); }
+  .jtab td.acts { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+  .jtab td.acts em { font-style: normal; color: var(--gold); font-weight: 700; padding: 6px 4px; }
+  .jtab .jbar { display: inline-block; width: 60px; vertical-align: middle; margin: 0 4px; }
+  .jgrp { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 6px; }
+  .jship { display: grid; grid-template-columns: 110px 70px 1fr auto; gap: 8px; align-items: center; padding: 3px 0; }
+  .jship span { color: var(--muted); font-size: 11px; }
+  .jphases { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  .jphases li { display: grid; gap: 2px; padding: 6px 9px; border-left: 3px solid var(--line); background: rgba(238, 243, 245, 0.03); }
+  .jphases li.done { border-left-color: #8dffb4; opacity: 0.7; }
+  .jphases li.now { border-left-color: var(--gold); background: rgba(227, 178, 87, 0.1); }
+  .jphases span { color: var(--fg); } .jphases small { color: var(--muted); font-size: 10.5px; }
+  #props { position: fixed; z-index: 11; left: calc(10px + env(safe-area-inset-left, 0px)); bottom: calc(118px + env(safe-area-inset-bottom, 0px)); width: min(340px, 44vw); display: flex; flex-direction: column; gap: 6px; pointer-events: auto; }
+  #props[hidden] { display: none; }
+  .prop { background: rgba(6, 10, 14, 0.9); border: 1px solid rgba(227, 178, 87, 0.6); padding: 8px 10px; display: grid; gap: 5px; }
+  .prop b { font: 700 12px/1.3 var(--f-body); color: var(--gold); }
+  .prop > span { font-size: 11px; line-height: 1.45; color: #d6e0e6; }
+  .pbar { height: 3px; background: rgba(238, 243, 245, 0.12); }
+  .pbar i { display: block; height: 100%; width: 100%; background: var(--gold); }
+  .pacts { display: flex; gap: 6px; align-items: center; }
+  .pacts button[data-a="approve"] { border-color: #8dffb4; }
+  .pacts button[data-a="veto"] { border-color: #ff8a78; }
+  .pacts em { margin-left: auto; font: 500 10.5px/1 var(--f-mono); font-style: normal; color: var(--muted); }
+  #dp { position: fixed; inset: 0; z-index: 16; display: grid; place-items: center; background: rgba(2, 5, 8, 0.45); pointer-events: auto; padding: 16px; }
+  #dp[hidden] { display: none; }
+  .dpc { width: min(520px, 100%); background: rgba(6, 10, 14, 0.96); border: 1px solid var(--gold); padding: 16px 18px; display: grid; gap: 10px; }
+  .dpc h3 { margin: 0; font: 800 22px/1.15 var(--f-display); letter-spacing: 0.03em; color: var(--gold); }
+  .dpc p { margin: 0; line-height: 1.7; color: #d6e0e6; font-size: 13px; }
+  .dpc p.eyebrow { font-size: 10px; }
+  .dopts { display: grid; gap: 6px; }
+  .dopts button { padding: 11px 12px; font-size: 13px; text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .dopts button.rec { border-color: var(--gold); background: rgba(227, 178, 87, 0.18); }
+  .dopts small { font: 500 10px/1 var(--f-mono); color: var(--gold); }
+  .dpc > em { font: 500 11px/1 var(--f-mono); font-style: normal; color: var(--muted); }
+  @media (max-width: 760px) { .pgrid, .orbat { grid-template-columns: 1fr; } .jship { grid-template-columns: 1fr 60px; } .jship span { grid-column: 1 / -1; } }
+  @media (max-height: 520px) { #props { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); width: min(300px, 40vw); } .prop > span { display: none; } .dpc { padding: 12px 14px; gap: 7px; } .dpc p { font-size: 12px; line-height: 1.55; } }
 </style>
 
 <div id="stage"></div>
@@ -291,6 +404,7 @@
     <button type="button" id="sp-take">接管</button>
   </div>
   <div id="cmdbar" hidden>
+    <button type="button" id="cm-jcc" class="lead">指挥中心</button>
     <button type="button" id="cm-alpha">大规模打击</button>
     <button type="button" id="cm-strike">攻击编队</button>
     <button type="button" id="cm-cap">加强巡逻</button>
@@ -322,7 +436,7 @@
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-support" data-act="support">战区支援</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
-  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
+  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · J 指挥中心 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>
@@ -384,6 +498,19 @@
   </div>
 </section>
 
+<section class="screen" id="plan" hidden>
+  <div class="card wide">
+    <p class="eyebrow">作战筹划 · 定下作战决心</p>
+    <h2>作战决心</h2>
+    <div id="plan-body"></div>
+    <div class="row">
+      <button class="btn primary" id="b-plan-go" type="button">下达作战命令</button>
+      <button class="btn" id="b-plan-staff" type="button">采纳参谋部方案</button>
+      <button class="btn" id="b-plan-back" type="button">返回</button>
+    </div>
+  </div>
+</section>
+
 <section class="screen" id="pause" hidden>
   <div class="card">
     <p class="eyebrow">作战暂停</p>
@@ -434,6 +561,13 @@
     <p id="tac-desc"></p>
   </div>
 </div>
+<div id="jcc" hidden>
+  <div class="jhead"><b>战区联合指挥中心</b><span id="jcc-phase"></span><button type="button" id="jcc-close">✕</button></div>
+  <div class="jtabs" id="jcc-tabs"><button type="button" data-t="sit" class="on">态势</button><button type="button" data-t="tgt">目标清单</button><button type="button" data-t="frc">兵力编组</button><button type="button" data-t="ap">兵力分配</button><button type="button" data-t="roe">规则与保障</button><button type="button" data-t="plan">作战计划</button></div>
+  <div id="jcc-body"></div>
+</div>
+<div id="props" hidden></div>
+<div id="dp" hidden></div>
 <div id="toast" hidden></div>
 <div id="loading">正在编组舰队 · 生成海域</div>
 
@@ -2858,35 +2992,109 @@ const Navy = (() => {
     return { group, spec: S };
   }
   function rr(a, b) { return a + rnd() * (b - a); }
+  // a ski-jump ramp to bolt onto a flat-deck model: K = { x0, x1, h }, deck top at Y. Curved non-skid top with the
+  // two take-off lines, tapered towards the bow, plated sides and a front face down to the deck edge
+  let rampMats = null;
+  function skiRamp(K, Y) {
+    if (!rampMats) {
+      const t = tex(256, 512, (g, w, h) => {
+        noisy(g, w, h, '#53575b', 0.08);
+        for (let i = 0; i < 40; i++) { g.fillStyle = `rgba(18,18,18,${rnd() * 0.12})`; g.fillRect(rnd() * w, rnd() * h, rr(8, 60), rr(20, 120)); }
+        g.strokeStyle = '#e8e6dc'; g.lineWidth = 5; g.beginPath(); g.moveTo(w * 0.04, 0); g.lineTo(w * 0.04, h); g.moveTo(w * 0.96, 0); g.lineTo(w * 0.96, h); g.stroke();
+        g.strokeStyle = '#e3c23a'; g.lineWidth = 4; g.setLineDash([26, 18]);
+        for (const u of [0.38, 0.62]) { g.beginPath(); g.moveTo(w * u, 0); g.lineTo(w * u, h); g.stroke(); }
+        g.setLineDash([]);
+      });
+      rampMats = { top: new THREE.MeshStandardMaterial({ map: t, roughness: 0.9 }), side: new THREE.MeshStandardMaterial({ color: 0x7d858c, roughness: 0.7, metalness: 0.2 }) };
+    }
+    const n = 16, P = [], S = [], UV = [];
+    const ws = u => lerp(30, 21, u * u) / 2;                       // half width, narrowing to the bow
+    const ys = u => Y + 0.12 + K.h * u * u;
+    const quad = (A, a, b, c, d) => A.push(...a, ...b, ...c, ...a, ...c, ...d);
+    for (let i = 0; i < n; i++) {
+      const u0 = i / n, u1 = (i + 1) / n, x0 = lerp(K.x0, K.x1, u0), x1 = lerp(K.x0, K.x1, u1);
+      quad(P, [x0, ys(u0), -ws(u0)], [x0, ys(u0), ws(u0)], [x1, ys(u1), ws(u1)], [x1, ys(u1), -ws(u1)]);
+      UV.push(0, u0, 1, u0, 1, u1, 0, u0, 1, u1, 0, u1);
+      for (const s of [1, -1]) quad(S, [x0, Y - 0.5, s * ws(u0)], [x1, Y - 0.5, s * ws(u1)], [x1, ys(u1), s * ws(u1)], [x0, ys(u0), s * ws(u0)]);
+    }
+    const we = ws(1), ye = ys(1);
+    quad(S, [K.x1, Y - 6, -we], [K.x1, Y - 6, we], [K.x1, ye, we], [K.x1, ye, -we]);        // bow face
+    const top = new THREE.BufferGeometry(); top.setAttribute('position', new THREE.Float32BufferAttribute(P, 3)); top.setAttribute('uv', new THREE.Float32BufferAttribute(UV, 2)); top.computeVertexNormals();
+    const side = new THREE.BufferGeometry(); side.setAttribute('position', new THREE.Float32BufferAttribute(S, 3)); side.computeVertexNormals();
+    const g = new THREE.Group();
+    for (const [geo, mat] of [[top, rampMats.top], [side, rampMats.side]]) { const m = new THREE.Mesh(geo, mat); m.material.side = THREE.DoubleSide; m.castShadow = m.receiveShadow = true; g.add(m); }
+    return g;
+  }
 
   /* ---------- submarines ---------- */
-  // teardrop pressure hull, sail with diving planes, cruciform (093B) or X (Virginia style) stern planes; anechoic black
+  // teardrop pressure hull in anechoic tiles, a teardrop sail with fairwater planes, flank-array panels and a
+  // shrouded pump-jet; 093B carries the VLS hump abaft the sail, Virginia the sail fillet and end-plated stern planes
   const SUBS = {
-    t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 14, h: 7.5, w: 4 }, xtail: false, number: '' },
-    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.8, w: 3.6 }, xtail: true, number: '' }
+    t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 15, h: 7.2, w: 3.8 }, hump: { x: 4, l: 20, h: 1.4 }, fillet: false, number: '' },
+    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.6, w: 3.4 }, hump: null, fillet: true, number: '' }
   };
+  let subMats = null;
   function submarine(cls) {
     const S = SUBS[cls], L = S.L, R = S.B / 2;
-    const skin = new THREE.MeshStandardMaterial({ color: 0x1a1d20, roughness: 0.85, metalness: 0.1, side: THREE.DoubleSide });
-    const P = [];
+    if (!subMats) {
+      const tiles = tex(256, 256, (g, w, h) => {
+        noisy(g, w, h, '#1c1f22', 0.05);
+        g.strokeStyle = 'rgba(0,0,0,0.55)'; g.lineWidth = 1.2;
+        for (let i = 0; i <= 16; i++) { g.beginPath(); g.moveTo(i * 16, 0); g.lineTo(i * 16, h); g.stroke(); g.beginPath(); g.moveTo(0, i * 16 + (i % 2) * 4); g.lineTo(w, i * 16 + (i % 2) * 4); g.stroke(); }
+        for (let i = 0; i < 26; i++) { g.fillStyle = `rgba(${rnd() < 0.5 ? '60,64,66' : '8,9,10'},${0.3 + rnd() * 0.4})`; g.fillRect(Math.floor(rnd() * 16) * 16 + 1, Math.floor(rnd() * 16) * 16 + 1, 14, 14); }
+      });
+      tiles.wrapS = tiles.wrapT = THREE.RepeatWrapping;
+      subMats = {
+        skin: new THREE.MeshStandardMaterial({ color: 0xffffff, map: tiles, roughness: 0.88, metalness: 0.05, side: THREE.DoubleSide }),
+        panel: new THREE.MeshStandardMaterial({ color: 0x2b3034, roughness: 0.7, metalness: 0.1 }),
+        dark: new THREE.MeshStandardMaterial({ color: 0x0b0c0d, roughness: 0.6 }),
+        mast: new THREE.MeshStandardMaterial({ color: 0x3a3f43, roughness: 0.5, metalness: 0.4 })
+      };
+    }
+    const M = subMats, P = [];
+    // hull: elliptical bow, parallel midbody, long conical stern
     const prof = [];
-    for (let i = 0; i <= 40; i++) {
-      const u = i / 40, x = -L / 2 + u * L;
-      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(Math.max(0, 1 - (u - 0.7) / 0.3), 1.25) + 0.15 : R;
-      prof.push(new THREE.Vector2(Math.max(r, 0.01), x));
+    for (let i = 0; i <= 64; i++) {
+      const u = i / 64, x = -L / 2 + u * L;
+      let r;
+      if (u > 0.86) r = R * Math.sqrt(Math.max(0, 1 - Math.pow((u - 0.86) / 0.14, 2)));
+      else if (u < 0.32) r = R * (0.12 + 0.88 * Math.pow(Math.sin(Math.PI / 2 * u / 0.32), 0.9));
+      else r = R;
+      prof.push(new THREE.Vector2(Math.max(r, 0.02), x));
     }
-    const hullG = new THREE.LatheGeometry(prof, 28); hullG.rotateZ(-Math.PI / 2);
-    P.push([hullG, skin]);
-    const sl = S.sail;
-    P.push([block(sl.x, 0, sl.l, sl.w, sl.l * 0.75, sl.w * 0.85, R * 0.6, sl.h + R * 0.4, -0.8), skin]);
-    for (const sg of [1, -1]) P.push([box(3, 0.3, 4.5, sl.x + 2, R + sl.h * 0.7, sg * (sl.w / 2 + 2.2)), skin]);
-    const tx = -L / 2 + 6;
+    prof.unshift(new THREE.Vector2(0.01, -L / 2));
+    const hullG = new THREE.LatheGeometry(prof, 36); hullG.rotateZ(-Math.PI / 2); hullG.rotateX(Math.PI / 2);
+    { const uv = hullG.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * 2 * Math.PI * R / 6, uv.getY(i) * L / 6); }
+    P.push([hullG, M.skin]);
+    // flank arrays: long panels along both sides of the midbody
+    for (const sg of [1, -1]) { const f = new THREE.CylinderGeometry(R + 0.04, R + 0.04, L * 0.42, 10, 1, true, sg > 0 ? Math.PI * 0.02 : Math.PI * 0.82, Math.PI * 0.16); f.rotateZ(-Math.PI / 2); f.translate(-L * 0.04, 0, 0); P.push([f, M.panel]); }
+    // sail: teardrop planform extruded upward, a cap, fairwater planes and masts
+    const sl = S.sail, sh = new THREE.Shape(), hw = sl.w / 2;
+    sh.moveTo(sl.l / 2, 0);
+    sh.absarc(sl.l / 2 - hw, 0, hw, 0, Math.PI / 2, false);
+    sh.bezierCurveTo(0, hw * 1.02, -sl.l / 4, hw * 0.9, -sl.l / 2, hw * 0.2);
+    sh.lineTo(-sl.l / 2, -hw * 0.2);
+    sh.bezierCurveTo(-sl.l / 4, -hw * 0.9, 0, -hw * 1.02, sl.l / 2 - hw, -hw);
+    sh.absarc(sl.l / 2 - hw, 0, hw, -Math.PI / 2, 0, false);
+    const sailG = new THREE.ExtrudeGeometry(sh, { depth: sl.h + R * 0.5, bevelEnabled: true, bevelThickness: 0.35, bevelSize: 0.3, bevelSegments: 3, curveSegments: 10 });
+    sailG.rotateX(-Math.PI / 2); sailG.translate(sl.x, R * 0.5, 0);
+    P.push([sailG, M.skin]);
+    const top = R + sl.h + 0.3;
+    for (const sg of [1, -1]) { const pl = block(sl.x + sl.l * 0.18, sg * (hw + 1.9), 3.2, 3.4, 2.0, 3.0, top - sl.h * 0.38, 0.32, -0.6); P.push([pl, M.skin]); }
+    for (const [dx, hh, r] of [[2.6, 3.2, 0.32], [0.6, 4.4, 0.24], [-1.6, 2.6, 0.4], [-3.4, 3.6, 0.2]]) P.push([cyl(r, r * 1.1, hh, sl.x + dx, top + hh / 2, 0, 8), M.mast]);
+    if (S.fillet) P.push([block(sl.x + sl.l / 2 + 1.6, 0, 6, sl.w * 0.9, 0.6, sl.w * 0.5, R * 0.75, 2.6, -2.6), M.skin]);
+    if (S.hump) { const hm = new THREE.SphereGeometry(1, 24, 10, 0, Math.PI * 2, 0, Math.PI / 2); hm.scale(S.hump.l / 2, S.hump.h, R * 0.62); hm.translate(S.hump.x, R * 0.82, 0); P.push([hm, M.skin]);
+      for (let i = 0; i < 6; i++) for (const sg of [1, -1]) P.push([cyl(0.62, 0.62, 0.08, S.hump.x - 6 + i * 2.4, R * 0.82 + S.hump.h - 0.05 - Math.abs(i - 2.5) * 0.08, sg * 1.0, 12), M.panel]); }
+    // stern planes: cruciform (Virginia's carry end plates); pump-jet shroud and stator ring
+    const tx = -L / 2 + 9;
     for (let k = 0; k < 4; k++) {
-      const a = (S.xtail ? Math.PI / 4 : 0) + k * Math.PI / 2;
-      const f = new THREE.BoxGeometry(5, 0.35, 4.2); f.translate(0, 0, 2.4 + R * 0.25);
-      f.rotateX(a); f.translate(tx, 0, 0); P.push([f, skin]);
+      const a = k * Math.PI / 2, span = R * 0.5 + (k % 2 ? 3.8 : 3.4);
+      const f = block(0, 0, 6.4, 0.44, 3.4, 0.22, 0, span, -1.6); f.rotateX(-Math.PI / 2 + a); f.translate(tx, 0, 0);
+      P.push([f, M.skin]);
+      if (S.fillet && k % 2 === 0) P.push([box(3.2, 2.4, 0.24, tx - 1.7, 0, (k === 0 ? -1 : 1) * span), M.skin]);   // end plates
     }
-    P.push([cyl(0.5, 0.5, 3, sl.x, R + sl.h + 1.6, 0, 6), skin]);
+    const shroud = new THREE.CylinderGeometry(R * 0.32, R * 0.4, 3.2, 24, 1, true); shroud.rotateZ(-Math.PI / 2); shroud.translate(-L / 2 + 0.6, 0, 0); P.push([shroud, M.skin]);
+    const stator = new THREE.CylinderGeometry(R * 0.3, R * 0.3, 0.2, 24); stator.rotateZ(-Math.PI / 2); stator.translate(-L / 2 - 0.9, 0, 0); P.push([stator, M.dark]);
     const group = assemble(P);
     return { group, spec: Object.assign({ L, B: S.B, T: R * 2, sub: true }, S) };
   }
@@ -2933,25 +3141,53 @@ const Navy = (() => {
     const cp = new THREE.BoxGeometry(1.4, 0.5, 1.4); cp.translate(7.6, 0.85, 0); add(cp, M.glass);
     return { obj: F22.bake({ group }), exhausts: [[-0.6, 0.5, 4], [-0.6, 0.5, -4]], radius: 12 };
   }
-  // Tu-16 layout medium bomber
+  // H-6K: the Tu-16 airframe re-engined with turbofans in the wing roots, a solid radome in place of the glazed
+  // nose, Tupolev gear pods trailing the wings, six pylons (two YJ-12 inboard) and an EW fairing in the old tail turret
   function h6k() {
-    const M = Craft.materials('h6', 0xe6e9ec, 4), group = new THREE.Group(), add = Craft.adder(group);
-    const W = curve([[17, 0], [16, 0.8], [13, 1.4], [8, 1.65], [0, 1.7], [-8, 1.5], [-14, 1.0], [-17, 0.4]]);
-    Craft.body(add, M.skin, W, curve([[17, 0], [16, 0.8], [13, 1.4], [8, 1.7], [0, 1.7], [-8, 1.5], [-14, 1.1], [-17, 0.5]]), curve([[17, 0], [16, -0.8], [12, -1.5], [0, -1.6], [-10, -1.3], [-17, -0.4]]), 17, -17, 2.2, 60, 20);
-    Craft.surface(add, M.skin, { le: z => 3.5 - (z - 1.5) * Math.tan(37 * D2R), te: z => -3.8 - (z - 1.5) * Math.tan(22 * D2R), th: Craft.lin(1.5, 16.5, 0.9, 0.18), y: z => -0.3 - (z - 1.5) * 0.04 }, 1.5, 16.5, 10);
+    const M = Craft.materials('h6', 0xdde1e4, 4), group = new THREE.Group(), add = Craft.adder(group), lin = Craft.lin;
+    const W = curve([[17.4, 0], [17, 0.45], [16, 0.95], [14.5, 1.35], [12, 1.62], [8, 1.72], [0, 1.72], [-6, 1.6], [-11, 1.3], [-15, 0.85], [-17.2, 0.45]]);
+    const TOP = curve([[17.4, 0], [17, 0.42], [16, 0.9], [14.6, 1.42], [13.4, 1.92], [12, 2.02], [9, 1.85], [0, 1.75], [-6, 1.7], [-12, 1.5], [-15.5, 1.1], [-17.2, 0.55]]);
+    const BOT = curve([[17.4, 0], [17, -0.4], [16, -0.85], [14, -1.35], [10, -1.6], [0, -1.65], [-8, -1.5], [-13, -1.1], [-17.2, -0.35]]);
+    Craft.body(add, M.skin, W, TOP, BOT, 17.4, -17.4, 2.2, 72, 22);
+    const k = 1.012, radome = new THREE.MeshStandardMaterial({ color: 0x8d949a, roughness: 0.6, metalness: 0.1, side: THREE.DoubleSide });
+    Craft.body(add, radome, x => W(x) * k, x => TOP(x) * k, x => BOT(x) * k, 17.45, 15.7, 2.2, 12, 22);
+    Craft.canopy(add, M, TOP, 14.6, 12.2, 1.05, 0.32, 0.35);
+    for (const sg of [1, -1]) for (const [x, y] of [[13.6, 1.55], [12.7, 1.6]]) P0(add, new THREE.BoxGeometry(0.7, 0.32, 0.04), M.glass, x, y, sg * (W(x) + 0.01));
+    P0(add, new THREE.SphereGeometry(0.36, 12, 8), M.dark, 15.2, -1.0, 0);                     // EO turret under the nose
+    const tc = new THREE.ConeGeometry(0.46, 1.8, 14); tc.rotateZ(Math.PI / 2); tc.translate(-18.1, 0.45, 0); add(tc, M.skin);
+    for (const [x, h] of [[5, 0.55], [-2, 0.45], [-8, 0.5]]) P0(add, new THREE.BoxGeometry(0.7, h, 0.06), M.dark, x, TOP(x) + h / 2 - 0.05, 0);
+    // wing: 35 degree sweep, slight anhedral, low-mid set; fences on the upper surface
+    const wy = z => -0.5 - (z - 1.6) * 0.052;
+    Craft.surface(add, M.skin, { le: z => 3.8 - (z - 1.6) * Math.tan(37 * D2R), te: z => -4.2 - (z - 1.6) * Math.tan(21 * D2R), th: lin(1.6, 16.5, 1.0, 0.18), y: wy }, 1.6, 16.5, 12);
+    for (const sg of [1, -1]) for (const z of [8.8, 12.6]) P0(add, new THREE.BoxGeometry(3.4, 0.28, 0.05), M.skin, 3.8 - (z - 1.6) * 0.754 - 1.4, wy(z) + 0.28, sg * z);
     const exhausts = [];
-    for (const s of [1, -1]) {
-      const n = new THREE.CylinderGeometry(1.0, 0.85, 10, 16); n.rotateZ(-Math.PI / 2); n.translate(0.2, -0.3, 2.4 * s); add(n, M.skin);
-      Craft.nozzle(add, M, -4.8, -5.6, -0.3, 2.4 * s, 0.8, 0.7);
-      exhausts.push([-5.7, -0.3, 2.4 * s]);
-      // YJ-12 under the wing
-      const m = new THREE.CylinderGeometry(0.33, 0.33, 7, 10); m.rotateZ(-Math.PI / 2); m.translate(-1, -1.3, 7 * s); add(m, M.white);
+    const loft = (x0, x1, yc, zc, rf, n = 18) => { const rings = []; for (let i = 0; i <= n; i++) { const t = i / n, x = lerp(x0, x1, t), r = rf(t); rings.push(Craft.ring(x, yc, zc, r, r, r, 2, 18)); } add(gridGeometry(rings), M.skin); return rings; };
+    for (const sg of [1, -1]) {
+      // root engine nacelle with the intake lip just ahead of the leading edge
+      const ze = 2.35 * sg, ye = -0.35;
+      const rings = loft(6.6, -6.4, ye, ze, t => t < 0.12 ? lerp(0.98, 1.15, t / 0.12) : lerp(1.15, 0.78, Math.pow((t - 0.12) / 0.88, 1.6)));
+      add(capGeometry(rings[0].slice(0, -1), p => [p[2], p[1]]), M.dark);
+      Craft.nozzle(add, M, -6.4, -7.1, ye, ze, 0.74, 0.66);
+      exhausts.push([-7.2, ye, ze]);
+      // Tupolev main-gear pod trailing the wing
+      const zp = 7.0 * sg;
+      loft(0.8, -9.2, wy(7) - 0.55, zp, t => 0.66 * Math.pow(Math.sin(Math.PI * Math.pow(t, 0.75)), 0.5) + 0.02, 16);
+      // pylons: YJ-12 inboard, an empty one outboard
+      for (const [z, msl] of [[4.6, true], [10.4, false]]) {
+        const zz = z * sg, xle = 3.8 - (z - 1.6) * 0.754;
+        P0(add, new THREE.BoxGeometry(3.2, 0.55, 0.16), M.skin, xle - 2.6, wy(z) - 0.42, zz);
+        if (msl) {
+          const b = new THREE.CylinderGeometry(0.32, 0.32, 5.6, 14); b.rotateZ(-Math.PI / 2); P0(add, b, M.white, xle - 2.4, wy(z) - 1.05, zz);
+          const n = new THREE.ConeGeometry(0.32, 1.3, 14); n.rotateZ(-Math.PI / 2); P0(add, n, M.white, xle + 1.1, wy(z) - 1.05, zz);
+          for (const a of [Math.PI / 4, -Math.PI / 4]) { const f = new THREE.BoxGeometry(0.9, 0.04, 1.3); f.rotateX(a); P0(add, f, M.white, xle - 4.8, wy(z) - 1.05, zz); }
+        }
+      }
     }
-    Craft.fins(add, M.skin, group, { z: 0, y: 1.2, le: -9.5, te: -15, h: 6, sLE: 42, sTE: 10, th0: 0.45, th1: 0.12 });
-    Craft.surface(add, M.skin, { le: Craft.lin(0.5, 6, -12.8, -16), te: Craft.lin(0.5, 6, -16.8, -17.8), th: Craft.lin(0.5, 6, 0.3, 0.1), y: () => 0.6 }, 0.5, 6, 6);
-    const glass = new THREE.SphereGeometry(1.0, 12, 8); glass.scale(1.6, 0.9, 1.0); glass.translate(15.4, 0, 0); add(glass, M.glass);
+    Craft.fins(add, M.skin, group, { z: 0, y: 1.3, le: -9.0, te: -15.6, h: 6.2, sLE: 44, sTE: 14, th0: 0.45, th1: 0.12 });
+    Craft.surface(add, M.skin, { le: z => -12.2 - (z - 0.5) * 0.9, te: z => -15.9 - (z - 0.5) * 0.32, th: lin(0.5, 5.6, 0.3, 0.1), y: () => 0.85 }, 0.5, 5.6, 6);
     return { obj: F22.bake({ group }), exhausts, radius: 15 };
   }
+  const P0 = (add, geo, mat, x, y, z) => { const m = add(geo, mat); m.position.set(x, y, z); return m; };
   const cache = {};
   function plane(type) {
     if (cache[type]) { const c = cache[type]; return { obj: c.obj.clone(), exhausts: c.exhausts, radius: c.radius }; }
@@ -2979,7 +3215,7 @@ const Navy = (() => {
   }
 
   function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
-  return { ship, plane, ashmGeometry, SPECS, CARRIERS, SUBS };
+  return { ship, plane, ashmGeometry, skiRamp, SPECS, CARRIERS, SUBS };
 })();
 
 /* High-detail warships and naval aircraft for 南海决战, from CC-licensed Sketchfab models (credits in NavyHD.CREDITS).
@@ -2988,7 +3224,8 @@ const Navy = (() => {
    through blob: URLs, which the artifact host's content policy blocks, and the models then render untextured.
    The GLB is decompressed with the browser's DecompressionStream and fitted to the game frame:
    ships: +x bow, +y up, waterline at y = 0, real length; aircraft: +x nose, gear contact at y = -gearH.
-   Stand-ins for the other side's types (Nimitz for Fujian, E-2D for KJ-600, F-35 for J-35) are desaturated
+   Stand-ins for the other side's types (Nimitz for Fujian and Shandong, E-2D for KJ-600, F-35 for J-35,
+   Super Hornet for the J-15 / J-16 family) are desaturated
    and tinted in PLA grey so the source markings do not read.
    Expects THREE and GLTFLoader in scope. */
 const NavyHD = (() => {
@@ -3127,7 +3364,7 @@ const NavyHD = (() => {
     g.traverse(m => { if (m.name === 'gearDown' || m.userData.gearDown) down.push(m); if (m.userData.gearUp) up.push(m); });
     const setGear = d => { for (const m of down) m.visible = d; for (const m of up) m.visible = !d; };
     setGear(false);
-    return { group: g, setGear, exhausts: (M.exhausts || []).map(e => e.map(x => x * (opt.scale || 1))), deckY: M.deckY };
+    return { group: g, setGear, exhausts: (M.exhausts || []).map(e => e.map(x => x * (opt.scale || 1))), deckY: M.deckY && M.deckY * (opt.scale || 1) };
   }
   return { loadAll, make, has, META, CREDITS };
 })();
@@ -3784,7 +4021,8 @@ class Ship {
     if (!shipProto[S.model + (S.number || '')]) shipProto[S.model + (S.number || '')] = Navy.ship(S.model, S.number);
     const built = shipProto[S.model + (S.number || '')];
     this.spec = built.spec;
-    const hdKey = SHIP_HD[S.model], hd = hdKey && NavyHD.make(hdKey.m, { pla: hdKey.pla });
+    const hdKey = SHIP_HD[S.model], hd = hdKey && NavyHD.make(hdKey.m, { pla: hdKey.pla, scale: hdKey.scale });
+    if (hd && hdKey.ski) { const r = Navy.skiRamp(Navy.CARRIERS[S.model].ski, hd.deckY); r.scale.setScalar(1 / hdKey.scale); hd.group.add(r); }
     this.obj = hd ? hd.group : built.group.clone();
     this.hd = !!hd;
     scene.add(this.obj);
@@ -3809,12 +4047,16 @@ class Ship {
       if (hd && hd.deckY) { this.deck.deckY = hd.deckY; this.deck.cats = this.deck.cats.map(c => Object.assign({}, c, { x1: Math.min(c.x1, hdKey.catMax || c.x1) })); }
     }
     if (this.deck) this.cats = this.deck.cats.map(c => ({ c, busy: 0, plane: null }));
-    // a deck park on the procedural carrier: J-15s tails-out along the starboard edge, thinned as the hangar empties
-    if (S.carrier && !hd && S.model === 'shandong') {
+    // a deck park on Shandong: J-15s tails-out along the starboard edge, thinned as the hangar empties
+    if (S.carrier && S.model === 'shandong') {
       this.park = [];
-      const Y = this.deck.deckY + (AC.j15.gearH || 2.6);
+      const Y = this.deck.deckY + (AC.j15.gearH || 2.6), deck = new THREE.Group();
+      if (hd && hdKey.scale) deck.scale.setScalar(1 / hdKey.scale);           // park in game metres inside the scaled model
+      this.obj.add(deck);
       for (const [x, z, r] of [[-122, 15, 2.3], [-104, 15, 2.3], [-86, 15, 2.3], [-68, 15, 2.3], [34, 14, 2.2], [52, 14, 2.2], [70, 14, 2.2], [88, 13, 2.2]]) {
-        const m = Navy.plane('j15').obj; m.position.set(x, Y, z); m.rotation.y = r; this.obj.add(m); this.park.push(m);
+        const p = hd && NavyHD.make(PLANE_HD.j15.m, { gearH: AC.j15.gearH, pla: true, scale: PLANE_HD.j15.scale });
+        if (p) p.setGear(true);
+        const m = p ? p.group : Navy.plane('j15').obj; m.position.set(x, Y, z); m.rotation.y = r; deck.add(m); this.park.push(m);
       }
     }
   }
@@ -3845,9 +4087,13 @@ class Ship {
 // which uploaded model stands in for each ship / aircraft class (pla: tint a US-built model in PLA grey)
 const SHIP_HD = {
   ford: { m: 'ford' }, reagan: { m: 'nimitz', catMax: 140 }, fujian: { m: 'nimitz', pla: true, catMax: 140 }, t055: { m: 't055' }, t052d: { m: 't055' }, t054a: { m: 't051' },
-  burke: { m: 'burke' }, tico: { m: 'burke' }
+  burke: { m: 'burke' }, tico: { m: 'burke' },
+  // Shandong: the Nimitz hull scaled to 305 m, in PLA grey, with the ski-jump built over the bow
+  shandong: { m: 'nimitz', pla: true, scale: 305 / 333, ski: true }
 };
-const PLANE_HD = { fa18: { m: 'fa18' }, ea18g: { m: 'fa18' }, f35c: { m: 'f35' }, j35: { m: 'f35', pla: true, scale: 1.1 }, e2d: { m: 'e2d' }, kj600: { m: 'e2d', pla: true } };
+// the Flanker family (J-15 / J-16 / J-15D) borrows the twin-tail Super Hornet airframe, 1.2x for the bigger jet
+const PLANE_HD = { fa18: { m: 'fa18' }, ea18g: { m: 'fa18' }, f35c: { m: 'f35' }, j35: { m: 'f35', pla: true, scale: 1.1 }, e2d: { m: 'e2d' }, kj600: { m: 'e2d', pla: true },
+  j15: { m: 'fa18', pla: true, scale: 1.2 }, j15d: { m: 'fa18', pla: true, scale: 1.2 }, j16: { m: 'fa18', pla: true, scale: 1.2 } };
 
 /* ---------- island base ---------- */
 function buildBase() {
@@ -3965,8 +4211,7 @@ const picture = { cn: new Map(), us: new Map() };
 const firstSeen = { cn: false, us: false };
 function sensorsOf(side) {
   const out = [];
-  const emcon = tac(side).navy === 'emcon';
-  for (const s of ships) if (s.alive && !s.dying && s.side === side && s.S.radar && !(s.S.sub && s.depth > 20) && !(emcon && !(s.emconBreak > game.t))) out.push({ u: s, h: s.S.sub ? 10 : s.mast, r: (s.S.sub ? 30000 : s.S.radar) * (s.radarDmg ? 0.5 : 1), cone: null });
+  for (const s of ships) if (s.alive && !s.dying && s.side === side && s.S.radar && !(s.S.sub && s.depth > 20) && !shipQuiet(s)) out.push({ u: s, h: s.S.sub ? 10 : s.mast, r: (s.S.sub ? 30000 : s.S.radar) * (s.radarDmg ? 0.5 : 1), cone: null });
   for (const b of bases) if (b.alive && b.side === side) out.push({ u: b, h: b.mast, r: b.S.radar * (b.radarDmg ? 0.5 : 1), cone: null });
   for (const p of planes) if (p.alive && !p.dying && p.side === side && p.airborne) out.push({ u: p, h: p.pos.y, r: p.T.radar, cone: p.T.aew ? null : p.fwd });
   // stand-off jamming: each enemy EW aircraft within 90 km cuts a sensor's reach (EA-18G / J-15D)
@@ -3979,7 +4224,7 @@ function canSee(sn, e) {
   // sea clutter: anything skimming the waves is much harder to pick out
   if (submerged(e)) return false;
   // a fleet under emission control gives nothing away to passive sensors: it has to be found by radar alone
-  const emK = e.kind === 'ship' && tac(e.side).navy === 'emcon' && !(e.emconBreak > game.t) ? 0.6 : 1;
+  const emK = e.kind === 'ship' && !e.S.sub && shipQuiet(e) ? 0.6 : 1;
   const clutter = emK * (e.kind === 'msl' && e.pos.y < 40 ? 0.35 : e.kind === 'plane' && e.pos.y < 60 ? 0.6 : 1) * (e.ewT > 0 ? 0.55 : 1) * (sn.jam || 1);
   if (d > sn.r * e.rcs * clutter) return false;
   const ht = e.kind === 'ship' ? e.h : e.kind === 'base' ? 30 : Math.max(e.pos.y, 1);
@@ -4183,7 +4428,7 @@ function killPlayer(cause) {
 }
 function damageShip(s, dmg, src, at) {
   if (!s.alive || s.dying) return;
-  s.hp -= dmg;
+  s.hp -= dmg; s.hitT = game.t;
   const wasFire = s.fires > 0.5;
   s.fires = Math.min(6, s.fires + (src && src.kind === 'torp' ? 0.3 : dmg > 60 ? 1 : 0.4));
   if (playerOwns(src)) { ribbon(src.kind === 'gun' ? '命中' : src.kind === 'torp' ? '鱼雷命中' : '导弹命中', '#ffd28a'); if (!wasFire && s.fires > 0.5) ribbon('起火', '#ff9a4a'); }
@@ -5360,7 +5605,9 @@ function callsign(side) { callN++; return `${CALL[side][callN % 8]}-${(callN % 9
 function launchPackage(h, tgt, o = {}) {
   const side = h.side, T = tac(side), main = intentTarget(side);
   const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
-  const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
+  // the air reserve stays on deck until the commander commits it (an alpha strike commits everything)
+  const C = command[side], keep = !o.alpha && !C.resvOut && C.resvN ? (C.resvN[h.name] || 0) : 0;
+  const avail = strikers.reduce((n, t) => n + h.hangar[t], 0) - keep;
   if (avail < 2) return null;
   const n = Math.min(o.n || 6, avail);
   const pkg = newPackage(side, h, tgt);
@@ -5494,7 +5741,13 @@ function shipAI(s) {
     want = headingOf(_c);
     spd = _c.length() > 1500 ? s.S.vmax : 6;
   } else {
-    const st = s.station || [1500, 0], T = tac(s.side).navy, k = T === 'ring' ? 0.55 : T === 'disperse' ? 1.5 : 1;
+    // stations by task group: the reserve astern of the carriers, the ASW screen out ahead on the axis, the AAW
+    // screen opened or closed up on the commander's order
+    let st = s.station || [1500, 0];
+    const C = command[s.side], g = s.grp;
+    if (g === 'reserve') st = [-5200 - (s.resIdx || 0) * 1800, ((s.resIdx || 0) % 2 ? 1 : -1) * 2600 + st[1] * 0.3];
+    else if (g === 'asw') st = [8200, st[1] * 0.7];
+    const T = tac(s.side).navy, k = (T === 'ring' ? 0.55 : T === 'disperse' ? 1.5 : 1) * (g === 'screen' || g === 'asw' ? (C.screenK || 1) : 1);
     const p = toWorld(guide, st[0] * k + 1200, 0, st[1] * k, _b);
     _c.subVectors(p, s.pos);
     want = headingOf(_c);
@@ -5536,6 +5789,7 @@ function bestTarget(side, from, range) {
 }
 function updateCommand(side, dt) {
   const C = command[side];
+  updateJoint(side, dt);
   updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt); updatePhantoms(side, dt);
   aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
@@ -5557,7 +5811,10 @@ function updateCommand(side, dt) {
       if (np && np.distanceTo(guide.pos) < (side === 'cn' ? 30000 : 42000)) course = wrapA(headingOf(_c.subVectors(np, guide.pos)) + Math.PI / 2);
     }
     else if (foeShip) {
-      const tp = (main && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
+      let tp = (main && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
+      // the fleet works round to the flank of the main direction (north, centre or south of the direct line)
+      const off = axisOff((planOf(side) || {}).main);
+      if (off) tp = _e.copy(tp).addScaledVector(latN(guide.pos, tp, _f), off * 22000);
       const d = tp.distanceTo(guide.pos), toFoe = headingOf(_c.subVectors(tp, guide.pos));
       // the PLA closes to its missile envelope; the US carriers keep their air wings' stand-off distance
       const keep = (side === 'cn' ? 70000 : 85000) - (T.navy === 'strike' ? 10000 : 0) + (main && main.kind === 'base' ? -12000 : 0);
@@ -5576,29 +5833,40 @@ function updateCommand(side, dt) {
       const tp = (main && main.kind === 'ship' && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
       const toUs = _c.subVectors(guide.pos, tp).setY(0).normalize();
       C.sagPoint = (C.sagPoint || new V3()).copy(tp).addScaledVector(toUs, T.navy === 'strike' ? 10000 : 15000);
+      // in a feint the surface action group shows itself on the supporting direction instead
+      const ph = phaseOf(side), P = planOf(side);
+      if (ph && ph.second && P && P.second !== 'none') C.sagPoint.addScaledVector(latN(guide.pos, tp, _f), axisOff(P.second) * 26000);
+      // the surface action group is the ships the task organisation put in it; it goes forward when the phase (or
+      // the commander) says so and comes back under a ring defence
       const sag = ships.filter(x => x.side === side && x.sag && x.alive && !x.dying);
-      if (T.navy === 'ring') for (const x of sag) x.sag = false;
-      else if (sag.length < (T.navy === 'strike' ? 5 : 3)) {
-        const cand = ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub && !x.sag && x !== flagship && x.hp > x.maxHp * 0.6 && x.station && Math.abs(x.station[1]) > 2500);
-        const pick = cand.sort((a, b) => b.value - a.value)[0];
-        if (pick) { pick.sag = true; pick.sagOff = (sag.length - 1) * 1800; if (side === game.side) radio('舰队司令部', `${pick.name}编入水面突击群，前出接敌！`, '#9fd4ff'); }
+      const so = C.sagOrder || 'auto', go = so === 'push' || (so === 'auto' && ((ph && ph.sag) || T.navy === 'strike'));
+      if (T.navy === 'ring' || !go) { if (sag.length && side === game.side && !(C.sagSaid > game.t)) { C.sagSaid = game.t + 60; radio('舰队司令部', '水面突击群撤回编队。', '#9fd4ff'); } for (const x of sag) x.sag = false; }
+      else {
+        const add = ships.filter(x => x.side === side && x.grp === 'sag' && !x.sag && x.alive && !x.dying && x !== flagship && x.hp > x.maxHp * 0.6);
+        for (const x of add) { x.sag = true; x.sagOff = (sag.length + add.indexOf(x) - 1) * 1800; }
+        if (add.length && side === game.side) radio('舰队司令部', `水面突击群（${add.map(x => x.name).join('、')}）前出接敌！`, '#9fd4ff');
       }
-      for (const x of sag) if (x.hp < x.maxHp * 0.45) { x.sag = false; if (side === game.side) radio(x.name, '受损严重，脱离突击群返回编队。', '#ff8a78'); }
+      for (const x of sag) if (x.hp < x.maxHp * 0.45 || x.grp !== 'sag') { x.sag = false; if (side === game.side && x.grp === 'sag') radio(x.name, '受损严重，脱离突击群返回编队。', '#ff8a78'); }
     }
   }
   // --- strategic strikes: the PLA Rocket Force against carriers, US Tomahawks against the island ---
   if (side === 'cn') {
     C.dfCd = (C.dfCd ?? 300) - dt;
-    if (C.dfCd <= 0 && (C.dfN ?? 4) > 0) { if (rocketForce('cn', 4, (C.dfN ?? 4) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 4) - 1; C.dfCd = 420; } else C.dfCd = 20; }
+    if (C.dfCd <= 0 && (C.dfN ?? 4) > 0) {
+      const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30);
+      if (!cvT) C.dfCd = 20;
+      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求东风齐射 4 枚`, ttl: 15, run: () => { if (rocketForce('cn', 4, (C.dfN ?? 4) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 4) - 1; C.dfCd = 420; } } }); }
+    }
   } else {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
     const b = bases.find(x => x.alive && known('us', x));
-    if (C.tlamCd <= 0 && b) { C.tlamCd = tomahawk('us', b, 16) ? 300 : 30; }
+    if (C.tlamCd <= 0 && b) { C.tlamCd = 120; if (release('us', b) !== 'no') staffAct('us', { key: 'tlam', title: '战斧对陆打击', detail: `16 枚战斧打击${b.name}跑道与雷达`, ttl: 20, run: () => { C.tlamCd = tomahawk('us', b, 16) ? 300 : 30; } }); }
     // maritime-strike Tomahawks: the surface fleet's long arm against ships, on the main target first
     C.mstCd = (C.mstCd ?? 120) - dt;
     const t = main && main.kind === 'ship' && fresh('us', main, 120) ? main : bestTarget('us', guide ? guide.pos : ZERO, 400000);
     const held = t && (C.pkgs || []).some(k => k.tgt === t && (k.phase === 'form' || k.phase === 'push') && !k.jointDone && game.t - k.t < 300);
-    if (C.mstCd <= 0 && t && t.kind === 'ship' && !held) { C.mstCd = tomahawk('us', t, 8) ? 150 : 30; }
+    const rel = t && release('us', t);
+    if (C.mstCd <= 0 && t && t.kind === 'ship' && !held && rel !== 'no') { C.mstCd = 90; staffAct('us', { key: 'mst:' + t.key, title: '海上打击型战斧', detail: `8 枚 MST 打击${t.name}`, ttl: 18, valid: () => t.alive && !t.dying, run: () => { C.mstCd = tomahawk('us', t, 8) ? 150 : 30; } }); }
   }
   // --- ship-launched anti-ship salvos (player's own ship fires only on the player's order) ---
   C.salvoCd -= dt;
@@ -5616,6 +5884,14 @@ function updateCommand(side, dt) {
       // a strike package is on its way to it: hold the salvo for the joint time-on-target (up to two minutes)
       if ((C.pkgs || []).some(k => k.tgt === main && (k.phase === 'form' || k.phase === 'push') && !k.jointDone && game.t - k.t < 300)) tgt = null;
     } else if (T.navy === 'focus' && main) tgt = null;
+    const rel = tgt ? release(side, tgt) : 'no';
+    if (tgt && rel === 'no') tgt = null;
+    if (tgt && rel === 'ask') {
+      const t = tgt;
+      C.salvoCd = 45;
+      staffAct(side, { key: 'salvo:' + (t.key || t.name), title: '舰艇齐射', detail: `${t.name}在舰舰导弹射程内，请求齐射（${t === main ? '主攻目标' : '非主攻目标'}）`, ttl: 18, valid: () => t.alive && !t.dying, run: () => fleetStrike(side, t) });
+      tgt = null;
+    }
     if (tgt) {
       const plan = [];
       // the PLA coordinates one big salvo so every missile arrives together; US ships each fire what reaches
@@ -5650,8 +5926,10 @@ function updateCommand(side, dt) {
   const count = role => air.filter(p => p.role === role).length;
   const homes = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying).concat(bases.filter(b => b.side === side && b.alive));
   const pick = (h, types) => types.find(t => h.hangar[t] > 0);
-  // airborne early warning
-  if (count('aew') < 1) for (const h of homes) { const t = pick(h, ['kj600', 'e2d']); if (t) { launchFrom(h, t, 'aew'); break; } }
+  // the apportionment of the air effort (制空 / 突击 / 预警侦察 / 反潜 / 电子战·加油) sets the scale of each mission
+  const ap = apOf(side), kAir = clamp(ap.air / 30, 0.35, 2.4), kStrike = clamp(ap.strike / 35, 0.3, 2.2), kIsr = clamp(ap.isr / 15, 0.4, 2.5);
+  // airborne early warning: a second orbit when reconnaissance has a big share
+  if (count('aew') < (ap.isr >= 25 ? 2 : 1)) for (const h of homes) { const t = pick(h, ['kj600', 'e2d']); if (t) { launchFrom(h, t, 'aew', count('aew') ? { latZ: 18000 } : {}); break; } }
   // the outer air battle: inbound raids (aircraft carrying anti-ship missiles) are met before they can launch -
   // the AEW vectors the nearest CAP fighters onto them and the deck launches alert fighters if that is not enough
   const centre = fleetCentre(side);
@@ -5676,10 +5954,11 @@ function updateCommand(side, dt) {
   }
   // combat air patrol
   // a cap on how many of a side's aircraft are airborne at once keeps the sky (and the frame rate) sane
+  // (patrols fill their own budget; strike packages get the room above it, so a big CAP never starves the strikes)
   const airCap = HQ() ? 34 : 26;
-  if (air.length >= airCap) return;
-  const capWant = Math.round((3 * homes.filter(h => h.kind === 'ship').length + (bases.some(b => b.side === side && b.alive) ? 2 : 0)) * (T.air === 'cap' ? 1.6 : 1));
-  if (count('cap') < capWant) for (const h of homes) {
+  if (air.length >= airCap + 16) return;
+  const capWant = Math.min(16, Math.round((3 * homes.filter(h => h.kind === 'ship').length + (bases.some(b => b.side === side && b.alive) ? 2 : 0)) * (T.air === 'cap' ? 1.4 : 1) * kAir));
+  if (count('cap') < capWant && air.length < airCap) for (const h of homes) {
     const t = pick(h, ['j35', 'f35c', 'j16', 'fa18', 'j15']);
     if (t) { launchFrom(h, t, 'cap', { off: rand(9000, 18000), latZ: rand(-12000, 12000) }); break; }
   }
@@ -5690,21 +5969,34 @@ function updateCommand(side, dt) {
     // the main target if the package can reach it; otherwise the best target nearby (never idle while one exists)
     const tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
     if (!tgt) continue;
-    if (launchPackage(h, tgt, { n: T.air === 'mass' ? 10 : 6, esc: T.air === 'mass' ? 4 : 2 })) C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
+    const rel = release(side, tgt);
+    if (rel === 'no') { C.strikeCd[h.name] = 30; continue; }
+    const n = clamp(Math.round((T.air === 'mass' ? 10 : 6) * kStrike), 2, 14), esc = Math.round((T.air === 'mass' ? 4 : 2) * clamp(kAir, 0.5, 1.5));
+    const cd = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1) * clamp(1 / kStrike, 0.55, 2.6);
+    if (rel === 'ask') {
+      C.strikeCd[h.name] = 60;
+      staffAct(side, { key: 'pkg:' + h.name + ':' + (tgt.key || tgt.name), title: '出动攻击编队', detail: `${h.name}请求出动 ${n} 架突击机攻击${tgt.name}${tgt === main ? '' : '（非主攻目标）'}`, ttl: 20, valid: () => tgt.alive && !tgt.dying && h.alive, run: () => { if (launchPackage(h, tgt, { n, esc })) C.strikeCd[h.name] = cd; } });
+    } else if (launchPackage(h, tgt, { n, esc })) C.strikeCd[h.name] = cd;
   }
   // the decisive blow: an alpha strike (a deck-load from each carrier) once the enemy's main carrier is held
+  // only in a phase that releases it (or, without a plan, whenever the main carrier is held)
   C.alphaCd = (C.alphaCd ?? 420) - 2.5;
-  if (!(side === game.side && game.role === 'cmd' && !game.staffAuto) && C.alphaCd <= 0 && main && main.carrier && fresh(side, main, 90)) {
+  const phA = phaseOf(side);
+  if ((!phA || phA.alpha) && C.alphaCd <= 0 && main && main.carrier && fresh(side, main, 90) && release(side, main) !== 'no') {
     const ready = homes.filter(h => h.kind === 'ship' && ['j15', 'j16', 'fa18'].reduce((n, t) => n + (h.hangar[t] || 0), 0) >= 8);
-    if (ready.length) { for (const h of ready) alphaStrike(h, main); C.alphaCd = 900; }
+    if (ready.length) {
+      C.alphaCd = 240;
+      staffAct(side, { key: 'alpha', title: '大规模打击', detail: `${ready.map(h => h.name).join('、')}甲板全力出动，对${main.name}实施大规模打击（回收暂停约 2 分钟）`, ttl: 25, valid: () => main.alive && !main.dying,
+        run: () => { let n = 0; for (const h of ready) if (alphaStrike(h, main)) n++; if (n) { C.alphaCd = 900; if (side === game.side && game.cmdT) game.cmdT.alpha = game.t + 600; } } });
+    }
   }
   // the buddy tanker: one up whenever strike packages are out (a Super Hornet / J-15 with a refuelling store)
-  if (count('tank') < 1 && (C.pkgs || []).some(k => k.phase === 'form' || k.phase === 'push')) {
+  if (count('tank') < (ap.ewt >= 5 ? 1 : 0) && (C.pkgs || []).some(k => k.phase === 'form' || k.phase === 'push')) {
     for (const h of homes) { const t = pick(h, side === 'us' ? ['fa18'] : ['j15', 'j16']); if (t) { const tk = launchFrom(h, t, 'tank'); if (tk) { tk.give = 1500; tk.name = `${AC[t].name} 加油机`; if (side === game.side) radio('空中指挥', `${tk.name}起飞，在主攻轴线上空中加油待命。`, '#9fd4ff'); } break; } }
   }
   // stand-off jamming: one EW aircraft holds a station on the axis, blinding the main target's group
   C.ewT = (C.ewT ?? 60) - 2.5;
-  if (main && C.ewT <= 0 && fresh(side, main, 90) && count('ew') < 1) {
+  if (main && C.ewT <= 0 && fresh(side, main, 90) && count('ew') < (ap.ewt >= 15 ? 2 : ap.ewt >= 5 ? 1 : 0)) {
     C.ewT = 90;
     for (const h of homes) { const t = pick(h, ['j15d', 'ea18g']); if (t && launchFrom(h, t, 'ew', { on: main })) { if (side === game.side) radio('空中指挥', `${AC[t].name}前出，对${main.name}实施远距支援干扰。`, '#9fd4ff'); break; } }
   }
@@ -5716,30 +6008,39 @@ function updateCommand(side, dt) {
     if (b && C.reinf <= 0) { C.reinf = 600; const add = Math.min(3, 6 - (b.hangar.h6k || 0)); if (add > 0) { b.hangar.h6k = (b.hangar.h6k || 0) + add; if (game.side === 'cn') radio('南部战区', `大陆机场增援 ${add} 架轰-6K 进驻岛礁。`, '#9fd4ff'); } }
     if (b && C.h6Cd <= 0 && b.hangar.h6k > 0) {
       const tgt = main && main.kind === 'ship' && fresh('cn', main, 150) && main.pos.distanceTo(b.pos) < 220000 ? main : bestTarget('cn', b.pos, 160000);
-      if (tgt) { for (let i = 0; i < Math.min(3, b.hangar.h6k); i++) launchFrom(b, 'h6k', 'bomber', { target: tgt }); C.h6Cd = 420; if (game.side === 'cn') radio('空中指挥', `轰-6K 编队出击，携鹰击-12 攻击${tgt.name}。`, '#9fd4ff'); else radio('E-2D', '侦测到轰-6K 编队起飞！', '#ff8a78'); }
+      const rel = tgt && release('cn', tgt);
+      const go = () => { if (!b.alive || !(b.hangar.h6k > 0)) return; for (let i = 0; i < Math.min(3, b.hangar.h6k); i++) launchFrom(b, 'h6k', 'bomber', { target: tgt }); C.h6Cd = 420; if (game.side === 'cn') radio('空中指挥', `轰-6K 编队出击，携鹰击-12 攻击${tgt.name}。`, '#9fd4ff'); else radio('E-2D', '侦测到轰-6K 编队起飞！', '#ff8a78'); };
+      if (tgt && rel === 'go' && kStrike > 0.5) go();
+      else if (tgt && rel !== 'no') { C.h6Cd = 90; staffAct('cn', { key: 'h6k', title: '轰-6K 出击', detail: `岛礁轰-6K 编队携鹰击-12 攻击${tgt.name}`, ttl: 20, valid: () => tgt.alive && !tgt.dying, run: go }); }
     }
   }
   // scouting when the enemy fleet is lost
   C.sweepCd -= 2.5;
-  if (!enemyFleet(side) && C.sweepCd <= 0 && game.t > 20) {
+  if (!enemyFleet(side) && C.sweepCd <= 0 && game.t > 20 && ap.isr >= 5) {
     const ip = intentPos(side, new V3());
     for (const h of homes) { const t = pick(h, ['j35', 'f35c', 'j15', 'fa18', 'j16']); if (t) { launchFrom(h, t, 'sweep', { point: ip ? ip.add(new V3(rand(-8000, 8000), 0, rand(-8000, 8000))) : new V3(side === 'cn' ? 40000 : -40000, 0, rand(-25000, 25000)) }); break; } }
-    C.sweepCd = 150;
+    C.sweepCd = 150 / kIsr;
   }
   // US: B-1B raids from outside the theatre
   if (side === 'us' && C.b1b > 0 && game.t > C.raidT) {
     C.raidT = game.t + 420;
     const tgt = main && main.kind === 'ship' ? main : bestTarget('us', new V3(0, 0, 0), 200000);
-    for (let i = 0; i < 2 && C.b1b > 0; i++) {
-      C.b1b--;
-      const pl = new Plane('us', 'b1b', null);
-      pl.pilot = new Pilot(pl, 0.7); pl.role = 'bomber'; pl.task = { target: tgt || ships.find(s => s.side === 'cn' && s.alive) };
-      pl.name = `B-1B ${callsign('us')}`;
-      pl.pos.set(THEATRE.air - 12000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
-      planes.push(pl);
-    }
-    radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
+    if (tgt && release('us', tgt) === 'ask') { C.raidT = game.t + 90; staffAct('us', { key: 'b1b', title: 'B-1B 远程突击', detail: `关岛 B-1B 双机携 8 枚 LRASM 突入，目标${tgt.name}`, ttl: 20, run: () => b1bRaid(tgt) }); return; }
+    b1bRaid(tgt);
   }
+}
+// a pair of B-1Bs from Guam, entering the theatre from the east
+function b1bRaid(tgt) {
+  const C = command.us;
+  for (let i = 0; i < 2 && C.b1b > 0; i++) {
+    C.b1b--;
+    const pl = new Plane('us', 'b1b', null);
+    pl.pilot = new Pilot(pl, 0.7); pl.role = 'bomber'; pl.task = { target: tgt || ships.find(s => s.side === 'cn' && s.alive) };
+    pl.name = `B-1B ${callsign('us')}`;
+    pl.pos.set(THEATRE.air - 12000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
+    planes.push(pl);
+  }
+  radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
 }
 const pending = [];
 /* ---------- naval warfare: handling, modules, submarines, torpedoes, strategic strikes, abilities ----------
@@ -5977,7 +6278,13 @@ function subAI(s, dt) {
   let want = C.course, spd = 6, depth = 90;
   // no contact close enough: the boats run ahead of the fleet down the main axis to an ambush position
   const ip = intentPos(s.side, _c);
-  if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
+  const esc = (C.subOrder || s.grp) === 'esc';
+  if (esc && best && best.pos.distanceTo(s.pos) > 20000) best = null;
+  if (esc && !best) {
+    // close escort: a few km ahead of the carriers on the axis, listening for enemy boats
+    const g = ships.find(x => x.side === s.side && x.carrier && x.alive && !x.dying);
+    if (g) { axisDir(s.side, g.pos, _d); _c.copy(g.pos).addScaledVector(_d, 7000); const d = _c.distanceTo(s.pos); want = headingOf(_c.sub(s.pos)); spd = d > 3000 ? 12 : 5; depth = 80; }
+  } else if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
   if (best) {
     const d = best.pos.distanceTo(s.pos);
     want = headingOf(_a.subVectors(best.pos, s.pos));
@@ -6214,13 +6521,14 @@ function defend(s, dt) {
   if (s.decoyCd > 0) s.decoyCd -= dt;
   if (s.decoys > 0 && s.decoyCd <= 0 && missiles.some(m => m.alive && m.cls === 'ashm' && m.side !== s.side && m.target === s && m.pos.distanceTo(s.pos) < 9000)) fireDecoy(s);
   s.samCd -= dt;
-  if (tac(s.side).navy === 'emcon' && !(s.emconBreak > game.t) && missiles.some(m => m.alive && m.cls === 'ashm' && m.side !== s.side && m.pos.distanceToSquared(s.pos) < 9e8)) { s.emconBreak = game.t + 40; if (mine(s)) radio(s.name, '遭到攻击，雷达开机！', '#ffd28a'); }
+  if (shipQuiet(s) && missiles.some(m => m.alive && m.cls === 'ashm' && m.side !== s.side && m.pos.distanceToSquared(s.pos) < 9e8)) { s.emconBreak = game.t + 40; if (mine(s)) radio(s.name, '遭到攻击，雷达开机！', '#ffd28a'); }
   const allOut = s.aegisT > 0;
   if (s.samCd > 0 || s.busy >= s.channels * (allOut ? 2 : 1)) return;
   s.samCd = (s.carrier ? 1.2 : 0.6) * (allOut ? 0.45 : 1);
   const stock = Object.keys(s.sam).filter(k => s.sam[k] > 0);
   if (!stock.length) return;
   let best = null, bs = 1e9, bw = null;
+  const wcs = roeOf(s.side).wcs;
   for (const [e, tr] of picture[s.side]) {
     if (!e.alive || e.dying || game.t - tr.t > 1.5) continue;
     const isM = e.kind === 'msl';
@@ -6228,6 +6536,12 @@ function defend(s, dt) {
     const d = e.pos.distanceTo(s.pos);
     const bal = isM && e.spec && e.spec.profile === 'ballistic';
     if (d > (bal ? 160000 : 46000)) continue;
+    // weapons control: "tight" holds fire on aircraft until a high-probability shot, "hold" engages only what
+    // threatens the ship itself (missiles aimed at it or anything close, strike aircraft inside 20 km)
+    if (wcs !== 'free' && !bal) {
+      if (isM && wcs === 'hold' && e.target !== s && d > 20000) continue;
+      if (!isM && (wcs === 'tight' ? d > 30000 : d > 15000 && !(e.ashmN > 0 && d < 20000))) continue;
+    }
     // the PLA engages what its own radar holds; US ships fire on any track in the CEC net
     if (s.side === 'cn' && !ownSees(s, e)) continue;
     const want = 1;   // shoot-look-shoot: one interceptor at a time per threat
@@ -6482,6 +6796,9 @@ function drawObjectives() {
   hc.textAlign = 'right';
   hc.font = `700 ${compact ? 11 : 12}px ${SANS}`; hc.fillStyle = GOLD; hc.fillText(C.title, x, y);
   hc.font = `500 ${compact ? 10 : 11}px ${SANS}`; hc.fillStyle = '#e9f2f7'; hc.fillText(`◆ ${C.goal}`, x, y + 16);
+  // the operation's phase (the chapters tell the story; the phases are the commander's plan)
+  const J = command[game.side], P = planOf(game.side);
+  if (J.ph && P && game.role !== 'cmd') { hc.font = `500 ${compact ? 9 : 10}px ${SANS}`; hc.fillStyle = 'rgba(255,210,138,0.85)'; hc.fillText(`战区 · 第 ${J.ph.i + 1}/${P.phases.length} 阶段 ${PHASES[J.ph.id].name} · ${J.ph.label}`, x, y + 31); }
   hc.restore();
 }
 
@@ -6664,6 +6981,7 @@ addEventListener('keydown', e => {
   if (k === 'Enter') input.launch = true;
   if (k === 'Tab') input.target = true;
   if (k === 'KeyM') toggleMap();
+  if (k === 'KeyJ') toggleJCC();
   if (k === 'KeyB') toggleGunsight();
   if (k === 'KeyK') input.dc = true;
   if (game.gunsight) { if (k === 'KeyF') toggleFCS(); if (k === 'KeyU') toggleFuse(); if (k === 'KeyZ') toggleBino(); }
@@ -7665,17 +7983,17 @@ const TACTICS = {
   wing: { follow: { name: '跟随掩护', desc: '僚机保持编队，只攻击威胁长机的敌机。' }, attack: { name: '攻击我的目标', desc: '僚机攻击你锁定或指定的目标。' }, free: { name: '自由交战', desc: '僚机自行选择目标。' } }
 };
 const tac = side => (game.tactic && game.tactic[side]) || { navy: 'balanced', air: 'balanced' };
-function setTactic(kind, id, side = game.side) {
+function setTactic(kind, id, side = game.side, quiet = false) {
   game.tactic = game.tactic || { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } };
   if (game.tactic[side][kind] === id) return;
   game.tactic[side][kind] = id;
-  if (side === game.side) { radio(kind === 'navy' ? '舰队司令部' : '空中指挥', `战术变更：${TACTICS[kind][id].name}。${TACTICS[kind][id].desc}`, '#ffd28a'); Sound.beep(1200, 0.05, 0.05); }
+  if (side === game.side && !quiet) { radio(kind === 'navy' ? '舰队司令部' : '空中指挥', `战术变更：${TACTICS[kind][id].name}。${TACTICS[kind][id].desc}`, '#ffd28a'); Sound.beep(1200, 0.05, 0.05); }
 }
 // the AI commanders pick their doctrines from the situation
 function aiTactics(side, dt) {
-  // the player's side: the commander decides (the staff only advises when told to run things); a pilot's or
-  // captain's staff keeps adapting, but leaves alone for five minutes a doctrine the player set by hand
-  if (side === game.side && game.role !== 'watch' && (game.role === 'cmd' ? !game.staffAuto : game.staffHold > game.t)) return;
+  // a pilot's or captain's staff keeps adapting, but leaves alone for five minutes a doctrine the player set by
+  // hand; the theatre commander's staff proposes its changes (command by negation)
+  if (side === game.side && game.role !== 'watch' && game.role !== 'cmd' && game.staffHold > game.t) return;
   const C = command[side];
   C.tacT = (C.tacT ?? 30) - dt;
   if (C.tacT > 0) return;
@@ -7686,7 +8004,8 @@ function aiTactics(side, dt) {
   const foeKnown = !!enemyFleet(side);
   const main = intentTarget(side);
   const carriers = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying);
-  const hurt = carriers.some(s => s.hp < s.maxHp * 0.6);
+  // a carrier hit hard in the last few minutes (an old wound does not keep the whole side on the defensive)
+  const hurt = carriers.some(s => s.hp < s.maxHp * 0.6 && game.t - (s.hitT ?? -999) < 180);
   const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== side).length;
   const foeStrikers = [...picture[side].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying && e.ashmN > 0).length;
   const foeAew = [...picture[side].keys()].some(e => e.kind === 'plane' && e.alive && !e.dying && e.T.aew);
@@ -7698,22 +8017,35 @@ function aiTactics(side, dt) {
   const foeF = [...picture[side].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying && e.T.mrm > 0).length;
   const healthy = ships.filter(s => s.side === side && s.alive && !s.dying && !s.carrier && !s.S.sub && s.hp > s.maxHp * 0.7).length;
   const r = Math.random();
-  const navy = !foeKnown ? (r < 0.6 ? 'emcon' : 'balanced')                    // hide while the scouts look
+  let navy = !foeKnown ? (r < 0.6 ? 'emcon' : 'balanced')                    // hide while the scouts look
     : hurt || inbound > 8 || foeStrikers > 8 ? 'ring'                            // weather the storm
     : dMain < 70000 && healthy >= 5 && r < 0.6 ? 'strike'                        // close in for the kill
     : main && r < 0.5 ? 'focus'                                                  // everything on the main target
     : r < 0.5 ? 'disperse' : 'balanced';
-  const air = !foeKnown ? 'sweep'
+  let air = !foeKnown ? 'sweep'
     : foeAew && foeF <= myF + 2 && r < 0.75 ? 'hunt'                             // put out the enemy's eyes first
     : hurt || foeStrikers > 6 ? 'cap'                                            // our carrier first
     : foeF > myF * 1.6 ? 'sweep'                                                 // win the air before striking
     : umbrella >= 4 ? (r < 0.55 ? 'mass' : 'low')                                // saturate or sneak under a strong umbrella
     : r < 0.5 ? 'mass' : 'balanced';
+  // the phase sets the posture; the staff departs from it only in an emergency (the carrier hit, a missile storm,
+  // a big raid), and keeps the fleet silent while the rules say EMCON A
+  const ph = phaseOf(side), emergency = hurt || inbound > 8 || foeStrikers > 6;
+  if (ph) {
+    navy = hurt || inbound > 8 || foeStrikers > 8 ? 'ring' : ph.navy;
+    air = hurt || foeStrikers > 6 ? 'cap' : ph.air === 'hunt' && !foeAew ? 'sweep' : ph.air;
+    if (roeOf(side).emcon === 'A' && !(hurt || inbound > 8)) navy = 'emcon';
+  }
   const was = tac(side);
-  setTactic('navy', navy, side); setTactic('air', air, side);
-  // signals intelligence: the player sometimes learns of the enemy's change of plan
-  if (side !== game.side && game.role !== 'watch' && (was.navy !== navy || was.air !== air) && Math.random() < 0.45)
-    radio('技术侦察', `截获敌方指挥网：敌转入「${TACTICS.navy[navy].name}」/「${TACTICS.air[air].name}」。`, '#ffd28a');
+  if (was.navy === navy && was.air === air) return;
+  const why = emergency ? (hurt ? '航母受损' : inbound > 8 ? `${inbound} 枚导弹来袭` : `${foeStrikers} 架敌攻击机`) + '，应急调整' : `按「${ph ? ph.name : '当前'}」阶段态势`;
+  staffAct(side, { key: `tac:${navy}/${air}`, title: '调整战术', detail: `舰队「${TACTICS.navy[navy].name}」· 空中「${TACTICS.air[air].name}」— ${why}`, ttl: emergency ? 10 : 20, hold: 120, run: () => {
+    const w = tac(side);
+    setTactic('navy', navy, side); setTactic('air', air, side);
+    // signals intelligence: the player sometimes learns of the enemy's change of plan
+    if (side !== game.side && game.role !== 'watch' && (w.navy !== navy || w.air !== air) && Math.random() < 0.45)
+      radio('技术侦察', `截获敌方指挥网：敌转入「${TACTICS.navy[navy].name}」/「${TACTICS.air[air].name}」。`, '#ffd28a');
+  } });
 }
 // a fighter sweep or an AEW hunt: a few fighters push out ahead of the fleet
 function airSweeps(side, dt) {
@@ -7722,7 +8054,8 @@ function airSweeps(side, dt) {
   const C = command[side];
   C.swpT = (C.swpT ?? 20) - dt;
   if (C.swpT > 0) return;
-  C.swpT = 110;
+  const kAir = clamp(apOf(side).air / 30, 0.35, 2.4);
+  C.swpT = 110 / kAir;
   const homes = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying);
   // sweeps clear the air along the main axis (the enemy group nearest us only when there is no main effort)
   const foeC = intentTarget(side) || enemyFleet(side);
@@ -7734,7 +8067,8 @@ function airSweeps(side, dt) {
   // stop short of the enemy group's area-defence umbrella (SM-6 / HHQ-9B reach plus margin)
   if (foeC && t === 'sweep') point = own.clone().addScaledVector(dir.normalize(), Math.max(0, L - 52000));
   let n = 0;
-  for (const h of homes) for (let i = 0; i < 2 && n < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty) { const p = launchFrom(h, ty, 'sweep', { point, hunt: t === 'hunt' }); if (p) n++; } }
+  const nMax = Math.max(1, Math.round(4 * Math.min(kAir, 1.5)));
+  for (const h of homes) for (let i = 0; i < 2 && n < nMax; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty) { const p = launchFrom(h, ty, 'sweep', { point, hunt: t === 'hunt' }); if (p) n++; } }
   if (n && side === game.side) radio('空中指挥', `${n} 架战斗机${t === 'hunt' ? '前出猎杀敌预警机' : '执行战斗机扫荡'}。`, '#9fd4ff');
 }
 
@@ -7805,11 +8139,15 @@ function updateIntent(side, dt) {
     if (sc > bs) { bs = sc; best = e; }
   }
   const prev = I && I.tgt;
-  if (best) { if (best !== prev) { setIntent(side, { tgt: best }); intentOrders(side); } else I.t = game.t; }
+  if (best && best !== prev && cmdSeat(side)) {
+    const b = best;
+    staffAct(side, { key: 'main:' + (b.key || b.name), title: '确定主攻目标', detail: `${b.name}${b.carrier ? '（航母）' : ''}价值最高、航迹可用，建议定为主攻目标，全部兵力向其集中`, ttl: 20, hold: 240, valid: () => b.alive && !b.dying && !(intentState(side) && intentState(side).src === 'player' && intentTarget(side)),
+      run: () => { setIntent(side, { tgt: b }); intentOrders(side); } });
+  } else if (best) { if (best !== prev) { setIntent(side, { tgt: best }); intentOrders(side); } else I.t = game.t; }
   else if (!I || dead) {
-    // nothing known: reconnaissance in force toward where the enemy must be
+    // nothing known: reconnaissance in force toward where the enemy must be, on the planned main direction
     const o = FLEET[SIDES[side].foe].origin;
-    setIntent(side, { point: new V3(o[0] * 0.6, 0, o[1] * 0.6) });
+    setIntent(side, { point: new V3(o[0] * 0.6, 0, o[1] * 0.6 - axisOff((planOf(side) || {}).main) * 20000) });
     intentOrders(side);
   }
 }
@@ -7850,6 +8188,9 @@ function newPackage(side, home, tgt) {
   const C = command[side];
   const ax = axisDir(side, home.pos, new V3());
   const k = { side, home, tgt, members: [], t: game.t, phase: 'form', rv: home.pos.clone().addScaledVector(ax, 14000).setY(5000), id: (C.pkgN = (C.pkgN || 0) + 1) };
+  // the rendezvous sits out on the flank of the main direction, so the package comes in from that side
+  const off = axisOff((planOf(side) || {}).main), tp = trackPos(side, tgt, _in1);
+  if (off && tp) k.rv.addScaledVector(latN(home.pos, tp, _in2), off * 18000);
   C.pkgs = C.pkgs || []; C.pkgs.push(k);
   return k;
 }
@@ -7911,6 +8252,11 @@ function updatePackages(side) {
       const st = !t.alive || t.dying ? '已被击沉' : t.hp > t.maxHp * 0.75 ? `轻伤（完好 ${Math.round(t.hp / t.maxHp * 100)}%），建议再次打击` : t.hp > t.maxHp * 0.4 ? `中度受损（完好 ${Math.round(t.hp / t.maxHp * 100)}%）` : `重创（完好 ${Math.round(t.hp / t.maxHp * 100)}%），丧失大部分战斗力`;
       const hits = k.hits || 0;
       radio('毁伤评估', `第 ${k.id} 攻击编队：发射 ${k.fired || 0} 枚，命中 ${hits} 枚。${t.name}${st}。`, '#9fd4ff');
+      jlog(side, `BDA · 第 ${k.id} 编队：命中 ${hits}/${k.fired || 0}，${t.name}${st}`);
+      if (t.alive && !t.dying && t.hp > t.maxHp * 0.4 && cmdSeat(side)) {
+        const h = ships.concat(bases).filter(x => x.side === side && x.alive && !x.dying && x.hangar && ['j15', 'j16', 'fa18'].some(q => x.hangar[q] > 0)).sort((a, b) => a.pos.distanceTo(t.pos) - b.pos.distanceTo(t.pos))[0];
+        if (h) staffAct(side, { key: 'reatk:' + (t.key || t.name), title: '再次打击', detail: `${t.name}未被摧毁（约 ${Math.round(t.hp / t.maxHp * 20) * 5}%），建议${h.name}再出动一个攻击编队`, ttl: 20, valid: () => t.alive && !t.dying, run: () => launchPackage(h, t, { n: 6, esc: 2 }) });
+      }
     }
   }
 }
@@ -7966,12 +8312,12 @@ function updateISR(side, dt) {
   // the other side's orbits are known: a staff (AI, or the player's staff on automatic) goes quiet for the pass
   // unless it is in a missile fight, and restores its posture after; the player is warned 20 s ahead
   const Cf = command[foe], soon = (Cf.satT ?? 99) < 20 || Cf.satEnd > game.t;
-  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : !(game.staffHold > game.t));
+  const staffRuns = side !== game.side || game.role === 'watch' || game.role === 'cmd' || !(game.staffHold > game.t);
   if (soon && !C.dodge && staffRuns && tac(side).navy !== 'emcon' && !missiles.some(m => m.alive && m.cls === 'ashm' && m.side === foe && m.target && m.target.side === side)) {
-    C.dodge = tac(side).navy; setTactic('navy', 'emcon', side);
-    if (side === game.side) radio('参谋部', '敌侦察卫星即将过顶，舰队转入电磁静默规避定位。', '#9fd4ff');
+    staffAct(side, { key: 'dodge', title: '卫星过顶 · 电磁静默', detail: '敌侦察卫星即将过顶，舰队雷达关机规避精确定位，过顶后恢复', ttl: 12, hold: 90, valid: () => !C.dodge && tac(side).navy !== 'emcon',
+      run: () => { C.dodge = tac(side).navy; setTactic('navy', 'emcon', side, true); if (side === game.side) radio('参谋部', '敌侦察卫星即将过顶，舰队转入电磁静默规避定位。', '#9fd4ff'); } });
   } else if (!soon && C.dodge) { if (tac(side).navy === 'emcon') setTactic('navy', C.dodge, side); C.dodge = null; C.dodgeEnd = game.t; }
-  if (side === game.side && game.role !== 'watch' && (Cf.satT ?? 99) < 20 && !C.satWarned && !staffRuns) { C.satWarned = true; radio('预警', '敌侦察卫星 20 秒后过顶——考虑电磁静默。', '#ffd28a'); }
+  if (side === game.side && game.role !== 'watch' && game.role !== 'cmd' && (Cf.satT ?? 99) < 20 && !C.satWarned && !staffRuns) { C.satWarned = true; radio('预警', '敌侦察卫星 20 秒后过顶——考虑电磁静默。', '#ffd28a'); }
   if (Cf.satT > 25) C.satWarned = false;
   C.satT = (C.satT ?? R.first) - dt;
   if (C.satT <= 0) {
@@ -8009,8 +8355,11 @@ function deployPhantom(side, quiet) {
   const C = command[side], foe = SIDES[side].foe;
   const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
   if (!cv) return null;
-  const ax = axisDir(side, cv.pos, new V3()), sgn = Math.random() < 0.5 ? 1 : -1, d = rand(20000, 30000);
-  const off = new V3(-ax.z * sgn, 0, ax.x * sgn).multiplyScalar(d).addScaledVector(ax, rand(-6000, 6000));
+  const ax = axisDir(side, cv.pos, new V3()), d = rand(20000, 30000), P = planOf(side);
+  // on the supporting direction when the plan has one, otherwise on a random flank
+  const n = latN(cv.pos, _in1.copy(cv.pos).add(ax), new V3()), sec = P && P.second !== 'none' ? axisOff(P.second) - axisOff(P.main) : 0;
+  const sgn = sec ? Math.sign(sec) : Math.random() < 0.5 ? 1 : -1;
+  const off = n.multiplyScalar(d * sgn).addScaledVector(ax, rand(-6000, 6000) + (sec ? 8000 : 0));
   const ph = { kind: 'ship', phantom: true, side, name: cv.name, key: 'ph' + (++phantomN), alive: true, dying: false, carrier: true, value: cv.value,
     hp: cv.maxHp, maxHp: cv.maxHp, S: { type: cv.S.type, sub: false, model: cv.S.model, L: cv.S.L, B: cv.S.B, radar: 0 }, rcs: cv.rcs, radius: cv.radius,
     sam: {}, ashm: {}, pos: cv.pos.clone().add(off), vel: cv.vel.clone(), off, until: game.t + 420, heading: cv.heading };
@@ -8033,11 +8382,15 @@ function updatePhantoms(side, dt) {
   const C = command[side], foe = SIDES[side].foe;
   C.phT = (C.phT ?? 240) - dt;
   // the staff deploys one when the fleet is quiet and the enemy is hunting for it
-  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : true);
+  const staffRuns = true;
   // (not into an enemy satellite pass: a SAR strip of empty sea would expose it at once)
   const satClear = !(command[foe].satEnd > game.t) && (command[foe].satT ?? 99) > 40;
   // right after a pass (the enemy has just refreshed its picture) or whenever the fleet is quiet
-  if (staffRuns && C.phT <= 0 && satClear && (tac(side).navy === 'emcon' || game.t - (C.dodgeEnd || -999) < 90) && !(C.phantoms || []).some(p => p.alive)) { C.phT = 420; deployPhantom(side); }
+  const lure = phaseOf(side) && phaseOf(side).phantom;
+  if (staffRuns && C.phT <= 0 && satClear && (lure || tac(side).navy === 'emcon' || game.t - (C.dodgeEnd || -999) < 90) && !(C.phantoms || []).some(p => p.alive)) {
+    C.phT = 120;
+    staffAct(side, { key: 'phantom', title: '电子佯动', detail: `在${lure ? '助攻方向' : '编队侧翼'}制造假航母编队信号，诱使敌方打击`, ttl: 20, hold: 180, run: () => { C.phT = 420; deployPhantom(side); } });
+  }
   for (const ph of C.phantoms || []) {
     if (!ph.alive) continue;
     const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
@@ -8081,7 +8434,8 @@ function drawForce() {
   const Cf = command[foeS];
   if (Cf.satEnd > game.t) lines.push([`⚠ 敌侦察卫星过顶中 ${Math.ceil(Cf.satEnd - game.t)}s`, '#ffd28a']);
   else if ((Cf.satT ?? 99) < 30) lines.push([`敌侦察卫星 ${Math.ceil(Cf.satT)}s 后过顶`, '#ffd28a']);
-  const T = tac(me); lines.push([`战术 · ${TACTICS.navy[T.navy].name} / ${TACTICS.air[T.air].name} · 参谋${game.staffAuto ? '自动' : '手动'}`, '#9fb0ba']);
+  const T = tac(me); lines.push([`战术 · ${TACTICS.navy[T.navy].name} / ${TACTICS.air[T.air].name} · ${ROE.wcs[roeOf(me).wcs][0]} · ${ROE.auth[authOf()][0]}`, '#9fb0ba']);
+  const pl = phaseLine(me); if (pl) lines.splice(1, 0, [pl, '#ffd28a']);
   const x = 12, y0 = compact ? 50 : 58, lh = compact ? 14 : 16;
   hc.save();
   hc.font = `600 ${compact ? 10 : 11}px ${SANS}`;
@@ -8107,7 +8461,7 @@ function aswTasking(side, dt) {
   if (!tgt) {
     // the staff's own awareness: a hostile boat held within 35 km of a carrier is hunted
     const cv = ships.filter(x => x.side === side && x.carrier && x.alive && !x.dying);
-    let bd = 35000;
+    let bd = 35000 * clamp(apOf(side).asw / 10, 0.6, 1.8);
     for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.S.sub && e.alive && !e.dying && game.t - tr.t < 60) for (const c of cv) { const d = tr.pos.distanceTo(c.pos); if (d < bd) { bd = d; tgt = e; } }
     if (!tgt && C.aswTgt && C.aswTgt.alive && !C.aswTgt.dying && game.t - (C.aswSeen || 0) < 180) tgt = C.aswTgt;
   }
@@ -8118,11 +8472,11 @@ function aswTasking(side, dt) {
   if (tgt !== C.aswTgt) { for (const x of hunters) x.hunt = null; hunters.length = 0; C.aswTgt = tgt; }
   // lost for three minutes: the search is called off (unless the commander keeps it designated)
   if (!ordered && game.t - (C.aswSeen || 0) > 180) { for (const x of hunters) x.hunt = null; C.aswTgt = null; return; }
-  const want = Math.min(2, ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub).length - 1);
+  const aw = apOf(side).asw, want = Math.min(aw >= 15 ? 3 : aw >= 6 ? 2 : 1, ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub).length - 1);
   if (hunters.length < want) {
     const datum = tr ? tr.pos : tgt.pos;
-    const cand = ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub && !x.hunt && x !== flagship && x.asw > 0)
-      .sort((a, b) => ((b.S.sonar || 0) > 0) - ((a.S.sonar || 0) > 0) || a.pos.distanceTo(datum) - b.pos.distanceTo(datum));
+    const cand = ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub && !x.hunt && x !== flagship && x.asw > 0 && x.grp !== 'reserve' && !x.sag)
+      .sort((a, b) => (b.grp === 'asw') - (a.grp === 'asw') || ((b.S.sonar || 0) > 0) - ((a.S.sonar || 0) > 0) || a.pos.distanceTo(datum) - b.pos.distanceTo(datum));
     const added = [];
     for (const x of cand.slice(0, want - hunters.length)) { x.hunt = tgt; x.sag = false; added.push(x.name); }
     if (added.length && side === game.side) radio('舰队司令部', `${added.join('、')}组成反潜猎杀群，高速前往${tgt.name}最后位置，到达后低速声呐搜索并实施攻击。`, '#9fd4ff');
@@ -8403,6 +8757,701 @@ function renderTacOrders() {
   $('tac-zout').onclick = () => { TM.span = Math.min(260000, TM.span * 1.6); };
 }
 
+/* ---------- joint command: operational design, phases, staff proposals and the joint operations centre ----------
+   Inlined into navwar.js (shares its scope).
+   A theatre commander does not fly the jets. Before the battle he fixes the operation: the main and the supporting
+   direction, the concept of operations (its phases), the task organisation of the fleet, the apportionment of the
+   air effort, the rules of engagement and how much the staff may decide alone. In battle the staff turns that into
+   sorties and salvos and brings him the decisions it may not take alone - command by negation: a proposal executes
+   when its time runs out unless the commander vetoes it. Each phase ends at a decision point. Both sides run the same
+   process; the AI commander approves its own staff. */
+
+const AXES = { N: '北翼', C: '中央', S: '南翼' };
+const axisOff = a => a === 'N' ? 1 : a === 'S' ? -1 : 0;
+const GROUPS = {
+  cv: ['航母核心', '航母与舰载机联队，舰队的中心'],
+  sag: ['水面突击群', '突击阶段前出接敌，以舰舰导弹与舰炮打击敌水面舰艇'],
+  screen: ['防空掩护群', '环绕航母组成区域防空，拦截来袭导弹与飞机'],
+  asw: ['反潜警戒群', '在主攻轴线前方组成反潜屏障，发现潜艇即转入猎杀'],
+  reserve: ['预备队', '在航母后方保存战力，由你决定投入时机'],
+  fwd: ['前出伏击', '潜艇沿主攻方向前出，伏击敌水面舰艇'],
+  esc: ['伴随护航', '潜艇在编队前方警戒，猎杀接近的敌潜艇']
+};
+const SHIP_GROUPS = ['sag', 'screen', 'asw', 'reserve'], SUB_GROUPS = ['fwd', 'esc'];
+const AP_KEYS = [['air', '制空'], ['strike', '对海突击'], ['isr', '预警侦察'], ['asw', '反潜'], ['ewt', '电子战 · 加油']];
+const ROE = {
+  wcs: {
+    free: ['武器自由', '参谋部可对射程内任何敌舰发起打击；防空导弹拦截一切敌方空中目标。'],
+    tight: ['武器限制', '进攻性火力只打主攻目标，其他目标需你批准；防空导弹只在高命中概率距离开火，节省弹药。'],
+    hold: ['武器保持', '所有进攻性火力（齐射、攻击编队、远程火力）逐项请示；防空只打直接威胁本舰的目标。']
+  },
+  emcon: {
+    A: ['A 级 · 全面静默', '全部舰艇雷达关机，只靠预警机与数据链；敌方难以发现我舰队，遭攻击的舰自动开机。'],
+    B: ['B 级 · 限制辐射', '航母与预备队静默，掩护群与反潜群雷达工作：敌方先看到的是外围护卫舰。'],
+    C: ['C 级 · 不限制', '全部雷达开机，探测与拦截效果最好，但舰队位置暴露。']
+  },
+  auth: {
+    delegate: ['授权参谋', '参谋部在计划范围内自行决断，只向你报告。'],
+    negation: ['否决式指挥', '参谋部提出建议并倒计时，到时自动执行，除非你否决（美军 CWC 的指挥方式）。'],
+    approve: ['逐项审批', '每一项建议都要你批准才执行，过期作废。']
+  }
+};
+// phases: posture on entry (apportionment, EMCON level, tactics), whether the surface action group pushes and the
+// alpha strike is released, how long the staff expects it to take, and its measure of progress [0..1, label]
+const PHASES = {
+  find: { name: '侦察预警', goal: '定位敌航母（识破假目标）', max: 900, ap: { air: 30, strike: 15, isr: 35, asw: 10, ewt: 10 }, emcon: 'A', navy: 'balanced', air: 'sweep', sag: false, alpha: false,
+    prog: side => { const f = foeCarrierFix(side); return [f ? 1 : 0, f ? `已定位${f.name}` : '卫星、超视距雷达与预警机搜索中']; } },
+  air: { name: '夺取制空', goal: '击落敌机 6 架或击落敌预警机', max: 600, ap: { air: 50, strike: 20, isr: 15, asw: 5, ewt: 10 }, emcon: 'B', navy: 'balanced', air: 'hunt', sag: false, alpha: false,
+    prog: (side, C) => { const L = game.ledger, k = L.air[foe(side)] - C.ph.base.air, a = L.aew[side] - C.ph.base.aew; return [Math.max(k / 6, a > 0 ? 1 : 0), `击落敌机 ${k} / 6${a > 0 ? ' · 敌预警机已被击落' : ''}`]; } },
+  strike: { name: '主攻突击', goal: '主攻目标完好度降至 40% 以下', max: 720, ap: { air: 25, strike: 50, isr: 10, asw: 5, ewt: 10 }, emcon: 'C', navy: 'focus', air: 'mass', sag: true, alpha: true, prog: strikeProg },
+  exploit: { name: '扩张战果', goal: '摧毁敌方战争潜力', max: 1e9, ap: { air: 30, strike: 40, isr: 10, asw: 10, ewt: 10 }, emcon: 'C', navy: 'strike', air: 'balanced', sag: true, alpha: true,
+    prog: side => [0, `敌战争潜力 ${Math.round(potential(foe(side)) / potential0[foe(side)] * 100)}%`] },
+  hide: { name: '隐蔽待机', goal: '先敌定位敌航母', max: 900, ap: { air: 40, strike: 25, isr: 25, asw: 5, ewt: 5 }, emcon: 'A', navy: 'balanced', air: 'cap', sag: false, alpha: false,
+    prog: side => { const f = foeCarrierFix(side); return [f ? 1 : 0, f ? `已定位${f.name} · 立即出击` : '全舰队静默，等待目标出现']; } },
+  blow: { name: '雷霆一击', goal: '一次饱和突击重创主攻目标', max: 600, ap: { air: 35, strike: 45, isr: 10, asw: 0, ewt: 10 }, emcon: 'C', navy: 'focus', air: 'mass', sag: true, alpha: true, prog: strikeProg },
+  shield: { name: '外层防御', goal: '打掉敌携弹攻击机 4 架，挫败敌方攻势', max: 420, ap: { air: 55, strike: 15, isr: 15, asw: 10, ewt: 5 }, emcon: 'B', navy: 'ring', air: 'cap', sag: false, alpha: false,
+    prog: (side, C) => { const a = game.ledger.archers[side] - C.ph.base.archers, q = (game.t - C.ph.t0) / 360; return [Math.max(a / 4, foeCarrierFix(side) ? q : 0), `打掉射手 ${a} / 4 · 坚守 ${Math.floor((game.t - C.ph.t0) / 60)} / 6 分钟`]; } },
+  counter: { name: '转入反击', goal: '主攻目标完好度降至 40% 以下', max: 720, ap: { air: 35, strike: 40, isr: 10, asw: 5, ewt: 10 }, emcon: 'C', navy: 'focus', air: 'mass', sag: true, alpha: true, prog: strikeProg },
+  lure: { name: '佯动牵制', goal: '诱使敌方打击佯动方向（骗走 4 枚导弹）', max: 480, ap: { air: 30, strike: 30, isr: 20, asw: 10, ewt: 10 }, emcon: 'A', navy: 'balanced', air: 'sweep', sag: true, alpha: false, phantom: true, second: true,
+    prog: (side, C) => { const f = game.ledger.fooled[side] - C.ph.base.fooled, q = (game.t - C.ph.t0) / 420; return [Math.max(f / 4, foeCarrierFix(side) ? q : 0), `骗走敌弹 ${f} / 4 · 牵制 ${Math.floor((game.t - C.ph.t0) / 60)} / 7 分钟`]; } }
+};
+function strikeProg(side, C) {
+  if ((game.flags[side === 'cn' ? 'sunkUSCV' : 'sunkCNCV'] || 0) > C.ph.base.cv) return [1, '敌航母已被击沉'];
+  const m = intentTarget(side);
+  if (!m) return [0, '主攻目标未定'];
+  const f = m.hp / m.maxHp;
+  return [clamp((1 - f) / 0.6, 0, 1), `${m.name} 完好度 ${hitOnce(side, m) ? `约 ${Math.round(f * 20) * 5}%` : '未打击'}`];
+}
+const CONCEPTS = {
+  decisive: { name: '先夺制空 · 再行突击', phases: ['find', 'air', 'strike', 'exploit'], desc: '标准的海上进攻战役：侦察定位 → 夺取制空权 → 集中突击敌航母 → 扩张战果。稳健，节奏较慢。' },
+  ambush: { name: '静默伏击 · 雷霆一击', phases: ['hide', 'blow', 'exploit'], desc: '全程电磁静默隐蔽待机，先敌定位后以全部兵力一次饱和突击。快而险，先敌发现是关键。' },
+  defense: { name: '外层防御 · 后发制人', phases: ['shield', 'counter', 'exploit'], desc: '先以战斗机与防空舰消耗来袭机群——打射手而不是箭，待敌攻势受挫再转入反击。稳妥，主动权在敌。' },
+  feint: { name: '声东击西 · 侧翼突击', phases: ['lure', 'strike', 'exploit'], desc: '突击群与电子佯动在助攻方向制造主攻假象，诱敌转移火力；主力静默接敌，从主攻方向突然出击。' }
+};
+
+/* ---------- small helpers ---------- */
+const planOf = side => game.plans && game.plans[side];
+const phaseOf = side => { const C = command[side]; return C.ph ? PHASES[C.ph.id] : null; };
+const apOf = side => command[side].ap || { air: 30, strike: 35, isr: 15, asw: 10, ewt: 10 };
+const roeOf = side => command[side].roe || { wcs: 'free', emcon: 'C' };
+const cmdSeat = side => side === game.side && game.role === 'cmd' && game.mode === 'play';
+const authOf = () => (command[game.side] || {}).auth || 'negation';
+const mmss = t => `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(Math.floor(t % 60)).padStart(2, '0')}`;
+// a real (not phantom) enemy carrier held within the last 90 s
+function foeCarrierFix(side) {
+  let best = null;
+  for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.carrier && !e.phantom && e.alive && !e.dying && game.t - tr.t < 90 && (!best || e.value > best.value)) best = e;
+  return best;
+}
+const hitOnce = (side, e) => e.hp < e.maxHp * 0.98;
+// emission control per ship: EMCON A (the "emcon" tactic) silences everything; B silences the carriers, the
+// reserve and the submarines while the screen radiates; a ship under attack always lights up
+function shipQuiet(s) {
+  if (s.emconBreak > game.t) return false;
+  if (tac(s.side).navy === 'emcon') return true;
+  return roeOf(s.side).emcon === 'B' && (s.carrier || s.grp === 'reserve');
+}
+function setEmcon(side, lv, quiet = false) {
+  const C = command[side];
+  C.roe = C.roe || { wcs: 'free', emcon: 'C' };
+  C.roe.emcon = lv;
+  if (lv === 'A') { if (tac(side).navy !== 'emcon') { C.preEmcon = tac(side).navy; setTactic('navy', 'emcon', side, quiet); } }
+  else if (tac(side).navy === 'emcon' && !C.dodge) setTactic('navy', C.preEmcon && C.preEmcon !== 'emcon' ? C.preEmcon : 'balanced', side, quiet);
+}
+// the perpendicular to an axis that points north (-z): a flank offset of +1 is the northern flank
+function latN(from, to, out) {
+  out.set(to.x - from.x, 0, to.z - from.z); const L = out.length() || 1;
+  out.set(out.z / L, 0, -out.x / L);
+  if (out.z > 0) out.negate();
+  return out;
+}
+// may the staff release this offensive fire on its own? 'go', 'ask' (a proposal to the commander) or 'no'
+function release(side, tgt) {
+  const w = roeOf(side).wcs;
+  if (w === 'free' || (w === 'tight' && tgt === intentTarget(side))) return 'go';
+  return side === game.side && game.role === 'cmd' ? 'ask' : side === game.side ? 'go' : 'no';
+}
+function jlog(side, text, color = '#cfe8ff') { const C = command[side]; (C.jlog = C.jlog || []).unshift({ t: game.t, text, color }); if (C.jlog.length > 40) C.jlog.length = 40; }
+
+/* ---------- the plan ---------- */
+// the staff's plan for a side; the recommended one (the player's starting point) or a varied one for the AI
+function staffPlan(side, rec) {
+  const pickC = rec ? (side === 'cn' ? 'decisive' : 'defense')
+    : side === 'cn' ? (Math.random() < 0.45 ? 'decisive' : Math.random() < 0.5 ? 'ambush' : 'feint')
+    : (Math.random() < 0.45 ? 'defense' : Math.random() < 0.6 ? 'decisive' : 'feint');
+  const main = rec ? 'C' : ['N', 'C', 'C', 'S'][Math.floor(Math.random() * 4)];
+  const second = pickC === 'feint' ? (main === 'N' ? 'S' : main === 'S' ? 'N' : (Math.random() < 0.5 ? 'N' : 'S')) : 'none';
+  return { concept: pickC, main, second, groups: staffGroups(side, pickC), ap: Object.assign({}, PHASES[CONCEPTS[pickC].phases[0]].ap), reserve: pickC === 'ambush' ? 10 : 20,
+    roe: { wcs: rec && side === 'us' ? 'tight' : 'free', emcon: PHASES[CONCEPTS[pickC].phases[0]].emcon }, auth: 'negation' };
+}
+// task organisation: the hardest-hitting pair forms the surface action group, the best sonar ships the ASW screen,
+// one destroyer is held back, the rest guard the carriers; submarines go forward (one stays with the fleet when
+// the plan is defensive)
+function staffGroups(side, concept) {
+  const g = {}, U = FLEET[side].units;
+  const pref = side === 'cn' ? { sag: [2, 5], asw: [8, 9], reserve: [7] } : { sag: [2, 8], asw: [9, 4], reserve: [7] };
+  U.forEach(([cls], i) => {
+    const S = CLS[cls], k = side + i;
+    if (S.carrier) g[k] = 'cv';
+    else if (S.sub) g[k] = concept === 'defense' && U.slice(0, i).some(([c]) => CLS[c].sub) ? 'esc' : 'fwd';
+    else g[k] = pref.sag.slice(0, concept === 'defense' ? 1 : 2).includes(i) ? 'sag' : pref.asw.includes(i) ? 'asw' : pref.reserve.includes(i) || (concept === 'defense' && i === pref.sag[1]) ? 'reserve' : 'screen';
+  });
+  return g;
+}
+function validPlan(P, side) {
+  if (!P || !CONCEPTS[P.concept] || !P.ap || !P.roe || !P.groups) return false;
+  return FLEET[side].units.every((u, i) => P.groups[side + i]);
+}
+// battle start: both sides' plans go into force
+function initJoint() {
+  game.plans = {};
+  game.ledger.phases = { cn: [], us: [] };
+  game.jstat = { approved: 0, vetoed: 0, auto: 0, dps: 0 };
+  dpQueue.length = 0; $('dp').hidden = true;
+  for (const side of ['cn', 'us']) {
+    const mine = side === game.side && game.role !== 'watch';
+    const P = mine && game.role === 'cmd' && validPlan(game.planDraft, side) ? JSON.parse(JSON.stringify(game.planDraft)) : staffPlan(side, mine);
+    P.phases = CONCEPTS[P.concept].phases.slice();
+    game.plans[side] = P;
+    const C = command[side];
+    Object.assign(C, { ap: Object.assign({}, P.ap), roe: { wcs: P.roe.wcs, emcon: P.roe.emcon }, auth: P.auth || 'negation', props: [], veto: {}, alerts: [], jlog: [], cc: {}, sagOrder: 'auto', screenK: 1, subOrder: null, resvOut: false, branched: false });
+    let ri = 0;
+    for (const s of ships) if (s.side === side) { s.grp = P.groups[s.key] || (s.carrier ? 'cv' : s.S.sub ? 'fwd' : 'screen'); if (s.grp === 'reserve') s.resIdx = ri++; }
+    // the air reserve: a share of each deck's strike aircraft that only the commander (or an alpha strike) commits
+    C.resvN = {};
+    for (const h of ships.concat(bases)) if (h.side === side && h.hangar) C.resvN[h.name] = Math.round(['j15', 'j16', 'fa18'].reduce((n, t) => n + (h.hangar[t] || 0), 0) * (P.reserve || 0) / 100);
+    enterPhase(side, 0, 'start');
+  }
+  renderProps();
+}
+function enterPhase(side, i, why) {
+  const C = command[side], P = planOf(side), id = P.phases[i], ph = PHASES[id], L = game.ledger, f = foe(side);
+  C.ph = { i, id, t0: game.t, hold: 0, dp: false, prog: 0, label: '', base: { air: L.air[f], aew: L.aew[side], archers: L.archers[side], fooled: L.fooled[side], cv: game.flags[side === 'cn' ? 'sunkUSCV' : 'sunkCNCV'] || 0 } };
+  if (why === 'start') setEmcon(side, C.roe.emcon, true);
+  else { C.ap = Object.assign({}, ph.ap); setEmcon(side, ph.emcon, true); }
+  if (C.roe.emcon !== 'A' && tac(side).navy !== ph.navy) setTactic('navy', ph.navy, side, true);
+  setTactic('air', ph.air, side, true);
+  C.tacT = 45;
+  if (ph.phantom) C.phT = Math.min(C.phT ?? 240, 40);
+  if (ph.alpha) C.alphaCd = Math.min(C.alphaCd ?? 420, 30);
+  L.phases[side].push({ id, t: game.t });
+  const n = P.phases.length, label = `第 ${i + 1} 阶段 / 共 ${n} · ${ph.name}`;
+  jlog(side, `${why === 'start' ? '作战开始' : why === 'branch' ? '启动应急预案' : '转入'} · ${label}`, GOLD);
+  if (side === game.side && game.role !== 'watch') {
+    if (why !== 'start') {
+      game.card = { title: label, sub: ph.goal, goal: `${CONCEPTS[P.concept].name} · 兵力分配与战术按阶段预案调整`, t: 5.5, max: 5.5 };
+      radio('战区指挥部', `${why === 'branch' ? '启动应急预案，' : ''}全线转入${label}：${ph.goal}。`, GOLD);
+      Music.stinger(id === 'strike' || id === 'blow' || id === 'counter');
+    } else radio('战区指挥部', `作战决心：${CONCEPTS[P.concept].name}，主攻方向${AXES[P.main]}${P.second !== 'none' ? `，助攻方向${AXES[P.second]}` : ''}。${label}。`, GOLD);
+  } else if (why !== 'start' && game.side && game.role !== 'watch' && Math.random() < 0.55) {
+    radio('技术侦察', `截获敌指挥网：敌转入「${ph.name}」阶段。`, '#ffd28a');
+    alertJ(game.side, 'sig' + id, `PIR-3 敌方作战阶段变化：「${ph.name}」`, 'hi');
+  }
+}
+
+/* ---------- each staff cycle: phase progress, decision points, CCIR, standing proposals ---------- */
+function updateJoint(side, dt) {
+  const C = command[side], P = planOf(side);
+  if (!P || !C.ph) return;
+  C.jT = (C.jT || 0) - dt;
+  if (C.jT > 0) return;
+  C.jT = 2;
+  const ph = PHASES[C.ph.id], [p, label] = ph.prog(side, C);
+  C.ph.prog = p; C.ph.label = label;
+  ccirCheck(side);
+  if (C.ph.dp || game.over) return;
+  const next = P.phases[C.ph.i + 1];
+  const hurt = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying && s.hp < s.maxHp * 0.5);
+  if (!C.branched && hurt && C.ph.id !== 'shield' && game.t > C.ph.hold) decisionPoint(side, 'branch', hurt);
+  else if (next && p >= 1 && game.t > C.ph.hold) decisionPoint(side, 'done');
+  else if (next && game.t - C.ph.t0 > ph.max && game.t > C.ph.hold) decisionPoint(side, 'late');
+  standingProposals(side);
+}
+function decisionPoint(side, kind, hurt) {
+  const C = command[side], P = planOf(side), ph = PHASES[C.ph.id], nid = P.phases[C.ph.i + 1], nx = nid && PHASES[nid];
+  let dp;
+  if (kind === 'branch') dp = {
+    title: '决策点 · 航母遭受重创', text: `${hurt.name}完好度跌破 50%。应急预案：转入「外层防御」——舰队收拢环形防空，战斗机全力掩护，暂停进攻约 6 分钟，然后恢复原计划。`,
+    opts: [{ label: '启动应急预案', run: () => { C.branched = true; P.phases.splice(C.ph.i + 1, 0, 'shield'); enterPhase(side, C.ph.i + 1, 'branch'); } },
+      { label: '坚持原计划', run: () => { C.branched = true; jlog(side, '指挥员决定：航母受创，坚持原计划'); } }],
+    def: side === game.side ? 0 : (Math.random() < 0.65 ? 0 : 1)
+  };
+  else dp = {
+    title: kind === 'done' ? `决策点 · 「${ph.name}」目标达成` : `决策点 · 「${ph.name}」已超时`,
+    text: kind === 'done' ? `${C.ph.label}。参谋部建议转入第 ${C.ph.i + 2} 阶段「${nx.name}」：${nx.goal}。` : `本阶段已进行 ${Math.floor((game.t - C.ph.t0) / 60)} 分钟仍未达成（${C.ph.label}）。可以转入「${nx.name}」，或延长本阶段 3 分钟。`,
+    opts: [{ label: `转入「${nx.name}」`, run: () => enterPhase(side, C.ph.i + 1, kind) },
+      { label: '延长本阶段 3 分钟', run: () => { C.ph.hold = game.t + 180; jlog(side, `指挥员决定：「${ph.name}」延长 3 分钟`); } }],
+    def: side !== game.side && kind === 'done' && Math.random() < 0.12 ? 1 : 0
+  };
+  C.ph.dp = true;
+  dp.side = side; dp.done = () => { if (C.ph) C.ph.dp = false; };
+  decide(dp);
+}
+// the commander decides at the console; anyone else's staff takes its own recommendation
+function decide(dp) {
+  if (cmdSeat(dp.side)) {
+    dpQueue.push(dp);
+    if (game.scale > 1) { game.scale = 1; game.autoCruise = false; $('b-scale').textContent = '时间 ×1'; }
+    Sound.beep(700, 0.12, 0.08); pending.push({ t: game.t + 0.15, fn: () => Sound.beep(940, 0.12, 0.08) });
+    showDP();
+    return;
+  }
+  const o = dp.opts[dp.def];
+  o.run(); dp.done();
+  if (dp.side === game.side && game.role !== 'watch') radio('战区指挥部', `${dp.title.replace('决策点 · ', '')}：参谋部决定${o.label}。`, '#9fd4ff');
+}
+// CCIR: what the commander must know at once (priority intelligence and friendly force information requirements)
+function alertJ(side, key, text, level = 'info') {
+  const C = command[side];
+  C.cc = C.cc || {};
+  if (C.cc['k_' + key] > game.t) return;
+  C.cc['k_' + key] = game.t + 120;
+  (C.alerts = C.alerts || []).unshift({ t: game.t, text, level });
+  if (C.alerts.length > 30) C.alerts.length = 30;
+  if (side !== game.side || game.role !== 'cmd') return;
+  radio('CCIR', text, level === 'crit' ? '#ff5a4f' : level === 'hi' ? '#ffd28a' : '#9fd4ff');
+  if (level === 'crit' && game.scale > 1) { game.scale = 1; game.autoCruise = false; $('b-scale').textContent = '时间 ×1'; message('关键情况 · 恢复实时', text, '#ff5a4f', 2.4); }
+}
+function ccirCheck(side) {
+  if (side !== game.side || game.role === 'watch') return;
+  const C = command[side], cc = C.cc = C.cc || {};
+  const cv = foeCarrierFix(side);
+  if (cv && !cc.cvFix) { cc.cvFix = true; alertJ(side, 'cvfix', `PIR-1 敌航母定位：${cv.name}`, 'hi'); }
+  else if (!cv && cc.cvFix && ![...picture[side].keys()].some(e => e.carrier && !e.phantom && e.alive)) { cc.cvFix = false; alertJ(side, 'cvlost', 'PIR-1 敌航母航迹丢失', 'hi'); }
+  const centre = fleetCentre(side);
+  if (centre) {
+    const raid = [...picture[side]].filter(([e, tr]) => e.kind === 'plane' && e.alive && !e.dying && e.ashmN > 0 && game.t - tr.t < 10 && tr.pos.distanceTo(centre) < 150000).length;
+    if (raid >= 6) alertJ(side, 'raid', `PIR-2 敌大规模空袭来袭：${raid} 架携弹攻击机`, 'crit');
+    const sub = C.aswTgt && C.aswTgt.alive ? C.aswTgt : null;
+    if (sub) alertJ(side, 'sub', `PIR-4 敌潜艇接近航母：${sub.name}，反潜群已出动`, 'hi');
+  }
+  for (const s of ships) if (s.side === side && s.carrier && s.alive && !s.dying) {
+    const f = s.hp / s.maxHp, lv = f < 0.3 ? 3 : f < 0.55 ? 2 : f < 0.8 ? 1 : 0;
+    if (lv > (cc['cv' + s.key] || 0)) { cc['cv' + s.key] = lv; alertJ(side, 'cvhp' + s.key + lv, `FFIR-1 ${s.name}受损，完好度 ${Math.round(f * 100)}%`, lv >= 2 ? 'crit' : 'hi'); }
+  }
+  const M = magazines(side);
+  if (M.sam0 && M.sam / M.sam0 < 0.3) alertJ(side, 'sam', `FFIR-2 舰队防空导弹余量 ${Math.round(M.sam / M.sam0 * 100)}%（垂发单元无法海上补充）`, 'hi');
+  const A = airStock(side);
+  if (A.strike0 && A.strike / A.strike0 < 0.3) alertJ(side, 'air', `FFIR-3 可用攻击机余量 ${Math.round(A.strike / A.strike0 * 100)}%`, 'hi');
+  if (game.t > 120 && !planes.some(p => p.side === side && p.alive && p.T.aew && p.airborne)) { cc.noAew = (cc.noAew || 0) + 2; if (cc.noAew > 60) alertJ(side, 'aew', 'FFIR-4 空中预警中断：无预警机在空', 'hi'); } else cc.noAew = 0;
+  const Cf = command[foe(side)];
+  if ((Cf.satT ?? 99) < 25 && !(Cf.satEnd > game.t)) alertJ(side, 'sat', `敌侦察卫星约 ${Math.ceil(Cf.satT)} 秒后过顶`, 'info');
+}
+// standing staff work: committing the reserve when the moment comes
+function standingProposals(side) {
+  const C = command[side], ph = phaseOf(side), main = intentTarget(side);
+  if (!C.resvOut && ph && ph.alpha && main && hitOnce(side, main) && main.hp < main.maxHp * 0.75 && Object.values(C.resvN || {}).some(n => n > 0))
+    staffAct(side, { key: 'resv-air', title: '投入航空预备队', detail: `${main.name}已受损（约 ${Math.round(main.hp / main.maxHp * 20) * 5}%），以预备队攻击机追加一波打击扩大战果`, ttl: 25, run: () => commitReserve(side, 'air') });
+  const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== side && m.target && m.target.carrier && m.target.side === side).length;
+  if (inbound >= 6 && ships.some(s => s.side === side && s.grp === 'reserve' && s.alive && !s.dying))
+    staffAct(side, { key: 'resv-ship', title: '预备队舰艇加入防空', detail: `${inbound} 枚反舰导弹扑向航母，预备队驱逐舰前出加入掩护群`, ttl: 12, run: () => commitReserve(side, 'ship') });
+}
+function commitReserve(side, what) {
+  const C = command[side];
+  if (what === 'air') {
+    C.resvOut = true;
+    const main = intentTarget(side);
+    let n = 0;
+    if (main) for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying && h.hangar && (C.resvN[h.name] || 0) > 0 && launchPackage(h, main, { n: Math.max(4, C.resvN[h.name]), esc: 2 })) n++;
+    for (const k in C.resvN) C.resvN[k] = 0;
+    jlog(side, `投入航空预备队${n ? `，${n} 个攻击编队出动` : ''}`, GOLD);
+    if (side === game.side) radio('战区指挥部', `航空预备队投入战斗${main ? `，目标${main.name}` : ''}！`, GOLD);
+  } else {
+    let n = 0;
+    for (const s of ships) if (s.side === side && s.grp === 'reserve' && s.alive && !s.dying) { s.grp = what === 'sag' ? 'sag' : 'screen'; n++; }
+    jlog(side, `预备队 ${n} 艘舰艇编入${what === 'sag' ? '水面突击群' : '防空掩护群'}`, GOLD);
+    if (side === game.side) radio('舰队司令部', `预备队 ${n} 艘舰艇编入${what === 'sag' ? '水面突击群' : '防空掩护群'}。`, '#9fd4ff');
+  }
+}
+// sustainment: what is left in the magazines and on the decks
+function magazines(side) {
+  const r = { sam: 0, sam0: 0, ashm: 0, ashm0: 0, ships: [] };
+  for (const s of ships) if (s.side === side && s.alive && !s.dying) {
+    const sam = Object.values(s.sam).reduce((a, b) => a + b, 0), sam0 = Object.values(s.S.sam).reduce((a, b) => a + b, 0) + (s.S.sm3 || 0);
+    const ashm = Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0), ashm0 = Object.values(s.S.ashm).reduce((a, b) => a + b, 0) + (s.S.tlam || 0);
+    r.sam += sam; r.sam0 += sam0; r.ashm += ashm; r.ashm0 += ashm0;
+    r.ships.push({ s, sam, sam0, ashm, ashm0 });
+  }
+  return r;
+}
+function airStock(side) {
+  const r = { strike: 0, strike0: 0, fighter: 0, types: {} };
+  for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying && h.hangar) {
+    for (const [t, n] of Object.entries(h.hangar)) { r.types[t] = (r.types[t] || 0) + n; if (['j15', 'j16', 'fa18'].includes(t)) r.strike += n; if (['j35', 'f35c', 'j15', 'fa18', 'j16'].includes(t)) r.fighter += n; }
+    for (const q of h.ready) if (['j15', 'j16', 'fa18'].includes(q.type)) r.strike++;
+  }
+  for (const h of ships.concat(bases)) if (h.side === side && h.S && (h.S.wing || (h.kind === 'base' && BASE.wing))) for (const t of ['j15', 'j16', 'fa18']) r.strike0 += ((h.kind === 'base' ? BASE.wing : h.S.wing)[t] || 0);
+  return r;
+}
+
+/* ---------- command by negation: staff proposals ---------- */
+let propN = 0;
+const dpQueue = [];
+// the staff wants to do something it may not do alone; for the AI side (or a commander away at a console) it just does
+function staffAct(side, p) {
+  const C = command[side];
+  if (!cmdSeat(side)) { p.run(); return true; }
+  const mode = authOf();
+  if (mode === 'delegate') { p.run(); game.jstat.auto++; jlog(side, `参谋部执行：${p.title}${p.detail ? ' · ' + p.detail : ''}`); radio('参谋部', `已执行：${p.title}。`, '#9fd4ff'); return true; }
+  C.props = C.props || [];
+  if (C.props.some(q => q.key === p.key) || (C.veto || {})[p.key] > game.t) return false;
+  p.t0 = game.wall || 0; p.ttl = (p.ttl || 20) * (mode === 'approve' ? 2 : 1); p.id = ++propN;
+  C.props.push(p);
+  // too many open at once: the oldest is settled the way the authority level says
+  while (C.props.length > 4) settleProp(C.props[0], mode === 'approve' ? 'expire' : 'auto');
+  renderProps();
+  Sound.beep(1050, 0.05, 0.04);
+  return false;
+}
+function settleProp(p, how) {
+  const C = command[game.side];
+  const i = C.props.indexOf(p); if (i < 0) return;
+  C.props.splice(i, 1);
+  if (how === 'approve' || how === 'auto') {
+    if (!p.valid || p.valid()) p.run();
+    game.jstat[how === 'approve' ? 'approved' : 'auto']++;
+    jlog(game.side, `${how === 'approve' ? '批准' : '默认执行'}：${p.title}${p.detail ? ' · ' + p.detail : ''}`, how === 'approve' ? '#8dffb4' : '#9fd4ff');
+  } else if (how === 'veto') {
+    C.veto[p.key] = game.t + (p.hold || 150); game.jstat.vetoed++;
+    jlog(game.side, `否决：${p.title}`, '#ff8a78');
+    radio('参谋部', `明白，取消「${p.title}」。`, '#9fb0ba');
+  } else { C.veto[p.key] = game.t + 60; jlog(game.side, `过期未批：${p.title}`, '#9fb0ba'); }
+  renderProps();
+}
+function renderProps() {
+  const box = $('props'); if (!box) return;
+  const C = command[game.side] || {}, list = game.role === 'cmd' && game.mode === 'play' ? (C.props || []) : [];
+  box.hidden = !list.length;
+  const mode = authOf();
+  box.innerHTML = list.slice(-(HH < 520 ? 2 : 4)).map(p => `<div class="prop" data-id="${p.id}"><b>参谋部建议 · ${p.title}</b><span>${p.detail || ''}</span><div class="pbar"><i id="pb${p.id}"></i></div>
+    <div class="pacts"><button type="button" data-a="approve">批准</button><button type="button" data-a="veto">否决</button><em id="pt${p.id}">${mode === 'approve' ? '待批' : '到时执行'}</em></div></div>`).join('');
+  for (const el of box.querySelectorAll('.prop')) for (const b of el.querySelectorAll('button')) b.onclick = () => { const p = C.props.find(q => q.id === +el.dataset.id); if (p) settleProp(p, b.dataset.a); };
+}
+function showDP() {
+  const dp = dpQueue[0], el = $('dp');
+  if (!dp) { el.hidden = true; return; }
+  if (!dp.t0) dp.t0 = game.wall || 0;
+  dp.ttl = authOf() === 'approve' ? 90 : 40;
+  el.innerHTML = `<div class="dpc"><p class="eyebrow">战区联合指挥中心</p><h3>${dp.title}</h3><p>${dp.text}</p>
+    <div class="dopts">${dp.opts.map((o, i) => `<button type="button" data-i="${i}" class="${i === dp.def ? 'rec' : ''}">${o.label}${i === dp.def ? '<small>参谋部建议</small>' : ''}</button>`).join('')}</div>
+    <div class="pbar"><i id="dpbar"></i></div><em id="dpt"></em></div>`;
+  el.hidden = false;
+  for (const b of el.querySelectorAll('.dopts button')) b.onclick = () => resolveDP(+b.dataset.i, true);
+}
+function resolveDP(i, byHand) {
+  const dp = dpQueue.shift(); if (!dp) return;
+  const o = dp.opts[i];
+  o.run(); dp.done(); game.jstat.dps++;
+  jlog(dp.side, `${byHand ? '指挥员决策' : '超时按参谋建议'}：${o.label}`, GOLD);
+  if (!byHand) radio('参谋部', `决策时限已到，按建议执行：${o.label}。`, '#9fd4ff');
+  showDP();
+}
+// per frame (wall clock, so time compression does not eat the commander's thinking time)
+function updateJointUI(rdt) {
+  if (game.mode !== 'play') return;
+  game.wall = (game.wall || 0) + rdt;
+  if (game.role !== 'cmd') { if (!$('props').hidden) $('props').hidden = true; return; }
+  const C = command[game.side], mode = authOf();
+  for (const p of (C.props || []).slice()) {
+    if (p.valid && !p.valid()) { settleProp(p, 'expire'); continue; }
+    const left = p.ttl - (game.wall - p.t0);
+    if (left <= 0) { settleProp(p, mode === 'approve' ? 'expire' : 'auto'); continue; }
+    const bar = $('pb' + p.id); if (bar) bar.style.width = `${(left / p.ttl * 100).toFixed(1)}%`;
+    const tx = $('pt' + p.id); if (tx) tx.textContent = `${mode === 'approve' ? '过期' : '执行'} ${Math.ceil(left)}s`;
+  }
+  const dp = dpQueue[0];
+  if (dp) {
+    const left = dp.ttl - (game.wall - dp.t0);
+    if (left <= 0) resolveDP(dp.def, false);
+    else { const b = $('dpbar'); if (b) b.style.width = `${(left / dp.ttl * 100).toFixed(1)}%`; const t = $('dpt'); if (t) t.textContent = `${Math.ceil(left)} 秒后按参谋部建议执行`; }
+  }
+  if (JC.open) { JC.t -= rdt; if (JC.t <= 0 && !JC.press) { JC.t = 1; renderJCC(); } }
+}
+
+/* ---------- the pre-battle planning screen ---------- */
+function openPlan() {
+  const side = game.side, saved = store.get('plan_' + side, null);
+  game.planDraft = validPlan(saved, side) ? saved : staffPlan(side, true);
+  renderPlan();
+  show('plan');
+}
+function planWarnings(P, side) {
+  const out = [], g = Object.values(P.groups), C = CONCEPTS[P.concept];
+  const n = k => g.filter(x => x === k).length;
+  if (!n('asw')) out.push(['未编组反潜警戒群', `敌方 2 艘攻击核潜艇可能潜近航母，只能临时抽调护航舰猎潜。`]);
+  if (!n('sag') && C.phases.some(id => PHASES[id].sag)) out.push(['无水面突击群', '突击阶段只能依靠舰载机与远程火力。']);
+  if (n('screen') < 3) out.push(['掩护群不足 3 艘', '航母区域防空薄弱，饱和攻击下拦截通道不够。']);
+  if (P.ap.air < 20) out.push(['制空兵力不足 20%', '攻击编队缺乏护航，战斗机巡逻稀疏。']);
+  if (P.ap.isr < 10) out.push(['预警侦察不足 10%', '可能长时间无法定位敌航母，假目标更难识破。']);
+  if (P.roe.emcon === 'C' && ['ambush', 'feint'].includes(P.concept)) out.push(['电磁管控与构想矛盾', `「${C.name}」依赖隐蔽，C 级管控会让敌方更早发现我舰队。`]);
+  if (P.roe.wcs === 'hold') out.push(['武器保持', '所有进攻性火力都要你逐项批准，节奏会变慢。']);
+  if (!P.reserve) out.push(['未保留预备队', '出现意外时无兵力可调。']);
+  else if (P.reserve > 30) out.push(['预备队过大', `${P.reserve}% 的攻击机按兵不动，突击强度下降。`]);
+  if (P.concept === 'feint' && (P.second === 'none' || P.second === P.main)) out.push(['助攻方向未定', '声东击西需要与主攻方向不同的助攻方向。']);
+  if (!out.length) out.push(['方案可行', '参谋部无异议。']);
+  return out;
+}
+function renderPlan() {
+  const P = game.planDraft, side = game.side, fo = foe(side), body = $('plan-body');
+  const seg = (k, opts, cur) => `<div class="seg" data-k="${k}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+  const d = Math.round(Math.hypot(FLEET[fo].origin[0] - FLEET[side].origin[0], FLEET[fo].origin[1] - FLEET[side].origin[1]) / 1000);
+  const intel = side === 'cn'
+    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×6、弗吉尼亚级 ×2），预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B 与水面舰战斧可从战区外打击。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
+    : `解放军福建舰、山东舰双航母编队（055 ×2、052D ×4、054A ×2、093B ×2），预计在我以西约 ${d} km 海域；永暑礁机场驻歼-16、轰-6K，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
+  const units = FLEET[side].units.map(([c, name], i) => ({ key: side + i, c, name, S: CLS[c] }));
+  body.innerHTML = `
+  <div class="pgrid">
+    <section class="psec"><h3>① 敌情判断 · 主攻方向</h3>
+      <canvas id="plan-map"></canvas>
+      <p class="pnote">${intel}</p>
+      <div class="prow"><i>主攻方向</i>${seg('main', Object.entries(AXES), P.main)}</div>
+      <div class="prow"><i>助攻方向</i>${seg('second', [['none', '不设'], ...Object.entries(AXES)], P.second)}</div>
+    </section>
+    <section class="psec"><h3>② 作战构想 · 阶段计划</h3>
+      <div class="concepts">${Object.entries(CONCEPTS).map(([k, c]) => `<button type="button" class="concept${k === P.concept ? ' on' : ''}" data-k="concept" data-v="${k}"><b>${c.name}</b><span class="chain">${c.phases.map((id, j) => `<em>${j + 1} ${PHASES[id].name}</em>`).join('<s>›</s>')}</span><small>${c.desc}</small></button>`).join('')}</div>
+    </section>
+    <section class="psec span2"><h3>③ 兵力编组</h3>
+      <div class="orbat">${units.map(u => u.S.carrier ? `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span><div class="seg fixed"><button type="button" class="on" disabled>航母核心</button></div></div>`
+        : `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span>${seg('g:' + u.key, (u.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(g => [g, GROUPS[g][0]]), P.groups[u.key])}</div>`).join('')}</div>
+      <p class="pnote">${SHIP_GROUPS.map(g => `<b>${GROUPS[g][0]}</b>：${GROUPS[g][1]}`).join('　')}</p>
+    </section>
+    <section class="psec"><h3>④ 兵力分配 · 第一阶段</h3>
+      <div class="sliders">${AP_KEYS.map(([k, l]) => `<label><i>${l}</i><input type="range" min="0" max="80" step="1" data-ap="${k}" value="${P.ap[k]}"><b id="apv-${k}">${P.ap[k]}%</b></label>`).join('')}
+      <label class="resv"><i>航空预备队</i><input type="range" min="0" max="40" step="5" data-resv="1" value="${P.reserve}"><b id="apv-resv">${P.reserve}%</b></label></div>
+      <p class="pnote">分配比例决定巡逻机数量、攻击编队规模与出动间隔、预警机与侦察出动、反潜与电子战 / 加油兵力。后续阶段按阶段预案调整，作战中可随时修改。预备队攻击机只在你下令或大规模打击时投入。</p>
+    </section>
+    <section class="psec"><h3>⑤ 交战规则 · 指挥方式</h3>
+      <div class="prow"><i>武器控制</i>${seg('wcs', Object.entries(ROE.wcs).map(([k, v]) => [k, v[0]]), P.roe.wcs)}</div>
+      <div class="prow"><i>电磁管控</i>${seg('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), P.roe.emcon)}</div>
+      <div class="prow"><i>参谋权限</i>${seg('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), P.auth)}</div>
+      <p class="pnote">${ROE.wcs[P.roe.wcs][1]}<br>${ROE.emcon[P.roe.emcon][1]}<br>${ROE.auth[P.auth][1]}</p>
+    </section>
+    <section class="psec span2"><h3>参谋部意见</h3><ul class="staffnote">${planWarnings(P, side).map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}</ul></section>
+  </div>`;
+  for (const sg of body.querySelectorAll('.seg:not(.fixed)')) for (const b of sg.querySelectorAll('button')) b.onclick = () => {
+    const k = sg.dataset.k, v = b.dataset.v;
+    if (k === 'main' || k === 'second') P[k] = v;
+    else if (k.startsWith('g:')) P.groups[k.slice(2)] = v;
+    else if (k === 'wcs' || k === 'emcon') P.roe[k] = v;
+    else if (k === 'auth') P.auth = v;
+    renderPlan();
+  };
+  for (const b of body.querySelectorAll('.concept')) b.onclick = () => {
+    const was = P.concept; P.concept = b.dataset.v;
+    if (was !== P.concept) {
+      const f = PHASES[CONCEPTS[P.concept].phases[0]]; P.ap = Object.assign({}, f.ap); P.roe.emcon = f.emcon;
+      if (P.concept === 'feint' && P.second === 'none') P.second = P.main === 'N' ? 'S' : 'N';
+      // the staff re-organises the force for the new concept unless the commander has already set it by hand
+      if (JSON.stringify(P.groups) === JSON.stringify(staffGroups(side, was))) P.groups = staffGroups(side, P.concept);
+    }
+    renderPlan();
+  };
+  for (const r of body.querySelectorAll('input[data-ap]')) r.oninput = () => { setAp(P.ap, r.dataset.ap, +r.value); for (const [k] of AP_KEYS) { $('apv-' + k).textContent = P.ap[k] + '%'; const o = body.querySelector(`input[data-ap="${k}"]`); if (o !== r) o.value = P.ap[k]; } };
+  for (const r of body.querySelectorAll('input[data-ap]')) r.onchange = () => renderPlan();
+  const rv = body.querySelector('input[data-resv]'); rv.oninput = () => { P.reserve = +rv.value; $('apv-resv').textContent = P.reserve + '%'; }; rv.onchange = () => renderPlan();
+  drawPlanMap();
+}
+// change one share and rescale the others so the whole stays 100
+function setAp(ap, key, v) {
+  v = clamp(Math.round(v), 0, 80);
+  const others = AP_KEYS.map(([k]) => k).filter(k => k !== key), rest = others.reduce((a, k) => a + ap[k], 0);
+  ap[key] = v;
+  const want = 100 - v;
+  for (const k of others) ap[k] = rest > 0 ? Math.round(ap[k] * want / rest) : Math.round(want / others.length);
+  const err = 100 - AP_KEYS.reduce((a, [k]) => a + ap[k], 0);
+  const big = others.sort((a, b) => ap[b] - ap[a])[0]; ap[big] = Math.max(0, ap[big] + err);
+}
+function drawPlanMap() {
+  const cv = $('plan-map'); if (!cv) return;
+  const P = game.planDraft, side = game.side, fo = foe(side);
+  const W = cv.clientWidth || 320, H = cv.clientHeight || 170, dpr = Math.min(2, devicePixelRatio || 1);
+  cv.width = W * dpr; cv.height = H * dpr;
+  const g = cv.getContext('2d'); g.scale(dpr, dpr);
+  const o0 = FLEET[side].origin, e0 = FLEET[fo].origin, cx = (o0[0] + e0[0]) / 2, cz = (o0[1] + e0[1]) / 2;
+  const span = 200000, s = Math.min(W / span, H / (span * 0.6)), P2 = (x, z) => [W / 2 + (x - cx) * s, H / 2 + (z - cz) * s];
+  g.fillStyle = '#071521'; g.fillRect(0, 0, W, H);
+  g.strokeStyle = 'rgba(141,255,180,0.07)';
+  for (let x = -160000; x <= 160000; x += 20000) { const [a] = P2(x, 0); g.beginPath(); g.moveTo(a, 0); g.lineTo(a, H); g.stroke(); }
+  for (let z = -120000; z <= 120000; z += 20000) { const [, b] = P2(0, z); g.beginPath(); g.moveTo(0, b); g.lineTo(W, b); g.stroke(); }
+  for (const F of REEFS) { const [x, y] = P2(F.x, F.z); g.fillStyle = F.type === 2 ? 'rgba(60,140,170,0.18)' : 'rgba(98,214,205,0.5)'; g.beginPath(); g.ellipse(x, y, Math.max(1, F.rx * s), Math.max(1, F.rz * s), F.rot, 0, Math.PI * 2); g.fill(); }
+  { const [x, y] = P2(BASE_LAND.x, BASE_LAND.z); g.fillStyle = '#d6c89e'; g.fillRect(x - 3, y - 3, 6, 6); g.font = `500 10px ${SANS}`; g.fillStyle = '#d6c89e'; g.textAlign = 'center'; g.fillText('永暑礁', x, y - 7); }
+  const o = FLEET[side].origin, e = FLEET[fo].origin, [ox, oy] = P2(o[0], o[1]), [ex, ey] = P2(e[0], e[1]);
+  g.strokeStyle = 'rgba(255,138,120,0.6)'; g.setLineDash([3, 4]); g.beginPath(); g.ellipse(ex, ey, 32000 * s, 26000 * s, 0, 0, Math.PI * 2); g.stroke(); g.setLineDash([]);
+  g.font = `600 11px ${SANS}`; g.textAlign = 'center'; g.fillStyle = '#ff8a78'; g.fillText('敌航母编队（估计）', ex, ey - 26000 * s - 6);
+  const arrow = (code, col, w, dash) => {
+    const lat = latN(new V3(o[0], 0, o[1]), new V3(e[0], 0, e[1]), new V3()).multiplyScalar(axisOff(code) * 30000);
+    const [tx, ty] = P2(e[0] + lat.x * 0.9, e[1] + lat.z * 0.9), [mx, my] = P2((o[0] + e[0]) / 2 + lat.x, (o[1] + e[1]) / 2 + lat.z);
+    g.strokeStyle = col; g.lineWidth = w; g.setLineDash(dash || []); g.beginPath(); g.moveTo(ox, oy); g.quadraticCurveTo(mx, my, tx, ty); g.stroke(); g.setLineDash([]);
+    const a = Math.atan2(ty - my, tx - mx); g.fillStyle = col; g.beginPath(); g.moveTo(tx, ty); g.lineTo(tx - Math.cos(a - 0.5) * 12, ty - Math.sin(a - 0.5) * 12); g.lineTo(tx - Math.cos(a + 0.5) * 12, ty - Math.sin(a + 0.5) * 12); g.closePath(); g.fill();
+    return [mx, my];
+  };
+  if (P.second !== 'none') { const [mx, my] = arrow(P.second, 'rgba(143,200,255,0.8)', 2, [6, 5]); g.fillStyle = '#8fc8ff'; g.font = `600 10px ${SANS}`; g.fillText(`助攻 · ${AXES[P.second]}`, mx, my - 8); }
+  { const [mx, my] = arrow(P.main, 'rgba(227,178,87,0.95)', 5); g.fillStyle = GOLD; g.font = `700 11px ${SANS}`; g.fillText(`主攻 · ${AXES[P.main]}`, mx, my - 10); }
+  g.fillStyle = SIDES[side].color; g.beginPath(); g.arc(ox, oy, 5, 0, Math.PI * 2); g.fill(); g.font = `600 11px ${SANS}`; g.fillText('我航母编队', ox, oy + (oy > H - 30 ? -10 : 18));
+  g.fillStyle = 'rgba(238,243,245,0.5)'; g.font = `500 9px ${MONO}`; g.textAlign = 'left'; g.fillText('N ↑   网格 20 km', 6, 12);
+}
+$('b-plan-go').onclick = () => { store.set('plan_' + game.side, game.planDraft); startGame(); };
+$('b-plan-staff').onclick = () => { game.planDraft = staffPlan(game.side, true); renderPlan(); };
+$('b-plan-back').onclick = () => brief();
+addEventListener('resize', () => { if (!$('plan').hidden) drawPlanMap(); });
+
+/* ---------- the joint operations centre (in battle) ---------- */
+const JC = { open: false, tab: 'sit', t: 0, press: false };
+function toggleJCC(tab) {
+  if (game.mode !== 'play' || game.role !== 'cmd') return;
+  JC.open = tab ? true : !JC.open;
+  if (tab) JC.tab = tab;
+  $('jcc').hidden = !JC.open;
+  $('cm-jcc')?.classList.toggle('on', JC.open);
+  if (JC.open) { JC.t = 0; renderJCC(); }
+}
+function renderJCC() {
+  if (!JC.open) return;
+  const side = game.side, C = command[side], P = planOf(side);
+  if (!P || !C.ph) return;
+  for (const b of document.querySelectorAll('#jcc-tabs button')) b.classList.toggle('on', b.dataset.t === JC.tab);
+  const ph = PHASES[C.ph.id];
+  $('jcc-phase').textContent = `${mmss(game.t)} · 第 ${C.ph.i + 1}/${P.phases.length} 阶段 ${ph.name} · ${ROE.auth[C.auth][0]}`;
+  const body = $('jcc-body'), keep = body.scrollTop;
+  body.innerHTML = JCC_TABS[JC.tab](side, C, P);
+  body.scrollTop = keep;
+  for (const b of body.querySelectorAll('[data-act]')) b.onclick = () => { jccAct(b.dataset.act, b.dataset.v); JC.t = 0.05; };
+  for (const s of body.querySelectorAll('select[data-grp]')) s.onchange = () => { const sh = ships.find(x => x.key === s.dataset.grp); if (sh) { sh.grp = s.value; if (s.value !== 'sag') sh.sag = false; if (s.value !== 'asw') sh.hunt = null; radio('舰队司令部', `${sh.name}编入${GROUPS[s.value][0]}。`, '#9fd4ff'); jlog(side, `${sh.name}编入${GROUPS[s.value][0]}`); } JC.t = 0.05; };
+  for (const r of body.querySelectorAll('input[data-ap]')) {
+    r.oninput = () => { setAp(C.ap, r.dataset.ap, +r.value); for (const [k] of AP_KEYS) { const o = body.querySelector(`input[data-ap="${k}"]`); if (o !== r) o.value = C.ap[k]; const v = $('jap-' + k); if (v) v.textContent = C.ap[k] + '%'; } };
+    r.onchange = () => { jlog(side, `调整兵力分配：${AP_KEYS.map(([k, l]) => `${l} ${C.ap[k]}%`).join(' · ')}`); radio('空中指挥', '收到新的兵力分配，按新比例组织出动。', '#9fd4ff'); JC.t = 0.05; };
+  }
+}
+const jbar = (v, col = '#8fc8ff') => `<span class="jbar"><i style="width:${Math.round(clamp(v, 0, 1) * 100)}%;background:${col}"></i></span>`;
+const segJ = (act, opts, cur) => `<div class="seg">${opts.map(([v, l]) => `<button type="button" data-act="${act}" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
+const JCC_TABS = {
+  // the situation: phase, balance, CCIR
+  sit(side, C, P) {
+    const ph = PHASES[C.ph.id], fo = foe(side), next = P.phases[C.ph.i + 1];
+    const pm = potential(side) / potential0[side], pf = potential(fo) / potential0[fo];
+    const myF = planes.filter(p => p.side === side && p.alive && p.airborne && p.mrm + p.srm > 0).length;
+    const foF = [...picture[side].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying && e.T.mrm > 0).length;
+    const inb = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== side && m.target && m.target.side === side).length;
+    const cv = foeCarrierFix(side), cvT = cv && picture[side].get(cv);
+    return `<div class="jphase"><b>第 ${C.ph.i + 1} 阶段 · ${ph.name}</b><span>${ph.goal}</span>${jbar(C.ph.prog, GOLD)}<em>${C.ph.label} · 已进行 ${mmss(game.t - C.ph.t0)}</em>
+      ${next ? `<button type="button" data-act="nextphase">提前转入「${PHASES[next].name}」</button>` : ''}</div>
+      <div class="jgrid">
+        <div><i>我方战争潜力</i>${jbar(pm, '#8fc8ff')}<b>${Math.round(pm * 100)}%</b></div>
+        <div><i>敌方战争潜力（估计）</i>${jbar(pf, '#ff8a78')}<b>${Math.round(pf / 0.1) * 10}%</b></div>
+        <div><i>空中力量对比（战斗机）</i><b>${myF} : ${foF}${foF ? ` · ${(myF / foF).toFixed(1)} 倍` : ''}</b></div>
+        <div><i>来袭反舰导弹</i><b style="color:${inb ? '#ff5a4f' : 'inherit'}">${inb}</b></div>
+        <div><i>敌航母</i><b>${cv ? `${cv.name} · 航迹 ${Math.round(game.t - cvT.t)} s${cvT.coarse ? ' · 粗略' : ''}` : '未掌握'}</b></div>
+        <div><i>主攻目标</i><b>${intentTarget(side) ? intentTarget(side).name : intentState(side) ? '指定海域' : '未定'}</b></div>
+      </div>
+      <h4>指挥员关键信息需求（CCIR）</h4>
+      <ul class="jlist">${(C.alerts || []).slice(0, 10).map(a => `<li class="${a.level}"><em>${mmss(a.t)}</em>${a.text}</li>`).join('') || '<li>暂无</li>'}</ul>`;
+  },
+  // the joint integrated prioritized target list
+  tgt(side, C) {
+    const main = intentTarget(side), rows = [];
+    for (const [e, tr] of picture[side]) {
+      if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying) continue;
+      const age = game.t - tr.t, sub = e.S && e.S.sub;
+      const score = sub ? -1 : e.value * (e.carrier ? 2 : 1) * (e === main ? 3 : 1) * (age < 60 ? 1 : 0.5);
+      const pk = (C.pkgs || []).filter(k => k.tgt === e && (k.phase === 'form' || k.phase === 'push')).length;
+      const ms = missiles.filter(m => m.alive && m.side === side && m.target === e).length;
+      rows.push({ e, tr, age, sub, score, pk, ms });
+    }
+    rows.sort((a, b) => b.score - a.score);
+    const q = r => r.tr.coarse ? `粗略 ${Math.round(r.age)}s` : r.age < 15 ? '精确' : `${Math.round(r.age)}s 前`;
+    const bda = r => hitOnce(side, r.e) ? `约 ${Math.round(r.e.hp / r.e.maxHp * 20) * 5}%` : '未打击';
+    return `<p class="jnote">目标按价值、主攻方向与航迹质量排序。BDA 为毁伤评估（估计值）。粗略航迹（卫星 / 超视距雷达）可以引导攻击编队，导弹末段需要自行搜索。</p>
+      <table class="jtab"><thead><tr><th>#</th><th>目标</th><th>航迹</th><th>评估</th><th>在途</th><th></th></tr></thead><tbody>
+      ${rows.map((r, i) => `<tr class="${r.e === main ? 'main' : ''}"><td>${r.sub ? '潜' : i + 1}</td><td><b>${r.e.name}</b><small>${r.e.kind === 'base' ? '岛礁机场' : r.e.S.type}</small></td><td>${q(r)}</td><td>${r.sub ? '—' : bda(r)}</td><td>${r.pk ? `${r.pk} 编队 ` : ''}${r.ms ? `${r.ms} 弹` : ''}${!r.pk && !r.ms ? '—' : ''}</td>
+        <td class="acts">${r.sub ? `<button type="button" data-act="asw" data-v="${r.e.key}">反潜猎杀</button>` : `${r.e === main ? '<em>主攻</em>' : `<button type="button" data-act="main" data-v="${r.e.key || r.e.name}">设为主攻</button>`}<button type="button" data-act="pkg" data-v="${r.e.key || r.e.name}">${hitOnce(side, r.e) ? '再次打击' : '攻击编队'}</button><button type="button" data-act="salvo" data-v="${r.e.key || r.e.name}">舰艇齐射</button>`}</td></tr>`).join('') || '<tr><td colspan="6">态势图中暂无敌方水面目标</td></tr>'}
+      </tbody></table>`;
+  },
+  // task organisation and the state of each group
+  frc(side, C) {
+    const mine = ships.filter(s => s.side === side && s.alive && !s.dying);
+    const grpOrder = { sag: ['sagOrder', [['auto', '按阶段'], ['push', '前出接敌'], ['hold', '撤回编队']]], screen: ['screenK', [['0.6', '收拢'], ['1', '标准'], ['1.4', '展开']]], reserve: ['resv', [['screen', '投入掩护'], ['sag', '投入突击']]], fwd: ['subOrder', [['', '按计划'], ['fwd', '全部前出'], ['esc', '全部护航']]] };
+    const status = s => s.hunt ? `猎潜 → ${s.hunt.name}` : s.sag ? '前出接敌' : s.grp === 'reserve' ? '后方待命' : s.S.sub ? `深 ${Math.round(s.depth)} m` : '编队';
+    let html = '';
+    for (const g of ['cv', 'sag', 'screen', 'asw', 'reserve', 'fwd', 'esc']) {
+      const list = mine.filter(s => s.grp === g);
+      if (!list.length && g !== 'reserve') continue;
+      const o = grpOrder[g];
+      html += `<div class="jgrp"><h4>${GROUPS[g][0]} <small>${list.length} 艘</small></h4>${o && list.length ? segJ('grp-' + g, o[1], g === 'screen' ? String(C.screenK || 1) : g === 'reserve' ? '' : g === 'fwd' ? (C.subOrder || '') : C[o[0]]) : ''}
+        ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
+    }
+    const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.airborne);
+    const by = r => air.filter(p => p.role === r).length;
+    const resv = Object.values(C.resvN || {}).reduce((a, b) => a + b, 0);
+    html += `<div class="jgrp"><h4>航空兵 <small>空中 ${air.length} 架</small></h4>
+      <div class="jgrid"><div><i>空中巡逻 / 扫荡</i><b>${by('cap') + by('sweep')}</b></div><div><i>突击 / 护航</i><b>${by('strike') + by('bomber')} / ${by('escort')}</b></div><div><i>预警 / 电子战 / 加油</i><b>${by('aew')} / ${by('ew')} / ${by('tank')}</b></div>
+      <div><i>航空预备队</i><b>${C.resvOut ? '已投入' : `${resv} 架`}</b>${!C.resvOut && resv ? '<button type="button" data-act="resv-air">投入预备队</button>' : ''}</div></div>
+      ${(C.pkgs || []).filter(k => k.phase === 'form' || k.phase === 'push').map(k => `<div class="jship"><b>第 ${k.id} 攻击编队${k.alpha ? '（大规模）' : ''}</b><span>${k.phase === 'form' ? `集结 ${k.ready || 0}/${k.total || 0}` : '已出发'} → ${k.tgt.name}</span></div>`).join('')}
+      ${ships.filter(h => h.side === side && h.carrier && h.alive && !h.dying).map(h => `<div class="jship"><b>${h.name}</b><span>${h.alpha > game.t ? '大规模出动' : h.cyc ? (h.cyc.phase === 'launch' ? '弹射窗口' : '回收窗口') : ''} · 待射 ${(h.queue || []).length} · 待降 ${(h.stack || []).length} · 机库 ${Object.values(h.hangar).reduce((a, b) => a + b, 0)} · 整备 ${h.ready.length}</span></div>`).join('')}</div>`;
+    return html;
+  },
+  // apportionment: the share of the air effort by mission
+  ap(side, C) {
+    const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.airborne);
+    const act = { air: ['cap', 'sweep', 'escort'], strike: ['strike', 'bomber'], isr: ['aew'], asw: [], ewt: ['ew', 'tank'] };
+    return `<p class="jnote">联合空中作战的兵力分配：决定参谋部如何安排出动——巡逻机数量、攻击编队规模与间隔、预警机与侦察、反潜兵力、电子战与空中加油。转入新阶段时按预案重置。</p>
+      <div class="sliders">${AP_KEYS.map(([k, l]) => `<label><i>${l}</i><input type="range" min="0" max="80" step="1" data-ap="${k}" value="${C.ap[k]}"><b id="jap-${k}">${C.ap[k]}%</b><small>${k === 'asw' ? `猎潜舰 ${ships.filter(s => s.side === side && s.hunt && s.alive).length}` : `在空 ${air.filter(p => act[k].includes(p.role)).length}`}</small></label>`).join('')}</div>
+      <div class="row"><button type="button" data-act="appreset">恢复「${PHASES[C.ph.id].name}」阶段预案</button></div>`;
+  },
+  // rules of engagement and sustainment
+  roe(side, C) {
+    const M = magazines(side), A = airStock(side), low = planes.filter(p => p.side === side && p.alive && p.airborne && p.fuel < p.T.fuel * 0.25).length;
+    const tk = planes.filter(p => p.side === side && p.alive && p.airborne && p.role === 'tank').length;
+    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 4} 次齐射` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
+    return `<div class="prow"><i>武器控制</i>${segJ('wcs', Object.entries(ROE.wcs).map(([k, v]) => [k, v[0]]), C.roe.wcs)}</div>
+      <div class="prow"><i>电磁管控</i>${segJ('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), tac(side).navy === 'emcon' ? 'A' : C.roe.emcon)}</div>
+      <div class="prow"><i>参谋权限</i>${segJ('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), C.auth)}</div>
+      <p class="jnote">${ROE.wcs[C.roe.wcs][1]} ${ROE.emcon[tac(side).navy === 'emcon' ? 'A' : C.roe.emcon][1]}</p>
+      <h4>弹药（垂发单元无法海上补充）</h4>
+      <div class="jgrid"><div><i>舰队防空导弹</i>${jbar(M.sam / (M.sam0 || 1), '#8fc8ff')}<b>${M.sam} / ${M.sam0}</b></div><div><i>反舰 / 对陆导弹</i>${jbar(M.ashm / (M.ashm0 || 1), '#ffc861')}<b>${M.ashm} / ${M.ashm0}</b></div></div>
+      <table class="jtab"><tbody>${M.ships.filter(x => !x.s.carrier).map(x => `<tr><td><b>${x.s.name}</b></td><td>防空 ${jbar(x.sam / (x.sam0 || 1))} ${x.sam}</td><td>反舰 ${jbar(x.ashm / (x.ashm0 || 1), '#ffc861')} ${x.ashm}</td></tr>`).join('')}</tbody></table>
+      <h4>航空保障</h4>
+      <div class="jgrid"><div><i>可用攻击机</i>${jbar(A.strike / (A.strike0 || 1), '#ffc861')}<b>${A.strike} / ${A.strike0}</b></div><div><i>机库</i><b>${Object.entries(A.types).filter(([, n]) => n > 0).map(([t, n]) => `${AC[t].name} ${n}`).join(' · ') || '空'}</b></div>
+      <div><i>低油量在空</i><b>${low}</b></div><div><i>加油机在空</i><b>${tk}</b></div><div><i>战区火力</i><b>${fires}</b></div></div>`;
+  },
+  // the plan: concept, phases, the decision log
+  plan(side, C, P) {
+    return `<p class="jnote"><b>${CONCEPTS[P.concept].name}</b> · 主攻方向${AXES[P.main]}${P.second !== 'none' ? ` · 助攻方向${AXES[P.second]}` : ''}。${CONCEPTS[P.concept].desc}</p>
+      <ol class="jphases">${P.phases.map((id, i) => `<li class="${i < C.ph.i ? 'done' : i === C.ph.i ? 'now' : ''}"><b>${i + 1} · ${PHASES[id].name}</b><span>${PHASES[id].goal}</span><small>分配 ${AP_KEYS.map(([k, l]) => `${l.split(' ')[0]} ${PHASES[id].ap[k]}`).join(' / ')} · 电磁 ${PHASES[id].emcon} 级${PHASES[id].alpha ? ' · 允许大规模打击' : ''}${PHASES[id].sag ? ' · 突击群前出' : ''}</small></li>`).join('')}</ol>
+      <h4>指挥日志</h4><ul class="jlist">${(C.jlog || []).slice(0, 14).map(l => `<li><em>${mmss(l.t)}</em><span style="color:${l.color}">${l.text}</span></li>`).join('')}</ul>`;
+  }
+};
+function jccAct(a, v) {
+  const side = game.side, C = command[side];
+  const find = k => [...picture[side].keys()].find(e => (e.key || e.name) === k && e.alive && !e.dying);
+  if (a === 'nextphase') { const P = planOf(side); if (P.phases[C.ph.i + 1]) { jlog(side, '指挥员决定：提前转入下一阶段', GOLD); enterPhase(side, C.ph.i + 1, 'order'); } }
+  else if (a === 'main') { const e = find(v); if (e) { designate(e); message('主攻目标已变更', e.name, GOLD, 2); jlog(side, `主攻目标改为${e.name}`, GOLD); } }
+  else if (a === 'pkg') { const e = find(v); if (e) { let n = 0; for (const h of cmdCarriers().concat(bases.filter(b => b.side === side && b.alive))) if (launchPackage(h, e, { n: 6, esc: 2 })) n++; jlog(side, `命令：对${e.name}出动 ${n} 个攻击编队`); if (!n) message('机库无可用攻击机', '', '#9fb0ba', 1.6); } }
+  else if (a === 'salvo') { const e = find(v); if (e) { const n = fleetStrike(side, e); jlog(side, n ? `命令：舰艇齐射 ${n} 枚，目标${e.name}` : `舰艇齐射：${e.name}超出射程`); if (!n) message('无舰艇在射程内', e.name, '#9fb0ba', 1.6); } }
+  else if (a === 'asw') { const e = find(v); if (e) { game.desigShip = e; jlog(side, `命令：反潜猎杀${e.name}`); } }
+  else if (a === 'resv-air') commitReserve(side, 'air');
+  else if (a === 'grp-sag') { C.sagOrder = v; jlog(side, `水面突击群：${{ auto: '按阶段行动', push: '前出接敌', hold: '撤回编队' }[v]}`); }
+  else if (a === 'grp-screen') { C.screenK = +v; jlog(side, `掩护群阵位：${{ 0.6: '收拢', 1: '标准', 1.4: '展开' }[v]}`); }
+  else if (a === 'grp-reserve') commitReserve(side, v);
+  else if (a === 'grp-fwd') { C.subOrder = v || null; jlog(side, `潜艇：${v === 'fwd' ? '全部前出伏击' : v === 'esc' ? '全部伴随护航' : '按计划'}`); }
+  else if (a === 'appreset') { C.ap = Object.assign({}, PHASES[C.ph.id].ap); jlog(side, '兵力分配恢复阶段预案'); }
+  else if (a === 'wcs') { C.roe.wcs = v; radio('战区指挥部', `武器控制状态：${ROE.wcs[v][0]}。`, GOLD); jlog(side, `武器控制：${ROE.wcs[v][0]}`, GOLD); }
+  else if (a === 'emcon') { setEmcon(side, v); radio('舰队司令部', `电磁管控 ${ROE.emcon[v][0]}。`, '#9fd4ff'); jlog(side, `电磁管控：${ROE.emcon[v][0]}`); cmdButtons(); }
+  else if (a === 'auth') { C.auth = v; radio('参谋部', `指挥方式：${ROE.auth[v][0]}。${ROE.auth[v][1]}`, '#9fd4ff'); renderProps(); cmdButtons(); }
+}
+for (const b of document.querySelectorAll('#jcc-tabs button')) b.onclick = () => { JC.tab = b.dataset.t; JC.t = 0; renderJCC(); };
+$('jcc-close').onclick = () => toggleJCC();
+{
+  const j = $('jcc');
+  j.addEventListener('pointerdown', () => { JC.press = true; });
+  for (const ev of ['pointerup', 'pointercancel', 'pointerleave']) j.addEventListener(ev, () => { JC.press = false; });
+}
+// the commander's line in the force panel and the objectives corner
+function phaseLine(side) {
+  const C = command[side], P = planOf(side); if (!C.ph || !P) return null;
+  const ph = PHASES[C.ph.id], n = Math.round(clamp(C.ph.prog, 0, 1) * 10);
+  return `第 ${C.ph.i + 1}/${P.phases.length} 阶段 · ${ph.name} ${'▮'.repeat(n)}${'▯'.repeat(10 - n)} ${C.ph.label}`;
+}
+
 function drawCaptain() {
   const s = flagship, compact = HH < 480;
   if (!s || !s.alive) return;
@@ -8620,11 +9669,12 @@ function precompile() {
 function startGame() {
   Sound.init();
   setupBattle();
-  Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffAuto: game.role !== 'cmd', staffHold: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
+  Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffHold: 0, wall: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
     ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
     stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 }, result: null,
     ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 } } });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
+  initJoint();
   $('b-scale').textContent = '时间 ×1'; $('b-ai').classList.remove('on'); $('b-map').classList.remove('on');
   precompile();
   const begin = () => {
@@ -8694,7 +9744,7 @@ function renderRoles() {
     if (side === 'us') inv.b1b = ['关岛 12'];
     for (const [t, homes] of Object.entries(inv)) pickButton(list, AC[t].name, `${AC_NOTE[t] || ''} · ${homes.join(' / ')} 架`, '飞行员', go('pilot', t));
   } else {
-    pickButton(list, '战区指挥官', '指挥本方全部海空兵力：主攻方向、战术、攻击编队、大规模打击、电磁静默 · 随时接管任一己方单位', '指挥', go('cmd', null));
+    pickButton(list, '战区指挥官', '上将视角：战前定下作战决心（主攻方向、作战构想、兵力编组、兵力分配、交战规则），战中在联合指挥中心按阶段指挥，参谋部提出建议由你批准或否决 · 随时接管任一己方单位', '指挥', go('cmd', null));
     pickButton(list, '观战', '双方 AI 对决 · 任意切换单位 · 自由镜头 · 自动导播', '观战', go('watch', null));
   }
 }
@@ -8754,7 +9804,15 @@ function takeRole(role, pick, home) {
     $('c-gun').hidden = !flagship.gun;
   }
   if (cam) { game.spec = game.spec || 'auto'; specButtons(); }
-  if (role === 'cmd') { cmdButtons(); if (game.mode === 'play' && game.t > 1) message('战区指挥', '主攻方向、战术与攻击编队由你决定 · 「切换单位」可随时接管', GOLD, 2.4); }
+  if (role === 'cmd') { cmdButtons(); renderProps(); showDP(); if (game.mode === 'play' && game.t > 1) message('战区指挥', '「指挥中心」查看态势、目标、兵力与交战规则 · 「切换单位」可随时接管', GOLD, 2.4); }
+  else {
+    // the commander leaves the console: the staff settles what was waiting, the way the authority level says
+    if (JC.open) toggleJCC();
+    while (dpQueue.length) resolveDP(dpQueue[0].def, false);
+    const C = command[game.side];
+    if (C && C.props) for (const p of C.props.slice()) settleProp(p, authOf() === 'approve' ? 'expire' : 'auto');
+    $('dp').hidden = true; $('props').hidden = true;
+  }
 }
 
 /* ---------- after losing an aircraft or a ship: fly again, take over, take a ship, or watch ---------- */
@@ -8924,8 +9982,9 @@ function cmdButtons() {
   const lab = (id, name, k) => { const left = k && game.cmdT[k] > game.t ? Math.ceil(game.cmdT[k] - game.t) : 0; const b = $(id); b.innerHTML = `${name}${left ? `<small>${left}s</small>` : ''}`; b.classList.toggle('cd', !!left); };
   lab('cm-alpha', '大规模打击', 'alpha'); lab('cm-strike', '攻击编队', 'strike'); lab('cm-cap', '加强巡逻', 'cap'); lab('cm-feint', '电子佯动', 'feint');
   $('cm-emcon').classList.toggle('on', tac(game.side).navy === 'emcon');
-  $('cm-staff').textContent = game.staffAuto ? '参谋：自动' : '参谋：手动';
-  $('cm-staff').classList.toggle('on', !!game.staffAuto);
+  const C = command[game.side], ph = phaseOf(game.side), P = planOf(game.side);
+  $('cm-jcc').innerHTML = `指挥中心${ph && P ? `<small>${C.ph.i + 1}/${P.phases.length} ${ph.name}</small>` : ''}`;
+  $('cm-staff').innerHTML = `参谋权限<small>${ROE.auth[authOf()][0]}</small>`;
 }
 $('cm-alpha').onclick = () => {
   if (!cmdReady('alpha')) return;
@@ -8947,9 +10006,10 @@ $('cm-cap').onclick = () => {
   if (n) { cmdUse('cap'); radio('空中指挥', `${n} 架战斗机紧急升空，加强舰队空中巡逻。`, '#9fd4ff'); }
 };
 $('cm-emcon').onclick = () => {
-  const C = command[game.side];
-  if (tac(game.side).navy === 'emcon') setTactic('navy', C.preEmcon && C.preEmcon !== 'emcon' ? C.preEmcon : 'balanced');
-  else { C.preEmcon = tac(game.side).navy; setTactic('navy', 'emcon'); }
+  const C = command[game.side], A = tac(game.side).navy === 'emcon';
+  if (A) setEmcon(game.side, C.emconWas || 'B');
+  else { C.emconWas = C.roe.emcon === 'A' ? 'B' : C.roe.emcon; setEmcon(game.side, 'A'); }
+  jlog(game.side, `电磁管控：${ROE.emcon[C.roe.emcon][0]}`);
   cmdButtons();
 };
 $('cm-feint').onclick = () => {
@@ -8957,7 +10017,8 @@ $('cm-feint').onclick = () => {
   if (deployPhantom(game.side)) { cmdUse('feint'); if (tac(game.side).navy !== 'emcon') message('建议配合电磁静默', '真编队的雷达信号会让佯动失去意义', '#ffc861', 2.2); }
   else message('无法佯动', '需要航母编队在场', '#9fb0ba', 1.6);
 };
-$('cm-staff').onclick = () => { game.staffAuto = !game.staffAuto; radio('参谋部', game.staffAuto ? '参谋部接管战术调整与大规模打击时机，主攻方向仍由你决定。' : '战术与打击时机交还指挥员。', '#9fd4ff'); cmdButtons(); };
+$('cm-staff').onclick = () => { const order = ['negation', 'approve', 'delegate'], C = command[game.side]; C.auth = order[(order.indexOf(authOf()) + 1) % 3]; radio('参谋部', `指挥方式：${ROE.auth[C.auth][0]}。${ROE.auth[C.auth][1]}`, '#9fd4ff'); jlog(game.side, `参谋权限：${ROE.auth[C.auth][0]}`); renderProps(); cmdButtons(); };
+$('cm-jcc').onclick = () => toggleJCC();
 
 /* ---------- theatre support: the side's strategic card, open to every role ---------- */
 function supportReady() { return game.mode === 'play' && game.t > (game.supportT || 120); }
@@ -8986,11 +10047,13 @@ function callSupport() {
 
 
 /* ---------- screens ---------- */
-const screens = ['menu', 'side', 'role', 'brief', 'pause', 'dead', 'end'];
+const screens = ['menu', 'side', 'role', 'brief', 'plan', 'pause', 'dead', 'end'];
 function show(name) {
   if (name !== null && TM.open) toggleMap();
   for (const k of screens) $(k).hidden = k !== name;
   const playing = name === null;
+  if (!playing) { if (JC.open) toggleJCC(); $('dp').hidden = true; $('props').hidden = true; }
+  else if (game.role === 'cmd') { renderProps(); showDP(); }
   $('touch').hidden = !playing;
   $('topbar').hidden = !playing;
   if (playing) $('touch').classList.toggle('desk', !isTouch);
@@ -9012,6 +10075,7 @@ function brief() {
   for (const [a, b] of SIDES[s].perks) { const dt = document.createElement('dt'); dt.textContent = a; const dd = document.createElement('dd'); dd.textContent = b; perks.append(dt, dd); }
   el.appendChild(perks);
   $('brief-title').textContent = SIDES[s].name;
+  $('b-go').textContent = game.role === 'cmd' ? '下一步 · 作战筹划' : '开始作战';
   show('brief');
 }
 function togglePause() {
@@ -9078,7 +10142,9 @@ function afterAction(win) {
     const fired = dbg.by[me] || 0, hits = dbg.hitBy[me] || 0, stopped = Object.entries(dbg.fate[them] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0);
     const row = (k, a, b) => `<tr><th>${k}</th><td>${a}</td><td>${b}</td></tr>`;
     const base = me === 'cn' ? (R.base ? '永暑礁机场坚守' : '永暑礁机场失守') : (R.base ? '永暑礁机场仍在运转' : '永暑礁机场被摧毁');
-    const score = Math.round((1 - R.pt) * 600 - (1 - R.pm) * 400 + L.archers[me] * 8 + L.aew[me] * 25 + L.fooled[me] * 4 + (me === 'cn' ? (R.base ? 60 : -60) : (R.base ? -30 : 60)));
+    // the plan counts: each phase of the operation carried through is worth as much as a destroyer
+    const phaseN = L.phases ? Math.max(0, L.phases[me].length - 1) : 0;
+    const score = Math.round((1 - R.pt) * 600 - (1 - R.pm) * 400 + L.archers[me] * 8 + L.aew[me] * 25 + L.fooled[me] * 4 + phaseN * 30 + (me === 'cn' ? (R.base ? 60 : -60) : (R.base ? -30 : 60)));
     const grade = score > 420 ? 'S' : score > 300 ? 'A' : score > 180 ? 'B' : score > 60 ? 'C' : 'D';
     $('e-report').innerHTML = `<table><thead><tr><th></th><td>${SIDES[me].short}</td><td>${SIDES[them].short}</td></tr></thead><tbody>
       ${row('剩余战争潜力', `${Math.round(R.pm * 100)}%`, `${Math.round(R.pt * 100)}%`)}
@@ -9089,10 +10155,18 @@ function afterAction(win) {
       ${row('反舰导弹 发射 / 命中', `${fired} / ${hits}`, `${dbg.by[them] || 0} / ${dbg.hitBy[them] || 0}`)}
       ${row('拦截敌导弹', stopped, Object.entries(dbg.fate[me] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0))}
       ${row('被佯动骗走的敌弹', L.fooled[me], L.fooled[them])}
+      ${L.phases ? row('作战构想', CONCEPTS[game.plans[me].concept].name, CONCEPTS[game.plans[them].concept].name) : ''}
+      ${L.phases ? row('达成阶段', phasesDone(me), phasesDone(them)) : ''}
+      ${game.role === 'cmd' && game.jstat ? row('指挥决策', `决策点 ${game.jstat.dps} · 批准 ${game.jstat.approved} · 否决 ${game.jstat.vetoed} · 默认执行 ${game.jstat.auto}`, '—') : ''}
       </tbody></table><p class="grade">战略目标：${base} · 战役评级 <b>${grade}</b></p>`;
   }
   Sound.engine(0, 0, false); Sound.lockTone(false); Sound.rwrTone(false);
   show('end');
+}
+// the phases a side reached, in order (the last one still running when the battle ended)
+function phasesDone(side) {
+  const L = game.ledger.phases[side], P = game.plans[side];
+  return `${L.map(p => PHASES[p.id].name).join(' → ')}（${L.length}/${P.phases.length}）`;
 }
 let toastTimer = 0;
 function toast(t, ms) { const el = $('toast'); el.textContent = t; el.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => { el.hidden = true; }, ms); }
@@ -9102,7 +10176,7 @@ for (const b of document.querySelectorAll('[data-side]')) b.onclick = () => choo
 $('b-side-back').onclick = () => show('menu');
 $('b-role-back').onclick = () => show('side');
 $('b-brief-back').onclick = () => chooseSide(game.side);
-$('b-go').onclick = startGame;
+$('b-go').onclick = () => game.role === 'cmd' ? openPlan() : startGame();
 $('b-resume').onclick = togglePause;
 $('b-quit').onclick = () => { Sound.ctx?.resume?.(); toMenu(); };
 $('b-again').onclick = () => show('side');
@@ -9195,6 +10269,7 @@ function frame() {
   const n = Math.max(1, Math.ceil(sim / (1 / 30)));
   for (let i = 0; i < n; i++) update(sim / n);
   fire.update(sim); smoke.update(sim);
+  updateJointUI(rdt);
   updateCamera(rdt);
   world.follow(camera.position, rdt);
   lod();
@@ -9252,6 +10327,6 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate, openPlan, toggleJCC, updateJointUI, PHASES, dpQueue };
 </script>
 </html>

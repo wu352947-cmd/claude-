@@ -4,7 +4,8 @@
    through blob: URLs, which the artifact host's content policy blocks, and the models then render untextured.
    The GLB is decompressed with the browser's DecompressionStream and fitted to the game frame:
    ships: +x bow, +y up, waterline at y = 0, real length; aircraft: +x nose, gear contact at y = -gearH.
-   Stand-ins for the other side's types (Nimitz for Fujian, E-2D for KJ-600, F-35 for J-35) are desaturated
+   Stand-ins for the other side's types (Nimitz for Fujian and Shandong, E-2D for KJ-600, F-35 for J-35,
+   Super Hornet for the J-15 / J-16 family) are desaturated
    and tinted in PLA grey so the source markings do not read.
    Expects THREE and GLTFLoader in scope. */
 const NavyHD = (() => {
@@ -143,7 +144,7 @@ const NavyHD = (() => {
     g.traverse(m => { if (m.name === 'gearDown' || m.userData.gearDown) down.push(m); if (m.userData.gearUp) up.push(m); });
     const setGear = d => { for (const m of down) m.visible = d; for (const m of up) m.visible = !d; };
     setGear(false);
-    return { group: g, setGear, exhausts: (M.exhausts || []).map(e => e.map(x => x * (opt.scale || 1))), deckY: M.deckY };
+    return { group: g, setGear, exhausts: (M.exhausts || []).map(e => e.map(x => x * (opt.scale || 1))), deckY: M.deckY && M.deckY * (opt.scale || 1) };
   }
   return { loadAll, make, has, META, CREDITS };
 })();

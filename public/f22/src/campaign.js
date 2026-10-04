@@ -188,6 +188,9 @@ function drawObjectives() {
   hc.textAlign = 'right';
   hc.font = `700 ${compact ? 11 : 12}px ${SANS}`; hc.fillStyle = GOLD; hc.fillText(C.title, x, y);
   hc.font = `500 ${compact ? 10 : 11}px ${SANS}`; hc.fillStyle = '#e9f2f7'; hc.fillText(`◆ ${C.goal}`, x, y + 16);
+  // the operation's phase (the chapters tell the story; the phases are the commander's plan)
+  const J = command[game.side], P = planOf(game.side);
+  if (J.ph && P && game.role !== 'cmd') { hc.font = `500 ${compact ? 9 : 10}px ${SANS}`; hc.fillStyle = 'rgba(255,210,138,0.85)'; hc.fillText(`战区 · 第 ${J.ph.i + 1}/${P.phases.length} 阶段 ${PHASES[J.ph.id].name} · ${J.ph.label}`, x, y + 31); }
   hc.restore();
 }
 

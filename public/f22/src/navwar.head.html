@@ -254,6 +254,119 @@
     .screen { align-items: flex-start; background: rgba(6, 10, 14, 0.82); }
     .stats { grid-template-columns: repeat(2, auto); }
   }
+
+  /* ---------- joint command: the planning screen, the joint operations centre, staff proposals, decision points ---------- */
+  .card.wide { width: min(1080px, 100%); }
+  .pgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .psec { background: rgba(8, 14, 20, 0.82); border: 1px solid var(--line); padding: 10px 12px; display: grid; gap: 8px; align-content: start; min-width: 0; }
+  .psec.span2 { grid-column: 1 / -1; }
+  .psec h3 { margin: 0; font: 700 13px/1.3 var(--f-body); color: var(--gold); letter-spacing: 0.06em; }
+  #plan-map { width: 100%; height: 170px; display: block; border: 1px solid var(--line); }
+  .pnote { margin: 0; font-size: 11.5px; line-height: 1.6; color: var(--muted); }
+  .pnote b { color: var(--fg); font-weight: 600; }
+  .prow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .prow > i { font: 600 11px/1 var(--f-body); font-style: normal; color: var(--muted); width: 56px; flex: none; }
+  .seg { display: inline-flex; flex-wrap: wrap; gap: 0; border: 1px solid var(--line); }
+  .seg button { appearance: none; cursor: pointer; font: 600 12px/1 var(--f-body); color: var(--muted); background: transparent; border: 0; border-right: 1px solid var(--line); padding: 8px 10px; }
+  .seg button:last-child { border-right: 0; }
+  .seg button.on { background: var(--gold); color: #1c1407; }
+  .seg.fixed button { cursor: default; }
+  .concepts { display: grid; gap: 6px; }
+  .concept { appearance: none; cursor: pointer; text-align: left; font: inherit; color: var(--fg); background: rgba(8, 14, 20, 0.5); border: 1px solid var(--line); padding: 8px 10px; display: grid; gap: 4px; }
+  .concept.on { border-color: var(--gold); background: rgba(227, 178, 87, 0.12); }
+  .concept b { font: 700 13px/1.2 var(--f-body); }
+  .concept small { font-size: 11px; line-height: 1.5; color: var(--muted); }
+  .chain { display: flex; flex-wrap: wrap; gap: 3px; align-items: center; font-size: 11px; }
+  .chain em { font-style: normal; background: rgba(143, 200, 255, 0.12); color: #cfe8ff; padding: 2px 6px; }
+  .chain s { text-decoration: none; color: var(--muted); }
+  .orbat { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; }
+  .orow { display: grid; grid-template-columns: minmax(120px, auto) 1fr; grid-template-rows: auto auto; gap: 1px 8px; align-items: center; padding: 4px 0; border-bottom: 1px solid rgba(238, 243, 245, 0.06); }
+  .orow b { font-size: 12.5px; } .orow span { font-size: 10.5px; color: var(--muted); grid-column: 1; }
+  .orow .seg { grid-column: 2; grid-row: 1 / span 2; justify-self: end; }
+  .orow .seg button { padding: 6px 7px; font-size: 11px; }
+  .sliders { display: grid; gap: 6px; }
+  .sliders label { display: grid; grid-template-columns: 78px 1fr 40px; align-items: center; gap: 8px; font-size: 12px; }
+  .sliders label small { grid-column: 2 / -1; font-size: 10px; color: var(--muted); margin-top: -4px; }
+  .sliders i { font-style: normal; color: var(--muted); }
+  .sliders b { font: 600 12px/1 var(--f-mono); text-align: right; }
+  .sliders input { width: 100%; accent-color: var(--gold); }
+  .sliders .resv { border-top: 1px solid var(--line); padding-top: 6px; }
+  .staffnote { margin: 0; padding-left: 16px; display: grid; gap: 3px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+  .staffnote b { color: #ffd28a; font-weight: 600; margin-right: 4px; }
+  #cmdbar button.lead { border-color: var(--gold); background: rgba(227, 178, 87, 0.25); }
+  #jcc { position: fixed; z-index: 14; top: calc(8px + env(safe-area-inset-top, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); right: calc(8px + env(safe-area-inset-right, 0px));
+    width: min(760px, calc(100vw - 16px)); background: rgba(5, 10, 15, 0.94); border: 1px solid rgba(227, 178, 87, 0.45); display: grid; grid-template-rows: auto auto 1fr; pointer-events: auto; }
+  #jcc[hidden] { display: none; }
+  .jhead { display: flex; align-items: center; gap: 10px; padding: 9px 10px 7px 14px; border-bottom: 1px solid var(--line); }
+  .jhead b { font: 700 14px/1 var(--f-body); color: var(--gold); letter-spacing: 0.08em; white-space: nowrap; }
+  .jhead span { flex: 1; font: 500 11px/1.3 var(--f-mono); color: var(--muted); min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .jhead button { appearance: none; cursor: pointer; font: 600 13px/1 var(--f-body); color: var(--fg); background: transparent; border: 1px solid var(--line); padding: 7px 10px; }
+  .jtabs { display: flex; gap: 4px; padding: 7px 10px; border-bottom: 1px solid var(--line); overflow-x: auto; }
+  .jtabs button { appearance: none; cursor: pointer; flex: none; font: 700 12px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 8px 11px; }
+  .jtabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
+  #jcc-body { overflow-y: auto; padding: 10px 14px 14px; display: grid; gap: 10px; align-content: start; font-size: 12px; -webkit-user-select: none; user-select: none; touch-action: pan-y; }
+  #jcc-body h4 { margin: 4px 0 0; font: 700 12px/1.3 var(--f-body); color: var(--gold); }
+  #jcc-body h4 small { color: var(--muted); font-weight: 500; margin-left: 6px; }
+  #jcc-body button, .dopts button, .pacts button { appearance: none; cursor: pointer; font: 600 11.5px/1 var(--f-body); color: var(--fg); background: rgba(8, 14, 20, 0.6); border: 1px solid rgba(227, 178, 87, 0.6); padding: 7px 9px; }
+  #jcc-body .seg button { border: 0; border-right: 1px solid var(--line); background: transparent; color: var(--muted); }
+  #jcc-body .seg button.on { background: var(--gold); color: #1c1407; }
+  #jcc-body select { font: 500 11px/1 var(--f-body); color: var(--fg); background: #0b141c; border: 1px solid var(--line); padding: 4px; }
+  .jnote { margin: 0; color: var(--muted); line-height: 1.55; }
+  .jnote b { color: var(--fg); }
+  .jphase { display: grid; gap: 5px; background: rgba(227, 178, 87, 0.08); border: 1px solid rgba(227, 178, 87, 0.35); padding: 9px 11px; }
+  .jphase b { font: 700 14px/1.2 var(--f-body); color: var(--gold); }
+  .jphase em { font-style: normal; color: var(--muted); font-size: 11px; }
+  .jphase button { justify-self: start; }
+  .jbar { display: block; height: 6px; background: rgba(238, 243, 245, 0.1); min-width: 60px; }
+  .jbar i { display: block; height: 100%; }
+  .jgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 6px 14px; }
+  .jgrid > div { display: grid; gap: 3px; align-content: start; }
+  .jgrid i { font-style: normal; color: var(--muted); font-size: 11px; }
+  .jgrid b { font: 600 12.5px/1.3 var(--f-body); }
+  .jlist { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+  .jlist li { padding: 4px 6px; border-left: 2px solid rgba(143, 200, 255, 0.4); background: rgba(238, 243, 245, 0.03); line-height: 1.4; }
+  .jlist li.hi { border-left-color: #ffd28a; } .jlist li.crit { border-left-color: #ff5a4f; color: #ffb4a8; }
+  .jlist em { font: 500 10.5px/1 var(--f-mono); font-style: normal; color: var(--muted); margin-right: 8px; }
+  .jtab { width: 100%; border-collapse: collapse; }
+  .jtab th { text-align: left; font: 600 10.5px/1 var(--f-mono); color: var(--muted); padding: 4px; border-bottom: 1px solid var(--line); }
+  .jtab td { padding: 5px 4px; border-bottom: 1px solid rgba(238, 243, 245, 0.06); vertical-align: middle; }
+  .jtab td small { display: block; color: var(--muted); font-size: 10px; }
+  .jtab tr.main td { background: rgba(227, 178, 87, 0.1); }
+  .jtab td.acts { display: flex; flex-wrap: wrap; gap: 4px; justify-content: flex-end; }
+  .jtab td.acts em { font-style: normal; color: var(--gold); font-weight: 700; padding: 6px 4px; }
+  .jtab .jbar { display: inline-block; width: 60px; vertical-align: middle; margin: 0 4px; }
+  .jgrp { display: grid; gap: 4px; border-top: 1px solid var(--line); padding-top: 6px; }
+  .jship { display: grid; grid-template-columns: 110px 70px 1fr auto; gap: 8px; align-items: center; padding: 3px 0; }
+  .jship span { color: var(--muted); font-size: 11px; }
+  .jphases { margin: 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+  .jphases li { display: grid; gap: 2px; padding: 6px 9px; border-left: 3px solid var(--line); background: rgba(238, 243, 245, 0.03); }
+  .jphases li.done { border-left-color: #8dffb4; opacity: 0.7; }
+  .jphases li.now { border-left-color: var(--gold); background: rgba(227, 178, 87, 0.1); }
+  .jphases span { color: var(--fg); } .jphases small { color: var(--muted); font-size: 10.5px; }
+  #props { position: fixed; z-index: 11; left: calc(10px + env(safe-area-inset-left, 0px)); bottom: calc(118px + env(safe-area-inset-bottom, 0px)); width: min(340px, 44vw); display: flex; flex-direction: column; gap: 6px; pointer-events: auto; }
+  #props[hidden] { display: none; }
+  .prop { background: rgba(6, 10, 14, 0.9); border: 1px solid rgba(227, 178, 87, 0.6); padding: 8px 10px; display: grid; gap: 5px; }
+  .prop b { font: 700 12px/1.3 var(--f-body); color: var(--gold); }
+  .prop > span { font-size: 11px; line-height: 1.45; color: #d6e0e6; }
+  .pbar { height: 3px; background: rgba(238, 243, 245, 0.12); }
+  .pbar i { display: block; height: 100%; width: 100%; background: var(--gold); }
+  .pacts { display: flex; gap: 6px; align-items: center; }
+  .pacts button[data-a="approve"] { border-color: #8dffb4; }
+  .pacts button[data-a="veto"] { border-color: #ff8a78; }
+  .pacts em { margin-left: auto; font: 500 10.5px/1 var(--f-mono); font-style: normal; color: var(--muted); }
+  #dp { position: fixed; inset: 0; z-index: 16; display: grid; place-items: center; background: rgba(2, 5, 8, 0.45); pointer-events: auto; padding: 16px; }
+  #dp[hidden] { display: none; }
+  .dpc { width: min(520px, 100%); background: rgba(6, 10, 14, 0.96); border: 1px solid var(--gold); padding: 16px 18px; display: grid; gap: 10px; }
+  .dpc h3 { margin: 0; font: 800 22px/1.15 var(--f-display); letter-spacing: 0.03em; color: var(--gold); }
+  .dpc p { margin: 0; line-height: 1.7; color: #d6e0e6; font-size: 13px; }
+  .dpc p.eyebrow { font-size: 10px; }
+  .dopts { display: grid; gap: 6px; }
+  .dopts button { padding: 11px 12px; font-size: 13px; text-align: left; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .dopts button.rec { border-color: var(--gold); background: rgba(227, 178, 87, 0.18); }
+  .dopts small { font: 500 10px/1 var(--f-mono); color: var(--gold); }
+  .dpc > em { font: 500 11px/1 var(--f-mono); font-style: normal; color: var(--muted); }
+  @media (max-width: 760px) { .pgrid, .orbat { grid-template-columns: 1fr; } .jship { grid-template-columns: 1fr 60px; } .jship span { grid-column: 1 / -1; } }
+  @media (max-height: 520px) { #props { bottom: calc(96px + env(safe-area-inset-bottom, 0px)); width: min(300px, 40vw); } .prop > span { display: none; } .dpc { padding: 12px 14px; gap: 7px; } .dpc p { font-size: 12px; line-height: 1.55; } }
 </style>
 
 <div id="stage"></div>
@@ -286,6 +399,7 @@
     <button type="button" id="sp-take">接管</button>
   </div>
   <div id="cmdbar" hidden>
+    <button type="button" id="cm-jcc" class="lead">指挥中心</button>
     <button type="button" id="cm-alpha">大规模打击</button>
     <button type="button" id="cm-strike">攻击编队</button>
     <button type="button" id="cm-cap">加强巡逻</button>
@@ -317,7 +431,7 @@
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-support" data-act="support">战区支援</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
-  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
+  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · J 指挥中心 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>
@@ -379,6 +493,19 @@
   </div>
 </section>
 
+<section class="screen" id="plan" hidden>
+  <div class="card wide">
+    <p class="eyebrow">作战筹划 · 定下作战决心</p>
+    <h2>作战决心</h2>
+    <div id="plan-body"></div>
+    <div class="row">
+      <button class="btn primary" id="b-plan-go" type="button">下达作战命令</button>
+      <button class="btn" id="b-plan-staff" type="button">采纳参谋部方案</button>
+      <button class="btn" id="b-plan-back" type="button">返回</button>
+    </div>
+  </div>
+</section>
+
 <section class="screen" id="pause" hidden>
   <div class="card">
     <p class="eyebrow">作战暂停</p>
@@ -429,6 +556,13 @@
     <p id="tac-desc"></p>
   </div>
 </div>
+<div id="jcc" hidden>
+  <div class="jhead"><b>战区联合指挥中心</b><span id="jcc-phase"></span><button type="button" id="jcc-close">✕</button></div>
+  <div class="jtabs" id="jcc-tabs"><button type="button" data-t="sit" class="on">态势</button><button type="button" data-t="tgt">目标清单</button><button type="button" data-t="frc">兵力编组</button><button type="button" data-t="ap">兵力分配</button><button type="button" data-t="roe">规则与保障</button><button type="button" data-t="plan">作战计划</button></div>
+  <div id="jcc-body"></div>
+</div>
+<div id="props" hidden></div>
+<div id="dp" hidden></div>
 <div id="toast" hidden></div>
 <div id="loading">正在编组舰队 · 生成海域</div>
 

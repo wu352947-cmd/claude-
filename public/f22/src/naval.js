@@ -233,7 +233,13 @@ function subAI(s, dt) {
   let want = C.course, spd = 6, depth = 90;
   // no contact close enough: the boats run ahead of the fleet down the main axis to an ambush position
   const ip = intentPos(s.side, _c);
-  if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
+  const esc = (C.subOrder || s.grp) === 'esc';
+  if (esc && best && best.pos.distanceTo(s.pos) > 20000) best = null;
+  if (esc && !best) {
+    // close escort: a few km ahead of the carriers on the axis, listening for enemy boats
+    const g = ships.find(x => x.side === s.side && x.carrier && x.alive && !x.dying);
+    if (g) { axisDir(s.side, g.pos, _d); _c.copy(g.pos).addScaledVector(_d, 7000); const d = _c.distanceTo(s.pos); want = headingOf(_c.sub(s.pos)); spd = d > 3000 ? 12 : 5; depth = 80; }
+  } else if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
   if (best) {
     const d = best.pos.distanceTo(s.pos);
     want = headingOf(_a.subVectors(best.pos, s.pos));

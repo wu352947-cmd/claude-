@@ -50,7 +50,7 @@ function renderRoles() {
     if (side === 'us') inv.b1b = ['关岛 12'];
     for (const [t, homes] of Object.entries(inv)) pickButton(list, AC[t].name, `${AC_NOTE[t] || ''} · ${homes.join(' / ')} 架`, '飞行员', go('pilot', t));
   } else {
-    pickButton(list, '战区指挥官', '指挥本方全部海空兵力：主攻方向、战术、攻击编队、大规模打击、电磁静默 · 随时接管任一己方单位', '指挥', go('cmd', null));
+    pickButton(list, '战区指挥官', '上将视角：战前定下作战决心（主攻方向、作战构想、兵力编组、兵力分配、交战规则），战中在联合指挥中心按阶段指挥，参谋部提出建议由你批准或否决 · 随时接管任一己方单位', '指挥', go('cmd', null));
     pickButton(list, '观战', '双方 AI 对决 · 任意切换单位 · 自由镜头 · 自动导播', '观战', go('watch', null));
   }
 }
@@ -110,7 +110,15 @@ function takeRole(role, pick, home) {
     $('c-gun').hidden = !flagship.gun;
   }
   if (cam) { game.spec = game.spec || 'auto'; specButtons(); }
-  if (role === 'cmd') { cmdButtons(); if (game.mode === 'play' && game.t > 1) message('战区指挥', '主攻方向、战术与攻击编队由你决定 · 「切换单位」可随时接管', GOLD, 2.4); }
+  if (role === 'cmd') { cmdButtons(); renderProps(); showDP(); if (game.mode === 'play' && game.t > 1) message('战区指挥', '「指挥中心」查看态势、目标、兵力与交战规则 · 「切换单位」可随时接管', GOLD, 2.4); }
+  else {
+    // the commander leaves the console: the staff settles what was waiting, the way the authority level says
+    if (JC.open) toggleJCC();
+    while (dpQueue.length) resolveDP(dpQueue[0].def, false);
+    const C = command[game.side];
+    if (C && C.props) for (const p of C.props.slice()) settleProp(p, authOf() === 'approve' ? 'expire' : 'auto');
+    $('dp').hidden = true; $('props').hidden = true;
+  }
 }
 
 /* ---------- after losing an aircraft or a ship: fly again, take over, take a ship, or watch ---------- */
@@ -280,8 +288,9 @@ function cmdButtons() {
   const lab = (id, name, k) => { const left = k && game.cmdT[k] > game.t ? Math.ceil(game.cmdT[k] - game.t) : 0; const b = $(id); b.innerHTML = `${name}${left ? `<small>${left}s</small>` : ''}`; b.classList.toggle('cd', !!left); };
   lab('cm-alpha', '大规模打击', 'alpha'); lab('cm-strike', '攻击编队', 'strike'); lab('cm-cap', '加强巡逻', 'cap'); lab('cm-feint', '电子佯动', 'feint');
   $('cm-emcon').classList.toggle('on', tac(game.side).navy === 'emcon');
-  $('cm-staff').textContent = game.staffAuto ? '参谋：自动' : '参谋：手动';
-  $('cm-staff').classList.toggle('on', !!game.staffAuto);
+  const C = command[game.side], ph = phaseOf(game.side), P = planOf(game.side);
+  $('cm-jcc').innerHTML = `指挥中心${ph && P ? `<small>${C.ph.i + 1}/${P.phases.length} ${ph.name}</small>` : ''}`;
+  $('cm-staff').innerHTML = `参谋权限<small>${ROE.auth[authOf()][0]}</small>`;
 }
 $('cm-alpha').onclick = () => {
   if (!cmdReady('alpha')) return;
@@ -303,9 +312,10 @@ $('cm-cap').onclick = () => {
   if (n) { cmdUse('cap'); radio('空中指挥', `${n} 架战斗机紧急升空，加强舰队空中巡逻。`, '#9fd4ff'); }
 };
 $('cm-emcon').onclick = () => {
-  const C = command[game.side];
-  if (tac(game.side).navy === 'emcon') setTactic('navy', C.preEmcon && C.preEmcon !== 'emcon' ? C.preEmcon : 'balanced');
-  else { C.preEmcon = tac(game.side).navy; setTactic('navy', 'emcon'); }
+  const C = command[game.side], A = tac(game.side).navy === 'emcon';
+  if (A) setEmcon(game.side, C.emconWas || 'B');
+  else { C.emconWas = C.roe.emcon === 'A' ? 'B' : C.roe.emcon; setEmcon(game.side, 'A'); }
+  jlog(game.side, `电磁管控：${ROE.emcon[C.roe.emcon][0]}`);
   cmdButtons();
 };
 $('cm-feint').onclick = () => {
@@ -313,7 +323,8 @@ $('cm-feint').onclick = () => {
   if (deployPhantom(game.side)) { cmdUse('feint'); if (tac(game.side).navy !== 'emcon') message('建议配合电磁静默', '真编队的雷达信号会让佯动失去意义', '#ffc861', 2.2); }
   else message('无法佯动', '需要航母编队在场', '#9fb0ba', 1.6);
 };
-$('cm-staff').onclick = () => { game.staffAuto = !game.staffAuto; radio('参谋部', game.staffAuto ? '参谋部接管战术调整与大规模打击时机，主攻方向仍由你决定。' : '战术与打击时机交还指挥员。', '#9fd4ff'); cmdButtons(); };
+$('cm-staff').onclick = () => { const order = ['negation', 'approve', 'delegate'], C = command[game.side]; C.auth = order[(order.indexOf(authOf()) + 1) % 3]; radio('参谋部', `指挥方式：${ROE.auth[C.auth][0]}。${ROE.auth[C.auth][1]}`, '#9fd4ff'); jlog(game.side, `参谋权限：${ROE.auth[C.auth][0]}`); renderProps(); cmdButtons(); };
+$('cm-jcc').onclick = () => toggleJCC();
 
 /* ---------- theatre support: the side's strategic card, open to every role ---------- */
 function supportReady() { return game.mode === 'play' && game.t > (game.supportT || 120); }
