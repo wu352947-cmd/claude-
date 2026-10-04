@@ -211,7 +211,7 @@ function airSweeps(side, dt) {
   const homes = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying);
   // sweeps clear the air along the main axis (the enemy group nearest us only when there is no main effort)
   const foeC = intentTarget(side) || enemyFleet(side);
-  let point = intentPos(side, new V3()) || (foeC ? (trackPos(side, foeC, new V3()) || foeC.pos.clone()) : new V3(side === 'cn' ? 30000 : -30000, 0, 0));
+  let point = intentPos(side, new V3()) || (foeC ? (trackPos(side, foeC, new V3()) || foeC.pos.clone()) : new V3(side === 'cn' ? 40000 : -40000, 0, 0));
   if (t === 'hunt') for (const [e, tr] of picture[side]) if (e.kind === 'plane' && e.T.aew && e.alive) { point = tr.pos.clone(); break; }
   // stop short of the enemy ships' missile umbrella
   const own = fleetCentre(side) || ZERO;
@@ -321,40 +321,146 @@ function axisStation(side, from, stand, out) {
   const dx = from.x - ip.x, dz = from.z - ip.z, L = Math.hypot(dx, dz) || 1;
   return out.set(ip.x + dx / L * stand, 0, ip.z + dz / L * stand);
 }
-// air-sea joint strike: when a strike package is on its way to the main target, the surface ships hold their
-// salvo and fire so that their missiles arrive with the aircraft's (one saturation wave, not two small ones)
-function jointStrikes(side) {
+/* ---------- strike packages: form up, push, split, release, egress, assess ----------
+   A package is launched over several minutes from the deck, so it first marshals at a rendezvous ahead of the
+   carrier; when everyone is there (or the push time arrives) it pushes as one. Short of the target the strikers
+   split to two initial points on either side of the axis, so the missiles come in from two bearings at once;
+   after release they egress (swing to CAP or home) and the package reports battle damage. */
+const PKG_FORM_MAX = 150;   // seconds the package waits for stragglers before it pushes anyway
+function newPackage(side, home, tgt) {
   const C = command[side];
-  C.pkgs = (C.pkgs || []).filter(k => k.tgt.alive && !k.tgt.dying && k.members.some(p => p.alive && !p.dying && p.ashmN > 0 && p.task && p.task.target === k.tgt) && !k.done);
+  const ax = axisDir(side, home.pos, new V3());
+  const k = { side, home, tgt, members: [], t: game.t, phase: 'form', rv: home.pos.clone().addScaledVector(ax, 14000).setY(5000), id: (C.pkgN = (C.pkgN || 0) + 1) };
+  C.pkgs = C.pkgs || []; C.pkgs.push(k);
+  return k;
+}
+function joinPackage(k, p) {
+  if (k.members.includes(p)) return;
+  const n = k.members.length;
+  k.members.push(p);
+  // alternate sides of the axis: two attack groups, each a little wider than the last pair
+  p.task = Object.assign(p.task || {}, { target: k.tgt, pkg: k, ipOff: (n % 2 ? -1 : 1) * (7000 + Math.floor(n / 2) * 900) });
+}
+// where a striker of a package should be going now (null: the normal attack logic takes over)
+function pkgSteer(pl, task, out) {
+  const k = task.pkg;
+  if (!k || k.phase === 'done') return null;
+  if (k.phase === 'form') { out.copy(k.rv); return 'marshal'; }
+  const tp = trackPos(pl.side, k.tgt, _in1) || task.last || k.tgt.pos;
+  const spec = MSL[pl.T.ashmType], rel = spec.range * 0.82;
+  const dx = tp.x - k.rv.x, dz = tp.z - k.rv.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L;
+  // the initial point: on this aircraft's side of the axis, a few km outside its release range
+  const back = rel + 9000;
+  out.set(tp.x - ux * back - uz * task.ipOff, 0, tp.z - uz * back + ux * task.ipOff);
+  if (task.ipDone || Math.hypot(out.x - pl.pos.x, out.z - pl.pos.z) < 4000 || Math.hypot(tp.x - pl.pos.x, tp.z - pl.pos.z) < rel) { task.ipDone = true; return null; }
+  return 'push';
+}
+function updatePackages(side) {
+  const C = command[side];
+  C.pkgs = (C.pkgs || []).filter(k => k.phase !== 'gone');
   for (const k of C.pkgs) {
-    const air = k.members.filter(p => p.alive && !p.dying && p.ashmN > 0 && p.task && p.task.target === k.tgt);
-    const lead = air[0];
-    const tp = trackPos(side, k.tgt, _in1); if (!tp || !lead) continue;
-    // the plan is made once the whole package is airborne and formed up (aircraft on deck have no ETA)
-    if (air.some(p => !p.airborne) || game.t - k.t < 25) continue;
-    // one combined salvo per target: a second package against the same target within a minute rides the first
-    if (C.jointLast === k.tgt && game.t - C.jointT < 60) { k.done = true; continue; }
-    const spec = MSL[lead.T.ashmType], d = Math.hypot(tp.x - lead.pos.x, tp.z - lead.pos.z);
-    const rel = spec.range * 0.82;
-    const airImpact = Math.max(0, d - rel) / Math.max(200, lead.speed) + Math.min(d, rel) / spec.v + 4;
-    const shooters = ships.filter(s => s.side === side && s.alive && !s.dying && s !== flagship && !s.S.sub && Object.keys(s.ashm).some(m => s.ashm[m] > 0 && MSL[m].range * 0.95 > tp.distanceTo(s.pos)));
-    // the US Navy's long arm is the maritime-strike Tomahawk: timed so it arrives with the package's LRASMs
-    if (!shooters.length && side === 'us' && (C.mstCd ?? 0) <= 60) {
-      const tl = ships.filter(s => s.side === side && s.alive && !s.dying && (s.tlamN || 0) > 0);
-      if (!tl.length) continue;
-      const tof = Math.max(...tl.map(s => tp.distanceTo(s.pos))) / MSL.mst.v;
-      if (airImpact - tof < 4) {
-        k.done = true; C.jointLast = k.tgt; C.jointT = game.t;
-        if (tomahawk(side, k.tgt, 8)) { C.mstCd = 150; if (side === game.side) radio('作战指挥', `分布式杀伤：海上打击型战斧与${air.length} 架攻击机的 LRASM 将同时抵达${k.tgt.name}！`, GOLD); }
+    const air = k.members.filter(p => p.alive && !p.dying && p.ashmN > 0 && p.task && p.task.pkg === k);
+    const mineSide = side === game.side;
+    if (k.phase === 'form') {
+      const up = air.filter(p => p.airborne), there = up.filter(p => p.pos.distanceTo(k.rv) < 7000);
+      k.ready = there.length; k.total = air.length;
+      if (air.length && (there.length === air.length || game.t - k.t > PKG_FORM_MAX) && up.length) {
+        k.phase = 'push'; k.pushT = game.t;
+        // stragglers still on deck are released to attack on their own
+        for (const p of air) if (!p.airborne) p.task.pkg = null;
+        if (mineSide) radio('空中指挥', `第 ${k.id} 攻击编队集结完毕（${up.length} 架），全编队出发！目标${k.tgt.name}，分两路突击。`, GOLD);
+        if (air.includes(player)) message('全编队出发 · PUSH', `目标 ${k.tgt.name} · 分两路进入初始点`, GOLD, 2.6);
       }
+      if (!air.length) k.phase = 'gone';
       continue;
     }
-    if (!shooters.length) continue;
-    const shipTof = Math.max(...shooters.map(s => tp.distanceTo(s.pos) / MSL[Object.keys(s.ashm).find(m => s.ashm[m] > 0)].v));
-    if (airImpact - shipTof < 4) {
-      k.done = true;
-      C.jointTgt = k.tgt; C.salvoCd = 0; C.jointLast = k.tgt; C.jointT = game.t;
-      if (side === game.side) radio('作战指挥', `空海协同：舰艇齐射与${air.length} 架攻击机的导弹将同时抵达${k.tgt.name}！`, GOLD);
+    if (k.phase === 'push') {
+      if (!k.tgt.alive || k.tgt.dying || !air.length) { k.phase = 'bda'; continue; }
+      if (!k.jointDone) jointFor(side, k, air);
+    }
+    // assessment once the last of the package's missiles has hit or been stopped
+    if (k.phase === 'bda' && !k.bdaT && !missiles.some(m => m.alive && m.pkg === k)) k.bdaT = game.t + 6;
+    if (k.phase === 'bda' && k.bdaT && game.t > k.bdaT) {
+      k.phase = 'gone';
+      if (!mineSide) continue;
+      const t = k.tgt;
+      const st = !t.alive || t.dying ? '已被击沉' : t.hp > t.maxHp * 0.75 ? `轻伤（完好 ${Math.round(t.hp / t.maxHp * 100)}%），建议再次打击` : t.hp > t.maxHp * 0.4 ? `中度受损（完好 ${Math.round(t.hp / t.maxHp * 100)}%）` : `重创（完好 ${Math.round(t.hp / t.maxHp * 100)}%），丧失大部分战斗力`;
+      const hits = k.hits || 0;
+      radio('毁伤评估', `第 ${k.id} 攻击编队：发射 ${k.fired || 0} 枚，命中 ${hits} 枚。${t.name}${st}。`, '#9fd4ff');
+    }
+  }
+}
+// air-sea joint strike: once the package pushes, the surface ships hold their salvo and fire so that their
+// missiles arrive with the aircraft's (one saturation wave, not two small ones)
+function jointFor(side, k, air) {
+  const C = command[side];
+  const lead = air[0];
+  const tp = trackPos(side, k.tgt, _in1); if (!tp || !lead) return;
+  // one combined salvo per target: a second package against the same target within a minute rides the first
+  if (C.jointLast === k.tgt && game.t - C.jointT < 60) { k.jointDone = true; return; }
+  const spec = MSL[lead.T.ashmType], d = Math.hypot(tp.x - lead.pos.x, tp.z - lead.pos.z);
+  const rel = spec.range * 0.82;
+  const airImpact = Math.max(0, d - rel) / Math.max(200, lead.speed) * 1.08 + Math.min(d, rel) / spec.v + 4;
+  const shooters = ships.filter(s => s.side === side && s.alive && !s.dying && s !== flagship && !s.S.sub && Object.keys(s.ashm).some(m => s.ashm[m] > 0 && MSL[m].range * 0.95 > tp.distanceTo(s.pos)));
+  // the US Navy's long arm is the maritime-strike Tomahawk: timed so it arrives with the package's LRASMs
+  if (!shooters.length && side === 'us' && (C.mstCd ?? 0) <= 60) {
+    const tl = ships.filter(s => s.side === side && s.alive && !s.dying && (s.tlamN || 0) > 0);
+    if (!tl.length) return;
+    const tof = Math.max(...tl.map(s => tp.distanceTo(s.pos))) / MSL.mst.v;
+    if (airImpact - tof < 4) {
+      k.jointDone = true; C.jointLast = k.tgt; C.jointT = game.t;
+      if (tomahawk(side, k.tgt, 8)) { C.mstCd = 150; if (side === game.side) radio('作战指挥', `分布式杀伤：海上打击型战斧与${air.length} 架攻击机的 LRASM 将同时抵达${k.tgt.name}！`, GOLD); }
+    }
+    return;
+  }
+  if (!shooters.length) return;
+  const shipTof = Math.max(...shooters.map(s => tp.distanceTo(s.pos) / MSL[Object.keys(s.ashm).find(m => s.ashm[m] > 0)].v));
+  if (airImpact - shipTof < 4) {
+    k.jointDone = true;
+    C.jointTgt = k.tgt; C.salvoCd = 0; C.jointLast = k.tgt; C.jointT = game.t;
+    if (side === game.side) radio('作战指挥', `空海协同：舰艇齐射与${air.length} 架攻击机的导弹将同时抵达${k.tgt.name}！`, GOLD);
+  }
+}
+function jointStrikes(side) { updatePackages(side); }
+
+/* ---------- theatre ISR: reconnaissance satellites and over-the-horizon radar ----------
+   Both sides get periodic satellite passes (SAR sees ships even under EMCON, but EMCON leaves the analysts a
+   much poorer fix); the PLA also runs sky-wave OTH radar, which sees large emitting ships coarsely and is
+   blinded by EMCON. These tracks are coarse and a few seconds old: good enough to cue a strike, a ballistic
+   missile or a scout, not good enough to guide a SAM. */
+const ISR = { cn: { period: 210, dur: 24, first: 70, oth: true }, us: { period: 260, dur: 24, first: 120, oth: false } };
+function isrFix(side, e, err) {
+  const P = picture[side], have = P.get(e);
+  if (have && game.t - have.t < 12) return false;          // a sensor already holds a better track
+  const tr = have || { pos: new V3(), vel: new V3(), t: 0, first: game.t };
+  tr.pos.copy(e.pos).add(_in1.set(rand(-err, err), 0, rand(-err, err))); tr.vel.copy(e.vel); tr.t = game.t - 8; tr.coarse = err;
+  if (!have) P.set(e, tr);
+  return true;
+}
+function updateISR(side, dt) {
+  const C = command[side], R = ISR[side], foe = SIDES[side].foe;
+  C.satT = (C.satT ?? R.first) - dt;
+  if (C.satT <= 0) {
+    C.satT = R.period; C.satEnd = game.t + R.dur; C.satN = 0;
+    if (side === game.side) radio(side === 'cn' ? '遥感卫星' : 'NRO', '侦察卫星过顶，开始成像搜索。', '#9fd4ff');
+    else if (game.side && game.role !== 'watch') radio('预警', `敌方侦察卫星过顶 ${R.dur} 秒！电磁静默可降低我舰被定位精度。`, '#ffd28a');
+  }
+  if (C.satEnd > game.t) {
+    C.satTick = (C.satTick || 0) - dt;
+    if (C.satTick <= 0) {
+      C.satTick = 6;
+      for (const e of ships) if (e.side === foe && e.alive && !e.dying && !submerged(e)) {
+        const quiet = tac(foe).navy === 'emcon' && !(e.emconBreak > game.t);
+        if (Math.random() < (quiet ? 0.55 : 0.9) && isrFix(side, e, quiet ? 3500 : 1200)) C.satN++;
+      }
+    }
+    if (game.t + 0.5 > C.satEnd && C.satN && side === game.side && !C.satSaid) { C.satSaid = true; radio(side === 'cn' ? '遥感卫星' : 'NRO', `本次过顶更新 ${C.satN} 批敌舰位置。`, '#9fd4ff'); }
+  } else C.satSaid = false;
+  if (R.oth) {
+    C.othT = (C.othT ?? 20) - dt;
+    if (C.othT <= 0) {
+      C.othT = 30;
+      for (const e of ships) if (e.side === foe && e.alive && !e.dying && !submerged(e) && (e.carrier || e.S.L > 150) && !(tac(foe).navy === 'emcon' && !(e.emconBreak > game.t)) && Math.random() < 0.7) isrFix(side, e, 6000);
     }
   }
 }
@@ -503,12 +609,42 @@ function drawTacMap() {
     hc.strokeStyle = 'rgba(227,178,87,0.28)'; hc.lineWidth = 10; hc.lineCap = 'round'; hc.beginPath(); hc.moveTo(x0, y0); hc.lineTo(x1 - Math.cos(a) * 18, y1 - Math.sin(a) * 18); hc.stroke(); hc.lineCap = 'butt';
     hc.fillStyle = 'rgba(227,178,87,0.5)'; hc.beginPath(); hc.moveTo(x1, y1); hc.lineTo(x1 - Math.cos(a - 0.45) * 26, y1 - Math.sin(a - 0.45) * 26); hc.lineTo(x1 - Math.cos(a + 0.45) * 26, y1 - Math.sin(a + 0.45) * 26); hc.closePath(); hc.fill();
     if (!I.tgt) { hc.strokeStyle = GOLD; hc.lineWidth = 1.5; hc.beginPath(); hc.arc(x1, y1, 9, 0, Math.PI * 2); hc.stroke(); }
-    const pk = (command[me].pkgs || []).filter(k => !k.done && k.tgt === I.tgt).length;
+    const pk = (command[me].pkgs || []).filter(k => (k.phase === 'form' || k.phase === 'push') && k.tgt === I.tgt).length;
     const lbl = `主攻方向 · ${I.tgt ? I.tgt.name : '指定海域'}${I.src === 'player' ? '' : '（司令部）'}${pk ? ` · ${pk} 个攻击编队在途` : ''}`;
     // the label sits by the arrowhead (the target line's label owns the midpoint); one label when they coincide
     const tgSame = I.tgt && (I.tgt === game.ashmSel);
     if (!tgSame) { hc.font = `700 11px ${SANS}`; hc.fillStyle = GOLD; hc.globalAlpha = 0.9; hc.textAlign = 'center'; hc.fillText(lbl, x1, y1 + (y1 > y0 ? 30 : -28)); hc.globalAlpha = 1; }
     TM.axisPk = pk;
+  }
+  // coarse fixes (satellite / OTH radar): an uncertainty circle instead of a precise position
+  for (const [e, tr] of picture[me]) {
+    if (!tr.coarse || !e.alive || e.dying || game.t - tr.t > 90) continue;
+    const q = trackPos(me, e, _in2); if (!q) continue;
+    const [x, y] = P(q.x, q.z);
+    hc.strokeStyle = 'rgba(255,138,120,0.5)'; hc.setLineDash([2, 4]); hc.lineWidth = 1; hc.beginPath(); hc.arc(x, y, Math.max(7, (tr.coarse + (game.t - tr.t) * 12) * s), 0, Math.PI * 2); hc.stroke(); hc.setLineDash([]);
+  }
+  const Cm = command[me];
+  if (Cm.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#9fd4ff'; hc.textAlign = 'left'; hc.fillText(`🛰 己方侦察卫星过顶 · ${Math.ceil(Cm.satEnd - game.t)} s`, 16, 72); }
+  const Cf = command[SIDES[me].foe];
+  if (Cf.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#ffd28a'; hc.textAlign = 'left'; hc.fillText(`⚠ 敌方侦察卫星过顶 · ${Math.ceil(Cf.satEnd - game.t)} s`, 16, 88); }
+  // strike packages of the player's side: rendezvous, the two attack axes through their initial points, the target
+  for (const k of command[me].pkgs || []) {
+    if (k.phase !== 'form' && k.phase !== 'push') continue;
+    const tp = trackPos(me, k.tgt, _in2) || k.tgt.pos; if (!tp) continue;
+    const [rx, ry] = P(k.rv.x, k.rv.z), [tx, ty] = P(tp.x, tp.z);
+    const dx = tp.x - k.rv.x, dz = tp.z - k.rv.z, L = Math.hypot(dx, dz) || 1, ux = dx / L, uz = dz / L;
+    const ac = k.members.find(q => q.alive && q.T.ashmType);
+    const back = (ac ? MSL[ac.T.ashmType].range * 0.82 : 30000) + 9000;
+    hc.strokeStyle = 'rgba(143,200,255,0.55)'; hc.lineWidth = 1.2; hc.setLineDash([3, 5]);
+    for (const sgn of [1, -1]) {
+      const ix = tp.x - ux * back - uz * 7500 * sgn, iz = tp.z - uz * back + ux * 7500 * sgn, [qx, qy] = P(ix, iz);
+      hc.beginPath(); hc.moveTo(rx, ry); hc.lineTo(qx, qy); hc.lineTo(tx, ty); hc.stroke();
+      hc.fillStyle = 'rgba(143,200,255,0.8)'; hc.fillRect(qx - 2.5, qy - 2.5, 5, 5);
+    }
+    hc.setLineDash([]);
+    hc.strokeStyle = BLUE; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(rx, ry - 6); hc.lineTo(rx + 6, ry); hc.lineTo(rx, ry + 6); hc.lineTo(rx - 6, ry); hc.closePath(); hc.stroke();
+    hc.font = `600 10px ${SANS}`; hc.fillStyle = BLUE; hc.textAlign = 'center';
+    hc.fillText(k.phase === 'form' ? `第${k.id}编队 集结 ${k.ready || 0}/${k.total || 0} · ${Math.max(0, Math.ceil(PKG_FORM_MAX - (game.t - k.t)))}s` : `第${k.id}编队 已出发`, rx, ry - 10);
   }
   if (TM.pt) { const [x, y] = P(TM.pt.x, TM.pt.z); hc.strokeStyle = '#eef3f5'; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(x - 8, y); hc.lineTo(x + 8, y); hc.moveTo(x, y - 8); hc.lineTo(x, y + 8); hc.stroke(); }
   // the player's own unit: impossible to miss

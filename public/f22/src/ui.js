@@ -71,7 +71,7 @@ function takeRole(role, pick, home) {
       command.us.b1b--;
       p = new Plane('us', 'b1b', null);
       p.pilot = new Pilot(p, 0.9); p.role = 'bomber'; p.task = { target: bestTarget('us', new V3(), 200000) };
-      p.pos.set(60000, 7000, rand(-15000, 15000)); setBasis(p.q, new V3(-1, 0, 0), Y_AXIS); p.speed = 260; p.axes(); p.sync();
+      p.pos.set(THEATRE.exit - 12000, 7000, rand(-25000, 25000)); setBasis(p.q, new V3(-1, 0, 0), Y_AXIS); p.speed = 260; p.axes(); p.sync();
       p.name = 'B-1B（你）'; planes.push(p);
     } else {
       const h = home || ships.concat(bases).filter(x => x.side === side && x.alive && !x.dying && x.hangar && x.hangar[pick] > 0).sort((a, b) => b.hangar[pick] - a.hangar[pick])[0];
