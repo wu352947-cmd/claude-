@@ -359,6 +359,50 @@ function jointStrikes(side) {
   }
 }
 
+/* ---------- anti-submarine warfare: hunter-killer groups ----------
+   A submarine is never a main effort for missiles and strike aircraft (they cannot reach a submerged boat).
+   Designating one - or an enemy boat closing on a carrier - sends a hunter-killer group: the escorts with
+   sonar and ASW rockets run to the datum, slow down to listen, and prosecute the contact. */
+function aswTasking(side, dt) {
+  const C = command[side];
+  C.aswT = (C.aswT ?? 0) - dt;
+  if (C.aswT > 0) return;
+  C.aswT = 3;
+  const ds = game.desigShip;
+  let tgt = null, ordered = false;
+  if (side === game.side && game.role !== 'watch' && ds && ds.alive && !ds.dying && ds.S && ds.S.sub && ds.side !== side) { tgt = ds; ordered = true; }
+  if (!tgt) {
+    // the staff's own awareness: a hostile boat held within 35 km of a carrier is hunted
+    const cv = ships.filter(x => x.side === side && x.carrier && x.alive && !x.dying);
+    let bd = 35000;
+    for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.S.sub && e.alive && !e.dying && game.t - tr.t < 60) for (const c of cv) { const d = tr.pos.distanceTo(c.pos); if (d < bd) { bd = d; tgt = e; } }
+    if (!tgt && C.aswTgt && C.aswTgt.alive && !C.aswTgt.dying && game.t - (C.aswSeen || 0) < 180) tgt = C.aswTgt;
+  }
+  const hunters = ships.filter(x => x.side === side && x.hunt && x.alive && !x.dying);
+  if (!tgt) { for (const x of hunters) x.hunt = null; C.aswTgt = null; return; }
+  const tr = picture[side].get(tgt);
+  if (tr) C.aswSeen = Math.max(C.aswSeen || 0, tr.t);
+  if (tgt !== C.aswTgt) { for (const x of hunters) x.hunt = null; hunters.length = 0; C.aswTgt = tgt; }
+  // lost for three minutes: the search is called off (unless the commander keeps it designated)
+  if (!ordered && game.t - (C.aswSeen || 0) > 180) { for (const x of hunters) x.hunt = null; C.aswTgt = null; return; }
+  const want = Math.min(2, ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub).length - 1);
+  if (hunters.length < want) {
+    const datum = tr ? tr.pos : tgt.pos;
+    const cand = ships.filter(x => x.side === side && x.alive && !x.dying && !x.carrier && !x.S.sub && !x.hunt && x !== flagship && x.asw > 0)
+      .sort((a, b) => ((b.S.sonar || 0) > 0) - ((a.S.sonar || 0) > 0) || a.pos.distanceTo(datum) - b.pos.distanceTo(datum));
+    const added = [];
+    for (const x of cand.slice(0, want - hunters.length)) { x.hunt = tgt; x.sag = false; added.push(x.name); }
+    if (added.length && side === game.side) radio('舰队司令部', `${added.join('、')}组成反潜猎杀群，高速前往${tgt.name}最后位置，到达后低速声呐搜索并实施攻击。`, '#9fd4ff');
+    else if (!added.length && !hunters.length && ordered && !C.aswNone) { C.aswNone = true; radio('舰队司令部', '无可用反潜舰艇，只能保持规避。', '#ffd28a'); }
+  }
+}
+// what a designated submarine means for the player's own unit, said once at the moment of designation
+function subOrderNote() {
+  if (game.role === 'pilot' && player) return player.T.aew ? '预警机保持监视 · 舰队派出反潜猎杀群' : '本机无反潜武器 · 舰队派出反潜猎杀群 · 你继续执行主攻方向任务';
+  if (game.role === 'captain' && flagship) return flagship.asw > 0 || flagship.S.sub ? '反潜目标 · 本舰可用反潜火箭 / 鱼雷攻击 · 僚舰组成猎杀群' : '反潜目标 · 僚舰组成反潜猎杀群';
+  return '反潜目标 · 舰队派出反潜猎杀群';
+}
+
 /* ---------- wingmen ---------- */
 function launchWingman(lead) {
   const h = lead.home;
@@ -436,7 +480,8 @@ function drawTacMap() {
     TM.hits.push(c);
   }
   // the designated target: a gold line from the player's unit, with range and what will hit it
-  const tg = game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying ? game.ashmSel : game.lock.desig && game.lock.desig.alive && game.lockManual > game.t ? game.lock.desig : null;
+  const dsub = game.desigShip && game.desigShip.S && game.desigShip.S.sub && game.desigShip.alive && !game.desigShip.dying ? game.desigShip : null;
+  const tg = dsub || (game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying ? game.ashmSel : null) || (game.lock.desig && game.lock.desig.alive && game.lockManual > game.t ? game.lock.desig : null);
   if (tg && own && own.pos) {
     const tp = trackPos(me, tg, _b) || tg.pos, [x0, y0] = P(own.pos.x, own.pos.z), [x1, y1] = P(tp.x, tp.z);
     hc.strokeStyle = GOLD; hc.lineWidth = 1.6; hc.setLineDash([7, 5]); hc.beginPath(); hc.moveTo(x0, y0); hc.lineTo(x1, y1); hc.stroke(); hc.setLineDash([]);
@@ -445,7 +490,9 @@ function drawTacMap() {
     const d = tp.distanceTo(own.pos), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
     const inbound = planes.filter(q => q.side === me && q.alive && q.task && q.task.target === tg && (q.role === 'strike' || q.role === 'bomber')).length;
     const isMain = intentTarget(me) === tg;
-    const label = `${isMain ? '主攻目标' : '目标'} ${tg.name || tg.T?.name} · ${km(d)} km${inbound ? ` · ${inbound} 架攻击机前往` : ''}`;
+    const hk = dsub ? ships.filter(x => x.side === me && x.hunt === tg && x.alive && !x.dying).length : 0;
+    const label = dsub ? `反潜目标 ${tg.name} · ${km(d)} km · ${hk ? `${hk} 艘猎杀舰前往` : '待派反潜舰'}`
+      : `${isMain ? '主攻目标' : '目标'} ${tg.name || tg.T?.name} · ${km(d)} km${inbound ? ` · ${inbound} 架攻击机前往` : ''}`;
     hc.font = `700 12px ${SANS}`; const w = hc.measureText(label).width + 12;
     hc.fillStyle = 'rgba(6,10,14,0.85)'; hc.fillRect(mx - w / 2, my - 18, w, 20); hc.fillStyle = GOLD; hc.textAlign = 'center'; hc.fillText(label, mx, my - 4);
   }
@@ -521,9 +568,9 @@ function renderTacCard() {
   const acts = [];
   if (enemy) {
     const isT = u === game.ashmSel || u === game.lock.desig;
-    const what = u.kind === 'plane' ? (game.role === 'pilot' ? '开 AI 驾驶将自动拦截' : '舰炮与防空优先对准它')
+    const what = u.S && u.S.sub ? subOrderNote() : u.kind === 'plane' ? (game.role === 'pilot' ? '开 AI 驾驶将自动拦截' : '舰炮与防空优先对准它')
       : `全军主攻目标 · ${game.role === 'pilot' && player ? (player.ashmN > 0 ? '你的 AI 驾驶将前往攻击' : player.T.ew ? '你的 AI 驾驶将前出干扰压制' : player.T.aew ? '你的预警机转向监视它' : '你的 AI 驾驶将前出夺取制空') : '舰队、潜艇与攻击波向它集中'}`;
-    acts.push([isT ? '✓ 当前目标' : u.kind === 'plane' ? '设为目标' : '设为主攻目标', () => { designate(u); message('目标已指定', `${u.name || type} · ${what}`, GOLD, 2.6); }]);
+    acts.push([isT ? '✓ 当前目标' : u.kind === 'plane' ? '设为目标' : u.S && u.S.sub ? '反潜猎杀' : '设为主攻目标', () => { designate(u); message('目标已指定', `${u.name || type} · ${what}`, GOLD, 2.6); }]);
     if (flagship && (u.kind === 'ship' || u.kind === 'base')) {
       if (!flagship.S.sub && !flagship.carrier) acts.push(['反舰齐射', () => { designate(u); useAbility(flagship, 'salvo', u); }]);
       if (flagship.carrier) acts.push(['出动攻击波', () => { designate(u); useAbility(flagship, 'strike', u); }]);

@@ -1608,7 +1608,8 @@ function playerAutoTask(p) {
   // a genuine RTB (fuel or weapons) stands; an escort whose package went home comes back to the task
   if (p.role === 'rtb' && (p.fuel < 400 || (p.mrm + p.srm + p.ashmN === 0 && !p.T.ew && !p.T.aew))) return;
   const ds = game.desigShip;
-  const sel = ds && ds.alive && !ds.dying ? ds : intentTarget(p.side);
+  // a designated submarine is the hunter-killer group's job: the aircraft keeps serving the main effort
+  const sel = ds && ds.alive && !ds.dying && !(ds.S && ds.S.sub) ? ds : intentTarget(p.side);
   if (!sel) {
     if ((p.role === 'strike' || p.role === 'bomber') && !(p.task && p.task.target && p.task.target.alive)) {
       const t = p.ashmN > 0 ? bestTarget(p.side, p.pos, 250000) : null;
@@ -1923,6 +1924,14 @@ function shipAI(s) {
   if (s === guide) {
     const C = command[s.side];
     want = C.course; spd = C.speed;
+  } else if (s.hunt && s.hunt.alive && !s.hunt.dying) {
+    // hunter-killer: sprint to the datum, then slow to listen (a fast ship deafens its own sonar)
+    const tp = trackPos(s.side, s.hunt, _c) || (s.huntLast ? _c.copy(s.huntLast) : _c.copy(s.hunt.pos));
+    s.huntLast = (s.huntLast || new V3()).copy(tp);
+    _c.sub(s.pos).setY(0);
+    const d = _c.length();
+    want = headingOf(_c) + (d < 3000 ? 0.9 : 0);   // close in, then circle the datum
+    spd = d > 9000 ? s.S.vmax : 7;
   } else if (s.sag && s.sag.alive !== false && command[s.side].sagPoint) {
     // surface action group: push toward the enemy screen to bring missiles and guns to bear
     const P = command[s.side].sagPoint, off = s.sagOff || 0;
@@ -1972,7 +1981,7 @@ function bestTarget(side, from, range) {
 }
 function updateCommand(side, dt) {
   const C = command[side];
-  updateIntent(side, dt);
+  updateIntent(side, dt); aswTasking(side, dt);
   aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
   const carrier = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
@@ -2375,7 +2384,7 @@ function selectAt(x, y) {
   else if (game.role === 'pilot' && best.kind === 'plane') { game.lock.desig = best; game.lockManual = game.t + 30; }
   game.gunTgt = best;
   if (game.role === 'captain' && flagship && flagship.gun && best.kind !== 'ship' && best.kind !== 'base') flagship.gun.fuse = 'AA';
-  message('目标指定', best.name || (best.spec && best.spec.name) || '', '#e3b257', 1.2);
+  message('目标指定', (best.name || (best.spec && best.spec.name) || '') + (best.S && best.S.sub ? ` · ${subOrderNote()}` : ''), '#e3b257', best.S && best.S.sub ? 3 : 1.2);
   Sound.beep(1500, 0.05, 0.05);
 }
 const SCALES = [1, 2, 4, 8];
@@ -2505,8 +2514,9 @@ function updateLock(dt) {
   Sound.lockTone(L.locked && p.srm + p.mrm > 0);
   // anti-ship selection: the player's own designation stays until it is gone; otherwise the best ship ahead
   const ds = game.desigShip;
-  if (ds && ds.alive && !ds.dying) { game.ashmSel = ds; return; }
-  game.desigShip = null;
+  // (a designated submarine stays designated for the hunter-killer group, but is not an anti-ship missile target)
+  if (ds && ds.alive && !ds.dying && !(ds.S && ds.S.sub)) { game.ashmSel = ds; return; }
+  if (!(ds && ds.alive && !ds.dying)) game.desigShip = null;
   game.ashmSel = null;
   if (p.ashmN > 0) {
     const R = MSL[p.T.ashmType].range;

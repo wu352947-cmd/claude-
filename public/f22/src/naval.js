@@ -199,6 +199,11 @@ function launchASW(s, sub) {
   if (mine(s)) radio(s.name, `${m.spec.name}发射，攻击水下目标！`, '#9fd4ff');
 }
 function updateASW(m, i, dt) {
+  // mid-course update over the datalink: the drop point follows the held track, led by the boat's motion
+  if (m.target && m.target.alive && fresh(m.side, m.target, 6) && trackPos(m.side, m.target, m.aim)) {
+    const hd0 = Math.hypot(m.aim.x - m.pos.x, m.aim.z - m.pos.z);
+    m.aim.addScaledVector(m.target.vel || ZERO, Math.min(hd0 / Math.max(m.speed, 100), 40));
+  }
   const hd = Math.hypot(m.aim.x - m.pos.x, m.aim.z - m.pos.z);
   _md.subVectors(m.aim, m.pos).setY(0).normalize();
   const up = clamp((hd - 600) / 4000, -0.6, 0.6);
@@ -261,7 +266,8 @@ function shipASW(s, dt) {
   s.aswCd = (s.aswCd || 0) - dt;
   if (s.asw > 0 && s.aswCd <= 0) {
     let tgt = null, bd = 20000;
-    for (const [e, tr] of picture[s.side]) if (isSub(e) && e.alive && !e.dying && game.t - tr.t < 6) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; tgt = e; } }
+    // a fresh contact can be engaged out to 20 km; a hunter on an older datum closes to 12 km before it shoots
+    for (const [e, tr] of picture[s.side]) if (isSub(e) && e.alive && !e.dying) { const age = game.t - tr.t, d = e.pos.distanceTo(s.pos); if ((age < 6 || (e === s.hunt && age < 20 && d < 12000)) && d < bd) { bd = d; tgt = e; } }
     if (tgt && (s !== flagship || game.ai)) launchASW(s, tgt);
   }
   const inbound = torps.find(t => t.side !== s.side && t.pos.distanceTo(s.pos) < 3500 && t.dir.dot(_a.subVectors(s.pos, t.pos).normalize()) > 0.6);
