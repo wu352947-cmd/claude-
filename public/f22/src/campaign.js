@@ -177,7 +177,7 @@ function drawObjectives() {
   const K = game.camp; if (!K || game.mode !== 'play' || game.cine) return;
   const C = CAMPAIGN.chapters[game.side][K.i]; if (!C) return;
   const compact = HH < 480;
-  const x = HW - (compact ? 10 : 16), y = compact ? 44 : 50;
+  const x = scopeBox.r ? scopeBox.x - scopeBox.r - 12 : HW - (compact ? 10 : 16), y = compact ? 44 : 50;
   hc.save();
   hc.textAlign = 'right';
   hc.font = `700 ${compact ? 11 : 12}px ${SANS}`; hc.fillStyle = GOLD; hc.fillText(C.title, x, y);

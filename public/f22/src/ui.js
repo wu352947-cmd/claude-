@@ -81,6 +81,7 @@ function takeRole(role, pick, home) {
       p.pilot = new Pilot(p, 0.9); p.role = 'cap'; p.name = `${AC[pick].name}（你）`;
       planes.push(p);
       if (!spotOnCatapult(p)) { p.state = 'deck'; p.deckT = 3; }
+      player = p; launchWingman(p);
     }
     player = p;
     $('b-scale').textContent = '时间 ×1'; game.scale = 1;
