@@ -4342,7 +4342,7 @@ function flight(pl, c, dt) {
 /* ---------- AI pilot ---------- */
 const MODE_TEXT = { pullup: '拉起避海', notch: '切向置尾 · 规避雷达弹', break: '急转规避', bvr: '超视距接敌', pursuit: '追踪', guns: '机炮咬尾',
   lag: '滞后追踪', cap: '战斗空中巡逻', aew: '预警巡逻', sweep: '前出搜索', escort: '护航', strike: '反舰突击', ingress: '低空突防', release: '发射反舰导弹',
-  bomber: '远程突击', rtb: '返航', barcap: '前出拦截巡逻 · 主攻轴线', ewesc: '随队电子干扰', ewsoj: '远距支援干扰 · 压制敌雷达', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
+  bomber: '远程突击', rtb: '返航', barcap: '前出拦截巡逻 · 主攻轴线', eyes: '隐身前出 · 目标指示', ewesc: '随队电子干扰', ewsoj: '远距支援干扰 · 压制敌雷达', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
 class Pilot {
   constructor(pl, skill) {
     Object.assign(this, { pl, skill, target: null, threat: null, think: rand(0, 0.5), lockT: 0, mslCd: rand(2, 5), mode: 'cap', desired: new V3(1, 0, 0), react: lerp(0.7, 0.08, skill), ashmT: 0 });
@@ -4487,8 +4487,17 @@ function roleFly(pl, d, c, out, dt) {
       const lat = (task.lat || 0) + (task.latZ || 0);
       let cx = anchor.x + dirToFoe.x * off - dirToFoe.z * lat, cz = anchor.z + dirToFoe.z * off + dirToFoe.x * lat;
       if (task.on && pl.role === 'cap') {
-        const st = axisStation(pl.side, anchor, task.stand || 50000, _ai3);
-        if (st) { cx = st.x; cz = st.z; P.mode = 'barcap'; }
+        // the station sits just outside the known SAM umbrella around the target (a stealth fighter closest)
+        let stand = task.stand || 50000;
+        const tp0 = trackPos(pl.side, task.on, _ai4);
+        if (tp0) {
+          let umb = 0;
+          for (const [e, tr] of picture[pl.side]) if (e.kind === 'ship' && e.alive && !e.dying && !(e.S && e.S.sub) && tr.pos.distanceTo(tp0) < 15000)
+            for (const k of Object.keys(e.sam || {})) if (e.sam[k] > 0 && !MSL[k].exo) umb = Math.max(umb, MSL[k].range + tr.pos.distanceTo(tp0));
+          stand = Math.max(task.eyes ? 30000 : 40000, umb + (task.eyes ? 2000 : 6000));
+        }
+        const st = axisStation(pl.side, anchor, stand, _ai3);
+        if (st) { cx = st.x; cz = st.z; P.mode = task.eyes ? 'eyes' : 'barcap'; }
       }
       // patrol stations stay outside the enemy fleet's area-defence envelope
       for (const [e, tr] of picture[pl.side]) if ((e.kind === 'ship' && !e.S.sub || e.kind === 'base') && e.alive && !e.dying) {
@@ -4672,7 +4681,13 @@ function playerAutoTask(p) {
     if (L && L.alive && !L.dying && L.role === 'strike' && L.ashmN > 0) return;
     const pk = planes.find(q => q !== p && q.side === p.side && q.alive && !q.dying && q.airborne && q.role === 'strike' && q.ashmN > 0 && q.task && q.task.target === sel && q.pos.distanceTo(p.pos) < 45000);
     if (pk) { p.role = 'escort'; p.task = { lead: pk, slot: 220, on: sel }; radio('空中指挥', `${p.name}：加入${pk.name}攻击编队担任护航。`, '#9fd4ff'); }
-    else if (p.role !== 'cap' || !same) { p.role = 'cap'; p.task = { on: sel, stand: 50000, off: 12000 }; }
+    else if (p.role !== 'cap' || !same) {
+      // a stealth fighter goes forward as the strike's eyes (its radar keeps the target track fresh for everyone
+      // on the datalink); a conventional fighter holds the barrier outside the SAM umbrella
+      const stealth = p.rcs < 0.5 || p.T.rcs < 0.5;
+      p.role = 'cap'; p.task = { on: sel, stand: stealth ? 36000 : 50000, off: 12000, eyes: stealth };
+      message('自动驾驶任务', stealth ? `${p.T.name}无反舰武器 · 隐身前出为攻击编队提供目标指示与制空` : `${p.T.name}无反舰武器 · 在敌防空圈外拦截巡逻掩护打击`, '#e3b257', 2.6);
+    }
   }
 }
 function ditch(pl) {
@@ -6314,7 +6329,11 @@ function updatePilot(dt) {
     const t = p.pilot.target;
     if (out.srm && t) { launchAAM(p, t, 'srm'); game.mslCd = 2; }
     else if (out.mrm && t) { launchAAM(p, t, 'mrm'); game.mslCd = 3; }
-    if (out.ashm && p.task && p.task.target && p.ashmN > 0) { p.ashmN--; launchASHM(p, p.task.target, p.T.ashmType); game.mslCd = 1.2; }
+    if (out.ashm && p.task && p.task.target && p.ashmN > 0) {
+      p.ashmN--; launchASHM(p, p.task.target, p.T.ashmType); game.mslCd = 1.2;
+      const tg = p.task.target, d = Math.round(tg.pos.distanceTo(p.pos) / 1000);
+      message(`自动驾驶：${MSL[p.T.ashmType].name} 发射`, `目标 ${tg.name} · ${d} km 防区外打击${p.ashmN ? ` · 剩余 ${p.ashmN} 枚` : ' · 反舰弹已打完，转入拦截巡逻'}`, '#e3b257', 2.6);
+    }
   }
   if (input.msl) { input.msl = false; firePlayerAAM(); }
   if (input.ashm) { input.ashm = false; firePlayerASHM(); }
