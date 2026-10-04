@@ -326,6 +326,24 @@ const Navy = (() => {
       cats: [{ x0: 100, x1: 162, z: 9, a: 0 }, { x0: 100, x1: 160, z: -4, a: -0.03 }, { x0: -50, x1: 40, z: -18, a: -0.16 }, { x0: -60, x1: 30, z: -30, a: -0.16 }],
       land: { x: -158, z: 7, a: -0.157, wires: [38, 50, 62] },
       elevators: [[20, 27], [-110, 27], [-120, -30]]
+    },
+    // Nimitz class (USS Ronald Reagan): the procedural stand-in behind the detailed model
+    reagan: {
+      side: 'us', name: '里根号', short: 'CVN-76', number: '76', L: 333, B: 41, T: 11.3, deckY: 18, deckW: 77,
+      deck: [[168, 0], [160, 16], [120, 22], [40, 22], [-60, 26], [-130, 26], [-160, 20], [-166, 10], [-166, -12], [-150, -24], [-90, -34], [-20, -40], [40, -36], [90, -28], [130, -18], [160, -8]],
+      island: { x: -40, z: 23, l: 30, w: 9, h: 20 },
+      cats: [{ x0: 100, x1: 162, z: 9, a: 0 }, { x0: 100, x1: 160, z: -4, a: -0.03 }, { x0: -50, x1: 40, z: -18, a: -0.16 }, { x0: -60, x1: 30, z: -30, a: -0.16 }],
+      land: { x: -158, z: 7, a: -0.157, wires: [38, 50, 62, 74] },
+      elevators: [[20, 27], [-110, 27], [-120, -30]]
+    },
+    // Type 002 Shandong: STOBAR, aircraft take off over the 14 degree ski-jump from two deck-run positions
+    shandong: {
+      side: 'cn', name: '山东舰', short: 'CV-17', number: '17', L: 305, B: 38, T: 10.5, deckY: 19, deckW: 75, ski: { x0: 112, x1: 152, h: 7.5 },
+      deck: [[152, 0], [150, 12], [118, 17], [40, 20], [-40, 22], [-110, 22], [-148, 18], [-152, 8], [-152, -12], [-138, -24], [-80, -34], [-10, -37], [40, -32], [80, -24], [120, -12], [150, -6]],
+      island: { x: 0, z: 19, l: 36, w: 11, h: 18 },
+      cats: [{ x0: -10, x1: 150, z: 3, a: 0, ski: true }, { x0: -40, x1: 150, z: -8, a: 0.04, ski: true }],
+      land: { x: -146, z: 6, a: -0.157, wires: [36, 48, 60, 72] },
+      elevators: [[50, 21], [-90, 21]]
     }
   };
   function carrier(cls) {
@@ -370,6 +388,21 @@ const Navy = (() => {
     });
     const top = new THREE.ShapeGeometry(shape);
     top.rotateX(Math.PI / 2); top.translate(0, Y + 0.05, 0);
+    if (S.ski) {
+      // the ski-jump: a curved ramp rising over the bow
+      const K = S.ski, n = 12, w = 28, pts = [];
+      for (let i = 0; i <= n; i++) { const u = i / n; pts.push([lerp(K.x0, K.x1, u), K.h * u * u]); }
+      const pos = [];
+      for (let i = 0; i < n; i++) {
+        const [x0, y0] = pts[i], [x1, y1] = pts[i + 1];
+        pos.push(x0, Y + y0 + 0.1, -w / 2, x1, Y + y1 + 0.1, -w / 2, x1, Y + y1 + 0.1, w / 2, x0, Y + y0 + 0.1, -w / 2, x1, Y + y1 + 0.1, w / 2, x0, Y + y0 + 0.1, w / 2);
+        for (const zz of [-w / 2, w / 2]) pos.push(x0, Y, zz, x1, Y, zz, x1, Y + y1 + 0.1, zz, x0, Y, zz, x1, Y + y1 + 0.1, zz, x0, Y + y0 + 0.1, zz);
+      }
+      const end = pts[n];
+      pos.push(end[0], Y, -w / 2, end[0], Y + end[1] + 0.1, -w / 2, end[0], Y + end[1] + 0.1, w / 2, end[0], Y, -w / 2, end[0], Y + end[1] + 0.1, w / 2, end[0], Y, w / 2);
+      const ramp = new THREE.BufferGeometry(); ramp.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); ramp.computeVertexNormals();
+      P.push([ramp, M.deck]);
+    }
     const uv = top.attributes.uv, pos = top.attributes.position;
     for (let i = 0; i < uv.count; i++) uv.setXY(i, (pos.getX(i) - minX) / W, 1 - (pos.getZ(i) - minZ) / D);
     const deckMat = new THREE.MeshStandardMaterial({ map: deckTex, roughness: 0.92, side: THREE.DoubleSide });
@@ -390,6 +423,38 @@ const Navy = (() => {
     return { group, spec: S };
   }
   function rr(a, b) { return a + rnd() * (b - a); }
+
+  /* ---------- submarines ---------- */
+  // teardrop pressure hull, sail with diving planes, cruciform (093B) or X (Virginia style) stern planes; anechoic black
+  const SUBS = {
+    t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 14, h: 7.5, w: 4 }, xtail: false, number: '' },
+    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.8, w: 3.6 }, xtail: true, number: '' }
+  };
+  function submarine(cls) {
+    const S = SUBS[cls], L = S.L, R = S.B / 2;
+    const skin = new THREE.MeshStandardMaterial({ color: 0x1a1d20, roughness: 0.85, metalness: 0.1, side: THREE.DoubleSide });
+    const P = [];
+    const prof = [];
+    for (let i = 0; i <= 40; i++) {
+      const u = i / 40, x = -L / 2 + u * L;
+      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(1 - (u - 0.7) / 0.3, 1.25) + 0.15 : R;
+      prof.push(new THREE.Vector2(Math.max(r, 0.01), x));
+    }
+    const hullG = new THREE.LatheGeometry(prof, 28); hullG.rotateZ(-Math.PI / 2);
+    P.push([hullG, skin]);
+    const sl = S.sail;
+    P.push([block(sl.x, 0, sl.l, sl.w, sl.l * 0.75, sl.w * 0.85, R * 0.6, sl.h + R * 0.4, -0.8), skin]);
+    for (const sg of [1, -1]) P.push([box(3, 0.3, 4.5, sl.x + 2, R + sl.h * 0.7, sg * (sl.w / 2 + 2.2)), skin]);
+    const tx = -L / 2 + 6;
+    for (let k = 0; k < 4; k++) {
+      const a = (S.xtail ? Math.PI / 4 : 0) + k * Math.PI / 2;
+      const f = new THREE.BoxGeometry(5, 0.35, 4.2); f.translate(0, 0, 2.4 + R * 0.25);
+      f.rotateX(a); f.translate(tx, 0, 0); P.push([f, skin]);
+    }
+    P.push([cyl(0.5, 0.5, 3, sl.x, R + sl.h + 1.6, 0, 6), skin]);
+    const group = assemble(P);
+    return { group, spec: Object.assign({ L, B: S.B, T: R * 2, sub: true }, S) };
+  }
 
   /* ---------- naval aircraft ---------- */
   const tint = (obj, color) => obj.traverse(m => { if (m.isMesh && m.material && m.material.color && !m.material.transparent) { m.material = m.material.clone(); m.material.color.multiply(new THREE.Color(color)); } });
@@ -478,6 +543,6 @@ const Navy = (() => {
     return mergeGeometries(g.map(x => x.toNonIndexed()));
   }
 
-  function ship(cls, number) { return CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
-  return { ship, plane, ashmGeometry, SPECS, CARRIERS };
+  function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
+  return { ship, plane, ashmGeometry, SPECS, CARRIERS, SUBS };
 })();

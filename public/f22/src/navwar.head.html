@@ -1,4 +1,4 @@
-<title>南海决战</title>
+<title>太平洋血泪 · 龙与鹰</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&family=Saira+Condensed:wght@600;800&display=swap">
@@ -128,8 +128,72 @@
   #loading[hidden], #touch[hidden] { display: none; }
   #toast { position: fixed; left: 50%; top: calc(18px + env(safe-area-inset-top, 0px)); transform: translateX(-50%); background: var(--panel); border: 1px solid var(--line); padding: 8px 14px; font-size: 12px; pointer-events: none; max-width: calc(100vw - 32px); text-align: center; }
   #toast[hidden] { display: none; }
+
+
+  /* ---------- cinematics: prologue / epilogue ---------- */
+  .tagline { margin: -4px 0 0; font: 800 clamp(20px, 4vw, 30px)/1 var(--f-display); letter-spacing: 0.5em; color: var(--fg); }
+  .tagline span { color: var(--gold); letter-spacing: 0.2em; }
+  #cine { position: fixed; inset: 0; z-index: 30; pointer-events: auto; }
+  #cine[hidden] { display: none; }
+  #cine::before, #cine::after { content: ""; position: absolute; left: 0; right: 0; height: 11vh; background: #000; z-index: 2; }
+  #cine::before { top: 0; } #cine::after { bottom: 0; }
+  #cine-map { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity 0.8s; }
+  #cine-text { position: absolute; left: 50%; bottom: 15vh; transform: translateX(-50%); width: min(820px, calc(100vw - 32px)); text-align: center; z-index: 3;
+    font: 500 clamp(15px, 2.4vw, 20px)/1.7 var(--f-body); color: #e9f0f4; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9); animation: cineIn 4.2s ease both; }
+  #cine-text.big { font: 700 clamp(20px, 3.4vw, 32px)/1.5 var(--f-body); color: var(--gold); letter-spacing: 0.06em; }
+  #cine-text.year { font: 800 clamp(26px, 5vw, 48px)/1.2 var(--f-display); letter-spacing: 0.3em; color: #fff; }
+  #cine-text.side { font: 800 clamp(22px, 4vw, 40px)/1.3 var(--f-display); letter-spacing: 0.12em; color: var(--gold); }
+  @keyframes cineIn { 0% { opacity: 0; transform: translate(-50%, 8px); } 14% { opacity: 1; transform: translate(-50%, 0); } 86% { opacity: 1; } 100% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { #cine-text { animation: none; } }
+  #cine-skip { position: absolute; right: calc(16px + env(safe-area-inset-right, 0px)); top: calc(11vh + 10px); z-index: 3; appearance: none; cursor: pointer;
+    font: 600 12px/1 var(--f-body); color: var(--fg); background: rgba(8, 14, 20, 0.6); border: 1px solid var(--line); padding: 9px 14px; letter-spacing: 0.1em; }
+  /* ---------- naval command: engine telegraph, ability bar ---------- */
+  #gears { position: absolute; left: calc(8px + env(safe-area-inset-left, 0px)); top: 24%; display: grid; gap: 4px; z-index: 2; }
+  #gears[hidden], #abil[hidden], #spec[hidden], #specbar[hidden] { display: none; }
+  #gears button { appearance: none; touch-action: none; cursor: pointer; font: 700 11px/1 var(--f-body); color: var(--muted); width: 50px; height: 30px;
+    background: rgba(8, 14, 20, 0.55); border: 1px solid rgba(238, 243, 245, 0.25); }
+  #gears button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
+  #gears .cap { font: 600 9px/1 var(--f-mono); color: var(--muted); letter-spacing: 0.12em; text-align: center; padding: 2px 0; }
+  #gears .mini { display: none; align-items: center; gap: 4px; }
+  #gears .mini b { font: 700 12px/1 var(--f-body); color: #1c1407; background: var(--gold); padding: 8px 6px; min-width: 40px; text-align: center; }
+  #gears .mini button { width: 38px; height: 32px; font-size: 16px; }
+  #abil { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; max-width: 46vw; flex-wrap: wrap; justify-content: center; }
+  .ab { appearance: none; touch-action: none; cursor: pointer; position: relative; width: 56px; height: 56px; border-radius: 12px; overflow: hidden;
+    font: 700 11px/1.15 var(--f-body); color: var(--fg); background: rgba(8, 14, 20, 0.6); border: 1.5px solid rgba(227, 178, 87, 0.65); display: grid; place-items: center; padding: 3px; }
+  .ab i { position: absolute; inset: 0; background: conic-gradient(rgba(6, 10, 14, 0.78) calc(var(--cd, 0) * 1turn), transparent 0); pointer-events: none; font-style: normal; }
+  .ab b { position: relative; z-index: 1; font-weight: 700; }
+  .ab small { position: absolute; right: 3px; top: 2px; font: 600 9px/1 var(--f-mono); color: var(--muted); z-index: 1; }
+  .ab.act { border-color: var(--hud); box-shadow: 0 0 0 2px rgba(141, 255, 180, 0.35) inset; }
+  .ab.off { opacity: 0.45; }
+  #touch.desk #gears, #touch.desk #abil { display: grid; }
+  #touch.desk #abil { display: flex; }
+
+  /* ---------- spectator: unit list and camera bar ---------- */
+  #specbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+  #specbar button { appearance: none; cursor: pointer; font: 700 12px/1 var(--f-body); color: var(--fg); background: var(--panel); border: 1px solid var(--line); padding: 10px 12px; min-width: 52px; }
+  #specbar button.on { background: var(--gold); color: #1c1407; border-color: var(--gold); }
+  #spec { position: fixed; left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(54px + env(safe-area-inset-top, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); width: min(300px, 44vw);
+    background: rgba(6, 10, 14, 0.86); border: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr; pointer-events: auto; }
+  #spec .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; border-bottom: 1px solid var(--line); }
+  #spec .tabs button { appearance: none; cursor: pointer; font: 600 11px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 6px 8px; }
+  #spec .tabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
+  #spec ul { list-style: none; margin: 0; padding: 4px; overflow-y: auto; }
+  #spec li button { appearance: none; cursor: pointer; width: 100%; text-align: left; display: grid; grid-template-columns: 1fr auto; gap: 2px 8px; font: 500 12px/1.35 var(--f-body); color: var(--fg); background: transparent; border: 0; border-bottom: 1px solid rgba(238, 243, 245, 0.07); padding: 7px 6px; }
+  #spec li button.on { background: rgba(227, 178, 87, 0.18); }
+  #spec li span { color: var(--muted); font-size: 11px; }
+  #spec li em { font: 600 10px/1 var(--f-mono); font-style: normal; align-self: center; }
+  .pick.dim { opacity: 0.45; }
+  .rtabs { display: flex; gap: 6px; flex-wrap: wrap; }
+  .rtabs button { appearance: none; cursor: pointer; font: 700 13px/1 var(--f-body); color: var(--muted); background: var(--panel); border: 1px solid var(--line); padding: 10px 14px; }
+  .rtabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
+  #role-list { max-height: 52vh; overflow-y: auto; }
   @media (max-height: 520px) {
     .card { gap: 9px; }
+    #gears { top: 200px; }
+    #gears > button, #gears .cap { display: none; }
+    #gears .mini { display: flex; }
+    .ab { width: 46px; height: 46px; font-size: 10px; border-radius: 10px; }
+    #role-list { max-height: 46vh; }
     .card h1 { font-size: clamp(40px, 9vh, 64px); }
     .tb { width: 52px; height: 52px; font-size: 11px; }
     .tb.big { width: 74px; height: 74px; }
@@ -164,6 +228,17 @@
     <button class="tb" id="b-flare" type="button">干扰</button>
     <button class="tb sm gold" id="b-launch" type="button">弹射<br>自动</button>
   </div>
+  <div id="gears" hidden><div class="cap">车钟</div><button type="button" data-g="5">全速</button><button type="button" data-g="4">3/4</button><button type="button" data-g="3">1/2</button><button type="button" data-g="2">1/4</button><button type="button" data-g="1">停车</button><button type="button" data-g="0">后退</button>
+    <div class="mini"><button type="button" data-step="-1">−</button><b id="gear-now">3/4</b><button type="button" data-step="1">＋</button></div></div>
+  <div id="abil" hidden></div>
+  <div id="specbar" hidden>
+    <button type="button" id="sp-list">单位</button>
+    <button type="button" id="sp-prev">◀</button>
+    <button type="button" id="sp-next">▶</button>
+    <button type="button" id="sp-auto" class="on">导播</button>
+    <button type="button" id="sp-free">自由</button>
+    <button type="button" id="sp-take">接管</button>
+  </div>
   <div class="cluster" id="cap-ctl" hidden>
     <button class="tb sm" id="c-view" type="button">视角</button>
     <button class="tb" id="c-target" type="button">目标</button>
@@ -185,21 +260,24 @@
   <button type="button" id="b-map" data-act="map">战术地图</button>
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
+  <button type="button" id="b-support" data-act="support">战区支援</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
   <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>
   <div class="card">
-    <p class="eyebrow">架空 if 线 · 海空联合作战</p>
-    <h1>南海<em>决战</em></h1>
-    <p class="lede">福建舰编队与福特号航母打击群在争议海域爆发全面交战。驾驶舰载机从电磁弹射器起飞、挂索着舰，或指挥驱逐舰打一场导弹对射——雷达地平线、数据链、饱和齐射与拦截都按真实规则运作。摧毁对方全部战争潜力才算胜利。</p>
+    <p class="eyebrow">南海决战 · 架空 if 线</p>
+    <h1>太平洋<em>血泪</em></h1>
+    <p class="tagline">龙 <span>与</span> 鹰</p>
+    <p class="lede">两支双航母舰队在南海迎头相撞。从电磁弹射器与滑跃甲板起飞，指挥万吨大驱与宙斯盾舰打一场饱和对射，潜入深海发射鱼雷，或调动火箭军的东风与关岛的 B-1B——直到一方的战争潜力被彻底摧毁。</p>
     <div class="row"><button class="btn primary" id="b-start" type="button">进入战区</button></div>
     <div class="row">
       <button class="chip" id="s-quality" type="button">画质 <b>高</b></button>
       <button class="chip" id="s-sound" type="button">音效 <b>开</b></button>
       <button class="chip" id="s-time" type="button">时段 <b>正午</b></button>
       <button class="chip" id="s-invert" type="button">俯仰 <b>上推爬升</b></button>
+      <button class="chip" id="s-cine" type="button">过场动画 <b>开</b></button>
     </div>
     <p class="note">虚构情景，仅供娱乐。舰艇、飞机与武器参数取自公开资料并为游戏节奏做了缩放。</p>
     <p class="note" id="credits"></p>
@@ -213,11 +291,11 @@
     <div class="sides">
       <button class="side-card" data-side="cn" type="button">
         <h3>中国人民解放军海军</h3>
-        <ul><li>福建舰 · 055 · 052D ×2 · 054A</li><li>前哨岛礁机场：歼-16、轰-6K</li><li>饱和协同齐射 · 超/高超音速反舰弹</li></ul>
+        <ul><li>福建舰 · 山东舰 · 055 ×2 · 052D ×4 · 054A ×2 · 093B ×2</li><li>岛礁机场：歼-16、轰-6K · 火箭军东风-21D / 26</li><li>饱和协同打击 · 鹰击-18 / 21 · 歼-15D 电子战</li></ul>
       </button>
       <button class="side-card" data-side="us" type="button">
         <h3>美国海军</h3>
-        <ul><li>福特号 · 提康德罗加级 · 伯克级 ×3</li><li>更大的舰载机联队 · F-35C · E-2D</li><li>CEC 协同防空 · B-1B 远程 LRASM 空袭</li></ul>
+        <ul><li>福特号 · 里根号 · 提康德罗加级 ×2 · 伯克级 ×6 · 弗吉尼亚级 ×2</li><li>F-35C · F/A-18E · EA-18G 咆哮者 · E-2D</li><li>宙斯盾 CEC · 标准-3/6 · 战斧 · B-1B LRASM</li></ul>
       </button>
     </div>
     <div class="row"><button class="btn" id="b-side-back" type="button">返回</button></div>
@@ -227,7 +305,8 @@
 <section class="screen" id="role" hidden>
   <div class="card">
     <p class="eyebrow" id="role-title">选择岗位</p>
-    <h2>你的岗位</h2>
+    <h2>你的战位</h2>
+    <div class="rtabs" id="role-tabs"><button type="button" data-t="ship" class="on">舰艇</button><button type="button" data-t="air">战机</button><button type="button" data-t="cmd">指挥 · 观战</button></div>
     <div class="picks" id="role-list"></div>
     <div class="row"><button class="btn" id="b-role-back" type="button">返回</button></div>
   </div>
@@ -260,6 +339,7 @@
   <div class="card">
     <p class="eyebrow">战斗仍在继续</p>
     <h2 id="dead-title">被击落</h2>
+    <p class="lede" id="dead-sub"></p>
     <div class="picks" id="dead-list"></div>
   </div>
 </section>
@@ -280,6 +360,8 @@
   </div>
 </section>
 
+<div id="spec" hidden><div class="tabs" id="spec-tabs"><button type="button" data-f="all" class="on">全部</button><button type="button" data-f="cn">解放军</button><button type="button" data-f="us">美军</button><button type="button" data-f="ship">舰艇</button><button type="button" data-f="air">飞机</button><button type="button" data-f="msl">导弹</button></div><ul id="spec-list"></ul></div>
+<div id="cine" hidden><canvas id="cine-map"></canvas><div id="cine-text"></div><button id="cine-skip" type="button">跳过 ›</button></div>
 <div id="toast" hidden></div>
 <div id="loading">正在编组舰队 · 生成海域</div>
 
