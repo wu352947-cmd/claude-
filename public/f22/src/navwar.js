@@ -2,10 +2,15 @@ import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
 
 /*@MODEL@*/
 /*@AIRCRAFT@*/
-/*@WORLD@*/
+/*@SEAENV@*/
 /*@NAVY@*/
 /*@NAVYHD@*/
 
@@ -64,9 +69,9 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(60, 1, 1.5, 60000);
+const camera = new THREE.PerspectiveCamera(60, 1, 1.5, 160000);
 scene.add(camera);
-const world = createWorld({ scene, renderer, hq: HQ(), time: settings.time, sea: true });
+const world = createSeaEnv({ scene, renderer, hq: HQ(), time: settings.time, wind: new V3(-0.85, 0, 0.53), islands: ISLANDS });
 const { fogColor, FOG_D, SUN, sunLight } = world;
 sunLight.shadow.camera.left = sunLight.shadow.camera.bottom = -60;
 sunLight.shadow.camera.right = sunLight.shadow.camera.top = 60;
@@ -88,18 +93,23 @@ class Particles {
     this.sa = new THREE.BufferAttribute(this.s, 1).setUsage(THREE.DynamicDrawUsage);
     g.setAttribute('position', this.pa); g.setAttribute('aColor', this.ca); g.setAttribute('aSize', this.sa);
     this.mat = new THREE.ShaderMaterial({
-      uniforms: { map: { value: map }, uScale: { value: 600 }, uFogColor: { value: fogColor }, uFogDensity: { value: FOG_D } },
-      vertexShader: `attribute vec4 aColor; attribute float aSize; uniform float uScale; varying vec4 vC; varying float vDist;
-        void main(){ vC = aColor; vec4 mv = modelViewMatrix * vec4(position, 1.0); vDist = -mv.z;
-          gl_Position = projectionMatrix * mv; gl_PointSize = min(aSize * uScale / max(vDist, 1.0), 900.0); }`,
-      fragmentShader: `uniform sampler2D map; uniform vec3 uFogColor; uniform float uFogDensity; varying vec4 vC; varying float vDist;
+      uniforms: Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), { map: { value: map }, uScale: { value: 600 } }),
+      fog: true,
+      vertexShader: `attribute vec4 aColor; attribute float aSize; uniform float uScale; varying vec4 vC;
+        #include <fog_pars_vertex>
+        void main(){ vC = aColor; vec4 mvPosition = modelViewMatrix * vec4(position, 1.0); float dist = -mvPosition.z;
+          gl_Position = projectionMatrix * mvPosition; gl_PointSize = min(aSize * uScale / max(dist, 1.0), 900.0);
+          #include <fog_vertex>
+        }`,
+      fragmentShader: `uniform sampler2D map; varying vec4 vC;
+        #include <fog_pars_fragment>
         void main(){
           vec4 t = texture2D(map, gl_PointCoord);
-          float f = 1.0 - exp(-pow(uFogDensity * vDist, 2.0));
-          ${additive ? 'gl_FragColor = vec4(vC.rgb * t.a * vC.a * (1.0 - f), 1.0);'
-                     : 'gl_FragColor = vec4(mix(vC.rgb, uFogColor, f), t.a * vC.a);'}
+          ${additive ? 'gl_FragColor = vec4(vC.rgb * t.a * vC.a * (1.0 - seaFogAmount(vFogW, fogDensity)), 1.0);'
+                     : 'gl_FragColor = vec4(vC.rgb, t.a * vC.a);'}
           #include <tonemapping_fragment>
           #include <colorspace_fragment>
+          ${additive ? '' : '#include <fog_fragment>'}
         }`,
       transparent: true, depthWrite: false,
       blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending
@@ -390,10 +400,21 @@ class Ship {
   get carrier() { return !!this.S.carrier; }
   vmax() { return this.S.vmax * (this.hp < this.maxHp * 0.35 ? 0.45 : this.hp < this.maxHp * 0.6 ? 0.75 : 1); }
   sync() {
-    const bob = Math.sin(game.t * 0.6 + this.pos.x * 0.001) * (this.carrier ? 0.15 : 0.35);
-    this.obj.position.set(this.pos.x, bob - this.sinking * (this.S.top + 18), this.pos.z);
-    const roll = this.list + Math.sin(game.t * 0.47 + this.pos.z * 0.001) * (this.carrier ? 0.004 : 0.02) - this.rudder * this.speed * 0.0016;
-    const pitch = this.trim + Math.sin(game.t * 0.33 + this.pos.x * 0.002) * (this.carrier ? 0.002 : 0.008);
+    // ride the swell: heave, pitch and roll from the sea surface at bow, stern and both beams, followed with the
+    // hull's inertia (a long hull averages the waves out; a carrier barely moves)
+    const L = this.S.L, B = this.carrier ? 40 : this.S.B, h = this.heading, x = this.pos.x, z = this.pos.z;
+    const fx = Math.cos(h), fz = -Math.sin(h), sx = Math.sin(h), sz = Math.cos(h), W = world.waveHeight;
+    const hb = W(x + fx * L * 0.38, z + fz * L * 0.38), hs = W(x - fx * L * 0.38, z - fz * L * 0.38);
+    const hp = W(x - sx * B * 0.5, z - sz * B * 0.5), hst = W(x + sx * B * 0.5, z + sz * B * 0.5);
+    const wv = this.wv || (this.wv = { y: 0, p: 0, r: 0, t: game.t });
+    const k = 1 - Math.exp(-clamp(game.t - wv.t, 0, 0.5) / (0.6 + L / 160));
+    wv.t = game.t;
+    wv.y += ((hb + hs + hp + hst) * 0.25 * (this.carrier ? 0.35 : 0.8) - wv.y) * k;
+    wv.p += (Math.atan2(hb - hs, L * 0.76) - wv.p) * k;
+    wv.r += (Math.atan2(hp - hst, B) * (this.carrier ? 0.4 : 1.6) - wv.r) * k;
+    this.obj.position.set(this.pos.x, wv.y - this.sinking * (this.S.top + 18), this.pos.z);
+    const roll = this.list + wv.r - this.rudder * this.speed * 0.0016;
+    const pitch = this.trim + wv.p;
     this.obj.rotation.set(roll, this.heading, pitch, 'YZX');
     if (this.lo) { this.lo.position.copy(this.obj.position); this.lo.rotation.copy(this.obj.rotation); }
   }
@@ -1662,6 +1683,7 @@ function updateShip(s, dt) {
     s.list += (0.32 * Math.sign(s.list || 1) - s.list) * dt * 0.03; s.trim += ((s.carrier ? 0.04 : -0.08) - s.trim) * dt * 0.02;
     s.speed *= Math.exp(-dt * 0.2);
     fwdOf(s.heading, _a); s.pos.addScaledVector(_a, s.speed * dt); s.vel.copy(_a).multiplyScalar(s.speed);
+    world.wakeTrack(s, s.pos.x, s.pos.z, _a.x, _a.z, s.speed, s.S.L, s.carrier ? 40 : s.S.B);
     shipSmoke(s, 3);
     s.sync();
     if (s.sinkT > 85) { s.alive = false; scene.remove(s.obj); if (s.lo) scene.remove(s.lo); }
@@ -1684,12 +1706,13 @@ function updateShip(s, dt) {
   if (s !== flagship && s.fires > 1.2 && s.dcCd <= 0) { s.dcT = 25; s.dcCd = 90; }
   if (s.dcT > 0) { s.dcT -= dt; s.fires = Math.max(0, s.fires - dt * 0.08); s.hp = Math.min(s.maxHp * 0.85, s.hp + s.maxHp * 0.0025 * dt); s.list *= Math.exp(-dt * 0.05); }
   if (s.fires > 0) { s.hp -= s.fires * 0.5 * dt; s.fires = Math.max(0, s.fires - dt * 0.012); shipSmoke(s, s.fires); if (s.hp <= 0) sinkShip(s, null); }
+  fwdOf(s.heading, _a);
+  world.wakeTrack(s, s.pos.x, s.pos.z, _a.x, _a.z, s.speed, s.S.L, s.carrier ? 40 : s.S.B);
   s.wakeT -= dt;
-  if (s.wakeT <= 0 && near(s.pos, 9000) && s.speed > 2) {
-    s.wakeT = 0.12;
-    const st = toWorld(s, -s.S.L * 0.48, 0.4, rand(-4, 4), _b);
-    smoke.emit(st.x, 0.6, st.z, -s.vel.x * 0.15 + rand(-2, 2), 0.3, -s.vel.z * 0.15 + rand(-2, 2), 14, s.carrier ? 22 : 12, s.carrier ? 70 : 42, 0.95, 0.97, 0.98, 0.7, 0.02);
-    for (const side of [1, -1]) { const b = toWorld(s, s.S.L * 0.45, 0.5, side * 3, _b); smoke.emit(b.x, 0.8, b.z, side * _a.z * 4, 1.5, -side * _a.x * 4, 6, 6, 24, 0.95, 0.97, 0.98, 0.55, 0.05); }
+  if (s.wakeT <= 0 && near(s.pos, 3000) && s.speed > 9) {
+    // spray thrown off the bow as she pitches into the swell
+    s.wakeT = 0.18;
+    for (const side of [1, -1]) { const b = toWorld(s, s.S.L * 0.44, 1.2, side * 2.5, _b); smoke.emit(b.x, 1.5, b.z, side * -_a.z * 5 + _a.x * s.speed * 0.6, 2.5, side * _a.x * 5 + _a.z * s.speed * 0.6, 1.6, 3, 14, 0.95, 0.97, 0.98, 0.5, 0.6, 6); }
   }
   s.sync();
 }
@@ -3150,10 +3173,34 @@ $('s-quality').onclick = () => { settings.quality = HQ() ? 'low' : 'high'; store
 $('s-sound').onclick = () => { settings.sound = !settings.sound; store.set('sound', settings.sound); Sound.setVolume(settings.sound); renderSettings(); };
 $('s-time').onclick = () => { settings.time = TIME_ORDER[(TIME_ORDER.indexOf(settings.time) + 1) % 3]; store.set('time', settings.time); world.setTime(settings.time); renderSettings(); };
 $('s-invert').onclick = () => { settings.invert = !settings.invert; store.set('invert', settings.invert); renderSettings(); };
-function applyQuality() { renderer.setPixelRatio(Math.min(devicePixelRatio, HQ() ? 2 : 1.25) * perf.scale); sunLight.castShadow = HQ(); resize(); }
+// high quality renders through a bloom pass (sun glints, flames, the sun itself); the fast path renders straight to screen
+let composer = null;
+function applyQuality() {
+  renderer.setPixelRatio(Math.min(devicePixelRatio, HQ() ? 2 : 1.25) * perf.scale); sunLight.castShadow = HQ();
+  if (HQ() && !composer) {
+    try {
+      composer = new EffectComposer(renderer);
+      composer.addPass(new RenderPass(scene, camera));
+      // a stray NaN or half-float overflow would be smeared over the whole frame by the bloom blur: clamp first
+      composer.addPass(new ShaderPass({
+        uniforms: { tDiffuse: { value: null } },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: `uniform sampler2D tDiffuse; varying vec2 vUv;
+          void main(){ vec4 c = texture2D(tDiffuse, vUv);
+            if (any(isnan(c)) || any(isinf(c))) c = vec4(0.0, 0.0, 0.0, 1.0);
+            gl_FragColor = vec4(clamp(c.rgb, 0.0, 400.0), c.a); }`
+      }));
+      composer.addPass(new UnrealBloomPass(new THREE.Vector2(512, 512), 0.35, 0.4, 7.0));
+      composer.addPass(new OutputPass());
+    } catch (e) { composer = null; }
+  } else if (!HQ() && composer) { composer.dispose(); composer = null; }
+  resize();
+}
+function render() { if (composer) composer.render(); else renderer.render(scene, camera); }
 function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
+  if (composer) { composer.setPixelRatio(renderer.getPixelRatio()); composer.setSize(w, h); }
   HDPR = Math.min(devicePixelRatio, isTouch ? 1.5 : 2); HW = w; HH = h;
   hud.width = Math.round(w * HDPR); hud.height = Math.round(h * HDPR);
   const scale = renderer.domElement.height * camera.projectionMatrix.elements[5] * 0.5;
@@ -3185,16 +3232,16 @@ function frame() {
   requestAnimationFrame(frame);
   const raw = clock.getDelta(), rdt = Math.min(raw, 0.05);
   adapt(raw);
-  if (game.mode === 'paused') { renderer.render(scene, camera); return; }
+  if (game.mode === 'paused') { render(); return; }
   const sim = rdt * (game.mode === 'play' ? game.scale : 1);
   const n = Math.max(1, Math.ceil(sim / (1 / 30)));
   for (let i = 0; i < n; i++) update(sim / n);
   fire.update(sim); smoke.update(sim);
   updateCamera(rdt);
-  world.follow(camera.position);
+  world.follow(camera.position, rdt);
   lod();
   $('keys').hidden = game.t > 30 && game.mode === 'play';
-  renderer.render(scene, camera);
+  render();
   drawHUD(rdt);
   $('flash').style.opacity = game.flash.toFixed(3);
 }
@@ -3238,11 +3285,11 @@ applyQuality();
 clock.getDelta();
 frame();
 $('loading').textContent = '正在下载舰船与舰载机模型 0 / 8';
-NavyHD.loadAll((n, total) => { $('loading').textContent = `正在下载舰船与舰载机模型 ${n} / ${total}`; }).then(() => {
+Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textContent = `正在下载舰船与舰载机模型 ${n} / ${total}`; })]).then(() => {
   toMenu();
   $('loading').hidden = true;
   window.__navwarReady = true;
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world };
