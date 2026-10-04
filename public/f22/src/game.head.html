@@ -1,0 +1,240 @@
+<title>猛禽制空</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans+SC:wght@400;500;700&family=Saira+Condensed:wght@600;800&display=swap">
+<style>
+  /* Layout: full-screen 3D sky; HUD canvas on top; thumb controls hug the lower corners; menus are a left-aligned briefing card */
+  :root {
+    --ink: #0a0f14;
+    --panel: rgba(8, 14, 20, 0.72);
+    --fg: #eef3f5;
+    --muted: #9fb0ba;
+    --line: rgba(238, 243, 245, 0.16);
+    --hud: #8dffb4;             /* HUD phosphor green */
+    --gold: #e3b257;            /* canopy gold, primary action */
+    --warn: #ff5a4f;
+    --f-display: "Saira Condensed", "Arial Narrow", "Noto Sans SC", sans-serif;
+    --f-body: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+    --f-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    --gut: 16px;
+    color-scheme: dark;
+  }
+  html, body { height: 100%; }
+  body {
+    margin: 0; overflow: hidden; background: var(--ink); color: var(--fg);
+    font-family: var(--f-body); font-size: 14px;
+    -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none;
+    -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+  }
+  #stage, #hud, #flash { position: fixed; inset: 0; width: 100%; height: 100%; }
+  #stage canvas { display: block; width: 100%; height: 100%; }
+  #hud { pointer-events: none; }
+  #flash {
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 40, 30, 0.55) 100%);
+  }
+
+  /* ---------- touch controls ---------- */
+  #touch { position: fixed; inset: 0; touch-action: none; }
+  #stick-zone { position: absolute; left: 0; top: 18%; bottom: 0; width: 46%; touch-action: none; }
+  #stick-base {
+    position: absolute; width: 132px; height: 132px; margin: -66px 0 0 -66px;
+    left: calc(110px + env(safe-area-inset-left, 0px)); top: calc(100% - 120px - env(safe-area-inset-bottom, 0px));
+    border-radius: 50%; border: 1.5px solid rgba(141, 255, 180, 0.35);
+    background: radial-gradient(circle, rgba(141, 255, 180, 0.08), rgba(8, 14, 20, 0.25) 70%);
+    pointer-events: none;
+  }
+  #stick-base::before, #stick-base::after {
+    content: ""; position: absolute; background: rgba(141, 255, 180, 0.22);
+  }
+  #stick-base::before { left: 50%; top: 14px; bottom: 14px; width: 1px; }
+  #stick-base::after { top: 50%; left: 14px; right: 14px; height: 1px; }
+  #stick-knob {
+    position: absolute; left: 50%; top: 50%; width: 54px; height: 54px; margin: -27px 0 0 -27px;
+    border-radius: 50%; background: rgba(141, 255, 180, 0.28); border: 1.5px solid var(--hud);
+    box-shadow: 0 0 14px rgba(141, 255, 180, 0.35);
+  }
+  .cluster {
+    position: absolute;
+    right: calc(14px + env(safe-area-inset-right, 0px)); bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+    display: grid; grid-template-columns: repeat(3, auto); grid-template-rows: auto auto auto;
+    gap: 10px; align-items: end; justify-items: center;
+  }
+  .tb {
+    appearance: none; touch-action: none; cursor: pointer;
+    font: 700 13px/1 var(--f-body); color: var(--fg); letter-spacing: 0.04em;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: rgba(8, 14, 20, 0.45); border: 1.5px solid rgba(238, 243, 245, 0.35);
+    display: grid; place-items: center;
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+  }
+  .tb small { display: block; font: 600 10px/1.2 var(--f-mono); color: var(--muted); margin-top: 2px; }
+  .tb.on { background: rgba(141, 255, 180, 0.22); border-color: var(--hud); }
+  .tb.gun { width: 96px; height: 96px; font-size: 16px; border-color: rgba(255, 90, 79, 0.7); grid-column: 3; grid-row: 2 / span 2; }
+  .tb.gun.on { background: rgba(255, 90, 79, 0.3); border-color: var(--warn); }
+  .tb.msl { grid-column: 2; grid-row: 2; border-color: rgba(227, 178, 87, 0.75); width: 74px; height: 74px; }
+  .tb.flr { grid-column: 2; grid-row: 3; }
+  .tb.ab { grid-column: 3; grid-row: 1; }
+  .tb.brk { grid-column: 1; grid-row: 3; width: 54px; height: 54px; font-size: 12px; }
+  .tb:focus-visible, .btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+  #b-pause {
+    position: fixed; top: calc(96px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px));
+    font: 600 11px/1 var(--f-mono); letter-spacing: 0.14em; color: var(--muted);
+    background: var(--panel); border: 1px solid var(--line); padding: 7px 12px; cursor: pointer;
+  }
+
+  /* ---------- screens ---------- */
+  .screen {
+    position: fixed; inset: 0; display: flex; align-items: center;
+    padding-inline: max(var(--gut), env(safe-area-inset-left, 0px)) max(var(--gut), env(safe-area-inset-right, 0px));
+    padding-block: max(var(--gut), env(safe-area-inset-top, 0px)) max(var(--gut), env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(90deg, rgba(6, 10, 14, 0.82) 0%, rgba(6, 10, 14, 0.45) 46%, rgba(6, 10, 14, 0) 70%);
+    overflow-y: auto;
+  }
+  .card { width: min(460px, 100%); display: grid; gap: 14px; }
+  .eyebrow { margin: 0; font: 600 11px/1.4 var(--f-mono); letter-spacing: 0.18em; text-transform: uppercase; color: var(--gold); }
+  .card h1, .card h2 {
+    margin: 0; font-family: var(--f-display); font-weight: 800; line-height: 0.95; letter-spacing: 0.02em;
+    text-wrap: balance;
+  }
+  .card h1 { font-size: clamp(44px, 9vw, 84px); }
+  .card h1 em { font-style: normal; color: var(--gold); }
+  .card h2 { font-size: clamp(36px, 7vw, 60px); }
+  .lede { margin: 0; color: var(--muted); line-height: 1.7; max-width: 36ch; }
+  .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .btn {
+    appearance: none; cursor: pointer; font: 700 15px/1 var(--f-body); letter-spacing: 0.08em;
+    padding: 14px 26px; border: 1px solid var(--line); background: var(--panel); color: var(--fg);
+  }
+  .btn.primary { background: var(--gold); color: #1c1407; border-color: var(--gold); padding-inline: 36px; }
+  .chip {
+    appearance: none; cursor: pointer; font: 500 12px/1 var(--f-body);
+    padding: 8px 11px; border: 1px solid var(--line); background: rgba(8, 14, 20, 0.5); color: var(--muted);
+    display: inline-flex; gap: 6px; align-items: center;
+  }
+  .chip b { font: 600 12px/1 var(--f-mono); color: var(--fg); }
+  .stats { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 22px; justify-content: start; }
+  .stats dt { font: 600 10px/1.4 var(--f-mono); letter-spacing: 0.14em; color: var(--muted); }
+  .stats dd { margin: 0; font: 600 26px/1.1 var(--f-mono); font-variant-numeric: tabular-nums; }
+  .help {
+    display: grid; grid-template-columns: auto 1fr; gap: 5px 14px; margin: 0;
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+  }
+  .help dt { font: 600 11px/1.5 var(--f-mono); color: var(--fg); white-space: nowrap; }
+  .help dd { margin: 0; min-width: 0; }
+  .best { font: 600 12px/1.4 var(--f-mono); color: var(--muted); letter-spacing: 0.08em; }
+  .best b { color: var(--fg); }
+  #loading {
+    position: fixed; inset: 0; display: grid; place-items: center; text-align: center;
+    background: var(--ink); color: var(--muted); font: 600 12px/1.8 var(--f-mono); letter-spacing: 0.16em;
+    padding-inline: var(--gut);
+  }
+  #loading[hidden], .screen[hidden], #touch[hidden], #b-pause[hidden] { display: none; }
+  #toast {
+    position: fixed; left: 50%; top: calc(18px + env(safe-area-inset-top, 0px)); transform: translateX(-50%);
+    background: var(--panel); border: 1px solid var(--line); padding: 8px 14px; font-size: 12px; color: var(--fg);
+    pointer-events: none; max-width: calc(100vw - 32px); text-align: center;
+  }
+  #toast[hidden] { display: none; }
+  @media (max-height: 520px) {
+    .card { gap: 10px; }
+    .card h1 { font-size: clamp(40px, 8vh, 64px); }
+    .help { display: none; }
+    .tb { width: 56px; height: 56px; font-size: 12px; }
+    .tb.gun { width: 84px; height: 84px; }
+    .tb.msl { width: 64px; height: 64px; }
+    .tb.brk { width: 48px; height: 48px; }
+    .cluster { gap: 8px; }
+    #stick-base { top: calc(100% - 100px - env(safe-area-inset-bottom, 0px)); left: calc(96px + env(safe-area-inset-left, 0px)); }
+  }
+  @media (max-width: 600px) and (orientation: portrait) {
+    .screen { align-items: flex-end; background: linear-gradient(0deg, rgba(6, 10, 14, 0.9) 0%, rgba(6, 10, 14, 0.5) 60%, rgba(6, 10, 14, 0) 100%); }
+    .stats { grid-template-columns: repeat(2, auto); }
+  }
+</style>
+
+<div id="stage"></div>
+<canvas id="hud"></canvas>
+<div id="flash"></div>
+
+<div id="touch" hidden>
+  <div id="stick-zone"><div id="stick-base"><div id="stick-knob"></div></div></div>
+  <div class="cluster">
+    <button class="tb ab" id="b-ab" type="button">加力</button>
+    <button class="tb brk" id="b-brake" type="button">减速</button>
+    <button class="tb msl" id="b-msl" type="button"><span>导弹<small id="msl-n">6</small></span></button>
+    <button class="tb flr" id="b-flare" type="button"><span>干扰<small id="flr-n">30</small></span></button>
+    <button class="tb gun" id="b-gun" type="button">机炮</button>
+  </div>
+</div>
+<button id="b-pause" type="button" hidden>暂停</button>
+
+<section class="screen" id="menu" hidden>
+  <div class="card">
+    <p class="eyebrow">F-22A Raptor · 空优作战</p>
+    <h1>猛禽<em>制空</em></h1>
+    <p class="lede">红方假想敌一波接一波压上来。机炮近距离咬尾，导弹锁定后发射，被导弹追上时投放干扰弹摆脱。</p>
+    <div class="row">
+      <button class="btn primary" id="b-start" type="button">出击</button>
+      <span class="best">最高分 <b id="best">0</b></span>
+    </div>
+    <div class="row">
+      <button class="chip" id="s-invert" type="button">俯仰 <b>上推爬升</b></button>
+      <button class="chip" id="s-quality" type="button">画质 <b>高</b></button>
+      <button class="chip" id="s-sound" type="button">音效 <b>开</b></button>
+    </div>
+    <dl class="help">
+      <dt>触屏</dt><dd>左手拖动控制俯仰和滚转；右手按住机炮，点导弹、干扰弹，按住加力或减速。横屏体验最佳。</dd>
+      <dt>键盘</dt><dd>W S 俯仰 · A D 滚转 · Q E 偏航 · Shift 加力 · Ctrl 减速 · 空格 机炮 · F 导弹 · X 干扰弹 · P 暂停</dd>
+    </dl>
+  </div>
+</section>
+
+<section class="screen" id="pause" hidden>
+  <div class="card">
+    <p class="eyebrow">任务暂停</p>
+    <h2>保持航向</h2>
+    <div class="row">
+      <button class="btn primary" id="b-resume" type="button">继续</button>
+      <button class="btn" id="b-restart" type="button">重新出击</button>
+      <button class="btn" id="b-quit" type="button">返回机库</button>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="over" hidden>
+  <div class="card">
+    <p class="eyebrow" id="over-tag">任务结束</p>
+    <h2 id="over-title">被击落</h2>
+    <dl class="stats">
+      <div><dt>得分</dt><dd id="o-score">0</dd></div>
+      <div><dt>击落</dt><dd id="o-kills">0</dd></div>
+      <div><dt>波次</dt><dd id="o-wave">1</dd></div>
+      <div><dt>最高分</dt><dd id="o-best">0</dd></div>
+    </dl>
+    <div class="row">
+      <button class="btn primary" id="b-again" type="button">再次出击</button>
+      <button class="btn" id="b-home" type="button">返回机库</button>
+    </div>
+  </div>
+</section>
+
+<div id="toast" hidden></div>
+<div id="loading">正在生成空域…</div>
+
+<script>
+  setTimeout(function () {
+    if (!window.__raptorReady) {
+      var el = document.getElementById('loading');
+      if (el) el.textContent = '三维引擎加载失败。请检查网络连接后刷新页面。';
+    }
+  }, 25000);
+</script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
