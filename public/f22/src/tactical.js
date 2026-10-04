@@ -271,6 +271,19 @@ function drawTacMap() {
     if ((u.kind === 'ship' || u.kind === 'base') && (c.n === 1 || TM.span < 60000)) { hc.font = `500 10px ${SANS}`; hc.fillStyle = t.color; hc.globalAlpha = 0.85; hc.textAlign = 'left'; hc.fillText(c.n > 1 ? `${u.name} 等` : u.name, c.x + 11, c.y + 4); hc.globalAlpha = 1; }
     TM.hits.push(c);
   }
+  // the designated target: a gold line from the player's unit, with range and what will hit it
+  const tg = game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying ? game.ashmSel : game.lock.desig && game.lock.desig.alive && game.lockManual > game.t ? game.lock.desig : null;
+  if (tg && own && own.pos) {
+    const tp = trackPos(me, tg, _b) || tg.pos, [x0, y0] = P(own.pos.x, own.pos.z), [x1, y1] = P(tp.x, tp.z);
+    hc.strokeStyle = GOLD; hc.lineWidth = 1.6; hc.setLineDash([7, 5]); hc.beginPath(); hc.moveTo(x0, y0); hc.lineTo(x1, y1); hc.stroke(); hc.setLineDash([]);
+    hc.beginPath(); hc.arc(x1, y1, 16, 0, Math.PI * 2); hc.stroke();
+    for (const a of [0, 1, 2, 3]) { const an = a * Math.PI / 2; hc.beginPath(); hc.moveTo(x1 + Math.cos(an) * 12, y1 + Math.sin(an) * 12); hc.lineTo(x1 + Math.cos(an) * 21, y1 + Math.sin(an) * 21); hc.stroke(); }
+    const d = tp.distanceTo(own.pos), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
+    const inbound = planes.filter(q => q.side === me && q.alive && q.task && q.task.target === tg && (q.role === 'strike' || q.role === 'bomber')).length;
+    const label = `目标 ${tg.name || tg.T?.name} · ${km(d)} km${inbound ? ` · ${inbound} 架攻击机前往` : ''}`;
+    hc.font = `700 12px ${SANS}`; const w = hc.measureText(label).width + 12;
+    hc.fillStyle = 'rgba(6,10,14,0.85)'; hc.fillRect(mx - w / 2, my - 18, w, 20); hc.fillStyle = GOLD; hc.textAlign = 'center'; hc.fillText(label, mx, my - 4);
+  }
   // the player's own unit: impossible to miss
   if (own && own.pos) {
     const [x, y] = P(own.pos.x, own.pos.z), hdg = own.kind === 'plane' ? Math.atan2(own.fwd.z, own.fwd.x) : -own.heading, pulse = 14 + Math.sin(game.t * 4) * 3;
@@ -278,6 +291,10 @@ function drawTacMap() {
     hc.save(); hc.translate(x, y); hc.rotate(hdg); hc.fillStyle = GOLD; hc.beginPath(); hc.moveTo(10, 0); hc.lineTo(-7, -6); hc.lineTo(-3, 0); hc.lineTo(-7, 6); hc.closePath(); hc.fill(); hc.restore();
     hc.font = `700 11px ${SANS}`; hc.fillStyle = GOLD; hc.textAlign = 'center'; hc.fillText('你', x, y - pulse - 5);
   }
+  // confirmations (target set, tactic changed, salvo fired) show on the map too
+  let my2 = 58;
+  for (const m of game.msgs) { hc.globalAlpha = clamp(m.t / 0.4, 0, 1); hc.font = `800 15px ${SANS}`; hc.fillStyle = m.color; hc.textAlign = 'center'; hc.fillText(m.sub ? `${m.text} · ${m.sub}` : m.text, HW / 2, my2 + 14); my2 += 20; }
+  hc.globalAlpha = 1;
   // scale bar
   const barM = step, barPx = barM * s;
   hc.strokeStyle = '#eef3f5'; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(16, HH - 150); hc.lineTo(16 + barPx, HH - 150); hc.stroke();
@@ -297,7 +314,7 @@ function tacTap(x, y) {
   renderTacCard();
 }
 function designate(e) {
-  if (e.kind === 'ship' || e.kind === 'base') game.ashmSel = e;
+  if (e.kind === 'ship' || e.kind === 'base') { game.ashmSel = e; game.desigShip = e; }
   game.gunTgt = e;
   if (game.role === 'pilot' && e.kind === 'plane') { game.lock.desig = e; game.lockManual = game.t + 30; }
   Sound.beep(1500, 0.05, 0.05);
@@ -315,7 +332,8 @@ function renderTacCard() {
   html += `<dl><dt>距离</dt><dd>${km(d)} km</dd><dt>方位</dt><dd>${String(brg).padStart(3, '0')}°</dd>${spd ? `<dt>速度</dt><dd>${spd}</dd>` : ''}${!enemy && hp ? `<dt>完好</dt><dd>${hp}</dd>` : ''}</dl>`;
   const acts = [];
   if (enemy) {
-    acts.push(['设为目标', () => { designate(u); message('目标指定', u.name || type, GOLD, 1.2); }]);
+    const isT = u === game.ashmSel || u === game.lock.desig;
+    acts.push([isT ? '✓ 当前目标' : '设为目标', () => { designate(u); message('目标已指定', `${u.name || type} · ${game.role === 'pilot' && player && player.ashmN > 0 && u.kind !== 'plane' ? '开 AI 驾驶将自动前往攻击' : game.role === 'captain' ? '齐射与舰炮将对准它' : '友军攻击波将优先打击它'}`, GOLD, 2.6); }]);
     if (flagship && (u.kind === 'ship' || u.kind === 'base')) {
       if (!flagship.S.sub && !flagship.carrier) acts.push(['反舰齐射', () => { designate(u); useAbility(flagship, 'salvo', u); }]);
       if (flagship.carrier) acts.push(['出动攻击波', () => { designate(u); useAbility(flagship, 'strike', u); }]);

@@ -1299,7 +1299,7 @@ function flight(pl, c, dt) {
 /* ---------- AI pilot ---------- */
 const MODE_TEXT = { pullup: '拉起避海', notch: '切向置尾 · 规避雷达弹', break: '急转规避', bvr: '超视距接敌', pursuit: '追踪', guns: '机炮咬尾',
   lag: '滞后追踪', cap: '战斗空中巡逻', aew: '预警巡逻', sweep: '前出搜索', escort: '护航', strike: '反舰突击', ingress: '低空突防', release: '发射反舰导弹',
-  bomber: '远程突击', rtb: '返航', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '等待着舰' };
+  bomber: '远程突击', rtb: '返航', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
 class Pilot {
   constructor(pl, skill) {
     Object.assign(this, { pl, skill, target: null, threat: null, think: rand(0, 0.5), lockT: 0, mslCd: rand(2, 5), mode: 'cap', desired: new V3(1, 0, 0), react: lerp(0.7, 0.08, skill), ashmT: 0 });
@@ -1314,7 +1314,7 @@ function aiAssess(pl) {
   let bestT = null, bs = 1e9;
   const reach = R === 'cap' || R === 'sweep' ? 60000 : R === 'escort' || R === 'wing' ? 30000 : R === 'strike' || R === 'bomber' ? 9000 : 0;
   const hunt = pl.task && pl.task.hunt;
-  if (pl.T.mrm + pl.T.srm > 0 || pl.T.ammo > 0) for (const [e, tr] of picture[pl.side]) {
+  if (pl.mrm + pl.srm > 0 || pl.ammo > 0) for (const [e, tr] of picture[pl.side]) {
     if (e.kind !== 'plane' || !e.alive || e.dying || game.t - tr.t > 4) continue;
     const d = e.pos.distanceTo(pl.pos);
     if (d > reach) continue;
@@ -1396,8 +1396,12 @@ function aiAttack(pl, t, d, c, out, dt) {
     P.gunsT = 0;
     P.mode = dist > 6000 ? 'bvr' : 'pursuit';
     d.copy(t.pos).addScaledVector(tv, clamp(dist / 1000, 0, 2.5) * (0.3 + 0.7 * sk)).sub(pl.pos).normalize();
+    if (P.crankT > 0 && dist > 7000) { P.crankT -= dt; P.mode = 'crank'; d.applyAxisAngle(Y_AXIS, (P.crankSide || 1) * 0.85); }
     if (dist > 6000 && pl.pos.y < t.pos.y + 1200) d.y += 0.06;
     c.boost = pl.speed < 300 || dist > 5000;
+  } else if (pl.ammo <= 0 && pl.srm <= 0) {
+    P.mode = 'extend'; P.extendT = 12; P.target = null;
+    d.set(-to.x, 0, -to.z).normalize(); d.y = 0.05; c.boost = true;
   } else {
     P.mode = 'guns';
     P.gunsT = (P.gunsT || 0) + dt;
@@ -1462,6 +1466,7 @@ function roleFly(pl, d, c, out, dt) {
     }
     case 'strike': case 'bomber': {
       const tgt = task.target;
+      if ((!tgt || !tgt.alive || tgt.dying) && pl.ashmN > 0) { const t = bestTarget(pl.side, pl.pos, 250000); if (t) { task.target = t; pl.task = task; break; } }
       if (!tgt || !tgt.alive || tgt.dying || pl.ashmN <= 0) { pl.role = 'rtb'; break; }
       const tp = trackPos(pl.side, tgt, _ai3) || task.last || tgt.pos;
       task.last = (task.last || new V3()).copy(tp);
@@ -1485,17 +1490,34 @@ function roleFly(pl, d, c, out, dt) {
       const h = pl.home;
       if (!h || !h.alive || h.dying) {
         const alt = altHome(pl);
-        if (alt) { pl.home = alt; radio(pl.name, `母舰失去作战能力，转降${alt.name}。`, '#ffd28a'); }
-        else { fly(d, pl, anchor.x, 3000, anchor.z); if (pl.fuel <= 0) ditch(pl); }
+        if (alt) { pl.home = alt; if (h) radio(pl.name, `${h.kind === 'ship' ? '母舰' : '机场'}失去作战能力，转降${alt.name}。`, '#ffd28a'); }
+        else exitTheatre(pl, d);
         break;
       }
+      // recovery: an initial point 11 km out on the extended centreline, then the gate 4 km out; from anywhere
+      // near the gate and roughly lined up the approach system takes over (no looping round a gate too small to hit)
       const ap = approachFrame(h);
-      const gate = _ai3.copy(ap.td).addScaledVector(ap.u, -6500).setY(ap.y + 600);
-      const busy = h.finalUntil > game.t;
-      if (busy) { P.mode = 'holding'; const a = Math.atan2(pl.pos.z - gate.z, pl.pos.x - gate.x) + 0.6; fly(d, pl, gate.x + Math.cos(a) * 3500, 1800, gate.z + Math.sin(a) * 3500); break; }
-      fly(d, pl, gate.x, gate.y, gate.z);
-      const gd = pl.pos.distanceTo(gate);
-      if (gd < 1800 && pl.fwd.angleTo(ap.u) < 0.8) beginFinal(pl);
+      _ai4.subVectors(pl.pos, ap.td);
+      const s = -_ai4.dot(ap.u), lat = _ai4.dot(ap.perp);
+      const ip = _ai3.copy(ap.td).addScaledVector(ap.u, -11000).setY(ap.y + 900);
+      // the marshal stack: returning aircraft queue in order and hold at stacked altitudes; only the next in line
+      // commences the approach, and it may not start final until the deck is clear of the one ahead
+      h.stack = (h.stack || []).filter(q => q.alive && !q.dying && q.role === 'rtb' && q.home === h && q.state === 'air');
+      if (!h.stack.includes(pl)) h.stack.push(pl);
+      const slot = h.stack.indexOf(pl);
+      if (slot > 0 || (h.finalUntil > game.t && s < 8000)) {
+        P.mode = 'holding';
+        const a = Math.atan2(pl.pos.z - ip.z, pl.pos.x - ip.x) + 0.45;
+        fly(d, pl, ip.x + Math.cos(a) * 4000, 1500 + Math.min(slot, 8) * 300, ip.z + Math.sin(a) * 4000);
+        break;
+      }
+      const onAxis = s > 2500 && s < 13000 && Math.abs(lat) < s * 0.35 + 600;
+      if (onAxis) {
+        const gate = _ai3.copy(ap.td).addScaledVector(ap.u, -Math.max(3500, s - 2500)).setY(ap.y + pl.T.gearH + Math.max(3500, s - 2500) * Math.tan(GLIDE) + 150);
+        fly(d, pl, gate.x, gate.y, gate.z);
+        c.brake = pl.speed > pl.T.vs * 2.2;
+        if (s < 7000 && Math.abs(lat) < 1500 && pl.fwd.angleTo(ap.u) < 1.0 && !(h.finalUntil > game.t)) { beginFinal(pl); h.stack = h.stack.filter(q => q !== pl); }
+      } else fly(d, pl, ip.x, ip.y, ip.z);
       if (pl.fuel <= -200) ditch(pl);
     }
   }
@@ -1505,9 +1527,38 @@ function fleetCentre(side) {
   return s ? s.pos : bases.find(b => b.side === side && b.alive)?.pos;
 }
 function altHome(pl) {
-  const c = ships.find(s => s.side === pl.side && s.carrier && s.alive && !s.dying);
+  const c = pl.T.cat && ships.find(s => s.side === pl.side && s.carrier && s.alive && !s.dying);
   if (c) return c;
   return bases.find(b => b.side === pl.side && b.alive) || null;
+}
+// aircraft without a home in the theatre (B-1Bs from Guam, H-6Ks and J-16s once the island is lost) fly out to the
+// mainland or to Guam; the bombers come back to the pool for a later raid
+function exitTheatre(pl, d) {
+  const east = pl.side === 'us', gx = east ? 78000 : -78000;
+  fly(d, pl, gx, 7000, pl.pos.z);
+  pl.pilot.mode = 'rtb';
+  if (east ? pl.pos.x > 74000 : pl.pos.x < -74000) {
+    if (pl === player) { game.cause = east ? '已返回关岛 · 任务完成' : '已返回大陆机场 · 任务完成'; game.mode = 'dead'; game.deadT = 0.5; game.deathPos = pl.pos.clone(); removePlane(pl); return; }
+    if (pl.type === 'b1b') pending.push({ t: game.t + 600, fn: () => { command.us.b1b++; } });
+    if (pl.type === 'h6k' && pl.side === 'cn') { const b = bases.find(x => x.alive); if (b) pending.push({ t: game.t + 600, fn: () => { b.hangar.h6k = (b.hangar.h6k || 0) + 1; } }); }
+    removePlane(pl);
+  }
+}
+// what the autopilot does with the player's own aircraft: the player's designation comes first
+function playerAutoTask(p) {
+  const sel = game.desigShip, ok = sel && sel.alive && !sel.dying;
+  const P = p.pilot;
+  if (ok && p.ashmN > 0 && p.T.ashmType && (sel.kind === 'ship' || sel.kind === 'base')) {
+    p.role = p.T.role === 'bomber' ? 'bomber' : 'strike';
+    p.task = Object.assign(p.task || {}, { target: sel, low: tac(p.side).air === 'low' });
+  } else if (game.lock.desig && game.lock.desig.alive && game.lockManual > game.t && p.mrm + p.srm > 0) {
+    if (p.role !== 'cap') { p.role = 'cap'; p.task = { off: 12000 }; }
+    if (P.target !== game.lock.desig) { P.target = game.lock.desig; P.lockT = 0; }
+  } else if ((p.role === 'strike' || p.role === 'bomber') && !(p.task && p.task.target && p.task.target.alive)) {
+    // no designation: the best ship target the picture holds, or patrol
+    const t = p.ashmN > 0 ? bestTarget(p.side, p.pos, 250000) : null;
+    if (t) p.task = Object.assign(p.task || {}, { target: t }); else if (!p.T.aew) { p.role = p.T.role === 'bomber' ? 'bomber' : 'cap'; p.task = { off: 12000 }; }
+  }
 }
 function ditch(pl) {
   if (mine(pl)) radio(pl.name, '燃油耗尽，跳伞！', '#ff8a78');
@@ -1542,7 +1593,7 @@ function beginFinal(pl) {
   pl.fin = { s: -_a.dot(ap.u), lat: _a.dot(ap.perp), hOff: 0 };
   pl.fin.hOff = pl.pos.y - (ap.y + pl.T.gearH + pl.fin.s * Math.tan(GLIDE));
   pl.state = 'final'; pl.gear = 1; pl.hook = true; pl.pilot && (pl.pilot.mode = 'final');
-  h.finalUntil = game.t + pl.fin.s / 55 + 14;
+  h.finalUntil = game.t + 24;   // the next aircraft may start final this long behind
 }
 function updateFinal(pl, dt) {
   const h = pl.home;
@@ -1952,7 +2003,9 @@ function updateCommand(side, dt) {
   for (const h of homes) {
     C.strikeCd[h.name] = (C.strikeCd[h.name] ?? 60) - 2.5;
     if (C.strikeCd[h.name] > 0) continue;
-    const tgt = bestTarget(side, h.pos, 150000);
+    let tgt = bestTarget(side, h.pos, 150000);
+    const want = side === game.side && game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying && fresh(side, game.ashmSel, 120) ? game.ashmSel : null;
+    if (want && want.pos.distanceTo(h.pos) < 180000) tgt = want;
     if (!tgt) continue;
     const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
     const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
@@ -2211,7 +2264,8 @@ function selectAt(x, y) {
     if (d < bd) { bd = d; best = e; }
   }
   if (!best) return;
-  if (best.kind === 'ship' || best.kind === 'base') game.ashmSel = best;
+  if (best.kind === 'ship' || best.kind === 'base') { game.ashmSel = best; game.desigShip = best; }
+  else if (game.role === 'pilot' && best.kind === 'plane') { game.lock.desig = best; game.lockManual = game.t + 30; }
   game.gunTgt = best;
   if (game.role === 'captain' && flagship && flagship.gun && best.kind !== 'ship' && best.kind !== 'base') flagship.gun.fuse = 'AA';
   message('目标指定', best.name || (best.spec && best.spec.name) || '', '#e3b257', 1.2);
@@ -2268,7 +2322,7 @@ function updatePilot(dt) {
   p.axes();
   const manual = Math.abs(inp.pitch) + Math.abs(inp.roll) + Math.abs(inp.yaw) > 0.15;
   let out = { gun: inp.gun, srm: false, mrm: false, cm: false, ashm: false };
-  if (game.ai && !manual) { out = aiControl(p, dt); if (inp.gun) out.gun = true; }
+  if (game.ai && !manual) { playerAutoTask(p); out = aiControl(p, dt); if (inp.gun) out.gun = true; }
   else {
     let roll = inp.roll;
     if (Math.abs(roll) < 0.05) roll += clamp(p.right.y * 1.3, -0.5, 0.5) * smooth(-0.2, 0.3, p.up.y);
@@ -2340,7 +2394,10 @@ function updateLock(dt) {
     if (L.locked && !was) Sound.beep(2000, 0.08, 0.06);
   } else L.locked = false;
   Sound.lockTone(L.locked && p.srm + p.mrm > 0);
-  // anti-ship selection: the best known enemy ship within reach and roughly ahead
+  // anti-ship selection: the player's own designation stays until it is gone; otherwise the best ship ahead
+  const ds = game.desigShip;
+  if (ds && ds.alive && !ds.dying) { game.ashmSel = ds; return; }
+  game.desigShip = null;
   game.ashmSel = null;
   if (p.ashmN > 0) {
     const R = MSL[p.T.ashmType].range;
@@ -2459,7 +2516,7 @@ function updatePlane(pl, dt) {
   const P = pl.pilot, t = P.target;
   if (out.gun && t) shootGun(pl, P.desired, lerp(0.03, 0.006, P.skill));
   if (out.srm && t) { if (launchAAM(pl, t, 'srm')) P.mslCd = 3; }
-  else if (out.mrm && t) { if (launchAAM(pl, t, 'mrm')) P.mslCd = 4; }
+  else if (out.mrm && t) { if (launchAAM(pl, t, 'mrm')) { P.mslCd = 4; P.crankT = 12 * pl.pilot.skill; P.crankSide = Math.random() < 0.5 ? 1 : -1; } }
   if (out.ashm && pl.ashmN > 0 && pl.task && pl.task.target) {
     pl.ashmN--;
     launchASHM(pl, pl.task.target, pl.T.ashmType, pl.task.last);
@@ -2821,6 +2878,53 @@ function drawPilot(dt) {
   if (Math.hypot(p.pos.x, p.pos.z) > 70000) warns.push('离开战区');
   if (warns.length && Math.floor(game.t * 4) % 2 === 0) warns.forEach((w, i) => text(w, cx, HH * 0.66 + i * 26, WARN, `800 ${compact ? 17 : 21}px ${SANS}`, 'center'));
   drawScope(p.pos, p.fwd, 40000, '雷达 40 km');
+  drawRWR(p);
+  // launch zone against the locked target: maximum range and no-escape range for its aspect and our altitude
+  if (L.target && L.target.alive) {
+    const spec = MSL[L.kind === 'srm' ? p.T.srmType : p.T.mrmType];
+    if (spec) {
+      const d = L.target.pos.distanceTo(p.pos), tv = L.target.vel, los = _a.subVectors(p.pos, L.target.pos).normalize();
+      const hot = tv && tv.lengthSq() > 1 ? tv.clone().normalize().dot(los) : 0;          // +1: target coming at us
+      const alt = 1 + clamp(p.pos.y / 20000, 0, 0.5) + clamp((p.speed - 250) / 600, -0.1, 0.25);
+      const rmax = spec.range * (0.72 + 0.28 * hot) * alt, rne = rmax * 0.45;
+      const x = cx + gap + 104, y0 = boxY + 70, h = compact ? 70 : 96, scaleMax = rmax * 1.3;
+      const Y = r => y0 + h - clamp(r / scaleMax, 0, 1) * h;
+      hc.save(); hc.strokeStyle = HUDC; hc.fillStyle = HUDC; hc.lineWidth = 1.4;
+      hc.beginPath(); hc.moveTo(x, y0); hc.lineTo(x, y0 + h); hc.stroke();
+      hc.lineWidth = 3; hc.beginPath(); hc.moveTo(x, Y(rmax)); hc.lineTo(x, Y(rne)); hc.stroke(); hc.lineWidth = 1.4;
+      for (const [r, l] of [[rmax, '最大'], [rne, '不可逃']]) { hc.beginPath(); hc.moveTo(x - 6, Y(r)); hc.lineTo(x + 6, Y(r)); hc.stroke(); hc.font = `500 9px ${SANS}`; hc.textAlign = 'left'; hc.fillText(l, x + 9, Y(r) + 3); }
+      const inZ = d < rmax, sure = d < rne;
+      hc.fillStyle = sure ? WARN : inZ ? GOLD : HUDC;
+      const ty = Y(d); hc.beginPath(); hc.moveTo(x - 4, ty); hc.lineTo(x - 13, ty - 5); hc.lineTo(x - 13, ty + 5); hc.closePath(); hc.fill();
+      hc.font = `600 10px ${MONO}`; hc.textAlign = 'right'; hc.fillText(km(d), x - 16, ty + 4);
+      text(sure ? '不可逃逸区' : inZ ? '射程内' : '超出射程', x, y0 + h + 14, sure ? WARN : inZ ? GOLD : '#9fb0ba', `700 10px ${SANS}`, 'center');
+      hc.restore();
+    }
+  }
+  // our missiles in flight: seeker phase and time to impact
+  const mine_ = missiles.filter(m => m.alive && m.owner === p && m.cls === 'aam');
+  mine_.slice(0, 3).forEach((m, i) => {
+    const t = m.target, dd = t && t.alive ? t.pos.distanceTo(m.pos) : 0, closing = t && t.vel ? m.speed - t.vel.dot(m.dir) : m.speed;
+    const phase = !t || !t.alive ? '丢失' : m.spec.seeker === 'ir' ? '红外跟踪' : dd < 9000 ? '主动 · PITBULL' : '数据链中制导';
+    text(`${m.spec.name} ▸ ${t ? (t.T ? t.T.name : t.name) : '—'} · ${phase}${t && t.alive ? ` · ${Math.max(0, dd / Math.max(closing, 80)).toFixed(0)} s` : ''}`, cx - gap - 84, boxY + 110 + i * 14, t && t.alive ? HUDC : '#9fb0ba', `500 10px ${MONO}`);
+  });
+  // high G: the edges grey out, sustained it closes to a tunnel
+  const gfx = $('gfx'); if (gfx) gfx.style.opacity = clamp((p.gStress - 0.6) / 3, 0, 0.88).toFixed(2);
+}
+// radar warning: who is painting us, from where; missiles in the air at us flash
+function drawRWR(p) {
+  const B = scopeBox; if (!B.r) return;
+  const fl = Math.hypot(p.fwd.x, p.fwd.z) || 1, hx = p.fwd.x / fl, hz = p.fwd.z / fl;
+  const tick = (pos, col, label, flash) => {
+    if (flash && Math.floor(game.t * 6) % 2) return;
+    const dx = pos.x - p.pos.x, dz = pos.z - p.pos.z, sd = dx * -hz + dz * hx, fd = dx * hx + dz * hz, a = Math.atan2(sd, fd);
+    const x = B.x + Math.sin(a) * (B.r + 9), y = B.y - Math.cos(a) * (B.r + 9);
+    hc.save(); hc.fillStyle = col; hc.font = `800 11px ${MONO}`; hc.textAlign = 'center'; hc.fillText(label, x, y + 4); hc.restore();
+  };
+  let n = 0;
+  for (const e of planes) if (e.alive && !e.dying && e.side !== p.side && e.painting && e.pilot && e.pilot.target === p && n++ < 6) tick(e.pos, AMBER, e.T.aew ? 'E' : 'F');
+  for (const m of missiles) if (m.alive && m.target === p && m.cls !== 'ashm') tick(m.pos, WARN, 'M', true);
+  for (const s of ships) if (s.alive && !s.dying && s.side !== p.side && s.pos.distanceTo(p.pos) < 45000 && known(s.side, p) && Object.values(s.sam).some(k => k > 0) && n++ < 9) tick(s.pos, RED, 'S');
 }
 // improved Fresnel lens: ball above / below datum = high / low on the glide slope; lineup and on-speed AoA
 function drawLandingAids(p) {
@@ -2981,6 +3085,7 @@ function drawHUD(dt) {
     text('轻触跳过', HW - 14, bar * 0.6, 'rgba(238,243,245,0.5)', `500 10px ${SANS}`, 'right');
     return;
   }
+  if (!(game.role === 'pilot' && player && player.alive) && $('gfx').style.opacity !== '0') $('gfx').style.opacity = '0';
   if (TM.open) { drawTacMap(); return; }
   if (HQ()) { hc.shadowColor = 'rgba(0,0,0,0.5)'; hc.shadowBlur = 3; }
   if (game.role === 'pilot' && player && player.alive) drawPilot(dt);
@@ -3313,4 +3418,4 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };
