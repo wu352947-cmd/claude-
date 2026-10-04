@@ -1,11 +1,13 @@
 import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /*@MODEL@*/
 /*@AIRCRAFT@*/
 /*@TERRAIN@*/
 /*@WORLD@*/
+/*@RAPTORHD@*/
 
 /* =========================================================
    猛禽制空: dogfight game built on the procedural F-22A.
@@ -162,10 +164,37 @@ const MSL = {
 const WAVE_NAMES = { flanker: '侧卫型', fulcrum: '支点型', ucav: '幽灵无人机', bomber: '轰炸机' };
 
 /* ---------- models ---------- */
-const playerJet = F22.build({ physical: HQ(), detail: HQ() ? 1 : 0.75, gear: true, shadows: true, anisotropy: 8 });
-scene.add(playerJet.group);
+// the player sits in a root group so the procedural jet can be swapped for the photo-textured HD mesh once it loads
+const playerRoot = new THREE.Group();
+scene.add(playerRoot);
+let playerJet = F22.build({ physical: HQ(), detail: HQ() ? 1 : 0.75, gear: true, shadows: true, anisotropy: 8 });
+playerRoot.add(playerJet.group);
 playerJet.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
 const mslMat = playerJet.materials.missileMat;
+let hdLevel = null, wingHD = null;
+function loadHD() {
+  const level = HQ() ? 'hi' : 'lo';
+  if (hdLevel === level) return;
+  hdLevel = level;
+  RaptorHD.build(`assets/${level}/raptor.gltf`, { physical: HQ(), anisotropy: HQ() ? 8 : 4 }).then(api => {
+    if (hdLevel !== level) return;
+    api.setGear(playerJet.gear);
+    playerRoot.remove(playerJet.group);
+    playerRoot.add(api.group);
+    playerJet = api;
+    player.exhausts = RaptorHD.EXHAUSTS.map(e => new V3(...e));
+  }).catch(err => console.warn('HD Raptor unavailable, keeping the procedural model', err));
+  // the wingman always flies the light mesh
+  if (!wingHD) RaptorHD.build('assets/lo/raptor.gltf', { physical: false, shadows: false, anisotropy: 4, plumes: false }).then(api => {
+    wingHD = api.group;
+    if (wingman && wingman.alive) swapWingman();
+  }).catch(() => {});
+}
+function swapWingman() {
+  const o = wingHD.clone(); o.position.copy(wingman.obj.position); o.quaternion.copy(wingman.obj.quaternion);
+  scene.remove(wingman.obj); wingman.obj = o; scene.add(o);
+  wingman.exhausts = RaptorHD.EXHAUSTS.map(e => new V3(...e));
+}
 const amraamGeo = F22.missileGeometry(), aim9Geo = F22.aim9Geometry();
 const wingProto = F22.bake(F22.build({ physical: false, detail: 0.55, gear: false, cockpit: true, bay: false, lights: true, plumes: false, shadows: false, anisotropy: 4 }));
 const protos = {};
@@ -204,7 +233,8 @@ function setBasis(q, f, u) {
   q.setFromRotationMatrix(_m4);
 }
 
-const player = new Plane('blue', 'raptor', playerJet.group, { name: 'Raptor 1' });
+const player = new Plane('blue', 'raptor', playerRoot, { name: 'Raptor 1' });
+loadHD();
 let wingman = null;
 let enemies = [];
 
@@ -404,7 +434,7 @@ function flight(pl, c, dt) {
 
 /* ---------- AI pilot (enemies, wingman, and the player's AI mode) ---------- */
 const MODE_TEXT = { pullup: '拉起避地', notch: '切向置尾 · 规避雷达弹', break: '急转摆脱导弹', bvr: '超视距接敌', pursuit: '领先追踪',
-  guns: '机炮咬尾', lag: '滞后追踪 · 防冲前', strike: '攻击防空阵地', formation: '编队飞行', patrol: '巡逻', route: '直飞目标', egress: '脱离', energy: '俯冲增速' };
+  guns: '机炮咬尾', lag: '滞后追踪 · 防冲前', strike: '攻击防空阵地', formation: '编队飞行', patrol: '巡逻', route: '直飞目标', egress: '脱离', energy: '俯冲增速', extend: '拉开距离 · 准备导弹' };
 class Pilot {
   constructor(pl, skill) {
     Object.assign(this, { pl, skill, target: null, threat: null, think: 0, lockT: 0, mslCd: rand(3, 7), mode: 'patrol', desired: new V3(1, 0, 0) });
@@ -439,7 +469,7 @@ function aiAssess(pl) {
     if (pl.team === 'blue' && (!bestT || bs > 7)) {
       for (const s of sams) if (s.alive && s.active) { const d = s.pos.distanceTo(pl.pos) / 1000 + 2; if (d < bs) { bs = d; bestT = s; } }
     }
-    if (bestT !== P.target) P.lockT = 0;
+    if (bestT !== P.target) { P.lockT = 0; P.gunsT = 0; }
     P.target = bestT;
   }
   P.threat = null;
@@ -469,14 +499,20 @@ function aiControl(pl, dt) {
   P.think -= dt;
   if (P.think <= 0) { P.think = P.react; aiAssess(pl); }
   const out = { gun: false, srm: false, mrm: false, cm: false };
-  const a1 = _ai1.copy(pl.pos).addScaledVector(pl.vel, 3), a2 = _ai2.copy(pl.pos).addScaledVector(pl.vel, 7);
-  const floor = Math.max(groundAt(a1.x, a1.z), groundAt(a2.x, a2.z), groundAt(pl.pos.x, pl.pos.z)) + (pl.type === 'bomber' ? 700 : 260 + (1 - sk) * 240);
+  // terrain ahead along the flight path (mountains rise fast at 300 m/s)
+  let gnd = groundAt(pl.pos.x, pl.pos.z);
+  for (const s of [1.5, 3, 5, 8]) { _ai1.copy(pl.pos).addScaledVector(pl.vel, s); gnd = Math.max(gnd, groundAt(_ai1.x, _ai1.z)); }
+  const floor = gnd + (pl.type === 'bomber' ? 700 : 260 + (1 - sk) * 240);
   const t = P.target, m = P.threat;
   pl.painting = false;
-  if (pl.pos.y + Math.min(pl.vel.y, 0) * 5 < floor) {
+  if (pl.pos.y + Math.min(pl.vel.y, 0) * (pl.type === 'bomber' ? 5 : 7) < floor) {
     P.mode = 'pullup';
     d.set(pl.fwd.x, 0, pl.fwd.z).normalize().addScaledVector(Y_AXIS, 1.3).normalize();
-    c.boost = true;
+    // steep and fast: bleed speed to tighten the pull, and let the nozzles help
+    const steep = pl.fwd.y < -0.25;
+    c.boost = !(steep && pl.speed > 280);
+    c.brake = steep && pl.speed > 330;
+    c.tvc = pl.type !== 'bomber' && pl.speed < 320;
   } else if (pl.type === 'bomber') {
     bomberRoute(pl, d);
     if (m && m.pos.distanceTo(pl.pos) < 2500) out.cm = true;
@@ -541,19 +577,28 @@ function aiAttack(pl, t, d, c, out, dt) {
     if (dist > 2600 && pl.pos.y - t.pos.y < 700) d.y += 0.18;
     c.boost = pl.speed < 280;
     if (dist < 1300 && off < 0.05 && pl.ammo > 0) out.gun = true;
+  } else if (P.extendT > 0 && dist < 2600) {
+    // a turning fight that goes nowhere: run out to missile range, then turn back in for an AIM-120 shot
+    P.extendT -= dt; P.mode = 'extend';
+    d.set(-to.x, 0, -to.z).normalize(); d.y = 0.08;
+    c.boost = true;
+    if (dist > 2400) P.extendT = 0;
   } else if (dist > 1500) {
+    P.gunsT = 0;
     P.mode = dist > 5000 ? 'bvr' : 'pursuit';
     d.copy(t.pos).addScaledVector(tv, clamp(dist / 1000, 0, 2.5) * (0.3 + 0.7 * sk)).sub(pl.pos).normalize();
     if (dist > 6000 && pl.pos.y < t.pos.y + 1200) d.y += 0.06;
     c.boost = pl.speed < 330 || dist > 4500;
   } else {
     P.mode = 'guns';
+    P.gunsT = (P.gunsT || 0) + dt;
+    if (P.gunsT > (pl.team === 'blue' ? 16 : 30) && pl.mrm > 0 && t.kind === 'plane') { P.gunsT = 0; P.extendT = 14; }
     d.copy(t.pos).addScaledVector(tv, dist / 1150).sub(pl.pos).normalize();
     const closure = _ai4.subVectors(pl.vel, tv).dot(to) / dist;
     if (dist < 260 && closure > 80 && off < 0.5) { c.brake = true; P.mode = 'lag'; }
     else c.boost = pl.speed < 280;
     const aimOff = pl.fwd.angleTo(d);
-    if (aimOff > 0.45 && pl.T.tvc && sk > 0.55 && pl.speed > 140) c.tvc = true;
+    if (aimOff > (pl.team === 'blue' ? 0.25 : 0.45) && pl.T.tvc && sk > 0.55 && pl.speed > 140) c.tvc = true;
     const cone = pl.team === 'blue' ? 0.075 : 0.035 + (1 - sk) * 0.03;
     if (aimOff < cone && dist < 1150 && pl.ammo > 0) out.gun = true;
   }
@@ -773,7 +818,7 @@ function killPlayer(cause) {
   game.cause = cause; game.mode = 'dead'; game.deadT = 3.2;
   explode(player.pos, 1.6, player.vel);
   spawnDebris(player.pos, player.vel, 8, 1.3);
-  playerJet.group.visible = false;
+  playerRoot.visible = false;
   Sound.lockTone(false); Sound.rwrTone(false); Sound.engine(0, 0, false);
 }
 function damageSam(s, dmg, src) {
@@ -812,7 +857,7 @@ function spawnEnemy(type, skill, anchor, i, facing) {
   enemies.push(e);
 }
 function spawnWingman(near) {
-  wingman = new Plane('blue', 'raptor', wingProto.clone(), { name: 'Raptor 2' });
+  wingman = new Plane('blue', 'raptor', (wingHD || wingProto).clone(), { name: 'Raptor 2', exhausts: wingHD ? RaptorHD.EXHAUSTS : RAPTOR_EXHAUSTS });
   wingman.pilot = new Pilot(wingman, 0.85);
   scene.add(wingman.obj);
   near.axes();
@@ -1495,7 +1540,7 @@ function resetPlayer() {
   player.pos.set(base.x + 1650, base.y + 60, base.z);
   setBasis(player.q, new V3(1, 0.17, 0).normalize(), Y_AXIS);
   player.axes(); player.integrate(0);
-  playerJet.group.visible = true;
+  playerRoot.visible = true;
   camQ.copy(player.q);
 }
 function clearWorld() {
@@ -1589,7 +1634,7 @@ function renderSettings() {
 }
 $('s-invert').onclick = () => { settings.invert = !settings.invert; store.set('invert', settings.invert); renderSettings(); };
 $('s-sound').onclick = () => { settings.sound = !settings.sound; store.set('sound', settings.sound); Sound.setVolume(settings.sound); renderSettings(); };
-$('s-quality').onclick = () => { settings.quality = HQ() ? 'low' : 'high'; store.set('quality', settings.quality); applyQuality(); renderSettings(); };
+$('s-quality').onclick = () => { settings.quality = HQ() ? 'low' : 'high'; store.set('quality', settings.quality); applyQuality(); loadHD(); renderSettings(); };
 $('s-time').onclick = () => { settings.time = TIME_ORDER[(TIME_ORDER.indexOf(settings.time) + 1) % TIME_ORDER.length]; store.set('time', settings.time); world.setTime(settings.time); renderSettings(); };
 $('s-wing').onclick = () => { settings.wingman = !settings.wingman; store.set('wingman', settings.wingman); renderSettings(); };
 function applyQuality() {

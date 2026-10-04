@@ -3,8 +3,10 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /*@MODEL@*/
+/*@RAPTORHD@*/
 
 const D2R = Math.PI / 180;
 const GROUND = F22.GROUND;
@@ -85,12 +87,17 @@ rim.position.set(-14, 6, -10);
 scene.add(rim);
 
 const jet = F22.build({ anisotropy: renderer.capabilities.getMaxAnisotropy() });
-scene.add(jet.group);
-jet.group.position.x = 0.3;
+// both models live in one holder; the high-detail mesh is shown by default once it has loaded
+const holder = new THREE.Group();
+holder.position.x = 0.3;
+holder.add(jet.group);
+scene.add(holder);
+let hd = null;
+const models = () => hd ? [jet, hd] : [jet];
 
 const abLight = new THREE.PointLight(0xff8a3c, 0, 14, 2);
 abLight.position.set(-10.6, -0.15, 0);
-jet.group.add(abLight);
+holder.add(abLight);
 
 /* ground, taxi line, scale figure */
 const shadowMat = new THREE.ShadowMaterial({ opacity: 0.38 });
@@ -167,8 +174,23 @@ function applySky() {
   camera.far = on ? 2500 : 400;
   camera.updateProjectionMatrix();
 }
+state.hd = true;
+function applyHD() {
+  const on = state.hd && !!hd;
+  jet.group.visible = !on;
+  if (hd) hd.group.visible = on;
+  press('t-hd', on);
+  // the high-detail mesh has a working canopy and gear, but its bays and control surfaces are fixed
+  for (const id of ['t-bay', 't-brake']) { $(id).disabled = on; $(id).title = on ? '切换到可动结构模型后可用' : ''; }
+}
+$('t-hd').onclick = () => { state.hd = !state.hd; applyHD(); };
+RaptorHD.build('assets/hi/raptor.gltf', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
+  hd = m; holder.add(m.group); applyHD();
+  if (state.wire) m.wireMats.forEach(x => { x.wireframe = true; });
+}).catch(() => { $('t-hd').disabled = true; $('t-hd').textContent = '高精度模型加载失败'; state.hd = false; applyHD(); });
+applyHD();
 $('t-spin').onclick = () => { state.spin = !state.spin; press('t-spin', state.spin); controls.autoRotate = state.spin; };
-$('t-wire').onclick = () => { state.wire = !state.wire; press('t-wire', state.wire); jet.wireMats.forEach(m => { m.wireframe = state.wire; }); };
+$('t-wire').onclick = () => { state.wire = !state.wire; press('t-wire', state.wire); models().forEach(mo => mo.wireMats.forEach(m => { m.wireframe = state.wire; })); };
 $('t-man').onclick = () => { state.man = !state.man; press('t-man', state.man); man.visible = state.man; };
 
 const VIEWS = { three: [15, 5.5, 17], front: [30, 1.4, 0.02], side: [0.02, 1.2, 30], top: [0.02, 32, 0.4], rear: [-21, 6.5, -14] };
@@ -216,19 +238,15 @@ function frame() {
   anim.brake += ((state.brake ? 1 : 0) - anim.brake) * k(reduced ? 60 : 4);
   anim.fly += ((state.fly ? 1 : 0) - anim.fly) * k(reduced ? 60 : 1.6);
 
-  jet.setGear(anim.gear);
-  jet.setBay(anim.bay);
-  jet.setSideBay(anim.bay);
-  jet.setCanopy(anim.canopy);
-  jet.setAB(anim.ab, t);
+  for (const m of models()) { m.setGear(anim.gear); m.setBay(anim.bay); m.setSideBay(anim.bay); m.setCanopy(anim.canopy); m.setAB(anim.ab, t); }
   abLight.intensity = anim.ab * 60 * (0.9 + 0.1 * Math.sin(t * 40));
 
   const f = anim.fly, mo = reduced ? 0 : 1;
   const roll = Math.sin(t * 0.45) * 0.32 * f * mo, pitch = Math.sin(t * 0.7) * 0.05 * f * mo;
-  jet.group.rotation.set(roll, 0, pitch);
-  jet.group.position.y = f * (1.6 + Math.sin(t * 0.9) * 0.18 * mo);
+  holder.rotation.set(roll, 0, pitch);
+  holder.position.y = f * (1.6 + Math.sin(t * 0.9) * 0.18 * mo);
   // control surfaces lead the motion they produce
-  jet.pose({ pitch: Math.cos(t * 0.7) * 0.6 * f * mo, roll: Math.cos(t * 0.45) * 0.7 * f * mo,
+  for (const m of models()) m.pose({ pitch: Math.cos(t * 0.7) * 0.6 * f * mo, roll: Math.cos(t * 0.45) * 0.7 * f * mo,
     yaw: Math.sin(t * 0.33) * 0.3 * f * mo, flap: (1 - f) * 0.4, lef: (1 - anim.gear) * 0.6, brake: anim.brake });
   shadowMat.opacity = 0.38 * (1 - f * 0.75);
   taxiMat.opacity = 0.55 * (1 - f);

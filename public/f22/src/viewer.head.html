@@ -118,6 +118,7 @@
     color: var(--muted);
   }
   .specs .geo b { color: var(--fg); font-weight: 500; font-family: var(--f-mono); }
+  .specs .geo a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
   .rail {
     position: fixed;
@@ -155,6 +156,7 @@
     transition: border-color .15s, color .15s, background-color .15s;
   }
   .btn:hover { border-color: rgba(227, 232, 234, 0.4); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .btn[aria-pressed]::before {
     content: "";
@@ -222,7 +224,7 @@
     <dt>首飞</dt><dd>1997-09-07</dd>
     <dt>生产数量</dt><dd>195 架</dd>
   </dl>
-  <p class="geo">平面对齐设计：机翼前缘后掠 <b>42°</b>、后缘前掠 <b>17°</b>，全动平尾与机翼同角；双垂尾外倾 <b>28°</b>；机翼下反 <b>3.25°</b>；二维矢量喷口 <b>±20°</b>；主弹舱挂 6 枚 AIM-120，两侧进气道弹舱各挂 1 枚 AIM-9X。没有专门的减速板，减速时副翼上偏、襟副翼下偏、方向舵向外张开。推力一栏为军用 / 加力。</p>
+  <p class="geo">平面对齐设计：机翼前缘后掠 <b>42°</b>、后缘前掠 <b>17°</b>，全动平尾与机翼同角；双垂尾外倾 <b>28°</b>；机翼下反 <b>3.25°</b>；二维矢量喷口 <b>±20°</b>；主弹舱挂 6 枚 AIM-120，两侧进气道弹舱各挂 1 枚 AIM-9X。没有专门的减速板，减速时副翼上偏、襟副翼下偏、方向舵向外张开。推力一栏为军用 / 加力。高精度模型：<a href="https://sketchfab.com/3d-models/f-22-raptor-fighter-jet-free-508de5c48845456bb033fb267ebe1d1e" target="_blank" rel="noopener">F-22 Raptor - Fighter Jet - Free</a>，作者 bohmerang，CC BY-NC-SA 4.0（贴图转 WebP、几何量化，内容未改）；起落架与座舱盖可动，弹舱与舵面动画请切换到可动结构模型查看。</p>
 </details>
 
 <nav class="rail" aria-label="模型控制">
@@ -239,6 +241,7 @@
   <div class="group" role="group" aria-labelledby="lbl-sys">
     <span class="group-label" id="lbl-sys">系统</span>
     <div class="btns">
+      <button class="btn" type="button" id="t-hd" aria-pressed="true">高精度模型</button>
       <button class="btn" type="button" id="t-gear" aria-pressed="true">起落架</button>
       <button class="btn" type="button" id="t-bay" aria-pressed="false">弹舱</button>
       <button class="btn" type="button" id="t-canopy" aria-pressed="false">座舱盖</button>

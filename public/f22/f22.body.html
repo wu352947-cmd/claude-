@@ -118,6 +118,7 @@
     color: var(--muted);
   }
   .specs .geo b { color: var(--fg); font-weight: 500; font-family: var(--f-mono); }
+  .specs .geo a { color: inherit; text-decoration: underline; text-underline-offset: 2px; }
 
   .rail {
     position: fixed;
@@ -155,6 +156,7 @@
     transition: border-color .15s, color .15s, background-color .15s;
   }
   .btn:hover { border-color: rgba(227, 232, 234, 0.4); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
   .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .btn[aria-pressed]::before {
     content: "";
@@ -222,7 +224,7 @@
     <dt>首飞</dt><dd>1997-09-07</dd>
     <dt>生产数量</dt><dd>195 架</dd>
   </dl>
-  <p class="geo">平面对齐设计：机翼前缘后掠 <b>42°</b>、后缘前掠 <b>17°</b>，全动平尾与机翼同角；双垂尾外倾 <b>28°</b>；机翼下反 <b>3.25°</b>；二维矢量喷口 <b>±20°</b>；主弹舱挂 6 枚 AIM-120，两侧进气道弹舱各挂 1 枚 AIM-9X。没有专门的减速板，减速时副翼上偏、襟副翼下偏、方向舵向外张开。推力一栏为军用 / 加力。</p>
+  <p class="geo">平面对齐设计：机翼前缘后掠 <b>42°</b>、后缘前掠 <b>17°</b>，全动平尾与机翼同角；双垂尾外倾 <b>28°</b>；机翼下反 <b>3.25°</b>；二维矢量喷口 <b>±20°</b>；主弹舱挂 6 枚 AIM-120，两侧进气道弹舱各挂 1 枚 AIM-9X。没有专门的减速板，减速时副翼上偏、襟副翼下偏、方向舵向外张开。推力一栏为军用 / 加力。高精度模型：<a href="https://sketchfab.com/3d-models/f-22-raptor-fighter-jet-free-508de5c48845456bb033fb267ebe1d1e" target="_blank" rel="noopener">F-22 Raptor - Fighter Jet - Free</a>，作者 bohmerang，CC BY-NC-SA 4.0（贴图转 WebP、几何量化，内容未改）；起落架与座舱盖可动，弹舱与舵面动画请切换到可动结构模型查看。</p>
 </details>
 
 <nav class="rail" aria-label="模型控制">
@@ -239,6 +241,7 @@
   <div class="group" role="group" aria-labelledby="lbl-sys">
     <span class="group-label" id="lbl-sys">系统</span>
     <div class="btns">
+      <button class="btn" type="button" id="t-hd" aria-pressed="true">高精度模型</button>
       <button class="btn" type="button" id="t-gear" aria-pressed="true">起落架</button>
       <button class="btn" type="button" id="t-bay" aria-pressed="false">弹舱</button>
       <button class="btn" type="button" id="t-canopy" aria-pressed="false">座舱盖</button>
@@ -280,6 +283,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { Sky } from 'three/addons/objects/Sky.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /* F-22A procedural model, shared by the viewer and the game.
    Units: metres. Frame: +x nose, +y up, +z right wing. Origin near mid-fuselage.
@@ -1217,6 +1221,107 @@ const F22 = (() => {
   return { build, bake, missileGeometry, aim9Geometry, kit, GROUND, TOP, BOT, W, upperY };
 })();
 
+/* High-detail F-22A: "F-22 Raptor - Fighter Jet - Free" by bohmerang (sketchfab.com/bohmerang),
+   CC BY-NC-SA 4.0, converted offline to WebP textures and quantized geometry.
+   Wrapped with the same control API as F22.build(). It is fitted at load time to the procedural model's frame:
+   +x nose, +y up, +z right, metres, 18.92 m long, nose at x = 9.45, gear contact at y = -2.46.
+   The source ships gear-up and gear-down sets (doors closed / open), a cockpit and a separate canopy.
+   Expects THREE, GLTFLoader and F22 in scope. */
+const RaptorHD = (() => {
+  const EXHAUSTS = [[-7.95, -0.42, 0.68], [-7.95, -0.42, -0.68]];
+  const CANOPY_HINGE = [3.95, 0.42];
+  const cache = {};
+
+  function load(url) {
+    if (!cache[url]) cache[url] = new Promise((res, rej) => new GLTFLoader().load(url, res, undefined, rej));
+    return cache[url];
+  }
+
+  // url: path of raptor.gltf. Resolves to an API compatible with F22.build().
+  async function build(url, opt = {}) {
+    const o = Object.assign({ shadows: true, anisotropy: 4, plumes: true }, opt);
+    const gltf = await load(url);
+    const group = new THREE.Group();
+    const model = gltf.scene.clone(true);
+    const parts = {};
+    model.traverse(m => {
+      if (!m.isMesh) return;
+      parts[m.name] = m;
+      m.castShadow = o.shadows && m.name !== 'canopy'; m.receiveShadow = o.shadows;
+    });
+    // fit into the shared frame
+    model.updateMatrixWorld(true);
+    const box = new THREE.Box3().setFromObject(model), s = 18.92 / (box.max.x - box.min.x);
+    const fit = new THREE.Group();
+    fit.scale.setScalar(s);
+    fit.position.set(9.45 - box.max.x * s, -2.46 - box.min.y * s, -(box.max.z + box.min.z) / 2 * s);
+    fit.add(model);
+    group.add(fit);
+
+    const paint = parts.body.material;
+    paint.envMapIntensity = 1.15;
+    for (const t of [paint.map, paint.normalMap, paint.metalnessMap]) if (t) t.anisotropy = o.anisotropy;
+    const glass = parts.canopy && parts.canopy.material;
+    if (glass) { glass.envMapIntensity = 1.6; glass.depthWrite = false; parts.canopy.renderOrder = 2; }
+    const missileMat = new THREE.MeshStandardMaterial({ color: 0xe8ebee, metalness: 0.2, roughness: 0.45 });
+
+    // moves a part under a pivot at (px, py), keeping its place through a copy of the fit transform
+    function pivot(mesh, px, py) {
+      const p = new THREE.Group(); p.position.set(px, py, 0); group.add(p);
+      const f = new THREE.Group(); f.scale.copy(fit.scale); f.position.copy(fit.position).sub(p.position); p.add(f);
+      f.add(mesh);
+      return p;
+    }
+    // canopy hinges at its aft end
+    const canopyPivot = parts.canopy ? pivot(parts.canopy, CANOPY_HINGE[0], CANOPY_HINGE[1]) : null;
+    // gear: the extended set folds up toward the belly, then swaps for the closed doors
+    const gearPivot = parts.gearDown ? pivot(parts.gearDown, 0, -0.45) : null;
+    if (parts.gearLight && gearPivot) gearPivot.children[0].add(parts.gearLight);
+
+    // afterburner plumes from the 2-D nozzles (flattened cross-section), vectored in pitch
+    const plumeMats = [], plumes = [], vectors = [];
+    if (o.plumes) {
+      const { plumeMaterial } = F22.kit;
+      for (const [x, y, z] of EXHAUSTS) {
+        const vec = new THREE.Group(); vec.position.set(x, y, z); group.add(vec); vectors.push(vec);
+        for (const [rt, rb, len, c1, c2, dia] of [[0.62, 0.26, 7.5, 0xff9a52, 0x4f6bff, 0], [0.48, 0.12, 4.0, 0xfff4d6, 0xff8a2a, 1]]) {
+          const pm = plumeMaterial(c1, c2, dia);
+          const m = new THREE.Mesh(new THREE.CylinderGeometry(rt, rb, len, 4, 24, true, Math.PI / 4), pm);
+          m.rotation.z = -Math.PI / 2;
+          m.scale.set(0.2 / 0.354, 1, 0.5 / 0.354);
+          m.position.set(-len / 2, 0, 0);
+          m.renderOrder = 3; m.visible = false; m.frustumCulled = false;
+          vec.add(m); plumeMats.push(pm); plumes.push(m);
+        }
+      }
+    }
+
+    const smooth = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const api = {
+      hd: true, group, exhausts: EXHAUSTS, skin: paint,
+      materials: { skin: paint, metal: paint, dark: paint, canopyMat: glass, missileMat },
+      wireMats: [paint], plumeMats, legs: [], doors: [], bayMissiles: [], gear: 0, bay: 0, sideBay: 0, canopy: 0,
+      // g: 0 = down and locked, 1 = stowed
+      setGear(g) {
+        api.gear = g;
+        const k = smooth(0, 0.85, g);
+        if (gearPivot) { gearPivot.scale.set(1, 1 - k * 0.9, 1); gearPivot.visible = g < 0.9; }
+        if (parts.gearUp) parts.gearUp.visible = g >= 0.9;
+      },
+      setBay() {}, setSideBay() {},
+      setCanopy(v) { api.canopy = v; if (canopyPivot) canopyPivot.rotation.z = v * 0.42; },
+      setAB(level, t) {
+        for (const pm of plumeMats) { pm.uniforms.uTime.value = t; pm.uniforms.uI.value = level * (pm.uniforms.uD.value ? 1.25 : 0.55); }
+        for (const p of plumes) p.visible = level > 0.01;
+      },
+      pose({ pitch = 0, vector = pitch } = {}) { for (const v of vectors) v.rotation.z = -Math.max(-1, Math.min(1, vector)) * 0.35; }
+    };
+    api.setGear(0);
+    return api;
+  }
+  return { build, EXHAUSTS };
+})();
+
 
 const D2R = Math.PI / 180;
 const GROUND = F22.GROUND;
@@ -1297,12 +1402,17 @@ rim.position.set(-14, 6, -10);
 scene.add(rim);
 
 const jet = F22.build({ anisotropy: renderer.capabilities.getMaxAnisotropy() });
-scene.add(jet.group);
-jet.group.position.x = 0.3;
+// both models live in one holder; the high-detail mesh is shown by default once it has loaded
+const holder = new THREE.Group();
+holder.position.x = 0.3;
+holder.add(jet.group);
+scene.add(holder);
+let hd = null;
+const models = () => hd ? [jet, hd] : [jet];
 
 const abLight = new THREE.PointLight(0xff8a3c, 0, 14, 2);
 abLight.position.set(-10.6, -0.15, 0);
-jet.group.add(abLight);
+holder.add(abLight);
 
 /* ground, taxi line, scale figure */
 const shadowMat = new THREE.ShadowMaterial({ opacity: 0.38 });
@@ -1379,8 +1489,23 @@ function applySky() {
   camera.far = on ? 2500 : 400;
   camera.updateProjectionMatrix();
 }
+state.hd = true;
+function applyHD() {
+  const on = state.hd && !!hd;
+  jet.group.visible = !on;
+  if (hd) hd.group.visible = on;
+  press('t-hd', on);
+  // the high-detail mesh has a working canopy and gear, but its bays and control surfaces are fixed
+  for (const id of ['t-bay', 't-brake']) { $(id).disabled = on; $(id).title = on ? '切换到可动结构模型后可用' : ''; }
+}
+$('t-hd').onclick = () => { state.hd = !state.hd; applyHD(); };
+RaptorHD.build('assets/hi/raptor.gltf', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
+  hd = m; holder.add(m.group); applyHD();
+  if (state.wire) m.wireMats.forEach(x => { x.wireframe = true; });
+}).catch(() => { $('t-hd').disabled = true; $('t-hd').textContent = '高精度模型加载失败'; state.hd = false; applyHD(); });
+applyHD();
 $('t-spin').onclick = () => { state.spin = !state.spin; press('t-spin', state.spin); controls.autoRotate = state.spin; };
-$('t-wire').onclick = () => { state.wire = !state.wire; press('t-wire', state.wire); jet.wireMats.forEach(m => { m.wireframe = state.wire; }); };
+$('t-wire').onclick = () => { state.wire = !state.wire; press('t-wire', state.wire); models().forEach(mo => mo.wireMats.forEach(m => { m.wireframe = state.wire; })); };
 $('t-man').onclick = () => { state.man = !state.man; press('t-man', state.man); man.visible = state.man; };
 
 const VIEWS = { three: [15, 5.5, 17], front: [30, 1.4, 0.02], side: [0.02, 1.2, 30], top: [0.02, 32, 0.4], rear: [-21, 6.5, -14] };
@@ -1428,19 +1553,15 @@ function frame() {
   anim.brake += ((state.brake ? 1 : 0) - anim.brake) * k(reduced ? 60 : 4);
   anim.fly += ((state.fly ? 1 : 0) - anim.fly) * k(reduced ? 60 : 1.6);
 
-  jet.setGear(anim.gear);
-  jet.setBay(anim.bay);
-  jet.setSideBay(anim.bay);
-  jet.setCanopy(anim.canopy);
-  jet.setAB(anim.ab, t);
+  for (const m of models()) { m.setGear(anim.gear); m.setBay(anim.bay); m.setSideBay(anim.bay); m.setCanopy(anim.canopy); m.setAB(anim.ab, t); }
   abLight.intensity = anim.ab * 60 * (0.9 + 0.1 * Math.sin(t * 40));
 
   const f = anim.fly, mo = reduced ? 0 : 1;
   const roll = Math.sin(t * 0.45) * 0.32 * f * mo, pitch = Math.sin(t * 0.7) * 0.05 * f * mo;
-  jet.group.rotation.set(roll, 0, pitch);
-  jet.group.position.y = f * (1.6 + Math.sin(t * 0.9) * 0.18 * mo);
+  holder.rotation.set(roll, 0, pitch);
+  holder.position.y = f * (1.6 + Math.sin(t * 0.9) * 0.18 * mo);
   // control surfaces lead the motion they produce
-  jet.pose({ pitch: Math.cos(t * 0.7) * 0.6 * f * mo, roll: Math.cos(t * 0.45) * 0.7 * f * mo,
+  for (const m of models()) m.pose({ pitch: Math.cos(t * 0.7) * 0.6 * f * mo, roll: Math.cos(t * 0.45) * 0.7 * f * mo,
     yaw: Math.sin(t * 0.33) * 0.3 * f * mo, flap: (1 - f) * 0.4, lef: (1 - anim.gear) * 0.6, brake: anim.brake });
   shadowMat.opacity = 0.38 * (1 - f * 0.75);
   taxiMat.opacity = 0.55 * (1 - f);
