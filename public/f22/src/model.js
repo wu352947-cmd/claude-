@@ -133,20 +133,27 @@ const F22 = (() => {
 
   /* ---------- textures ---------- */
   const texCache = {};
+  const PAINTS = {
+    usaf: { base: '#e4e8eb', seed: 20250917, blobs: 10, camo: ['rgba(48, 56, 64, 0.2)', 'rgba(48, 56, 64, 0.14)'] },
+    aggressor: { base: '#e4e8eb', seed: 77031, blobs: 16, camo: ['rgba(126, 82, 46, 0.42)', 'rgba(52, 66, 96, 0.42)', 'rgba(170, 160, 140, 0.35)'] },
+    flanker: { base: '#e6edf3', seed: 4411, blobs: 20, camo: ['rgba(58, 98, 146, 0.55)', 'rgba(126, 156, 192, 0.5)', 'rgba(36, 58, 92, 0.4)'] },
+    fulcrum: { base: '#e3e6e2', seed: 9137, blobs: 16, camo: ['rgba(84, 98, 86, 0.5)', 'rgba(146, 152, 146, 0.45)'] },
+    ucav: { base: '#c4c8cd', seed: 313, blobs: 6, camo: ['rgba(30, 34, 40, 0.22)'] },
+    bomber: { base: '#f4f5f6', seed: 808, blobs: 5, camo: ['rgba(120, 128, 136, 0.1)'] }
+  };
   function skinTextures(paint, aniso) {
     if (texCache[paint]) return texCache[paint];
     const N = 1024;
     const mk = () => { const c = document.createElement('canvas'); c.width = c.height = N; return [c, c.getContext('2d')]; };
     const [c, g] = mk(), [cb, gb] = mk();
-    let seed = paint === 'usaf' ? 20250917 : 77031;
+    const P = PAINTS[paint] || PAINTS.usaf;
+    let seed = P.seed;
     const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    g.fillStyle = '#e4e8eb'; g.fillRect(0, 0, N, N);
+    g.fillStyle = P.base; g.fillRect(0, 0, N, N);
     gb.fillStyle = '#ffffff'; gb.fillRect(0, 0, N, N);
     // large two-tone camouflage blobs, drawn wrapped so the tile is seamless
-    const camo = paint === 'usaf'
-      ? ['rgba(48, 56, 64, 0.2)', 'rgba(48, 56, 64, 0.14)']
-      : ['rgba(126, 82, 46, 0.42)', 'rgba(52, 66, 96, 0.42)', 'rgba(170, 160, 140, 0.35)'];
-    for (let b = 0; b < (paint === 'usaf' ? 10 : 16); b++) {
+    const camo = P.camo;
+    for (let b = 0; b < P.blobs; b++) {
       const cx = rnd() * N, cy = rnd() * N, r = 110 + rnd() * 170, pts = [];
       const nv = 6 + Math.floor(rnd() * 4);
       for (let i = 0; i < nv; i++) { const a = i / nv * Math.PI * 2 + rnd() * 0.4, rr = r * (0.6 + rnd() * 0.5); pts.push([Math.cos(a) * rr, Math.sin(a) * rr]); }
@@ -222,6 +229,23 @@ const F22 = (() => {
     return missileGeo;
   }
 
+  // AIM-9X Sidewinder, nose along +x, length 3.0 m
+  let aim9Geo = null;
+  function aim9Geometry() {
+    if (aim9Geo) return aim9Geo;
+    const parts = [];
+    const body = new THREE.CylinderGeometry(0.064, 0.064, 2.7, 12); body.rotateZ(-Math.PI / 2); body.translate(-0.15, 0, 0); parts.push(body);
+    const nose = new THREE.SphereGeometry(0.064, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2); nose.rotateZ(-Math.PI / 2); nose.translate(1.2, 0, 0); parts.push(nose);
+    for (let i = 0; i < 4; i++) {
+      const a = i * Math.PI / 2 + Math.PI / 4;
+      const strake = new THREE.BoxGeometry(0.7, 0.01, 0.05); strake.translate(0.55, 0, 0.09); strake.rotateX(a); parts.push(strake);
+      const tail = new THREE.BoxGeometry(0.26, 0.01, 0.16); tail.translate(-1.35, 0, 0.13); tail.rotateX(a); parts.push(tail);
+    }
+    aim9Geo = mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p));
+    aim9Geo.computeVertexNormals();
+    return aim9Geo;
+  }
+
   function plumeMaterial(c1, c2, diamonds) {
     return new THREE.ShaderMaterial({
       uniforms: { uTime: { value: 0 }, uI: { value: 0 }, uC1: { value: new THREE.Color(c1) }, uC2: { value: new THREE.Color(c2) }, uD: { value: diamonds } },
@@ -288,6 +312,7 @@ const F22 = (() => {
     }
 
     // canopy, sill and cockpit
+    let canopyPivot = null;
     {
       const CBW = curve([[6.85, 0], [6.55, 0.26], [6.0, 0.44], [5.2, 0.52], [4.2, 0.53], [3.4, 0.48], [2.8, 0.34], [2.15, 0]]);
       const CH = curve([[6.85, 0], [6.55, 0.2], [6.0, 0.44], [5.2, 0.62], [4.4, 0.68], [3.6, 0.62], [3.0, 0.44], [2.15, 0]]);
@@ -300,12 +325,18 @@ const F22 = (() => {
         }
         rings.push(ring);
       }
-      const c = new THREE.Mesh(gridGeometry(rings), canopyMat);
+      // the canopy hinges at its aft end and lifts at the front
+      const hx = 2.2, hy = TOP(2.2) - 0.03;
+      canopyPivot = new THREE.Group();
+      canopyPivot.position.set(hx, hy, 0);
+      group.add(canopyPivot);
+      const cg = gridGeometry(rings); cg.translate(-hx, -hy, 0);
+      const c = new THREE.Mesh(cg, canopyMat);
       c.renderOrder = 2;
-      group.add(c);
+      canopyPivot.add(c);
       for (const k of [0, M]) {
-        const pts = rings.map(r => new THREE.Vector3(...r[k]));
-        add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.024, 6), dark);
+        const pts = rings.map(r => new THREE.Vector3(r[k][0] - hx, r[k][1] - hy, r[k][2]));
+        add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.024, 6), dark, canopyPivot);
       }
       if (o.cockpit) {
         const box = (w, h, d, x, y, z, m = dark) => { const b = add(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); return b; };
@@ -367,14 +398,16 @@ const F22 = (() => {
       return meshes;
     }
     const hinged = [];
-    function hingedSurface(pl, z0, z1, c, side, parent, kind, n) {
-      const sgn = side < 0;
-      const p0 = hingePoint(pl, z0, c + 0.005), p1 = hingePoint(pl, z1, c + 0.005);
-      if (sgn) { p0[2] = -p0[2]; p1[2] = -p1[2]; }
+    // lead = true builds a leading-edge flap ahead of the hinge line, otherwise a trailing-edge surface behind it
+    function hingedSurface(pl, z0, z1, c, side, parent, kind, n, { lead = false, mirrorZ = side < 0 } = {}) {
+      const hc = lead ? c - 0.005 : c + 0.005;
+      const p0 = hingePoint(pl, z0, hc), p1 = hingePoint(pl, z1, hc);
+      if (mirrorZ) { p0[2] = -p0[2]; p1[2] = -p1[2]; }
       const pivot = new THREE.Group();
       pivot.position.set(...p0);
       parent.add(pivot);
-      for (const m of piece(liftingRings(pl, z0, z1, c + 0.005, 1, n, 12), skin, pivot, sgn)) m.geometry.translate(-p0[0], -p0[1], -p0[2]);
+      const rings = lead ? liftingRings(pl, z0, z1, 0, hc, n, 10) : liftingRings(pl, z0, z1, hc, 1, n, 12);
+      for (const m of piece(rings, skin, pivot, mirrorZ)) m.geometry.translate(-p0[0], -p0[1], -p0[2]);
       const axis = new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]).normalize();
       hinged.push({ pivot, axis, side, kind });
     }
@@ -384,8 +417,9 @@ const F22 = (() => {
     for (const side of [1, -1]) {
       const mz = side < 0;
       piece(liftingRings(WING, 1.2, 1.95, 0, 1, 3), skin, group, mz);
-      piece(liftingRings(WING, 1.95, 6.3, 0, HC, Math.round(16 * det)), skin, group, mz);
+      piece(liftingRings(WING, 1.95, 6.3, 0.125, HC, Math.round(16 * det)), skin, group, mz);
       piece(liftingRings(WING, 6.3, 6.78, 0, 1, 3), skin, group, mz);
+      hingedSurface(WING, 1.97, 6.28, 0.125, side, group, 'lef', 8, { lead: true });
       hingedSurface(WING, 1.98, 4.12, HC, side, group, 'flaperon', 6);
       hingedSurface(WING, 4.17, 6.27, HC, side, group, 'aileron', 6);
     }
@@ -413,7 +447,7 @@ const F22 = (() => {
       piece(liftingRings(FIN, 0, 0.36, 0, 1, 2), skin, frame, false);
       piece(liftingRings(FIN, 0.36, 2.2, 0, 0.69, 10), skin, frame, false);
       piece(liftingRings(FIN, 2.2, 2.45, 0, 1, 2), skin, frame, false);
-      hingedSurface(FIN, 0.38, 2.17, 0.69, 1, frame, 'rudder', 6);
+      hingedSurface(FIN, 0.38, 2.17, 0.69, side, frame, 'rudder', 6, { mirrorZ: false });
       if (o.lights) {
         const strip = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.06),
           new THREE.MeshBasicMaterial({ color: 0xb8ff9a, transparent: true, opacity: 0.55, side: THREE.DoubleSide, toneMapped: false }));
@@ -532,6 +566,41 @@ const F22 = (() => {
       }
     }
 
+    // side weapons bays on the outer intake walls, each with an AIM-9X on a swing-out launcher
+    const sideBays = [];
+    if (o.bay) {
+      const g9 = aim9Geometry(), xf = 2.15, xa = 0.45;
+      for (const side of [1, -1]) {
+        const wall = (x, t) => new THREE.Vector3(x, lerp(CY(x) - 0.05, -1.08, t), lerp(W(x) - 0.04, W(x) - 0.2, t) * side);
+        const xm = (xf + xa) / 2;
+        const top = wall(xm, 0), bot = wall(xm, 1);
+        const d = bot.clone().sub(top);
+        const n = new THREE.Vector3(0, d.z, -d.y).multiplyScalar(side).normalize(); // outward wall normal
+        const quad = (off, t0, t1) => {
+          const pts = [wall(xf, t0), wall(xa, t0), wall(xa, t1), wall(xf, t1)].map(p => p.addScaledVector(n, off));
+          const g = new THREE.BufferGeometry();
+          g.setAttribute('position', new THREE.Float32BufferAttribute(pts.flatMap(p => [p.x, p.y, p.z]), 3));
+          g.setAttribute('uv', new THREE.Float32BufferAttribute(pts.flatMap(p => [p.x * S, p.y * S]), 2));
+          g.setIndex([0, 1, 2, 0, 2, 3]); g.computeVertexNormals();
+          return { g, pts };
+        };
+        const recess = quad(0.006, 0.3, 0.86);
+        add(recess.g, dark);
+        const door = quad(0.016, 0.3, 0.86);
+        const A = door.pts[0], B = door.pts[1];
+        const pivot = new THREE.Group();
+        pivot.position.copy(A);
+        door.g.translate(-A.x, -A.y, -A.z);
+        add(door.g, skin, pivot);
+        group.add(pivot);
+        const axis = B.clone().sub(A).normalize();
+        const msl = add(g9, missileMat);
+        const centre = wall(xm - 0.1, 0.6).addScaledVector(n, 0.02);
+        msl.visible = false;
+        sideBays.push({ pivot, axis, side, msl, centre, n });
+      }
+    }
+
     // navigation and formation lights
     if (o.lights) {
       const tipX = (WING.le(6.78) + WING.te(6.78)) / 2;
@@ -562,7 +631,20 @@ const F22 = (() => {
     const api = {
       group, skin, materials: { skin, metal, dark, gearMat, canopyMat, missileMat }, wireMats: [skin, metal, burnt, gearMat],
       plumeMats, legs, doors, bayMissiles,
-      gear: 0, bay: 0,
+      gear: 0, bay: 0, sideBay: 0,
+      setCanopy(v) { if (canopyPivot) canopyPivot.rotation.z = v * 0.45; },
+      // v: 0 closed, 1 open with launcher swung out; armed: AIM-9X left in bays (2 = both, 1 = right only)
+      setSideBay(v, armed = 2) {
+        api.sideBay = v;
+        const open = smooth(0, 0.5, v), ext = smooth(0.35, 1, v);
+        for (const b of sideBays) {
+          b.pivot.quaternion.setFromAxisAngle(b.axis, open * 1.7 * b.side);
+          const has = b.side > 0 ? armed >= 1 : armed >= 2;
+          b.msl.visible = v > 0.06 && has;
+          b.msl.position.copy(b.centre).addScaledVector(b.n, 0.08 + ext * 0.55);
+          b.msl.position.y -= ext * 0.18;
+        }
+      },
       setGear(g) {             // 0 = down, 1 = stowed
         api.gear = g;
         for (const l of legs) { l.rotation.z = g * Math.PI / 2 * 0.96; l.visible = g < 0.96; }
@@ -580,17 +662,19 @@ const F22 = (() => {
         for (const p of plumes) p.visible = level > 0.01;
         glow.color.setRGB(lerp(0.1, 1.0, level), lerp(0.047, 0.69, level), lerp(0.024, 0.35, level));
       },
-      // pitch +1 nose up, roll +1 right wing down, yaw +1 nose right, flap 0..1
-      pose({ pitch = 0, roll = 0, yaw = 0, flap = 0 } = {}) {
+      // pitch +1 nose up, roll +1 right wing down, yaw +1 nose right; flap, lef (leading-edge droop) and brake 0..1.
+      // The F-22 has no speedbrake panel: it raises both ailerons, drops the flaperons and splays the rudders.
+      pose({ pitch = 0, roll = 0, yaw = 0, flap = 0, lef = 0, brake = 0, vector = pitch } = {}) {
         for (const s of stabs) s.pivot.rotation.z = -(pitch * 0.32 + roll * 0.12 * s.side);
         for (const h of hinged) {
           let ang = 0;
-          if (h.kind === 'flaperon') ang = -(roll * 0.28 * h.side - flap * 0.35) * h.side;
-          else if (h.kind === 'aileron') ang = -(roll * 0.4 * h.side) * h.side;
-          else if (h.kind === 'rudder') ang = yaw * 0.35;
+          if (h.kind === 'flaperon') ang = -(roll * 0.28 * h.side - flap * 0.35 - brake * 0.45) * h.side;
+          else if (h.kind === 'aileron') ang = -(roll * 0.4 * h.side + brake * 0.55) * h.side;
+          else if (h.kind === 'rudder') ang = yaw * 0.35 + brake * 0.42 * h.side;
+          else if (h.kind === 'lef') ang = -lef * 0.42 * h.side;
           h.pivot.quaternion.setFromAxisAngle(h.axis, ang);
         }
-        for (const v of vectors) v.rotation.z = -pitch * 0.3;
+        for (const v of vectors) v.rotation.z = -clamp(vector, -1, 1) * 0.35;
       }
     };
     api.setGear(o.gear ? 0 : 1);
@@ -628,5 +712,6 @@ const F22 = (() => {
     return out;
   }
 
-  return { build, bake, missileGeometry, GROUND, TOP, BOT, W, upperY };
+  const kit = { curve, gridGeometry, capGeometry, mirror, liftingRings, naca, plumeMaterial, skinTextures, sawDoorGeometry, lerp, clamp, smooth, S };
+  return { build, bake, missileGeometry, aim9Geometry, kit, GROUND, TOP, BOT, W, upperY };
 })();

@@ -21,7 +21,16 @@ function ridged(x, y, oct) {
   for (let i = 0; i < oct; i++) { let n = 1 - Math.abs(vnoise(x * f, y * f)); s += a * n * n; f *= 2.1; a *= 0.5; }
   return s;
 }
+// Airbase pad: runway along x. The terrain is levelled to 14 m inside it and blends out over 500 m.
+const AIRBASE = { x: -1000, z: -500, y: 14, len: 3400, wid: 900 };
 function terrainH(x, z) {
+  const h = rawTerrainH(x, z);
+  const d = Math.max(Math.abs(x - AIRBASE.x) - AIRBASE.len / 2, Math.abs(z - AIRBASE.z) - AIRBASE.wid / 2);
+  if (d >= 500) return h;
+  const t = d <= 0 ? 1 : 1 - d / 500, k = t * t * (3 - 2 * t);
+  return h + (AIRBASE.y - h) * k;
+}
+function rawTerrainH(x, z) {
   const X = x / 4200, Z = z / 4200;
   const c = fbm(X + 3.1, Z - 1.7, 4);
   const land = c < -0.06 ? 0 : Math.min(1, (c + 0.06) / 0.3);

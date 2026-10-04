@@ -95,8 +95,8 @@ man.visible = false;
 scene.add(man);
 
 /* state & controls */
-const state = { gear: true, bay: false, ab: false, fly: false, spin: !reduced, wire: false, man: false };
-const anim = { gear: 0, bay: 0, ab: 0, fly: 0 };
+const state = { gear: true, bay: false, canopy: false, brake: false, ab: false, fly: false, spin: !reduced, wire: false, man: false };
+const anim = { gear: 0, bay: 0, canopy: 0, brake: 0, ab: 0, fly: 0 };
 const $ = id => document.getElementById(id);
 const press = (id, on) => $(id).setAttribute('aria-pressed', String(on));
 press('t-spin', state.spin);
@@ -104,6 +104,8 @@ controls.autoRotate = state.spin;
 
 $('t-gear').onclick = () => { state.gear = !state.gear; press('t-gear', state.gear); };
 $('t-bay').onclick = () => { state.bay = !state.bay; press('t-bay', state.bay); };
+$('t-canopy').onclick = () => { state.canopy = !state.canopy; press('t-canopy', state.canopy); };
+$('t-brake').onclick = () => { state.brake = !state.brake; press('t-brake', state.brake); };
 $('t-ab').onclick = () => { state.ab = !state.ab; press('t-ab', state.ab); };
 $('t-fly').onclick = () => {
   state.fly = !state.fly; press('t-fly', state.fly);
@@ -155,10 +157,14 @@ function frame() {
   anim.gear += ((state.gear ? 0 : 1) - anim.gear) * k(reduced ? 60 : 2.6);
   anim.bay += ((state.bay ? 1 : 0) - anim.bay) * k(reduced ? 60 : 2.4);
   anim.ab += ((state.ab ? 1 : 0) - anim.ab) * k(5);
+  anim.canopy += ((state.canopy ? 1 : 0) - anim.canopy) * k(reduced ? 60 : 1.8);
+  anim.brake += ((state.brake ? 1 : 0) - anim.brake) * k(reduced ? 60 : 4);
   anim.fly += ((state.fly ? 1 : 0) - anim.fly) * k(reduced ? 60 : 1.6);
 
   jet.setGear(anim.gear);
   jet.setBay(anim.bay);
+  jet.setSideBay(anim.bay);
+  jet.setCanopy(anim.canopy);
   jet.setAB(anim.ab, t);
   abLight.intensity = anim.ab * 60 * (0.9 + 0.1 * Math.sin(t * 40));
 
@@ -168,7 +174,7 @@ function frame() {
   jet.group.position.y = f * (1.6 + Math.sin(t * 0.9) * 0.18 * mo);
   // control surfaces lead the motion they produce
   jet.pose({ pitch: Math.cos(t * 0.7) * 0.6 * f * mo, roll: Math.cos(t * 0.45) * 0.7 * f * mo,
-    yaw: Math.sin(t * 0.33) * 0.3 * f * mo, flap: (1 - f) * 0.4 });
+    yaw: Math.sin(t * 0.33) * 0.3 * f * mo, flap: (1 - f) * 0.4, lef: (1 - anim.gear) * 0.6, brake: anim.brake });
   shadowMat.opacity = 0.38 * (1 - f * 0.75);
   taxiMat.opacity = 0.55 * (1 - f);
   ringMat.opacity = 0.12 * (1 - f);

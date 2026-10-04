@@ -27,9 +27,13 @@
     -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent;
     overscroll-behavior: none;
   }
-  #stage, #hud, #flash { position: fixed; inset: 0; width: 100%; height: 100%; }
+  #stage, #hud, #flash, #gloc { position: fixed; inset: 0; width: 100%; height: 100%; }
   #stage canvas { display: block; width: 100%; height: 100%; }
   #hud { pointer-events: none; }
+  #gloc {
+    pointer-events: none; opacity: 0;
+    background: radial-gradient(ellipse at center, transparent 18%, rgba(0, 0, 0, 0.85) 62%, #000 100%);
+  }
   #flash {
     pointer-events: none; opacity: 0;
     background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 40, 30, 0.55) 100%);
@@ -76,11 +80,20 @@
   .tb.msl { grid-column: 2; grid-row: 2; border-color: rgba(227, 178, 87, 0.75); width: 74px; height: 74px; }
   .tb.flr { grid-column: 2; grid-row: 3; }
   .tb.ab { grid-column: 3; grid-row: 1; }
+  .tb.tvc { grid-column: 2; grid-row: 1; width: 54px; height: 54px; font-size: 12px; }
+  .tb.cam { grid-column: 1; grid-row: 2; width: 54px; height: 54px; font-size: 12px; }
   .tb.brk { grid-column: 1; grid-row: 3; width: 54px; height: 54px; font-size: 12px; }
+  #b-ai {
+    position: fixed; right: calc(14px + env(safe-area-inset-right, 0px)); top: calc(150px + env(safe-area-inset-top, 0px));
+    font: 700 12px/1 var(--f-body); letter-spacing: 0.06em; color: var(--gold);
+    background: var(--panel); border: 1px solid rgba(227, 178, 87, 0.6); padding: 9px 12px; cursor: pointer;
+  }
+  #b-ai.on { background: var(--gold); color: #1c1407; }
+  #b-ai[hidden] { display: none; }
   .tb:focus-visible, .btn:focus-visible, .chip:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
 
   #b-pause {
-    position: fixed; top: calc(96px + env(safe-area-inset-top, 0px)); left: calc(16px + env(safe-area-inset-left, 0px));
+    position: fixed; top: calc(194px + env(safe-area-inset-top, 0px)); right: calc(14px + env(safe-area-inset-right, 0px));
     font: 600 11px/1 var(--f-mono); letter-spacing: 0.14em; color: var(--muted);
     background: var(--panel); border: 1px solid var(--line); padding: 7px 12px; cursor: pointer;
   }
@@ -145,7 +158,9 @@
     .tb { width: 56px; height: 56px; font-size: 12px; }
     .tb.gun { width: 84px; height: 84px; }
     .tb.msl { width: 64px; height: 64px; }
-    .tb.brk { width: 48px; height: 48px; }
+    .tb.brk, .tb.tvc, .tb.cam { width: 46px; height: 46px; font-size: 11px; }
+    #b-ai { top: calc(116px + env(safe-area-inset-top, 0px)); }
+    #b-pause { top: calc(154px + env(safe-area-inset-top, 0px)); }
     .cluster { gap: 8px; }
     #stick-base { top: calc(100% - 100px - env(safe-area-inset-bottom, 0px)); left: calc(96px + env(safe-area-inset-left, 0px)); }
   }
@@ -157,11 +172,14 @@
 
 <div id="stage"></div>
 <canvas id="hud"></canvas>
+<div id="gloc"></div>
 <div id="flash"></div>
 
 <div id="touch" hidden>
   <div id="stick-zone"><div id="stick-base"><div id="stick-knob"></div></div></div>
   <div class="cluster">
+    <button class="tb cam" id="b-cam" type="button">视角</button>
+    <button class="tb tvc" id="b-tvc" type="button">矢量</button>
     <button class="tb ab" id="b-ab" type="button">加力</button>
     <button class="tb brk" id="b-brake" type="button">减速</button>
     <button class="tb msl" id="b-msl" type="button"><span>导弹<small id="msl-n">6</small></span></button>
@@ -170,24 +188,29 @@
   </div>
 </div>
 <button id="b-pause" type="button" hidden>暂停</button>
+<button id="b-ai" type="button" aria-pressed="false" hidden>AI 自动空战</button>
 
 <section class="screen" id="menu" hidden>
   <div class="card">
     <p class="eyebrow">F-22A Raptor · 空优作战</p>
     <h1>猛禽<em>制空</em></h1>
-    <p class="lede">红方假想敌一波接一波压上来。机炮近距离咬尾，导弹锁定后发射，被导弹追上时投放干扰弹摆脱。</p>
+    <p class="lede">从基地紧急起飞，迎击侧卫型、支点型、隐身无人机和来袭轰炸机。红外弹用干扰弹骗，雷达弹靠切向置尾和箔条甩，贴地飞行能躲开防空雷达。</p>
     <div class="row">
       <button class="btn primary" id="b-start" type="button">出击</button>
+      <button class="btn" id="b-watch" type="button">AI 观战</button>
       <span class="best">最高分 <b id="best">0</b></span>
     </div>
     <div class="row">
       <button class="chip" id="s-invert" type="button">俯仰 <b>上推爬升</b></button>
       <button class="chip" id="s-quality" type="button">画质 <b>高</b></button>
       <button class="chip" id="s-sound" type="button">音效 <b>开</b></button>
+      <button class="chip" id="s-time" type="button">时段 <b>黄昏</b></button>
+      <button class="chip" id="s-wing" type="button">僚机 <b>开</b></button>
     </div>
     <dl class="help">
-      <dt>触屏</dt><dd>左手拖动控制俯仰和滚转；右手按住机炮，点导弹、干扰弹，按住加力或减速。横屏体验最佳。</dd>
-      <dt>键盘</dt><dd>W S 俯仰 · A D 滚转 · Q E 偏航 · Shift 加力 · Ctrl 减速 · 空格 机炮 · F 导弹 · X 干扰弹 · P 暂停</dd>
+      <dt>触屏</dt><dd>左手拖动控制俯仰和滚转；右手按住机炮，点导弹、干扰弹；按住加力、减速或矢量（推力矢量急转）。右上角 AI 按钮开启自动空战，横屏体验最佳。</dd>
+      <dt>键盘</dt><dd>W S 俯仰 · A D 滚转 · Q E 偏航 · Shift 加力 · Ctrl 减速 · V 矢量 · 空格 机炮 · F 导弹 · X 干扰弹 · C 锁定视角 · T AI · P 暂停</dd>
+      <dt>导弹</dt><dd>4.5 公里内自动选 AIM-9X 红外弹，更远用 AIM-120D 雷达弹。持续超过 7G 会视野变窄。</dd>
     </dl>
   </div>
 </section>
