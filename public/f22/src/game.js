@@ -20,6 +20,7 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const rand = (a, b) => a + Math.random() * (b - a);
 const X_AXIS = new V3(1, 0, 0), Y_AXIS = new V3(0, 1, 0), Z_AXIS = new V3(0, 0, 1), ZERO = new V3();
+const _qA = new Q();
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const groundAt = (x, z) => Math.max(terrainH(x, z), 0);
@@ -183,6 +184,8 @@ class Plane {
     this.gunCd = 0; this.cmCd = 0; this.cm = this.T.cm; this.srm = this.T.srm; this.mrm = this.T.mrm; this.ammo = this.T.ammo;
     this.pilot = null; this.name = opts.name || this.T.name; this.radius = this.T.radius;
     this.spin = new V3(); this.dieT = 0; this.bombed = false; this.escaped = false; this.painting = false;
+    this.rate = new V3();   // body rates: x roll, y pitch, z yaw (rad/s)
+    this.alpha = 0;         // angle of attack: the nose rides above the flight path
   }
   axes() {
     this.fwd.set(1, 0, 0).applyQuaternion(this.q);
@@ -190,7 +193,9 @@ class Plane {
     this.right.set(0, 0, 1).applyQuaternion(this.q);
   }
   integrate(dt) { this.vel.copy(this.fwd).multiplyScalar(this.speed); this.pos.addScaledVector(this.vel, dt); this.sync(); }
-  sync() { this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q); }
+  // q is the flight-path frame; the airframe is drawn pitched up by the angle of attack
+  sync() { this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q).multiply(_qA.setFromAxisAngle(Z_AXIS, this.alpha)); }
+  nose(out) { const ca = Math.cos(this.alpha), sa = Math.sin(this.alpha); return out.copy(this.fwd).multiplyScalar(ca).addScaledVector(this.up, sa); }
 }
 const _m4 = new THREE.Matrix4();
 function setBasis(q, f, u) {
@@ -369,8 +374,12 @@ function flight(pl, c, dt) {
   pl.stall = pl.speed < 112;
   if (pl.stall && !tv) pitch -= (112 - pl.speed) / 60;
   const spdF = clamp((pl.speed - 80) / 190, tv ? 0.8 : 0.3, 1);
-  const pr = pitch * T.pitch * spdF * (tv ? 1.8 : 1) * pl.authority;
-  const rr = c.roll * T.roll * pl.authority, yr = (c.yaw || 0) * 0.35;
+  // fly-by-wire rate command: body rates build toward the stick demand instead of snapping to it
+  const R = pl.rate;
+  R.y += (pitch * T.pitch * spdF * (tv ? 1.8 : 1) * pl.authority - R.y) * (1 - Math.exp(-dt / 0.15));
+  R.x += (c.roll * T.roll * pl.authority - R.x) * (1 - Math.exp(-dt / 0.12));
+  R.z += ((c.yaw || 0) * 0.35 - R.z) * (1 - Math.exp(-dt / 0.25));
+  const pr = R.y, rr = R.x, yr = R.z;
   pl.q.multiply(_q.setFromAxisAngle(Z_AXIS, pr * dt));
   pl.q.multiply(_q.setFromAxisAngle(X_AXIS, rr * dt));
   pl.q.multiply(_q.setFromAxisAngle(Y_AXIS, -yr * dt));
@@ -381,6 +390,10 @@ function flight(pl, c, dt) {
   const drag = T.drag * pl.speed * pl.speed + Math.abs(pitch) * pl.speed * 0.045 * spdF * (tv ? 3.4 : 1) + (c.brake ? pl.speed * 0.13 : 0);
   pl.speed = clamp(pl.speed + (thrust - drag - 9.81 * pl.fwd.y) * dt, 60, 620);
   pl.g = 1 + Math.abs(pr) * pl.speed / 9.81 * 0.36;
+  // angle of attack grows with load and with low speed; thrust vectoring lets the F-22 go far past the normal limit
+  const qd = (260 / Math.max(pl.speed, 80)) ** 2;
+  const aT = clamp((0.045 + (pl.g - 1) * 0.028 * (pr < 0 ? -1 : 1)) * qd, -0.2, tv ? 1.1 : 0.45);
+  pl.alpha += (aT - pl.alpha) * (1 - Math.exp(-dt / 0.25));
   // sustained load above 7.5 G builds G stress; past 3.5 the pilot greys out and loses stick authority
   pl.gStress = Math.max(0, pl.gStress + (pl.g > 7.5 ? (pl.g - 7.5) * 0.45 : -1.3) * dt);
   pl.authority = pl.gStress > 3.5 ? 0.6 : 1;
@@ -877,7 +890,8 @@ function updatePlayer(dt) {
       smoke.emit(_a.x, _a.y, _a.z, p.vel.x * 0.92, p.vel.y * 0.92, p.vel.z * 0.92, 0.7, 0.8, 3.2, 0.95, 0.96, 1, 0.35, 3);
     }
   }
-  if (ctlS.tvc > 0.5 && p.speed < 260) { // vapour over the wing during thrust-vectored high-alpha turns
+  if (p.alpha > 0.22) game.shake = Math.max(game.shake, (p.alpha - 0.22) * 0.5);   // airframe buffet at high alpha
+  if ((ctlS.tvc > 0.5 && p.speed < 260) || p.alpha > 0.3) { // vapour over the wing in high-alpha turns
     _a.set(-1, 1.2, 0).applyQuaternion(p.q).add(p.pos);
     smoke.emit(_a.x, _a.y, _a.z, p.vel.x * 0.95, p.vel.y * 0.95, p.vel.z * 0.95, 0.35, 6, 12, 0.95, 0.96, 1, 0.25, 4);
   }
@@ -892,7 +906,7 @@ function updatePlayer(dt) {
   p.gunCd -= dt;
   const gt = gunSolution(p);
   if (out.gun) {
-    const dir = (game.ai && !manual) ? p.pilot.desired.clone() : p.fwd.clone();
+    const dir = (game.ai && !manual) ? p.pilot.desired.clone() : p.nose(new V3());
     if (gt) dir.lerp(_b.copy(game.leadPoint).sub(p.pos).normalize(), 0.85).normalize();
     shootGun(p, dir, 0.004);
   }
@@ -919,10 +933,11 @@ function updatePlayer(dt) {
 function gunSolution(p) {
   game.gunTarget = null;
   let bestE = null, bestA = 0.11;
+  const nose = p.nose(new V3());
   for (const e of redAir()) {
     const d = e.pos.distanceTo(p.pos);
     if (d > 1600) continue;
-    const ang = p.fwd.angleTo(_b.copy(e.pos).addScaledVector(e.vel, d / 1150).sub(p.pos));
+    const ang = nose.angleTo(_b.copy(e.pos).addScaledVector(e.vel, d / 1150).sub(p.pos));
     if (ang < bestA) { bestA = ang; bestE = e; }
   }
   if (bestE) {
@@ -1237,8 +1252,40 @@ function drawHUD(dt) {
   hc.lineWidth = 1.5; hc.strokeStyle = HUDC; hc.fillStyle = HUDC;
   if (HQ()) { hc.shadowColor = 'rgba(141,255,180,0.6)'; hc.shadowBlur = 4; }
 
-  // boresight and gun pipper
-  const bs = proj(_a.copy(p.pos).addScaledVector(p.fwd, 700));
+  // pitch ladder around the flight path marker
+  {
+    const fh = new V3(p.fwd.x, 0, p.fwd.z);
+    if (fh.lengthSq() < 1e-6) fh.set(1, 0, 0);
+    fh.normalize();
+    const rh = new V3(-fh.z, 0, fh.x), centre = new V3(), tmp = new V3();
+    const pitchDeg = Math.asin(clamp(p.fwd.y, -1, 1)) * 180 / Math.PI;
+    hc.save(); hc.globalAlpha = 0.75; hc.font = `500 10px ${MONO}`;
+    for (let a = Math.ceil((pitchDeg - 22) / 10) * 10; a <= pitchDeg + 22; a += 10) {
+      if (a < -90 || a > 90) continue;
+      const r = a * Math.PI / 180;
+      centre.copy(fh).multiplyScalar(Math.cos(r)).addScaledVector(Y_AXIS, Math.sin(r)).multiplyScalar(1000).add(p.pos);
+      const c0 = proj(centre);
+      if (c0.behind) continue;
+      const e1 = proj(tmp.copy(centre).addScaledVector(rh, 90)), e2 = proj(tmp.copy(centre).addScaledVector(rh, -90));
+      const g1 = proj(tmp.copy(centre).addScaledVector(rh, 26)), g2 = proj(tmp.copy(centre).addScaledVector(rh, -26));
+      hc.setLineDash(a < 0 ? [6, 5] : []);
+      hc.beginPath();
+      if (a === 0) { hc.moveTo(e1.x * 1.6 - c0.x * 0.6, e1.y * 1.6 - c0.y * 0.6); hc.lineTo(e2.x * 1.6 - c0.x * 0.6, e2.y * 1.6 - c0.y * 0.6); }
+      else { hc.moveTo(e1.x, e1.y); hc.lineTo(g1.x, g1.y); hc.moveTo(g2.x, g2.y); hc.lineTo(e2.x, e2.y); }
+      hc.stroke();
+      if (a !== 0) { hc.textAlign = 'left'; hc.fillText(String(Math.abs(a)), e1.x + 4, e1.y + 3); }
+    }
+    hc.setLineDash([]); hc.restore();
+    // flight path marker: where the jet is actually going
+    const fp = proj(tmp.copy(p.pos).addScaledVector(p.fwd, 1000));
+    if (!fp.behind) {
+      hc.beginPath(); hc.arc(fp.x, fp.y, 6, 0, Math.PI * 2);
+      hc.moveTo(fp.x - 6, fp.y); hc.lineTo(fp.x - 16, fp.y); hc.moveTo(fp.x + 6, fp.y); hc.lineTo(fp.x + 16, fp.y);
+      hc.moveTo(fp.x, fp.y - 6); hc.lineTo(fp.x, fp.y - 12); hc.stroke();
+    }
+  }
+  // gun boresight along the nose, and the gun pipper
+  const bs = proj(_a.copy(p.pos).addScaledVector(p.nose(new V3()), 700));
   if (!bs.behind) {
     hc.beginPath(); hc.arc(bs.x, bs.y, 15, 0, Math.PI * 2); hc.stroke();
     hc.beginPath();
@@ -1327,7 +1374,7 @@ function drawHUD(dt) {
   hc.textAlign = 'left'; hc.strokeRect(cx + gap, boxY, 84, 28); hc.fillText(String(Math.round(p.pos.y)), cx + gap + 8, boxY + 20);
   hc.font = `500 10px ${MONO}`;
   hc.textAlign = 'right'; hc.fillText('KM/H', cx - gap, boxY - 6); hc.fillText(`M ${(p.speed / 340).toFixed(2)}`, cx - gap, boxY + 44);
-  hc.save(); if (p.g > 8) hc.fillStyle = WARN; hc.fillText(`G ${p.g.toFixed(1)}`, cx - gap, boxY + 58); hc.restore();
+  hc.save(); if (p.g > 8) hc.fillStyle = WARN; hc.fillText(`G ${p.g.toFixed(1)}`, cx - gap, boxY + 58); hc.fillText(`α ${(p.alpha * 180 / Math.PI).toFixed(0)}°`, cx - gap, boxY + 72); hc.restore();
   hc.textAlign = 'left'; hc.fillText('ALT M', cx + gap, boxY - 6); hc.fillText(`AGL ${Math.max(0, Math.round(game.agl || 0))}`, cx + gap, boxY + 44);
   const tags = [p.boost && '加力', p.c.tvc && '矢量', p.c.brake && '减速板'].filter(Boolean);
   hc.save(); hc.fillStyle = GOLD; hc.font = `700 11px ${SANS}`; hc.textAlign = 'right';

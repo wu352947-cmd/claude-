@@ -301,14 +301,17 @@ const F22 = (() => {
   function gridGeometry(rings, uvFn) {
     const nR = rings.length, nP = rings[0].length;
     const pos = new Float32Array(nR * nP * 3), uv = new Float32Array(nR * nP * 2);
+    const seg = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
     for (let i = 0; i < nR; i++) {
-      let arc = 0;
+      let arc = 0, total = 0;
+      for (let j = 1; j < nP; j++) total += seg(rings[i][j], rings[i][j - 1]);
       for (let j = 0; j < nP; j++) {
         const p = rings[i][j];
-        if (j > 0) { const q = rings[i][j - 1]; arc += Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]); }
+        if (j > 0) arc += seg(p, rings[i][j - 1]);
         const k = i * nP + j;
         pos[k * 3] = p[0]; pos[k * 3 + 1] = p[1]; pos[k * 3 + 2] = p[2];
-        const t = uvFn ? uvFn(p, arc) : [p[0] * S, arc * S];
+        // uvFn(point, arc length, fraction of the ring, index in ring, ring index, ring size, ring count)
+        const t = uvFn ? uvFn(p, arc, total > 0 ? arc / total : 0, j, i, nP, nR) : [p[0] * S, arc * S];
         uv[k * 2] = t[0]; uv[k * 2 + 1] = t[1];
       }
     }
@@ -337,25 +340,26 @@ const F22 = (() => {
   const mirror = rings => rings.map(r => r.map(p => [p[0], p[1], -p[2]]));
 
   /* ---------- fuselage tables ---------- */
-  const W = curve([[9.45, 0], [9.2, 0.12], [8.6, 0.26], [8.0, 0.37], [7.0, 0.53], [6.0, 0.68], [5.0, 0.83], [4.2, 0.97],
-    [3.4, 1.15], [2.6, 1.36], [1.8, 1.55], [1.0, 1.66], [0, 1.7], [-2, 1.7], [-4, 1.66], [-5.5, 1.6], [-7, 1.52],
+  const W = curve([[9.45, 0], [9.2, 0.12], [8.6, 0.27], [8.0, 0.38], [7.0, 0.55], [6.0, 0.71], [5.0, 0.86], [4.2, 1.0],
+    [3.4, 1.2], [2.6, 1.42], [1.8, 1.58], [1.0, 1.67], [0, 1.7], [-2, 1.7], [-4, 1.66], [-5.5, 1.6], [-7, 1.52],
     [-8, 1.45], [-8.6, 1.38], [-9.0, 1.3]]);
-  const WL = curve([[9.45, 0], [9.2, 0.1], [8.6, 0.22], [8.0, 0.31], [7.0, 0.45], [6.0, 0.57], [5.0, 0.66], [4.0, 0.7],
-    [3.0, 0.7], [1.0, 0.72], [0, 0.85], [-1, 1.15], [-2.5, 1.45], [-4, 1.5], [-6, 1.42], [-7.5, 1.3], [-8.6, 1.2], [-9, 1.12]]);
+  const WL = curve([[9.45, 0], [9.2, 0.1], [8.6, 0.22], [8.0, 0.31], [7.0, 0.45], [6.0, 0.56], [5.0, 0.6], [4.2, 0.56],
+    [3.4, 0.52], [1.0, 0.54], [0, 0.75], [-1, 1.1], [-2.5, 1.45], [-4, 1.5], [-6, 1.42], [-7.5, 1.3], [-8.6, 1.2], [-9, 1.12]]);
   const TOP = curve([[9.45, -0.08], [9.0, 0.08], [8.0, 0.3], [7.0, 0.48], [6.0, 0.62], [5.0, 0.72], [4.0, 0.8], [3.0, 0.88],
     [2.0, 0.95], [1.0, 0.95], [0, 0.88], [-2, 0.74], [-4, 0.64], [-6, 0.53], [-7.5, 0.46], [-8.6, 0.38], [-9.0, 0.3]]);
   const BOT = curve([[9.45, -0.1], [9.0, -0.22], [8.0, -0.42], [7.0, -0.58], [6.0, -0.72], [5.0, -0.85], [4.0, -0.98],
     [3.0, -1.1], [2.0, -1.17], [0, -1.22], [-2, -1.2], [-4, -1.12], [-6, -0.98], [-7.5, -0.82], [-8.6, -0.7], [-9.0, -0.62]]);
   const CY = curve([[9.45, -0.1], [8, -0.08], [6, -0.06], [3, -0.05], [-9, -0.05]]);
-  const E1 = 2 / 2.6, E2 = 2 / 3.2;
+  // Upper section: rounded crown falling to a sharp chine edge, y = cy + h (1 - t^CROWN), t = |z| / w.
+  const CROWN = 2.3, E2 = 2 / 3.2;
   const YS = x => CY(x) - 0.3 * (CY(x) - BOT(x));
 
   function section(x, na = 12, nb = 10) {
     const w = Math.max(W(x), 0.0005), wl = Math.min(Math.max(WL(x), 0.0004), w), top = TOP(x), bot = BOT(x), cy = CY(x), ys = YS(x);
     const upper = [], lower = [[x, cy, w]];
     for (let k = 0; k <= na; k++) {
-      const th = k / na * Math.PI / 2;
-      upper.push([x, cy + (top - cy) * Math.pow(Math.cos(th), E1), w * Math.pow(Math.sin(th), E1)]);
+      const t = Math.sin(k / na * Math.PI / 2);
+      upper.push([x, cy + (top - cy) * (1 - Math.pow(t, CROWN)), w * t]);
     }
     for (let k = 0; k <= nb; k++) {
       const th = (1 - k / nb) * Math.PI / 2;
@@ -365,9 +369,12 @@ const F22 = (() => {
   }
   function upperY(x, z) {
     const w = Math.max(W(x), 1e-4), r = clamp(Math.abs(z) / w, 0, 1);
-    const s = Math.pow(r, 1 / E1), c = Math.sqrt(Math.max(0, 1 - s * s));
-    return CY(x) + (TOP(x) - CY(x)) * Math.pow(c, E1);
+    return CY(x) + (TOP(x) - CY(x)) * (1 - Math.pow(r, CROWN));
   }
+
+  const CANOPY_W = curve([[6.25, 0], [6.0, 0.2], [5.5, 0.41], [4.8, 0.51], [4.0, 0.53], [3.3, 0.48], [2.7, 0.34], [2.0, 0]]);
+  const CANOPY_H = curve([[6.25, 0], [6.0, 0.17], [5.5, 0.44], [4.7, 0.65], [3.9, 0.7], [3.2, 0.6], [2.6, 0.4], [2.0, 0]]);
+  const CANOPY_X = [6.25, 2.0];
 
   /* ---------- lifting surfaces ---------- */
   const naca = x => 0.2969 * Math.sqrt(x) - 0.126 * x - 0.3516 * x * x + 0.2843 * x ** 3 - 0.1036 * x ** 4;
@@ -474,6 +481,209 @@ const F22 = (() => {
     return (texCache[paint] = { map: wrap(c, true), bump: wrap(cb, false) });
   }
 
+  /* ---------- F-22 livery: one texture per part, laid out on that part's own shape ----------
+     Fuselage: u runs nose to tail, v runs from the top centreline to the chine (upper half) and on to the keel (lower half).
+     Wing, stabilator: planform x/z; the left half of the sheet is the upper surface, the right half the lower.
+     Fin: chord x and span s; the two halves are the two faces, mirrored so lettering reads correctly from both sides. */
+  const LIV = { base: '#888e93', dark: '#646a70', trim: '#b9bdc0', radome: '#9da2a6', mark: '#565c62', seam: 'rgba(26, 32, 38, 0.36)' };
+  const BODY_U = x => (9.45 - x) / 18.45;
+  const WING_X = [-6.7, 2.1], WING_Z = 6.95, STAB_X = [-10.15, -6.1], STAB_Z = 4.6, FIN_X = [-8.05, -4.45], FIN_S = 2.5;
+  const livCache = {};
+  function livery(aniso, scale = 1) {
+    if (livCache[scale]) return livCache[scale];
+    let seed = 11;
+    const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const sheet = (w, h) => {
+      const mk = () => { const c = document.createElement('canvas'); c.width = Math.round(w * scale); c.height = Math.round(h * scale); const g = c.getContext('2d'); g.scale(scale, scale); return [c, g]; };
+      const [c, g] = mk(), [cb, gb] = mk();
+      g.fillStyle = LIV.base; g.fillRect(0, 0, w, h);
+      gb.fillStyle = '#fff'; gb.fillRect(0, 0, w, h);
+      return { c, g, cb, gb, w, h };
+    };
+    // soft-edged camouflage blob; ay stretches it so it reads round on the surface
+    // ex stretches the patch along the airframe; the real pattern runs in long irregular bands
+    function blob(S, cx, cy, r, ay, ex = 1.7) {
+      const n = 12, pts = [], tilt = (rnd() - 0.5) * 0.8;
+      for (let i = 0; i < n; i++) {
+        const a = i / n * Math.PI * 2 + rnd() * 0.35, k = 0.42 + rnd() * 0.75;
+        const px = Math.cos(a) * r * k * ex, py = Math.sin(a) * r * k;
+        pts.push([px * Math.cos(tilt) - py * Math.sin(tilt), (px * Math.sin(tilt) + py * Math.cos(tilt)) * ay]);
+      }
+      const g = S.g;
+      g.fillStyle = LIV.dark;
+      for (const [f, alpha] of [[1.14, 0.22], [1.06, 0.45], [1, 1]]) {
+        g.globalAlpha = alpha; g.beginPath();
+        const mid = i => { const p = pts[i % n], q = pts[(i + 1) % n]; return [(p[0] + q[0]) / 2 * f + cx, (p[1] + q[1]) / 2 * f + cy]; };
+        const m0 = mid(0); g.moveTo(m0[0], m0[1]);
+        for (let i = 1; i <= n; i++) { const p = pts[i % n], m = mid(i); g.quadraticCurveTo(p[0] * f + cx, p[1] * f + cy, m[0], m[1]); }
+        g.closePath(); g.fill();
+      }
+      g.globalAlpha = 1;
+    }
+    function line(S, pts) {
+      for (const [g, style, lw] of [[S.g, LIV.seam, 1.4], [S.gb, '#000', 2.4]]) {
+        g.strokeStyle = style; g.lineWidth = lw; g.beginPath();
+        pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke();
+      }
+    }
+    function saw(x0, y0, x1, y1, tooth = 14, amp = 6) {
+      const len = Math.hypot(x1 - x0, y1 - y0), n = Math.max(2, Math.round(len / tooth)), nx = -(y1 - y0) / len, ny = (x1 - x0) / len, pts = [];
+      for (let i = 0; i <= n; i++) { const t = i / n, o = i % 2 ? amp : 0; pts.push([x0 + (x1 - x0) * t + nx * o, y0 + (y1 - y0) * t + ny * o]); }
+      return pts;
+    }
+    // access panel with sawtooth fore and aft edges, the F-22's signature
+    function panel(S, x0, y0, x1, y1, fill = false) {
+      const pts = [[x0, y0], [x1, y0], ...saw(x1, y0, x1, y1), [x0, y1], ...saw(x0, y1, x0, y0)];
+      if (fill) { S.g.fillStyle = 'rgba(70, 76, 82, 0.18)'; S.g.beginPath(); pts.forEach(([x, y], i) => i ? S.g.lineTo(x, y) : S.g.moveTo(x, y)); S.g.fill(); }
+      line(S, [...pts, pts[0]]);
+    }
+    function dots(S, pts, step = 9) {
+      for (const [g, col] of [[S.g, 'rgba(26,32,38,0.22)'], [S.gb, 'rgba(0,0,0,0.5)']]) {
+        g.fillStyle = col;
+        for (let i = 1; i < pts.length; i++) {
+          const [x0, y0] = pts[i - 1], [x1, y1] = pts[i], n = Math.floor(Math.hypot(x1 - x0, y1 - y0) / step);
+          for (let k = 0; k < n; k++) g.fillRect(x0 + (x1 - x0) * k / n - 1, y0 + (y1 - y0) * k / n - 1, 2, 2);
+        }
+      }
+    }
+    function poly(S, pts, color) { S.g.fillStyle = color; S.g.beginPath(); pts.forEach(([x, y], i) => i ? S.g.lineTo(x, y) : S.g.moveTo(x, y)); S.g.closePath(); S.g.fill(); }
+    function label(S, text, x, y, px, sy, weight = 700) {
+      const g = S.g; g.save(); g.translate(x, y); g.scale(1, sy);
+      g.fillStyle = LIV.mark; g.font = `${weight} ${px}px "Arial Narrow", Arial, Helvetica, sans-serif`;
+      g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 0, 0); g.restore();
+    }
+    // low-visibility star-and-bar: dark grey outline only
+    function insignia(S, x, y, r, sy) {
+      const g = S.g; g.save(); g.translate(x, y); g.scale(1, sy);
+      g.strokeStyle = LIV.mark; g.lineWidth = r * 0.08; g.lineJoin = 'miter';
+      g.beginPath(); g.arc(0, 0, r, 0, Math.PI * 2); g.stroke();
+      g.beginPath();
+      for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.38 : r * 0.96; g.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); }
+      g.closePath(); g.stroke();
+      for (const sx of [1, -1]) { g.beginPath(); g.moveTo(sx * r * 0.95, -r * 0.3); g.lineTo(sx * r * 1.95, -r * 0.3); g.lineTo(sx * r * 1.95, r * 0.3); g.lineTo(sx * r * 0.95, r * 0.3); g.stroke(); }
+      g.restore();
+    }
+
+    /* fuselage */
+    const B = sheet(2048, 1024);
+    {
+      const X = x => BODY_U(x) * 2048, YU = f => f * 512, YL = f => 512 + f * 512;
+      for (let x = 7.4; x > -9; x -= rand(2.0, 3.0)) { blob(B, X(x), YU(rand(0.1, 0.9)), rand(110, 160), 2.1); blob(B, X(x - 1.1), YL(rand(0.15, 0.85)), rand(100, 150), 2.4); }
+      function rand(a, b) { return a + rnd() * (b - a); }
+      B.g.fillStyle = LIV.radome; B.g.fillRect(0, 0, X(7.75), 1024);
+      // canopy surround: a light grey frame where the canopy meets the fuselage
+      const fAt = (x, z) => {
+        const up = section(x, 48, 2).upper;
+        let total = 0, arcs = [0];
+        for (let k = 1; k < up.length; k++) { total += Math.hypot(up[k][1] - up[k - 1][1], up[k][2] - up[k - 1][2]); arcs.push(total); }
+        for (let k = 1; k < up.length; k++) if (up[k][2] >= z) { const t = (z - up[k - 1][2]) / Math.max(up[k][2] - up[k - 1][2], 1e-6); return (arcs[k - 1] + t * (arcs[k] - arcs[k - 1])) / total; }
+        return 1;
+      };
+      const outline = [];
+      for (let i = 0; i <= 40; i++) { const x = lerp(CANOPY_X[0], CANOPY_X[1], i / 40); outline.push([X(x), YU(fAt(x, Math.max(CANOPY_W(x), 0)))]); }
+      for (const [g, col, lw] of [[B.g, LIV.trim, 18], [B.gb, '#fff', 18]]) { g.strokeStyle = col; g.lineWidth = lw; g.lineJoin = 'round'; g.beginPath(); outline.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.stroke(); }
+      line(B, outline.map(([x, y]) => [x, y + 10]));
+      // frames and longitudinal seams following the structure
+      const frame = (x, f0, f1, lower) => { const Y = lower ? YL : YU; line(B, [[X(x), Y(f0)], [X(x), Y(f1)]]); };
+      for (const lower of [false, true]) frame(7.75, 0, 1, lower);
+      frame(6.95, 0.55, 1, false); frame(6.95, 0, 1, true);
+      frame(1.85, 0, 1, false);
+      for (const x of [-0.7, -2.9, -5.0, -7.0, -8.3]) { frame(x, 0, 1, false); frame(x, 0, 1, true); }
+      line(B, [[X(1.85), YU(0.42)], [X(-8.6), YU(0.42)]]);
+      line(B, [[X(6.95), YU(0.8)], [X(-8.6), YU(0.8)]]);
+      line(B, [[X(7.75), YL(0.32)], [X(2.6), YL(0.32)]]);
+      dots(B, [[X(7.75), 0], [X(7.75), 1024]], 8);
+      dots(B, [[X(1.85), YU(0.42)], [X(-8.6), YU(0.42)]], 11);
+      // sawtooth access doors
+      for (const [x0, x1, f0, f1, lower] of [[1.5, 0.3, 0.14, 0.36], [-1.2, -2.5, 0.5, 0.72], [-3.3, -4.6, 0.13, 0.34], [-5.4, -6.6, 0.52, 0.74],
+        [6.6, 5.3, 0.06, 0.4, true], [5.0, 3.9, 0.08, 0.42, true], [-1.5, -3.6, 0.55, 0.85, true]]) {
+        const Y = lower ? YL : YU;
+        panel(B, X(x0), Y(f0), X(x1), Y(f1));
+      }
+      panel(B, X(-0.95), YU(0), X(-1.8), YU(0.07), true);          // air refuelling receptacle door
+      label(B, 'NO STEP', X(-1.5), YU(0.6), 12, 1.9, 600);
+    }
+
+    /* wing */
+    const Wg = sheet(2048, 1024);
+    {
+      const X = (x, face) => face * 1024 + (x - WING_X[0]) / (WING_X[1] - WING_X[0]) * 1024, Y = z => (z / WING_Z + 1) / 2 * 1024;
+      const ay = (1024 / (2 * WING_Z)) / (1024 / (WING_X[1] - WING_X[0]));
+      for (const face of [0, 1]) for (const side of [1, -1]) {
+        const P = (x, z) => [X(x, face), Y(z * side)];
+        for (let k = 0; k < 6; k++) { const z = 1.6 + rnd() * 5, xc = rnd(); const [px, py] = P(lerp(WING.le(z), WING.te(z), xc), z); blob(Wg, px, py, 60 + rnd() * 70, ay); }
+        const span = []; for (let z = 1.2; z <= 6.781; z += 0.1) span.push(z);
+        // light grey trim on the leading edge, tip and trailing edge
+        poly(Wg, [...span.map(z => P(WING.le(z), z)), ...span.slice().reverse().map(z => P(WING.le(z) - 0.17, z))], LIV.trim);
+        poly(Wg, [...span.map(z => P(WING.te(z), z)), ...span.slice().reverse().map(z => P(WING.te(z) + 0.06, z))], LIV.trim);
+        poly(Wg, [P(WING.le(6.78), 6.78), P(WING.te(6.78), 6.78), P(WING.te(6.62), 6.62), P(WING.le(6.62), 6.62)], LIV.trim);
+        const chord = c => span.filter(z => z >= 1.7 && z <= 6.6).map(z => P(lerp(WING.le(z), WING.te(z), c), z));
+        line(Wg, chord(0.17)); line(Wg, chord(0.6)); dots(Wg, chord(0.17), 10); dots(Wg, chord(0.6), 10);
+        for (const z of [2.6, 3.5, 4.4, 5.3, 6.1]) line(Wg, [P(lerp(WING.le(z), WING.te(z), 0.17), z), P(lerp(WING.le(z), WING.te(z), 0.6), z)]);
+        if (face === 0) {
+          const [ax0, ay0] = P(lerp(WING.le(2.4), WING.te(2.4), 0.3), 2.4), [ax1, ay1] = P(lerp(WING.le(3.2), WING.te(3.2), 0.5), 3.2);
+          panel(Wg, ax0, ay0, ax1, ay1);
+        }
+      }
+      // star-and-bar on the upper left wing and lower right wing, as on USAF aircraft
+      for (const [face, side] of [[0, -1], [1, 1]]) { const z = 5.0, [px, py] = [X(lerp(WING.le(z), WING.te(z), 0.55), face), Y(z * side)]; insignia(Wg, px, py, 52, ay); }
+    }
+
+    /* stabilators */
+    const St = sheet(1024, 512);
+    {
+      const X = (x, face) => face * 512 + (x - STAB_X[0]) / (STAB_X[1] - STAB_X[0]) * 512, Y = z => (z / STAB_Z + 1) / 2 * 512;
+      const ay = (512 / (2 * STAB_Z)) / (512 / (STAB_X[1] - STAB_X[0]));
+      for (const face of [0, 1]) for (const side of [1, -1]) {
+        const P = (x, z) => [X(x, face), Y(z * side)];
+        for (let k = 0; k < 3; k++) { const z = 1.4 + rnd() * 2.8; const [px, py] = P(lerp(STAB.le(z), STAB.te(z), rnd()), z); blob(St, px, py, 40 + rnd() * 40, ay); }
+        const span = []; for (let z = 1.2; z <= 4.421; z += 0.08) span.push(z);
+        poly(St, [...span.map(z => P(STAB.le(z), z)), ...span.slice().reverse().map(z => P(STAB.le(z) - 0.15, z))], LIV.trim);
+        poly(St, [...span.map(z => P(STAB.te(z), z)), ...span.slice().reverse().map(z => P(STAB.te(z) + 0.07, z))], LIV.trim);
+        poly(St, [P(STAB.le(4.42), 4.42), P(STAB.te(4.42), 4.42), P(STAB.te(4.3), 4.3), P(STAB.le(4.3), 4.3)], LIV.trim);
+        line(St, span.filter(z => z < 4.2).map(z => P(lerp(STAB.le(z), STAB.te(z), 0.35), z)));
+      }
+    }
+
+    /* fins */
+    const Fn = sheet(1024, 1024);
+    {
+      const X = (x, face) => face * 512 + (x - FIN_X[0]) / (FIN_X[1] - FIN_X[0]) * 512, Y = s => (1 - s / FIN_S) * 1024;
+      const ay = (1024 / FIN_S) / (512 / (FIN_X[1] - FIN_X[0]));
+      for (const face of [0, 1]) {
+        const P = (x, s) => [X(x, face), Y(s)];
+        for (let k = 0; k < 3; k++) { const s = 0.3 + rnd() * 1.9; const [px, py] = P(lerp(FIN.le(s), FIN.te(s), rnd()), s); blob(Fn, px, py, 45 + rnd() * 45, ay); }
+        const span = []; for (let s = 0; s <= 2.451; s += 0.05) span.push(s);
+        poly(Fn, [...span.map(s => P(FIN.le(s), s)), ...span.slice().reverse().map(s => P(FIN.le(s) - 0.15, s))], LIV.trim);
+        poly(Fn, [...span.map(s => P(FIN.te(s), s)), ...span.slice().reverse().map(s => P(FIN.te(s) + 0.06, s))], LIV.trim);
+        poly(Fn, [P(FIN.le(2.45), 2.45), P(FIN.te(2.45), 2.45), P(FIN.te(2.36), 2.36), P(FIN.le(2.36), 2.36)], LIV.trim);
+        line(Fn, span.filter(s => s > 0.3).map(s => P(lerp(FIN.le(s), FIN.te(s), 0.2), s)));
+        // tail code and squadron, as worn by Langley's 27th Fighter Squadron
+        const cx = X(-6.25, face);
+        label(Fn, 'FF', cx, Y(1.22), 86, ay, 800);
+        label(Fn, '27th FS', cx, Y(0.72), 24, ay, 700);
+        label(Fn, 'AF 09-4191', cx, Y(0.48), 15, ay, 600);
+      }
+    }
+
+    /* intakes: light grey lip trim */
+    const In = sheet(512, 64);
+    poly(In, [[0, 0], [16, 0], [16, 64], [0, 64]], LIV.trim);
+    line(In, [[17, 0], [17, 64]]);
+
+    const tex = (S, wrap) => {
+      const make = (cv, srgb) => {
+        const t = new THREE.CanvasTexture(cv);
+        t.wrapS = t.wrapT = wrap ? THREE.RepeatWrapping : THREE.ClampToEdgeWrapping;
+        if (srgb) t.colorSpace = THREE.SRGBColorSpace;
+        t.anisotropy = aniso;
+        return t;
+      };
+      return { map: make(S.c, true), bump: make(S.cb, false) };
+    };
+    return (livCache[scale] = { body: tex(B), wing: tex(Wg), stab: tex(St), fin: tex(Fn), intake: tex(In) });
+  }
+
   /* ---------- shared small parts ---------- */
   function sawDoorGeometry(len, wd) {
     const s = new THREE.Shape(), t = 0.11;
@@ -543,11 +753,20 @@ const F22 = (() => {
     const o = Object.assign({ paint: 'usaf', gear: true, cockpit: true, bay: true, lights: true, plumes: true,
       physical: true, detail: 1, anisotropy: 4, shadows: true }, opt);
     const tex = skinTextures(o.paint, o.anisotropy);
+    const liv = livery(o.anisotropy, o.texScale || 1);
     const Mat = o.physical ? THREE.MeshPhysicalMaterial : THREE.MeshStandardMaterial;
-    const skinOpts = { color: o.paint === 'usaf' ? 0x7d858d : 0x8a8580, map: tex.map, bumpMap: tex.bump, bumpScale: 0.6,
-      metalness: 0.4, roughness: 0.5, side: THREE.DoubleSide };
-    if (o.physical) Object.assign(skinOpts, { clearcoat: 0.18, clearcoatRoughness: 0.5 });
-    const skin = new Mat(skinOpts);
+    // Have Glass paint: low-sheen metallic grey
+    const paint = t => new Mat(Object.assign({ color: 0xffffff, map: t.map, bumpMap: t.bump, bumpScale: 0.7,
+      metalness: 0.3, roughness: 0.56, envMapIntensity: 0.85, side: THREE.DoubleSide }, o.physical ? { clearcoat: 0.12, clearcoatRoughness: 0.6 } : {}));
+    const bodyMat = paint(liv.body), wingMat = paint(liv.wing), stabMat = paint(liv.stab), finMat = paint(liv.fin), intakeMat = paint(liv.intake);
+    const skin = new Mat(Object.assign({ color: 0xa3a9ae, map: tex.map, bumpMap: tex.bump, bumpScale: 0.6, metalness: 0.3, roughness: 0.56,
+      envMapIntensity: 0.85, side: THREE.DoubleSide }, o.physical ? { clearcoat: 0.12, clearcoatRoughness: 0.6 } : {}));
+    const trim = new THREE.MeshStandardMaterial({ color: 0xb9bdc0, metalness: 0.25, roughness: 0.6 });
+    const uvBodyUp = (p, a, f) => [BODY_U(p[0]), 1 - f * 0.5], uvBodyLo = (p, a, f) => [BODY_U(p[0]), 0.5 - f * 0.5];
+    const planUV = (X, Z) => (p, a, f, j, i, nP) => [(j <= (nP - 1) / 2 ? 0 : 0.5) + (p[0] - X[0]) / (X[1] - X[0]) * 0.5, 1 - (p[2] / Z + 1) / 2];
+    const uvWing = planUV(WING_X, WING_Z), uvStab = planUV(STAB_X, STAB_Z);
+    const uvFin = (p, a, f, j, i, nP) => { const u = (p[0] - FIN_X[0]) / (FIN_X[1] - FIN_X[0]); return [j <= (nP - 1) / 2 ? (1 - u) * 0.5 : 0.5 + u * 0.5, p[2] / FIN_S]; };
+    const uvIntake = (p, a, f, j, i, nP, nR) => [i / (nR - 1), f];
     const metal = new THREE.MeshStandardMaterial({ color: 0x4a4e52, metalness: 0.85, roughness: 0.42, side: THREE.DoubleSide });
     const burnt = new THREE.MeshStandardMaterial({ color: 0x5a5148, metalness: 0.9, roughness: 0.38, side: THREE.DoubleSide });
     const dark = new THREE.MeshStandardMaterial({ color: 0x15181b, metalness: 0.2, roughness: 0.85, side: THREE.DoubleSide });
@@ -577,7 +796,8 @@ const F22 = (() => {
         const s = section(x, Math.round(12 * Math.max(det, 0.7)), Math.round(10 * Math.max(det, 0.7)));
         up.push(s.upper); lo.push(s.lower);
       }
-      for (const r of [up, mirror(up), lo, mirror(lo)]) add(gridGeometry(r), skin);
+      for (const r of [up, mirror(up)]) add(gridGeometry(r, uvBodyUp), bodyMat);
+      for (const r of [lo, mirror(lo)]) add(gridGeometry(r, uvBodyLo), bodyMat);
       const last = section(-9.0);
       const half = last.upper.concat(last.lower.slice(1));
       const loop = half.concat(half.slice(1, -1).reverse().map(p => [p[0], p[1], -p[2]]));
@@ -587,11 +807,9 @@ const F22 = (() => {
     // canopy, sill and cockpit
     let canopyPivot = null;
     {
-      const CBW = curve([[6.85, 0], [6.55, 0.26], [6.0, 0.44], [5.2, 0.52], [4.2, 0.53], [3.4, 0.48], [2.8, 0.34], [2.15, 0]]);
-      const CH = curve([[6.85, 0], [6.55, 0.2], [6.0, 0.44], [5.2, 0.62], [4.4, 0.68], [3.6, 0.62], [3.0, 0.44], [2.15, 0]]);
       const rings = [], NC = Math.round(60 * det), M = 28;
       for (let i = 0; i <= NC; i++) {
-        const x = lerp(6.85, 2.15, i / NC), bw = Math.max(CBW(x), 0), h = Math.max(CH(x), 0), ring = [];
+        const x = lerp(CANOPY_X[0], CANOPY_X[1], i / NC), bw = Math.max(CANOPY_W(x), 0), h = Math.max(CANOPY_H(x), 0), ring = [];
         for (let k = 0; k <= M; k++) {
           const ph = -Math.PI / 2 + Math.PI * k / M, z = bw * Math.sin(ph);
           ring.push([x, upperY(x, z) - 0.03 + h * Math.pow(Math.max(Math.cos(ph), 0), 0.7), z]);
@@ -599,7 +817,7 @@ const F22 = (() => {
         rings.push(ring);
       }
       // the canopy hinges at its aft end and lifts at the front
-      const hx = 2.2, hy = TOP(2.2) - 0.03;
+      const hx = 2.05, hy = TOP(2.05) - 0.03;
       canopyPivot = new THREE.Group();
       canopyPivot.position.set(hx, hy, 0);
       group.add(canopyPivot);
@@ -609,7 +827,7 @@ const F22 = (() => {
       canopyPivot.add(c);
       for (const k of [0, M]) {
         const pts = rings.map(r => new THREE.Vector3(r[k][0] - hx, r[k][1] - hy, r[k][2]));
-        add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.024, 6), dark, canopyPivot);
+        add(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 48, 0.032, 6), trim, canopyPivot);
       }
       if (o.cockpit) {
         const box = (w, h, d, x, y, z, m = dark) => { const b = add(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); return b; };
@@ -636,16 +854,16 @@ const F22 = (() => {
       const corner = (key, u) => {
         const x = lerp(c0[key], xEnd, u), e = smooth(0.55, 1, u), yb = lerp(-1.08, -0.62, smooth(0.35, 1, u));
         switch (key) {
-          case 'it': return [x, YS(x) - 0.03, 0.75];
+          case 'it': return [x, YS(x) - 0.03, 0.56];
           case 'ot': return [x, lerp(CY(x) - 0.05, YS(x), e), lerp(W(x) - 0.04, 1.0, e)];
-          case 'ob': return [x, yb, lerp(W(x) - 0.2, 0.95, e)];
-          case 'ib': return [x, yb, 0.75];
+          case 'ob': return [x, yb, lerp(W(x) - 0.22, 0.95, e)];
+          case 'ib': return [x, yb, 0.56];
         }
       };
       for (const [a, b] of [['it', 'ot'], ['ot', 'ob'], ['ob', 'ib'], ['ib', 'it']]) {
         const rings = [];
         for (let i = 0; i <= N; i++) rings.push([corner(a, i / N), corner(b, i / N)]);
-        for (const r of [rings, mirror(rings)]) add(gridGeometry(r), skin);
+        for (const r of [rings, mirror(rings)]) add(gridGeometry(r, uvIntake), intakeMat);
       }
       const mouth = ['it', 'ot', 'ob', 'ib'].map(k => corner(k, 0.09));
       for (const m of [mouth, mouth.map(p => [p[0], p[1], -p[2]])]) {
@@ -658,10 +876,9 @@ const F22 = (() => {
     }
 
     // surface helpers
-    const uvSpan = p => [p[0] * S, p[2] * S];
-    function piece(rings, mat, parent, mirrorZ) {
+    function piece(rings, mat, parent, mirrorZ, uv) {
       const r = mirrorZ ? mirror(rings) : rings;
-      const meshes = [add(gridGeometry(r, uvSpan), mat, parent)];
+      const meshes = [add(gridGeometry(r, uv), mat, parent)];
       for (const ring of [r[0], r[r.length - 1]]) {
         let loop = ring;
         const a = loop[0], b = loop[loop.length - 1];
@@ -672,7 +889,7 @@ const F22 = (() => {
     }
     const hinged = [];
     // lead = true builds a leading-edge flap ahead of the hinge line, otherwise a trailing-edge surface behind it
-    function hingedSurface(pl, z0, z1, c, side, parent, kind, n, { lead = false, mirrorZ = side < 0 } = {}) {
+    function hingedSurface(pl, z0, z1, c, side, parent, kind, n, { lead = false, mirrorZ = side < 0, mat = wingMat, uv = uvWing } = {}) {
       const hc = lead ? c - 0.005 : c + 0.005;
       const p0 = hingePoint(pl, z0, hc), p1 = hingePoint(pl, z1, hc);
       if (mirrorZ) { p0[2] = -p0[2]; p1[2] = -p1[2]; }
@@ -680,7 +897,7 @@ const F22 = (() => {
       pivot.position.set(...p0);
       parent.add(pivot);
       const rings = lead ? liftingRings(pl, z0, z1, 0, hc, n, 10) : liftingRings(pl, z0, z1, hc, 1, n, 12);
-      for (const m of piece(rings, skin, pivot, mirrorZ)) m.geometry.translate(-p0[0], -p0[1], -p0[2]);
+      for (const m of piece(rings, mat, pivot, mirrorZ, uv)) m.geometry.translate(-p0[0], -p0[1], -p0[2]);
       const axis = new THREE.Vector3(p1[0] - p0[0], p1[1] - p0[1], p1[2] - p0[2]).normalize();
       hinged.push({ pivot, axis, side, kind });
     }
@@ -689,9 +906,9 @@ const F22 = (() => {
     const HC = 0.775;
     for (const side of [1, -1]) {
       const mz = side < 0;
-      piece(liftingRings(WING, 1.2, 1.95, 0, 1, 3), skin, group, mz);
-      piece(liftingRings(WING, 1.95, 6.3, 0.125, HC, Math.round(16 * det)), skin, group, mz);
-      piece(liftingRings(WING, 6.3, 6.78, 0, 1, 3), skin, group, mz);
+      piece(liftingRings(WING, 1.2, 1.95, 0, 1, 3), wingMat, group, mz, uvWing);
+      piece(liftingRings(WING, 1.95, 6.3, 0.125, HC, Math.round(16 * det)), wingMat, group, mz, uvWing);
+      piece(liftingRings(WING, 6.3, 6.78, 0, 1, 3), wingMat, group, mz, uvWing);
       hingedSurface(WING, 1.97, 6.28, 0.125, side, group, 'lef', 8, { lead: true });
       hingedSurface(WING, 1.98, 4.12, HC, side, group, 'flaperon', 6);
       hingedSurface(WING, 4.17, 6.27, HC, side, group, 'aileron', 6);
@@ -704,23 +921,23 @@ const F22 = (() => {
       const pivot = new THREE.Group();
       pivot.position.set(...piv);
       group.add(pivot);
-      for (const m of piece(liftingRings(STAB, 1.2, 4.42, 0, 1, 10), skin, pivot, side < 0)) m.geometry.translate(-piv[0], -piv[1], -piv[2]);
+      for (const m of piece(liftingRings(STAB, 1.2, 4.42, 0, 1, 10), stabMat, pivot, side < 0, uvStab)) m.geometry.translate(-piv[0], -piv[1], -piv[2]);
       stabs.push({ pivot, side });
     }
 
     // canted vertical tails with rudders
     for (const side of [1, -1]) {
       const cant = new THREE.Group();
-      cant.position.set(0, 0.26, 1.22 * side);
+      cant.position.set(0, 0.1, 1.22 * side);
       cant.rotation.x = 28 * D2R * side;
       group.add(cant);
       const frame = new THREE.Group();
       frame.rotation.x = -Math.PI / 2;
       cant.add(frame);
-      piece(liftingRings(FIN, 0, 0.36, 0, 1, 2), skin, frame, false);
-      piece(liftingRings(FIN, 0.36, 2.2, 0, 0.69, 10), skin, frame, false);
-      piece(liftingRings(FIN, 2.2, 2.45, 0, 1, 2), skin, frame, false);
-      hingedSurface(FIN, 0.38, 2.17, 0.69, side, frame, 'rudder', 6, { mirrorZ: false });
+      piece(liftingRings(FIN, 0, 0.36, 0, 1, 2), finMat, frame, false, uvFin);
+      piece(liftingRings(FIN, 0.36, 2.2, 0, 0.69, 10), finMat, frame, false, uvFin);
+      piece(liftingRings(FIN, 2.2, 2.45, 0, 1, 2), finMat, frame, false, uvFin);
+      hingedSurface(FIN, 0.38, 2.17, 0.69, side, frame, 'rudder', 6, { mirrorZ: false, mat: finMat, uv: uvFin });
       if (o.lights) {
         const strip = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.06),
           new THREE.MeshBasicMaterial({ color: 0xb8ff9a, transparent: true, opacity: 0.55, side: THREE.DoubleSide, toneMapped: false }));
@@ -741,7 +958,7 @@ const F22 = (() => {
       }
       add(gridGeometry(rings), metal);
       for (const s of [1, -1]) {
-        const wall = add(new THREE.BoxGeometry(0.6, 0.74, 0.03), burnt);
+        const wall = add(new THREE.BoxGeometry(0.6, 0.74, 0.03), skin);
         wall.position.set(-9.58, -0.15, zc + 0.5 * s);
       }
       const inner = new THREE.Mesh(new THREE.PlaneGeometry(0.9, 0.62), glow);
@@ -754,7 +971,7 @@ const F22 = (() => {
         const hinge = new THREE.Group();
         hinge.position.set(0, 0.36 * s, 0);
         hinge.rotation.z = 0.13 * s;
-        const flap = add(new THREE.BoxGeometry(0.6, 0.035, 0.97), burnt, hinge);
+        const flap = add(new THREE.BoxGeometry(0.6, 0.035, 0.97), skin, hinge);
         flap.position.x = -0.3;
         vec.add(hinge);
       }
@@ -844,7 +1061,7 @@ const F22 = (() => {
     if (o.bay) {
       const g9 = aim9Geometry(), xf = 2.15, xa = 0.45;
       for (const side of [1, -1]) {
-        const wall = (x, t) => new THREE.Vector3(x, lerp(CY(x) - 0.05, -1.08, t), lerp(W(x) - 0.04, W(x) - 0.2, t) * side);
+        const wall = (x, t) => new THREE.Vector3(x, lerp(CY(x) - 0.05, -1.08, t), lerp(W(x) - 0.04, W(x) - 0.22, t) * side);
         const xm = (xf + xa) / 2;
         const top = wall(xm, 0), bot = wall(xm, 1);
         const d = bot.clone().sub(top);
@@ -902,7 +1119,8 @@ const F22 = (() => {
 
     // ---------- runtime controls ----------
     const api = {
-      group, skin, materials: { skin, metal, dark, gearMat, canopyMat, missileMat }, wireMats: [skin, metal, burnt, gearMat],
+      group, skin, materials: { skin, bodyMat, wingMat, finMat, stabMat, metal, dark, gearMat, canopyMat, missileMat },
+      wireMats: [skin, bodyMat, wingMat, finMat, stabMat, intakeMat, metal, burnt, gearMat],
       plumeMats, legs, doors, bayMissiles,
       gear: 0, bay: 0, sideBay: 0,
       setCanopy(v) { if (canopyPivot) canopyPivot.rotation.z = v * 0.45; },
@@ -1709,6 +1927,7 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
 const rand = (a, b) => a + Math.random() * (b - a);
 const X_AXIS = new V3(1, 0, 0), Y_AXIS = new V3(0, 1, 0), Z_AXIS = new V3(0, 0, 1), ZERO = new V3();
+const _qA = new Q();
 const isTouch = matchMedia('(pointer: coarse)').matches || 'ontouchstart' in window;
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const groundAt = (x, z) => Math.max(terrainH(x, z), 0);
@@ -1872,6 +2091,8 @@ class Plane {
     this.gunCd = 0; this.cmCd = 0; this.cm = this.T.cm; this.srm = this.T.srm; this.mrm = this.T.mrm; this.ammo = this.T.ammo;
     this.pilot = null; this.name = opts.name || this.T.name; this.radius = this.T.radius;
     this.spin = new V3(); this.dieT = 0; this.bombed = false; this.escaped = false; this.painting = false;
+    this.rate = new V3();   // body rates: x roll, y pitch, z yaw (rad/s)
+    this.alpha = 0;         // angle of attack: the nose rides above the flight path
   }
   axes() {
     this.fwd.set(1, 0, 0).applyQuaternion(this.q);
@@ -1879,7 +2100,9 @@ class Plane {
     this.right.set(0, 0, 1).applyQuaternion(this.q);
   }
   integrate(dt) { this.vel.copy(this.fwd).multiplyScalar(this.speed); this.pos.addScaledVector(this.vel, dt); this.sync(); }
-  sync() { this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q); }
+  // q is the flight-path frame; the airframe is drawn pitched up by the angle of attack
+  sync() { this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q).multiply(_qA.setFromAxisAngle(Z_AXIS, this.alpha)); }
+  nose(out) { const ca = Math.cos(this.alpha), sa = Math.sin(this.alpha); return out.copy(this.fwd).multiplyScalar(ca).addScaledVector(this.up, sa); }
 }
 const _m4 = new THREE.Matrix4();
 function setBasis(q, f, u) {
@@ -2058,8 +2281,12 @@ function flight(pl, c, dt) {
   pl.stall = pl.speed < 112;
   if (pl.stall && !tv) pitch -= (112 - pl.speed) / 60;
   const spdF = clamp((pl.speed - 80) / 190, tv ? 0.8 : 0.3, 1);
-  const pr = pitch * T.pitch * spdF * (tv ? 1.8 : 1) * pl.authority;
-  const rr = c.roll * T.roll * pl.authority, yr = (c.yaw || 0) * 0.35;
+  // fly-by-wire rate command: body rates build toward the stick demand instead of snapping to it
+  const R = pl.rate;
+  R.y += (pitch * T.pitch * spdF * (tv ? 1.8 : 1) * pl.authority - R.y) * (1 - Math.exp(-dt / 0.15));
+  R.x += (c.roll * T.roll * pl.authority - R.x) * (1 - Math.exp(-dt / 0.12));
+  R.z += ((c.yaw || 0) * 0.35 - R.z) * (1 - Math.exp(-dt / 0.25));
+  const pr = R.y, rr = R.x, yr = R.z;
   pl.q.multiply(_q.setFromAxisAngle(Z_AXIS, pr * dt));
   pl.q.multiply(_q.setFromAxisAngle(X_AXIS, rr * dt));
   pl.q.multiply(_q.setFromAxisAngle(Y_AXIS, -yr * dt));
@@ -2070,6 +2297,10 @@ function flight(pl, c, dt) {
   const drag = T.drag * pl.speed * pl.speed + Math.abs(pitch) * pl.speed * 0.045 * spdF * (tv ? 3.4 : 1) + (c.brake ? pl.speed * 0.13 : 0);
   pl.speed = clamp(pl.speed + (thrust - drag - 9.81 * pl.fwd.y) * dt, 60, 620);
   pl.g = 1 + Math.abs(pr) * pl.speed / 9.81 * 0.36;
+  // angle of attack grows with load and with low speed; thrust vectoring lets the F-22 go far past the normal limit
+  const qd = (260 / Math.max(pl.speed, 80)) ** 2;
+  const aT = clamp((0.045 + (pl.g - 1) * 0.028 * (pr < 0 ? -1 : 1)) * qd, -0.2, tv ? 1.1 : 0.45);
+  pl.alpha += (aT - pl.alpha) * (1 - Math.exp(-dt / 0.25));
   // sustained load above 7.5 G builds G stress; past 3.5 the pilot greys out and loses stick authority
   pl.gStress = Math.max(0, pl.gStress + (pl.g > 7.5 ? (pl.g - 7.5) * 0.45 : -1.3) * dt);
   pl.authority = pl.gStress > 3.5 ? 0.6 : 1;
@@ -2566,7 +2797,8 @@ function updatePlayer(dt) {
       smoke.emit(_a.x, _a.y, _a.z, p.vel.x * 0.92, p.vel.y * 0.92, p.vel.z * 0.92, 0.7, 0.8, 3.2, 0.95, 0.96, 1, 0.35, 3);
     }
   }
-  if (ctlS.tvc > 0.5 && p.speed < 260) { // vapour over the wing during thrust-vectored high-alpha turns
+  if (p.alpha > 0.22) game.shake = Math.max(game.shake, (p.alpha - 0.22) * 0.5);   // airframe buffet at high alpha
+  if ((ctlS.tvc > 0.5 && p.speed < 260) || p.alpha > 0.3) { // vapour over the wing in high-alpha turns
     _a.set(-1, 1.2, 0).applyQuaternion(p.q).add(p.pos);
     smoke.emit(_a.x, _a.y, _a.z, p.vel.x * 0.95, p.vel.y * 0.95, p.vel.z * 0.95, 0.35, 6, 12, 0.95, 0.96, 1, 0.25, 4);
   }
@@ -2581,7 +2813,7 @@ function updatePlayer(dt) {
   p.gunCd -= dt;
   const gt = gunSolution(p);
   if (out.gun) {
-    const dir = (game.ai && !manual) ? p.pilot.desired.clone() : p.fwd.clone();
+    const dir = (game.ai && !manual) ? p.pilot.desired.clone() : p.nose(new V3());
     if (gt) dir.lerp(_b.copy(game.leadPoint).sub(p.pos).normalize(), 0.85).normalize();
     shootGun(p, dir, 0.004);
   }
@@ -2608,10 +2840,11 @@ function updatePlayer(dt) {
 function gunSolution(p) {
   game.gunTarget = null;
   let bestE = null, bestA = 0.11;
+  const nose = p.nose(new V3());
   for (const e of redAir()) {
     const d = e.pos.distanceTo(p.pos);
     if (d > 1600) continue;
-    const ang = p.fwd.angleTo(_b.copy(e.pos).addScaledVector(e.vel, d / 1150).sub(p.pos));
+    const ang = nose.angleTo(_b.copy(e.pos).addScaledVector(e.vel, d / 1150).sub(p.pos));
     if (ang < bestA) { bestA = ang; bestE = e; }
   }
   if (bestE) {
@@ -2926,8 +3159,40 @@ function drawHUD(dt) {
   hc.lineWidth = 1.5; hc.strokeStyle = HUDC; hc.fillStyle = HUDC;
   if (HQ()) { hc.shadowColor = 'rgba(141,255,180,0.6)'; hc.shadowBlur = 4; }
 
-  // boresight and gun pipper
-  const bs = proj(_a.copy(p.pos).addScaledVector(p.fwd, 700));
+  // pitch ladder around the flight path marker
+  {
+    const fh = new V3(p.fwd.x, 0, p.fwd.z);
+    if (fh.lengthSq() < 1e-6) fh.set(1, 0, 0);
+    fh.normalize();
+    const rh = new V3(-fh.z, 0, fh.x), centre = new V3(), tmp = new V3();
+    const pitchDeg = Math.asin(clamp(p.fwd.y, -1, 1)) * 180 / Math.PI;
+    hc.save(); hc.globalAlpha = 0.75; hc.font = `500 10px ${MONO}`;
+    for (let a = Math.ceil((pitchDeg - 22) / 10) * 10; a <= pitchDeg + 22; a += 10) {
+      if (a < -90 || a > 90) continue;
+      const r = a * Math.PI / 180;
+      centre.copy(fh).multiplyScalar(Math.cos(r)).addScaledVector(Y_AXIS, Math.sin(r)).multiplyScalar(1000).add(p.pos);
+      const c0 = proj(centre);
+      if (c0.behind) continue;
+      const e1 = proj(tmp.copy(centre).addScaledVector(rh, 90)), e2 = proj(tmp.copy(centre).addScaledVector(rh, -90));
+      const g1 = proj(tmp.copy(centre).addScaledVector(rh, 26)), g2 = proj(tmp.copy(centre).addScaledVector(rh, -26));
+      hc.setLineDash(a < 0 ? [6, 5] : []);
+      hc.beginPath();
+      if (a === 0) { hc.moveTo(e1.x * 1.6 - c0.x * 0.6, e1.y * 1.6 - c0.y * 0.6); hc.lineTo(e2.x * 1.6 - c0.x * 0.6, e2.y * 1.6 - c0.y * 0.6); }
+      else { hc.moveTo(e1.x, e1.y); hc.lineTo(g1.x, g1.y); hc.moveTo(g2.x, g2.y); hc.lineTo(e2.x, e2.y); }
+      hc.stroke();
+      if (a !== 0) { hc.textAlign = 'left'; hc.fillText(String(Math.abs(a)), e1.x + 4, e1.y + 3); }
+    }
+    hc.setLineDash([]); hc.restore();
+    // flight path marker: where the jet is actually going
+    const fp = proj(tmp.copy(p.pos).addScaledVector(p.fwd, 1000));
+    if (!fp.behind) {
+      hc.beginPath(); hc.arc(fp.x, fp.y, 6, 0, Math.PI * 2);
+      hc.moveTo(fp.x - 6, fp.y); hc.lineTo(fp.x - 16, fp.y); hc.moveTo(fp.x + 6, fp.y); hc.lineTo(fp.x + 16, fp.y);
+      hc.moveTo(fp.x, fp.y - 6); hc.lineTo(fp.x, fp.y - 12); hc.stroke();
+    }
+  }
+  // gun boresight along the nose, and the gun pipper
+  const bs = proj(_a.copy(p.pos).addScaledVector(p.nose(new V3()), 700));
   if (!bs.behind) {
     hc.beginPath(); hc.arc(bs.x, bs.y, 15, 0, Math.PI * 2); hc.stroke();
     hc.beginPath();
@@ -3016,7 +3281,7 @@ function drawHUD(dt) {
   hc.textAlign = 'left'; hc.strokeRect(cx + gap, boxY, 84, 28); hc.fillText(String(Math.round(p.pos.y)), cx + gap + 8, boxY + 20);
   hc.font = `500 10px ${MONO}`;
   hc.textAlign = 'right'; hc.fillText('KM/H', cx - gap, boxY - 6); hc.fillText(`M ${(p.speed / 340).toFixed(2)}`, cx - gap, boxY + 44);
-  hc.save(); if (p.g > 8) hc.fillStyle = WARN; hc.fillText(`G ${p.g.toFixed(1)}`, cx - gap, boxY + 58); hc.restore();
+  hc.save(); if (p.g > 8) hc.fillStyle = WARN; hc.fillText(`G ${p.g.toFixed(1)}`, cx - gap, boxY + 58); hc.fillText(`α ${(p.alpha * 180 / Math.PI).toFixed(0)}°`, cx - gap, boxY + 72); hc.restore();
   hc.textAlign = 'left'; hc.fillText('ALT M', cx + gap, boxY - 6); hc.fillText(`AGL ${Math.max(0, Math.round(game.agl || 0))}`, cx + gap, boxY + 44);
   const tags = [p.boost && '加力', p.c.tvc && '矢量', p.c.brake && '减速板'].filter(Boolean);
   hc.save(); hc.fillStyle = GOLD; hc.font = `700 11px ${SANS}`; hc.textAlign = 'right';
