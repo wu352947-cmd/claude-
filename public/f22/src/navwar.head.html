@@ -120,6 +120,7 @@
   .stats { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 22px; justify-content: start; }
   .stats dt { font: 600 10px/1.4 var(--f-mono); letter-spacing: 0.14em; color: var(--muted); }
   .stats dd { margin: 0; font: 600 26px/1.1 var(--f-mono); }
+  .note a { color: inherit; }
   .note { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.6; max-width: 56ch; }
   #loading { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; background: var(--ink); color: var(--muted); font: 600 12px/1.8 var(--f-mono); letter-spacing: 0.16em; padding-inline: var(--gut); }
   #loading[hidden], #touch[hidden] { display: none; }
@@ -165,8 +166,17 @@
     <button class="tb sm" id="c-view" type="button">视角</button>
     <button class="tb" id="c-target" type="button">目标</button>
     <button class="tb" id="c-decoy" type="button">诱饵</button>
-    <span></span><span></span>
+    <button class="tb sm" id="c-dc" type="button">损管</button>
+    <button class="tb gold" id="c-gun" type="button">炮瞄</button>
     <button class="tb big" id="c-salvo" type="button">反舰<br>齐射</button>
+  </div>
+  <div class="cluster" id="gun-ctl" hidden>
+    <button class="tb sm" id="g-exit" type="button">退出</button>
+    <button class="tb on" id="g-fcs" type="button">火控</button>
+    <button class="tb sm" id="g-zoom" type="button">望远</button>
+    <button class="tb sm" id="g-fuse" type="button">引信<br>触发</button>
+    <span></span>
+    <button class="tb big" id="g-fire" type="button">开火</button>
   </div>
 </div>
 <div id="topbar" hidden>
@@ -174,7 +184,7 @@
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
-  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：WASD 舵与航速 · R 齐射 · Tab 目标 · X 诱饵<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
+  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：WASD 舵与航速 · R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>
@@ -189,7 +199,8 @@
       <button class="chip" id="s-time" type="button">时段 <b>正午</b></button>
       <button class="chip" id="s-invert" type="button">俯仰 <b>上推爬升</b></button>
     </div>
-    <p class="note">虚构情景，仅供娱乐。舰艇、飞机与武器参数取自公开资料并为游戏节奏做了缩放；全部模型为程序化建模。</p>
+    <p class="note">虚构情景，仅供娱乐。舰艇、飞机与武器参数取自公开资料并为游戏节奏做了缩放。</p>
+    <p class="note" id="credits"></p>
   </div>
 </section>
 

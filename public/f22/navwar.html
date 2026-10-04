@@ -125,6 +125,7 @@
   .stats { display: grid; grid-template-columns: repeat(4, auto); gap: 4px 22px; justify-content: start; }
   .stats dt { font: 600 10px/1.4 var(--f-mono); letter-spacing: 0.14em; color: var(--muted); }
   .stats dd { margin: 0; font: 600 26px/1.1 var(--f-mono); }
+  .note a { color: inherit; }
   .note { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.6; max-width: 56ch; }
   #loading { position: fixed; inset: 0; display: grid; place-items: center; text-align: center; background: var(--ink); color: var(--muted); font: 600 12px/1.8 var(--f-mono); letter-spacing: 0.16em; padding-inline: var(--gut); }
   #loading[hidden], #touch[hidden] { display: none; }
@@ -170,8 +171,17 @@
     <button class="tb sm" id="c-view" type="button">视角</button>
     <button class="tb" id="c-target" type="button">目标</button>
     <button class="tb" id="c-decoy" type="button">诱饵</button>
-    <span></span><span></span>
+    <button class="tb sm" id="c-dc" type="button">损管</button>
+    <button class="tb gold" id="c-gun" type="button">炮瞄</button>
     <button class="tb big" id="c-salvo" type="button">反舰<br>齐射</button>
+  </div>
+  <div class="cluster" id="gun-ctl" hidden>
+    <button class="tb sm" id="g-exit" type="button">退出</button>
+    <button class="tb on" id="g-fcs" type="button">火控</button>
+    <button class="tb sm" id="g-zoom" type="button">望远</button>
+    <button class="tb sm" id="g-fuse" type="button">引信<br>触发</button>
+    <span></span>
+    <button class="tb big" id="g-fire" type="button">开火</button>
   </div>
 </div>
 <div id="topbar" hidden>
@@ -179,7 +189,7 @@
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
-  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：WASD 舵与航速 · R 齐射 · Tab 目标 · X 诱饵<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
+  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：WASD 舵与航速 · R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>
@@ -194,7 +204,8 @@
       <button class="chip" id="s-time" type="button">时段 <b>正午</b></button>
       <button class="chip" id="s-invert" type="button">俯仰 <b>上推爬升</b></button>
     </div>
-    <p class="note">虚构情景，仅供娱乐。舰艇、飞机与武器参数取自公开资料并为游戏节奏做了缩放；全部模型为程序化建模。</p>
+    <p class="note">虚构情景，仅供娱乐。舰艇、飞机与武器参数取自公开资料并为游戏节奏做了缩放。</p>
+    <p class="note" id="credits"></p>
   </div>
 </section>
 
@@ -293,6 +304,7 @@
 import * as THREE from 'three';
 import { Sky } from 'three/addons/objects/Sky.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /* F-22A procedural model, shared by the viewer and the game.
    Units: metres. Frame: +x nose, +y up, +z right wing. Origin near mid-fuselage.
@@ -2394,6 +2406,145 @@ const Navy = (() => {
   return { ship, plane, ashmGeometry, SPECS, CARRIERS };
 })();
 
+/* High-detail warships and naval aircraft for 南海决战, from CC-licensed Sketchfab models (credits in NavyHD.CREDITS).
+   Each model ships as assets/navy/<key>.txt: base64 of a gzipped GLB (WebP textures, quantized geometry).
+   It is decompressed with the browser's DecompressionStream and fitted to the game frame:
+   ships: +x bow, +y up, waterline at y = 0, real length; aircraft: +x nose, gear contact at y = -gearH.
+   Stand-ins for the other side's types (Nimitz for Fujian, E-2D for KJ-600, F-35 for J-35) are desaturated
+   and tinted in PLA grey so the source markings do not read.
+   Expects THREE and GLTFLoader in scope. */
+const NavyHD = (() => {
+  // rotation about y, uniform scale and offset measured offline from each model's vertex cloud
+  const META = {
+    ford:   { rotY: Math.PI / 2, scale: 27.874915, off: [1.8302, -14.8039, -1.7304], deckY: 19.0 },
+    nimitz: { rotY: Math.PI / 2, scale: 1.050467, off: [-54.0847, -4.8941, 234.1264], deckY: 17.4 },
+    burke:  { rotY: Math.PI / 2, scale: 1020.821343, off: [-27.1105, -10.0341, 0.0174] },
+    t055:   { rotY: Math.PI, scale: 1.64886, off: [0.8646, -15.273, -2.6044] },
+    t051:   { rotY: Math.PI / 2, scale: 1.096986, off: [0.5287, 0.5772, -0.0011] },
+    fa18:   { rotY: Math.PI, scale: 0.225021, off: [-1.3407, 1.8028, 0.0024], gearCut: 0.95, exhausts: [[-8.7, 0.45, 0.55], [-8.7, 0.45, -0.55]] },
+    f35:    { rotY: 0, scale: 0.115636, off: [-2.3949, 2.9293, -0.0272], gearNodes: true, exhausts: [[-7.4, 1.0, 0]] },
+    e2d:    { rotY: Math.PI / 2, scale: 0.182504, off: [1.2961, 2.0314, -0.002], gearCut: 0.9, exhausts: [[-0.5, 2.6, 2.9], [-0.5, 2.6, -2.9]] }
+  };
+  const CREDITS = [
+    ['Gerald R Ford aircraft Carrier', 'waelXcm', 'CC BY 4.0', 'https://sketchfab.com/3d-models/gerald-r-ford-aircraft-carrier-562bf516e1494df38d8f222504dc798b'],
+    ['USS Nimitz class aircraft carrier', 'k26_k29', 'CC BY 4.0', 'https://sketchfab.com/3d-models/uss-nimitz-class-aircraft-carrier-e9f23bab3bd14f34ba9e54ccd082f46d'],
+    ['Alreigh Burke Destroyer', 'waelXcm', 'CC BY 4.0', 'https://sketchfab.com/3d-models/alreigh-burke-destroyer-52a04129e8f64134ae26d365c4e82ce7'],
+    ['Type 055 Renhai class destroyer [Free]', 'andertan', 'CC BY-ND 4.0', 'https://sketchfab.com/3d-models/type-055-renhai-class-destroyer-free-c0a3c5cb49fd4b688b65e4f3a18b5917'],
+    ['Chinese PLAN 051 Class Destroyer', '全斗焕', 'CC BY 4.0', 'https://sketchfab.com/lxyun_2'],
+    ['Boeing F/A-18E "Super Hornet"', 'KOG_THORNS', 'CC BY 4.0', 'https://sketchfab.com/3d-models/boeing-fa-18e-super-hornet-9e852037bf2141dcb3fda17013958131'],
+    ['F-35 Lightning II - Fighter Jet - Free', 'bohmerang', 'CC BY-NC-SA 4.0', 'https://sketchfab.com/3d-models/f-35-lightning-ii-fighter-jet-free-b1ab1c0090e34b0fbfe667e706023e6d'],
+    ['Grumman E-2D Advanced Hawkeye', 'Muhamad Mirza Arrafi', 'CC BY 4.0', 'https://sketchfab.com/3d-models/grumman-e-2d-advanced-hawkeye-0082cf8f15044cfd80ebd4e11b96789d']
+  ];
+  const templates = {};
+
+  async function fetchGLB(key) {
+    const r = await fetch(`assets/navy/${key}.txt`);
+    if (!r.ok) throw new Error(key + ' ' + r.status);
+    const b64 = (await r.text()).trim();
+    const raw = atob(b64), bytes = new Uint8Array(raw.length);
+    for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
+    const ds = new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')));
+    const buf = await ds.arrayBuffer();
+    return new Promise((res, rej) => new GLTFLoader().parse(buf, '', res, rej));
+  }
+  // wraps a model so it sits in the game frame
+  function fitGroup(key, scene) {
+    const M = META[key];
+    const inner = new THREE.Group(); inner.rotation.y = M.rotY; inner.add(scene);
+    const mid = new THREE.Group(); mid.scale.setScalar(M.scale); mid.position.set(...M.off); mid.add(inner);
+    const g = new THREE.Group(); g.add(mid);
+    g.updateMatrixWorld(true);
+    return g;
+  }
+  // split a fused aircraft mesh into airframe and landing gear by height above the wheels
+  function splitGear(root, cut) {
+    const gear = new THREE.Group(); gear.name = 'gear';
+    const meshes = [];
+    root.traverse(m => { if (m.isMesh) meshes.push(m); });
+    const inv = new THREE.Matrix4().copy(root.matrixWorld).invert(), v = new THREE.Vector3(), mtx = new THREE.Matrix4();
+    for (const m of meshes) {
+      const geo = m.geometry, pos = geo.attributes.position;
+      if (!geo.index) continue;
+      mtx.multiplyMatrices(inv, m.matrixWorld);
+      const idx = geo.index.array, keep = [], drop = [];
+      const ys = new Float32Array(pos.count);
+      for (let i = 0; i < pos.count; i++) ys[i] = v.fromBufferAttribute(pos, i).applyMatrix4(mtx).y;
+      for (let t = 0; t < idx.length; t += 3) {
+        const y = (ys[idx[t]] + ys[idx[t + 1]] + ys[idx[t + 2]]) / 3;
+        (y < cut ? drop : keep).push(idx[t], idx[t + 1], idx[t + 2]);
+      }
+      if (!drop.length) continue;
+      const g1 = geo.clone(); g1.setIndex(keep);
+      const g2 = geo.clone(); g2.setIndex(drop);
+      m.geometry = g1;
+      const gm = new THREE.Mesh(g2, m.material);
+      gm.matrixAutoUpdate = false; gm.matrix.copy(mtx);
+      gear.add(gm);
+    }
+    root.add(gear);
+    return gear;
+  }
+  // PLA grey for stand-ins: desaturate the texture and tint it
+  function tintPLA(root) {
+    const done = new Map();
+    root.traverse(m => {
+      if (!m.isMesh) return;
+      const list = Array.isArray(m.material) ? m.material : [m.material];
+      const out = list.map(mat => {
+        if (done.has(mat)) return done.get(mat);
+        const c = mat.clone();
+        if (!c.transparent) c.onBeforeCompile = sh => {
+          sh.fragmentShader = sh.fragmentShader.replace('#include <map_fragment>',
+            '#include <map_fragment>\n  { float l = dot(diffuseColor.rgb, vec3(0.3, 0.59, 0.11)); diffuseColor.rgb = vec3(l) * vec3(0.9, 0.96, 1.04); }');
+        };
+        done.set(mat, c);
+        return c;
+      });
+      m.material = Array.isArray(m.material) ? out : out[0];
+    });
+  }
+  // loads every model; onProgress(done, total, key). Resolves even if some fail (those keep the procedural model).
+  async function loadAll(onProgress) {
+    const keys = Object.keys(META);
+    if (typeof DecompressionStream === 'undefined') return {};
+    let n = 0;
+    await Promise.all(keys.map(k => fetchGLB(k).then(g => {
+      g.scene.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; } });
+      templates[k] = g.scene;
+    }).catch(e => console.warn('model', k, e)).finally(() => onProgress && onProgress(++n, keys.length, k))));
+    return templates;
+  }
+  const has = k => !!templates[k];
+  // prepare each variant once (fit, gear split, tint); copies are cheap clones that share geometry
+  const prepared = {};
+  function prep(key, opt) {
+    const id = `${key}|${opt.gearH ?? ''}|${opt.pla ? 1 : 0}|${opt.scale || 1}`;
+    if (prepared[id]) return prepared[id];
+    const M = META[key];
+    const g = fitGroup(key, templates[key].clone(true));
+    if (opt.gearH != null) {
+      g.children[0].position.y -= opt.gearH;          // gear contact at -gearH
+      g.updateMatrixWorld(true);
+      if (M.gearCut) splitGear(g, M.gearCut - opt.gearH).name = 'gearDown';
+      if (M.gearNodes) g.traverse(m => { if (m.name === 'Object_16' || m.name === 'Object_18') m.userData.gearDown = true; if (m.name === 'Object_14') m.userData.gearUp = true; });
+    }
+    if (opt.scale) g.scale.setScalar(opt.scale);
+    if (opt.pla) tintPLA(g);
+    return (prepared[id] = g);
+  }
+  // a fitted copy; aircraft get setGear(down) to show or stow the landing gear
+  function make(key, opt = {}) {
+    if (!templates[key]) return null;
+    const g = prep(key, opt).clone(true), M = META[key];
+    const down = [], up = [];
+    g.traverse(m => { if (m.name === 'gearDown' || m.userData.gearDown) down.push(m); if (m.userData.gearUp) up.push(m); });
+    const setGear = d => { for (const m of down) m.visible = d; for (const m of up) m.visible = !d; };
+    setGear(false);
+    return { group: g, setGear, exhausts: (M.exhausts || []).map(e => e.map(x => x * (opt.scale || 1))), deckY: M.deckY };
+  }
+  return { loadAll, make, has, META, CREDITS };
+})();
+
 
 /* =========================================================
    南海决战: a what-if sea-and-air battle between two carrier groups.
@@ -2607,6 +2758,12 @@ const MSL = {
   essm:   { name: 'ESSM', cls: 'sam', v: 1150, range: 15000, pk: 0.72 },
   ram:    { name: 'RAM', cls: 'sam', v: 820, range: 4800, pk: 0.68, short: true }
 };
+// naval guns: muzzle velocity, quadratic drag fitted to the published maximum range, rate of fire, mount slew rates (deg/s)
+const GUNS = {
+  h130: { name: 'H/PJ-38 130 毫米舰炮', v0: 930, k: 3.831e-5, rate: 1.5, dmg: 22, ammo: 280, train: 40, elev: 25, x: 0.38, maxR: 29500 },
+  mk45: { name: 'Mk 45 127 毫米舰炮', v0: 810, k: 4.454e-5, rate: 3.0, dmg: 19, ammo: 600, train: 30, elev: 20, x: 0.37, maxR: 24000 },
+  h76:  { name: 'H/PJ-26 76 毫米舰炮', v0: 980, k: 1.064e-4, rate: 1.0, dmg: 9, ammo: 500, train: 50, elev: 35, x: 0.4, maxR: 16000 }
+};
 const PK_MUL = { plane: 0.6, sub: 0.48, super: 0.32, high: 0.42, hyper: 0.2 };
 const CIWS_PK = { sub: 0.32, super: 0.16, high: 0.2, hyper: 0.06, plane: 0.3 };
 
@@ -2614,15 +2771,15 @@ const CIWS_PK = { sub: 0.32, super: 0.16, high: 0.2, hyper: 0.06, plane: 0.3 };
 // vmax m/s (31 kn = 16 m/s), turn deg/s at speed, mast = radar height m, channels = simultaneous SAM engagements
 const SH = {
   fujian: { model: 'fujian', side: 'cn', name: '福建舰', hp: 2600, vmax: 16, turn: 0.9, mast: 48, radar: 100000, carrier: true, sam: { hhq10: 24 }, ashm: {}, channels: 4, ciws: 3, decoys: 10, value: 300, wing: { j15: 10, j35: 6, kj600: 2 }, top: 22, L: 316, B: 76 },
-  t055:   { model: 't055', side: 'cn', name: '南昌舰', hp: 640, vmax: 15.5, turn: 1.6, mast: 40, radar: 115000, sam: { hhq9: 48, hhq10: 24 }, ashm: { yj21: 4, yj18: 14 }, channels: 8, ciws: 1, decoys: 8, gun: true, value: 130, top: 30, L: 180, B: 20 },
-  t052d:  { model: 't052d', side: 'cn', name: '昆明舰', hp: 470, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 10 }, channels: 6, ciws: 1, decoys: 8, gun: true, value: 80, top: 26, L: 157, B: 18 },
-  t052d2: { model: 't052d', side: 'cn', name: '长沙舰', hp: 470, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 10 }, channels: 6, ciws: 1, decoys: 8, gun: true, value: 80, top: 26, L: 157, B: 18, number: '173' },
-  t054a:  { model: 't054a', side: 'cn', name: '黄山舰', hp: 330, vmax: 14.5, turn: 2, mast: 28, radar: 80000, sam: { hhq16: 24 }, ashm: { yj83: 8 }, channels: 4, ciws: 1, decoys: 6, gun: true, value: 50, top: 22, L: 134, B: 16 },
+  t055:   { model: 't055', side: 'cn', name: '南昌舰', hp: 640, vmax: 15.5, turn: 1.6, mast: 40, radar: 115000, sam: { hhq9: 48, hhq10: 24 }, ashm: { yj21: 4, yj18: 14 }, channels: 8, ciws: 1, decoys: 8, gun: 'h130', value: 130, top: 30, L: 180, B: 20 },
+  t052d:  { model: 't052d', side: 'cn', name: '昆明舰', hp: 470, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 10 }, channels: 6, ciws: 1, decoys: 8, gun: 'h130', value: 80, top: 26, L: 157, B: 18 },
+  t052d2: { model: 't052d', side: 'cn', name: '长沙舰', hp: 470, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 10 }, channels: 6, ciws: 1, decoys: 8, gun: 'h130', value: 80, top: 26, L: 157, B: 18, number: '173' },
+  t054a:  { model: 't054a', side: 'cn', name: '黄山舰', hp: 330, vmax: 14.5, turn: 2, mast: 28, radar: 80000, sam: { hhq16: 24 }, ashm: { yj83: 8 }, channels: 4, ciws: 1, decoys: 6, gun: 'h76', value: 50, top: 22, L: 134, B: 16 },
   ford:   { model: 'ford', side: 'us', name: '福特号', hp: 2800, vmax: 16.5, turn: 0.9, mast: 50, radar: 100000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 340, wing: { fa18: 12, f35c: 8, e2d: 2 }, top: 24, L: 333, B: 78 },
-  tico:   { model: 'tico', side: 'us', name: '普林斯顿号', hp: 560, vmax: 16, turn: 1.6, mast: 36, radar: 110000, sam: { sm6: 22, sm2: 40 }, ashm: { harpoon: 8, sm6s: 6 }, channels: 8, ciws: 2, decoys: 10, gun: true, value: 100, top: 28, L: 173, B: 17 },
-  burke1: { model: 'burke', side: 'us', name: '杰克·H·卢卡斯号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: true, value: 80, top: 26, L: 155, B: 20 },
-  burke2: { model: 'burke', side: 'us', name: '平克尼号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: true, value: 80, top: 26, L: 155, B: 20, number: '91' },
-  burke3: { model: 'burke', side: 'us', name: '米利厄斯号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: true, value: 80, top: 26, L: 155, B: 20, number: '69' }
+  tico:   { model: 'tico', side: 'us', name: '普林斯顿号', hp: 560, vmax: 16, turn: 1.6, mast: 36, radar: 110000, sam: { sm6: 22, sm2: 40 }, ashm: { harpoon: 8, sm6s: 6 }, channels: 8, ciws: 2, decoys: 10, gun: 'mk45', value: 100, top: 28, L: 173, B: 17 },
+  burke1: { model: 'burke', side: 'us', name: '杰克·H·卢卡斯号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20 },
+  burke2: { model: 'burke', side: 'us', name: '平克尼号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20, number: '91' },
+  burke3: { model: 'burke', side: 'us', name: '米利厄斯号', hp: 480, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20, number: '69' }
 };
 // fleet stations (m) relative to the carrier, in the carrier's frame: +x ahead, +z starboard
 const ORBAT = {
@@ -2745,16 +2902,24 @@ class Ship {
     if (!shipProto[S.model + (S.number || '')]) shipProto[S.model + (S.number || '')] = Navy.ship(S.model, S.number);
     const built = shipProto[S.model + (S.number || '')];
     this.spec = built.spec;
-    this.obj = built.group.clone();
+    const hdKey = SHIP_HD[key], hd = hdKey && NavyHD.make(hdKey.m, { pla: hdKey.pla });
+    this.obj = hd ? hd.group : built.group.clone();
+    this.hd = !!hd;
     scene.add(this.obj);
     this.pos = new V3(); this.vel = new V3(); this.heading = 0; this.speed = 10; this.order = 10; this.rudder = 0; this.helm = 0;
     this.hp = this.maxHp = S.hp; this.alive = true; this.sinking = 0; this.dying = false;
     this.sam = Object.assign({}, S.sam); this.ashm = Object.assign({}, S.ashm); this.decoys = S.decoys;
     this.channels = S.channels; this.busy = 0; this.samCd = 0; this.decoyCd = 0; this.gunCd = rand(2, 5); this.ciwsHeat = 0;
+    this.gun = S.gun ? { spec: GUNS[S.gun], brg: 0, elv: 0.05, wantB: 0, wantE: 0.05, cd: rand(1, 3), ammo: GUNS[S.gun].ammo, fuse: 'HE', aimT: 0 } : null;
+    this.dcT = 0; this.dcCd = 0;
     this.radius = S.L / 2; this.h = S.top; this.mast = S.mast; this.rcs = S.carrier ? 1.6 : key === 't055' ? 0.7 : 1;
     this.fires = 0; this.radarDmg = false; this.list = 0; this.trim = 0; this.station = null; this.wakeT = 0;
     this.hangar = Object.assign({}, S.wing || {}); this.ready = []; this.cats = []; this.lastLaunch = -99;
-    if (S.carrier) this.deck = Navy.CARRIERS[S.model];
+    if (S.carrier) {
+      // the flight deck follows the model actually shown
+      this.deck = Object.assign({}, Navy.CARRIERS[S.model]);
+      if (hd && hd.deckY) { this.deck.deckY = hd.deckY; this.deck.cats = this.deck.cats.map(c => Object.assign({}, c, { x1: Math.min(c.x1, hdKey.catMax || c.x1) })); }
+    }
     if (this.deck) this.cats = this.deck.cats.map(c => ({ c, busy: 0, plane: null }));
   }
   get carrier() { return !!this.S.carrier; }
@@ -2767,6 +2932,13 @@ class Ship {
     this.obj.rotation.set(roll, this.heading, pitch, 'YZX');
   }
 }
+
+// which uploaded model stands in for each ship / aircraft class (pla: tint a US-built model in PLA grey)
+const SHIP_HD = {
+  ford: { m: 'ford' }, fujian: { m: 'nimitz', pla: true, catMax: 140 }, t055: { m: 't055' }, t052d: { m: 't055' }, t052d2: { m: 't055' }, t054a: { m: 't051' },
+  burke1: { m: 'burke' }, burke2: { m: 'burke' }, burke3: { m: 'burke' }, tico: { m: 'burke' }
+};
+const PLANE_HD = { fa18: { m: 'fa18' }, f35c: { m: 'f35' }, j35: { m: 'f35', pla: true, scale: 1.1 }, e2d: { m: 'e2d' }, kj600: { m: 'e2d', pla: true } };
 
 /* ---------- island base ---------- */
 function buildBase() {
@@ -2807,8 +2979,10 @@ function buildBase() {
 class Plane {
   constructor(side, type, home) {
     const T = this.T = AC[type];
-    const m = Navy.plane(T.model);
+    const hdKey = PLANE_HD[type], hd = hdKey && NavyHD.make(hdKey.m, { gearH: T.gearH, pla: hdKey.pla, scale: hdKey.scale });
+    const m = hd ? { obj: hd.group, exhausts: hd.exhausts } : Navy.plane(T.model);
     this.obj = m.obj; scene.add(this.obj);
+    this.setGearVis = hd ? hd.setGear : null; this.gearShown = false;
     this.exhausts = m.exhausts.map(e => new V3(...e));
     this.side = side; this.type = type; this.home = home; this.kind = 'plane'; this.name = T.name;
     this.pos = new V3(); this.q = new Q(); this.vel = new V3();
@@ -2830,7 +3004,10 @@ class Plane {
     this.right.set(0, 0, 1).applyQuaternion(this.q);
   }
   integrate(dt) { this.vel.copy(this.fwd).multiplyScalar(this.speed); this.pos.addScaledVector(this.vel, dt); this.sync(); }
-  sync() { this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q).multiply(_qA.setFromAxisAngle(Z_AXIS, this.alpha)); }
+  sync() {
+    this.obj.position.copy(this.pos); this.obj.quaternion.copy(this.q).multiply(_qA.setFromAxisAngle(Z_AXIS, this.alpha));
+    if (this.setGearVis) { const d = this.gear > 0.5 || this.state === 'cat' || this.state === 'deck' || this.state === 'trap' || this.state === 'final'; if (d !== this.gearShown) { this.gearShown = d; this.setGearVis(d); } }
+  }
   nose(out) { const ca = Math.cos(this.alpha), sa = Math.sin(this.alpha); return out.copy(this.fwd).multiplyScalar(ca).addScaledVector(this.up, sa); }
   get airborne() { return this.state === 'air' || this.state === 'final'; }
 }
@@ -3373,42 +3550,153 @@ function ciws(s, dt) {
     }
   }
 }
-// naval gun duels: ballistic shells against ships inside 18 km
-function shipGun(s, dt) {
-  if (!s.S.gun) return;
-  s.gunCd -= dt;
-  if (s.gunCd > 0) return;
-  let tgt = null, bd = 18000;
-  for (const [e] of picture[s.side]) if (e.kind === 'ship' && e.alive && !e.dying) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; tgt = e; } }
-  if (!tgt) { s.gunCd = 2; return; }
-  s.gunCd = 3.5;
-  const from = toWorld(s, s.radius * 0.75, 9, 0);
-  const tof = bd / 800;
-  const aim = tgt.pos.clone().addScaledVector(tgt.vel, tof);
-  shells.push({ from, to: aim.add(new V3(rand(-1, 1), 0, rand(-1, 1)).multiplyScalar(bd * 0.012)), t: 0, tof, owner: s, target: tgt, hitP: bd < 8000 ? 0.35 : bd < 13000 ? 0.2 : 0.1 });
-  if (near(from, 7000)) { Sound.burst(0.4, 900, 80, 0.4 * clamp(1 - from.distanceTo(camera.position) / 7000, 0, 1)); for (let i = 0; i < 10; i++) smoke.emit(from.x, from.y, from.z, rand(-4, 4), rand(2, 8), rand(-4, 4), rand(1.5, 3), 4, 18, 0.7, 0.7, 0.7, 0.7, 0.8); }
+// ---- naval guns: real ballistics with drag, fire-control solutions, impact and proximity fuzes ----
+const _gt = {};
+function gunTable(spec) {
+  if (_gt[spec.name]) return _gt[spec.name];
+  const rows = [];
+  for (let e = 0; e <= 45.01; e += 0.25) {
+    const el = e * D2R; let vx = spec.v0 * Math.cos(el), vy = spec.v0 * Math.sin(el), x = 0, y = 0, t = 0;
+    const h = 0.04;
+    while (y >= 0 && t < 120) { const v = Math.hypot(vx, vy); vx += -spec.k * v * vx * h; vy += (-9.81 - spec.k * v * vy) * h; x += vx * h; y += vy * h; t += h; }
+    rows.push([el, x, t]);
+  }
+  return (_gt[spec.name] = rows);
 }
-const shellMesh = new THREE.Mesh(new THREE.SphereGeometry(0.6, 6, 4), new THREE.MeshBasicMaterial({ color: 0xffc070 }));
-const shellPool = [];
+// elevation and time of flight for a horizontal range (low-angle solution)
+function solveElev(spec, R) {
+  const T = gunTable(spec);
+  for (let i = 1; i < T.length; i++) {
+    if (T[i][1] >= R) { const a = T[i - 1], b = T[i], k = (R - a[1]) / (b[1] - a[1]); return { elv: lerp(a[0], b[0], k), tof: lerp(a[2], b[2], k) }; }
+    if (T[i][1] < T[i - 1][1]) break;
+  }
+  return null;
+}
+function rangeAt(spec, elv) {
+  const T = gunTable(spec), i = clamp(Math.floor(elv / D2R / 0.25), 0, T.length - 2), a = T[i], b = T[i + 1], k = clamp((elv - a[0]) / (b[0] - a[0]), 0, 1);
+  return { R: lerp(a[1], b[1], k), tof: lerp(a[2], b[2], k) };
+}
+const gunMount = (s, out = new V3()) => toWorld(s, s.S.L * s.gun.spec.x, s.h * 0.35 + 3, 0, out);
+const gunDir = (s, brg, elv, out = new V3()) => { const h = s.heading + brg; return out.set(Math.cos(h) * Math.cos(elv), Math.sin(elv), -Math.sin(h) * Math.cos(elv)); };
+// where a shell fired at (brg, elv) comes down on the sea: what the director's crosshair shows
+function impactPoint(s, brg, elv, out = new V3()) {
+  const m = gunMount(s, _ga), R = rangeAt(s.gun.spec, Math.max(elv, 0)).R, h = s.heading + brg;
+  return out.set(m.x + Math.cos(h) * R, 0, m.z - Math.sin(h) * R);
+}
+// the sight looks at the fall of shot for ship targets, straight down the barrel for anti-air fire
+function sightPoint(s, brg, elv, out) {
+  if (s.gun.fuse === 'AA') return out.copy(gunMount(s, _ga)).addScaledVector(gunDir(s, brg, elv, _gc), 3000);
+  return impactPoint(s, brg, elv, out);
+}
+// fire-control solution: iterate time of flight against the target's motion
+function fcs(s, T) {
+  const g = s.gun, m = gunMount(s, _ga);
+  // shells carry the firing ship's own motion, so lead on the target's motion relative to ours
+  const tv = _gd.copy(T.vel || ZERO).sub(s.vel);
+  _gb.copy(T.pos);
+  let sol = null;
+  for (let i = 0; i < 4; i++) {
+    const d = Math.hypot(_gb.x - m.x, _gb.z - m.z);
+    sol = solveElev(g.spec, d);
+    if (!sol) return null;
+    const hgt = (T.kind === 'ship' ? T.h * 0.3 : T.pos.y) - m.y;
+    sol.elv += Math.atan2(hgt, d);
+    _gb.copy(T.pos).addScaledVector(tv, sol.tof);
+  }
+  const brg = wrapA(headingOf(_gc.subVectors(_gb, m)) - s.heading);
+  return { brg, elv: sol.elv, tof: sol.tof, range: Math.hypot(_gb.x - m.x, _gb.z - m.z), aim: _gb.clone() };
+}
+const _ga = new V3(), _gb = new V3(), _gc = new V3(), _gd = new V3();
+function fireGun(s, err) {
+  const g = s.gun;
+  if (g.cd > 0 || g.ammo <= 0) return false;
+  if (Math.abs(g.brg) > 2.6) return false;                       // the superstructure masks the arcs astern
+  g.cd = g.spec.rate; g.ammo--;
+  const m = gunMount(s, new V3()), dir = gunDir(s, g.brg, g.elv);
+  dir.x += rand(-err, err); dir.y += rand(-err, err) + s.list * 0.02; dir.z += rand(-err, err); dir.normalize();
+  m.addScaledVector(dir, 6);
+  shells.push({ pos: m.clone(), prev: m.clone(), vel: dir.multiplyScalar(g.spec.v0).add(s.vel), owner: s, side: s.side, spec: g.spec, fuse: g.fuse, t: 0, target: s === flagship ? game.gunTgt : g.tgt });
+  if (near(m, 9000)) {
+    const v = clamp(1 - m.distanceTo(camera.position) / 9000, 0, 1);
+    Sound.burst(0.55, 900, 60, (s === flagship ? 0.7 : 0.35) * v); Sound.burst(0.12, 3000, 600, 0.25 * v, 'bandpass');
+    for (let i = 0; i < 6; i++) fire.emit(m.x, m.y, m.z, dir.x * 60 + rand(-8, 8), dir.y * 60 + rand(-8, 8), dir.z * 60 + rand(-8, 8), 0.12, 8, 18, 1.5, 1.1, 0.6, 1);
+    for (let i = 0; i < 12; i++) smoke.emit(m.x, m.y, m.z, dir.x * 25 + rand(-5, 5), dir.y * 25 + rand(0, 6), dir.z * 25 + rand(-5, 5), rand(2, 4), 6, 30, 0.75, 0.74, 0.72, 0.7, 0.9);
+  }
+  if (s === flagship) game.shake = Math.max(game.shake, 0.6);
+  return true;
+}
+// mounts slew toward their ordered bearing and elevation at the real rates
+function slewGun(s, dt) {
+  const g = s.gun;
+  g.cd -= dt;
+  g.brg += clamp(wrapA(g.wantB - g.brg), -g.spec.train * D2R * dt, g.spec.train * D2R * dt);
+  g.elv += clamp(g.wantE - g.elv, -g.spec.elev * D2R * dt, g.spec.elev * D2R * dt);
+  g.wantE = clamp(g.wantE, -0.12, 1.2);
+}
+// gun crews (AI ships, and the player's ship outside the gunsight) engage the nearest enemy ship in range
+function shipGun(s, dt) {
+  if (!s.gun) return;
+  slewGun(s, dt);
+  if (s === flagship && game.gunsight) return;
+  s.gun.aimT -= dt;
+  if (s.gun.aimT <= 0) {
+    s.gun.aimT = 2;
+    let tgt = null, bd = s.gun.spec.maxR * 0.85;
+    for (const [e, tr] of picture[s.side]) if (e.kind === 'ship' && e.alive && !e.dying && game.t - tr.t < 5) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; tgt = e; } }
+    s.gun.tgt = tgt;
+  }
+  const t = s.gun.tgt;
+  if (!t || !t.alive || t.dying) return;
+  const sol = fcs(s, t);
+  if (!sol) return;
+  s.gun.wantB = sol.brg; s.gun.wantE = sol.elv; s.gun.fuse = 'HE';
+  if (Math.abs(wrapA(sol.brg - s.gun.brg)) < 0.01 && Math.abs(sol.elv - s.gun.elv) < 0.004) fireGun(s, 0.0032);
+}
+const shellMesh = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 6, 4), new THREE.MeshBasicMaterial({ color: 0xffd08a, toneMapped: false }), 240);
+shellMesh.frustumCulled = false; scene.add(shellMesh);
 function updateShells(dt) {
-  shellPool.forEach(m => { m.visible = false; });
+  let n = 0;
   for (let i = shells.length - 1; i >= 0; i--) {
-    const s = shells[i];
-    s.t += dt;
-    const k = s.t / s.tof;
-    if (k >= 1) {
-      shells.splice(i, 1);
-      if (s.target.alive && !s.target.dying && Math.random() < s.hitP) damageShip(s.target, rand(5, 9), { owner: s.owner, kind: 'gun' }, toWorld(s.target, rand(-50, 50), 8, rand(-5, 5)));
-      else splash(s.to, 0.7);
-      continue;
+    const sh = shells[i];
+    sh.prev.copy(sh.pos);
+    const v = sh.vel.length();
+    sh.vel.addScaledVector(sh.vel, -sh.spec.k * v * dt); sh.vel.y -= 9.81 * dt;
+    sh.pos.addScaledVector(sh.vel, dt); sh.t += dt;
+    let done = false;
+    // impact fuze against hulls
+    for (const s of ships) {
+      if (s.side === sh.side || !s.alive || s.sinkT > 40 || sh.pos.distanceToSquared(s.pos) > (s.radius + 120) ** 2) continue;
+      const steps = Math.max(1, Math.ceil(sh.prev.distanceTo(sh.pos) / 8));
+      for (let k = 1; k <= steps; k++) { _gc.lerpVectors(sh.prev, sh.pos, k / steps); if (insideShip(s, _gc, 1.5)) { damageShip(s, sh.spec.dmg * rand(0.8, 1.3), { owner: sh.owner, kind: 'gun' }, _gc.clone()); done = true; if (sh.owner === flagship) { game.gunHits = (game.gunHits || 0) + 1; game.lastFall = { t: game.t, text: '命中！' }; } break; } }
+      if (done) break;
     }
-    if (near(s.from, 20000)) {
-      let m = shellPool[i];
-      if (!m) { m = shellPool[i] = shellMesh.clone(); scene.add(m); }
-      m.visible = true;
-      m.position.lerpVectors(s.from, s.to, k); m.position.y += Math.sin(Math.PI * k) * s.tof * s.tof * 1.2;
+    // proximity fuze against missiles and aircraft
+    if (!done && sh.fuse === 'AA' && sh.t > 1) {
+      for (const m of missiles) if (m.alive && m.side !== sh.side && m.cls === 'ashm' && m.pos.distanceToSquared(sh.pos) < 22 * 22) {
+        explode(sh.pos, 0.5, null); done = true;
+        if (Math.random() < 0.6) { explode(m.pos, 0.8, null); const j = missiles.indexOf(m); scene.remove(m.mesh); m.alive = false; missiles.splice(j, 1); if (sh.owner === flagship) { message('舰炮击毁来袭导弹', '', '#8dffb4', 2); } }
+        break;
+      }
+      if (!done) for (const p of planes) if (p.alive && !p.dying && p.side !== sh.side && p.airborne && p.pos.distanceToSquared(sh.pos) < 28 * 28) { explode(sh.pos, 0.6, null); damagePlane(p, 70, { owner: sh.owner, kind: 'gun' }); done = true; break; }
+    }
+    if (!done && sh.pos.y < 0) {
+      splash(sh.pos, sh.spec.dmg > 10 ? 1.3 : 0.8);
+      // fall-of-shot report for the player: over / short against the designated target
+      if (sh.owner === flagship && sh.target && sh.target.alive) {
+        const to = _gc.subVectors(sh.target.pos, sh.owner.pos).setY(0), d = to.length();
+        const along = _ga.subVectors(sh.pos, sh.owner.pos).setY(0).dot(to) / d - d;
+        const cross = _ga.cross(to.normalize()).y;
+        if (Math.abs(along) < 2500) game.lastFall = { t: game.t, text: `${along > 0 ? '远弹' : '近弹'} ${Math.abs(along).toFixed(0)} 米 · 偏${cross > 0 ? '左' : '右'} ${Math.abs(cross).toFixed(0)} 米` };
+      }
+      done = true;
+    }
+    if (done || sh.t > 90) { shells.splice(i, 1); continue; }
+    if (n < 240 && near(sh.pos, 25000)) {
+      dummy.position.copy(sh.pos); dummy.quaternion.identity(); dummy.scale.setScalar(clamp(sh.pos.distanceTo(camera.position) / 900, 0.5, 5)); dummy.updateMatrix();
+      shellMesh.setMatrixAt(n++, dummy.matrix);
     }
   }
+  shellMesh.count = n; shellMesh.instanceMatrix.needsUpdate = true;
 }
 function updateFlares(dt) {
   for (let i = flares.length - 1; i >= 0; i--) {
@@ -3916,7 +4204,7 @@ function updateShip(s, dt) {
   // helm: AI keeps station on the guide; the player's ship follows the player's orders
   if (s !== flagship || game.ai) shipAI(s);
   const vmax = s.vmax();
-  s.order = clamp(s.order, 0, vmax);
+  s.order = clamp(s.order, s === flagship ? -5 : 0, vmax);
   s.speed += clamp(s.order - s.speed, -0.22 * dt, 0.12 * dt);
   s.helm += (s.rudder - s.helm) * (1 - Math.exp(-dt / 2.5));        // rudder takes time to bite
   s.heading = wrapA(s.heading - s.helm * s.S.turn * D2R * clamp(s.speed / 7, 0.15, 1) * dt);
@@ -3925,6 +4213,10 @@ function updateShip(s, dt) {
   s.pos.addScaledVector(s.vel, dt);
   if (groundAt(s.pos.x + _a.x * s.radius, s.pos.z + _a.z * s.radius) > 0) { s.speed = 0; s.order = 0; damageShip(s, 30 * dt, null, null); if (mine(s) && Math.random() < dt) radio(s.name, '搁浅！', '#ff8a78'); }
   // fires burn until damage control puts them out
+  // damage control: crews fight fires and flooding; a focused effort (player order, or the AI when burning) works much faster
+  s.dcCd -= dt;
+  if (s !== flagship && s.fires > 1.2 && s.dcCd <= 0) { s.dcT = 25; s.dcCd = 90; }
+  if (s.dcT > 0) { s.dcT -= dt; s.fires = Math.max(0, s.fires - dt * 0.08); s.hp = Math.min(s.maxHp * 0.85, s.hp + s.maxHp * 0.0025 * dt); s.list *= Math.exp(-dt * 0.05); }
   if (s.fires > 0) { s.hp -= s.fires * 0.5 * dt; s.fires = Math.max(0, s.fires - dt * 0.012); shipSmoke(s, s.fires); if (s.hp <= 0) sinkShip(s, null); }
   s.wakeT -= dt;
   if (s.wakeT <= 0 && near(s.pos, 9000) && s.speed > 2) {
@@ -4193,7 +4485,7 @@ function chapterEvent(kind, side, unit) {
 }
 
 /* ---------- input ---------- */
-const input = { stickX: 0, stickY: 0, keys: new Set(), gun: false, boost: false, brake: false, msl: false, flare: false, ashm: false, gear: false, acls: false, launch: false, decoy: false, target: false };
+const input = { stickX: 0, stickY: 0, keys: new Set(), gun: false, boost: false, brake: false, msl: false, flare: false, ashm: false, gear: false, acls: false, launch: false, decoy: false, target: false, fire: false, dc: false };
 addEventListener('keydown', e => {
   if (game.mode !== 'play' && game.mode !== 'paused') return;
   const k = e.code;
@@ -4208,6 +4500,9 @@ addEventListener('keydown', e => {
   if (k === 'Enter') input.launch = true;
   if (k === 'Tab') input.target = true;
   if (k === 'KeyM') toggleMap();
+  if (k === 'KeyB') toggleGunsight();
+  if (k === 'KeyK') input.dc = true;
+  if (game.gunsight) { if (k === 'KeyF') toggleFCS(); if (k === 'KeyU') toggleFuse(); if (k === 'KeyZ') toggleBino(); }
   if (k === 'KeyT') cycleScale();
   if (k === 'KeyY') toggleAI();
   if (k === 'KeyC' || k === 'KeyV') cycleView();
@@ -4247,7 +4542,8 @@ addEventListener('blur', () => { input.keys.clear(); input.gun = input.boost = i
     el.addEventListener('lostpointercapture', off);
   };
   const tap = (el, fn) => el.addEventListener('pointerdown', e => { e.preventDefault(); fn(); el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 140); });
-  hold($('b-gun'), 'gun'); hold($('b-ab'), 'boost'); hold($('b-brake'), 'brake');
+  hold($('b-gun'), 'gun'); hold($('b-ab'), 'boost'); hold($('b-brake'), 'brake'); hold($('g-fire'), 'fire');
+  tap($('c-gun'), toggleGunsight); tap($('g-exit'), toggleGunsight); tap($('g-fcs'), toggleFCS); tap($('g-fuse'), toggleFuse); tap($('g-zoom'), toggleBino); tap($('c-dc'), () => { input.dc = true; });
   tap($('b-msl'), () => { input.msl = true; }); tap($('b-flare'), () => { input.flare = true; });
   tap($('b-ashm'), () => { input.ashm = true; }); tap($('b-gear'), () => { input.gear = true; });
   tap($('b-launch'), () => { input.launch = true; input.acls = true; });
@@ -4269,6 +4565,40 @@ function readStick() {
     brake: input.brake || k.has('ControlLeft') || k.has('ControlRight') || k.has('KeyZ')
   };
 }
+function toggleGunsight() {
+  if (game.role !== 'captain' || !flagship || !flagship.gun) { if (game.role === 'captain') message('本舰没有主炮', '', '#9fb0ba', 1.4); return; }
+  game.gunsight = !game.gunsight; game.zoom = 1; game.fcsAuto = true;
+  $('cap-ctl').hidden = game.gunsight; $('gun-ctl').hidden = !game.gunsight;
+  if (game.gunsight) { const g = flagship.gun; g.wantB = g.brg; g.wantE = g.elv; message('炮瞄模式', `${g.spec.name} · 拖动瞄准，火控可自动解算`, '#e3b257', 2); }
+}
+function toggleFCS() { game.fcsAuto = !game.fcsAuto; message(game.fcsAuto ? '火控自动跟踪' : '手动瞄准', game.fcsAuto ? '主炮随动目标提前量' : '对准菱形标记再开火', '#e3b257', 1.4); $('g-fcs').classList.toggle('on', game.fcsAuto); }
+function toggleFuse() { const g = flagship && flagship.gun; if (!g) return; g.fuse = g.fuse === 'HE' ? 'AA' : 'HE'; message(g.fuse === 'HE' ? '触发引信 · 对舰' : '近炸引信 · 对空', g.fuse === 'AA' ? '可拦截来袭导弹与飞机' : '', '#e3b257', 1.4); $('g-fuse').innerHTML = g.fuse === 'HE' ? '引信<br>触发' : '引信<br>近炸'; }
+function toggleBino() { game.zoom = (game.zoom || 1) > 0.5 ? 0.2 : 1; }
+// the gunsight laid by dragging: bearing and elevation orders, scaled to the zoom
+function gunLay(dx, dy) {
+  const g = flagship && flagship.gun; if (!g) return;
+  const f = (game.zoom || 1) * 0.0022;
+  g.wantB = wrapA(g.wantB - dx * f); g.wantE = clamp(g.wantE - dy * f * 0.6, -0.12, 1.2);
+  if (game.fcsAuto) { game.fcsAuto = false; $('g-fcs').classList.remove('on'); }
+}
+// tap a contact on screen to designate it
+function selectAt(x, y) {
+  if (game.mode !== 'play') return;
+  let best = null, bd = 46;
+  for (const [e, tr] of picture[game.side]) {
+    if (!e.alive || e.dying) continue;
+    const pp = proj(e.kind === 'ship' || e.kind === 'base' ? tr.pos : e.pos);
+    if (pp.behind) continue;
+    const d = Math.hypot(pp.x - x, pp.y - y);
+    if (d < bd) { bd = d; best = e; }
+  }
+  if (!best) return;
+  if (best.kind === 'ship' || best.kind === 'base') game.ashmSel = best;
+  game.gunTgt = best;
+  if (game.role === 'captain' && flagship && flagship.gun && best.kind !== 'ship' && best.kind !== 'base') flagship.gun.fuse = 'AA';
+  message('目标指定', best.name || (best.spec && best.spec.name) || '', '#e3b257', 1.2);
+  Sound.beep(1500, 0.05, 0.05);
+}
 function toggleMap() { game.map = !game.map; $('b-map')?.classList.toggle('on', game.map); }
 const SCALES = [1, 2, 4, 8];
 function cycleScale() {
@@ -4284,7 +4614,7 @@ function toggleAI() {
   message(game.ai ? (game.role === 'pilot' ? 'AI 自动驾驶 开启' : 'AI 舰长 开启') : '手动控制', game.ai ? '执行当前任务 · 拖动摇杆可临时接管' : '', '#e3b257', 1.8);
   $('b-ai').classList.toggle('on', game.ai);
 }
-function cycleView() { game.view = (game.view + 1) % (game.role === 'pilot' ? 2 : 4); game.viewT = 0; }
+function cycleView() { game.view = (game.view + 1) % (game.role === 'pilot' ? 2 : 4); game.viewT = 0; look.yaw = look.pitch = 0; game.zoom = 1; }
 
 /* ---------- the player as a pilot ---------- */
 const ctlS = { pitch: 0, roll: 0 };
@@ -4440,14 +4770,31 @@ function updateCaptain(dt) {
   if (!s || !s.alive || s.dying) return;
   const rud = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0) + input.stickX;
   const thr = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0) + input.stickY;
-  if (!game.ai || Math.abs(rud) + Math.abs(thr) > 0.15) {
+  if (!game.gunsight && (!game.ai || Math.abs(rud) + Math.abs(thr) > 0.15)) {
     s.rudder = clamp(rud, -1, 1);
-    s.order = clamp(s.order + thr * 3 * dt, 0, s.vmax());
+    s.order = clamp(s.order + thr * 3 * dt, -5, s.vmax());
   }
   const list = captainTargets();
   if (input.target) { input.target = false; if (list.length) { const i = list.indexOf(game.ashmSel); game.ashmSel = list[(i + 1) % list.length]; } }
   if (!list.includes(game.ashmSel)) game.ashmSel = list[0] || null;
   if (input.decoy) { input.decoy = false; if (s.decoys > 0 && s.decoyCd <= 0) fireDecoy(s); else message(s.decoys > 0 ? '诱饵装填中' : '诱饵耗尽', '', '#9fb0ba', 1.2); }
+  if (input.dc) { input.dc = false; if (s.dcCd <= 0) { s.dcT = 25; s.dcCd = 90; message('损管队全力抢修', '灭火、堵漏、恢复系统 · 25 秒', '#e3b257', 2); radio(s.name, '全舰损管！', '#9fd4ff'); } else message('损管队整备中', `${Math.ceil(s.dcCd)} 秒`, '#9fb0ba', 1.2); }
+  // gunsight: the player lays and fires the main gun
+  if (game.gunsight && s.gun) {
+    const g = s.gun;
+    if (g.fuse === 'AA' && (!game.gunTgt || !game.gunTgt.alive || (game.gunTgt.kind !== 'msl' && game.gunTgt.kind !== 'plane'))) {
+      let best = null, bd = 12000;
+      for (const [e] of picture[s.side]) if ((e.kind === 'msl' || e.kind === 'plane') && e.alive && !e.dying) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; best = e; } }
+      game.gunTgt = best;
+    } else if (g.fuse === 'HE' && (!game.gunTgt || !game.gunTgt.alive || game.gunTgt.kind !== 'ship')) game.gunTgt = game.ashmSel && game.ashmSel.kind === 'ship' ? game.ashmSel : null;
+    game.gunSol = game.gunTgt && game.gunTgt.alive ? fcs(s, game.gunTgt) : null;
+    if (game.fcsAuto && game.gunSol) { g.wantB = game.gunSol.brg; g.wantE = game.gunSol.elv; }
+    const kb = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0), ke = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
+    if (kb || ke) gunLay(kb * 6, -ke * 6);
+    if (Math.abs(input.stickX) + Math.abs(input.stickY) > 0.05) gunLay(input.stickX * 7, -input.stickY * 7);   // the left stick lays the gun too
+    if (input.fire || k.has('Space')) fireGun(s, 0.0024);
+    return;
+  }
   if (input.ashm) {
     input.ashm = false;
     const t = game.ashmSel;
@@ -4513,18 +4860,40 @@ function updateBase(b, dt) {
 }
 
 /* ---------- camera ---------- */
-const camQ = new Q();
+const camQ = new Q(), _qL = new Q();
 let camDist = 26, fov = 60;
 const camTarget = new V3(), camPos = new V3();
 let orbitA = 0.6, orbitE = 0.32;
 {
-  // drag on empty sky to orbit the captain / spectator camera
-  let id = null, lx = 0, ly = 0;
-  stage.addEventListener('pointerdown', e => { if (game.role === 'pilot') return; id = e.pointerId; lx = e.clientX; ly = e.clientY; });
-  addEventListener('pointermove', e => { if (e.pointerId !== id) return; orbitA -= (e.clientX - lx) * 0.006; orbitE = clamp(orbitE + (e.clientY - ly) * 0.004, 0.04, 1.4); lx = e.clientX; ly = e.clientY; });
-  addEventListener('pointerup', e => { if (e.pointerId === id) id = null; });
+  // free look: drag anywhere that is not a control to swing the camera, pinch or wheel to zoom.
+  // Pilots get a look-around that springs back behind the jet; captains and spectators orbit freely.
+  const pts = new Map();
+  let pinch0 = 0, zoom0 = 1;
+  stage.addEventListener('pointerdown', e => {
+    pts.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now() });
+    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = game.zoom || 1; }
+    look.active = true;
+  });
+  addEventListener('pointermove', e => {
+    const q = pts.get(e.pointerId);
+    if (!q) return;
+    const dx = e.clientX - q.x, dy = e.clientY - q.y;
+    q.x = e.clientX; q.y = e.clientY;
+    if (pts.size >= 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0 > 10) game.zoom = clamp(zoom0 * pinch0 / d, 0.3, 6); return; }
+    if (game.gunsight) { gunLay(dx, dy); return; }
+    if (game.role === 'pilot') { look.yaw = clamp(look.yaw - dx * 0.008, -Math.PI, Math.PI); look.pitch = clamp(look.pitch + dy * 0.006, -1.2, 1.2); look.idle = 0; }
+    else if (game.role === 'captain' && game.view === 1) { look.yaw -= dx * 0.004; look.pitch = clamp(look.pitch - dy * 0.003, -0.6, 0.5); }
+    else { orbitA -= dx * 0.006; orbitE = clamp(orbitE + dy * 0.004, 0.04, 1.45); }
+  });
+  const up = e => {
+    const q = pts.get(e.pointerId);
+    if (q && pts.size === 1 && Math.hypot(e.clientX - q.x0, e.clientY - q.y0) < 9 && performance.now() - q.t0 < 350) selectAt(e.clientX, e.clientY);
+    pts.delete(e.pointerId); if (!pts.size) look.active = false;
+  };
+  addEventListener('pointerup', up); addEventListener('pointercancel', up);
   stage.addEventListener('wheel', e => { game.zoom = clamp((game.zoom || 1) * (e.deltaY > 0 ? 1.12 : 0.89), 0.3, 6); }, { passive: true });
 }
+const look = { yaw: 0, pitch: 0, active: false, idle: 0 };
 function orbit(target, dist, dt, smoothK = 3) {
   const ce = Math.cos(orbitE), se = Math.sin(orbitE);
   camPos.set(target.x + Math.cos(orbitA) * ce * dist, target.y + se * dist, target.z + Math.sin(orbitA) * ce * dist);
@@ -4563,6 +4932,7 @@ function director(dt) {
     for (const s of ships) if (s.dying && s.sinkT < 50) cands.push([s, 4]);
     cands.push([ships.find(s => s.side === game.side && s.alive) || ships[0], 1]);
     cands.sort((a, b) => b[1] - a[1] + rand(-1, 1));
+    if (cands[0] && cands[0][0] !== game.focus) game.snap = 2;   // a cut, not a pan, between shots
     game.focus = cands[0] && cands[0][0];
   }
   const t = game.focus;
@@ -4589,8 +4959,8 @@ function updateCamera(dt) {
     const p = player;
     if (p.state === 'cat' || p.state === 'deck' || p.state === 'trap' || p.state === 'queued') {
       // on deck: a deck-crew view from behind and above
-      _a.copy(p.fwd).setY(0).normalize();
-      camPos.copy(p.pos).addScaledVector(_a, -34).add(_b.set(0, 9, 0)).addScaledVector(p.right, 8);
+      _a.copy(p.fwd).setY(0).normalize().applyAxisAngle(Y_AXIS, look.yaw);
+      camPos.copy(p.pos).addScaledVector(_a, -34 * (game.zoom || 1)).add(_b.set(0, 9 + look.pitch * 20, 0)).addScaledVector(p.right, 8);
       camera.position.lerp(camPos, 1 - Math.exp(-dt * 4)); camera.up.copy(Y_AXIS);
       camera.lookAt(_c.copy(p.pos).addScaledVector(_a, 30));
       camQ.copy(p.q); fov = 58;
@@ -4601,20 +4971,38 @@ function updateCamera(dt) {
       else game.view = 0;
     } else {
       camQ.slerp(p.q, 1 - Math.exp(-dt * 4.5));
-      const back = _a.set(-1, 0, 0).applyQuaternion(camQ), up = _b.set(0, 1, 0).applyQuaternion(camQ), fw = _c.set(1, 0, 0).applyQuaternion(camQ);
-      camDist += ((p.boost ? 31 : 25) * (p.T.radius / 8) - camDist) * (1 - Math.exp(-dt * 2));
+      // look-around: springs back behind the jet a moment after the finger lifts
+      if (!look.active) { look.idle += dt; if (look.idle > 1.2) { const k = 1 - Math.exp(-dt * 3); look.yaw -= look.yaw * k; look.pitch -= look.pitch * k; } }
+      _q.setFromAxisAngle(Y_AXIS, look.yaw).multiply(_qA.setFromAxisAngle(Z_AXIS, -look.pitch));
+      const lq = _qL.copy(camQ).multiply(_q);
+      const back = _a.set(-1, 0, 0).applyQuaternion(lq), up = _b.set(0, 1, 0).applyQuaternion(camQ), fw = _c.set(1, 0, 0).applyQuaternion(lq);
+      camDist += ((p.boost ? 31 : 25) * (p.T.radius / 8) * (game.zoom || 1) - camDist) * (1 - Math.exp(-dt * 2));
       camera.position.copy(p.pos).addScaledVector(back, camDist).addScaledVector(up, 6.2 * p.T.radius / 8);
       camera.up.copy(up);
-      camera.lookAt(camTarget.copy(p.pos).addScaledVector(fw, 30).addScaledVector(up, 2.4));
+      const free = Math.abs(look.yaw) + Math.abs(look.pitch) > 0.05;
+      camera.lookAt(camTarget.copy(p.pos).addScaledVector(fw, free ? 0 : 30).addScaledVector(up, free ? 0 : 2.4));
       fov += ((p.boost ? 70 : 60) - fov) * (1 - Math.exp(-dt * 2));
     }
+  } else if (game.role === 'captain' && flagship && game.gunsight && flagship.gun) {
+    // over the gun mount, looking down the barrel
+    const s = flagship, g = s.gun, m = gunMount(s, camPos), dir = gunDir(s, g.brg, 0, _d);
+    camera.position.copy(m).addScaledVector(dir, -14).addScaledVector(Y_AXIS, 6);
+    camera.up.copy(Y_AXIS);
+    camera.lookAt(sightPoint(s, g.brg, g.elv, _c));
+    fov = 45 * (game.zoom || 1);
   } else if (game.role === 'captain' && flagship) {
     const s = flagship;
     if (game.view === 3) { const m = ownMissile(); if (m) chaseMissile(m, dt); else orbit(_d.copy(s.pos).setY(20), s.S.L * 1.5 * (game.zoom || 1), dt); }
-    else if (game.view === 1) { toWorld(s, s.S.L * 0.15, s.h + 6, 0, camPos); camera.position.copy(camPos); camera.up.copy(Y_AXIS); camera.lookAt(toWorld(s, s.S.L * 2, s.h * 0.4, 0, _d)); }
+    else if (game.view === 1) {
+      // bridge wing: look anywhere by dragging; zoom works as binoculars
+      toWorld(s, s.S.L * 0.27, s.h * 0.62, 0, camPos); camera.position.copy(camPos); camera.up.copy(Y_AXIS);
+      const h = s.heading + look.yaw;
+      camera.lookAt(_d.set(camPos.x + Math.cos(h) * 1000, camPos.y + Math.tan(look.pitch) * 1000 - 20, camPos.z - Math.sin(h) * 1000));
+      fov = 55 * clamp(game.zoom || 1, 0.12, 1.4);
+    }
     else if (game.view === 2) { orbitE = 1.25; orbit(_d.copy(s.pos), s.S.L * 6 * (game.zoom || 1), dt); }
     else { if (orbitE > 1.2) orbitE = 0.3; orbit(_d.copy(s.pos).setY(20), s.S.L * 1.5 * (game.zoom || 1), dt); }
-    fov = 55;
+    if (game.view !== 1) fov = 55;
   } else director(dt);
   if (camera.position.y < 2) camera.position.y = 2;
   if (game.shake > 0.01 && !reduced) {
@@ -4870,7 +5258,7 @@ function drawCaptain() {
   drawContacts(s.pos, 40000, 150000);
   const sx = 16, sy = compact ? 46 : 54;
   hc.save();
-  hc.fillStyle = 'rgba(6,12,18,0.5)'; hc.fillRect(sx - 8, sy - 16, 236, compact ? 150 : 176);
+  hc.fillStyle = 'rgba(6,12,18,0.5)'; hc.fillRect(sx - 8, sy - 16, 250, compact ? 160 : 168);
   hc.restore();
   hc.strokeStyle = HUDC; hc.lineWidth = 1.2;
   text(`${s.name} · ${s.spec.name || ''}`, sx, sy, GOLD, `700 13px ${SANS}`);
@@ -4881,6 +5269,8 @@ function drawCaptain() {
   text(`舰空：${Object.entries(s.sam).map(([k, n]) => `${MSL[k].name} ${n}`).join('  ')}`, sx, sy + 50, HUDC, `500 10px ${SANS}`);
   const ash = Object.entries(s.ashm);
   text(`反舰：${ash.length ? ash.map(([k, n]) => `${MSL[k].name} ${n}`).join('  ') : '无'}`, sx, sy + 66, AMBER, `500 10px ${SANS}`);
+  const tele = s.order < -0.5 ? '后退' : s.order < 0.5 ? '停车' : s.order < s.S.vmax * 0.4 ? '前进一' : s.order < s.S.vmax * 0.75 ? '前进二' : '前进三';
+  text(`车钟 ${tele}${s.gun ? `  主炮 ${s.gun.ammo}` : ''}  损管 ${s.dcT > 0 ? '抢修中' : s.dcCd > 0 ? Math.ceil(s.dcCd) + ' s' : '就绪'}`, sx, sy + (compact ? 136 : 140), HUDC, `500 10px ${SANS}`);
   text(`诱饵 ${s.decoys}  火控通道 ${s.busy}/${s.channels}${s.carrier ? `  舰载机 ${Object.values(s.hangar).reduce((a, b) => a + b, 0) + s.ready.length}` : ''}`, sx, sy + 82, HUDC, `500 10px ${SANS}`);
   const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== s.side && known(s.side, m));
   if (inbound.length) {
@@ -4897,6 +5287,52 @@ function drawCaptain() {
   } else text('没有掌握敌舰位置 · 等待舰载机或预警机侦察', sx, sy + (compact ? 118 : 120), '#9fb0ba', `500 11px ${SANS}`);
   if (game.ai) text('AI 舰长指挥中 · 操纵摇杆即可临时接管', HW / 2, compact ? 60 : 70, GOLD, `700 12px ${SANS}`, 'center');
   drawScope(s.pos, fwdOf(s.heading, _c), 90000, '雷达 90 km');
+}
+// gunsight: reticle with mil ticks, fire-control diamond, rangefinder and fall of shot
+function drawGunsight() {
+  const s = flagship, g = s.gun, cx = HW / 2, cy = HH / 2, compact = HH < 480;
+  const pxPerRad = HH / 2 / Math.tan(camera.fov * D2R / 2);
+  hc.save();
+  hc.strokeStyle = HUDC; hc.fillStyle = HUDC; hc.lineWidth = 1.4;
+  hc.beginPath(); hc.moveTo(cx - 60, cy); hc.lineTo(cx - 12, cy); hc.moveTo(cx + 12, cy); hc.lineTo(cx + 60, cy); hc.moveTo(cx, cy - 60); hc.lineTo(cx, cy - 12); hc.moveTo(cx, cy + 12); hc.lineTo(cx, cy + 60); hc.stroke();
+  hc.beginPath(); hc.arc(cx, cy, 3, 0, Math.PI * 2); hc.fill();
+  text(g.fuse === 'AA' ? '炮管指向' : '弹着点', cx + 14, cy - 8, HUDC, `600 10px ${SANS}`);
+  hc.font = `500 9px ${MONO}`; hc.textAlign = 'left';
+  for (let m = -20; m <= 20; m += 5) { if (!m) continue; const off = m / 1000 * pxPerRad; if (Math.abs(off) > HH * 0.45) continue; hc.beginPath(); hc.moveTo(cx - 6, cy + off); hc.lineTo(cx + 6, cy + off); hc.stroke(); hc.fillText(String(-m), cx + 9, cy + off + 3); }
+  // the ordered lay (where the mount is slewing to)
+  const want = proj(sightPoint(s, g.wantB, g.wantE, _a));
+  if (!want.behind) { hc.save(); hc.globalAlpha = 0.55; hc.strokeRect(want.x - 7, want.y - 7, 14, 14); hc.restore(); }
+  const sol = game.gunSol, T = game.gunTgt;
+  if (T && T.alive) {
+    const tp = proj(T.kind === 'ship' ? _a.copy(T.pos).setY(T.h * 0.3) : T.pos);
+    if (!tp.behind) { hc.save(); hc.strokeStyle = RED; hc.lineWidth = 2; hc.strokeRect(tp.x - 16, tp.y - 16, 32, 32); hc.restore(); text(T.name || (T.spec && T.spec.name) || '', tp.x + 20, tp.y - 8, RED, `600 11px ${SANS}`); }
+  }
+  // fire-control solution: put the reticle on the diamond and fire
+  if (sol) {
+    const sp = proj(g.fuse === 'AA' ? sightPoint(s, sol.brg, sol.elv, _a) : _a.copy(sol.aim).setY(0));
+    if (!sp.behind) {
+      hc.save(); hc.strokeStyle = GOLD; hc.lineWidth = 2;
+      hc.beginPath(); hc.moveTo(sp.x, sp.y - 11); hc.lineTo(sp.x + 11, sp.y); hc.lineTo(sp.x, sp.y + 11); hc.lineTo(sp.x - 11, sp.y); hc.closePath(); hc.stroke(); hc.restore();
+      const err = Math.hypot(wrapA(sol.brg - g.brg), sol.elv - g.elv) * 1000;
+      text(err < 1.5 ? '诸元吻合 · 开火' : `偏差 ${err.toFixed(1)} 密位`, sp.x, sp.y + 26, err < 1.5 ? HUDC : GOLD, `700 11px ${SANS}`, 'center');
+    }
+  }
+  hc.restore();
+  const x0 = 16, y0 = compact ? 46 : 54;
+  hc.save(); hc.fillStyle = 'rgba(6,12,18,0.55)'; hc.fillRect(x0 - 8, y0 - 16, 262, compact ? 148 : 160); hc.restore();
+  const shot = rangeAt(g.spec, Math.max(g.elv, 0));
+  const relDeg = ((-g.brg / D2R) + 360) % 360;
+  text(`${s.name} · ${g.spec.name}`, x0, y0, GOLD, `700 12px ${SANS}`);
+  text(`方位 ${relDeg.toFixed(1)}°（${g.brg < 0 ? '右舷' : '左舷'}）  仰角 ${(g.elv / D2R).toFixed(2)}°`, x0, y0 + 18, HUDC, `500 11px ${MONO}`);
+  text(`落点距离 ${km(shot.R)} km  飞行 ${shot.tof.toFixed(1)} s`, x0, y0 + 34, HUDC, `500 11px ${MONO}`);
+  text(`弹药 ${g.ammo}  装填 ${g.cd > 0 ? g.cd.toFixed(1) + ' s' : '就绪'}  引信 ${g.fuse === 'HE' ? '触发' : '近炸'}`, x0, y0 + 50, g.cd > 0 ? GOLD : HUDC, `500 11px ${MONO}`);
+  text(game.fcsAuto ? '火控：自动跟踪' : '火控：手动', x0, y0 + 66, game.fcsAuto ? HUDC : AMBER, `700 11px ${SANS}`);
+  if (T && T.alive) text(`目标 ${T.name || (T.spec && T.spec.name) || ''} · ${km(T.pos.distanceTo(s.pos))} km${sol ? '' : ' · 超出射程'}`, x0, y0 + 84, sol ? GOLD : '#9fb0ba', `600 11px ${SANS}`);
+  else text(g.fuse === 'HE' ? '点击屏幕上的敌舰指定目标' : '没有来袭目标', x0, y0 + 84, '#9fb0ba', `500 11px ${SANS}`);
+  if (Math.abs(g.brg) > 2.6) text('射界受限：舰体遮挡', cx, cy + 90, WARN, `700 13px ${SANS}`, 'center');
+  if (game.lastFall && game.t - game.lastFall.t < 4) text(game.lastFall.text, cx, cy - 80, game.lastFall.text === '命中！' ? '#8dffb4' : AMBER, `800 ${compact ? 16 : 20}px ${SANS}`, 'center');
+  text(`望远 ×${(1 / (game.zoom || 1)).toFixed(0)}`, HW - 20, HH - (isTouch ? 230 : 30), '#eef3f5', `600 11px ${MONO}`, 'right');
+  drawScope(s.pos, fwdOf(s.heading, _c), 30000, '雷达 30 km');
 }
 // full tactical picture
 function drawMap() {
@@ -4935,6 +5371,7 @@ function drawHUD(dt) {
   if (game.mode !== 'play' && game.mode !== 'paused') { Sound.rwrTone(false); return; }
   if (HQ()) { hc.shadowColor = 'rgba(0,0,0,0.5)'; hc.shadowBlur = 3; }
   if (game.role === 'pilot' && player && player.alive) drawPilot(dt);
+  else if (game.role === 'captain' && game.gunsight && flagship && flagship.gun) drawGunsight();
   else if (game.role === 'captain') drawCaptain();
   else { drawContacts(camera.position, 30000, 150000); const f = game.focus; if (f) text(f.kind === 'msl' ? `${f.spec.name} → ${f.target?.name || ''}` : f.name || '', HW / 2, HH - 40, '#eef3f5', `600 13px ${SANS}`, 'center'); }
   drawTop();
@@ -5060,7 +5497,7 @@ function takeRole(role, pick) {
   }
   sunLight.shadow.camera.far = 1200; sunLight.shadow.camera.updateProjectionMatrix();
   $('pilot-ctl').hidden = role !== 'pilot';
-  $('cap-ctl').hidden = role !== 'captain';
+  $('cap-ctl').hidden = role !== 'captain'; $('gun-ctl').hidden = true; game.gunsight = false;
   $('stick-zone').hidden = role === 'watch';
   $('b-ai').hidden = role === 'watch';
   $('b-ai').textContent = role === 'captain' ? 'AI 舰长' : 'AI 驾驶';
@@ -5077,7 +5514,7 @@ function show(name) {
 }
 function toMenu() {
   setupBattle();
-  game.mode = 'menu'; game.role = 'watch'; game.t = 0;
+  game.mode = 'menu'; game.role = 'watch'; game.t = 0; game.snap = 3;
   Sound.engine(0, 0, false); Sound.lockTone(false); Sound.rwrTone(false);
   show('menu');
 }
@@ -5240,10 +5677,16 @@ function update(dt) {
 /* ---------- boot ---------- */
 renderSettings();
 applyQuality();
-toMenu();
 clock.getDelta();
 frame();
-$('loading').hidden = true;
+$('loading').textContent = '正在下载舰船与舰载机模型 0 / 8';
+NavyHD.loadAll((n, total) => { $('loading').textContent = `正在下载舰船与舰载机模型 ${n} / ${total}`; }).then(() => {
+  toMenu();
+  $('loading').hidden = true;
+  window.__navwarReady = true;
+  const cr = $('credits');
+  if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
+});
 window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input };
 </script>
 </html>
