@@ -5718,17 +5718,20 @@ function cinePlay(shots, onDone) {
   game.cine = { shots, i: 0, t: 0, onDone };
   game.snap = 2;
 }
-function cineStop() {
+function cineStop(skip = false) {
   const c = game.cine; game.cine = null; game.snap = 2;
-  if (c && c.onDone) c.onDone();
+  if (c && c.onDone && !skip) c.onDone();
 }
 function updateCine(dt) {
   const c = game.cine; if (!c) return false;
   const sh = c.shots[c.i];
   if (!sh) { cineStop(); return false; }
-  c.t += dt;
+  // the cut frame after a shot change passes a huge dt to snap the camera; the shot clock must not jump with it
+  const now = performance.now(), step = c.last ? Math.min((now - c.last) / 1000, 0.5) : 0;
+  c.last = now;
+  c.t += step;
   sh.fn(c.t, dt);
-  if (c.t >= sh.dur) { c.i++; c.t = 0; game.snap = 2; }
+  if (c.t >= sh.dur) { c.i++; c.t = 0; c.last = 0; game.snap = 2; }
   return true;
 }
 // shots built from live units
@@ -5830,7 +5833,7 @@ function runPrologue(done) {
   const esc = ships.find(s => s.side === game.side && !s.carrier && !s.S.sub);
   // the flyover runs on the 3D view behind the map once the map has faded
   const shots = [own && shot.orbit(own, 700, 120, 0.05, 7), esc && shot.low(esc, 6), foeC && shot.orbit(foeC, 900, 200, -0.04, 7), own && shot.orbit(own, 260, 40, 0.09, 6)].filter(Boolean);
-  const finish = () => { if (ended) return; ended = true; cancelAnimationFrame(raf); el.hidden = true; cineStop(); game.cine = null; done(); };
+  const finish = () => { if (ended) return; ended = true; cancelAnimationFrame(raf); el.hidden = true; cineStop(true); done(); };
   $('cine-skip').onclick = finish;
   const step = () => {
     const now = performance.now(), dt = Math.min((now - last) / 1000, 0.5); last = now; t += dt;
@@ -5838,7 +5841,7 @@ function runPrologue(done) {
     if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
     const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0);
     if (t < T_MAP) { cv.style.opacity = String(clamp(t / 1.2, 0, 1) * clamp((T_MAP - t) / 1.5, 0, 1)); drawPrologueMap(g, W, H, t, game.side); }
-    else { cv.style.opacity = '0'; if (!game.cine && shots.length) cinePlay(shots.slice()); }
+    else { cv.style.opacity = '0'; if (!game.cine && shots.length) { const loop = () => { if (!ended) cinePlay(shots.slice(), loop); }; loop(); } }
     const nl = Math.min(lines.length - 1, Math.floor(t / T_LINE));
     if (nl !== li) {
       li = nl; const [txt, kind] = lines[li];
@@ -6380,6 +6383,8 @@ function updateCamera(dt) {
   if (game.snap > 0) { game.snap--; dt = 10; }
   if (game.cine && updateCine(dt)) {
     // the cinematic placed the camera
+  } else if (game.mode === 'cine') {
+    // between shots of a cinematic the camera holds still
   } else if (game.mode === 'menu') {
     game.menuA += dt * 0.05;
     const c = ships.find(s => s.side === game.side && s.carrier) || ships[0];
@@ -7351,8 +7356,9 @@ function adapt(raw) {
   if (perf.t < 2) return;
   perf.t = 0;
   const was = perf.scale;
-  if (perf.avg > 1 / 36 && perf.scale > 0.5) perf.scale = Math.max(0.5, perf.scale - 0.15);
-  else if (perf.avg < 1 / 54 && perf.scale < 1) perf.scale = Math.min(1, perf.scale + 0.1);
+  perf.hold = (perf.hold || 0) - 2;
+  if (perf.avg > 1 / 34 && perf.scale > 0.5) { perf.scale = Math.max(0.5, perf.scale - 0.15); perf.hold = 20; }
+  else if (perf.avg < 1 / 57 && perf.scale < 1 && perf.hold <= 0) { perf.scale = Math.min(1, perf.scale + 0.1); perf.hold = 10; }
   if (perf.scale !== was) applyQuality();
 }
 function lod() {

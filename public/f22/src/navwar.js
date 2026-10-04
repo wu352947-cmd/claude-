@@ -2585,6 +2585,8 @@ function updateCamera(dt) {
   if (game.snap > 0) { game.snap--; dt = 10; }
   if (game.cine && updateCine(dt)) {
     // the cinematic placed the camera
+  } else if (game.mode === 'cine') {
+    // between shots of a cinematic the camera holds still
   } else if (game.mode === 'menu') {
     game.menuA += dt * 0.05;
     const c = ships.find(s => s.side === game.side && s.carrier) || ships[0];
@@ -3305,8 +3307,9 @@ function adapt(raw) {
   if (perf.t < 2) return;
   perf.t = 0;
   const was = perf.scale;
-  if (perf.avg > 1 / 36 && perf.scale > 0.5) perf.scale = Math.max(0.5, perf.scale - 0.15);
-  else if (perf.avg < 1 / 54 && perf.scale < 1) perf.scale = Math.min(1, perf.scale + 0.1);
+  perf.hold = (perf.hold || 0) - 2;
+  if (perf.avg > 1 / 34 && perf.scale > 0.5) { perf.scale = Math.max(0.5, perf.scale - 0.15); perf.hold = 20; }
+  else if (perf.avg < 1 / 57 && perf.scale < 1 && perf.hold <= 0) { perf.scale = Math.min(1, perf.scale + 0.1); perf.hold = 10; }
   if (perf.scale !== was) applyQuality();
 }
 function lod() {
