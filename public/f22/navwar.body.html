@@ -3403,6 +3403,7 @@ function message(text, sub = '', color = '#8dffb4', dur = 2.4) {
 }
 function radio(from, text, color = '#cfe8ff') {
   game.radio.push({ from, text, color, t: 5 });
+  if (dbg.log) dbg.log.push(`${Math.round(game.t)} ${from}: ${text}`);
   if (game.radio.length > 4) game.radio.shift();
 }
 const mine = u => u.side === game.side;
@@ -3936,8 +3937,10 @@ function updateASHM(m, i, dt) {
   if (m.age > 4) m.phase = 'cruise';
   m.speed += (v - m.speed) * (1 - Math.exp(-dt * (m.age < 2 ? 1.5 : 0.8)));
   // seeker
-  if (!m.seekerOn && hd < 17000) {
-    m.seekerOn = true;
+  // seeker: switched on 17 km out, it keeps searching its cone (every half second) until it finds a ship
+  m.seekT = (m.seekT || 0) - dt;
+  if (!m.locked && hd < 17000 && m.seekT <= 0) {
+    m.seekerOn = true; m.seekT = 0.5;
     const tgt = acquire(m);
     if (tgt) { m.target = tgt; m.locked = true; }
   }
@@ -3979,7 +3982,7 @@ function updateASHM(m, i, dt) {
   m.dist = (m.dist || 0) + m.speed * dt;
   // a missile that has flown past its aim point without hitting anything is spent
   if (hd < 300 && m.pos.y < 30) m.closest = Math.min(m.closest ?? 1e9, hd);
-  if (m.pos.y < 0.5 || m.dist > m.range || (m.closest < 300 && hd > m.closest + 150)) { if (m.locked && (dbg.misses = dbg.misses || []).length < 12) dbg.misses.push({ side: m.side, n: S.name, tgt: m.target && m.target.name, tk: m.target && m.target.kind, alive: m.target && m.target.alive, d: m.target && Math.round(m.target.pos.distanceTo(m.pos)), y: Math.round(m.pos.y), dist: Math.round(m.dist), range: m.range, hd: Math.round(hd) }); dbg.miss++; dbg.fate[m.side][m.locked ? 'missLocked' : 'missNoLock'] = (dbg.fate[m.side][m.locked ? 'missLocked' : 'missNoLock'] || 0) + 1; if (!m.locked) dbg.noSeeker++; endMissile(m, i); }
+  if (m.pos.y < 0.5 || m.dist > m.range || (m.closest < 300 && hd > m.closest + 150)) { if ((dbg.misses = dbg.misses || []).length < 24) dbg.misses.push({ side: m.side, n: S.name, tgt: m.target && m.target.name, tk: m.target && m.target.kind, alive: m.target && m.target.alive, d: m.target && Math.round(m.target.pos.distanceTo(m.pos)), y: Math.round(m.pos.y), dist: Math.round(m.dist), range: m.range, hd: Math.round(hd), locked: m.locked, age: Math.round(m.age), seek: m.seekerOn }); dbg.miss++; dbg.fate[m.side][m.locked ? 'missLocked' : 'missNoLock'] = (dbg.fate[m.side][m.locked ? 'missLocked' : 'missNoLock'] || 0) + 1; if (!m.locked) dbg.noSeeker++; endMissile(m, i); }
 }
 // active seeker: the briefed target if it is in the basket, otherwise the most valuable (LRASM) or nearest ship ahead
 function acquire(m) {
@@ -4013,6 +4016,8 @@ function updateSAM(m, i, dt) {
       let pk = S.pk * PK_MUL[cls] * (t.spec && t.spec.evade || 1) * (m.owner && m.owner.aegisT > 0 ? 1.15 : 1) * (tac(m.side).navy === 'ring' ? 1.12 : tac(m.side).navy === 'disperse' ? 0.9 : 1);
       if (t.kind === 'plane' && game.t - t.chaffT < 2.5) pk *= 0.6;
       if (t.kind === 'plane' && t.pos.y < 60) pk *= 0.7;
+      // the shooting ship's fire-control radar under enemy jamming (stand-off or escort jammer within 90 km)
+      if (m.owner && m.owner.kind === 'ship' && planes.some(j => j.T.ew && j.alive && !j.dying && j.airborne && j.side !== m.side && j.pos.distanceToSquared(m.owner.pos) < 8.1e9)) pk *= 0.82;
       if (Math.random() < pk) {
         if (t.kind === 'plane') damagePlane(t, 260, { owner: m.owner, kind: 'missile', name: S.name });
         else { const j = missiles.indexOf(t); if (j >= 0) { dbg.samKill++; if (t.spec.profile === 'ballistic') { game.flags.bmKill = (game.flags.bmKill || 0) + 1; if (m.side === game.side) { radio(m.owner.name, `${S.name}拦截东风弹道导弹！`, '#8dffb4'); if (m.owner === flagship) ribbon('拦截弹道导弹', '#8dffb4'); } } else if (m.owner === flagship) ribbon('拦截', '#8dffb4'); dbg.fate[t.side].sam = (dbg.fate[t.side].sam || 0) + 1; explode(t.pos, 0.8, null); scene.remove(t.mesh); t.alive = false; missiles.splice(j, 1); if (t.side === game.side && Math.random() < 0.3) radio('敌舰', '拦截命中。', '#ff8a78'); else if (Math.random() < 0.25) radio(m.owner.name, `${S.name}拦截成功！`, '#9fd4ff'); } }
@@ -4337,7 +4342,7 @@ function flight(pl, c, dt) {
 /* ---------- AI pilot ---------- */
 const MODE_TEXT = { pullup: '拉起避海', notch: '切向置尾 · 规避雷达弹', break: '急转规避', bvr: '超视距接敌', pursuit: '追踪', guns: '机炮咬尾',
   lag: '滞后追踪', cap: '战斗空中巡逻', aew: '预警巡逻', sweep: '前出搜索', escort: '护航', strike: '反舰突击', ingress: '低空突防', release: '发射反舰导弹',
-  bomber: '远程突击', rtb: '返航', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
+  bomber: '远程突击', rtb: '返航', barcap: '前出拦截巡逻 · 主攻轴线', ewesc: '随队电子干扰', ewsoj: '远距支援干扰 · 压制敌雷达', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
 class Pilot {
   constructor(pl, skill) {
     Object.assign(this, { pl, skill, target: null, threat: null, think: rand(0, 0.5), lockT: 0, mslCd: rand(2, 5), mode: 'cap', desired: new V3(1, 0, 0), react: lerp(0.7, 0.08, skill), ashmT: 0 });
@@ -4350,12 +4355,17 @@ function aiAssess(pl) {
   let td = 14000;
   for (const m of missiles) if (m.alive && m.target === pl && (m.cls === 'aam' || m.cls === 'sam') && m.age > 0.3) { const d = m.pos.distanceTo(pl.pos); if (d < td) { td = d; P.threat = m; } }
   let bestT = null, bs = 1e9;
-  const reach = R === 'cap' || R === 'sweep' ? 60000 : R === 'escort' || R === 'wing' ? 30000 : R === 'strike' || R === 'bomber' ? 9000 : 0;
+  const reach = R === 'cap' || R === 'sweep' ? 60000 : R === 'escort' || R === 'wing' ? 30000 : R === 'strike' || R === 'bomber' || R === 'ew' ? 9000 : 0;
   const hunt = pl.task && pl.task.hunt;
+  // fighters on patrol do not chase into the enemy fleet's SAM umbrella (escorts and strikers must go in)
+  const wary = R === 'cap' || R === 'sweep' || R === 'ew';
+  const sams = wary ? [...picture[pl.side]].filter(([e]) => e.kind === 'ship' && e.alive && !e.dying && !(e.S && e.S.sub) && Object.keys(e.sam || {}).some(k => e.sam[k] > 0 && !MSL[k].exo)).map(([e, tr]) => ({ p: tr.pos, r: 0.85 * Math.max(...Object.keys(e.sam).filter(k => e.sam[k] > 0 && !MSL[k].exo).map(k => MSL[k].range)) })) : [];
+  const covered = q => sams.some(sp => Math.hypot(q.x - sp.p.x, q.z - sp.p.z) < sp.r);
   if (pl.mrm + pl.srm > 0 || pl.ammo > 0) for (const [e, tr] of picture[pl.side]) {
     if (e.kind !== 'plane' || !e.alive || e.dying || game.t - tr.t > 4) continue;
     const d = e.pos.distanceTo(pl.pos);
     if (d > reach) continue;
+    if (wary && d > 6000 && covered(e.pos)) continue;
     _ai1.subVectors(e.pos, pl.pos);
     const off = pl.fwd.angleTo(_ai1);
     const s = d / 1000 + off * 1.4 + (e === P.target ? -2 : 0) - (e.T.role === 'bomber' ? 8 : e.T.aew ? (hunt ? 40 : 6) : e.ashmN > 0 ? 3 : 0);
@@ -4464,17 +4474,25 @@ function aiAttack(pl, t, d, c, out, dt) {
 // what an aircraft does when it is not fighting: its assigned role
 function roleFly(pl, d, c, out, dt) {
   const P = pl.pilot, home = pl.home, task = pl.task || {};
-  const dirToFoe = _ai2.set(SIDES[pl.side].foe === 'us' ? 1 : -1, 0, 0);
   const anchor = home && home.alive && !home.dying ? home.pos : (fleetCentre(pl.side) || pl.pos);
-  if ((pl.fuel < 240 || (pl.role !== 'aew' && pl.mrm + pl.srm + pl.ashmN === 0 && pl.T.role !== 'bomber')) && pl.role !== 'rtb') { pl.role = 'rtb'; if (mine(pl) && Math.random() < 0.3) radio(pl.name, pl.fuel < 240 ? 'Bingo 油量，返航。' : '弹药耗尽，返航。', '#9fd4ff'); }
+  // patrols face the main effort, not a fixed compass direction
+  const dirToFoe = axisDir(pl.side, anchor, _ai2);
+  if ((pl.fuel < 240 || (pl.role !== 'aew' && pl.role !== 'ew' && pl.mrm + pl.srm + pl.ashmN === 0 && pl.T.role !== 'bomber')) && pl.role !== 'rtb') { pl.role = 'rtb'; if (mine(pl) && Math.random() < 0.3) radio(pl.name, pl.fuel < 240 ? 'Bingo 油量，返航。' : '弹药耗尽，返航。', '#9fd4ff'); }
   switch (pl.role) {
     case 'cap': case 'aew': {
       P.mode = pl.role;
       const off = pl.role === 'aew' ? 26000 : task.off || 14000, alt = pl.role === 'aew' ? 8000 : 6500, r = pl.role === 'aew' ? 9000 : 6000;
-      let cx = anchor.x + dirToFoe.x * off + (task.lat || 0), cz = anchor.z + (task.latZ || 0);
+      // the station: ahead of the fleet along the axis (lateral spread across it), or - for a forward barrier CAP
+      // tasked on the main target - on the axis just outside the target group's missile umbrella
+      const lat = (task.lat || 0) + (task.latZ || 0);
+      let cx = anchor.x + dirToFoe.x * off - dirToFoe.z * lat, cz = anchor.z + dirToFoe.z * off + dirToFoe.x * lat;
+      if (task.on && pl.role === 'cap') {
+        const st = axisStation(pl.side, anchor, task.stand || 50000, _ai3);
+        if (st) { cx = st.x; cz = st.z; P.mode = 'barcap'; }
+      }
       // patrol stations stay outside the enemy fleet's area-defence envelope
       for (const [e, tr] of picture[pl.side]) if ((e.kind === 'ship' && !e.S.sub || e.kind === 'base') && e.alive && !e.dying) {
-        const dx = cx - tr.pos.x, dz = cz - tr.pos.z, d = Math.hypot(dx, dz), keep = 42000;
+        const dx = cx - tr.pos.x, dz = cz - tr.pos.z, d = Math.hypot(dx, dz), keep = 47000;   // SM-6 / HHQ-9B reach plus margin
         if (d < keep) { cx = tr.pos.x + dx / (d || 1) * keep; cz = tr.pos.z + dz / (d || 1) * keep; }
       }
       const a = Math.atan2(pl.pos.z - cz, pl.pos.x - cx) + 0.5;
@@ -4482,6 +4500,31 @@ function roleFly(pl, d, c, out, dt) {
       c.boost = pl.speed < 200;
       // the AEW keeps clear of enemy fighters
       if (pl.T.aew) for (const [e] of picture[pl.side]) if (e.kind === 'plane' && e.T.mrm > 0 && e.pos.distanceTo(pl.pos) < 35000) { fly(d, pl, anchor.x, alt, anchor.z); break; }
+      break;
+    }
+    case 'ew': {
+      // stand-off / escort jamming: with a strike package, ride with it; otherwise hold an orbit on the axis
+      // inside jamming range of the target group (90 km) but outside its area-defence missiles
+      const L = task.pkg;
+      const tgt = task.on && task.on.alive && !task.on.dying ? task.on : intentTarget(pl.side);
+      if (L && L.alive && !L.dying && L.role === 'strike' && L.ashmN > 0) {
+        P.mode = 'ewesc';
+        const slot = _ai3.copy(L.pos).addScaledVector(L.right, 320).addScaledVector(L.fwd, -900).setY(Math.max(L.pos.y + 900, 1500));
+        d.subVectors(slot, pl.pos); const dist = d.length(); d.normalize();
+        if (dist < 400) d.lerp(L.fwd, 0.7).normalize();
+        c.boost = _ai4.subVectors(slot, pl.pos).dot(pl.fwd) > 300;
+        break;
+      }
+      task.pkg = null;
+      const tp = tgt ? (trackPos(pl.side, tgt, _ai4) || tgt.pos) : intentPos(pl.side, _ai4);
+      if (!tp) { pl.role = 'cap'; pl.task = { off: 16000 }; break; }
+      P.mode = 'ewsoj';
+      const dx = anchor.x - tp.x, dz = anchor.z - tp.z, Lh = Math.hypot(dx, dz) || 1;
+      const stand = Math.min(64000, Lh * 0.9);
+      const cx = tp.x + dx / Lh * stand, cz = tp.z + dz / Lh * stand;
+      const a = Math.atan2(pl.pos.z - cz, pl.pos.x - cx) + 0.45;
+      fly(d, pl, cx + Math.cos(a) * 5000, 7500, cz + Math.sin(a) * 5000);
+      c.boost = pl.speed < 210;
       break;
     }
     case 'sweep': {
@@ -4505,7 +4548,13 @@ function roleFly(pl, d, c, out, dt) {
     case 'strike': case 'bomber': {
       const tgt = task.target;
       if ((!tgt || !tgt.alive || tgt.dying) && pl.ashmN > 0) { const t = bestTarget(pl.side, pl.pos, 250000); if (t) { task.target = t; pl.task = task; break; } }
-      if (!tgt || !tgt.alive || tgt.dying || pl.ashmN <= 0) { pl.role = 'rtb'; break; }
+      if (!tgt || !tgt.alive || tgt.dying || pl.ashmN <= 0) {
+        // swing-role: a striker with air-to-air missiles and fuel left joins the CAP on the axis instead of
+        // queueing at the carrier with the whole package
+        if (pl.role === 'strike' && pl.mrm + pl.srm > 0 && pl.fuel > 500) { pl.role = 'cap'; pl.task = { off: rand(12000, 20000), lat: rand(-12000, 12000) }; if (mine(pl) && pl !== player && Math.random() < 0.25) radio(pl.name, '反舰弹已投放，转入空中巡逻。', '#9fd4ff'); }
+        else pl.role = 'rtb';
+        break;
+      }
       const tp = trackPos(pl.side, tgt, _ai3) || task.last || tgt.pos;
       task.last = (task.last || new V3()).copy(tp);
       const dist = Math.hypot(tp.x - pl.pos.x, tp.z - pl.pos.z), spec = MSL[pl.T.ashmType];
@@ -4582,20 +4631,47 @@ function exitTheatre(pl, d) {
     removePlane(pl);
   }
 }
-// what the autopilot does with the player's own aircraft: the player's designation comes first
+// what the autopilot does with the player's own aircraft: the player's designation (the side's main target)
+// comes first, and every type serves it in its own way - strikers attack it, jammers blind it from stand-off,
+// fighters hold a barrier on its axis, the AEW watches toward it. Nothing flies away from it.
 function playerAutoTask(p) {
-  const sel = game.desigShip, ok = sel && sel.alive && !sel.dying;
   const P = p.pilot;
-  if (ok && p.ashmN > 0 && p.T.ashmType && (sel.kind === 'ship' || sel.kind === 'base')) {
-    p.role = p.T.role === 'bomber' ? 'bomber' : 'strike';
-    p.task = Object.assign(p.task || {}, { target: sel, low: tac(p.side).air === 'low' });
-  } else if (game.lock.desig && game.lock.desig.alive && game.lockManual > game.t && p.mrm + p.srm > 0) {
-    if (p.role !== 'cap') { p.role = 'cap'; p.task = { off: 12000 }; }
+  // an enemy aircraft the player picked: intercept it
+  if (game.lock.desig && game.lock.desig.alive && !game.lock.desig.dying && game.lockManual > game.t && p.mrm + p.srm > 0) {
+    if (p.role !== 'cap' || p.task?.on) { p.role = 'cap'; p.task = { off: 12000 }; }
     if (P.target !== game.lock.desig) { P.target = game.lock.desig; P.lockT = 0; }
-  } else if ((p.role === 'strike' || p.role === 'bomber') && !(p.task && p.task.target && p.task.target.alive)) {
-    // no designation: the best ship target the picture holds, or patrol
-    const t = p.ashmN > 0 ? bestTarget(p.side, p.pos, 250000) : null;
-    if (t) p.task = Object.assign(p.task || {}, { target: t }); else if (!p.T.aew) { p.role = p.T.role === 'bomber' ? 'bomber' : 'cap'; p.task = { off: 12000 }; }
+    return;
+  }
+  if (p.state !== 'air') return;
+  // a genuine RTB (fuel or weapons) stands; an escort whose package went home comes back to the task
+  if (p.role === 'rtb' && (p.fuel < 400 || (p.mrm + p.srm + p.ashmN === 0 && !p.T.ew && !p.T.aew))) return;
+  const ds = game.desigShip;
+  const sel = ds && ds.alive && !ds.dying ? ds : intentTarget(p.side);
+  if (!sel) {
+    if ((p.role === 'strike' || p.role === 'bomber') && !(p.task && p.task.target && p.task.target.alive)) {
+      const t = p.ashmN > 0 ? bestTarget(p.side, p.pos, 250000) : null;
+      if (t) p.task = Object.assign(p.task || {}, { target: t }); else if (!p.T.aew) { p.role = p.T.role === 'bomber' ? 'bomber' : 'cap'; p.task = { off: 12000 }; }
+    }
+    return;
+  }
+  const same = p.task && (p.task.target === sel || p.task.on === sel);
+  if (p.ashmN > 0 && p.T.ashmType) {
+    p.role = p.T.role === 'bomber' ? 'bomber' : 'strike';
+    p.task = Object.assign(same ? p.task : {}, { target: sel, low: tac(p.side).air === 'low' });
+  } else if (p.T.ew) {
+    // join a friendly strike package heading for it, else stand-off jamming on the axis
+    const pk = planes.find(q => q !== p && q.side === p.side && q.alive && !q.dying && q.role === 'strike' && q.ashmN > 0 && q.task && q.task.target === sel && q.pos.distanceTo(p.pos) < 40000);
+    if (p.role !== 'ew' || !same || (pk && !p.task.pkg)) { p.role = 'ew'; p.task = { on: sel, pkg: pk || null }; }
+  } else if (p.T.aew) {
+    if (p.role !== 'aew' || !same) { p.role = 'aew'; p.task = { on: sel }; }
+  } else if (p.mrm + p.srm > 0) {
+    // no anti-ship weapons: escort a friendly package going for it, else a barrier CAP on the axis just outside
+    // the target group's SAM umbrella
+    const L = p.role === 'escort' && p.task && p.task.lead;
+    if (L && L.alive && !L.dying && L.role === 'strike' && L.ashmN > 0) return;
+    const pk = planes.find(q => q !== p && q.side === p.side && q.alive && !q.dying && q.airborne && q.role === 'strike' && q.ashmN > 0 && q.task && q.task.target === sel && q.pos.distanceTo(p.pos) < 45000);
+    if (pk) { p.role = 'escort'; p.task = { lead: pk, slot: 220, on: sel }; radio('空中指挥', `${p.name}：加入${pk.name}攻击编队担任护航。`, '#9fd4ff'); }
+    else if (p.role !== 'cap' || !same) { p.role = 'cap'; p.task = { on: sel, stand: 50000, off: 12000 }; }
   }
 }
 function ditch(pl) {
@@ -4631,7 +4707,7 @@ function beginFinal(pl) {
   pl.fin = { s: -_a.dot(ap.u), lat: _a.dot(ap.perp), hOff: 0 };
   pl.fin.hOff = pl.pos.y - (ap.y + pl.T.gearH + pl.fin.s * Math.tan(GLIDE));
   pl.state = 'final'; pl.gear = 1; pl.hook = true; pl.pilot && (pl.pilot.mode = 'final');
-  h.finalUntil = game.t + 24;   // the next aircraft may start final this long behind
+  h.finalUntil = game.t + 12;   // the next aircraft may start final this long behind (a ~1 km interval)
 }
 function updateFinal(pl, dt) {
   const h = pl.home;
@@ -4653,7 +4729,7 @@ function updateFinal(pl, dt) {
 }
 function bolterGo(pl) {
   pl.state = 'air'; pl.speed = pl.T.vs * 1.3; pl.c.boost = true; pl.gear = 1; pl.hook = true;
-  if (pl.home) pl.home.finalUntil = game.t + 25;
+  if (pl.home) pl.home.finalUntil = game.t + 14;
   if (pl === player) { message('逃逸复飞！', '挂索失败 · 加力爬升，重新进近', '#ffc861', 2.6); radio('着舰指挥官', 'Bolter, bolter, bolter！', '#ffd28a'); }
 }
 function startTrap(pl, wire) {
@@ -4687,7 +4763,7 @@ function updateDeck(pl, dt) {
   pl.deckT -= dt;
   if (pl.deckT > 0) return;
   if (pl === player) {
-    pl.rearm(); pl.hp = pl.maxHp;
+    pl.rearm(); pl.hp = pl.maxHp; pl.role = 'cap'; pl.task = null; pl.pilot.mode = 'cap';
     if (!spotOnCatapult(pl)) { pl.deckT = 2; return; }
     message('补给完成', h.kind === 'ship' ? '已就位弹射器 · 推满油门后弹射' : '已滑入跑道 · 推满油门起飞', '#e3b257', 3);
   } else { h.ready.push({ type: pl.type, t: game.t + 50 }); removePlane(pl); }
@@ -4917,13 +4993,14 @@ const command = {
 function enemyFleet(side) {
   let best = null, bd = 1e12;
   const c = fleetCentre(side) || ZERO;
-  for (const [e, tr] of picture[side]) if ((e.kind === 'ship' || e.kind === 'base') && e.alive && !e.dying) { const d = tr.pos.distanceToSquared(c); if (d < bd) { bd = d; best = e; } }
+  for (const [e, tr] of picture[side]) if ((e.kind === 'ship' || e.kind === 'base') && e.alive && !e.dying && !(e.S && e.S.sub)) { const d = tr.pos.distanceToSquared(c); if (d < bd) { bd = d; best = e; } }
   return best;
 }
 function bestTarget(side, from, range) {
   let best = null, bs = -1;
   for (const [e, tr] of picture[side]) {
-    if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || game.t - tr.t > 120) continue;
+    // submarines are for torpedoes and ASW; an anti-ship missile cannot hit a boat that is (or will be) submerged
+    if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || game.t - tr.t > 120 || (e.S && e.S.sub)) continue;
     const d = tr.pos.distanceTo(from);
     if (d > range) continue;
     const sc = e.value * (e.carrier ? 1.6 : 1) * (0.4 + 0.6 * e.hp / e.maxHp) - d / 4000;
@@ -4933,31 +5010,44 @@ function bestTarget(side, from, range) {
 }
 function updateCommand(side, dt) {
   const C = command[side];
-  aiTactics(side, dt); airSweeps(side, dt);
+  updateIntent(side, dt);
+  aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
   const carrier = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
   const guide = carrier || ships.find(s => s.side === side && s.alive && !s.dying);
-  // --- fleet course ---
+  const main = intentTarget(side);
+  // --- fleet course: on the axis of the main effort ---
   if (guide) {
-    const foeShip = enemyFleet(side);
+    const foeShip = main && main.kind === 'ship' ? main : enemyFleet(side);
     const flightOps = carrier && (carrier.cats.some(c => c.plane) || carrier.finalUntil > game.t || (carrier.queue && carrier.queue.length));
     const into = headingOf(_a.copy(WIND.dir).negate());
     let course, spd = 11;
+    const ip = intentPos(side, _b), I = intentState(side);
     if (flightOps) { course = into; spd = 15; }
+    else if (I && !I.tgt && I.src === 'player') {
+      // a direction the commander picked: the fleet advances there, but not into a known enemy group
+      course = headingOf(_c.subVectors(ip, guide.pos)); spd = ip.distanceTo(guide.pos) > 6000 ? 14 : 4;
+      const near = enemyFleet(side), np = near && trackPos(side, near, _c);
+      if (np && np.distanceTo(guide.pos) < (side === 'cn' ? 30000 : 42000)) course = wrapA(headingOf(_c.subVectors(np, guide.pos)) + Math.PI / 2);
+    }
     else if (foeShip) {
-      const tp = trackPos(side, foeShip, _b) || foeShip.pos;
+      const tp = (main && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
       const d = tp.distanceTo(guide.pos), toFoe = headingOf(_c.subVectors(tp, guide.pos));
       // the PLA closes to its missile envelope; the US carriers keep their air wings' stand-off distance
-      const keep = (side === 'cn' ? 38000 : 52000) - (T.navy === 'strike' ? 10000 : 0);
+      const keep = (side === 'cn' ? 38000 : 52000) - (T.navy === 'strike' ? 10000 : 0) + (main && main.kind === 'base' ? -12000 : 0);
       course = d > keep + 8000 ? toFoe : d < keep - 8000 ? wrapA(toFoe + Math.PI) : wrapA(toFoe + Math.PI / 2);
-      spd = 13;
-    } else { course = side === 'cn' ? 0.15 : Math.PI - 0.1; spd = side === 'cn' ? 11 : 8; }
+      spd = d > keep + 8000 ? 14 : 13;
+      // never sail into another enemy group on the way: a closer hostile surface group inside the stand-off pushes us off
+      const near = enemyFleet(side);
+      if (near && near !== main) { const np = trackPos(side, near, _c); if (np && np.distanceTo(guide.pos) < keep * 0.6) course = headingOf(_c.subVectors(guide.pos, np)); }
+    } else if (ip) { course = headingOf(_c.subVectors(ip, guide.pos)); spd = ip.distanceTo(guide.pos) > 30000 ? 12 : 6; }
+    else { course = side === 'cn' ? 0.15 : Math.PI - 0.1; spd = side === 'cn' ? 11 : 8; }
     // stay in the theatre
     if (Math.hypot(guide.pos.x, guide.pos.z) > 60000) course = headingOf(_c.set(-guide.pos.x, 0, -guide.pos.z));
     C.course = course; C.speed = spd;
-    // surface action group: once the enemy is found, a few escorts push forward to fight ship-to-ship
+    // surface action group: once the enemy is found, a few escorts push forward down the main axis
     if (foeShip && game.t > 45) {
-      const tp = trackPos(side, foeShip, _b) || foeShip.pos;
+      const tp = (main && main.kind === 'ship' && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
       const toUs = _c.subVectors(guide.pos, tp).setY(0).normalize();
       C.sagPoint = (C.sagPoint || new V3()).copy(tp).addScaledVector(toUs, T.navy === 'strike' ? 10000 : 15000);
       const sag = ships.filter(x => x.side === side && x.sag && x.alive && !x.dying);
@@ -4978,10 +5068,11 @@ function updateCommand(side, dt) {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
     const b = bases.find(x => x.alive && known('us', x));
     if (C.tlamCd <= 0 && b) { C.tlamCd = tomahawk('us', b, 16) ? 300 : 30; }
-    // maritime-strike Tomahawks: the surface fleet's long arm against ships
+    // maritime-strike Tomahawks: the surface fleet's long arm against ships, on the main target first
     C.mstCd = (C.mstCd ?? 120) - dt;
-    const t = bestTarget('us', guide ? guide.pos : ZERO, 400000);
-    if (C.mstCd <= 0 && t && t.kind === 'ship') { C.mstCd = tomahawk('us', t, 8) ? 150 : 30; }
+    const t = main && main.kind === 'ship' && fresh('us', main, 120) ? main : bestTarget('us', guide ? guide.pos : ZERO, 400000);
+    const held = t && (C.pkgs || []).some(k => k.tgt === t && !k.done && game.t - k.t < 120);
+    if (C.mstCd <= 0 && t && t.kind === 'ship' && !held) { C.mstCd = tomahawk('us', t, 8) ? 150 : 30; }
   }
   // --- ship-launched anti-ship salvos (player's own ship fires only on the player's order) ---
   C.salvoCd -= dt;
@@ -4990,8 +5081,15 @@ function updateCommand(side, dt) {
     const shooters = ships.filter(s => s.side === side && s.alive && !s.dying && s !== flagship && Object.values(s.ashm).some(n => n > 0));
     let tgt = null;
     for (const s of shooters) { const maxR = Math.max(...Object.keys(s.ashm).filter(k => s.ashm[k] > 0).map(k => MSL[k].range)); const t = bestTarget(side, s.pos, maxR * 0.95); if (t && (!tgt || t.value > tgt.value)) tgt = t; }
-    // concentrate fire: the player's designated target, or the enemy's most valuable ship for an AI commander
-    if (T.navy === 'focus') { const f = side === game.side && game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying ? game.ashmSel : null; if (f && fresh(side, f, 120)) tgt = f; }
+    // the main effort comes first whenever any shooter can reach it; under "focus" nothing else is engaged at all
+    const reach = e => e && fresh(side, e, 120) && shooters.some(s => { const tp = trackPos(side, e, _b); return tp && Object.keys(s.ashm).some(k => s.ashm[k] > 0 && MSL[k].range * 0.95 > tp.distanceTo(s.pos)); });
+    const joint = C.jointTgt && C.jointTgt.alive && !C.jointTgt.dying ? C.jointTgt : null; C.jointTgt = null;
+    if (joint && reach(joint)) tgt = joint;
+    else if (main && reach(main)) {
+      tgt = main;
+      // a strike package is on its way to it: hold the salvo for the joint time-on-target (up to two minutes)
+      if ((C.pkgs || []).some(k => k.tgt === main && !k.done && game.t - k.t < 120)) tgt = null;
+    } else if (T.navy === 'focus' && main) tgt = null;
     if (tgt) {
       const plan = [];
       // the PLA coordinates one big salvo so every missile arrives together; US ships each fire what reaches
@@ -5041,20 +5139,28 @@ function updateCommand(side, dt) {
   for (const h of homes) {
     C.strikeCd[h.name] = (C.strikeCd[h.name] ?? 60) - 2.5;
     if (C.strikeCd[h.name] > 0) continue;
-    let tgt = bestTarget(side, h.pos, 150000);
-    const want = side === game.side && game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying && fresh(side, game.ashmSel, 120) ? game.ashmSel : null;
-    if (want && want.pos.distanceTo(h.pos) < 180000) tgt = want;
+    // the main target if the package can reach it; otherwise the best target nearby (never idle while one exists)
+    let tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
     if (!tgt) continue;
     const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
     const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
     if (avail < 2) continue;
     const n = Math.min(T.air === 'mass' ? 10 : 6, avail);
-    let lead = null;
-    for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (!lead) lead = p; }
-    for (let i = 0; i < 2; i++) { const t = pick(h, ['j35', 'f35c']); if (t) launchFrom(h, t, 'escort', { lead, slot: i ? -160 : 160 }); }
-    const ew = pick(h, ['j15d', 'ea18g']); if (ew) launchFrom(h, ew, 'escort', { lead, slot: 320 });
+    let lead = null; const members = [];
+    for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (p) { members.push(p); if (!lead) lead = p; } }
+    // a full package: fighter escort to clear the way and a jammer to blind the target's radars
+    let esc = 0;
+    for (let i = 0; i < (T.air === 'mass' ? 4 : 2); i++) { const t = pick(h, ['j35', 'f35c', 'fa18', 'j15']); if (t && launchFrom(h, t, 'escort', { lead, slot: [160, -160, 260, -260][i] })) esc++; }
+    const ew = pick(h, ['j15d', 'ea18g']); const ewp = ew && launchFrom(h, ew, 'ew', { pkg: lead, on: tgt });
+    C.pkgs = C.pkgs || []; C.pkgs.push({ tgt, members, t: game.t });
     C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
-    if (side === game.side) radio('空中指挥', `${h.name}起飞 ${n} 架突击机，目标${tgt.name}。`, '#9fd4ff');
+    if (side === game.side) radio('空中指挥', `${h.name}出动攻击编队：${n} 架突击机${esc ? ` + ${esc} 架护航` : ''}${ewp ? ' + 电子战机' : ''}，目标${tgt.name}${tgt === main ? '（主攻目标）' : ''}。`, '#9fd4ff');
+  }
+  // stand-off jamming: one EW aircraft holds a station on the axis, blinding the main target's group
+  C.ewT = (C.ewT ?? 60) - 2.5;
+  if (main && C.ewT <= 0 && fresh(side, main, 90) && count('ew') < 1) {
+    C.ewT = 90;
+    for (const h of homes) { const t = pick(h, ['j15d', 'ea18g']); if (t && launchFrom(h, t, 'ew', { on: main })) { if (side === game.side) radio('空中指挥', `${AC[t].name}前出，对${main.name}实施远距支援干扰。`, '#9fd4ff'); break; } }
   }
   // the island's H-6K regiment, topped up from the mainland while the island can still take them
   if (side === 'cn') {
@@ -5063,20 +5169,21 @@ function updateCommand(side, dt) {
     C.reinf = (C.reinf ?? 600) - 2.5;
     if (b && C.reinf <= 0) { C.reinf = 600; const add = Math.min(3, 6 - (b.hangar.h6k || 0)); if (add > 0) { b.hangar.h6k = (b.hangar.h6k || 0) + add; if (game.side === 'cn') radio('南部战区', `大陆机场增援 ${add} 架轰-6K 进驻岛礁。`, '#9fd4ff'); } }
     if (b && C.h6Cd <= 0 && b.hangar.h6k > 0) {
-      const tgt = bestTarget('cn', b.pos, 160000);
+      const tgt = main && main.kind === 'ship' && fresh('cn', main, 150) && main.pos.distanceTo(b.pos) < 220000 ? main : bestTarget('cn', b.pos, 160000);
       if (tgt) { for (let i = 0; i < Math.min(3, b.hangar.h6k); i++) launchFrom(b, 'h6k', 'bomber', { target: tgt }); C.h6Cd = 420; if (game.side === 'cn') radio('空中指挥', `轰-6K 编队出击，携鹰击-12 攻击${tgt.name}。`, '#9fd4ff'); else radio('E-2D', '侦测到轰-6K 编队起飞！', '#ff8a78'); }
     }
   }
   // scouting when the enemy fleet is lost
   C.sweepCd -= 2.5;
   if (!enemyFleet(side) && C.sweepCd <= 0 && game.t > 20) {
-    for (const h of homes) { const t = pick(h, ['j35', 'f35c', 'j15', 'fa18', 'j16']); if (t) { launchFrom(h, t, 'sweep', { point: new V3(side === 'cn' ? 30000 : -30000, 0, rand(-15000, 15000)) }); break; } }
+    const ip = intentPos(side, new V3());
+    for (const h of homes) { const t = pick(h, ['j35', 'f35c', 'j15', 'fa18', 'j16']); if (t) { launchFrom(h, t, 'sweep', { point: ip ? ip.add(new V3(rand(-8000, 8000), 0, rand(-8000, 8000))) : new V3(side === 'cn' ? 30000 : -30000, 0, rand(-15000, 15000)) }); break; } }
     C.sweepCd = 150;
   }
   // US: B-1B raids from outside the theatre
   if (side === 'us' && C.b1b > 0 && game.t > C.raidT) {
     C.raidT = game.t + 420;
-    const tgt = bestTarget('us', new V3(0, 0, 0), 200000);
+    const tgt = main && main.kind === 'ship' ? main : bestTarget('us', new V3(0, 0, 0), 200000);
     for (let i = 0; i < 2 && C.b1b > 0; i++) {
       C.b1b--;
       const pl = new Plane('us', 'b1b', null);
@@ -5310,10 +5417,16 @@ function updateASW(m, i, dt) {
 function subAI(s, dt) {
   const foes = [...picture[s.side]].filter(([e, tr]) => e.kind === 'ship' && e.alive && !e.dying && !isSub(e) && game.t - tr.t < 60);
   let best = null, bd = 1e12;
-  for (const [e] of foes) { const d = e.pos.distanceTo(s.pos) - (e.carrier ? 4000 : 0); if (d < bd) { bd = d; best = e; } }
+  // the main target pulls hardest: a submarine goes for it over a closer escort
+  const main = intentTarget(s.side);
+  for (const [e] of foes) { const d = e.pos.distanceTo(s.pos) - (e.carrier ? 4000 : 0) - (e === main ? 25000 : 0); if (d < bd) { bd = d; best = e; } }
+  if (best && best.pos.distanceTo(s.pos) > 45000) best = null;
   s.aiT = (s.aiT || 0) - dt;
   const C = command[s.side];
   let want = C.course, spd = 6, depth = 90;
+  // no contact close enough: the boats run ahead of the fleet down the main axis to an ambush position
+  const ip = intentPos(s.side, _c);
+  if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
   if (best) {
     const d = best.pos.distanceTo(s.pos);
     want = headingOf(_a.subVectors(best.pos, s.pos));
@@ -5405,6 +5518,9 @@ function updateBallistic(m, i, dt) {
 function rocketForce(side, n = 4, type = 'df21d') {
   let tgt = null;
   for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30 && (!tgt || e.value > tgt.value)) tgt = e;
+  // the main effort, if it is a ship with a fresh enough track for a ballistic shot
+  const main = intentTarget(side);
+  if (main && main.kind === 'ship' && fresh(side, main, 30)) tgt = main;
   if (!tgt) return false;
   for (let k = 0; k < n; k++) pending.push({ t: game.t + k * 1.6, fn: () => { if (tgt.alive) { const m = launchBallistic(side, tgt, type); if (k === 0) cineOn('ballistic', m); } } });
   const mineSide = side === game.side;
@@ -5448,7 +5564,7 @@ const ABIL = {
   salvo:  { name: '反舰齐射', short: '齐射', key: 'KeyR', cd: 10, can: s => Object.values(s.ashm).some(n => n > 0), use: (s, t) => captainSalvo(s, t) },
   fleet:  { name: s => s.side === 'cn' ? '饱和协同打击' : '分布式杀伤', short: s => s.side === 'cn' ? '饱和打击' : '分布杀伤', key: 'Digit1', cd: 150, can: s => !!game.ashmSel, use: (s, t) => t ? fleetStrike(s.side, t, s) > 0 : false },
   aegis:  { name: s => s.side === 'cn' ? '海红旗区域防空网' : '宙斯盾全力防空', short: '防空全开', key: 'Digit2', cd: 90, dur: 25, can: s => Object.values(s.sam).some(n => n > 0), use: s => { s.aegisT = 25; return true; } },
-  ew:     { name: '电子战干扰', short: '电子干扰', key: 'Digit3', cd: 70, dur: 20, use: s => { s.ewT = 20; for (const m of missiles) if (m.cls === 'ashm' && m.target === s && m.locked && Math.random() < 0.35) { m.locked = false; m.seekerOn = false; m.aim.add(_a.set(rand(-1, 1), 0, rand(-1, 1)).multiplyScalar(900)); } return true; } },
+  ew:     { name: '电子战干扰', short: '电子干扰', key: 'Digit3', cd: 70, dur: 20, use: s => { s.ewT = 20; for (const m of missiles) if (m.cls === 'ashm' && m.target === s && m.locked && Math.random() < 0.35) { m.locked = false; m.seekerOn = false; m.seekT = 6; m.aim.add(_a.set(rand(-1, 1), 0, rand(-1, 1)).multiplyScalar(900)); } return true; } },
   sprint: { name: '主机超负荷', short: '全速冲刺', key: 'Digit4', cd: 60, dur: 20, use: s => { s.sprintT = 20; return true; } },
   sonar:  { name: '主动声呐', short: '主动声呐', key: 'Digit5', cd: 50, dur: 25, use: s => { s.pingT = 25; return true; } },
   asw:    { name: '反潜攻击', short: '反潜', key: 'Digit6', cd: 20, can: s => s.asw > 0, use: s => { let t = null, bd = 20000; for (const [e, tr] of picture[s.side]) if (isSub(e) && e.alive && game.t - tr.t < 8) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; t = e; } } if (!t) { message('无水下目标', '先用主动声呐搜索', '#9fb0ba', 1.6); return false; } launchASW(s, t); return true; } },
@@ -6098,7 +6214,7 @@ function selectAt(x, y) {
     if (d < bd) { bd = d; best = e; }
   }
   if (!best) return;
-  if (best.kind === 'ship' || best.kind === 'base') { game.ashmSel = best; game.desigShip = best; }
+  if (best.kind === 'ship' || best.kind === 'base') { game.ashmSel = best; game.desigShip = best; playerIntent(best); }
   else if (game.role === 'pilot' && best.kind === 'plane') { game.lock.desig = best; game.lockManual = game.t + 30; }
   game.gunTgt = best;
   if (game.role === 'captain' && flagship && flagship.gun && best.kind !== 'ship' && best.kind !== 'base') flagship.gun.fuse = 'AA';
@@ -6127,8 +6243,10 @@ function updatePilot(dt) {
   const p = player, inp = readStick();
   if (input.target) { input.target = false; }
   if (p.state === 'cat') {
-    p.boost = inp.boost;
+    p.boost = inp.boost || game.ai;
     input.acls = false;
+    // on autopilot the deck crew launches as soon as the aircraft is spotted (the AI flies the next sortie)
+    if (game.ai && p.catT > 1e8) input.launch = true;
     if (input.launch) { input.launch = false; if (p.catT > 1e8) { p.catT = 2.4; radio('弹射官', '敬礼确认，弹射！', '#ffd28a'); } }
     updateCat(p, dt); return;
   }
@@ -6966,14 +7084,40 @@ function aiTactics(side, dt) {
   const C = command[side];
   C.tacT = (C.tacT ?? 30) - dt;
   if (C.tacT > 0) return;
-  C.tacT = 70;
+  C.tacT = 45;
+  // read the situation the way a staff would: what threatens us, what the enemy can still see, how strong the
+  // main target's defences are, and who is winning the air
   const foeKnown = !!enemyFleet(side);
+  const main = intentTarget(side);
   const carriers = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying);
   const hurt = carriers.some(s => s.hp < s.maxHp * 0.6);
   const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== side).length;
-  setTactic('navy', !foeKnown ? (Math.random() < 0.5 ? 'emcon' : 'balanced') : hurt || inbound > 10 ? 'ring' : Math.random() < 0.35 ? 'strike' : Math.random() < 0.5 ? 'disperse' : 'balanced', side);
-  const aew = [...picture[side].keys()].some(e => e.kind === 'plane' && e.T.aew);
-  setTactic('air', !foeKnown ? 'sweep' : aew && Math.random() < 0.5 ? 'hunt' : hurt ? 'cap' : Math.random() < 0.4 ? 'mass' : Math.random() < 0.5 ? 'low' : 'balanced', side);
+  const foeStrikers = [...picture[side].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying && e.ashmN > 0).length;
+  const foeAew = [...picture[side].keys()].some(e => e.kind === 'plane' && e.alive && !e.dying && e.T.aew);
+  const own = fleetCentre(side), mp = main && trackPos(side, main, new V3());
+  const dMain = own && mp ? mp.distanceTo(own) : 1e9;
+  // the main target's area-defence umbrella: SAM ships known within 15 km of it
+  const umbrella = mp ? [...picture[side]].filter(([e, tr]) => e.kind === 'ship' && e.alive && !e.dying && !(e.S && e.S.sub) && tr.pos.distanceTo(mp) < 15000).length : 0;
+  const myF = planes.filter(p => p.side === side && p.alive && p.airborne && p.mrm + p.srm > 0).length;
+  const foeF = [...picture[side].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying && e.T.mrm > 0).length;
+  const healthy = ships.filter(s => s.side === side && s.alive && !s.dying && !s.carrier && !s.S.sub && s.hp > s.maxHp * 0.7).length;
+  const r = Math.random();
+  const navy = !foeKnown ? (r < 0.6 ? 'emcon' : 'balanced')                    // hide while the scouts look
+    : hurt || inbound > 8 || foeStrikers > 8 ? 'ring'                            // weather the storm
+    : dMain < 70000 && healthy >= 5 && r < 0.6 ? 'strike'                        // close in for the kill
+    : main && r < 0.5 ? 'focus'                                                  // everything on the main target
+    : r < 0.5 ? 'disperse' : 'balanced';
+  const air = !foeKnown ? 'sweep'
+    : foeAew && foeF <= myF + 2 && r < 0.75 ? 'hunt'                             // put out the enemy's eyes first
+    : hurt || foeStrikers > 6 ? 'cap'                                            // our carrier first
+    : foeF > myF * 1.6 ? 'sweep'                                                 // win the air before striking
+    : umbrella >= 4 ? (r < 0.55 ? 'mass' : 'low')                                // saturate or sneak under a strong umbrella
+    : r < 0.5 ? 'mass' : 'balanced';
+  const was = tac(side);
+  setTactic('navy', navy, side); setTactic('air', air, side);
+  // signals intelligence: the player sometimes learns of the enemy's change of plan
+  if (side !== game.side && game.role !== 'watch' && (was.navy !== navy || was.air !== air) && Math.random() < 0.45)
+    radio('技术侦察', `截获敌方指挥网：敌转入「${TACTICS.navy[navy].name}」/「${TACTICS.air[air].name}」。`, '#ffd28a');
 }
 // a fighter sweep or an AEW hunt: a few fighters push out ahead of the fleet
 function airSweeps(side, dt) {
@@ -6984,8 +7128,9 @@ function airSweeps(side, dt) {
   if (C.swpT > 0) return;
   C.swpT = 110;
   const homes = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying);
-  const foeC = enemyFleet(side);
-  let point = foeC ? (trackPos(side, foeC, new V3()) || foeC.pos.clone()) : new V3(side === 'cn' ? 30000 : -30000, 0, 0);
+  // sweeps clear the air along the main axis (the enemy group nearest us only when there is no main effort)
+  const foeC = intentTarget(side) || enemyFleet(side);
+  let point = intentPos(side, new V3()) || (foeC ? (trackPos(side, foeC, new V3()) || foeC.pos.clone()) : new V3(side === 'cn' ? 30000 : -30000, 0, 0));
   if (t === 'hunt') for (const [e, tr] of picture[side]) if (e.kind === 'plane' && e.T.aew && e.alive) { point = tr.pos.clone(); break; }
   // stop short of the enemy ships' missile umbrella
   const own = fleetCentre(side) || ZERO;
@@ -6994,6 +7139,143 @@ function airSweeps(side, dt) {
   let n = 0;
   for (const h of homes) for (let i = 0; i < 2 && n < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty) { const p = launchFrom(h, ty, 'sweep', { point, hunt: t === 'hunt' }); if (p) n++; } }
   if (n && side === game.side) radio('空中指挥', `${n} 架战斗机${t === 'hunt' ? '前出猎杀敌预警机' : '执行战斗机扫荡'}。`, '#9fd4ff');
+}
+
+/* ---------- commander's intent: one main effort per side ----------
+   Every unit of a side orients on it: the fleet steers to its stand-off line on that axis, the surface action
+   group and the submarines push down it, CAP stations, AEW orbits and fighter sweeps sit on it, stand-off
+   jammers blind the target's sensors, and strike packages plus the ships' salvos converge on the main target
+   with a time-on-target plan. The player's designation (or a direction picked on the map) is the intent for
+   the player's side; AI commanders choose and hold their own main effort. */
+const _in1 = new V3(), _in2 = new V3();
+function intentState(side) { game.intent = game.intent || { cn: null, us: null }; return game.intent[side]; }
+function setIntent(side, I) {
+  game.intent = game.intent || { cn: null, us: null };
+  game.intent[side] = I ? Object.assign({ t: game.t, src: 'ai' }, I) : null;
+  if (I) game.intent[side].last = I.tgt ? (trackPos(side, I.tgt, new V3()) || I.tgt.pos.clone()) : I.point.clone();
+  command[side].intentAck = false;
+}
+// the player's word: called on every designation of a ship / base, and on "main axis" picks on the map
+function playerIntent(tgt, point) {
+  if (!game.side || game.role === 'watch' || (tgt && tgt.S && tgt.S.sub)) return;   // a submarine is an ASW task, not a main effort
+  const cur = intentState(game.side);
+  if (tgt && cur && cur.tgt === tgt && cur.src === 'player') return;
+  setIntent(game.side, tgt ? { tgt, src: 'player' } : { point: point.clone().setY(0), src: 'player' });
+  intentOrders(game.side);
+}
+// the main target if it is still worth pursuing (alive); point intents have none
+function intentTarget(side) {
+  const I = intentState(side);
+  return I && I.tgt && I.tgt.alive && !I.tgt.dying ? I.tgt : null;
+}
+// where the main effort points: the target's track (or its last known position), or the chosen point
+function intentPos(side, out) {
+  const I = intentState(side);
+  if (!I) return null;
+  if (I.tgt) {
+    const tp = I.tgt.alive && !I.tgt.dying ? trackPos(side, I.tgt, out) : null;
+    if (tp) { I.last.copy(tp); return out; }
+    return out.copy(I.last);
+  }
+  return out.copy(I.point);
+}
+// unit vector along the axis of advance from a position (falls back to the enemy's side of the theatre)
+function axisDir(side, from, out) {
+  const ip = intentPos(side, _in1);
+  if (ip) { out.set(ip.x - from.x, 0, ip.z - from.z); if (out.lengthSq() > 1e6) return out.normalize(); }
+  return out.set(SIDES[side].foe === 'us' ? 1 : -1, 0, 0);
+}
+// AI commanders: commit to a main effort and hold it (a main effort that changes every minute is no main effort)
+function updateIntent(side, dt) {
+  const C = command[side], I = intentState(side);
+  C.intT = (C.intT ?? 0) - dt;
+  const dead = I && I.tgt && (!I.tgt.alive || I.tgt.dying);
+  if (dead && I.src === 'player' && side === game.side) radio('作战指挥', `主攻目标${I.tgt.name}已被摧毁！按预案转入下一目标。`, GOLD);
+  const playerHeld = I && I.src === 'player' && !dead && game.role !== 'watch' && side === game.side;
+  if (playerHeld || (!dead && C.intT > 0 && I)) return;
+  C.intT = 45;
+  // a known carrier above all, then the most valuable surface combatant, then the island; a lost contact is held
+  // for a while along its last known position before the commander gives up on it
+  let best = null, bs = -1;
+  for (const [e, tr] of picture[side]) {
+    if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || (e.S && e.S.sub)) continue;
+    const age = game.t - tr.t;
+    if (age > 240) continue;
+    const sc = e.value * (e.carrier ? 2.2 : e.kind === 'base' ? 1.2 : 1) * (0.5 + 0.5 * e.hp / e.maxHp) * (e === (I && I.tgt) ? 1.35 : 1) - age * 0.2;
+    if (sc > bs) { bs = sc; best = e; }
+  }
+  const prev = I && I.tgt;
+  if (best) { if (best !== prev) { setIntent(side, { tgt: best }); intentOrders(side); } else I.t = game.t; }
+  else if (!I || dead) {
+    // nothing known: reconnaissance in force toward where the enemy must be
+    const o = FLEET[SIDES[side].foe].origin;
+    setIntent(side, { point: new V3(o[0] * 0.6, 0, o[1] * 0.6) });
+    intentOrders(side);
+  }
+}
+// acknowledgements: every arm reports how it is supporting the main effort, so compliance is visible
+function intentOrders(side) {
+  const I = intentState(side), C = command[side];
+  if (!I || side !== game.side) return;
+  C.intentAck = true;
+  const name = I.tgt ? I.tgt.name : '指定方向';
+  const ships_ = ships.filter(s => s.side === side && s.alive && !s.dying);
+  const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.airborne && p !== player);
+  const subs = ships_.filter(s => s.S.sub).length;
+  const strikers = air.filter(p => (p.role === 'strike' || p.role === 'bomber') && p.ashmN > 0);
+  // aircraft already out on a strike are retasked onto the main target (if it is a ship and within their reach)
+  let re = 0;
+  if (I.tgt) for (const p of strikers) if (p.task && p.task.target !== I.tgt && p.pos.distanceTo(I.tgt.pos) < 220000) { p.task.target = I.tgt; re++; }
+  for (const k of Object.keys(C.strikeCd || {})) C.strikeCd[k] = Math.min(C.strikeCd[k], 30);   // the next package goes soon
+  C.sweepAx = 0; C.swpT = Math.min(C.swpT ?? 0, 5); C.ewT = 0;
+  const src = I.src === 'player' ? '指挥员命令' : '司令部决心';
+  radio('作战指挥', `${src}：主攻方向——${name}。全部兵力向该方向集中。`, GOLD);
+  pending.push({ t: game.t + 1.6, fn: () => radio('舰队司令部', `收到。编队转向主攻方向，水面突击群前出${subs ? `，${subs} 艘潜艇前出伏击` : ''}。`, '#9fd4ff') });
+  pending.push({ t: game.t + 3.2, fn: () => radio('空中指挥', `收到。巡逻阵位前推，电子战机前出压制${re ? `，${re} 架在途攻击机改攻${name}` : ''}，${I.tgt ? `下一攻击波打击${name}` : '攻击波将打击该方向发现的目标'}。`, '#9fd4ff') });
+}
+// the station of an aircraft tasked against the main target: on the axis, `stand` metres short of it
+function axisStation(side, from, stand, out) {
+  const ip = intentPos(side, _in2);
+  if (!ip) return null;
+  const dx = from.x - ip.x, dz = from.z - ip.z, L = Math.hypot(dx, dz) || 1;
+  return out.set(ip.x + dx / L * stand, 0, ip.z + dz / L * stand);
+}
+// air-sea joint strike: when a strike package is on its way to the main target, the surface ships hold their
+// salvo and fire so that their missiles arrive with the aircraft's (one saturation wave, not two small ones)
+function jointStrikes(side) {
+  const C = command[side];
+  C.pkgs = (C.pkgs || []).filter(k => k.tgt.alive && !k.tgt.dying && k.members.some(p => p.alive && !p.dying && p.ashmN > 0 && p.task && p.task.target === k.tgt) && !k.done);
+  for (const k of C.pkgs) {
+    const air = k.members.filter(p => p.alive && !p.dying && p.ashmN > 0 && p.task && p.task.target === k.tgt);
+    const lead = air[0];
+    const tp = trackPos(side, k.tgt, _in1); if (!tp || !lead) continue;
+    // the plan is made once the whole package is airborne and formed up (aircraft on deck have no ETA)
+    if (air.some(p => !p.airborne) || game.t - k.t < 25) continue;
+    // one combined salvo per target: a second package against the same target within a minute rides the first
+    if (C.jointLast === k.tgt && game.t - C.jointT < 60) { k.done = true; continue; }
+    const spec = MSL[lead.T.ashmType], d = Math.hypot(tp.x - lead.pos.x, tp.z - lead.pos.z);
+    const rel = spec.range * 0.82;
+    const airImpact = Math.max(0, d - rel) / Math.max(200, lead.speed) + Math.min(d, rel) / spec.v + 4;
+    const shooters = ships.filter(s => s.side === side && s.alive && !s.dying && s !== flagship && !s.S.sub && Object.keys(s.ashm).some(m => s.ashm[m] > 0 && MSL[m].range * 0.95 > tp.distanceTo(s.pos)));
+    // the US Navy's long arm is the maritime-strike Tomahawk: timed so it arrives with the package's LRASMs
+    if (!shooters.length && side === 'us' && (C.mstCd ?? 0) <= 60) {
+      const tl = ships.filter(s => s.side === side && s.alive && !s.dying && (s.tlamN || 0) > 0);
+      if (!tl.length) continue;
+      const tof = Math.max(...tl.map(s => tp.distanceTo(s.pos))) / MSL.mst.v;
+      if (airImpact - tof < 4) {
+        k.done = true; C.jointLast = k.tgt; C.jointT = game.t;
+        if (tomahawk(side, k.tgt, 8)) { C.mstCd = 150; if (side === game.side) radio('作战指挥', `分布式杀伤：海上打击型战斧与${air.length} 架攻击机的 LRASM 将同时抵达${k.tgt.name}！`, GOLD); }
+      }
+      continue;
+    }
+    if (!shooters.length) continue;
+    const shipTof = Math.max(...shooters.map(s => tp.distanceTo(s.pos) / MSL[Object.keys(s.ashm).find(m => s.ashm[m] > 0)].v));
+    if (airImpact - shipTof < 4) {
+      k.done = true;
+      C.jointTgt = k.tgt; C.salvoCd = 0; C.jointLast = k.tgt; C.jointT = game.t;
+      if (side === game.side) radio('作战指挥', `空海协同：舰艇齐射与${air.length} 架攻击机的导弹将同时抵达${k.tgt.name}！`, GOLD);
+    }
+  }
 }
 
 /* ---------- wingmen ---------- */
@@ -7018,7 +7300,7 @@ function toggleMap() {
   TM.open = !TM.open; game.map = TM.open;
   $('b-map')?.classList.toggle('on', TM.open);
   $('tac').hidden = !TM.open; $('touch').style.visibility = $('topbar').style.visibility = TM.open ? 'hidden' : '';
-  if (TM.open) { TM.follow = true; TM.sel = null; renderTacOrders(); renderTacCard(); }
+  if (TM.open) { TM.follow = true; TM.sel = null; TM.pt = null; renderTacOrders(); renderTacCard(); }
 }
 function tacOwn() { return player || flagship || (game.role === 'watch' ? game.focus : null); }
 function tacToScreen(x, z) { const s = Math.min(HW, HH) / TM.span; return [HW / 2 + (x - TM.cx) * s, HH / 2 + (z - TM.cz) * s]; }
@@ -7081,10 +7363,26 @@ function drawTacMap() {
     for (const a of [0, 1, 2, 3]) { const an = a * Math.PI / 2; hc.beginPath(); hc.moveTo(x1 + Math.cos(an) * 12, y1 + Math.sin(an) * 12); hc.lineTo(x1 + Math.cos(an) * 21, y1 + Math.sin(an) * 21); hc.stroke(); }
     const d = tp.distanceTo(own.pos), mx = (x0 + x1) / 2, my = (y0 + y1) / 2;
     const inbound = planes.filter(q => q.side === me && q.alive && q.task && q.task.target === tg && (q.role === 'strike' || q.role === 'bomber')).length;
-    const label = `目标 ${tg.name || tg.T?.name} · ${km(d)} km${inbound ? ` · ${inbound} 架攻击机前往` : ''}`;
+    const isMain = intentTarget(me) === tg;
+    const label = `${isMain ? '主攻目标' : '目标'} ${tg.name || tg.T?.name} · ${km(d)} km${inbound ? ` · ${inbound} 架攻击机前往` : ''}`;
     hc.font = `700 12px ${SANS}`; const w = hc.measureText(label).width + 12;
     hc.fillStyle = 'rgba(6,10,14,0.85)'; hc.fillRect(mx - w / 2, my - 18, w, 20); hc.fillStyle = GOLD; hc.textAlign = 'center'; hc.fillText(label, mx, my - 4);
   }
+  // the main effort: a broad arrow from the fleet down the axis, so the whole side's orientation is visible
+  const ip = intentPos(me, new V3()), fc = fleetCentre(me);
+  if (ip && fc) {
+    const I = intentState(me), [x0, y0] = P(fc.x, fc.z), [x1, y1] = P(ip.x, ip.z), a = Math.atan2(y1 - y0, x1 - x0);
+    hc.strokeStyle = 'rgba(227,178,87,0.28)'; hc.lineWidth = 10; hc.lineCap = 'round'; hc.beginPath(); hc.moveTo(x0, y0); hc.lineTo(x1 - Math.cos(a) * 18, y1 - Math.sin(a) * 18); hc.stroke(); hc.lineCap = 'butt';
+    hc.fillStyle = 'rgba(227,178,87,0.5)'; hc.beginPath(); hc.moveTo(x1, y1); hc.lineTo(x1 - Math.cos(a - 0.45) * 26, y1 - Math.sin(a - 0.45) * 26); hc.lineTo(x1 - Math.cos(a + 0.45) * 26, y1 - Math.sin(a + 0.45) * 26); hc.closePath(); hc.fill();
+    if (!I.tgt) { hc.strokeStyle = GOLD; hc.lineWidth = 1.5; hc.beginPath(); hc.arc(x1, y1, 9, 0, Math.PI * 2); hc.stroke(); }
+    const pk = (command[me].pkgs || []).filter(k => !k.done && k.tgt === I.tgt).length;
+    const lbl = `主攻方向 · ${I.tgt ? I.tgt.name : '指定海域'}${I.src === 'player' ? '' : '（司令部）'}${pk ? ` · ${pk} 个攻击编队在途` : ''}`;
+    // the label sits by the arrowhead (the target line's label owns the midpoint); one label when they coincide
+    const tgSame = I.tgt && (I.tgt === game.ashmSel);
+    if (!tgSame) { hc.font = `700 11px ${SANS}`; hc.fillStyle = GOLD; hc.globalAlpha = 0.9; hc.textAlign = 'center'; hc.fillText(lbl, x1, y1 + (y1 > y0 ? 30 : -28)); hc.globalAlpha = 1; }
+    TM.axisPk = pk;
+  }
+  if (TM.pt) { const [x, y] = P(TM.pt.x, TM.pt.z); hc.strokeStyle = '#eef3f5'; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(x - 8, y); hc.lineTo(x + 8, y); hc.moveTo(x, y - 8); hc.lineTo(x, y + 8); hc.stroke(); }
   // the player's own unit: impossible to miss
   if (own && own.pos) {
     const [x, y] = P(own.pos.x, own.pos.z), hdg = own.kind === 'plane' ? Math.atan2(own.fwd.z, own.fwd.x) : -own.heading, pulse = 14 + Math.sin(game.t * 4) * 3;
@@ -7108,20 +7406,28 @@ function drawTacMap() {
 function tacTap(x, y) {
   let best = null, bd = 26;
   for (const c of TM.hits) { const d = Math.hypot(c.x - x, c.y - y); if (d < bd) { bd = d; best = c; } }
-  if (!best) { TM.sel = null; renderTacCard(); return; }
+  if (!best) { TM.sel = null; const [wx, wz] = tacToWorld(x, y); TM.pt = new V3(wx, 0, wz); renderTacCard(); return; }
+  TM.pt = null;
   if (best.n > 1 && TM.span > 12000) { const [wx, wz] = tacToWorld(best.x, best.y); TM.cx = wx; TM.cz = wz; TM.follow = false; TM.span = Math.max(8000, TM.span / 2.6); return; }
   TM.sel = best.top.u;
   if (best.top.enemy) designate(TM.sel);
   renderTacCard();
 }
 function designate(e) {
-  if (e.kind === 'ship' || e.kind === 'base') { game.ashmSel = e; game.desigShip = e; }
+  if (e.kind === 'ship' || e.kind === 'base') { game.ashmSel = e; game.desigShip = e; playerIntent(e); }
   game.gunTgt = e;
   if (game.role === 'pilot' && e.kind === 'plane') { game.lock.desig = e; game.lockManual = game.t + 30; }
   Sound.beep(1500, 0.05, 0.05);
 }
 function renderTacCard() {
   const el = $('tac-card'), u = TM.sel;
+  if (!u && TM.pt && game.role !== 'watch') {
+    // open sea: the commander can make it the side's direction of attack
+    const own = tacOwn(), d = own && own.pos ? TM.pt.distanceTo(_a.copy(own.pos).setY(0)) : 0;
+    el.innerHTML = `<b style="color:var(--gold, #e3b257)">海域 ${Math.round(TM.pt.x / 1000)}, ${Math.round(TM.pt.z / 1000)}</b><span>距你 ${km(d)} km</span><div class="acts"><button type="button" data-i="0">设为主攻方向</button></div>`;
+    el.querySelector('button').onclick = () => { playerIntent(null, TM.pt); message('主攻方向已确定', '舰队、潜艇与空中力量向该海域集中', GOLD, 2.6); TM.pt = null; renderTacCard(); };
+    el.hidden = false; return;
+  }
   if (!u || !u.alive || u.dying) { el.hidden = true; return; }
   const own = tacOwn(), enemy = u.side !== game.side;
   const d = own && own.pos ? u.pos.distanceTo(own.pos) : 0;
@@ -7134,7 +7440,9 @@ function renderTacCard() {
   const acts = [];
   if (enemy) {
     const isT = u === game.ashmSel || u === game.lock.desig;
-    acts.push([isT ? '✓ 当前目标' : '设为目标', () => { designate(u); message('目标已指定', `${u.name || type} · ${game.role === 'pilot' && player && player.ashmN > 0 && u.kind !== 'plane' ? '开 AI 驾驶将自动前往攻击' : game.role === 'captain' ? '齐射与舰炮将对准它' : '友军攻击波将优先打击它'}`, GOLD, 2.6); }]);
+    const what = u.kind === 'plane' ? (game.role === 'pilot' ? '开 AI 驾驶将自动拦截' : '舰炮与防空优先对准它')
+      : `全军主攻目标 · ${game.role === 'pilot' && player ? (player.ashmN > 0 ? '你的 AI 驾驶将前往攻击' : player.T.ew ? '你的 AI 驾驶将前出干扰压制' : player.T.aew ? '你的预警机转向监视它' : '你的 AI 驾驶将前出夺取制空') : '舰队、潜艇与攻击波向它集中'}`;
+    acts.push([isT ? '✓ 当前目标' : u.kind === 'plane' ? '设为目标' : '设为主攻目标', () => { designate(u); message('目标已指定', `${u.name || type} · ${what}`, GOLD, 2.6); }]);
     if (flagship && (u.kind === 'ship' || u.kind === 'base')) {
       if (!flagship.S.sub && !flagship.carrier) acts.push(['反舰齐射', () => { designate(u); useAbility(flagship, 'salvo', u); }]);
       if (flagship.carrier) acts.push(['出动攻击波', () => { designate(u); useAbility(flagship, 'strike', u); }]);
@@ -7388,6 +7696,8 @@ function setupBattle() {
     });
   }
   const b = buildBase(); baseGroup = b.obj; bases.push(b);
+  // a new battle starts from a clean staff: no cooldowns, packages or intents left over from the last one
+  for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
   Object.assign(command.cn, { course: 0, speed: 11, salvoCd: 40, airT: 0, strikeCd: {}, sweepCd: 30, h6Cd: 150 });
   Object.assign(command.us, { course: Math.PI, speed: 11, salvoCd: 50, airT: 0, strikeCd: {}, sweepCd: 30, b1b: 10, raidT: 240 });
   command.cn.reinf = 600;
@@ -7403,7 +7713,7 @@ function startGame() {
   Sound.init();
   setupBattle();
   Object.assign(game, { mode: 'play', t: 0, scale: 1, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
-    ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
+    ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
     stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 } });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
   $('b-scale').textContent = '时间 ×1'; $('b-ai').classList.remove('on'); $('b-map').classList.remove('on');

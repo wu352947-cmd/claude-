@@ -219,10 +219,16 @@ function updateASW(m, i, dt) {
 function subAI(s, dt) {
   const foes = [...picture[s.side]].filter(([e, tr]) => e.kind === 'ship' && e.alive && !e.dying && !isSub(e) && game.t - tr.t < 60);
   let best = null, bd = 1e12;
-  for (const [e] of foes) { const d = e.pos.distanceTo(s.pos) - (e.carrier ? 4000 : 0); if (d < bd) { bd = d; best = e; } }
+  // the main target pulls hardest: a submarine goes for it over a closer escort
+  const main = intentTarget(s.side);
+  for (const [e] of foes) { const d = e.pos.distanceTo(s.pos) - (e.carrier ? 4000 : 0) - (e === main ? 25000 : 0); if (d < bd) { bd = d; best = e; } }
+  if (best && best.pos.distanceTo(s.pos) > 45000) best = null;
   s.aiT = (s.aiT || 0) - dt;
   const C = command[s.side];
   let want = C.course, spd = 6, depth = 90;
+  // no contact close enough: the boats run ahead of the fleet down the main axis to an ambush position
+  const ip = intentPos(s.side, _c);
+  if (ip && !best) { const d = ip.distanceTo(s.pos); if (d > 12000) { want = headingOf(_c.sub(s.pos)); spd = 11; depth = 120; } }
   if (best) {
     const d = best.pos.distanceTo(s.pos);
     want = headingOf(_a.subVectors(best.pos, s.pos));
@@ -314,6 +320,9 @@ function updateBallistic(m, i, dt) {
 function rocketForce(side, n = 4, type = 'df21d') {
   let tgt = null;
   for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30 && (!tgt || e.value > tgt.value)) tgt = e;
+  // the main effort, if it is a ship with a fresh enough track for a ballistic shot
+  const main = intentTarget(side);
+  if (main && main.kind === 'ship' && fresh(side, main, 30)) tgt = main;
   if (!tgt) return false;
   for (let k = 0; k < n; k++) pending.push({ t: game.t + k * 1.6, fn: () => { if (tgt.alive) { const m = launchBallistic(side, tgt, type); if (k === 0) cineOn('ballistic', m); } } });
   const mineSide = side === game.side;
@@ -357,7 +366,7 @@ const ABIL = {
   salvo:  { name: '反舰齐射', short: '齐射', key: 'KeyR', cd: 10, can: s => Object.values(s.ashm).some(n => n > 0), use: (s, t) => captainSalvo(s, t) },
   fleet:  { name: s => s.side === 'cn' ? '饱和协同打击' : '分布式杀伤', short: s => s.side === 'cn' ? '饱和打击' : '分布杀伤', key: 'Digit1', cd: 150, can: s => !!game.ashmSel, use: (s, t) => t ? fleetStrike(s.side, t, s) > 0 : false },
   aegis:  { name: s => s.side === 'cn' ? '海红旗区域防空网' : '宙斯盾全力防空', short: '防空全开', key: 'Digit2', cd: 90, dur: 25, can: s => Object.values(s.sam).some(n => n > 0), use: s => { s.aegisT = 25; return true; } },
-  ew:     { name: '电子战干扰', short: '电子干扰', key: 'Digit3', cd: 70, dur: 20, use: s => { s.ewT = 20; for (const m of missiles) if (m.cls === 'ashm' && m.target === s && m.locked && Math.random() < 0.35) { m.locked = false; m.seekerOn = false; m.aim.add(_a.set(rand(-1, 1), 0, rand(-1, 1)).multiplyScalar(900)); } return true; } },
+  ew:     { name: '电子战干扰', short: '电子干扰', key: 'Digit3', cd: 70, dur: 20, use: s => { s.ewT = 20; for (const m of missiles) if (m.cls === 'ashm' && m.target === s && m.locked && Math.random() < 0.35) { m.locked = false; m.seekerOn = false; m.seekT = 6; m.aim.add(_a.set(rand(-1, 1), 0, rand(-1, 1)).multiplyScalar(900)); } return true; } },
   sprint: { name: '主机超负荷', short: '全速冲刺', key: 'Digit4', cd: 60, dur: 20, use: s => { s.sprintT = 20; return true; } },
   sonar:  { name: '主动声呐', short: '主动声呐', key: 'Digit5', cd: 50, dur: 25, use: s => { s.pingT = 25; return true; } },
   asw:    { name: '反潜攻击', short: '反潜', key: 'Digit6', cd: 20, can: s => s.asw > 0, use: s => { let t = null, bd = 20000; for (const [e, tr] of picture[s.side]) if (isSub(e) && e.alive && game.t - tr.t < 8) { const d = e.pos.distanceTo(s.pos); if (d < bd) { bd = d; t = e; } } if (!t) { message('无水下目标', '先用主动声呐搜索', '#9fb0ba', 1.6); return false; } launchASW(s, t); return true; } },
