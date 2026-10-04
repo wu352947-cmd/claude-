@@ -408,6 +408,7 @@ function createWorld({ scene, renderer, hq, time, sea = false }) {
 
   return {
     TIMES, SUN, FOG_D, fogColor, sunLight, water, waterMat, smokeTex, glowTex, base, sams, towns, setTime, lightsMat,
+    follow(p) { sky.position.copy(p); },
     update(t) { waterMat.uniforms.uTime.value = t; for (const s of sams) if (s.alive) s.dish.rotation.y = t * (s.active ? 2.4 : 0.6); }
   };
 }

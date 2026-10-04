@@ -191,8 +191,8 @@ const Navy = (() => {
     hw: curve([[0, 0.72], [0.12, 0.92], [0.4, 1], [0.62, 0.97], [0.8, 0.78], [0.92, 0.42], [1, 0.03]]),
     flare: curve([[0, 0.02], [0.5, 0.03], [0.8, 0.1], [0.95, 0.22], [1, 0.06]])
   };
-  function combatant(cls) {
-    const S = SPECS[cls], M = mats(S.side), P = [];
+  function combatant(cls, number) {
+    const S = Object.assign({}, SPECS[cls], number ? { number } : {}), M = mats(S.side), P = [];
     const L = S.L, B = S.B;
     const fbK = S.fbK || [[0, 6.5], [0.5, 7], [0.85, 8.6], [1, 9.6]];
     const fbC = curve(fbK), fb = u => fbC(u) * S.fbScale;
@@ -478,6 +478,6 @@ const Navy = (() => {
     return mergeGeometries(g.map(x => x.toNonIndexed()));
   }
 
-  function ship(cls) { return CARRIERS[cls] ? carrier(cls) : combatant(cls); }
+  function ship(cls, number) { return CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
   return { ship, plane, ashmGeometry, SPECS, CARRIERS };
 })();
