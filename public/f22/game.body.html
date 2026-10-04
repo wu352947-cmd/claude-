@@ -418,7 +418,11 @@ const F22 = (() => {
     flanker: { base: '#e6edf3', seed: 4411, blobs: 20, camo: ['rgba(58, 98, 146, 0.55)', 'rgba(126, 156, 192, 0.5)', 'rgba(36, 58, 92, 0.4)'] },
     fulcrum: { base: '#e3e6e2', seed: 9137, blobs: 16, camo: ['rgba(84, 98, 86, 0.5)', 'rgba(146, 152, 146, 0.45)'] },
     ucav: { base: '#c4c8cd', seed: 313, blobs: 6, camo: ['rgba(30, 34, 40, 0.22)'] },
-    bomber: { base: '#f4f5f6', seed: 808, blobs: 5, camo: ['rgba(120, 128, 136, 0.1)'] }
+    bomber: { base: '#f4f5f6', seed: 808, blobs: 5, camo: ['rgba(120, 128, 136, 0.1)'] },
+    plan: { base: '#dfe5ea', seed: 5501, blobs: 8, camo: ['rgba(70, 92, 118, 0.22)', 'rgba(40, 56, 76, 0.16)'] },
+    usn: { base: '#e2e5e8', seed: 1949, blobs: 8, camo: ['rgba(60, 66, 74, 0.2)', 'rgba(90, 96, 104, 0.14)'] },
+    h6: { base: '#e9ecee', seed: 1959, blobs: 6, camo: ['rgba(110, 120, 130, 0.14)'] },
+    bone: { base: '#c9ccd0', seed: 1974, blobs: 6, camo: ['rgba(40, 44, 50, 0.22)'] }
   };
   function skinTextures(paint, aniso) {
     if (texCache[paint]) return texCache[paint];
@@ -1352,6 +1356,19 @@ const Craft = (() => {
     const f = o.fin;
     fins(add, M.skin, group, { z: f.z * k, y: f.y * k, le: f.le * k, te: f.te * k, h: f.h * k, sLE: f.sLE, sTE: f.sTE, th0: 0.2 * k, th1: 0.06 * k, cant: f.cant });
     if (o.ventral) fins(add, M.skin, group, { z: 2.0 * k, y: -0.42 * k, le: -5.6 * k, te: -7.3 * k, h: 0.95 * k, sLE: 45, sTE: 20, th0: 0.1 * k, th1: 0.04 * k, cant: 15, down: true });
+    // canard foreplanes (J-15 style)
+    if (o.canard) {
+      const cn = o.canard;
+      surface(add, M.skin, {
+        le: lin(cn.z0 * k, cn.z1 * k, cn.le * k, (cn.le - (cn.z1 - cn.z0) * 0.9) * k), te: lin(cn.z0 * k, cn.z1 * k, (cn.le - 1.6) * k, (cn.le - 1.4 - (cn.z1 - cn.z0) * 0.55) * k),
+        th: lin(cn.z0 * k, cn.z1 * k, 0.1 * k, 0.04 * k), y: () => cn.y * k
+      }, cn.z0 * k, cn.z1 * k, 6);
+    }
+    // carrier tail hook
+    if (o.hook) {
+      const h = new THREE.CylinderGeometry(0.05 * k, 0.05 * k, 2.2 * k, 6); h.rotateZ(Math.PI / 2 - 0.25); h.translate((o.tail + 1.4) * k, -0.55 * k, 0);
+      add(h, M.dark);
+    }
     const st = o.stab;
     surface(add, M.skin, {
       le: lin(st.z0 * k, 4.4 * k, -6.2 * k, -8.0 * k), te: lin(st.z0 * k, 4.4 * k, -8.9 * k, -9.4 * k),
@@ -1445,12 +1462,13 @@ const Craft = (() => {
   }
 
   function build(type, aniso = 4) {
+    if (typeof type === 'object') return twinJet(Object.assign({ aniso }, type));
     if (type === 'flanker') return twinJet(Object.assign({ aniso }, FLANKER));
     if (type === 'fulcrum') return twinJet(Object.assign({ aniso }, FULCRUM));
     if (type === 'ucav') return ucav(aniso);
     return bomber(aniso);
   }
-  return { build };
+  return { build, FLANKER, FULCRUM, bomber, materials, adder, ring, body, surface, fins, nozzle, canopy, lin };
 })();
 
 /* Procedural islands: value-noise fbm continents with ridged mountains. Heights in metres, sea level 0. */
@@ -1500,7 +1518,7 @@ function rawTerrainH(x, z) {
 
 /* World: sky and time of day, island terrain, ocean, clouds, forests, towns, the airbase and SAM sites.
    createWorld() returns handles the game updates each frame. Expects THREE, Sky, terrainH, vnoise, AIRBASE, F22 in scope. */
-function createWorld({ scene, renderer, hq, time }) {
+function createWorld({ scene, renderer, hq, time, sea = false }) {
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -1541,7 +1559,7 @@ function createWorld({ scene, renderer, hq, time }) {
 
   /* ---------- terrain ---------- */
   const TSIZE = 22000;
-  {
+  if (!sea) {
     const seg = hq ? 260 : 180;
     const geo = new THREE.PlaneGeometry(TSIZE, TSIZE, seg, seg);
     geo.rotateX(-Math.PI / 2);
@@ -1674,12 +1692,12 @@ function createWorld({ scene, renderer, hq, time }) {
     transparent: true, depthWrite: false
   });
   {
-    const clusters = hq ? 80 : 46, per = 7;
+    const clusters = sea ? (hq ? 300 : 170) : hq ? 80 : 46, per = 7, span = sea ? 62000 : 12000;
     const mesh = new THREE.InstancedMesh(new THREE.PlaneGeometry(1, 1), cloudMat, clusters * per);
     const m = new THREE.Matrix4(), p = new THREE.Vector3(), q = new THREE.Quaternion(), s = new THREE.Vector3();
     let k = 0;
     for (let c = 0; c < clusters; c++) {
-      const cx = rr(-12000, 12000), cz = rr(-12000, 12000), cy = rr(1900, 3000), r = rr(250, 600);
+      const cx = rr(-span, span), cz = rr(-span, span), cy = rr(1900, 3000), r = rr(250, 600);
       for (let i = 0; i < per; i++) {
         p.set(cx + rr(-r, r), cy + rr(-r, r) * 0.22, cz + rr(-r, r));
         const sc = rr(380, 820); s.set(sc, sc, sc);
@@ -1696,7 +1714,7 @@ function createWorld({ scene, renderer, hq, time }) {
 
   /* ---------- towns on the coastal flats ---------- */
   const towns = [];
-  {
+  if (!sea) {
     const cands = [];
     for (let x = -9500; x <= 9500; x += 450) for (let z = -9500; z <= 9500; z += 450) {
       const h = terrainH(x, z);
@@ -1740,7 +1758,7 @@ function createWorld({ scene, renderer, hq, time }) {
   }
 
   /* ---------- forests ---------- */
-  {
+  if (!sea) {
     const count = hq ? 9000 : 3800;
     const geo = new THREE.ConeGeometry(1, 1, 6); geo.translate(0, 0.5, 0);
     const trees = new THREE.InstancedMesh(geo, new THREE.MeshStandardMaterial({ roughness: 0.95, flatShading: true }), count);
@@ -1766,9 +1784,9 @@ function createWorld({ scene, renderer, hq, time }) {
   }
 
   /* ---------- airbase ---------- */
-  const base = { x: AIRBASE.x, z: AIRBASE.z, y: AIRBASE.y, hp: 100, pos: new THREE.Vector3(AIRBASE.x, AIRBASE.y, AIRBASE.z) };
+  const base = sea ? null : { x: AIRBASE.x, z: AIRBASE.z, y: AIRBASE.y, hp: 100, pos: new THREE.Vector3(AIRBASE.x, AIRBASE.y, AIRBASE.z) };
   const lightPts = [], lightCols = [];
-  {
+  if (!sea) {
     const Y = AIRBASE.y, X = AIRBASE.x, Z = AIRBASE.z;
     const flat = (w, d, x, z, mat, y = Y + 0.06) => {
       const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), mat);
@@ -1842,14 +1860,14 @@ function createWorld({ scene, renderer, hq, time }) {
   const lightsMat = new THREE.PointsMaterial({ size: 5, map: glowTex, vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
   {
     const g = new THREE.BufferGeometry();
-    g.setAttribute('position', new THREE.Float32BufferAttribute(lightPts, 3));
-    g.setAttribute('color', new THREE.Float32BufferAttribute(lightCols, 3));
+    g.setAttribute('position', new THREE.Float32BufferAttribute(lightPts.length ? lightPts : [0, -9999, 0], 3));
+    g.setAttribute('color', new THREE.Float32BufferAttribute(lightCols.length ? lightCols : [0, 0, 0], 3));
     scene.add(new THREE.Points(g, lightsMat));
   }
 
   /* ---------- SAM sites on island high ground ---------- */
   const sams = [];
-  {
+  if (!sea) {
     const cands = [];
     for (let x = -9000; x <= 9000; x += 500) for (let z = -9000; z <= 9000; z += 500) {
       const h = terrainH(x, z);
@@ -1907,7 +1925,7 @@ function createWorld({ scene, renderer, hq, time }) {
   setTime(time);
 
   return {
-    TIMES, SUN, FOG_D, fogColor, sunLight, water, waterMat, smokeTex, glowTex, base, sams, towns, setTime,
+    TIMES, SUN, FOG_D, fogColor, sunLight, water, waterMat, smokeTex, glowTex, base, sams, towns, setTime, lightsMat,
     update(t) { waterMat.uniforms.uTime.value = t; for (const s of sams) if (s.alive) s.dish.rotation.y = t * (s.active ? 2.4 : 0.6); }
   };
 }

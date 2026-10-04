@@ -144,6 +144,19 @@ const Craft = (() => {
     const f = o.fin;
     fins(add, M.skin, group, { z: f.z * k, y: f.y * k, le: f.le * k, te: f.te * k, h: f.h * k, sLE: f.sLE, sTE: f.sTE, th0: 0.2 * k, th1: 0.06 * k, cant: f.cant });
     if (o.ventral) fins(add, M.skin, group, { z: 2.0 * k, y: -0.42 * k, le: -5.6 * k, te: -7.3 * k, h: 0.95 * k, sLE: 45, sTE: 20, th0: 0.1 * k, th1: 0.04 * k, cant: 15, down: true });
+    // canard foreplanes (J-15 style)
+    if (o.canard) {
+      const cn = o.canard;
+      surface(add, M.skin, {
+        le: lin(cn.z0 * k, cn.z1 * k, cn.le * k, (cn.le - (cn.z1 - cn.z0) * 0.9) * k), te: lin(cn.z0 * k, cn.z1 * k, (cn.le - 1.6) * k, (cn.le - 1.4 - (cn.z1 - cn.z0) * 0.55) * k),
+        th: lin(cn.z0 * k, cn.z1 * k, 0.1 * k, 0.04 * k), y: () => cn.y * k
+      }, cn.z0 * k, cn.z1 * k, 6);
+    }
+    // carrier tail hook
+    if (o.hook) {
+      const h = new THREE.CylinderGeometry(0.05 * k, 0.05 * k, 2.2 * k, 6); h.rotateZ(Math.PI / 2 - 0.25); h.translate((o.tail + 1.4) * k, -0.55 * k, 0);
+      add(h, M.dark);
+    }
     const st = o.stab;
     surface(add, M.skin, {
       le: lin(st.z0 * k, 4.4 * k, -6.2 * k, -8.0 * k), te: lin(st.z0 * k, 4.4 * k, -8.9 * k, -9.4 * k),
@@ -237,10 +250,11 @@ const Craft = (() => {
   }
 
   function build(type, aniso = 4) {
+    if (typeof type === 'object') return twinJet(Object.assign({ aniso }, type));
     if (type === 'flanker') return twinJet(Object.assign({ aniso }, FLANKER));
     if (type === 'fulcrum') return twinJet(Object.assign({ aniso }, FULCRUM));
     if (type === 'ucav') return ucav(aniso);
     return bomber(aniso);
   }
-  return { build };
+  return { build, FLANKER, FULCRUM, bomber, materials, adder, ring, body, surface, fins, nozzle, canopy, lin };
 })();
