@@ -178,7 +178,15 @@
   #tac-desc { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.5; min-height: 1.5em; }
   /* ---------- naval command: engine telegraph, ability bar ---------- */
   #gears { position: absolute; left: calc(8px + env(safe-area-inset-left, 0px)); top: 24%; display: grid; gap: 4px; z-index: 2; }
-  #gears[hidden], #abil[hidden], #spec[hidden], #specbar[hidden] { display: none; }
+  #gears[hidden], #abil[hidden], #spec[hidden], #specbar[hidden], #cmdbar[hidden] { display: none; }
+  #cmdbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(62px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 96vw; }
+  #cmdbar button { appearance: none; cursor: pointer; font: 700 12px/1.15 var(--f-body); color: var(--fg); background: rgba(20, 16, 6, 0.72); border: 1px solid rgba(227, 178, 87, 0.7); padding: 10px 12px; min-width: 64px; }
+  #cmdbar button.on { background: var(--gold); color: #1c1407; border-color: var(--gold); }
+  #cmdbar button.cd { opacity: 0.5; }
+  #cmdbar button small { display: block; font: 500 10px/1 var(--f-mono); color: var(--muted); margin-top: 3px; }
+  #spec .rhead { padding: 8px 10px; font: 700 12px/1.3 var(--f-body); color: var(--gold); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  #spec .rhead button { appearance: none; cursor: pointer; font: 600 11px/1 var(--f-body); color: var(--fg); background: transparent; border: 1px solid var(--line); padding: 5px 8px; }
+  #spec li.sep { font: 600 10px/1 var(--f-mono); color: var(--muted); letter-spacing: 0.12em; padding: 9px 6px 4px; }
   #gears button { appearance: none; touch-action: none; cursor: pointer; font: 700 11px/1 var(--f-body); color: var(--muted); width: 50px; height: 30px;
     background: rgba(8, 14, 20, 0.55); border: 1px solid rgba(238, 243, 245, 0.25); }
   #gears button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
@@ -194,8 +202,8 @@
   .ab small { position: absolute; right: 3px; top: 2px; font: 600 9px/1 var(--f-mono); color: var(--muted); z-index: 1; }
   .ab.act { border-color: var(--hud); box-shadow: 0 0 0 2px rgba(141, 255, 180, 0.35) inset; }
   .ab.off { opacity: 0.45; }
-  #touch.desk #gears, #touch.desk #abil { display: grid; }
-  #touch.desk #abil { display: flex; }
+  #touch.desk #gears:not([hidden]) { display: grid; }
+  #touch.desk #abil:not([hidden]) { display: flex; }
 
   /* ---------- spectator: unit list and camera bar ---------- */
   #specbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
@@ -204,6 +212,14 @@
   #spec { position: fixed; left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(54px + env(safe-area-inset-top, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); width: min(300px, 44vw);
     background: rgba(6, 10, 14, 0.86); border: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr; pointer-events: auto; }
   #spec .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; border-bottom: 1px solid var(--line); }
+  #spec .tabs[hidden] { display: none; }
+  #e-report table { width: 100%; border-collapse: collapse; font: 500 12px/1.4 var(--f-body); margin: 6px 0 4px; }
+  #e-report th { text-align: left; color: var(--muted); font-weight: 500; padding: 4px 6px 4px 0; white-space: nowrap; }
+  #e-report td { padding: 4px 6px; color: var(--fg); border-left: 1px solid var(--line); }
+  #e-report thead td { color: var(--gold); font-weight: 700; }
+  #e-report tr + tr th, #e-report tr + tr td { border-top: 1px solid rgba(238, 243, 245, 0.07); }
+  #e-report .grade { font: 600 13px/1.5 var(--f-body); color: var(--muted); margin: 6px 0 0; }
+  #e-report .grade b { color: var(--gold); font-size: 20px; margin-left: 4px; }
   #spec .tabs button { appearance: none; cursor: pointer; font: 600 11px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 6px 8px; }
   #spec .tabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
   #spec ul { list-style: none; margin: 0; padding: 4px; overflow-y: auto; }
@@ -269,6 +285,14 @@
     <button type="button" id="sp-free">自由</button>
     <button type="button" id="sp-take">接管</button>
   </div>
+  <div id="cmdbar" hidden>
+    <button type="button" id="cm-alpha">大规模打击</button>
+    <button type="button" id="cm-strike">攻击编队</button>
+    <button type="button" id="cm-cap">加强巡逻</button>
+    <button type="button" id="cm-emcon">电磁静默</button>
+    <button type="button" id="cm-feint">电子佯动</button>
+    <button type="button" id="cm-staff">参谋：手动</button>
+  </div>
   <div class="cluster" id="cap-ctl" hidden>
     <button class="tb sm" id="c-view" type="button">视角</button>
     <button class="tb" id="c-target" type="button">目标</button>
@@ -288,6 +312,7 @@
 </div>
 <div id="topbar" hidden>
   <button type="button" id="b-map" data-act="map">战术地图</button>
+  <button type="button" id="b-units" data-act="units">切换单位</button>
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-support" data-act="support">战区支援</button>
@@ -383,6 +408,7 @@
       <dt>时长</dt><dt>击落</dt><dt>击沉</dt><dt>着舰</dt>
       <dd id="e-time">0</dd><dd id="e-kills">0</dd><dd id="e-ships">0</dd><dd id="e-traps">0</dd>
     </dl>
+    <div id="e-report"></div>
     <div class="row">
       <button class="btn primary" id="b-again" type="button">再战一场</button>
       <button class="btn" id="b-home" type="button">主菜单</button>
@@ -1644,7 +1670,7 @@ const Craft = (() => {
      a high altocumulus deck in the sky dome, and distant cumulonimbus towers.
    - Wakes: each ship leaves a turbulent centre wake and Kelvin arms (19.5°) of foam that age and spread.
    Expects THREE in scope. Textures are loaded from assets/sea/ (relative URLs). */
-function createSeaEnv({ scene, renderer, hq, time, wind, islands = [], Lensflare, LensflareElement }) {
+function createSeaEnv({ scene, renderer, hq, time, wind, reefs = [], Lensflare, LensflareElement }) {
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -1799,8 +1825,8 @@ vec3 swell(vec2 p, float dist, inout vec2 slope) {
     return lerp(lerp(at(x0, y0), at(x0 + 1, y0), fx), lerp(at(x0, y0 + 1), at(x0 + 1, y0 + 1), fx), fy);
   }
   // cumulus cover over the sea: one field drives both where clouds stand and where their shadows fall
-  const CU_SCALE = 34000, CU_BASE = 950;
-  const cuCover = (x, z) => noise(x / CU_SCALE, z / CU_SCALE, 0) * 0.75 + noise(x / CU_SCALE * 3.1, z / CU_SCALE * 3.1, 2) * 0.25;
+  const CU_SCALE = 34000, CU_BASE = 950, CLOUD_SPAN = 2 * CU_SCALE;
+  const cuCover = (x, z) => noise(x / CU_SCALE, z / CU_SCALE, 0) * 0.75 + noise(x / CU_SCALE * 3, z / CU_SCALE * 3, 2) * 0.25;
 
   /* ---------- lights and environment map ---------- */
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
@@ -1872,12 +1898,16 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   let envRT = null;
 
   /* ---------- ocean ---------- */
-  const isl = islands.slice(0, 4);
-  while (isl.length < 4) isl.push({ x: 1e7, z: 1e7, rx: 1, rz: 1, rot: 0 });
-  const uIsl = { value: isl.map(I => new THREE.Vector4(I.x, I.z, I.rx, I.rz)) }, uIslRot = { value: isl.map(I => I.rot || 0) };
+  // reef bathymetry: the eight features nearest the camera (atoll rings, reef platforms, submerged banks)
+  const NREEF = 8, far4 = () => new THREE.Vector4(1e7, 1e7, 1, 1);
+  const uReefA = { value: Array.from({ length: NREEF }, far4) }, uReefB = { value: Array.from({ length: NREEF }, () => new THREE.Vector4(0, 0, 1, 0)) };
+  function pickReefs(p) {
+    const list = reefs.slice().sort((a, b) => (Math.hypot(a.a.x - p.x, a.a.y - p.z) - Math.max(a.a.z, a.a.w)) - (Math.hypot(b.a.x - p.x, b.a.y - p.z) - Math.max(b.a.z, b.a.w)));
+    for (let i = 0; i < NREEF; i++) { const r = list[i]; if (r) { uReefA.value[i].copy(r.a); uReefB.value[i].copy(r.b); } else { uReefA.value[i].set(1e7, 1e7, 1, 1); uReefB.value[i].set(0, 0, 1, 0); } }
+  }
   const waterUniforms = Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), {
     uWave, uWave2, uTime, uOcean: oceanTex, uNoise: noiseTex, uDeep: { value: new THREE.Color() }, uSSS: { value: new THREE.Color() },
-    uIsl, uIslRot, uCenter: { value: new THREE.Vector2() }, uDetail: { value: hq ? 1 : 0.85 }
+    uReefA, uReefB, uCenter: { value: new THREE.Vector2() }, uDetail: { value: hq ? 1 : 0.85 }
   });
   const waterMat = new THREE.ShaderMaterial({
     uniforms: waterUniforms, fog: true, side: THREE.DoubleSide,
@@ -1896,7 +1926,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         gl_Position = projectionMatrix * mvPosition;
         #include <fog_vertex>
       }`,
-    fragmentShader: `uniform sampler2D uOcean; uniform vec3 uDeep, uSSS; uniform vec4 uIsl[4]; uniform float uIslRot[4]; uniform float uDetail;
+    fragmentShader: `uniform sampler2D uOcean; uniform vec3 uDeep, uSSS; uniform vec4 uReefA[8]; uniform vec4 uReefB[8]; uniform float uDetail;
       #include <sea_waves>
       varying vec3 vWorld; varying vec2 vSlope; varying float vH;
       #include <fog_pars_fragment>
@@ -1906,7 +1936,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         vec2 q = rot(p, ang) / tile + vec2(uTime * spd / tile, 0.0);
         return texture2D(uOcean, q);
       }
-      float cuCover(vec2 p){ return texture2D(uNoise, p / ${CU_SCALE.toFixed(1)}).r * 0.75 + texture2D(uNoise, p / ${CU_SCALE.toFixed(1)} * 3.1).b * 0.25; }
+      float cuCover(vec2 p){ return texture2D(uNoise, p / ${CU_SCALE.toFixed(1)}).r * 0.75 + texture2D(uNoise, p / ${CU_SCALE.toFixed(1)} * 3.0).b * 0.25; }
       void main(){
         vec3 toCam = cameraPosition - vWorld; float dist = length(toCam); vec3 v = toCam / dist;
         float wa = atan(${WIND.y.toFixed(4)}, ${WIND.x.toFixed(4)});
@@ -1945,22 +1975,51 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         float back = pow(max(dot(-v, SKY_SUN) * 0.5 + 0.5, 0.0), 3.0);
         float crest = clamp(vH * 0.8 + 0.35 + (l1.a - 0.5) * 0.6, 0.0, 1.5);
         body += uSSS * (0.10 + 0.5 * back) * crest * SKY_SUNC * (0.3 + sunUp) * shade * (1.0 - far);
-        // reef shallows: turquoise over sand, brightening toward the beach
-        float sh = 0.0;
-        for (int i = 0; i < 4; i++) {
-          vec2 dp = rot(vWorld.xz - uIsl[i].xy, -uIslRot[i]);
-          float e = length(dp / uIsl[i].zw);
-          sh = max(sh, 1.0 - smoothstep(1.0, 1.9, e));
+        // reef bathymetry: s = how shallow (1 reef flat awash, ~0.62 lagoon, falling to 0 down the outer slope),
+        // surf where the swell breaks on the outer edge of a rim or a reef platform
+        float s = 0.0, surf = 0.0, lag = 0.0;
+        for (int i = 0; i < 8; i++) {
+          vec4 A = uReefA[i], B = uReefB[i];
+          vec2 dp = rot(vWorld.xz - A.xy, -B.x);
+          float e = length(dp / A.zw);
+          if (e > 3.0) continue;
+          float sd = length(dp) * (e - 1.0) / max(e, 1e-3);
+          float si = 0.0, edge = 0.0;
+          if (B.z < 0.5) {
+            float dr = abs(sd);
+            si = dr < B.y ? 1.0 : sd < 0.0 ? mix(1.0, 0.62, smoothstep(B.y, B.y + 280.0, dr)) : 1.0 - smoothstep(B.y, B.y + 520.0, dr);
+            edge = sd > 0.0 ? 1.0 - smoothstep(0.0, 70.0, abs(dr - B.y - 12.0)) : 0.0;
+            if (sd < 0.0) lag = max(lag, smoothstep(B.y + 150.0, B.y + 500.0, dr));
+          } else if (B.z < 1.5) {
+            si = sd < 0.0 ? 1.0 : 1.0 - smoothstep(0.0, 460.0, sd);
+            edge = 1.0 - smoothstep(0.0, 60.0, abs(sd - 10.0));
+          } else si = sd < 0.0 ? 0.32 : 0.32 * (1.0 - smoothstep(0.0, 1500.0, sd));
+          s = max(s, si); surf = max(surf, edge);
         }
-        if (sh > 0.0) {
-          vec3 shallow = mix(vec3(0.02, 0.22, 0.24), vec3(0.18, 0.5, 0.46), sh * sh) * (amb * 1.2 + SKY_SUNC * sunUp * 0.8 * shade);
-          body = mix(body, shallow, sh);
+        if (lag > 0.0) s = max(s, 0.62 + 0.3 * smoothstep(0.62, 0.8, texture2D(uNoise, vWorld.xz / 420.0).g * 0.7 + texture2D(uNoise, vWorld.xz / 97.0).r * 0.3) * lag);   // coral heads in the lagoon
+        if (s > 0.002) {
+          vec2 cp = vWorld.xz;
+          float coral = texture2D(uNoise, cp / 90.0).g * 0.6 + texture2D(uNoise, cp / 23.0).r * 0.4;
+          vec3 mid = vec3(0.012, 0.17, 0.27), lagoon = vec3(0.03, 0.38, 0.45);
+          vec3 reefTop = mix(vec3(0.1, 0.43, 0.41), vec3(0.42, 0.57, 0.48), smoothstep(0.4, 0.8, coral));
+          reefTop = mix(reefTop, vec3(0.1, 0.2, 0.16), smoothstep(0.62, 0.8, coral) * 0.55);   // dark coral heads
+          vec3 sc = s < 0.35 ? mix(uDeep, mid, s / 0.35) : s < 0.7 ? mix(mid, lagoon, (s - 0.35) / 0.35) : mix(lagoon, reefTop, (s - 0.7) / 0.3);
+          vec3 lit = sc * (amb * 1.15 + SKY_SUNC * sunUp * 0.9 * shade);
+          body = mix(body, lit, smoothstep(0.0, 0.25, s));
+        }
+        float surfF = 0.0;
+        if (surf > 0.0) {
+          float n1 = texture2D(uNoise, vWorld.xz / 140.0 + vec2(uTime * 0.01, 0.0)).b;
+          float n2 = texture2D(uNoise, vWorld.xz / 37.0 - vec2(0.0, uTime * 0.03)).a;
+          surfF = surf * smoothstep(0.35, 0.75, 0.5 + 0.5 * sin(uTime * 1.3 + n1 * 9.0) * 0.6 + n2 * 0.5) * (1.0 - far * 0.7);
         }
         vec3 col = mix(body, refl, fres) + spec;
         // whitecaps on the steepest, highest crests
         float foam = smoothstep(0.3, 0.9, l2.b * 0.8 + l1.b * 0.5) * smoothstep(0.25, 0.7, vH + l1.a * 0.4) * (1.0 - far) * 0.6;
         foam *= 0.55 + 0.45 * texture2D(uNoise, vWorld.xz / 21.0).a;
+        foam *= 1.0 - smoothstep(0.45, 0.9, s);   // calm water inside the reef
         col = mix(col, (SKY_SUNC * sunUp * 0.9 * shade + amb * 0.9), foam * 0.75);
+        col = mix(col, (SKY_SUNC * sunUp * 0.95 * shade + amb * 1.0), surfF * 0.85);
         gl_FragColor = vec4(col, 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -2091,7 +2150,9 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     }
   }
   function buildClouds() {
-    const span = 70000, step = hq ? 3000 : 3800;
+    // the field is one period of the cloud noise (2 x 68 km = 4 x CU_SCALE) and wraps round the camera, so the
+    // whole theatre has weather and the cumulus still sit over their own shadows
+    const span = CLOUD_SPAN, step = hq ? 3000 : 3800;
     for (let x = -span; x <= span; x += step) for (let z = -span; z <= span; z += step) {
       const px = x + rr(-0.4, 0.4) * step, pz = z + rr(-0.4, 0.4) * step;
       const c = cuCover(px, pz);
@@ -2103,8 +2164,10 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     for (let i = 0; i < 4; i++) {
       const a = rnd() * Math.PI * 2, d = rr(85000, 105000);
       const cx = Math.cos(a) * d, cz = Math.sin(a) * d, W = rr(7000, 10000);
+      const first = puffs.length;
       addCluster(cx, cz, W, rr(9000, 12000), CU_BASE, 1.2);
       for (let k = 0; k < 6; k++) puffs.push({ x: cx + rr(-1, 1) * W * 0.9, y: CU_BASE + rr(10500, 12000), z: cz + rr(-0.6, 0.6) * W, s: W * rr(0.5, 0.8), shade: 1, v: Math.floor(rnd() * 4), flip: 0, stretch: 2.2 });
+      for (let k = first; k < puffs.length; k++) puffs[k].cb = true;   // horizon towers keep their distance from the camera
     }
     cloudMat.uniforms.uAtlas.value = puffAtlas();
     const N = puffs.length;
@@ -2125,12 +2188,16 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     if (!cloudMesh) return;
     const N = puffs.length;
     if (order.length !== N) { order.length = 0; for (let i = 0; i < N; i++) order.push(i); }
-    for (const p of puffs) p.d = (p.x - cam.x) ** 2 + (p.y - cam.y) ** 2 + (p.z - cam.z) ** 2;
+    const W2 = CLOUD_SPAN * 2, wrap = d => d - W2 * Math.floor((d + CLOUD_SPAN) / W2);
+    for (const p of puffs) {
+      p.ex = p.cb ? cam.x + p.x : cam.x + wrap(p.x - cam.x); p.ez = p.cb ? cam.z + p.z : cam.z + wrap(p.z - cam.z);
+      p.d = (p.ex - cam.x) ** 2 + (p.y - cam.y) ** 2 + (p.ez - cam.z) ** 2;
+    }
     order.sort((a, b) => puffs[b].d - puffs[a].d);
     const P = aPuff.array, I = aInfo.array;
     for (let k = 0; k < N; k++) {
       const p = puffs[order[k]];
-      P[k * 4] = p.x; P[k * 4 + 1] = p.y; P[k * 4 + 2] = p.z; P[k * 4 + 3] = p.s;
+      P[k * 4] = p.ex; P[k * 4 + 1] = p.y; P[k * 4 + 2] = p.ez; P[k * 4 + 3] = p.s;
       I[k * 4] = p.shade; I[k * 4 + 1] = p.v; I[k * 4 + 2] = p.flip; I[k * 4 + 3] = p.stretch;
     }
     aPuff.needsUpdate = true; aInfo.needsUpdate = true;
@@ -2143,6 +2210,8 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   const wPosA = new THREE.BufferAttribute(wPos, 2).setUsage(THREE.DynamicDrawUsage), wAttA = new THREE.BufferAttribute(wAtt, 4).setUsage(THREE.DynamicDrawUsage);
   const wIdxA = new THREE.BufferAttribute(wIdx, 1).setUsage(THREE.DynamicDrawUsage);
   wakeGeo.setAttribute('position', wPosA); wakeGeo.setAttribute('aW', wAttA); wakeGeo.setIndex(wIdxA);
+  // positions are (x, z) pairs, which three cannot bound: give it a sphere so it never tries
+  wakeGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e9);
   const wakeMat = new THREE.ShaderMaterial({
     uniforms: Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), { uWave, uWave2, uTime, uNoise: noiseTex }),
     fog: true, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
@@ -2334,7 +2403,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   // the environment map waits for the noise texture (the cloud deck shows in reflections)
   ready.then(() => { if (envRT) envRT.dispose(); envSky.material.needsUpdate = true; envRT = pmrem.fromScene(envScene, 0.015); scene.environment = envRT.texture; });
 
-  let sortT = 0;
+  let sortT = 0, reefT = 0;
   const tmp = new THREE.Vector3();
   return {
     TIMES, SUN, FOG_D, fogColor, sunLight, water, waterMat, ready, smokeTex, glowTex, setTime, waveHeight, wakeTrack,
@@ -2343,6 +2412,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
       sky.position.copy(p);
       const sn = hq ? 2 : 3;
       waterUniforms.uCenter.value.set(Math.round(p.x / sn) * sn, Math.round(p.z / sn) * sn);
+      reefT -= dt; if (reefT <= 0) { reefT = 0.5; pickReefs(p); }
       if (flare) flare.position.copy(tmp.copy(SUN).multiplyScalar(90000).add(p));
       sortT -= dt;
       if (sortT <= 0) { sortT = 0.25; sortClouds(p); }
@@ -2773,6 +2843,12 @@ const Navy = (() => {
     ciws(P, M, 120, Y - 2, 18, S.side === 'us' ? 'phalanx' : 'type1130');
     ciws(P, M, -140, Y - 2, -18, S.side === 'us' ? 'phalanx' : 'type1130');
     ciws(P, M, -120, Y - 2, 24, S.side === 'us' ? 'phalanx' : 'type1130');
+    if (S.side === 'cn') {
+      // HQ-10 short-range SAM launchers on the quarter sponsons, a bridge window band and a mast yard on the island
+      for (const [x, z] of [[-138, 22], [-130, -28], [128, -14]]) { P.push([block(x, z, 7, 6, 6, 5, Y - 3, 1.2), M.grey]); P.push([block(x, z, 4.6, 3.4, 4.2, 3.0, Y - 1.8, 3.4), M.light]); }
+      P.push([box(I.l * 0.86, 1.2, 0.3, I.x, Y + I.h * 0.82, I.z - I.w / 2 - 0.1), M.glass]);
+      P.push([box(0.4, 0.4, I.w * 1.6, I.x - 2, Y + I.h * 1.55 + 2, I.z), M.dark]);
+    }
     const group = assemble(P);
     return { group, spec: S };
   }
@@ -2791,7 +2867,7 @@ const Navy = (() => {
     const prof = [];
     for (let i = 0; i <= 40; i++) {
       const u = i / 40, x = -L / 2 + u * L;
-      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(1 - (u - 0.7) / 0.3, 1.25) + 0.15 : R;
+      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(Math.max(0, 1 - (u - 0.7) / 0.3), 1.25) + 0.15 : R;
       prof.push(new THREE.Vector2(Math.max(r, 0.01), x));
     }
     const hullG = new THREE.LatheGeometry(prof, 28); hullG.rotateZ(-Math.PI / 2);
@@ -3088,19 +3164,283 @@ const HQ = () => settings.quality === 'high';
 // the theatre: the two fleets open ~115 km apart (about 600 km at the game's 1:5 weapon scale), so strikes have
 // to find, form up, transit and push - the fight is not decided from the deck
 const THEATRE = { sea: 115000, air: 150000, exit: 170000 };
-const ISLANDS = [
-  { x: -21000, z: -24000, rx: 2400, rz: 700, base: true, rot: 0.15 },
-  { x: 6000, z: 21000, rx: 500, rz: 300 }, { x: -2000, z: -9000, rx: 300, rz: 200 }, { x: 15000, z: -20000, rx: 600, rz: 260 }
+/* ---------- 南沙群岛: the reefs, atolls and islands of the theatre ----------
+   Real Spratly features placed by their real relative positions (longitude / latitude compressed to the game's
+   1:5 theatre scale, 1° ≈ 22 km), each drawn at its real size:
+   - atolls: a ring of reef flat (awash at low tide) around a turquoise lagoon, surf breaking on the outer rim;
+     cays and vegetated islands sit on the rim (郑和群礁 with 太平岛, 敦谦沙洲, 鸿庥岛; 美济礁; 渚碧礁; 弹丸礁)
+   - reef platforms: small reefs with a sand cay or a vegetated island (中业岛, 南威岛, 南薰礁, 赤瓜礁, 华阳礁)
+   - the artificial island: 永暑礁, a 3 km runway on reclaimed coral with a harbour basin, hangars and radomes
+   The water shader colours the sea by this bathymetry; terrainH() uses it for grounding, reef avoidance and flight.
+   Inlined into navwar.js (shares its scope; THREE and mergeGeometries are imported there). */
+const REEF_K = 22000, REEF_LON0 = 114.2, REEF_LAT0 = 10.0;
+const ll = (lon, lat) => [(lon - REEF_LON0) * REEF_K, -(lat - REEF_LAT0) * REEF_K];
+// shape types: 0 atoll ring (rim half-width w), 1 reef platform, 2 submerged bank
+const REEFS = [
+  { name: '永暑礁', at: ll(112.89, 9.55), rx: 3300, rz: 1300, rot: 0.42, type: 1, base: true },
+  { name: '郑和群礁', at: ll(114.42, 10.38), rx: 9000, rz: 3300, rot: 0.22, type: 0, w: 260 },
+  { name: '美济礁', at: ll(115.53, 9.9), rx: 4300, rz: 2900, rot: -0.3, type: 0, w: 220 },
+  { name: '渚碧礁', at: ll(114.08, 10.92), rx: 2900, rz: 1900, rot: 0.6, type: 0, w: 200 },
+  { name: '弹丸礁', at: ll(113.84, 7.38), rx: 3600, rz: 1000, rot: 0.35, type: 0, w: 180 },
+  { name: '中业岛', at: ll(114.28, 11.05), rx: 1500, rz: 900, rot: 0.3, type: 1 },
+  { name: '南威岛', at: ll(111.92, 8.64), rx: 900, rz: 600, rot: 0.1, type: 1 },
+  { name: '南薰礁', at: ll(114.22, 10.21), rx: 700, rz: 450, rot: 0.8, type: 1 },
+  { name: '赤瓜礁', at: ll(114.28, 9.72), rx: 1300, rz: 700, rot: -0.5, type: 1 },
+  { name: '华阳礁', at: ll(112.86, 8.86), rx: 1700, rz: 600, rot: 0.9, type: 1 },
+  { name: '九章群礁', at: ll(114.55, 9.85), rx: 7000, rz: 4000, rot: 0.4, type: 2 }
 ];
-function terrainH(x, z) {
+for (const F of REEFS) { F.x = F.at[0]; F.z = F.at[1]; F.c = Math.cos(F.rot); F.s = Math.sin(F.rot); F.R = Math.max(F.rx, F.rz) + 900; }
+// land: islands and cays, each on its reef (local position on the feature, metres)
+const REEF_LAND = [
+  // 太平岛 on the north rim of 郑和群礁: the largest natural island of the group, wooded, with a short airstrip
+  { name: '太平岛', on: '郑和群礁', u: -4200, v: -3000, rx: 690, rz: 200, rot: 0.05, h: 3.8, veg: 0.9, strip: true, light: true },
+  { name: '敦谦沙洲', on: '郑和群礁', u: 2600, v: -3150, rx: 300, rz: 120, rot: -0.05, h: 2.6, veg: 0.6 },
+  { name: '鸿庥岛', on: '郑和群礁', u: 1500, v: 3200, rx: 320, rz: 140, rot: 0.08, h: 3.0, veg: 0.8, light: true },
+  { name: '中业岛', on: '中业岛', u: 200, v: 0, rx: 380, rz: 260, rot: 0.2, h: 3.4, veg: 0.85, strip: true },
+  { name: '南威岛', on: '南威岛', u: 0, v: 0, rx: 330, rz: 180, rot: 0.1, h: 2.4, veg: 0.5, light: true },
+  { name: '美济礁沙洲', on: '美济礁', u: 3900, v: 1000, rx: 140, rz: 60, rot: 0.9, h: 1.8, veg: 0 },
+  { name: '弹丸礁沙洲', on: '弹丸礁', u: 2600, v: -450, rx: 420, rz: 110, rot: 0.1, h: 2.2, veg: 0.3 },
+  { name: '南薰礁沙洲', on: '南薰礁', u: 0, v: 0, rx: 90, rz: 50, rot: 0, h: 1.6, veg: 0 }
+];
+for (const L of REEF_LAND) {
+  const F = REEFS.find(f => f.name === L.on);
+  L.x = F.x + L.u * F.c - L.v * F.s; L.z = F.z + L.u * F.s + L.v * F.c; L.rot = (L.rot || 0) + F.rot;
+}
+// the artificial island (永暑礁) in its own frame: runway along +x, the harbour basin cut into the east end
+const BASE_REEF = REEFS[0];
+const BASE_LAND = { name: '永暑礁', x: BASE_REEF.x + 300 * BASE_REEF.c, z: BASE_REEF.z + 300 * BASE_REEF.s, rot: BASE_REEF.rot, base: true, rx: 1800, rz: 520 };
+function inBaseLand(lx, lz) {
+  if (lx > -1700 && lx < 1650 && lz > -230 && lz < 130) return true;
+  if (lx > 250 && lx < 1650 && lz >= 130 && lz < 560) return !(lx > 1050 && lz > 380 && lz < 500);
+  return false;
+}
+// bathymetry / land height at (x, z): highest of every feature that reaches the point
+function reefLocal(F, x, z) {
+  const dx = x - F.x, dz = z - F.z;
+  const u = dx * F.c + dz * F.s, v = -dx * F.s + dz * F.c;
+  const e = Math.hypot(u / F.rx, v / F.rz), r = Math.hypot(u, v);
+  return { u, v, e, sd: e > 1e-4 ? r * (e - 1) / e : -Math.min(F.rx, F.rz) };
+}
+const smoothR = (a, b, v) => { const t = Math.min(1, Math.max(0, (v - a) / (b - a))); return t * t * (3 - 2 * t); };
+function reefH(x, z) {
   let h = -60;
-  for (const I of ISLANDS) {
-    const c = Math.cos(I.rot || 0), s = Math.sin(I.rot || 0), dx = x - I.x, dz = z - I.z;
-    const u = (dx * c + dz * s) / I.rx, v = (-dx * s + dz * c) / I.rz, d = Math.hypot(u, v);
-    if (d < 1.6) h = Math.max(h, d < 1 ? (I.base ? 4 : 2.5) : lerp(I.base ? 4 : 2.5, -12, (d - 1) / 0.6));
+  for (const F of REEFS) {
+    if (Math.abs(x - F.x) > F.R || Math.abs(z - F.z) > F.R) continue;
+    const L = reefLocal(F, x, z);
+    let f;
+    if (F.type === 0) {
+      const dr = Math.abs(L.sd);
+      if (dr < F.w) f = -0.6;
+      else if (L.sd < 0) f = -0.6 + (-18 + 0.6) * smoothR(F.w, F.w + 280, dr);
+      else f = -0.6 + (-60 + 0.6) * smoothR(F.w, F.w + 520, dr);
+    } else if (F.type === 1) f = L.sd < 0 ? -0.8 : -0.8 + (-60 + 0.8) * smoothR(0, 460, L.sd);
+    else f = L.sd < 0 ? -24 : -24 + (-60 + 24) * smoothR(0, 1500, L.sd);
+    if (f > h) h = f;
+  }
+  for (const I of REEF_LAND) {
+    const dx = x - I.x, dz = z - I.z; if (Math.abs(dx) > I.rx * 1.2 || Math.abs(dz) > I.rx * 1.2) continue;
+    const c = Math.cos(I.rot), s = Math.sin(I.rot), e = Math.hypot((dx * c + dz * s) / I.rx, (-dx * s + dz * c) / I.rz);
+    if (e < 1.08) h = Math.max(h, e < 1 ? I.h * (1 - smoothR(0.55, 1, e)) + 0.4 * (1 - e) : -0.6);
+  }
+  {
+    const I = BASE_LAND, dx = x - I.x, dz = z - I.z;
+    if (Math.abs(dx) < 2200 && Math.abs(dz) < 2200) { const c = Math.cos(I.rot), s = Math.sin(I.rot); if (inBaseLand(dx * c + dz * s, -dx * s + dz * c)) h = Math.max(h, 4.2); }
   }
   return h;
 }
+// the shader takes the eight features nearest the camera
+const REEF_GPU = REEFS.map(F => ({ F, a: new THREE.Vector4(F.x, F.z, F.rx, F.rz), b: new THREE.Vector4(F.rot, F.w || 0, F.type, 0) }));
+
+/* ---------- land meshes: islands with beaches and woods, cays, palms; the artificial island base ---------- */
+function reefNoise(x, z) { return Math.sin(x * 0.013 + Math.sin(z * 0.011) * 2.1) * 0.5 + Math.sin(z * 0.021 - x * 0.007) * 0.3 + Math.sin((x + z) * 0.047) * 0.2; }
+function islandGeometry(I) {
+  // concentric rings of an ellipse: wooded interior, sand beach, a shelf running under the water
+  const rings = 14, segs = 64, pos = [], col = [], idx = [];
+  const sand = new THREE.Color(0xd9cba4), wet = new THREE.Color(0xa99f80), wood = new THREE.Color(0x2c4a1e), wood2 = new THREE.Color(0x46612a), tmp = new THREE.Color();
+  const c = Math.cos(I.rot), s = Math.sin(I.rot);
+  pos.push(0, I.h + 0.4, 0); col.push(...wood.toArray());
+  for (let r = 1; r <= rings; r++) {
+    const e = r / rings * 1.1;
+    for (let k = 0; k < segs; k++) {
+      const a = k / segs * Math.PI * 2, wob = 1 + 0.05 * Math.sin(a * 3 + I.rx * 0.01) + 0.03 * Math.sin(a * 7 + I.rz * 0.02);
+      const u = Math.cos(a) * I.rx * e * wob, v = Math.sin(a) * I.rz * e * wob;
+      const y = e < 1 ? I.h * (1 - smoothR(0.55, 1, e)) + 0.4 * (1 - e) : -0.6 - (e - 1) * 12;
+      pos.push(u * c - v * s, y, u * s + v * c);
+      const veg = I.veg && e < 0.78 - 0.1 * reefNoise(u, v) ? I.veg : 0;
+      if (veg) tmp.copy(wood).lerp(wood2, 0.5 + 0.5 * reefNoise(u * 3, v * 3)); else if (e > 0.93) tmp.copy(wet); else tmp.copy(sand).offsetHSL(0, 0, 0.03 * reefNoise(u * 5, v * 5));
+      col.push(tmp.r, tmp.g, tmp.b);
+    }
+  }
+  for (let k = 0; k < segs; k++) idx.push(0, 1 + (k + 1) % segs, 1 + k);
+  for (let r = 1; r < rings; r++) for (let k = 0; k < segs; k++) {
+    const a = 1 + (r - 1) * segs + k, b = 1 + (r - 1) * segs + (k + 1) % segs, cc = 1 + r * segs + k, d = 1 + r * segs + (k + 1) % segs;
+    idx.push(a, b, d, a, d, cc);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  g.setIndex(idx); g.computeVertexNormals();
+  return g;
+}
+function palmGeometry() {
+  const trunk = new THREE.CylinderGeometry(0.22, 0.34, 9, 5); trunk.translate(0, 4.5, 0); trunk.rotateZ(0.12);
+  const parts = [trunk];
+  for (let i = 0; i < 6; i++) { const f = new THREE.ConeGeometry(0.7, 5.2, 3); f.rotateZ(Math.PI / 2 + 0.35); f.translate(2.3, 9.2, 0); f.rotateY(i / 6 * Math.PI * 2); parts.push(f); }
+  const g = mergeGeometries(parts.map(p => p.index ? p.toNonIndexed() : p));
+  const n = g.attributes.position.count, col = new Float32Array(n * 3);
+  for (let i = 0; i < n; i++) { const y = g.attributes.position.getY(i), leaf = y > 8.3; col.set(leaf ? [0.16, 0.33, 0.1] : [0.38, 0.3, 0.2], i * 3); }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  return g;
+}
+function buildReefLand(scene) {
+  const group = new THREE.Group();
+  const landMat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.96, metalness: 0 });
+  const white = new THREE.MeshStandardMaterial({ color: 0xeeeeea, roughness: 0.7 }), red = new THREE.MeshStandardMaterial({ color: 0xb8352e, roughness: 0.6 });
+  const roof = new THREE.MeshStandardMaterial({ color: 0x8c8a84, roughness: 0.8 }), asphalt = new THREE.MeshStandardMaterial({ color: 0x45484a, roughness: 0.9 });
+  const trees = [], lights = [], blocks = [], strips = [];
+  for (const I of REEF_LAND) {
+    const m = new THREE.Mesh(islandGeometry(I), landMat); m.position.set(I.x, 0, I.z); m.receiveShadow = true; group.add(m);
+    if (I.veg) {
+      const n = Math.round(I.rx * I.rz * 0.0009 * I.veg) + 6;
+      for (let k = 0; k < n; k++) {
+        const a = Math.random() * Math.PI * 2, e = Math.sqrt(Math.random()) * 0.82;
+        const u = Math.cos(a) * I.rx * e, v = Math.sin(a) * I.rz * e, c = Math.cos(I.rot), s = Math.sin(I.rot);
+        trees.push([I.x + u * c - v * s, Math.max(0.6, reefH(I.x + u * c - v * s, I.z + u * s + v * c)), I.z + u * s + v * c, 0.7 + Math.random() * 0.6, Math.random() * 6.3]);
+      }
+    }
+    const c = Math.cos(I.rot), s = Math.sin(I.rot), at = (u, v) => [I.x + u * c - v * s, I.z + u * s + v * c];
+    if (I.strip) { const [x, z] = at(0, I.rz * 0.15); strips.push([x, z, I.rx * 1.7, 30, I.rot, I.h + 0.05]); }
+    if (I.light) { const [x, z] = at(I.rx * 0.8, 0); lights.push([x, Math.max(1, reefH(x, z)), z]); }
+    if (I.strip) for (let k = 0; k < 5; k++) { const [x, z] = at(-I.rx * 0.4 + k * 60, -I.rz * 0.45); blocks.push([x, I.h, z, I.rot]); }
+  }
+  // palms: one instanced mesh for the whole theatre
+  if (trees.length) {
+    const im = new THREE.InstancedMesh(palmGeometry(), new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.85 }), trees.length);
+    const M = new THREE.Matrix4(), q = new THREE.Quaternion(), sc = new THREE.Vector3(), p = new THREE.Vector3();
+    trees.forEach(([x, y, z, k, a], i) => { q.setFromAxisAngle(new THREE.Vector3(0, 1, 0), a); sc.setScalar(k); p.set(x, y, z); M.compose(p, q, sc); im.setMatrixAt(i, M); });
+    im.castShadow = true; group.add(im);
+  }
+  Object.assign(asphalt, { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  for (const [x, z, len, w, rot, y] of strips) { const m = new THREE.Mesh(new THREE.PlaneGeometry(len, w), asphalt); m.rotation.set(-Math.PI / 2, 0, -rot); m.position.set(x, y + 0.3, z); group.add(m); }
+  for (const [x, y, z] of lights) {
+    const t = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 2.4, 22, 10), white); t.position.set(x, y + 11, z); t.castShadow = true; group.add(t);
+    const h = new THREE.Mesh(new THREE.CylinderGeometry(2.1, 2.1, 3.5, 10), red); h.position.set(x, y + 23.5, z); group.add(h);
+  }
+  for (const [x, y, z, rot] of blocks) { const b = new THREE.Mesh(new THREE.BoxGeometry(34, 7, 16), white); b.position.set(x, y + 3.5, z); b.rotation.y = -rot; b.castShadow = true; group.add(b); const r = new THREE.Mesh(new THREE.BoxGeometry(35, 0.6, 17), roof); r.position.set(x, y + 7.3, z); r.rotation.y = -rot; group.add(r); }
+  scene.add(group);
+  return group;
+}
+// 永暑礁: reclaimed coral with sea walls, a 3 km runway and parallel taxiway, aprons, hardened shelters, a harbour
+// basin with piers, radomes and a radar tower, an HQ-9 battery, close-in weapon towers, a lighthouse
+function runwayTexture() {
+  const cv = document.createElement('canvas'); cv.width = 1024; cv.height = 64;
+  const g = cv.getContext('2d');
+  g.fillStyle = '#3d4043'; g.fillRect(0, 0, 1024, 64);
+  for (let i = 0; i < 2600; i++) { g.fillStyle = `rgba(${Math.random() < 0.5 ? '255,255,255' : '0,0,0'},${Math.random() * 0.05})`; g.fillRect(Math.random() * 1024, Math.random() * 64, 2, 2); }
+  g.fillStyle = '#e9e9e4';
+  g.fillRect(0, 2, 1024, 1.2); g.fillRect(0, 60.8, 1024, 1.2);
+  for (let x = 40; x < 984; x += 26) g.fillRect(x, 31, 13, 1.4);
+  for (const x0 of [6, 1000]) for (let k = 0; k < 8; k++) g.fillRect(x0 + (x0 > 500 ? -18 : 0), 6 + k * 6.5, 18, 3.6);
+  for (const x0 of [120, 880]) { g.fillRect(x0, 18, 22, 6); g.fillRect(x0, 40, 22, 6); }
+  g.fillStyle = 'rgba(20,20,20,0.35)'; for (const x0 of [60, 940]) g.fillRect(x0 - 40, 10, 80, 44);
+  const t = new THREE.CanvasTexture(cv); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4;
+  return t;
+}
+function buildBaseIsland(g) {
+  const concrete = new THREE.MeshStandardMaterial({ color: 0xbdb8a8, roughness: 0.95 }), wall = new THREE.MeshStandardMaterial({ color: 0x8f8b80, roughness: 0.9 });
+  const sandM = new THREE.MeshStandardMaterial({ color: 0xd7cba6, roughness: 1 });
+  // the land: the outline with the harbour notch, extruded from below the waterline, sea walls on the sides
+  const sh = new THREE.Shape();
+  const P = [[-1700, -230], [1500, -230], [1650, -150], [1650, 380], [1050, 380], [1050, 500], [1650, 500], [1650, 560], [400, 560], [250, 130], [-1600, 130], [-1700, 60]];
+  P.forEach(([x, z], i) => i ? sh.lineTo(x, -z) : sh.moveTo(x, -z));
+  const land = new THREE.ExtrudeGeometry(sh, { depth: 7.2, bevelEnabled: true, bevelThickness: 1.2, bevelSize: 6, bevelSegments: 1, steps: 1 });
+  land.rotateX(-Math.PI / 2); land.translate(0, -4.2, 0);   // top face (with the bevel) at 4.2 m
+  const lm = new THREE.Mesh(land, [sandM, wall]); lm.receiveShadow = true; g.add(lm);
+  // the reef platform around it, awash
+  // surface layers sit just above the fill and are pulled forward in depth, so they never fight the land surface
+  // for the depth buffer when seen from kilometres away
+  const decal = m => Object.assign(m, { polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -4 });
+  const flatTop = (w, d, x, z, m, y = 4.4) => { decal(m); const o = new THREE.Mesh(new THREE.PlaneGeometry(w, d), m); o.rotation.x = -Math.PI / 2; o.position.set(x, y, z); o.receiveShadow = true; g.add(o); return o; };
+  const rw = new THREE.MeshStandardMaterial({ map: runwayTexture(), roughness: 0.9 });
+  flatTop(3000, 55, 50, -120, rw, 4.5);
+  const asph = new THREE.MeshStandardMaterial({ color: 0x4a4d50, roughness: 0.9 });
+  flatTop(2700, 24, 100, 40, asph);
+  for (const x of [-900, -100, 700]) flatTop(24, 140, x, -30, asph);
+  flatTop(800, 210, 820, 260, concrete.clone(), 4.42);
+  flatTop(380, 150, -400, 92, concrete.clone(), 4.42);
+  const white = new THREE.MeshStandardMaterial({ color: 0xe4e2da, roughness: 0.75 }), grey = new THREE.MeshStandardMaterial({ color: 0x9da09e, roughness: 0.8 });
+  const dark = new THREE.MeshStandardMaterial({ color: 0x3a3e42, roughness: 0.7 }), green = new THREE.MeshStandardMaterial({ color: 0x3f5a2a, roughness: 1 });
+  const solar = new THREE.MeshStandardMaterial({ color: 0x1d2b46, roughness: 0.25, metalness: 0.4 });
+  const parts = new Map();
+  const put = (geo, mat, x, y, z, ry = 0) => { geo = geo.clone(); geo.rotateY(ry); geo.translate(x, y, z); if (!parts.has(mat)) parts.set(mat, []); parts.get(mat).push(geo.index ? geo.toNonIndexed() : geo); };
+  // hardened aircraft shelters along the north edge of the taxiway (half cylinders, door to the taxiway)
+  const shelter = new THREE.CylinderGeometry(13, 13, 34, 14, 1, false, 0, Math.PI); shelter.rotateZ(Math.PI / 2); shelter.rotateY(Math.PI / 2);
+  for (let i = 0; i < 14; i++) put(shelter, grey, -1350 + i * 48, 4.2, 96);
+  // hangars and support buildings in the east block
+  for (let i = 0; i < 4; i++) put(new THREE.BoxGeometry(70, 20, 50), white, 520 + i * 85, 14, 200);
+  for (let i = 0; i < 6; i++) put(new THREE.BoxGeometry(40, 14, 22), white, 480 + (i % 3) * 60, 11, 330 + Math.floor(i / 3) * 40);
+  put(new THREE.BoxGeometry(30, 32, 30), white, 330, 20, 300);                              // control tower block
+  put(new THREE.BoxGeometry(16, 6, 16), new THREE.MeshStandardMaterial({ color: 0x2a3a48, roughness: 0.2, metalness: 0.5 }), 330, 39, 300);
+  // radomes on towers, the radar tower, the HF array
+  const dome = new THREE.SphereGeometry(14, 18, 12);
+  for (const [x, z] of [[760, 420], [880, 520], [1180, 540], [620, 520]]) { put(new THREE.CylinderGeometry(9, 11, 22, 10), white, x, 15, z); put(dome, white, x, 34, z); }
+  put(new THREE.CylinderGeometry(3, 5, 60, 8), grey, 1450, 34, 300); put(new THREE.BoxGeometry(14, 3, 6), dark, 1450, 66, 300);
+  for (let i = 0; i < 12; i++) put(new THREE.CylinderGeometry(0.5, 0.5, 26, 4), grey, 1200 + (i % 6) * 22, 17, 230 + Math.floor(i / 6) * 22);
+  // HQ-9 battery, close-in weapon towers at the corners
+  for (let i = 0; i < 6; i++) { const l = new THREE.BoxGeometry(11, 3, 3); l.rotateZ(0.9); put(l, dark, -1200 + (i % 3) * 26, 9, 10 + Math.floor(i / 3) * 24); }
+  for (const [x, z] of [[-1660, -200], [-1660, 90], [1600, -180], [1600, 540]]) { put(new THREE.CylinderGeometry(5, 6, 14, 8), grey, x, 11, z); put(new THREE.CylinderGeometry(2, 2.6, 4, 8), white, x, 20, z); }
+  // solar fields, fuel tanks, planted trees
+  for (let i = 0; i < 10; i++) put(new THREE.BoxGeometry(40, 0.8, 18), solar, -1500 + i * 46, 5.2, -205);
+  for (let i = 0; i < 4; i++) put(new THREE.CylinderGeometry(11, 11, 12, 16), white, 1150 + i * 30, 10, 140);
+  for (let i = 0; i < 60; i++) put(new THREE.IcosahedronGeometry(3.2, 0), green, -1550 + Math.random() * 3000, 6.5, 118 + Math.random() * 8);
+  // the harbour: piers into the basin, a lighthouse on the breakwater
+  for (let i = 0; i < 3; i++) put(new THREE.BoxGeometry(14, 2, 90), concrete, 1150 + i * 140, 3.4, 440);
+  put(new THREE.CylinderGeometry(2.4, 3.2, 26, 10), white, 1640, 17, 530); put(new THREE.CylinderGeometry(3, 3, 4, 10), new THREE.MeshStandardMaterial({ color: 0xb8352e }), 1640, 32, 530);
+  for (const [mat, list] of parts) { const m = new THREE.Mesh(mergeGeometries(list), mat); m.castShadow = m.receiveShadow = true; g.add(m); }
+  return g;
+}
+// ambient traffic: fishing boats clustered at the reefs (the trawler fleets that ride out on the banks) and a few
+// merchant ships on the lanes; scenery only, not part of the battle picture
+function buildAmbient(scene) {
+  const hullG = (() => {
+    const s = new THREE.Shape(); s.moveTo(-1, -0.5); s.lineTo(0.7, -0.5); s.lineTo(1, 0); s.lineTo(0.7, 0.5); s.lineTo(-1, 0.5); s.lineTo(-1, -0.5);
+    const g = new THREE.ExtrudeGeometry(s, { depth: 1, bevelEnabled: false }); g.rotateX(-Math.PI / 2); g.translate(0, 0, 0); return g;
+  })();
+  const parts = (L, B, H, cab, col, cabCol) => {
+    const h = hullG.clone(); h.scale(L / 2, H, B); const c = new THREE.BoxGeometry(L * cab, H * 1.6, B * 0.7); c.translate(-L * 0.18, H * 1.6, 0);
+    const ni = x => x.index ? x.toNonIndexed() : x, hN = ni(h);
+    const g = mergeGeometries([hN, ni(c)]);
+    const n = g.attributes.position.count, cc = new Float32Array(n * 3), hn = hN.attributes.position.count;
+    for (let i = 0; i < n; i++) cc.set(i < hn ? col : cabCol, i * 3);
+    g.setAttribute('color', new THREE.BufferAttribute(cc, 3)); return g;
+  };
+  const mat = new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.7 });
+  const kinds = [{ g: parts(38, 7, 3, 0.3, [0.85, 0.86, 0.85], [0.2, 0.36, 0.62]), n: 0, list: [] }, { g: parts(52, 9, 3.5, 0.25, [0.7, 0.22, 0.18], [0.92, 0.92, 0.9]), n: 0, list: [] }, { g: parts(190, 30, 9, 0.12, [0.16, 0.2, 0.26], [0.9, 0.9, 0.88]), n: 0, list: [] }];
+  const fleets = [['九章群礁', 14], ['美济礁', 8], ['永暑礁', 5], ['郑和群礁', 7], ['渚碧礁', 6]];
+  for (const [name, n] of fleets) {
+    const F = REEFS.find(f => f.name === name);
+    for (let i = 0; i < n; i++) {
+      const a = Math.random() * Math.PI * 2, r = (F.type === 2 ? 0.5 : 1.15) + Math.random() * 0.5;
+      const u = Math.cos(a) * F.rx * r, v = Math.sin(a) * F.rz * r;
+      const x = F.x + u * F.c - v * F.s, z = F.z + u * F.s + v * F.c;
+      if (reefH(x, z) > -10) continue;
+      kinds[Math.random() < 0.7 ? 0 : 1].list.push([x, z, Math.random() * 6.3]);
+    }
+  }
+  // merchant traffic on the lanes north and south of the reefs
+  for (let i = 0; i < 6; i++) kinds[2].list.push([-90000 + i * 34000 + Math.random() * 8000, (i % 2 ? -1 : 1) * (52000 + Math.random() * 9000), i % 2 ? 0.08 : Math.PI + 0.08]);
+  const M = new THREE.Matrix4(), q = new THREE.Quaternion(), one = new THREE.Vector3(1, 1, 1), p = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0);
+  for (const k of kinds) {
+    if (!k.list.length) continue;
+    const im = new THREE.InstancedMesh(k.g, mat, k.list.length);
+    k.list.forEach(([x, z, h], i) => { q.setFromAxisAngle(Y, h); p.set(x, -0.6, z); M.compose(p, q, one); im.setMatrixAt(i, M); });
+    im.castShadow = true; scene.add(im);
+  }
+}
+
+// land pieces (the artificial island first) for the code that only needs outlines
+const ISLANDS = [BASE_LAND, ...REEF_LAND];
+const terrainH = reefH;
 const groundAt = (x, z) => Math.max(terrainH(x, z), 0);
 
 /* ---------- renderer & world ---------- */
@@ -3113,7 +3453,8 @@ stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, 1, 1.5, 160000);
 scene.add(camera);
-const world = createSeaEnv({ scene, renderer, hq: HQ(), time: settings.time, wind: new V3(-0.85, 0, 0.53), islands: ISLANDS });
+const world = createSeaEnv({ scene, renderer, hq: HQ(), time: settings.time, wind: new V3(-0.85, 0, 0.53), reefs: REEF_GPU });
+buildReefLand(scene); buildAmbient(scene);
 const { fogColor, FOG_D, SUN, sunLight } = world;
 sunLight.shadow.camera.left = sunLight.shadow.camera.bottom = -60;
 sunLight.shadow.camera.right = sunLight.shadow.camera.top = 60;
@@ -3319,7 +3660,7 @@ const FLEET = {
 };
 const SH = {};
 for (const side of ['cn', 'us']) FLEET[side].units.forEach(([cls, name, number], i) => { SH[`${side}${i}`] = Object.assign({}, CLS[cls], { cls, name, number }); });
-const BASE = { side: 'cn', name: '前哨岛礁机场', hp: 2000, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48 }, channels: 8, wing: { j16: 16, h6k: 10 }, isl: ISLANDS[0] };
+const BASE = { side: 'cn', name: '永暑礁机场', hp: 2000, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48 }, channels: 8, wing: { j16: 16, h6k: 10 }, isl: BASE_LAND };
 const WIND = { dir: new V3(-0.85, 0, 0.53).normalize(), speed: 8 };   // wind blows toward this direction (from the north-east)
 
 /* ---------- audio: synthesised with WebAudio (from 猛禽制空) ---------- */
@@ -3410,6 +3751,8 @@ function radio(from, text, color = '#cfe8ff') {
   if (game.radio.length > 4) game.radio.shift();
 }
 const mine = u => u.side === game.side;
+// roles that look at the battle through the director / free camera (the spectator and the theatre commander)
+const camRole = () => game.role === 'watch' || game.role === 'cmd';
 const sideColor = s => s === game.side ? '#9fd4ff' : '#ff8a78';
 
 /* ---------- geometry helpers ---------- */
@@ -3461,6 +3804,14 @@ class Ship {
       if (hd && hd.deckY) { this.deck.deckY = hd.deckY; this.deck.cats = this.deck.cats.map(c => Object.assign({}, c, { x1: Math.min(c.x1, hdKey.catMax || c.x1) })); }
     }
     if (this.deck) this.cats = this.deck.cats.map(c => ({ c, busy: 0, plane: null }));
+    // a deck park on the procedural carrier: J-15s tails-out along the starboard edge, thinned as the hangar empties
+    if (S.carrier && !hd && S.model === 'shandong') {
+      this.park = [];
+      const Y = this.deck.deckY + (AC.j15.gearH || 2.6);
+      for (const [x, z, r] of [[-122, 15, 2.3], [-104, 15, 2.3], [-86, 15, 2.3], [-68, 15, 2.3], [34, 14, 2.2], [52, 14, 2.2], [70, 14, 2.2], [88, 13, 2.2]]) {
+        const m = Navy.plane('j15').obj; m.position.set(x, Y, z); m.rotation.y = r; this.obj.add(m); this.park.push(m);
+      }
+    }
   }
   get carrier() { return !!this.S.carrier; }
   vmax() { return this.S.vmax * (this.hp < this.maxHp * 0.35 ? 0.45 : this.hp < this.maxHp * 0.6 ? 0.75 : 1) * (this.sprintT > 0 ? 1.22 : 1) * (this.mods && this.mods.engine > 0 ? 0.5 : 1); }
@@ -3497,25 +3848,7 @@ const PLANE_HD = { fa18: { m: 'fa18' }, ea18g: { m: 'fa18' }, f35c: { m: 'f35' }
 function buildBase() {
   const I = BASE.isl, g = new THREE.Group();
   g.position.set(I.x, 0, I.z); g.rotation.y = -I.rot;
-  const sand = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 48), new THREE.MeshStandardMaterial({ color: 0xd9cfae, roughness: 1 }));
-  sand.scale.set(I.rx * 1.02, 1, I.rz * 1.02); sand.position.y = 0; g.add(sand);
-  const shoal = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2, 48), new THREE.MeshStandardMaterial({ color: 0x5fb7b0, roughness: 0.4, transparent: true, opacity: 0.55 }));
-  shoal.scale.set(I.rx * 1.45, 1, I.rz * 1.9); shoal.position.y = -0.5; g.add(shoal);
-  const flat = (w, d, x, z, col, y = 4.05) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: col, roughness: 0.92 })); m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); g.add(m); return m; };
-  flat(3000, 55, 0, -120, 0x3c3f42);
-  for (let x = -1400; x <= 1400; x += 60) flat(24, 1.2, x, -120, 0xeeeeea, 4.07);
-  flat(2600, 22, 0, 60, 0x4a4c4f);
-  flat(700, 180, -500, 320, 0x77797a);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xc8c6be, roughness: 0.8 }), dark = new THREE.MeshStandardMaterial({ color: 0x3a3e42, roughness: 0.7 });
-  const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o); return o; };
-  for (let i = 0; i < 8; i++) add(new THREE.BoxGeometry(34, 12, 26), mat, -760 + i * 44, 10, 360);
-  add(new THREE.BoxGeometry(60, 18, 40), mat, 500, 13, 330);
-  add(new THREE.CylinderGeometry(4, 6, 46, 10), mat, 760, 27, 300);
-  const dome = add(new THREE.SphereGeometry(16, 20, 12, 0, Math.PI * 2, 0, Math.PI / 1.8), new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.5 }), 760, 52, 300);
-  dome.castShadow = false;
-  for (const x of [900, 1050]) add(new THREE.CylinderGeometry(9, 9, 10, 18), new THREE.MeshStandardMaterial({ color: 0xe8e8e4 }), x, 9, 380);
-  // HQ-9 launchers
-  for (let i = 0; i < 4; i++) { const l = add(new THREE.BoxGeometry(11, 3, 3), dark, 1250 + (i % 2) * 30, 8, 250 + Math.floor(i / 2) * 30); l.rotation.z = 0.9; }
+  buildBaseIsland(g);
   scene.add(g);
   const base = {
     kind: 'base', side: BASE.side, name: BASE.name, value: BASE.value, hp: BASE.hp, maxHp: BASE.hp, alive: true, dying: false,
@@ -3535,6 +3868,9 @@ class Plane {
     const hdKey = PLANE_HD[type], hd = hdKey && NavyHD.make(hdKey.m, { gearH: T.gearH, pla: hdKey.pla, scale: hdKey.scale });
     const m = hd ? { obj: hd.group, exhausts: hd.exhausts } : Navy.plane(T.model);
     this.obj = m.obj; scene.add(this.obj);
+    // level of detail: the HD airframe (12-68k triangles) only close to the camera; a baked low-poly airframe
+    // (shared geometry) further out, nothing beyond the distance at which an aircraft is below a pixel
+    if (hd) { this.lo = Navy.plane(T.model).obj; this.lo.visible = false; scene.add(this.lo); }
     this.setGearVis = hd ? hd.setGear : null; this.gearShown = false;
     this.exhausts = m.exhausts.map(e => new V3(...e));
     this.side = side; this.type = type; this.home = home; this.kind = 'plane'; this.name = T.name;
@@ -3570,7 +3906,7 @@ function setBasis(q, f, u) {
   _m4.makeBasis(f, up, new V3().crossVectors(f, up));
   q.setFromRotationMatrix(_m4);
 }
-function removePlane(pl) { pl.alive = false; scene.remove(pl.obj); const i = planes.indexOf(pl); if (i >= 0) planes.splice(i, 1); }
+function removePlane(pl) { pl.alive = false; scene.remove(pl.obj); if (pl.lo) scene.remove(pl.lo); const i = planes.indexOf(pl); if (i >= 0) planes.splice(i, 1); }
 
 /* ---------- effects ---------- */
 const _a = new V3(), _b = new V3(), _c = new V3(), _d = new V3(), _e = new V3(), _f = new V3();
@@ -3814,13 +4150,24 @@ function destroyPlane(pl, src) {
   pl.spin.set(rand(-3, 3), 0, rand(-1.2, 1.2));
   explode(pl.pos, pl.T.role === 'bomber' ? 1.4 : 0.8, pl.vel);
   spawnDebris(pl.pos, pl.vel, 5);
+  ledgerPlane(pl);
   const by = src && src.owner;
   if (by === player) { game.stats.kills++; message('击落', pl.name, '#8dffb4', 2.2); radio('你', `击落一架${pl.name}！`, '#9fd4ff'); }
   else if (mine(pl) && Math.random() < 0.5) radio('塔台', `${pl.name}被击落。`, '#ff8a78');
   else if (!mine(pl) && Math.random() < 0.4) radio(SIDES[game.side].short, `击落敌${pl.name}。`, '#9fd4ff');
 }
+// the war ledger: what each side lost, and how
+function ledgerPlane(pl) {
+  const L = game.ledger, by = foe(pl.side);
+  if (!L) return;
+  L.air[pl.side]++;
+  if (pl.ashmN > 0) L.archers[by]++;        // shot down with its anti-ship missiles still on the rails
+  if (pl.T.aew) L.aew[by]++;
+  if (pl.role === 'tank') L.tankers[by]++;
+}
 function killPlayer(cause) {
   if (!player || !player.alive) return;
+  ledgerPlane(player);
   player.dying = true; player.dieT = 0.01;
   explode(player.pos, 1.4, player.vel);
   spawnDebris(player.pos, player.vel, 8, 1.3);
@@ -3846,6 +4193,7 @@ function damageShip(s, dmg, src, at) {
 }
 function sinkShip(s, src) {
   s.dying = true; s.sinkT = 0; s.speed *= 0.3; s.order = 0;
+  if (game.ledger) game.ledger.sunk[s.side].push(s.name);
   explode(toWorld(s, 0, s.h * 0.5, 0), 3, null);
   if (playerOwns(src)) { game.stats.shipKills++; ribbon('击沉', '#8dffb4'); }
   message(`${s.name}${s.carrier ? '' : ''}沉没`, mine(s) ? '我方舰艇损失' : '敌舰被击沉', mine(s) ? '#ff8a78' : '#8dffb4', 3.6);
@@ -4685,7 +5033,7 @@ function roleFly(pl, d, c, out, dt) {
       // the player's aircraft is taken first (the deck is kept ready for the sortie the player is flying)
       if (!h.stack.includes(pl)) { if (pl === player) h.stack.unshift(pl); else h.stack.push(pl); }
       const slot = h.stack.indexOf(pl);
-      if (slot > 0 || (h.finalUntil > game.t && s < 8000)) {
+      if (slot > 0 || (h.finalUntil > game.t && s < 8000) || !recoveryOpen(h, pl)) {
         P.mode = 'holding';
         const a = Math.atan2(pl.pos.z - ip.z, pl.pos.x - ip.x) + 0.45;
         fly(d, pl, ip.x + Math.cos(a) * 4000, 1500 + Math.min(slot, 8) * 300, ip.z + Math.sin(a) * 4000);
@@ -4997,16 +5345,62 @@ function launchFrom(home, type, role, task = {}) {
   pl.role = role; pl.task = task;
   pl.name = `${AC[type].name} ${callsign(home.side)}`;
   planes.push(pl);
-  if (!spotOnCatapult(pl)) { pl.state = 'queued'; pl.obj.visible = false; home.queue = home.queue || []; home.queue.push(pl); }
+  if (!deckOpen(home, pl) || !spotOnCatapult(pl)) { pl.state = 'queued'; pl.obj.visible = false; home.queue = home.queue || []; home.queue.push(pl); }
   return pl;
 }
 const CALL = { cn: ['海鹰', '飞鲨', '雷霆', '利剑', '神盾', '蛟龙', '猎鹰', '长缨'], us: ['Viper', 'Jolly', 'Rhino', 'Ghost', 'Hawk', 'Ace', 'Reaper', 'Saber'] };
 let callN = 0;
 function callsign(side) { callN++; return `${CALL[side][callN % 8]}-${(callN % 9) + 1}`; }
+// one strike package from one home: strikers (they marshal and push together), fighter escort, a jammer
+function launchPackage(h, tgt, o = {}) {
+  const side = h.side, T = tac(side), main = intentTarget(side);
+  const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
+  const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
+  if (avail < 2) return null;
+  const n = Math.min(o.n || 6, avail);
+  const pkg = newPackage(side, h, tgt);
+  if (o.alpha) pkg.alpha = true;
+  let lead = null;
+  for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (p) { joinPackage(pkg, p); if (!lead) lead = p; } }
+  let esc = 0;
+  const pick = types => types.find(t => h.hangar[t] > 0);
+  for (let i = 0; i < (o.esc ?? 2); i++) { const t = pick(['j35', 'f35c', 'fa18', 'j15']); if (t && launchFrom(h, t, 'escort', { lead, slot: [160, -160, 260, -260, 360, -360][i % 6] })) esc++; }
+  let ewn = 0;
+  for (let i = 0; i < (o.ew ?? 1); i++) { const ew = pick(['j15d', 'ea18g']); if (ew && launchFrom(h, ew, 'ew', { pkg: lead, on: tgt })) ewn++; }
+  if (side === game.side) radio('空中指挥', `${h.name}出动第 ${pkg.id} 攻击编队${o.alpha ? '（大规模打击）' : ''}：${n} 架突击机${esc ? ` + ${esc} 架护航` : ''}${ewn ? ` + ${ewn} 架电子战机` : ''}，目标${tgt.name}${tgt === main ? '（主攻目标）' : ''}，集结点编队后统一出发。`, o.alpha ? GOLD : '#9fd4ff');
+  return pkg;
+}
+// alpha strike: the deck is spotted for one big launch - about half the air wing - and recoveries wait until it is
+// away; the package is bigger, better escorted and jammed, at the cost of a long gap in the carrier's CAP cycle
+function alphaStrike(h, tgt) {
+  if (!h || h.kind !== 'ship' || !h.carrier || !h.alive || h.dying || !tgt) return null;
+  const k = launchPackage(h, tgt, { n: 12, esc: 4, ew: 2, alpha: true });
+  if (!k) return null;
+  h.alpha = game.t + 150; h.cyc = { phase: 'launch', until: game.t + 150 };
+  if (h.side === game.side) message('大规模打击', `${h.name}甲板全力出动 · 目标 ${tgt.name} · 回收暂停约 2 分钟`, GOLD, 3);
+  else if (game.side && game.role !== 'watch') radio('预警', `侦测到${h.name}方向大批飞机起飞——敌方大规模空袭！`, '#ff5a4f');
+  return k;
+}
+// cyclic operations: a carrier alternates a launch window and a recovery window (the angled deck cannot recover
+// over aircraft being spotted on the waist catapults); a window ends early when its work is done
+const CYC = { launch: 45, recover: 70 };
+function deckCycle(h) {
+  if (h.kind !== 'ship' || !h.carrier) return;
+  const c = h.cyc || (h.cyc = { phase: 'launch', until: game.t + CYC.launch });
+  const waiting = (h.queue || []).length, airQ = (h.stack || []).length, busy = h.cats.some(k => k.plane && k.plane.state === 'cat');
+  if (c.phase === 'launch') {
+    if (h.alpha > game.t) return;
+    if (game.t > c.until || (!waiting && !busy && airQ >= 2)) { c.phase = 'recover'; c.until = game.t + CYC.recover; }
+  } else if (game.t > c.until || (!airQ && waiting && !(h.finalUntil > game.t))) { c.phase = 'launch'; c.until = game.t + CYC.launch; }
+}
+const deckOpen = (h, pl) => !(h.kind === 'ship' && h.carrier && h.cyc && h.cyc.phase === 'recover' && pl !== player && !(pl.task && pl.task.vector));
+const recoveryOpen = (h, pl) => !(h.kind === 'ship' && h.carrier && h.cyc && h.cyc.phase === 'launch' && pl !== player && pl.fuel > 200);
 function processQueues() {
+  for (const h of ships) if (h.alive && !h.dying) deckCycle(h);
   for (const h of ships.concat(bases)) {
     if (!h.queue || !h.queue.length || !h.alive || h.dying) continue;
     const pl = h.queue[0];
+    if (!deckOpen(h, pl)) continue;
     if (spotOnCatapult(pl)) { h.queue.shift(); pl.obj.visible = true; }
     else pl.state = 'queued';
   }
@@ -5014,6 +5408,7 @@ function processQueues() {
 
 /* ---------- ships: helm, damage control, wakes ---------- */
 function updateShip(s, dt) {
+  if (s.park) { s.parkT = (s.parkT || 0) - dt; if (s.parkT <= 0) { s.parkT = 2; const n = Object.values(s.hangar).reduce((a, b) => a + b, 0) - 6; s.park.forEach((m, i) => { m.visible = i < n && s.alive; }); } }
   if (s.dying) {
     s.sinkT += dt;
     // a sinking hull: steam where the sea reaches the boilers, burning fuel spreading on the water
@@ -5044,7 +5439,7 @@ function updateShip(s, dt) {
   fwdOf(s.heading, _a);
   s.vel.copy(_a).multiplyScalar(s.speed * K.move);
   s.pos.addScaledVector(s.vel, dt);
-  if (groundAt(s.pos.x + _a.x * s.radius, s.pos.z + _a.z * s.radius) > 0) { s.speed = 0; s.order = 0; damageShip(s, 30 * dt, null, null); if (mine(s) && Math.random() < dt) radio(s.name, '搁浅！', '#ff8a78'); }
+  if (terrainH(s.pos.x + _a.x * s.radius, s.pos.z + _a.z * s.radius) > -6 && !s.S.sub) { s.speed = 0; s.order = 0; damageShip(s, 30 * dt, null, null); if (mine(s) && Math.random() < dt) radio(s.name, '搁浅！', '#ff8a78'); }
   // fires burn until damage control puts them out
   // damage control: crews fight fires and flooding; a focused effort (player order, or the AI when burning) works much faster
   s.dcCd -= dt;
@@ -5106,7 +5501,7 @@ function shipAI(s) {
   if (s.evadeT > 0) { s.evadeT -= 1 / 30; want = s.evadeDir; spd = s.S.vmax; }
   // keep off the reefs
   fwdOf(want, _a);
-  for (const r of [1500, 3000]) if (groundAt(s.pos.x + _a.x * r, s.pos.z + _a.z * r) > -5) { want += 0.9; break; }
+  for (const r of [1500, 3000]) if (terrainH(s.pos.x + _a.x * r, s.pos.z + _a.z * r) > -12) { want += 0.9; break; }
   s.rudder = clamp(wrapA(s.heading - want) * 2.5, -1, 1);
   s.order = spd;
 }
@@ -5136,7 +5531,7 @@ function bestTarget(side, from, range) {
 }
 function updateCommand(side, dt) {
   const C = command[side];
-  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt);
+  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt); updatePhantoms(side, dt);
   aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
   const carrier = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
@@ -5286,23 +5681,17 @@ function updateCommand(side, dt) {
   // strike packages against the best target in reach
   for (const h of homes) {
     C.strikeCd[h.name] = (C.strikeCd[h.name] ?? 60) - 2.5;
-    if (C.strikeCd[h.name] > 0) continue;
+    if (C.strikeCd[h.name] > 0 || h.alpha > game.t) continue;
     // the main target if the package can reach it; otherwise the best target nearby (never idle while one exists)
-    let tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
+    const tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
     if (!tgt) continue;
-    const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
-    const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
-    if (avail < 2) continue;
-    const n = Math.min(T.air === 'mass' ? 10 : 6, avail);
-    let lead = null; const members = [];
-    const pkg = newPackage(side, h, tgt);
-    for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (p) { joinPackage(pkg, p); members.push(p); if (!lead) lead = p; } }
-    // a full package: fighter escort to clear the way and a jammer to blind the target's radars
-    let esc = 0;
-    for (let i = 0; i < (T.air === 'mass' ? 4 : 2); i++) { const t = pick(h, ['j35', 'f35c', 'fa18', 'j15']); if (t && launchFrom(h, t, 'escort', { lead, slot: [160, -160, 260, -260][i] })) esc++; }
-    const ew = pick(h, ['j15d', 'ea18g']); const ewp = ew && launchFrom(h, ew, 'ew', { pkg: lead, on: tgt });
-    C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
-    if (side === game.side) radio('空中指挥', `${h.name}出动第 ${pkg.id} 攻击编队：${n} 架突击机${esc ? ` + ${esc} 架护航` : ''}${ewp ? ' + 电子战机' : ''}，目标${tgt.name}${tgt === main ? '（主攻目标）' : ''}，集结点编队后统一出发。`, '#9fd4ff');
+    if (launchPackage(h, tgt, { n: T.air === 'mass' ? 10 : 6, esc: T.air === 'mass' ? 4 : 2 })) C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
+  }
+  // the decisive blow: an alpha strike (a deck-load from each carrier) once the enemy's main carrier is held
+  C.alphaCd = (C.alphaCd ?? 420) - 2.5;
+  if (!(side === game.side && game.role === 'cmd' && !game.staffAuto) && C.alphaCd <= 0 && main && main.carrier && fresh(side, main, 90)) {
+    const ready = homes.filter(h => h.kind === 'ship' && ['j15', 'j16', 'fa18'].reduce((n, t) => n + (h.hangar[t] || 0), 0) >= 8);
+    if (ready.length) { for (const h of ready) alphaStrike(h, main); C.alphaCd = 900; }
   }
   // the buddy tanker: one up whenever strike packages are out (a Super Hornet / J-15 with a refuelling store)
   if (count('tank') < 1 && (C.pkgs || []).some(k => k.phase === 'form' || k.phase === 'push')) {
@@ -5341,7 +5730,7 @@ function updateCommand(side, dt) {
       const pl = new Plane('us', 'b1b', null);
       pl.pilot = new Pilot(pl, 0.7); pl.role = 'bomber'; pl.task = { target: tgt || ships.find(s => s.side === 'cn' && s.alive) };
       pl.name = `B-1B ${callsign('us')}`;
-      pl.pos.set(THEATRE.exit - 8000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
+      pl.pos.set(THEATRE.air - 12000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
       planes.push(pl);
     }
     radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
@@ -5663,7 +6052,7 @@ function updateBallistic(m, i, dt) {
   if (m.pos.y < 60) {
     let hit = null;
     for (const s of ships) if (s.alive && !s.dying && s.side !== m.side && !submerged(s)) { const steps = Math.max(1, Math.ceil(m.prev.distanceTo(m.pos) / 10)); for (let k = 1; k <= steps; k++) { _d.lerpVectors(m.prev, m.pos, k / steps); if (insideShip(s, _d, 6)) { hit = s; break; } } if (hit) break; }
-    if (hit) { dbg.hit++; dbg.hitBy[m.side]++; damageShip(hit, S.dmg * rand(0.85, 1.15), { owner: m.owner, kind: 'missile', name: S.name }, _d.clone()); explode(_d, 4, null); if (hit.carrier) { hit.deckClosed = game.t + 90; if (mine(hit) || game.side === m.side) radio(mine(hit) ? hit.name : '火箭军', mine(hit) ? '飞行甲板被击穿！弹射器停止工作！' : `东风命中${hit.name}！`, mine(hit) ? '#ff5a4f' : '#8dffb4'); } endMissile(m, i, false); return; }
+    if (hit) { dbg.hit++; dbg.hitBy[m.side]++; game.flags.dfHit = (game.flags.dfHit || 0) + 1; damageShip(hit, S.dmg * rand(0.85, 1.15), { owner: m.owner, kind: 'missile', name: S.name }, _d.clone()); explode(_d, 4, null); if (hit.carrier) { hit.deckClosed = game.t + 90; if (mine(hit) || game.side === m.side) radio(mine(hit) ? hit.name : '火箭军', mine(hit) ? '飞行甲板被击穿！弹射器停止工作！' : `东风命中${hit.name}！`, mine(hit) ? '#ff5a4f' : '#8dffb4'); } endMissile(m, i, false); return; }
     if (m.pos.y < 0.5) {
       // a near miss still sends a shock wave through a hull close by
       for (const s of ships) if (s.alive && !s.dying && s.side !== m.side && s.pos.distanceTo(_d.set(m.pos.x, 0, m.pos.z)) < s.radius + 60) damageShip(s, S.dmg * 0.25, { owner: m.owner, kind: 'missile', name: S.name }, null);
@@ -5730,13 +6119,14 @@ const ABIL = {
   torp:   { name: '鱼雷齐射', short: '鱼雷', key: 'KeyE', cd: 8, can: s => s.torpsN > 0, use: (s, t) => subTorpedoes(s, t) },
   depth:  { name: '深度', short: '深度', key: 'KeyQ', cd: 0.5, use: s => { const D = [18, 60, 140]; const i = D.indexOf(s.depthWant ?? 60); s.depthWant = D[(i + 1) % 3]; message(`深度 ${s.depthWant} 米`, s.depthWant === 18 ? '潜望镜深度 · 可发射导弹 · 易被发现' : s.depthWant === 140 ? '深潜 · 最安静' : '巡航深度', '#9fd4ff', 1.6); return true; } },
   strike: { name: '出动攻击波', short: '攻击波', key: 'Digit8', cd: 120, can: s => s.carrier, use: (s, t) => carrierStrike(s, t) },
+  alpha:  { name: '大规模打击', short: '大规模', key: 'Digit0', cd: 600, can: s => s.carrier && !!(intentTarget(s.side) || game.ashmSel), use: (s, t) => !!alphaStrike(s, (t && t.kind !== 'plane' && !(t.S && t.S.sub) ? t : null) || intentTarget(s.side)) },
   cap:    { name: '加强空中巡逻', short: '加强巡逻', key: 'Digit9', cd: 60, can: s => s.carrier, use: s => { let n = 0; for (let i = 0; i < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => s.hangar[x] > 0); if (ty) { launchFrom(s, ty, 'cap', { off: rand(6000, 14000), latZ: rand(-9000, 9000) }); n++; } } if (n) radio(s.name, `${n} 架战斗机加强空中巡逻。`, '#9fd4ff'); return n > 0; } },
   dc:     { name: '损管', short: '损管', key: 'KeyK', cd: 90, dur: 25, use: s => { s.dcT = 25; message('损管队全力抢修', '灭火、堵漏、抢修主炮与动力 · 25 秒', '#e3b257', 2); radio(s.name, '全舰损管！', '#9fd4ff'); return true; } },
   decoy:  { name: '诱饵', short: '诱饵', key: 'KeyX', cd: 15, can: s => s.decoys > 0, use: s => { fireDecoy(s); return true; } }
 };
 function abilitiesOf(s) {
   if (s.S.sub) return ['torp', 'salvo', 'depth', 'sprint', 'sonar', 'decoy', 'dc'];
-  if (s.carrier) return ['strike', 'cap', 'aegis', 'ew', 'sprint', 'decoy', 'dc'];
+  if (s.carrier) return ['strike', 'alpha', 'cap', 'aegis', 'ew', 'sprint', 'decoy', 'dc'];
   const a = ['salvo', 'fleet', 'aegis', 'ew', 'sprint', 'sonar', 'asw'];
   if (s.S.tlam) a.push('tlam');
   return a.concat(['decoy', 'dc']);
@@ -5775,17 +6165,10 @@ function subTorpedoes(s, t) {
   return n > 0;
 }
 function carrierStrike(s, t) {
-  t = t || bestTarget(s.side, s.pos, 160000);
+  t = t || intentTarget(s.side) || bestTarget(s.side, s.pos, 160000);
   if (!t) { if (s === flagship) message('无打击目标', '等待预警机发现敌舰', '#9fb0ba', 1.6); return false; }
-  const strikers = ['j15', 'fa18'].filter(x => s.hangar[x] > 0);
-  const avail = strikers.reduce((n, x) => n + s.hangar[x], 0);
-  if (avail < 2) { if (s === flagship) message('机库无可用攻击机', '', '#9fb0ba', 1.6); return false; }
-  const n = Math.min(6, avail);
-  let lead = null;
-  for (let i = 0; i < n; i++) { const ty = strikers.find(x => s.hangar[x] > 0); const p = launchFrom(s, ty, 'strike', { target: t }); if (!lead) lead = p; }
-  for (let i = 0; i < 2; i++) { const ty = ['j35', 'f35c'].find(x => s.hangar[x] > 0); if (ty) launchFrom(s, ty, 'escort', { lead, slot: i ? -160 : 160 }); }
-  const ew = ['j15d', 'ea18g'].find(x => s.hangar[x] > 0); if (ew) launchFrom(s, ew, 'escort', { lead, slot: 320 });
-  radio(s.name, `攻击波起飞：${n} 架突击机，目标${t.name}。`, '#9fd4ff');
+  const k = launchPackage(s, t, { n: 6, esc: 2 });
+  if (!k) { if (s === flagship) message('机库无可用攻击机', '', '#9fb0ba', 1.6); return false; }
   return true;
 }
 // AI captains use their abilities by the same rules
@@ -5881,10 +6264,10 @@ const potential0 = { cn: 1, us: 1 };
 const STORY = {
   brief: {
     cn: ['架空 if 线。南海某争议海域，双方舰队已对峙七十二小时。一架侦察机在雷达锁定中坠海，谁先开火已无人能说清——冲突在数分钟内升级为全面交战。',
-      '舰队司令部命令：以福建舰编队与前哨岛礁机场为核心，发现并摧毁美国福特号航母打击群，在对方远程打击力量集结之前夺取制海权。',
+      '舰队司令部命令：以福建舰编队与永暑礁机场为核心，发现并摧毁美国福特号航母打击群，在对方远程打击力量集结之前夺取制海权。',
       '敌方舰空导弹可借 E-2D 数据链拦截地平线外的目标，舰载机联队规模更大。我方优势在于更远、更快的反舰导弹与岛礁陆基航空兵——先找到他们，再用一次齐射压垮他们的防空。'],
     us: ['架空 if 线。南海某争议海域，双方舰队已对峙七十二小时。一架侦察机在雷达锁定中坠海，谁先开火已无人能说清——冲突在数分钟内升级为全面交战。',
-      '第七舰队命令：福特号航母打击群保持远距离，以舰载机联队与 B-1B 远程打击摧毁福建舰编队及其前哨岛礁机场。',
+      '第七舰队命令：福特号航母打击群保持远距离，以舰载机联队与 B-1B 远程打击摧毁福建舰编队及其永暑礁机场。',
       '对方的鹰击系列反舰导弹射程更远、末段更快，我们的水面舰在导弹对射中处于劣势。保持距离，用 E-2D 看清战场，让舰载机与 LRASM 替你出拳；标准-6 与 CEC 会守住防空圈。']
   },
   chapters: [
@@ -5929,25 +6312,31 @@ const CAMPAIGN = {
   chapters: {
     cn: [
       { title: '序章 · 龙出深海', line: '双航母编队驶出三亚。空警-600 弹射升空，为舰队睁开眼睛。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'cn' && p.T.aew && p.state === 'air') },
-      { title: '第一章 · 拂晓惊雷', line: '东方海天之间，美军双航母打击群的雷达回波浮出屏幕。', goal: '发现敌方航母', check: () => [...picture.cn.keys()].some(e => e.kind === 'ship' && e.carrier) },
-      { title: '第二章 · 饱和之潮', line: '十二艘战舰的垂发单元同时开启。数十枚鹰击导弹统一时间扑向敌阵。', goal: '反舰导弹命中敌舰 6 次', check: () => dbg.hitBy.cn >= 6 },
-      { title: '第三章 · 东风破浪', line: '大陆深处，火箭军的发射车竖起了东风。航母杀手，从太空俯冲而下。', goal: '击沉任意一艘敌舰', check: () => game.flags.sunkUS > 0 },
-      { title: '第四章 · 血染南海', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkUSCV > 0 },
-      { title: '终章 · 龙吟九霄', line: '最后的力量全部压上。为了那些没能回家的人，打完这一仗。', goal: '摧毁敌方战争潜力', check: () => false }
+      { title: '第一章 · 寻鹰', line: '东方海天之间，美军双航母打击群隐入了电磁静默。卫星、超视距雷达与预警机，一寸一寸地找。', goal: '发现敌方航母（真目标）', check: () => [...picture.cn.keys()].some(e => e.kind === 'ship' && e.carrier && !e.phantom) },
+      { title: '第二章 · 夺取制空', line: '歼-35 与歼-15 前出。先打掉敌人的眼睛，再谈打他的拳头。', goal: '击落敌机 6 架，或击落一架 E-2D', check: () => game.ledger.air.us >= 6 || game.ledger.aew.cn >= 1 },
+      { title: '第三章 · 饱和之潮', line: '攻击编队在集结点汇合，舰队的垂发单元同时开启。数十枚鹰击统一时间扑向敌阵。', goal: '反舰导弹命中敌舰 8 次', check: () => dbg.hitBy.cn >= 8 },
+      { title: '第四章 · 东风破浪', line: '大陆深处，火箭军的发射车竖起了东风。航母杀手，从太空俯冲而下。', goal: '东风命中敌舰，或击沉任意一艘敌舰', check: () => game.flags.dfHit > 0 || game.flags.sunkUS > 0 },
+      { title: '第五章 · 血染南海', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母，同时守住永暑礁', check: () => game.flags.sunkUSCV > 0 },
+      { title: '终章 · 龙吟九霄', line: '最后的力量全部压上。为了那些没能回家的人，打完这一仗。', goal: '夺取制海权：摧毁敌方战争潜力', check: () => false }
     ],
     us: [
-      { title: '序章 · 鹰巢', line: '福特号飞行甲板上，弹射器的蒸汽与电磁轰鸣交织。E-2D 鹰眼起飞。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'us' && p.T.aew && p.state === 'air') },
-      { title: '第一章 · 雷霆之眼', line: '鹰眼的雷达扫过南海。福建舰编队，就在西方地平线之外。', goal: '发现敌方航母', check: () => [...picture.us.keys()].some(e => e.kind === 'ship' && e.carrier) },
-      { title: '第二章 · 分布式杀伤', line: 'LRASM、战斧、鱼叉——从天空、海面与深海，同时出拳。', goal: '反舰导弹命中敌舰 6 次', check: () => dbg.hitBy.us >= 6 },
-      { title: '第三章 · 盾与矛', line: '宙斯盾雷达捕捉到大气层外的再入目标——东风。标准-3，发射！', goal: '拦截东风弹道导弹 2 枚，或击沉任意一艘敌舰', check: () => (game.flags.bmKill || 0) >= 2 || game.flags.sunkCN > 0 },
-      { title: '第四章 · 铁与火', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkCNCV > 0 },
-      { title: '终章 · 最后的黎明', line: '剩下的战力只够打一场。为了那些没能回家的人，打完这一仗。', goal: '摧毁敌方战争潜力', check: () => false }
+      { title: '序章 · 鹰巢', line: '福特号飞行甲板上，弹射器的轰鸣此起彼伏。E-2D 鹰眼起飞。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'us' && p.T.aew && p.state === 'air') },
+      { title: '第一章 · 雷霆之眼', line: '鹰眼的雷达扫过南海。福建舰编队，就在西方地平线之外——如果那不是诱饵的话。', goal: '发现敌方航母（真目标）', check: () => [...picture.us.keys()].some(e => e.kind === 'ship' && e.carrier && !e.phantom) },
+      { title: '第二章 · 外层空战', line: '射手，而不是箭。在轰-6K 和歼-15 发射之前，把它们打下来。', goal: '击落携弹的敌攻击机 / 轰炸机 4 架', check: () => game.ledger.archers.us >= 4 },
+      { title: '第三章 · 盾与矛', line: '宙斯盾雷达捕捉到大气层外的再入目标——东风。标准-3，发射！', goal: '拦截东风 2 枚，或拦截来袭反舰导弹 20 枚', check: () => (game.flags.bmKill || 0) >= 2 || ['sam', 'ciws', 'decoy'].reduce((a, k) => a + ((dbg.fate.cn || {})[k] || 0), 0) >= 20 },
+      { title: '第四章 · 分布式杀伤', line: 'LRASM、战斧、鱼叉——从天空、海面与深海，同时出拳。', goal: '反舰导弹命中敌舰 8 次', check: () => dbg.hitBy.us >= 8 },
+      { title: '第五章 · 铁与火', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkCNCV > 0 },
+      { title: '终章 · 最后的黎明', line: '剩下的战力只够打一场。为了那些没能回家的人，打完这一仗。', goal: '夺取制海权：摧毁敌方战争潜力', check: () => false }
     ]
   },
   end: {
     win: {
       cn: ['美军双航母打击群失去作战能力，残存舰艇向东撤出南海。', '胜利的代价写在每一艘燃烧的军舰上，写在海面漂浮的救生筏上。', '龙守住了家门。但太平洋记住了这一天的血与泪。'],
       us: ['解放军双航母编队失去作战能力，南海暂时恢复了平静。', '胜利的代价写在每一艘燃烧的军舰上，写在海面漂浮的救生筏上。', '鹰守住了航道。但太平洋记住了这一天的血与泪。']
+    },
+    draw: {
+      cn: ['两支舰队都已精疲力竭，谁也没能把对方赶出南海。', '海面上漂满了残骸与油污。谈判桌上的每一句话，都带着硝烟的味道。', '太平洋记住了这一天的血与泪。'],
+      us: ['两支舰队都已精疲力竭，谁也没能把对方赶出南海。', '海面上漂满了残骸与油污。谈判桌上的每一句话，都带着硝烟的味道。', '太平洋记住了这一天的血与泪。']
     },
     lose: {
       cn: ['我方编队战争潜力耗尽，残存舰艇被迫撤离战区。', '将士们已经尽了全力。这场失败，将被反复复盘、铭记。', '太平洋记住了这一天的血与泪。'],
@@ -6171,7 +6560,7 @@ function drawPrologueMap(g, W, H, t, side) {
   g.font = `500 ${Math.round(sc * 0.42)}px ${SANS}`;
   for (const [txt, lo, la] of [['海南', 109.6, 19.2], ['吕宋', 121.2, 16.2], ['南沙群岛', 114.2, 9.8], ['西沙群岛', 111.8, 16.6], ['巴士海峡', 121, 20.8]]) { const [x, y] = P([lo, la]); g.fillText(txt, x, y); }
   // the island base
-  if (t > 5) { const [x, y] = P([114.0, 10.6]); g.fillStyle = '#ff7a6b'; g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); }
+  if (t > 5) { const [x, y] = P([112.89, 9.55]); g.fillStyle = '#ff7a6b'; g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); g.fillStyle = `rgba(255,170,160,${0.8 * k})`; g.textAlign = 'left'; g.fillText('永暑礁', x + 7, y + 4); g.textAlign = 'center'; }
   // fleets converge
   const u = clamp((t - 6) / 14, 0, 1);
   const cn = [[111.0, 17.6], [114.2, 15.4]], us = [[123.5, 19.6], [117.4, 15.6]];
@@ -6237,7 +6626,7 @@ function runEpilogue(win, done) {
   const el = $('cine'), tx = $('cine-text');
   el.hidden = false; $('cine-map').style.opacity = '0'; $('cine-skip').hidden = false;
   Music.end(win);
-  const lines = CAMPAIGN.end[win ? 'win' : 'lose'][game.side];
+  const lines = CAMPAIGN.end[game.result && game.result.tier === 'draw' ? 'draw' : win ? 'win' : 'lose'][game.side];
   let i = 0, timer = 0, ended = false;
   const finish = () => { if (ended) return; ended = true; clearInterval(timer); el.hidden = true; done(); };
   $('cine-skip').onclick = finish;
@@ -6329,7 +6718,7 @@ addEventListener('blur', () => { input.keys.clear(); input.gun = input.boost = i
   tap($('b-cam'), cycleView);
   tap($('c-salvo'), () => { input.ashm = true; }); tap($('c-decoy'), () => { input.decoy = true; });
   tap($('c-target'), () => { input.target = true; }); tap($('c-view'), cycleView);
-  for (const b of document.querySelectorAll('[data-act]')) b.addEventListener('click', () => ({ map: toggleMap, scale: cycleScale, ai: toggleAI, pause: togglePause, support: callSupport })[b.dataset.act]());
+  for (const b of document.querySelectorAll('[data-act]')) b.addEventListener('click', () => ({ map: toggleMap, scale: cycleScale, ai: toggleAI, pause: togglePause, support: callSupport, units: toggleRoster })[b.dataset.act]());
   $('touch').addEventListener('contextmenu', e => e.preventDefault());
 }
 function readStick() {
@@ -6407,7 +6796,12 @@ function cruiseGuard(dt) {
   game.cruiseT = 0.5;
   const hot = threatNear();
   if (hot && game.scale > 1) { game.scale = 1; game.autoCruise = false; $('b-scale').textContent = '时间 ×1'; message('接敌 · 恢复实时', '', '#ffc861', 1.4); }
-  else if (!hot && game.ai && game.role === 'pilot' && game.scale === 1 && !game.noCruise && game.t > 5) { game.scale = 4; game.autoCruise = true; $('b-scale').textContent = '时间 ×4'; message('自动巡航 ×4', '航渡阶段时间加速 · 接敌自动恢复实时', '#9fd4ff', 1.6); }
+  else if (!hot && game.ai && game.role === 'pilot' && !game.noCruise && game.t > 5) {
+    // as fast as the device allows: a slow frame rate (each extra step costs a full simulation tick) caps it at x2
+    const want = perf.avg > 1 / 36 ? 2 : 4;
+    if (game.scale === 1) { game.scale = want; game.autoCruise = true; $('b-scale').textContent = `时间 ×${want}`; message(`自动巡航 ×${want}`, '航渡阶段时间加速 · 接敌自动恢复实时', '#9fd4ff', 1.6); }
+    else if (game.autoCruise && game.scale !== want) { game.scale = want; $('b-scale').textContent = `时间 ×${want}`; }
+  }
 }
 function toggleAI() {
   if (game.mode !== 'play' || game.role === 'watch') return;
@@ -6717,7 +7111,7 @@ let orbitA = 0.6, orbitE = 0.32;
     if (game.gunsight) { gunLay(dx, dy); return; }
     if (game.role === 'pilot') { look.yaw = clamp(look.yaw - dx * 0.008, -Math.PI, Math.PI); look.pitch = clamp(look.pitch + dy * 0.006, -1.2, 1.2); look.idle = 0; }
     else if (game.role === 'captain' && game.view === 1) { look.yaw -= dx * 0.005; look.pitch = clamp(look.pitch - dy * 0.004, -0.6, 0.5); }
-    else if (game.role === 'watch' && game.spec === 'free') { freeCam.yaw -= dx * 0.004; freeCam.pitch = clamp(freeCam.pitch - dy * 0.004, -1.4, 1.2); }
+    else if (camRole() && game.spec === 'free') { freeCam.yaw -= dx * 0.004; freeCam.pitch = clamp(freeCam.pitch - dy * 0.004, -1.4, 1.2); }
     else { orbitA -= dx * 0.007; orbitE = clamp(orbitE + dy * 0.005, 0.04, 1.45); }
   });
   const drop = e => {
@@ -6766,15 +7160,15 @@ function chaseMissile(m, dt) {
 }
 function ownMissile() {
   let best = null;
-  for (const m of missiles) if (m.alive && m.cls === 'ashm' && (m.owner === flagship || m.owner === player || (game.role === 'watch' && m.side === game.side)) && (!best || m.age < best.age)) best = m;
+  for (const m of missiles) if (m.alive && m.cls === 'ashm' && (m.owner === flagship || m.owner === player || (camRole() && m.side === game.side)) && (!best || m.age < best.age)) best = m;
   return best;
 }
 function director(dt) {
   game.viewT -= dt;
   const f = game.focus;
   const valid = f && (f.alive !== false) && !(f.kind === 'ship' && f.sinkT > 60);
-  if (game.role === 'watch' && game.spec === 'follow' && !valid) { game.spec = 'auto'; if (game.mode === 'play') specButtons(); }
-  if ((game.viewT <= 0 && !(game.role === 'watch' && game.spec === 'follow')) || !valid) {
+  if (camRole() && game.spec === 'follow' && !valid) { game.spec = 'auto'; if (game.mode === 'play') specButtons(); }
+  if ((game.viewT <= 0 && !(camRole() && game.spec === 'follow')) || !valid) {
     game.viewT = 12;
     const cands = [];
     for (const m of missiles) if (m.alive && m.cls === 'ashm' && m.target && m.target.pos && m.pos.distanceTo(m.target.pos) < 15000) cands.push([m, 5]);
@@ -6783,6 +7177,7 @@ function director(dt) {
     for (const s of ships) if (s.alive && !s.dying && s.fires > 0.5) cands.push([s, 2]);
     for (const s of ships) if (s.dying && s.sinkT < 50) cands.push([s, 4]);
     cands.push([ships.find(s => s.side === game.side && s.alive) || ships[0], 1]);
+    if (game.role === 'cmd') for (const c of cands) if (c[0] && c[0].side === game.side) c[1] += 1.5;
     cands.sort((a, b) => b[1] - a[1] + rand(-1, 1));
     if (cands[0] && cands[0][0] !== game.focus) game.snap = 2;   // a cut, not a pan, between shots
     game.focus = cands[0] && cands[0][0];
@@ -6859,7 +7254,7 @@ function updateCamera(dt) {
     else if (game.view === 2) { orbitE = 1.25; orbit(_d.copy(s.pos), s.S.L * 6 * (game.zoom || 1), dt); }
     else { if (orbitE > 1.2) orbitE = 0.3; orbit(_d.copy(s.pos).setY(20), s.S.L * 1.5 * (game.zoom || 1), dt); }
     if (game.view !== 1) fov = 55;
-  } else if (game.role === 'watch' && game.spec === 'free' && game.mode === 'play') updateFreeCam(dt);
+  } else if (camRole() && game.spec === 'free' && game.mode === 'play') updateFreeCam(dt);
   else director(dt);
   if (camera.position.y < 2) camera.position.y = 2;
   if (game.shake > 0.01 && !reduced) {
@@ -7273,11 +7668,14 @@ function setTactic(kind, id, side = game.side) {
 }
 // the AI commanders pick their doctrines from the situation
 function aiTactics(side, dt) {
-  if (side === game.side && game.role !== 'watch') return;
+  // the player's side: the commander decides (the staff only advises when told to run things); a pilot's or
+  // captain's staff keeps adapting, but leaves alone for five minutes a doctrine the player set by hand
+  if (side === game.side && game.role !== 'watch' && (game.role === 'cmd' ? !game.staffAuto : game.staffHold > game.t)) return;
   const C = command[side];
   C.tacT = (C.tacT ?? 30) - dt;
   if (C.tacT > 0) return;
   C.tacT = 45;
+  if (C.dodge) return;   // riding out an enemy satellite pass under EMCON
   // read the situation the way a staff would: what threatens us, what the enemy can still see, how strong the
   // main target's defences are, and who is winning the air
   const foeKnown = !!enemyFleet(side);
@@ -7328,7 +7726,8 @@ function airSweeps(side, dt) {
   // stop short of the enemy ships' missile umbrella
   const own = fleetCentre(side) || ZERO;
   const dir = _a.subVectors(point, own).setY(0); const L = dir.length();
-  if (foeC && t === 'sweep') point = own.clone().addScaledVector(dir.normalize(), Math.max(0, L - 30000));
+  // stop short of the enemy group's area-defence umbrella (SM-6 / HHQ-9B reach plus margin)
+  if (foeC && t === 'sweep') point = own.clone().addScaledVector(dir.normalize(), Math.max(0, L - 52000));
   let n = 0;
   for (const h of homes) for (let i = 0; i < 2 && n < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty) { const p = launchFrom(h, ty, 'sweep', { point, hunt: t === 'hunt' }); if (p) n++; } }
   if (n && side === game.side) radio('空中指挥', `${n} 架战斗机${t === 'hunt' ? '前出猎杀敌预警机' : '执行战斗机扫荡'}。`, '#9fd4ff');
@@ -7354,7 +7753,9 @@ function playerIntent(tgt, point) {
   const cur = intentState(game.side);
   if (tgt && cur && cur.tgt === tgt && cur.src === 'player') return;
   setIntent(game.side, tgt ? { tgt, src: 'player' } : { point: point.clone().setY(0), src: 'player' });
-  intentOrders(game.side);
+  // the staff acknowledges (and retasks aircraft already out) once the commander's choice has settled, so a
+  // captain flicking through targets does not flood the net with orders
+  command[game.side].ackAt = game.t + 2.5;
 }
 // the main target if it is still worth pursuing (alive); point intents have none
 function intentTarget(side) {
@@ -7381,6 +7782,7 @@ function axisDir(side, from, out) {
 // AI commanders: commit to a main effort and hold it (a main effort that changes every minute is no main effort)
 function updateIntent(side, dt) {
   const C = command[side], I = intentState(side);
+  if (C.ackAt && game.t >= C.ackAt) { C.ackAt = 0; intentOrders(side); }
   C.intT = (C.intT ?? 0) - dt;
   const dead = I && I.tgt && (!I.tgt.alive || I.tgt.dying);
   if (dead && I.src === 'player' && side === game.side) radio('作战指挥', `主攻目标${I.tgt.name}已被摧毁！按预案转入下一目标。`, GOLD);
@@ -7476,7 +7878,12 @@ function updatePackages(side) {
     if (k.phase === 'form') {
       const up = air.filter(p => p.airborne), there = up.filter(p => p.pos.distanceTo(k.rv) < 7000);
       k.ready = there.length; k.total = air.length;
-      if (air.length && (there.length === air.length || game.t - k.t > PKG_FORM_MAX) && up.length) {
+      // packages against the same target from other decks wait for each other and push together
+      const sibs = C.pkgs.filter(o => o !== k && o.phase === 'form' && o.tgt === k.tgt && Math.abs(o.t - k.t) < 120);
+      const sibWait = sibs.some(o => !o.readyAll && game.t - o.t < PKG_FORM_MAX);
+      k.readyAll = air.length && there.length === air.length;
+      if (air.length && ((k.readyAll && !sibWait) || k.pushNow || game.t - k.t > PKG_FORM_MAX) && up.length) {
+        for (const o of sibs) o.pushNow = true;
         k.phase = 'push'; k.pushT = game.t;
         // stragglers still on deck are released to attack on their own
         for (const p of air) if (!p.airborne) p.task.pkg = null;
@@ -7551,6 +7958,16 @@ function isrFix(side, e, err) {
 }
 function updateISR(side, dt) {
   const C = command[side], R = ISR[side], foe = SIDES[side].foe;
+  // the other side's orbits are known: a staff (AI, or the player's staff on automatic) goes quiet for the pass
+  // unless it is in a missile fight, and restores its posture after; the player is warned 20 s ahead
+  const Cf = command[foe], soon = (Cf.satT ?? 99) < 20 || Cf.satEnd > game.t;
+  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : !(game.staffHold > game.t));
+  if (soon && !C.dodge && staffRuns && tac(side).navy !== 'emcon' && !missiles.some(m => m.alive && m.cls === 'ashm' && m.side === foe && m.target && m.target.side === side)) {
+    C.dodge = tac(side).navy; setTactic('navy', 'emcon', side);
+    if (side === game.side) radio('参谋部', '敌侦察卫星即将过顶，舰队转入电磁静默规避定位。', '#9fd4ff');
+  } else if (!soon && C.dodge) { if (tac(side).navy === 'emcon') setTactic('navy', C.dodge, side); C.dodge = null; C.dodgeEnd = game.t; }
+  if (side === game.side && game.role !== 'watch' && (Cf.satT ?? 99) < 20 && !C.satWarned && !staffRuns) { C.satWarned = true; radio('预警', '敌侦察卫星 20 秒后过顶——考虑电磁静默。', '#ffd28a'); }
+  if (Cf.satT > 25) C.satWarned = false;
   C.satT = (C.satT ?? R.first) - dt;
   if (C.satT <= 0) {
     C.satT = R.period; C.satEnd = game.t + R.dur; C.satN = 0;
@@ -7575,6 +7992,99 @@ function updateISR(side, dt) {
       for (const e of ships) if (e.side === foe && e.alive && !e.dying && !submerged(e) && (e.carrier || e.S.L > 150) && !(tac(foe).navy === 'emcon' && !(e.emconBreak > game.t)) && Math.random() < 0.7) isrFix(side, e, 6000);
     }
   }
+}
+
+/* ---------- electronic deception: phantom carrier groups ----------
+   A fleet that has gone quiet can project a false picture: decoy emitters (and the jammers' deception modes)
+   paint a carrier group 20-30 km off the real one. The enemy's ESM-quality track of it is as good as any other,
+   so it can draw strikes, ballistic missiles and the enemy's main effort - until a real look exposes it: a radar
+   within 40 km, a satellite pass, or missiles that arrive and find empty sea. */
+let phantomN = 0;
+function deployPhantom(side, quiet) {
+  const C = command[side], foe = SIDES[side].foe;
+  const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
+  if (!cv) return null;
+  const ax = axisDir(side, cv.pos, new V3()), sgn = Math.random() < 0.5 ? 1 : -1, d = rand(20000, 30000);
+  const off = new V3(-ax.z * sgn, 0, ax.x * sgn).multiplyScalar(d).addScaledVector(ax, rand(-6000, 6000));
+  const ph = { kind: 'ship', phantom: true, side, name: cv.name, key: 'ph' + (++phantomN), alive: true, dying: false, carrier: true, value: cv.value,
+    hp: cv.maxHp, maxHp: cv.maxHp, S: { type: cv.S.type, sub: false, model: cv.S.model, L: cv.S.L, B: cv.S.B, radar: 0 }, rcs: cv.rcs, radius: cv.radius,
+    sam: {}, ashm: {}, pos: cv.pos.clone().add(off), vel: cv.vel.clone(), off, until: game.t + 420, heading: cv.heading };
+  C.phantoms = (C.phantoms || []).concat(ph);
+  picture[foe].set(ph, { pos: ph.pos.clone(), vel: ph.vel.clone(), t: game.t - 3, first: game.t, coarse: 900 });
+  if (side === game.side && !quiet) radio('电子战', `电子佯动展开：在${Math.round(d / 1000)} km 外制造一个假航母编队信号。`, '#9fd4ff');
+  return ph;
+}
+function revealPhantom(ph, side, why) {
+  if (!ph.alive) return;
+  picture[side].delete(ph);
+  const wasted = missiles.filter(m => m.alive && m.target === ph).length;
+  if (game.ledger) game.ledger.fooled[ph.side] += wasted;
+  for (const m of missiles) if (m.alive && m.target === ph) m.target = null;
+  if (side === game.side) radio('情报', `识破电子假目标：所谓「${ph.name}」${why}`, '#ffd28a');
+  else if (ph.side === game.side) radio('电子战', `敌方识破了我方佯动信号（${why}）。`, '#ffd28a');
+  ph.exposed = (ph.exposed || 0) + 1;
+}
+function updatePhantoms(side, dt) {
+  const C = command[side], foe = SIDES[side].foe;
+  C.phT = (C.phT ?? 240) - dt;
+  // the staff deploys one when the fleet is quiet and the enemy is hunting for it
+  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : true);
+  // (not into an enemy satellite pass: a SAR strip of empty sea would expose it at once)
+  const satClear = !(command[foe].satEnd > game.t) && (command[foe].satT ?? 99) > 40;
+  // right after a pass (the enemy has just refreshed its picture) or whenever the fleet is quiet
+  if (staffRuns && C.phT <= 0 && satClear && (tac(side).navy === 'emcon' || game.t - (C.dodgeEnd || -999) < 90) && !(C.phantoms || []).some(p => p.alive)) { C.phT = 420; deployPhantom(side); }
+  for (const ph of C.phantoms || []) {
+    if (!ph.alive) continue;
+    const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
+    if (!cv || game.t > ph.until) { ph.alive = false; picture[foe].delete(ph); continue; }
+    // it keeps station on the real group's course, so it moves like a fleet
+    ph.pos.copy(cv.pos).add(ph.off); ph.vel.copy(cv.vel); ph.heading = cv.heading;
+    ph.tickT = (ph.tickT || 0) - dt;
+    if (ph.tickT <= 0 && picture[foe].has(ph)) { ph.tickT = 6; const tr = picture[foe].get(ph); tr.pos.copy(ph.pos).add(_in1.set(rand(-600, 600), 0, rand(-600, 600))); tr.vel.copy(ph.vel); tr.t = game.t - 3; }
+    if (!picture[foe].has(ph)) continue;
+    // exposure: a real radar looks, a satellite images empty sea, or missiles arrive and find nothing
+    for (const sn of sensorsOf(foe)) if (sn.r > 20000 && sn.u.pos.distanceTo(ph.pos) < 40000) { revealPhantom(ph, foe, '雷达近距离抵近，该海域并无舰船'); break; }
+    if (!picture[foe].has(ph)) continue;
+    if (command[foe].satEnd > game.t && Math.random() < dt * 0.03) { revealPhantom(ph, foe, '卫星成像该海域空无一舰'); continue; }
+    for (const m of missiles) if (m.alive && m.side === foe && m.target === ph && Math.hypot(m.pos.x - ph.pos.x, m.pos.z - ph.pos.z) < 3000) { revealPhantom(ph, foe, '导弹抵达目标区未发现舰船'); break; }
+  }
+}
+
+/* ---------- the commander's force panel: the whole side at a glance ---------- */
+function drawForce() {
+  const me = game.side, foeS = SIDES[me].foe, C = command[me], compact = HH < 480;
+  game.cmdBtnT = (game.cmdBtnT || 0) - 1; if (game.cmdBtnT <= 0) { game.cmdBtnT = 20; cmdButtons(); }
+  const lines = [];
+  const main = intentTarget(me), I = intentState(me), fc = fleetCentre(me);
+  const ip = intentPos(me, _in2);
+  lines.push([main ? `主攻 · ${main.name}${fc && ip ? ` · ${Math.round(ip.distanceTo(fc) / 1000)} km` : ''}${I && I.src !== 'player' ? '（参谋建议）' : ''}` : I && I.point ? '主攻 · 指定海域' : '主攻 · 未定（地图点选敌舰）', GOLD]);
+  const own = ships.filter(s => s.side === me && s.alive && !s.dying);
+  const air = planes.filter(p => p.side === me && p.alive && !p.dying && p.airborne);
+  const by = r => air.filter(p => p.role === r).length;
+  const hangar = own.concat(bases.filter(b => b.side === me && b.alive)).reduce((n, h) => n + (h.hangar ? Object.values(h.hangar).reduce((a, b) => a + b, 0) : 0), 0);
+  lines.push([`我方 · 舰 ${own.length} · 空中 ${air.length}（巡逻 ${by('cap')} · 突击 ${by('strike') + by('bomber')} · 护航 ${by('escort') + by('ew')}）· 机库 ${hangar}`, '#cfe8ff']);
+  for (const h of own.filter(s => s.carrier)) {
+    const c = h.cyc, ph = h.alpha > game.t ? '大规模出动' : c ? (c.phase === 'launch' ? '弹射窗口' : '回收窗口') : '';
+    lines.push([`  ${h.name} ${Math.round(h.hp / h.maxHp * 100)}% · ${ph}${c ? ` ${Math.max(0, Math.ceil(c.until - game.t))}s` : ''} · 待射 ${(h.queue || []).length} · 待降 ${(h.stack || []).length}`, h.hp < h.maxHp * 0.5 ? '#ff8a78' : '#9fb0ba']);
+  }
+  for (const k of (C.pkgs || []).filter(k => k.phase === 'form' || k.phase === 'push'))
+    lines.push([`  第 ${k.id} 编队${k.alpha ? '（大规模）' : ''} · ${k.phase === 'form' ? `集结 ${k.ready || 0}/${k.total || 0}` : '已出发'} → ${k.tgt.name}`, '#9fd4ff']);
+  const kShips = [...picture[me].keys()].filter(e => e.kind === 'ship' && e.alive && !e.dying).length;
+  const kAir = [...picture[me].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying).length;
+  const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== me && m.target && m.target.side === me).length;
+  lines.push([`敌情 · 已知舰 ${kShips} · 机 ${kAir}${inbound ? ` · 来袭导弹 ${inbound}` : ''}`, inbound ? '#ff8a78' : '#ffb4a8']);
+  const Cf = command[foeS];
+  if (Cf.satEnd > game.t) lines.push([`⚠ 敌侦察卫星过顶中 ${Math.ceil(Cf.satEnd - game.t)}s`, '#ffd28a']);
+  else if ((Cf.satT ?? 99) < 30) lines.push([`敌侦察卫星 ${Math.ceil(Cf.satT)}s 后过顶`, '#ffd28a']);
+  const T = tac(me); lines.push([`战术 · ${TACTICS.navy[T.navy].name} / ${TACTICS.air[T.air].name} · 参谋${game.staffAuto ? '自动' : '手动'}`, '#9fb0ba']);
+  const x = 12, y0 = compact ? 50 : 58, lh = compact ? 14 : 16;
+  hc.save();
+  hc.font = `600 ${compact ? 10 : 11}px ${SANS}`;
+  const w = Math.min(HW * 0.46, Math.max(...lines.map(l => hc.measureText(l[0]).width)) + 16);
+  hc.fillStyle = 'rgba(6,10,14,0.62)'; hc.fillRect(x - 6, y0 - lh + 2, w, lines.length * lh + 8);
+  hc.textAlign = 'left';
+  lines.forEach(([t, c], i) => { hc.fillStyle = c; hc.fillText(t, x, y0 + i * lh); });
+  hc.restore();
 }
 
 /* ---------- anti-submarine warfare: hunter-killer groups ----------
@@ -7645,7 +8155,7 @@ function toggleMap() {
   $('tac').hidden = !TM.open; $('touch').style.visibility = $('topbar').style.visibility = TM.open ? 'hidden' : '';
   if (TM.open) { TM.follow = true; TM.sel = null; TM.pt = null; renderTacOrders(); renderTacCard(); }
 }
-function tacOwn() { return player || flagship || (game.role === 'watch' ? game.focus : null); }
+function tacOwn() { return player || flagship || (camRole() ? game.focus : null); }
 function tacToScreen(x, z) { const s = Math.min(HW, HH) / TM.span; return [HW / 2 + (x - TM.cx) * s, HH / 2 + (z - TM.cz) * s]; }
 function tacToWorld(px, py) { const s = Math.min(HW, HH) / TM.span; return [TM.cx + (px - HW / 2) / s, TM.cz + (py - HH / 2) / s]; }
 function drawTacMap() {
@@ -7660,7 +8170,17 @@ function drawTacMap() {
   const [wx0, wz0] = tacToWorld(0, 0), [wx1, wz1] = tacToWorld(HW, HH);
   for (let g = Math.floor(wx0 / step) * step; g <= wx1; g += step) { const [x] = P(g, 0); hc.beginPath(); hc.moveTo(x, 0); hc.lineTo(x, HH); hc.stroke(); }
   for (let g = Math.floor(wz0 / step) * step; g <= wz1; g += step) { const [, y] = P(0, g); hc.beginPath(); hc.moveTo(0, y); hc.lineTo(HW, y); hc.stroke(); }
-  for (const I of ISLANDS) { const [x, y] = P(I.x, I.z); hc.fillStyle = 'rgba(201,187,142,0.8)'; hc.beginPath(); hc.ellipse(x, y, Math.max(2, I.rx * s), Math.max(1.5, I.rz * s), -(I.rot || 0), 0, Math.PI * 2); hc.fill(); }
+  // the reefs: atoll rings and reef platforms in reef cyan, banks faint, land in sand, names when there is room
+  for (const F of REEFS) {
+    const [x, y] = P(F.x, F.z), rx = Math.max(2, F.rx * s), ry = Math.max(1.5, F.rz * s);
+    if (x < -rx - 60 || y < -ry - 60 || x > HW + rx + 60 || y > HH + ry + 60) continue;
+    hc.beginPath(); hc.ellipse(x, y, rx, ry, F.rot, 0, Math.PI * 2);
+    if (F.type === 0) { hc.strokeStyle = 'rgba(98,214,205,0.55)'; hc.lineWidth = Math.max(1.5, (F.w || 200) * 2 * s); hc.stroke(); hc.fillStyle = 'rgba(40,150,160,0.12)'; hc.fill(); }
+    else if (F.type === 1) { hc.fillStyle = 'rgba(98,214,205,0.35)'; hc.fill(); }
+    else { hc.fillStyle = 'rgba(60,140,170,0.1)'; hc.fill(); }
+    if (TM.span < 140000 || F.base) { hc.font = `500 10px ${SANS}`; hc.fillStyle = 'rgba(160,220,215,0.75)'; hc.textAlign = 'center'; hc.fillText(F.name, x, y + ry + 12); }
+  }
+  for (const I of ISLANDS) { const [x, y] = P(I.x, I.z); hc.fillStyle = 'rgba(214,200,158,0.9)'; hc.beginPath(); hc.ellipse(x, y, Math.max(1.5, I.rx * s), Math.max(1.2, I.rz * s), I.rot || 0, 0, Math.PI * 2); hc.fill(); }
   // own weapon envelopes around the player's unit
   if (own && own.pos && own.kind === 'ship') {
     const rings = [];
@@ -7739,6 +8259,13 @@ function drawTacMap() {
   if (Cm.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#9fd4ff'; hc.textAlign = 'left'; hc.fillText(`🛰 己方侦察卫星过顶 · ${Math.ceil(Cm.satEnd - game.t)} s`, 16, 72); }
   const Cf = command[SIDES[me].foe];
   if (Cf.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#ffd28a'; hc.textAlign = 'left'; hc.fillText(`⚠ 敌方侦察卫星过顶 · ${Math.ceil(Cf.satEnd - game.t)} s`, 16, 88); }
+  // our own deception: the phantom groups we are projecting (dashed, so they are never mistaken for real ships)
+  for (const ph of command[me].phantoms || []) {
+    if (!ph.alive) continue;
+    const [x, y] = P(ph.pos.x, ph.pos.z), seen = picture[SIDES[me].foe].has(ph);
+    hc.strokeStyle = BLUE; hc.globalAlpha = 0.7; hc.setLineDash([3, 3]); hc.lineWidth = 1.2; hc.beginPath(); hc.arc(x, y, 9, 0, Math.PI * 2); hc.stroke(); hc.setLineDash([]);
+    hc.font = `600 10px ${SANS}`; hc.fillStyle = BLUE; hc.textAlign = 'center'; hc.fillText(`佯动${seen ? ' · 在敌方态势图中' : ' · 已被识破'}`, x, y - 13); hc.globalAlpha = 1;
+  }
   // strike packages of the player's side: rendezvous, the two attack axes through their initial points, the target
   for (const k of command[me].pkgs || []) {
     if (k.phase !== 'form' && k.phase !== 'push') continue;
@@ -7826,8 +8353,8 @@ function renderTacCard() {
       if (flagship.tlamN > 0) acts.push(['战斧打击', () => { designate(u); useAbility(flagship, 'tlam', u); }]);
       if (tac(game.side).navy !== 'focus') acts.push(['舰队集火', () => { designate(u); setTactic('navy', 'focus'); renderTacOrders(); }]);
     }
-  } else if (game.role === 'watch' || (u.kind === 'ship' || (u.kind === 'plane' && u.state === 'air'))) {
-    acts.push(['镜头跟随', () => { toggleMap(); if (game.role === 'watch') specFollow(u); }]);
+  } else if (camRole() || (u.kind === 'ship' || (u.kind === 'plane' && u.state === 'air'))) {
+    acts.push(['镜头跟随', () => { toggleMap(); if (camRole()) specFollow(u); }]);
     if (u.kind === 'ship' || u.kind === 'plane') acts.push(['接管', () => { toggleMap(); takeRole(u.kind === 'ship' ? 'captain' : 'pilot', u); }]);
   }
   el.innerHTML = html + `<div class="acts">${acts.map((a, i) => `<button type="button" data-i="${i}">${a[0]}</button>`).join('')}</div>`;
@@ -7840,7 +8367,7 @@ function renderTacOrders() {
     box.innerHTML = '';
     for (const [id, t] of Object.entries(TACTICS[kind])) {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = t.name; if (id === cur) b.className = 'on';
-      b.onclick = () => { if (kind === 'wing') { game.wingOrder = id; radio('僚机', `收到：${t.name}。`, '#9fd4ff'); } else setTactic(kind, id); renderTacOrders(); $('tac-desc').textContent = t.desc; };
+      b.onclick = () => { if (kind === 'wing') { game.wingOrder = id; radio('僚机', `收到：${t.name}。`, '#9fd4ff'); } else { setTactic(kind, id); game.staffHold = game.t + 300; } renderTacOrders(); $('tac-desc').textContent = t.desc; };
       b.onpointerenter = () => { $('tac-desc').textContent = t.desc; };
       box.appendChild(b);
     }
@@ -7996,7 +8523,7 @@ function drawHUD(dt) {
   if (game.role === 'pilot' && player && player.alive) drawPilot(dt);
   else if (game.role === 'captain' && game.gunsight && flagship && flagship.gun) drawGunsight();
   else if (game.role === 'captain') drawCaptain();
-  else { drawContacts(camera.position, 30000, 150000); const f = game.focus; if (f) text(f.kind === 'msl' ? `${f.spec.name} → ${f.target?.name || ''}` : f.name || '', HW / 2, HH - 40, '#eef3f5', `600 13px ${SANS}`, 'center'); }
+  else { drawContacts(camera.position, 30000, 150000); if (game.role === 'cmd' && $('spec').hidden) drawForce(); const f = game.focus; if (f) text(f.kind === 'msl' ? `${f.spec.name} → ${f.target?.name || ''}` : f.name || '', HW / 2, HH - (game.role === 'cmd' ? 128 : 66), '#eef3f5', `600 13px ${SANS}`, 'center'); }
   drawTop();
   // chapter card, messages, radio
   if (game.card && game.card.t > 0) {
@@ -8047,8 +8574,8 @@ function drawHUD(dt) {
 /* ---------- battle setup ---------- */
 let baseGroup = null;
 function clearBattle() {
-  for (const s of ships) scene.remove(s.obj);
-  for (const p of planes) scene.remove(p.obj);
+  for (const s of ships) { scene.remove(s.obj); if (s.lo) scene.remove(s.lo); }
+  for (const p of planes) { scene.remove(p.obj); if (p.lo) scene.remove(p.lo); }
   for (const m of missiles) scene.remove(m.mesh);
   for (const d of debris) scene.remove(d.mesh);
   if (baseGroup) scene.remove(baseGroup);
@@ -8088,9 +8615,10 @@ function precompile() {
 function startGame() {
   Sound.init();
   setupBattle();
-  Object.assign(game, { mode: 'play', t: 0, scale: 1, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
+  Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffAuto: game.role !== 'cmd', staffHold: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
     ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
-    stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 } });
+    stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 }, result: null,
+    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 } } });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
   $('b-scale').textContent = '时间 ×1'; $('b-ai').classList.remove('on'); $('b-map').classList.remove('on');
   precompile();
@@ -8161,7 +8689,8 @@ function renderRoles() {
     if (side === 'us') inv.b1b = ['关岛 12'];
     for (const [t, homes] of Object.entries(inv)) pickButton(list, AC[t].name, `${AC_NOTE[t] || ''} · ${homes.join(' / ')} 架`, '飞行员', go('pilot', t));
   } else {
-    pickButton(list, '战区指挥 · 观战', '任意切换双方单位 · 自由镜头 · 自动导播 · 随时接管己方单位', '指挥', go('watch', null));
+    pickButton(list, '战区指挥官', '指挥本方全部海空兵力：主攻方向、战术、攻击编队、大规模打击、电磁静默 · 随时接管任一己方单位', '指挥', go('cmd', null));
+    pickButton(list, '观战', '双方 AI 对决 · 任意切换单位 · 自由镜头 · 自动导播', '观战', go('watch', null));
   }
 }
 for (const b of document.querySelectorAll('#role-tabs button')) b.onclick = () => { game.roleTab = b.dataset.t; renderRoles(); };
@@ -8182,7 +8711,7 @@ function takeRole(role, pick, home) {
       command.us.b1b--;
       p = new Plane('us', 'b1b', null);
       p.pilot = new Pilot(p, 0.9); p.role = 'bomber'; p.task = { target: bestTarget('us', new V3(), 200000) };
-      p.pos.set(THEATRE.exit - 12000, 7000, rand(-25000, 25000)); setBasis(p.q, new V3(-1, 0, 0), Y_AXIS); p.speed = 260; p.axes(); p.sync();
+      p.pos.set(THEATRE.air - 14000, 7000, rand(-25000, 25000)); setBasis(p.q, new V3(-1, 0, 0), Y_AXIS); p.speed = 260; p.axes(); p.sync();
       p.name = 'B-1B（你）'; planes.push(p);
     } else {
       const h = home || ships.concat(bases).filter(x => x.side === side && x.alive && !x.dying && x.hangar && x.hangar[pick] > 0).sort((a, b) => b.hangar[pick] - a.hangar[pick])[0];
@@ -8209,15 +8738,18 @@ function takeRole(role, pick, home) {
   $('pilot-ctl').hidden = role !== 'pilot';
   $('cap-ctl').hidden = role !== 'captain'; $('gun-ctl').hidden = true; game.gunsight = false;
   $('gears').hidden = $('abil').hidden = role !== 'captain';
-  $('specbar').hidden = role !== 'watch'; if (role !== 'watch') $('spec').hidden = true;
-  $('stick-zone').hidden = role === 'watch' && game.spec !== 'free';
-  $('b-ai').hidden = role === 'watch';
+  const cam = role === 'watch' || role === 'cmd';
+  $('specbar').hidden = !cam; $('spec').hidden = true; game.roster = false;
+  $('cmdbar').hidden = role !== 'cmd';
+  $('stick-zone').hidden = cam && game.spec !== 'free';
+  $('b-ai').hidden = cam;
   $('b-ai').textContent = role === 'captain' ? (flagship && flagship.S.sub ? 'AI 艇长' : 'AI 舰长') : 'AI 驾驶';
   if (role === 'captain') {
     $('c-salvo').innerHTML = flagship.S.sub ? '潜射<br>导弹' : flagship.carrier ? '攻击波' : '反舰<br>齐射';
     $('c-gun').hidden = !flagship.gun;
   }
-  if (role === 'watch') { game.spec = game.spec || 'auto'; specButtons(); }
+  if (cam) { game.spec = game.spec || 'auto'; specButtons(); }
+  if (role === 'cmd') { cmdButtons(); if (game.mode === 'play' && game.t > 1) message('战区指挥', '主攻方向、战术与攻击编队由你决定 · 「切换单位」可随时接管', GOLD, 2.4); }
 }
 
 /* ---------- after losing an aircraft or a ship: fly again, take over, take a ship, or watch ---------- */
@@ -8233,7 +8765,8 @@ function deathChoices() {
   const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.state === 'air' && p !== player).slice(0, 6);
   for (const p of air) add(`接管空中 · ${p.name}`, `${MODE_TEXT[p.pilot && p.pilot.mode] || p.role} · 高度 ${Math.round(p.pos.y)} m`, () => takeRole('pilot', p), '接管');
   for (const s of ships.filter(s => s.side === side && s.alive && !s.dying)) add(`指挥 ${s.name}`, `${s.S.type} · 舰体 ${Math.round(s.hp / s.maxHp * 100)}%`, () => takeRole('captain', s), s.S.sub ? '艇长' : '舰长');
-  add('战区指挥 · 观战', '任意切换单位 · 自由镜头', () => takeRole('watch'), '指挥');
+  add('战区指挥官', '指挥全部兵力 · 随时接管任一单位', () => takeRole('cmd'), '指挥');
+  add('观战', '自由镜头 · 自动导播', () => takeRole('watch'), '观战');
   $('dead-title').textContent = game.cause || '任务中断';
   $('dead-sub').textContent = total ? `本方空军尚余 ${total} 架战机可以出击` : '本方舰载航空兵已经耗尽';
   show('dead');
@@ -8291,9 +8824,11 @@ function specButtons() {
   $('sp-list').classList.toggle('on', !$('spec').hidden);
   const f = game.focus;
   $('sp-take').hidden = !(f && f.side === game.side && (f.kind === 'ship' || (f.kind === 'plane' && f.state === 'air')));
-  $('stick-zone').hidden = game.role === 'watch' && game.spec !== 'free';
+  $('stick-zone').hidden = camRole() && game.spec !== 'free';
 }
 function renderSpecList() {
+  if (game.roster) { renderRoster(); return; }
+  $('spec-tabs').hidden = false; const rh = $('spec').querySelector('.rhead'); if (rh) rh.remove();
   const ul = $('spec-list'); ul.innerHTML = '';
   for (const u of specUnits()) {
     const li = document.createElement('li'), b = document.createElement('button');
@@ -8304,7 +8839,7 @@ function renderSpecList() {
     li.appendChild(b); ul.appendChild(li);
   }
 }
-$('sp-list').onclick = () => { $('spec').hidden = !$('spec').hidden; if (!$('spec').hidden) renderSpecList(); specButtons(); };
+$('sp-list').onclick = () => { game.roster = false; $('spec').hidden = !$('spec').hidden; if (!$('spec').hidden) renderSpecList(); specButtons(); };
 $('sp-auto').onclick = () => { game.spec = 'auto'; game.viewT = 0; specButtons(); };
 $('sp-free').onclick = () => {
   game.spec = game.spec === 'free' ? 'follow' : 'free';
@@ -8337,6 +8872,88 @@ function updateFreeCam(dt) {
   camera.lookAt(_c.copy(fc.pos).add(_d.set(Math.cos(fc.yaw) * Math.cos(fc.pitch), Math.sin(fc.pitch), -Math.sin(fc.yaw) * Math.cos(fc.pitch))));
 }
 
+/* ---------- the unit roster: jump into any friendly unit at any moment, from any role ---------- */
+function toggleRoster() {
+  if (game.mode !== 'play') return;
+  const open = !(game.roster && !$('spec').hidden);
+  game.roster = open; $('spec').hidden = !open;
+  $('b-units').classList.toggle('on', open);
+  if (open) renderRoster();
+}
+function renderRoster() {
+  const side = game.side, ul = $('spec-list'); ul.innerHTML = '';
+  $('spec-tabs').hidden = true;
+  let rh = $('spec').querySelector('.rhead');
+  if (!rh) { rh = document.createElement('div'); rh.className = 'rhead'; $('spec').insertBefore(rh, ul); }
+  rh.innerHTML = `<span>切换单位 · ${SIDES[side].name}</span><button type="button">关闭</button>`;
+  rh.querySelector('button').onclick = toggleRoster;
+  const sep = t => { const li = document.createElement('li'); li.className = 'sep'; li.textContent = t; ul.appendChild(li); };
+  const add = (title, sub, tag, fn, on = false) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; if (on) b.className = 'on';
+    b.innerHTML = `<b>${title}</b><em style="color:var(--gold)">${tag}</em><span>${sub}</span>`;
+    b.onclick = () => { game.roster = false; $('spec').hidden = true; $('b-units').classList.remove('on'); fn(); };
+    li.appendChild(b); ul.appendChild(li);
+  };
+  if (game.role !== 'cmd') add('战区指挥官', '回到全局指挥 · 主攻方向、编队、大规模打击', '指挥', () => takeRole('cmd'));
+  sep('舰艇');
+  for (const s of ships.filter(x => x.side === side && x.alive && !x.dying))
+    add(s.name, `${s.S.type} · 完好 ${Math.round(s.hp / s.maxHp * 100)}%${s.carrier ? ` · 机库 ${Object.values(s.hangar).reduce((a, b) => a + b, 0)}` : ''}${s.S.sub ? ` · 深 ${Math.round(s.depth)} m` : ''}`, s.S.sub ? '艇长' : '舰长', () => takeRole('captain', s), s === flagship);
+  const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.state === 'air');
+  if (air.length) sep(`空中 · ${air.length} 架`);
+  for (const p of air.sort((a, b) => (b.ashmN > 0) - (a.ashmN > 0) || a.name.localeCompare(b.name)))
+    add(p.name.replace('（你）', ''), `${MODE_TEXT[p.pilot && p.pilot.mode] || p.role} · ${Math.round(p.pos.y)} m · 油 ${Math.round(p.fuel / p.T.fuel * 100)}%`, '接管', () => takeRole('pilot', p), p === player);
+  const inv = airInventory(side);
+  if (Object.keys(inv).length) sep('机库 · 新出击');
+  for (const [t, x] of Object.entries(inv)) add(`出击 · ${AC[t].name}`, `${x.guam ? '关岛' : x.homes.map(([h, n]) => `${h.name} ${n}`).join(' / ')} 架`, '飞行员', () => takeRole('pilot', t));
+}
+// the theatre commander's order bar
+function cmdCarriers() { return ships.filter(s => s.side === game.side && s.carrier && s.alive && !s.dying); }
+function cmdTarget() { const t = intentTarget(game.side) || (game.ashmSel && game.ashmSel.alive && !game.ashmSel.dying && !(game.ashmSel.S && game.ashmSel.S.sub) ? game.ashmSel : null); return t; }
+const cmdCd = { alpha: 600, strike: 120, cap: 60, feint: 300 };
+function cmdReady(k) { game.cmdT = game.cmdT || {}; return !(game.cmdT[k] > game.t); }
+function cmdUse(k) { game.cmdT[k] = game.t + cmdCd[k]; cmdButtons(); }
+function cmdButtons() {
+  if (game.role !== 'cmd') return;
+  game.cmdT = game.cmdT || {};
+  const lab = (id, name, k) => { const left = k && game.cmdT[k] > game.t ? Math.ceil(game.cmdT[k] - game.t) : 0; const b = $(id); b.innerHTML = `${name}${left ? `<small>${left}s</small>` : ''}`; b.classList.toggle('cd', !!left); };
+  lab('cm-alpha', '大规模打击', 'alpha'); lab('cm-strike', '攻击编队', 'strike'); lab('cm-cap', '加强巡逻', 'cap'); lab('cm-feint', '电子佯动', 'feint');
+  $('cm-emcon').classList.toggle('on', tac(game.side).navy === 'emcon');
+  $('cm-staff').textContent = game.staffAuto ? '参谋：自动' : '参谋：手动';
+  $('cm-staff').classList.toggle('on', !!game.staffAuto);
+}
+$('cm-alpha').onclick = () => {
+  if (!cmdReady('alpha')) return;
+  const t = cmdTarget(); if (!t) { message('先指定主攻目标', '在战术地图上点选敌舰', '#9fb0ba', 1.8); return; }
+  let n = 0; for (const h of cmdCarriers()) if (alphaStrike(h, t)) n++;
+  if (n) { cmdUse('alpha'); command[game.side].alphaCd = 900; radio('战区指挥', `命令：${n} 艘航母甲板全力出动，对${t.name}实施大规模打击！`, GOLD); }
+  else message('无法发起大规模打击', '航母机库攻击机不足', '#9fb0ba', 1.8);
+};
+$('cm-strike').onclick = () => {
+  if (!cmdReady('strike')) return;
+  const t = cmdTarget(); if (!t) { message('先指定主攻目标', '在战术地图上点选敌舰', '#9fb0ba', 1.8); return; }
+  let n = 0; for (const h of cmdCarriers().concat(bases.filter(b => b.side === game.side && b.alive))) if (launchPackage(h, t, { n: 6, esc: 2 })) n++;
+  if (n) cmdUse('strike'); else message('机库无可用攻击机', '', '#9fb0ba', 1.6);
+};
+$('cm-cap').onclick = () => {
+  if (!cmdReady('cap')) return;
+  let n = 0;
+  for (const h of cmdCarriers()) for (let i = 0; i < 3; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty && launchFrom(h, ty, 'cap', { off: rand(10000, 20000), latZ: rand(-12000, 12000) })) n++; }
+  if (n) { cmdUse('cap'); radio('空中指挥', `${n} 架战斗机紧急升空，加强舰队空中巡逻。`, '#9fd4ff'); }
+};
+$('cm-emcon').onclick = () => {
+  const C = command[game.side];
+  if (tac(game.side).navy === 'emcon') setTactic('navy', C.preEmcon && C.preEmcon !== 'emcon' ? C.preEmcon : 'balanced');
+  else { C.preEmcon = tac(game.side).navy; setTactic('navy', 'emcon'); }
+  cmdButtons();
+};
+$('cm-feint').onclick = () => {
+  if (!cmdReady('feint')) return;
+  if (deployPhantom(game.side)) { cmdUse('feint'); if (tac(game.side).navy !== 'emcon') message('建议配合电磁静默', '真编队的雷达信号会让佯动失去意义', '#ffc861', 2.2); }
+  else message('无法佯动', '需要航母编队在场', '#9fb0ba', 1.6);
+};
+$('cm-staff').onclick = () => { game.staffAuto = !game.staffAuto; radio('参谋部', game.staffAuto ? '参谋部接管战术调整与大规模打击时机，主攻方向仍由你决定。' : '战术与打击时机交还指挥员。', '#9fd4ff'); cmdButtons(); };
+
 /* ---------- theatre support: the side's strategic card, open to every role ---------- */
 function supportReady() { return game.mode === 'play' && game.t > (game.supportT || 120); }
 function callSupport() {
@@ -8351,7 +8968,7 @@ function callSupport() {
         const pl = new Plane('us', 'b1b', null);
         pl.pilot = new Pilot(pl, 0.75); pl.role = 'bomber'; pl.task = { target: t };
         pl.name = `B-1B ${callsign('us')}`;
-        pl.pos.set(62000, 6500, rand(-15000, 15000) + i * 500); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
+        pl.pos.set(THEATRE.air - 14000, 6500, rand(-15000, 15000) + i * 500); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
         planes.push(pl);
       }
       radio('空中指挥', `B-1B 双机携 8 枚 LRASM 突入，目标${t.name}。`, '#9fd4ff');
@@ -8404,27 +9021,71 @@ function checkEnd(dt) {
     const alive = ships.some(s => s.side === side && s.alive && !s.dying) || bases.some(b => b.side === side && b.alive);
     const p = potential(side) / potential0[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
-    if (!alive || p < 0.4 || (!carriers && p < 0.55)) { game.over = foe(side); game.endT = 5; message(game.over === game.side ? '胜利' : '战败', `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`, game.over === game.side ? '#8dffb4' : '#ff8a78', 5); return; }
+    if (!alive || p < 0.4 || (!carriers && p < 0.55)) { finish(foe(side), `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`); return; }
   }
-  // campaign deadline: after 45 minutes the side with less of its war potential left breaks off
+  // campaign deadline: after 45 minutes both fleets are spent; a close result is a strategic stalemate
   if (game.t > 2700) {
-    const lose = potential('cn') / potential0.cn < potential('us') / potential0.us ? 'cn' : 'us';
-    game.over = foe(lose); game.endT = 5; message(game.over === game.side ? '胜利' : '战败', `${SIDES[lose].name}无力再战，撤出战区`, game.over === game.side ? '#8dffb4' : '#ff8a78', 5); return;
+    const pm = potential('cn') / potential0.cn, pu = potential('us') / potential0.us;
+    if (Math.abs(pm - pu) < 0.06) { finish(null, '双方战争潜力相当，各自撤出战区'); return; }
+    const lose = pm < pu ? 'cn' : 'us';
+    finish(foe(lose), `${SIDES[lose].name}无力再战，撤出战区`);
   }
-  const pm = potential('cn') / potential0.cn, pu = potential('us') / potential0.us;
 }
+// the result in tiers: decisive / victory / Pyrrhic, stalemate, defeat / heavy defeat
+function finish(winner, why) {
+  game.over = winner || 'draw'; game.endT = 5;
+  const me = game.side, them = foe(me), L = game.ledger;
+  const cv = side => ships.filter(s => s.side === side && s.carrier);
+  const cvLost = side => cv(side).filter(s => !s.alive || s.dying).length;
+  let tier;
+  if (!winner) tier = 'draw';
+  else if (winner === me) tier = cvLost(them) === cv(them).length && cvLost(me) === 0 ? 'decisive' : cvLost(me) > 0 ? 'pyrrhic' : 'win';
+  else tier = cvLost(me) === cv(me).length ? 'rout' : 'lose';
+  game.result = { tier, why, pm: potential(me) / potential0[me], pt: potential(them) / potential0[them], base: bases.some(b => b.alive) };
+  const T = RESULT_TIERS[tier];
+  message(T.name, why, T.color, 5);
+}
+const RESULT_TIERS = {
+  decisive: { name: '决定性胜利', color: '#8dffb4', title: '夺取制海权' },
+  win: { name: '胜利', color: '#8dffb4', title: '夺取制海权' },
+  pyrrhic: { name: '惨胜', color: '#ffd28a', title: '代价惨重的胜利' },
+  draw: { name: '战略僵持', color: '#cfe8ff', title: '谁也没能赢下南海' },
+  lose: { name: '战败', color: '#ff8a78', title: '撤出战区' },
+  rout: { name: '惨败', color: '#ff5a4f', title: '舰队覆灭' }
+};
 function endGame() {
   game.mode = 'over';
-  const win = game.over === game.side;
+  const win = game.over === game.side || game.over === 'draw';
   if (settings.cine && !game.endShown) { game.endShown = true; game.mode = 'cine'; runEpilogue(win, () => { game.mode = 'over'; afterAction(win); }); return; }
   afterAction(win);
 }
 function afterAction(win) {
-  $('end-tag').textContent = win ? '胜利' : '战败';
-  $('end-title').textContent = win ? '夺取制海权' : '撤出战区';
-  $('end-text').textContent = CAMPAIGN.end[win ? 'win' : 'lose'][game.side].join('');
+  const R = game.result || { tier: win ? 'win' : 'lose', why: '' }, T = RESULT_TIERS[R.tier];
+  const me = game.side, them = foe(me), L = game.ledger;
+  $('end-tag').textContent = T.name; $('end-tag').style.color = T.color;
+  $('end-title').textContent = T.title;
+  const story = CAMPAIGN.end[R.tier === 'draw' ? 'draw' : win ? 'win' : 'lose'][me];
+  $('end-text').textContent = `${R.why}。` + story.join('');
   const S = game.stats, mm = Math.floor(game.t / 60);
   $('e-time').textContent = `${mm} 分`; $('e-kills').textContent = S.kills; $('e-ships').textContent = S.shipKills; $('e-traps').textContent = S.traps;
+  // the after-action report: both sides' ledgers, the objective, and a grade
+  if (L) {
+    const fired = dbg.by[me] || 0, hits = dbg.hitBy[me] || 0, stopped = Object.entries(dbg.fate[them] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0);
+    const row = (k, a, b) => `<tr><th>${k}</th><td>${a}</td><td>${b}</td></tr>`;
+    const base = me === 'cn' ? (R.base ? '永暑礁机场坚守' : '永暑礁机场失守') : (R.base ? '永暑礁机场仍在运转' : '永暑礁机场被摧毁');
+    const score = Math.round((1 - R.pt) * 600 - (1 - R.pm) * 400 + L.archers[me] * 8 + L.aew[me] * 25 + L.fooled[me] * 4 + (me === 'cn' ? (R.base ? 60 : -60) : (R.base ? -30 : 60)));
+    const grade = score > 420 ? 'S' : score > 300 ? 'A' : score > 180 ? 'B' : score > 60 ? 'C' : 'D';
+    $('e-report').innerHTML = `<table><thead><tr><th></th><td>${SIDES[me].short}</td><td>${SIDES[them].short}</td></tr></thead><tbody>
+      ${row('剩余战争潜力', `${Math.round(R.pm * 100)}%`, `${Math.round(R.pt * 100)}%`)}
+      ${row('舰艇损失', L.sunk[me].length ? L.sunk[me].join('、') : '无', L.sunk[them].length ? L.sunk[them].join('、') : '无')}
+      ${row('飞机损失', L.air[me], L.air[them])}
+      ${row('打掉的携弹「射手」', L.archers[me], L.archers[them])}
+      ${row('击落预警机 / 加油机', `${L.aew[me]} / ${L.tankers[me]}`, `${L.aew[them]} / ${L.tankers[them]}`)}
+      ${row('反舰导弹 发射 / 命中', `${fired} / ${hits}`, `${dbg.by[them] || 0} / ${dbg.hitBy[them] || 0}`)}
+      ${row('拦截敌导弹', stopped, Object.entries(dbg.fate[me] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0))}
+      ${row('被佯动骗走的敌弹', L.fooled[me], L.fooled[them])}
+      </tbody></table><p class="grade">战略目标：${base} · 战役评级 <b>${grade}</b></p>`;
+  }
   Sound.engine(0, 0, false); Sound.lockTone(false); Sound.rwrTone(false);
   show('end');
 }
@@ -8508,8 +9169,17 @@ function adapt(raw) {
   if (perf.scale !== was) applyQuality();
 }
 function lod() {
-  const far = HQ() ? 9000 : 5000;
+  const far = HQ() ? 9000 : 3500;
   for (const s of ships) if (s.lo && s.alive) { const lo = s.obj.position.distanceTo(camera.position) > far; s.obj.visible = !lo; s.lo.visible = lo; }
+  const pfar = HQ() ? 1600 : 1000, cull = 25000;
+  for (const p of planes) {
+    if (!p.lo) continue;
+    const d = p.obj.position.distanceTo(camera.position), show = p.state !== 'queued';
+    const hd = p === player || d < pfar;
+    p.obj.visible = show && hd && d < cull;
+    p.lo.visible = show && !hd && d < cull;
+    if (p.lo.visible) { p.lo.position.copy(p.obj.position); p.lo.quaternion.copy(p.obj.quaternion); }
+  }
 }
 function frame() {
   requestAnimationFrame(frame);
@@ -8577,5 +9247,5 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };
 </script>

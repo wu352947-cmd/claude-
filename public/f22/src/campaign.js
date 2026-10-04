@@ -23,25 +23,31 @@ const CAMPAIGN = {
   chapters: {
     cn: [
       { title: '序章 · 龙出深海', line: '双航母编队驶出三亚。空警-600 弹射升空，为舰队睁开眼睛。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'cn' && p.T.aew && p.state === 'air') },
-      { title: '第一章 · 拂晓惊雷', line: '东方海天之间，美军双航母打击群的雷达回波浮出屏幕。', goal: '发现敌方航母', check: () => [...picture.cn.keys()].some(e => e.kind === 'ship' && e.carrier) },
-      { title: '第二章 · 饱和之潮', line: '十二艘战舰的垂发单元同时开启。数十枚鹰击导弹统一时间扑向敌阵。', goal: '反舰导弹命中敌舰 6 次', check: () => dbg.hitBy.cn >= 6 },
-      { title: '第三章 · 东风破浪', line: '大陆深处，火箭军的发射车竖起了东风。航母杀手，从太空俯冲而下。', goal: '击沉任意一艘敌舰', check: () => game.flags.sunkUS > 0 },
-      { title: '第四章 · 血染南海', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkUSCV > 0 },
-      { title: '终章 · 龙吟九霄', line: '最后的力量全部压上。为了那些没能回家的人，打完这一仗。', goal: '摧毁敌方战争潜力', check: () => false }
+      { title: '第一章 · 寻鹰', line: '东方海天之间，美军双航母打击群隐入了电磁静默。卫星、超视距雷达与预警机，一寸一寸地找。', goal: '发现敌方航母（真目标）', check: () => [...picture.cn.keys()].some(e => e.kind === 'ship' && e.carrier && !e.phantom) },
+      { title: '第二章 · 夺取制空', line: '歼-35 与歼-15 前出。先打掉敌人的眼睛，再谈打他的拳头。', goal: '击落敌机 6 架，或击落一架 E-2D', check: () => game.ledger.air.us >= 6 || game.ledger.aew.cn >= 1 },
+      { title: '第三章 · 饱和之潮', line: '攻击编队在集结点汇合，舰队的垂发单元同时开启。数十枚鹰击统一时间扑向敌阵。', goal: '反舰导弹命中敌舰 8 次', check: () => dbg.hitBy.cn >= 8 },
+      { title: '第四章 · 东风破浪', line: '大陆深处，火箭军的发射车竖起了东风。航母杀手，从太空俯冲而下。', goal: '东风命中敌舰，或击沉任意一艘敌舰', check: () => game.flags.dfHit > 0 || game.flags.sunkUS > 0 },
+      { title: '第五章 · 血染南海', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母，同时守住永暑礁', check: () => game.flags.sunkUSCV > 0 },
+      { title: '终章 · 龙吟九霄', line: '最后的力量全部压上。为了那些没能回家的人，打完这一仗。', goal: '夺取制海权：摧毁敌方战争潜力', check: () => false }
     ],
     us: [
-      { title: '序章 · 鹰巢', line: '福特号飞行甲板上，弹射器的蒸汽与电磁轰鸣交织。E-2D 鹰眼起飞。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'us' && p.T.aew && p.state === 'air') },
-      { title: '第一章 · 雷霆之眼', line: '鹰眼的雷达扫过南海。福建舰编队，就在西方地平线之外。', goal: '发现敌方航母', check: () => [...picture.us.keys()].some(e => e.kind === 'ship' && e.carrier) },
-      { title: '第二章 · 分布式杀伤', line: 'LRASM、战斧、鱼叉——从天空、海面与深海，同时出拳。', goal: '反舰导弹命中敌舰 6 次', check: () => dbg.hitBy.us >= 6 },
-      { title: '第三章 · 盾与矛', line: '宙斯盾雷达捕捉到大气层外的再入目标——东风。标准-3，发射！', goal: '拦截东风弹道导弹 2 枚，或击沉任意一艘敌舰', check: () => (game.flags.bmKill || 0) >= 2 || game.flags.sunkCN > 0 },
-      { title: '第四章 · 铁与火', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkCNCV > 0 },
-      { title: '终章 · 最后的黎明', line: '剩下的战力只够打一场。为了那些没能回家的人，打完这一仗。', goal: '摧毁敌方战争潜力', check: () => false }
+      { title: '序章 · 鹰巢', line: '福特号飞行甲板上，弹射器的轰鸣此起彼伏。E-2D 鹰眼起飞。', goal: '起飞预警机，建立战场空情', check: () => planes.some(p => p.side === 'us' && p.T.aew && p.state === 'air') },
+      { title: '第一章 · 雷霆之眼', line: '鹰眼的雷达扫过南海。福建舰编队，就在西方地平线之外——如果那不是诱饵的话。', goal: '发现敌方航母（真目标）', check: () => [...picture.us.keys()].some(e => e.kind === 'ship' && e.carrier && !e.phantom) },
+      { title: '第二章 · 外层空战', line: '射手，而不是箭。在轰-6K 和歼-15 发射之前，把它们打下来。', goal: '击落携弹的敌攻击机 / 轰炸机 4 架', check: () => game.ledger.archers.us >= 4 },
+      { title: '第三章 · 盾与矛', line: '宙斯盾雷达捕捉到大气层外的再入目标——东风。标准-3，发射！', goal: '拦截东风 2 枚，或拦截来袭反舰导弹 20 枚', check: () => (game.flags.bmKill || 0) >= 2 || ['sam', 'ciws', 'decoy'].reduce((a, k) => a + ((dbg.fate.cn || {})[k] || 0), 0) >= 20 },
+      { title: '第四章 · 分布式杀伤', line: 'LRASM、战斧、鱼叉——从天空、海面与深海，同时出拳。', goal: '反舰导弹命中敌舰 8 次', check: () => dbg.hitBy.us >= 8 },
+      { title: '第五章 · 铁与火', line: '海面燃烧，钢铁在下沉。只要敌航母还在，这场仗就没有结束。', goal: '击沉一艘敌方航母', check: () => game.flags.sunkCNCV > 0 },
+      { title: '终章 · 最后的黎明', line: '剩下的战力只够打一场。为了那些没能回家的人，打完这一仗。', goal: '夺取制海权：摧毁敌方战争潜力', check: () => false }
     ]
   },
   end: {
     win: {
       cn: ['美军双航母打击群失去作战能力，残存舰艇向东撤出南海。', '胜利的代价写在每一艘燃烧的军舰上，写在海面漂浮的救生筏上。', '龙守住了家门。但太平洋记住了这一天的血与泪。'],
       us: ['解放军双航母编队失去作战能力，南海暂时恢复了平静。', '胜利的代价写在每一艘燃烧的军舰上，写在海面漂浮的救生筏上。', '鹰守住了航道。但太平洋记住了这一天的血与泪。']
+    },
+    draw: {
+      cn: ['两支舰队都已精疲力竭，谁也没能把对方赶出南海。', '海面上漂满了残骸与油污。谈判桌上的每一句话，都带着硝烟的味道。', '太平洋记住了这一天的血与泪。'],
+      us: ['两支舰队都已精疲力竭，谁也没能把对方赶出南海。', '海面上漂满了残骸与油污。谈判桌上的每一句话，都带着硝烟的味道。', '太平洋记住了这一天的血与泪。']
     },
     lose: {
       cn: ['我方编队战争潜力耗尽，残存舰艇被迫撤离战区。', '将士们已经尽了全力。这场失败，将被反复复盘、铭记。', '太平洋记住了这一天的血与泪。'],
@@ -265,7 +271,7 @@ function drawPrologueMap(g, W, H, t, side) {
   g.font = `500 ${Math.round(sc * 0.42)}px ${SANS}`;
   for (const [txt, lo, la] of [['海南', 109.6, 19.2], ['吕宋', 121.2, 16.2], ['南沙群岛', 114.2, 9.8], ['西沙群岛', 111.8, 16.6], ['巴士海峡', 121, 20.8]]) { const [x, y] = P([lo, la]); g.fillText(txt, x, y); }
   // the island base
-  if (t > 5) { const [x, y] = P([114.0, 10.6]); g.fillStyle = '#ff7a6b'; g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); }
+  if (t > 5) { const [x, y] = P([112.89, 9.55]); g.fillStyle = '#ff7a6b'; g.beginPath(); g.arc(x, y, 4, 0, Math.PI * 2); g.fill(); g.fillStyle = `rgba(255,170,160,${0.8 * k})`; g.textAlign = 'left'; g.fillText('永暑礁', x + 7, y + 4); g.textAlign = 'center'; }
   // fleets converge
   const u = clamp((t - 6) / 14, 0, 1);
   const cn = [[111.0, 17.6], [114.2, 15.4]], us = [[123.5, 19.6], [117.4, 15.6]];
@@ -331,7 +337,7 @@ function runEpilogue(win, done) {
   const el = $('cine'), tx = $('cine-text');
   el.hidden = false; $('cine-map').style.opacity = '0'; $('cine-skip').hidden = false;
   Music.end(win);
-  const lines = CAMPAIGN.end[win ? 'win' : 'lose'][game.side];
+  const lines = CAMPAIGN.end[game.result && game.result.tier === 'draw' ? 'draw' : win ? 'win' : 'lose'][game.side];
   let i = 0, timer = 0, ended = false;
   const finish = () => { if (ended) return; ended = true; clearInterval(timer); el.hidden = true; done(); };
   $('cine-skip').onclick = finish;

@@ -50,19 +50,10 @@ const HQ = () => settings.quality === 'high';
 // the theatre: the two fleets open ~115 km apart (about 600 km at the game's 1:5 weapon scale), so strikes have
 // to find, form up, transit and push - the fight is not decided from the deck
 const THEATRE = { sea: 115000, air: 150000, exit: 170000 };
-const ISLANDS = [
-  { x: -21000, z: -24000, rx: 2400, rz: 700, base: true, rot: 0.15 },
-  { x: 6000, z: 21000, rx: 500, rz: 300 }, { x: -2000, z: -9000, rx: 300, rz: 200 }, { x: 15000, z: -20000, rx: 600, rz: 260 }
-];
-function terrainH(x, z) {
-  let h = -60;
-  for (const I of ISLANDS) {
-    const c = Math.cos(I.rot || 0), s = Math.sin(I.rot || 0), dx = x - I.x, dz = z - I.z;
-    const u = (dx * c + dz * s) / I.rx, v = (-dx * s + dz * c) / I.rz, d = Math.hypot(u, v);
-    if (d < 1.6) h = Math.max(h, d < 1 ? (I.base ? 4 : 2.5) : lerp(I.base ? 4 : 2.5, -12, (d - 1) / 0.6));
-  }
-  return h;
-}
+/*@REEFS@*/
+// land pieces (the artificial island first) for the code that only needs outlines
+const ISLANDS = [BASE_LAND, ...REEF_LAND];
+const terrainH = reefH;
 const groundAt = (x, z) => Math.max(terrainH(x, z), 0);
 
 /* ---------- renderer & world ---------- */
@@ -75,7 +66,8 @@ stage.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(60, 1, 1.5, 160000);
 scene.add(camera);
-const world = createSeaEnv({ scene, renderer, hq: HQ(), time: settings.time, wind: new V3(-0.85, 0, 0.53), islands: ISLANDS });
+const world = createSeaEnv({ scene, renderer, hq: HQ(), time: settings.time, wind: new V3(-0.85, 0, 0.53), reefs: REEF_GPU });
+buildReefLand(scene); buildAmbient(scene);
 const { fogColor, FOG_D, SUN, sunLight } = world;
 sunLight.shadow.camera.left = sunLight.shadow.camera.bottom = -60;
 sunLight.shadow.camera.right = sunLight.shadow.camera.top = 60;
@@ -281,7 +273,7 @@ const FLEET = {
 };
 const SH = {};
 for (const side of ['cn', 'us']) FLEET[side].units.forEach(([cls, name, number], i) => { SH[`${side}${i}`] = Object.assign({}, CLS[cls], { cls, name, number }); });
-const BASE = { side: 'cn', name: '前哨岛礁机场', hp: 2000, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48 }, channels: 8, wing: { j16: 16, h6k: 10 }, isl: ISLANDS[0] };
+const BASE = { side: 'cn', name: '永暑礁机场', hp: 2000, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48 }, channels: 8, wing: { j16: 16, h6k: 10 }, isl: BASE_LAND };
 const WIND = { dir: new V3(-0.85, 0, 0.53).normalize(), speed: 8 };   // wind blows toward this direction (from the north-east)
 
 /* ---------- audio: synthesised with WebAudio (from 猛禽制空) ---------- */
@@ -372,6 +364,8 @@ function radio(from, text, color = '#cfe8ff') {
   if (game.radio.length > 4) game.radio.shift();
 }
 const mine = u => u.side === game.side;
+// roles that look at the battle through the director / free camera (the spectator and the theatre commander)
+const camRole = () => game.role === 'watch' || game.role === 'cmd';
 const sideColor = s => s === game.side ? '#9fd4ff' : '#ff8a78';
 
 /* ---------- geometry helpers ---------- */
@@ -423,6 +417,14 @@ class Ship {
       if (hd && hd.deckY) { this.deck.deckY = hd.deckY; this.deck.cats = this.deck.cats.map(c => Object.assign({}, c, { x1: Math.min(c.x1, hdKey.catMax || c.x1) })); }
     }
     if (this.deck) this.cats = this.deck.cats.map(c => ({ c, busy: 0, plane: null }));
+    // a deck park on the procedural carrier: J-15s tails-out along the starboard edge, thinned as the hangar empties
+    if (S.carrier && !hd && S.model === 'shandong') {
+      this.park = [];
+      const Y = this.deck.deckY + (AC.j15.gearH || 2.6);
+      for (const [x, z, r] of [[-122, 15, 2.3], [-104, 15, 2.3], [-86, 15, 2.3], [-68, 15, 2.3], [34, 14, 2.2], [52, 14, 2.2], [70, 14, 2.2], [88, 13, 2.2]]) {
+        const m = Navy.plane('j15').obj; m.position.set(x, Y, z); m.rotation.y = r; this.obj.add(m); this.park.push(m);
+      }
+    }
   }
   get carrier() { return !!this.S.carrier; }
   vmax() { return this.S.vmax * (this.hp < this.maxHp * 0.35 ? 0.45 : this.hp < this.maxHp * 0.6 ? 0.75 : 1) * (this.sprintT > 0 ? 1.22 : 1) * (this.mods && this.mods.engine > 0 ? 0.5 : 1); }
@@ -459,25 +461,7 @@ const PLANE_HD = { fa18: { m: 'fa18' }, ea18g: { m: 'fa18' }, f35c: { m: 'f35' }
 function buildBase() {
   const I = BASE.isl, g = new THREE.Group();
   g.position.set(I.x, 0, I.z); g.rotation.y = -I.rot;
-  const sand = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 8, 48), new THREE.MeshStandardMaterial({ color: 0xd9cfae, roughness: 1 }));
-  sand.scale.set(I.rx * 1.02, 1, I.rz * 1.02); sand.position.y = 0; g.add(sand);
-  const shoal = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 2, 48), new THREE.MeshStandardMaterial({ color: 0x5fb7b0, roughness: 0.4, transparent: true, opacity: 0.55 }));
-  shoal.scale.set(I.rx * 1.45, 1, I.rz * 1.9); shoal.position.y = -0.5; g.add(shoal);
-  const flat = (w, d, x, z, col, y = 4.05) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ color: col, roughness: 0.92 })); m.rotation.x = -Math.PI / 2; m.position.set(x, y, z); g.add(m); return m; };
-  flat(3000, 55, 0, -120, 0x3c3f42);
-  for (let x = -1400; x <= 1400; x += 60) flat(24, 1.2, x, -120, 0xeeeeea, 4.07);
-  flat(2600, 22, 0, 60, 0x4a4c4f);
-  flat(700, 180, -500, 320, 0x77797a);
-  const mat = new THREE.MeshStandardMaterial({ color: 0xc8c6be, roughness: 0.8 }), dark = new THREE.MeshStandardMaterial({ color: 0x3a3e42, roughness: 0.7 });
-  const add = (geo, m, x, y, z) => { const o = new THREE.Mesh(geo, m); o.position.set(x, y, z); o.castShadow = o.receiveShadow = true; g.add(o); return o; };
-  for (let i = 0; i < 8; i++) add(new THREE.BoxGeometry(34, 12, 26), mat, -760 + i * 44, 10, 360);
-  add(new THREE.BoxGeometry(60, 18, 40), mat, 500, 13, 330);
-  add(new THREE.CylinderGeometry(4, 6, 46, 10), mat, 760, 27, 300);
-  const dome = add(new THREE.SphereGeometry(16, 20, 12, 0, Math.PI * 2, 0, Math.PI / 1.8), new THREE.MeshStandardMaterial({ color: 0xf2f2ee, roughness: 0.5 }), 760, 52, 300);
-  dome.castShadow = false;
-  for (const x of [900, 1050]) add(new THREE.CylinderGeometry(9, 9, 10, 18), new THREE.MeshStandardMaterial({ color: 0xe8e8e4 }), x, 9, 380);
-  // HQ-9 launchers
-  for (let i = 0; i < 4; i++) { const l = add(new THREE.BoxGeometry(11, 3, 3), dark, 1250 + (i % 2) * 30, 8, 250 + Math.floor(i / 2) * 30); l.rotation.z = 0.9; }
+  buildBaseIsland(g);
   scene.add(g);
   const base = {
     kind: 'base', side: BASE.side, name: BASE.name, value: BASE.value, hp: BASE.hp, maxHp: BASE.hp, alive: true, dying: false,
@@ -497,6 +481,9 @@ class Plane {
     const hdKey = PLANE_HD[type], hd = hdKey && NavyHD.make(hdKey.m, { gearH: T.gearH, pla: hdKey.pla, scale: hdKey.scale });
     const m = hd ? { obj: hd.group, exhausts: hd.exhausts } : Navy.plane(T.model);
     this.obj = m.obj; scene.add(this.obj);
+    // level of detail: the HD airframe (12-68k triangles) only close to the camera; a baked low-poly airframe
+    // (shared geometry) further out, nothing beyond the distance at which an aircraft is below a pixel
+    if (hd) { this.lo = Navy.plane(T.model).obj; this.lo.visible = false; scene.add(this.lo); }
     this.setGearVis = hd ? hd.setGear : null; this.gearShown = false;
     this.exhausts = m.exhausts.map(e => new V3(...e));
     this.side = side; this.type = type; this.home = home; this.kind = 'plane'; this.name = T.name;
@@ -532,7 +519,7 @@ function setBasis(q, f, u) {
   _m4.makeBasis(f, up, new V3().crossVectors(f, up));
   q.setFromRotationMatrix(_m4);
 }
-function removePlane(pl) { pl.alive = false; scene.remove(pl.obj); const i = planes.indexOf(pl); if (i >= 0) planes.splice(i, 1); }
+function removePlane(pl) { pl.alive = false; scene.remove(pl.obj); if (pl.lo) scene.remove(pl.lo); const i = planes.indexOf(pl); if (i >= 0) planes.splice(i, 1); }
 
 /* ---------- effects ---------- */
 const _a = new V3(), _b = new V3(), _c = new V3(), _d = new V3(), _e = new V3(), _f = new V3();
@@ -776,13 +763,24 @@ function destroyPlane(pl, src) {
   pl.spin.set(rand(-3, 3), 0, rand(-1.2, 1.2));
   explode(pl.pos, pl.T.role === 'bomber' ? 1.4 : 0.8, pl.vel);
   spawnDebris(pl.pos, pl.vel, 5);
+  ledgerPlane(pl);
   const by = src && src.owner;
   if (by === player) { game.stats.kills++; message('击落', pl.name, '#8dffb4', 2.2); radio('你', `击落一架${pl.name}！`, '#9fd4ff'); }
   else if (mine(pl) && Math.random() < 0.5) radio('塔台', `${pl.name}被击落。`, '#ff8a78');
   else if (!mine(pl) && Math.random() < 0.4) radio(SIDES[game.side].short, `击落敌${pl.name}。`, '#9fd4ff');
 }
+// the war ledger: what each side lost, and how
+function ledgerPlane(pl) {
+  const L = game.ledger, by = foe(pl.side);
+  if (!L) return;
+  L.air[pl.side]++;
+  if (pl.ashmN > 0) L.archers[by]++;        // shot down with its anti-ship missiles still on the rails
+  if (pl.T.aew) L.aew[by]++;
+  if (pl.role === 'tank') L.tankers[by]++;
+}
 function killPlayer(cause) {
   if (!player || !player.alive) return;
+  ledgerPlane(player);
   player.dying = true; player.dieT = 0.01;
   explode(player.pos, 1.4, player.vel);
   spawnDebris(player.pos, player.vel, 8, 1.3);
@@ -808,6 +806,7 @@ function damageShip(s, dmg, src, at) {
 }
 function sinkShip(s, src) {
   s.dying = true; s.sinkT = 0; s.speed *= 0.3; s.order = 0;
+  if (game.ledger) game.ledger.sunk[s.side].push(s.name);
   explode(toWorld(s, 0, s.h * 0.5, 0), 3, null);
   if (playerOwns(src)) { game.stats.shipKills++; ribbon('击沉', '#8dffb4'); }
   message(`${s.name}${s.carrier ? '' : ''}沉没`, mine(s) ? '我方舰艇损失' : '敌舰被击沉', mine(s) ? '#ff8a78' : '#8dffb4', 3.6);
@@ -1647,7 +1646,7 @@ function roleFly(pl, d, c, out, dt) {
       // the player's aircraft is taken first (the deck is kept ready for the sortie the player is flying)
       if (!h.stack.includes(pl)) { if (pl === player) h.stack.unshift(pl); else h.stack.push(pl); }
       const slot = h.stack.indexOf(pl);
-      if (slot > 0 || (h.finalUntil > game.t && s < 8000)) {
+      if (slot > 0 || (h.finalUntil > game.t && s < 8000) || !recoveryOpen(h, pl)) {
         P.mode = 'holding';
         const a = Math.atan2(pl.pos.z - ip.z, pl.pos.x - ip.x) + 0.45;
         fly(d, pl, ip.x + Math.cos(a) * 4000, 1500 + Math.min(slot, 8) * 300, ip.z + Math.sin(a) * 4000);
@@ -1959,16 +1958,62 @@ function launchFrom(home, type, role, task = {}) {
   pl.role = role; pl.task = task;
   pl.name = `${AC[type].name} ${callsign(home.side)}`;
   planes.push(pl);
-  if (!spotOnCatapult(pl)) { pl.state = 'queued'; pl.obj.visible = false; home.queue = home.queue || []; home.queue.push(pl); }
+  if (!deckOpen(home, pl) || !spotOnCatapult(pl)) { pl.state = 'queued'; pl.obj.visible = false; home.queue = home.queue || []; home.queue.push(pl); }
   return pl;
 }
 const CALL = { cn: ['海鹰', '飞鲨', '雷霆', '利剑', '神盾', '蛟龙', '猎鹰', '长缨'], us: ['Viper', 'Jolly', 'Rhino', 'Ghost', 'Hawk', 'Ace', 'Reaper', 'Saber'] };
 let callN = 0;
 function callsign(side) { callN++; return `${CALL[side][callN % 8]}-${(callN % 9) + 1}`; }
+// one strike package from one home: strikers (they marshal and push together), fighter escort, a jammer
+function launchPackage(h, tgt, o = {}) {
+  const side = h.side, T = tac(side), main = intentTarget(side);
+  const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
+  const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
+  if (avail < 2) return null;
+  const n = Math.min(o.n || 6, avail);
+  const pkg = newPackage(side, h, tgt);
+  if (o.alpha) pkg.alpha = true;
+  let lead = null;
+  for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (p) { joinPackage(pkg, p); if (!lead) lead = p; } }
+  let esc = 0;
+  const pick = types => types.find(t => h.hangar[t] > 0);
+  for (let i = 0; i < (o.esc ?? 2); i++) { const t = pick(['j35', 'f35c', 'fa18', 'j15']); if (t && launchFrom(h, t, 'escort', { lead, slot: [160, -160, 260, -260, 360, -360][i % 6] })) esc++; }
+  let ewn = 0;
+  for (let i = 0; i < (o.ew ?? 1); i++) { const ew = pick(['j15d', 'ea18g']); if (ew && launchFrom(h, ew, 'ew', { pkg: lead, on: tgt })) ewn++; }
+  if (side === game.side) radio('空中指挥', `${h.name}出动第 ${pkg.id} 攻击编队${o.alpha ? '（大规模打击）' : ''}：${n} 架突击机${esc ? ` + ${esc} 架护航` : ''}${ewn ? ` + ${ewn} 架电子战机` : ''}，目标${tgt.name}${tgt === main ? '（主攻目标）' : ''}，集结点编队后统一出发。`, o.alpha ? GOLD : '#9fd4ff');
+  return pkg;
+}
+// alpha strike: the deck is spotted for one big launch - about half the air wing - and recoveries wait until it is
+// away; the package is bigger, better escorted and jammed, at the cost of a long gap in the carrier's CAP cycle
+function alphaStrike(h, tgt) {
+  if (!h || h.kind !== 'ship' || !h.carrier || !h.alive || h.dying || !tgt) return null;
+  const k = launchPackage(h, tgt, { n: 12, esc: 4, ew: 2, alpha: true });
+  if (!k) return null;
+  h.alpha = game.t + 150; h.cyc = { phase: 'launch', until: game.t + 150 };
+  if (h.side === game.side) message('大规模打击', `${h.name}甲板全力出动 · 目标 ${tgt.name} · 回收暂停约 2 分钟`, GOLD, 3);
+  else if (game.side && game.role !== 'watch') radio('预警', `侦测到${h.name}方向大批飞机起飞——敌方大规模空袭！`, '#ff5a4f');
+  return k;
+}
+// cyclic operations: a carrier alternates a launch window and a recovery window (the angled deck cannot recover
+// over aircraft being spotted on the waist catapults); a window ends early when its work is done
+const CYC = { launch: 45, recover: 70 };
+function deckCycle(h) {
+  if (h.kind !== 'ship' || !h.carrier) return;
+  const c = h.cyc || (h.cyc = { phase: 'launch', until: game.t + CYC.launch });
+  const waiting = (h.queue || []).length, airQ = (h.stack || []).length, busy = h.cats.some(k => k.plane && k.plane.state === 'cat');
+  if (c.phase === 'launch') {
+    if (h.alpha > game.t) return;
+    if (game.t > c.until || (!waiting && !busy && airQ >= 2)) { c.phase = 'recover'; c.until = game.t + CYC.recover; }
+  } else if (game.t > c.until || (!airQ && waiting && !(h.finalUntil > game.t))) { c.phase = 'launch'; c.until = game.t + CYC.launch; }
+}
+const deckOpen = (h, pl) => !(h.kind === 'ship' && h.carrier && h.cyc && h.cyc.phase === 'recover' && pl !== player && !(pl.task && pl.task.vector));
+const recoveryOpen = (h, pl) => !(h.kind === 'ship' && h.carrier && h.cyc && h.cyc.phase === 'launch' && pl !== player && pl.fuel > 200);
 function processQueues() {
+  for (const h of ships) if (h.alive && !h.dying) deckCycle(h);
   for (const h of ships.concat(bases)) {
     if (!h.queue || !h.queue.length || !h.alive || h.dying) continue;
     const pl = h.queue[0];
+    if (!deckOpen(h, pl)) continue;
     if (spotOnCatapult(pl)) { h.queue.shift(); pl.obj.visible = true; }
     else pl.state = 'queued';
   }
@@ -1976,6 +2021,7 @@ function processQueues() {
 
 /* ---------- ships: helm, damage control, wakes ---------- */
 function updateShip(s, dt) {
+  if (s.park) { s.parkT = (s.parkT || 0) - dt; if (s.parkT <= 0) { s.parkT = 2; const n = Object.values(s.hangar).reduce((a, b) => a + b, 0) - 6; s.park.forEach((m, i) => { m.visible = i < n && s.alive; }); } }
   if (s.dying) {
     s.sinkT += dt;
     // a sinking hull: steam where the sea reaches the boilers, burning fuel spreading on the water
@@ -2006,7 +2052,7 @@ function updateShip(s, dt) {
   fwdOf(s.heading, _a);
   s.vel.copy(_a).multiplyScalar(s.speed * K.move);
   s.pos.addScaledVector(s.vel, dt);
-  if (groundAt(s.pos.x + _a.x * s.radius, s.pos.z + _a.z * s.radius) > 0) { s.speed = 0; s.order = 0; damageShip(s, 30 * dt, null, null); if (mine(s) && Math.random() < dt) radio(s.name, '搁浅！', '#ff8a78'); }
+  if (terrainH(s.pos.x + _a.x * s.radius, s.pos.z + _a.z * s.radius) > -6 && !s.S.sub) { s.speed = 0; s.order = 0; damageShip(s, 30 * dt, null, null); if (mine(s) && Math.random() < dt) radio(s.name, '搁浅！', '#ff8a78'); }
   // fires burn until damage control puts them out
   // damage control: crews fight fires and flooding; a focused effort (player order, or the AI when burning) works much faster
   s.dcCd -= dt;
@@ -2068,7 +2114,7 @@ function shipAI(s) {
   if (s.evadeT > 0) { s.evadeT -= 1 / 30; want = s.evadeDir; spd = s.S.vmax; }
   // keep off the reefs
   fwdOf(want, _a);
-  for (const r of [1500, 3000]) if (groundAt(s.pos.x + _a.x * r, s.pos.z + _a.z * r) > -5) { want += 0.9; break; }
+  for (const r of [1500, 3000]) if (terrainH(s.pos.x + _a.x * r, s.pos.z + _a.z * r) > -12) { want += 0.9; break; }
   s.rudder = clamp(wrapA(s.heading - want) * 2.5, -1, 1);
   s.order = spd;
 }
@@ -2098,7 +2144,7 @@ function bestTarget(side, from, range) {
 }
 function updateCommand(side, dt) {
   const C = command[side];
-  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt);
+  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt); updatePhantoms(side, dt);
   aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
   const carrier = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
@@ -2248,23 +2294,17 @@ function updateCommand(side, dt) {
   // strike packages against the best target in reach
   for (const h of homes) {
     C.strikeCd[h.name] = (C.strikeCd[h.name] ?? 60) - 2.5;
-    if (C.strikeCd[h.name] > 0) continue;
+    if (C.strikeCd[h.name] > 0 || h.alpha > game.t) continue;
     // the main target if the package can reach it; otherwise the best target nearby (never idle while one exists)
-    let tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
+    const tgt = main && fresh(side, main, 150) && main.pos.distanceTo(h.pos) < 200000 ? main : bestTarget(side, h.pos, 150000);
     if (!tgt) continue;
-    const strikers = ['j15', 'j16', 'fa18'].filter(t => h.hangar[t] > 0);
-    const avail = strikers.reduce((n, t) => n + h.hangar[t], 0);
-    if (avail < 2) continue;
-    const n = Math.min(T.air === 'mass' ? 10 : 6, avail);
-    let lead = null; const members = [];
-    const pkg = newPackage(side, h, tgt);
-    for (let i = 0; i < n; i++) { const t = strikers.find(x => h.hangar[x] > 0); const p = launchFrom(h, t, 'strike', { target: tgt, low: T.air === 'low' }); if (p) { joinPackage(pkg, p); members.push(p); if (!lead) lead = p; } }
-    // a full package: fighter escort to clear the way and a jammer to blind the target's radars
-    let esc = 0;
-    for (let i = 0; i < (T.air === 'mass' ? 4 : 2); i++) { const t = pick(h, ['j35', 'f35c', 'fa18', 'j15']); if (t && launchFrom(h, t, 'escort', { lead, slot: [160, -160, 260, -260][i] })) esc++; }
-    const ew = pick(h, ['j15d', 'ea18g']); const ewp = ew && launchFrom(h, ew, 'ew', { pkg: lead, on: tgt });
-    C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
-    if (side === game.side) radio('空中指挥', `${h.name}出动第 ${pkg.id} 攻击编队：${n} 架突击机${esc ? ` + ${esc} 架护航` : ''}${ewp ? ' + 电子战机' : ''}，目标${tgt.name}${tgt === main ? '（主攻目标）' : ''}，集结点编队后统一出发。`, '#9fd4ff');
+    if (launchPackage(h, tgt, { n: T.air === 'mass' ? 10 : 6, esc: T.air === 'mass' ? 4 : 2 })) C.strikeCd[h.name] = 220 * (T.air === 'mass' || T.air === 'cap' ? 1.5 : 1);
+  }
+  // the decisive blow: an alpha strike (a deck-load from each carrier) once the enemy's main carrier is held
+  C.alphaCd = (C.alphaCd ?? 420) - 2.5;
+  if (!(side === game.side && game.role === 'cmd' && !game.staffAuto) && C.alphaCd <= 0 && main && main.carrier && fresh(side, main, 90)) {
+    const ready = homes.filter(h => h.kind === 'ship' && ['j15', 'j16', 'fa18'].reduce((n, t) => n + (h.hangar[t] || 0), 0) >= 8);
+    if (ready.length) { for (const h of ready) alphaStrike(h, main); C.alphaCd = 900; }
   }
   // the buddy tanker: one up whenever strike packages are out (a Super Hornet / J-15 with a refuelling store)
   if (count('tank') < 1 && (C.pkgs || []).some(k => k.phase === 'form' || k.phase === 'push')) {
@@ -2303,7 +2343,7 @@ function updateCommand(side, dt) {
       const pl = new Plane('us', 'b1b', null);
       pl.pilot = new Pilot(pl, 0.7); pl.role = 'bomber'; pl.task = { target: tgt || ships.find(s => s.side === 'cn' && s.alive) };
       pl.name = `B-1B ${callsign('us')}`;
-      pl.pos.set(THEATRE.exit - 8000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
+      pl.pos.set(THEATRE.air - 12000, 6000, rand(-30000, 30000) + i * 400); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
       planes.push(pl);
     }
     radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
@@ -2372,10 +2412,10 @@ const potential0 = { cn: 1, us: 1 };
 const STORY = {
   brief: {
     cn: ['架空 if 线。南海某争议海域，双方舰队已对峙七十二小时。一架侦察机在雷达锁定中坠海，谁先开火已无人能说清——冲突在数分钟内升级为全面交战。',
-      '舰队司令部命令：以福建舰编队与前哨岛礁机场为核心，发现并摧毁美国福特号航母打击群，在对方远程打击力量集结之前夺取制海权。',
+      '舰队司令部命令：以福建舰编队与永暑礁机场为核心，发现并摧毁美国福特号航母打击群，在对方远程打击力量集结之前夺取制海权。',
       '敌方舰空导弹可借 E-2D 数据链拦截地平线外的目标，舰载机联队规模更大。我方优势在于更远、更快的反舰导弹与岛礁陆基航空兵——先找到他们，再用一次齐射压垮他们的防空。'],
     us: ['架空 if 线。南海某争议海域，双方舰队已对峙七十二小时。一架侦察机在雷达锁定中坠海，谁先开火已无人能说清——冲突在数分钟内升级为全面交战。',
-      '第七舰队命令：福特号航母打击群保持远距离，以舰载机联队与 B-1B 远程打击摧毁福建舰编队及其前哨岛礁机场。',
+      '第七舰队命令：福特号航母打击群保持远距离，以舰载机联队与 B-1B 远程打击摧毁福建舰编队及其永暑礁机场。',
       '对方的鹰击系列反舰导弹射程更远、末段更快，我们的水面舰在导弹对射中处于劣势。保持距离，用 E-2D 看清战场，让舰载机与 LRASM 替你出拳；标准-6 与 CEC 会守住防空圈。']
   },
   chapters: [
@@ -2480,7 +2520,7 @@ addEventListener('blur', () => { input.keys.clear(); input.gun = input.boost = i
   tap($('b-cam'), cycleView);
   tap($('c-salvo'), () => { input.ashm = true; }); tap($('c-decoy'), () => { input.decoy = true; });
   tap($('c-target'), () => { input.target = true; }); tap($('c-view'), cycleView);
-  for (const b of document.querySelectorAll('[data-act]')) b.addEventListener('click', () => ({ map: toggleMap, scale: cycleScale, ai: toggleAI, pause: togglePause, support: callSupport })[b.dataset.act]());
+  for (const b of document.querySelectorAll('[data-act]')) b.addEventListener('click', () => ({ map: toggleMap, scale: cycleScale, ai: toggleAI, pause: togglePause, support: callSupport, units: toggleRoster })[b.dataset.act]());
   $('touch').addEventListener('contextmenu', e => e.preventDefault());
 }
 function readStick() {
@@ -2558,7 +2598,12 @@ function cruiseGuard(dt) {
   game.cruiseT = 0.5;
   const hot = threatNear();
   if (hot && game.scale > 1) { game.scale = 1; game.autoCruise = false; $('b-scale').textContent = '时间 ×1'; message('接敌 · 恢复实时', '', '#ffc861', 1.4); }
-  else if (!hot && game.ai && game.role === 'pilot' && game.scale === 1 && !game.noCruise && game.t > 5) { game.scale = 4; game.autoCruise = true; $('b-scale').textContent = '时间 ×4'; message('自动巡航 ×4', '航渡阶段时间加速 · 接敌自动恢复实时', '#9fd4ff', 1.6); }
+  else if (!hot && game.ai && game.role === 'pilot' && !game.noCruise && game.t > 5) {
+    // as fast as the device allows: a slow frame rate (each extra step costs a full simulation tick) caps it at x2
+    const want = perf.avg > 1 / 36 ? 2 : 4;
+    if (game.scale === 1) { game.scale = want; game.autoCruise = true; $('b-scale').textContent = `时间 ×${want}`; message(`自动巡航 ×${want}`, '航渡阶段时间加速 · 接敌自动恢复实时', '#9fd4ff', 1.6); }
+    else if (game.autoCruise && game.scale !== want) { game.scale = want; $('b-scale').textContent = `时间 ×${want}`; }
+  }
 }
 function toggleAI() {
   if (game.mode !== 'play' || game.role === 'watch') return;
@@ -2868,7 +2913,7 @@ let orbitA = 0.6, orbitE = 0.32;
     if (game.gunsight) { gunLay(dx, dy); return; }
     if (game.role === 'pilot') { look.yaw = clamp(look.yaw - dx * 0.008, -Math.PI, Math.PI); look.pitch = clamp(look.pitch + dy * 0.006, -1.2, 1.2); look.idle = 0; }
     else if (game.role === 'captain' && game.view === 1) { look.yaw -= dx * 0.005; look.pitch = clamp(look.pitch - dy * 0.004, -0.6, 0.5); }
-    else if (game.role === 'watch' && game.spec === 'free') { freeCam.yaw -= dx * 0.004; freeCam.pitch = clamp(freeCam.pitch - dy * 0.004, -1.4, 1.2); }
+    else if (camRole() && game.spec === 'free') { freeCam.yaw -= dx * 0.004; freeCam.pitch = clamp(freeCam.pitch - dy * 0.004, -1.4, 1.2); }
     else { orbitA -= dx * 0.007; orbitE = clamp(orbitE + dy * 0.005, 0.04, 1.45); }
   });
   const drop = e => {
@@ -2917,15 +2962,15 @@ function chaseMissile(m, dt) {
 }
 function ownMissile() {
   let best = null;
-  for (const m of missiles) if (m.alive && m.cls === 'ashm' && (m.owner === flagship || m.owner === player || (game.role === 'watch' && m.side === game.side)) && (!best || m.age < best.age)) best = m;
+  for (const m of missiles) if (m.alive && m.cls === 'ashm' && (m.owner === flagship || m.owner === player || (camRole() && m.side === game.side)) && (!best || m.age < best.age)) best = m;
   return best;
 }
 function director(dt) {
   game.viewT -= dt;
   const f = game.focus;
   const valid = f && (f.alive !== false) && !(f.kind === 'ship' && f.sinkT > 60);
-  if (game.role === 'watch' && game.spec === 'follow' && !valid) { game.spec = 'auto'; if (game.mode === 'play') specButtons(); }
-  if ((game.viewT <= 0 && !(game.role === 'watch' && game.spec === 'follow')) || !valid) {
+  if (camRole() && game.spec === 'follow' && !valid) { game.spec = 'auto'; if (game.mode === 'play') specButtons(); }
+  if ((game.viewT <= 0 && !(camRole() && game.spec === 'follow')) || !valid) {
     game.viewT = 12;
     const cands = [];
     for (const m of missiles) if (m.alive && m.cls === 'ashm' && m.target && m.target.pos && m.pos.distanceTo(m.target.pos) < 15000) cands.push([m, 5]);
@@ -2934,6 +2979,7 @@ function director(dt) {
     for (const s of ships) if (s.alive && !s.dying && s.fires > 0.5) cands.push([s, 2]);
     for (const s of ships) if (s.dying && s.sinkT < 50) cands.push([s, 4]);
     cands.push([ships.find(s => s.side === game.side && s.alive) || ships[0], 1]);
+    if (game.role === 'cmd') for (const c of cands) if (c[0] && c[0].side === game.side) c[1] += 1.5;
     cands.sort((a, b) => b[1] - a[1] + rand(-1, 1));
     if (cands[0] && cands[0][0] !== game.focus) game.snap = 2;   // a cut, not a pan, between shots
     game.focus = cands[0] && cands[0][0];
@@ -3010,7 +3056,7 @@ function updateCamera(dt) {
     else if (game.view === 2) { orbitE = 1.25; orbit(_d.copy(s.pos), s.S.L * 6 * (game.zoom || 1), dt); }
     else { if (orbitE > 1.2) orbitE = 0.3; orbit(_d.copy(s.pos).setY(20), s.S.L * 1.5 * (game.zoom || 1), dt); }
     if (game.view !== 1) fov = 55;
-  } else if (game.role === 'watch' && game.spec === 'free' && game.mode === 'play') updateFreeCam(dt);
+  } else if (camRole() && game.spec === 'free' && game.mode === 'play') updateFreeCam(dt);
   else director(dt);
   if (camera.position.y < 2) camera.position.y = 2;
   if (game.shake > 0.01 && !reduced) {
@@ -3387,7 +3433,7 @@ function drawHUD(dt) {
   if (game.role === 'pilot' && player && player.alive) drawPilot(dt);
   else if (game.role === 'captain' && game.gunsight && flagship && flagship.gun) drawGunsight();
   else if (game.role === 'captain') drawCaptain();
-  else { drawContacts(camera.position, 30000, 150000); const f = game.focus; if (f) text(f.kind === 'msl' ? `${f.spec.name} → ${f.target?.name || ''}` : f.name || '', HW / 2, HH - 40, '#eef3f5', `600 13px ${SANS}`, 'center'); }
+  else { drawContacts(camera.position, 30000, 150000); if (game.role === 'cmd' && $('spec').hidden) drawForce(); const f = game.focus; if (f) text(f.kind === 'msl' ? `${f.spec.name} → ${f.target?.name || ''}` : f.name || '', HW / 2, HH - (game.role === 'cmd' ? 128 : 66), '#eef3f5', `600 13px ${SANS}`, 'center'); }
   drawTop();
   // chapter card, messages, radio
   if (game.card && game.card.t > 0) {
@@ -3438,8 +3484,8 @@ function drawHUD(dt) {
 /* ---------- battle setup ---------- */
 let baseGroup = null;
 function clearBattle() {
-  for (const s of ships) scene.remove(s.obj);
-  for (const p of planes) scene.remove(p.obj);
+  for (const s of ships) { scene.remove(s.obj); if (s.lo) scene.remove(s.lo); }
+  for (const p of planes) { scene.remove(p.obj); if (p.lo) scene.remove(p.lo); }
   for (const m of missiles) scene.remove(m.mesh);
   for (const d of debris) scene.remove(d.mesh);
   if (baseGroup) scene.remove(baseGroup);
@@ -3479,9 +3525,10 @@ function precompile() {
 function startGame() {
   Sound.init();
   setupBattle();
-  Object.assign(game, { mode: 'play', t: 0, scale: 1, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
+  Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffAuto: game.role !== 'cmd', staffHold: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
     ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
-    stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 } });
+    stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 }, result: null,
+    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 } } });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
   $('b-scale').textContent = '时间 ×1'; $('b-ai').classList.remove('on'); $('b-map').classList.remove('on');
   precompile();
@@ -3543,27 +3590,71 @@ function checkEnd(dt) {
     const alive = ships.some(s => s.side === side && s.alive && !s.dying) || bases.some(b => b.side === side && b.alive);
     const p = potential(side) / potential0[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
-    if (!alive || p < 0.4 || (!carriers && p < 0.55)) { game.over = foe(side); game.endT = 5; message(game.over === game.side ? '胜利' : '战败', `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`, game.over === game.side ? '#8dffb4' : '#ff8a78', 5); return; }
+    if (!alive || p < 0.4 || (!carriers && p < 0.55)) { finish(foe(side), `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`); return; }
   }
-  // campaign deadline: after 45 minutes the side with less of its war potential left breaks off
+  // campaign deadline: after 45 minutes both fleets are spent; a close result is a strategic stalemate
   if (game.t > 2700) {
-    const lose = potential('cn') / potential0.cn < potential('us') / potential0.us ? 'cn' : 'us';
-    game.over = foe(lose); game.endT = 5; message(game.over === game.side ? '胜利' : '战败', `${SIDES[lose].name}无力再战，撤出战区`, game.over === game.side ? '#8dffb4' : '#ff8a78', 5); return;
+    const pm = potential('cn') / potential0.cn, pu = potential('us') / potential0.us;
+    if (Math.abs(pm - pu) < 0.06) { finish(null, '双方战争潜力相当，各自撤出战区'); return; }
+    const lose = pm < pu ? 'cn' : 'us';
+    finish(foe(lose), `${SIDES[lose].name}无力再战，撤出战区`);
   }
-  const pm = potential('cn') / potential0.cn, pu = potential('us') / potential0.us;
 }
+// the result in tiers: decisive / victory / Pyrrhic, stalemate, defeat / heavy defeat
+function finish(winner, why) {
+  game.over = winner || 'draw'; game.endT = 5;
+  const me = game.side, them = foe(me), L = game.ledger;
+  const cv = side => ships.filter(s => s.side === side && s.carrier);
+  const cvLost = side => cv(side).filter(s => !s.alive || s.dying).length;
+  let tier;
+  if (!winner) tier = 'draw';
+  else if (winner === me) tier = cvLost(them) === cv(them).length && cvLost(me) === 0 ? 'decisive' : cvLost(me) > 0 ? 'pyrrhic' : 'win';
+  else tier = cvLost(me) === cv(me).length ? 'rout' : 'lose';
+  game.result = { tier, why, pm: potential(me) / potential0[me], pt: potential(them) / potential0[them], base: bases.some(b => b.alive) };
+  const T = RESULT_TIERS[tier];
+  message(T.name, why, T.color, 5);
+}
+const RESULT_TIERS = {
+  decisive: { name: '决定性胜利', color: '#8dffb4', title: '夺取制海权' },
+  win: { name: '胜利', color: '#8dffb4', title: '夺取制海权' },
+  pyrrhic: { name: '惨胜', color: '#ffd28a', title: '代价惨重的胜利' },
+  draw: { name: '战略僵持', color: '#cfe8ff', title: '谁也没能赢下南海' },
+  lose: { name: '战败', color: '#ff8a78', title: '撤出战区' },
+  rout: { name: '惨败', color: '#ff5a4f', title: '舰队覆灭' }
+};
 function endGame() {
   game.mode = 'over';
-  const win = game.over === game.side;
+  const win = game.over === game.side || game.over === 'draw';
   if (settings.cine && !game.endShown) { game.endShown = true; game.mode = 'cine'; runEpilogue(win, () => { game.mode = 'over'; afterAction(win); }); return; }
   afterAction(win);
 }
 function afterAction(win) {
-  $('end-tag').textContent = win ? '胜利' : '战败';
-  $('end-title').textContent = win ? '夺取制海权' : '撤出战区';
-  $('end-text').textContent = CAMPAIGN.end[win ? 'win' : 'lose'][game.side].join('');
+  const R = game.result || { tier: win ? 'win' : 'lose', why: '' }, T = RESULT_TIERS[R.tier];
+  const me = game.side, them = foe(me), L = game.ledger;
+  $('end-tag').textContent = T.name; $('end-tag').style.color = T.color;
+  $('end-title').textContent = T.title;
+  const story = CAMPAIGN.end[R.tier === 'draw' ? 'draw' : win ? 'win' : 'lose'][me];
+  $('end-text').textContent = `${R.why}。` + story.join('');
   const S = game.stats, mm = Math.floor(game.t / 60);
   $('e-time').textContent = `${mm} 分`; $('e-kills').textContent = S.kills; $('e-ships').textContent = S.shipKills; $('e-traps').textContent = S.traps;
+  // the after-action report: both sides' ledgers, the objective, and a grade
+  if (L) {
+    const fired = dbg.by[me] || 0, hits = dbg.hitBy[me] || 0, stopped = Object.entries(dbg.fate[them] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0);
+    const row = (k, a, b) => `<tr><th>${k}</th><td>${a}</td><td>${b}</td></tr>`;
+    const base = me === 'cn' ? (R.base ? '永暑礁机场坚守' : '永暑礁机场失守') : (R.base ? '永暑礁机场仍在运转' : '永暑礁机场被摧毁');
+    const score = Math.round((1 - R.pt) * 600 - (1 - R.pm) * 400 + L.archers[me] * 8 + L.aew[me] * 25 + L.fooled[me] * 4 + (me === 'cn' ? (R.base ? 60 : -60) : (R.base ? -30 : 60)));
+    const grade = score > 420 ? 'S' : score > 300 ? 'A' : score > 180 ? 'B' : score > 60 ? 'C' : 'D';
+    $('e-report').innerHTML = `<table><thead><tr><th></th><td>${SIDES[me].short}</td><td>${SIDES[them].short}</td></tr></thead><tbody>
+      ${row('剩余战争潜力', `${Math.round(R.pm * 100)}%`, `${Math.round(R.pt * 100)}%`)}
+      ${row('舰艇损失', L.sunk[me].length ? L.sunk[me].join('、') : '无', L.sunk[them].length ? L.sunk[them].join('、') : '无')}
+      ${row('飞机损失', L.air[me], L.air[them])}
+      ${row('打掉的携弹「射手」', L.archers[me], L.archers[them])}
+      ${row('击落预警机 / 加油机', `${L.aew[me]} / ${L.tankers[me]}`, `${L.aew[them]} / ${L.tankers[them]}`)}
+      ${row('反舰导弹 发射 / 命中', `${fired} / ${hits}`, `${dbg.by[them] || 0} / ${dbg.hitBy[them] || 0}`)}
+      ${row('拦截敌导弹', stopped, Object.entries(dbg.fate[me] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0))}
+      ${row('被佯动骗走的敌弹', L.fooled[me], L.fooled[them])}
+      </tbody></table><p class="grade">战略目标：${base} · 战役评级 <b>${grade}</b></p>`;
+  }
   Sound.engine(0, 0, false); Sound.lockTone(false); Sound.rwrTone(false);
   show('end');
 }
@@ -3647,8 +3738,17 @@ function adapt(raw) {
   if (perf.scale !== was) applyQuality();
 }
 function lod() {
-  const far = HQ() ? 9000 : 5000;
+  const far = HQ() ? 9000 : 3500;
   for (const s of ships) if (s.lo && s.alive) { const lo = s.obj.position.distanceTo(camera.position) > far; s.obj.visible = !lo; s.lo.visible = lo; }
+  const pfar = HQ() ? 1600 : 1000, cull = 25000;
+  for (const p of planes) {
+    if (!p.lo) continue;
+    const d = p.obj.position.distanceTo(camera.position), show = p.state !== 'queued';
+    const hd = p === player || d < pfar;
+    p.obj.visible = show && hd && d < cull;
+    p.lo.visible = show && !hd && d < cull;
+    if (p.lo.visible) { p.lo.position.copy(p.obj.position); p.lo.quaternion.copy(p.obj.quaternion); }
+  }
 }
 function frame() {
   requestAnimationFrame(frame);
@@ -3716,4 +3816,4 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate };

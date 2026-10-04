@@ -419,6 +419,12 @@ const Navy = (() => {
     ciws(P, M, 120, Y - 2, 18, S.side === 'us' ? 'phalanx' : 'type1130');
     ciws(P, M, -140, Y - 2, -18, S.side === 'us' ? 'phalanx' : 'type1130');
     ciws(P, M, -120, Y - 2, 24, S.side === 'us' ? 'phalanx' : 'type1130');
+    if (S.side === 'cn') {
+      // HQ-10 short-range SAM launchers on the quarter sponsons, a bridge window band and a mast yard on the island
+      for (const [x, z] of [[-138, 22], [-130, -28], [128, -14]]) { P.push([block(x, z, 7, 6, 6, 5, Y - 3, 1.2), M.grey]); P.push([block(x, z, 4.6, 3.4, 4.2, 3.0, Y - 1.8, 3.4), M.light]); }
+      P.push([box(I.l * 0.86, 1.2, 0.3, I.x, Y + I.h * 0.82, I.z - I.w / 2 - 0.1), M.glass]);
+      P.push([box(0.4, 0.4, I.w * 1.6, I.x - 2, Y + I.h * 1.55 + 2, I.z), M.dark]);
+    }
     const group = assemble(P);
     return { group, spec: S };
   }
@@ -437,7 +443,7 @@ const Navy = (() => {
     const prof = [];
     for (let i = 0; i <= 40; i++) {
       const u = i / 40, x = -L / 2 + u * L;
-      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(1 - (u - 0.7) / 0.3, 1.25) + 0.15 : R;
+      const r = u < 0.12 ? R * Math.sqrt(Math.max(0, 1 - Math.pow(1 - u / 0.12, 2))) : u > 0.7 ? R * Math.pow(Math.max(0, 1 - (u - 0.7) / 0.3), 1.25) + 0.15 : R;
       prof.push(new THREE.Vector2(Math.max(r, 0.01), x));
     }
     const hullG = new THREE.LatheGeometry(prof, 28); hullG.rotateZ(-Math.PI / 2);

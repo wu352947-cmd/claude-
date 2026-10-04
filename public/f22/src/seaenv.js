@@ -10,7 +10,7 @@
      a high altocumulus deck in the sky dome, and distant cumulonimbus towers.
    - Wakes: each ship leaves a turbulent centre wake and Kelvin arms (19.5°) of foam that age and spread.
    Expects THREE in scope. Textures are loaded from assets/sea/ (relative URLs). */
-function createSeaEnv({ scene, renderer, hq, time, wind, islands = [], Lensflare, LensflareElement }) {
+function createSeaEnv({ scene, renderer, hq, time, wind, reefs = [], Lensflare, LensflareElement }) {
   const lerp = (a, b, t) => a + (b - a) * t;
   const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
   const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a), 0, 1); return t * t * (3 - 2 * t); };
@@ -165,8 +165,8 @@ vec3 swell(vec2 p, float dist, inout vec2 slope) {
     return lerp(lerp(at(x0, y0), at(x0 + 1, y0), fx), lerp(at(x0, y0 + 1), at(x0 + 1, y0 + 1), fx), fy);
   }
   // cumulus cover over the sea: one field drives both where clouds stand and where their shadows fall
-  const CU_SCALE = 34000, CU_BASE = 950;
-  const cuCover = (x, z) => noise(x / CU_SCALE, z / CU_SCALE, 0) * 0.75 + noise(x / CU_SCALE * 3.1, z / CU_SCALE * 3.1, 2) * 0.25;
+  const CU_SCALE = 34000, CU_BASE = 950, CLOUD_SPAN = 2 * CU_SCALE;
+  const cuCover = (x, z) => noise(x / CU_SCALE, z / CU_SCALE, 0) * 0.75 + noise(x / CU_SCALE * 3, z / CU_SCALE * 3, 2) * 0.25;
 
   /* ---------- lights and environment map ---------- */
   const hemi = new THREE.HemisphereLight(0xffffff, 0x444444, 1);
@@ -238,12 +238,16 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   let envRT = null;
 
   /* ---------- ocean ---------- */
-  const isl = islands.slice(0, 4);
-  while (isl.length < 4) isl.push({ x: 1e7, z: 1e7, rx: 1, rz: 1, rot: 0 });
-  const uIsl = { value: isl.map(I => new THREE.Vector4(I.x, I.z, I.rx, I.rz)) }, uIslRot = { value: isl.map(I => I.rot || 0) };
+  // reef bathymetry: the eight features nearest the camera (atoll rings, reef platforms, submerged banks)
+  const NREEF = 8, far4 = () => new THREE.Vector4(1e7, 1e7, 1, 1);
+  const uReefA = { value: Array.from({ length: NREEF }, far4) }, uReefB = { value: Array.from({ length: NREEF }, () => new THREE.Vector4(0, 0, 1, 0)) };
+  function pickReefs(p) {
+    const list = reefs.slice().sort((a, b) => (Math.hypot(a.a.x - p.x, a.a.y - p.z) - Math.max(a.a.z, a.a.w)) - (Math.hypot(b.a.x - p.x, b.a.y - p.z) - Math.max(b.a.z, b.a.w)));
+    for (let i = 0; i < NREEF; i++) { const r = list[i]; if (r) { uReefA.value[i].copy(r.a); uReefB.value[i].copy(r.b); } else { uReefA.value[i].set(1e7, 1e7, 1, 1); uReefB.value[i].set(0, 0, 1, 0); } }
+  }
   const waterUniforms = Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), {
     uWave, uWave2, uTime, uOcean: oceanTex, uNoise: noiseTex, uDeep: { value: new THREE.Color() }, uSSS: { value: new THREE.Color() },
-    uIsl, uIslRot, uCenter: { value: new THREE.Vector2() }, uDetail: { value: hq ? 1 : 0.85 }
+    uReefA, uReefB, uCenter: { value: new THREE.Vector2() }, uDetail: { value: hq ? 1 : 0.85 }
   });
   const waterMat = new THREE.ShaderMaterial({
     uniforms: waterUniforms, fog: true, side: THREE.DoubleSide,
@@ -262,7 +266,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         gl_Position = projectionMatrix * mvPosition;
         #include <fog_vertex>
       }`,
-    fragmentShader: `uniform sampler2D uOcean; uniform vec3 uDeep, uSSS; uniform vec4 uIsl[4]; uniform float uIslRot[4]; uniform float uDetail;
+    fragmentShader: `uniform sampler2D uOcean; uniform vec3 uDeep, uSSS; uniform vec4 uReefA[8]; uniform vec4 uReefB[8]; uniform float uDetail;
       #include <sea_waves>
       varying vec3 vWorld; varying vec2 vSlope; varying float vH;
       #include <fog_pars_fragment>
@@ -272,7 +276,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         vec2 q = rot(p, ang) / tile + vec2(uTime * spd / tile, 0.0);
         return texture2D(uOcean, q);
       }
-      float cuCover(vec2 p){ return texture2D(uNoise, p / ${CU_SCALE.toFixed(1)}).r * 0.75 + texture2D(uNoise, p / ${CU_SCALE.toFixed(1)} * 3.1).b * 0.25; }
+      float cuCover(vec2 p){ return texture2D(uNoise, p / ${CU_SCALE.toFixed(1)}).r * 0.75 + texture2D(uNoise, p / ${CU_SCALE.toFixed(1)} * 3.0).b * 0.25; }
       void main(){
         vec3 toCam = cameraPosition - vWorld; float dist = length(toCam); vec3 v = toCam / dist;
         float wa = atan(${WIND.y.toFixed(4)}, ${WIND.x.toFixed(4)});
@@ -311,22 +315,51 @@ vec4 cloudDeck(vec3 d, vec3 o) {
         float back = pow(max(dot(-v, SKY_SUN) * 0.5 + 0.5, 0.0), 3.0);
         float crest = clamp(vH * 0.8 + 0.35 + (l1.a - 0.5) * 0.6, 0.0, 1.5);
         body += uSSS * (0.10 + 0.5 * back) * crest * SKY_SUNC * (0.3 + sunUp) * shade * (1.0 - far);
-        // reef shallows: turquoise over sand, brightening toward the beach
-        float sh = 0.0;
-        for (int i = 0; i < 4; i++) {
-          vec2 dp = rot(vWorld.xz - uIsl[i].xy, -uIslRot[i]);
-          float e = length(dp / uIsl[i].zw);
-          sh = max(sh, 1.0 - smoothstep(1.0, 1.9, e));
+        // reef bathymetry: s = how shallow (1 reef flat awash, ~0.62 lagoon, falling to 0 down the outer slope),
+        // surf where the swell breaks on the outer edge of a rim or a reef platform
+        float s = 0.0, surf = 0.0, lag = 0.0;
+        for (int i = 0; i < 8; i++) {
+          vec4 A = uReefA[i], B = uReefB[i];
+          vec2 dp = rot(vWorld.xz - A.xy, -B.x);
+          float e = length(dp / A.zw);
+          if (e > 3.0) continue;
+          float sd = length(dp) * (e - 1.0) / max(e, 1e-3);
+          float si = 0.0, edge = 0.0;
+          if (B.z < 0.5) {
+            float dr = abs(sd);
+            si = dr < B.y ? 1.0 : sd < 0.0 ? mix(1.0, 0.62, smoothstep(B.y, B.y + 280.0, dr)) : 1.0 - smoothstep(B.y, B.y + 520.0, dr);
+            edge = sd > 0.0 ? 1.0 - smoothstep(0.0, 70.0, abs(dr - B.y - 12.0)) : 0.0;
+            if (sd < 0.0) lag = max(lag, smoothstep(B.y + 150.0, B.y + 500.0, dr));
+          } else if (B.z < 1.5) {
+            si = sd < 0.0 ? 1.0 : 1.0 - smoothstep(0.0, 460.0, sd);
+            edge = 1.0 - smoothstep(0.0, 60.0, abs(sd - 10.0));
+          } else si = sd < 0.0 ? 0.32 : 0.32 * (1.0 - smoothstep(0.0, 1500.0, sd));
+          s = max(s, si); surf = max(surf, edge);
         }
-        if (sh > 0.0) {
-          vec3 shallow = mix(vec3(0.02, 0.22, 0.24), vec3(0.18, 0.5, 0.46), sh * sh) * (amb * 1.2 + SKY_SUNC * sunUp * 0.8 * shade);
-          body = mix(body, shallow, sh);
+        if (lag > 0.0) s = max(s, 0.62 + 0.3 * smoothstep(0.62, 0.8, texture2D(uNoise, vWorld.xz / 420.0).g * 0.7 + texture2D(uNoise, vWorld.xz / 97.0).r * 0.3) * lag);   // coral heads in the lagoon
+        if (s > 0.002) {
+          vec2 cp = vWorld.xz;
+          float coral = texture2D(uNoise, cp / 90.0).g * 0.6 + texture2D(uNoise, cp / 23.0).r * 0.4;
+          vec3 mid = vec3(0.012, 0.17, 0.27), lagoon = vec3(0.03, 0.38, 0.45);
+          vec3 reefTop = mix(vec3(0.1, 0.43, 0.41), vec3(0.42, 0.57, 0.48), smoothstep(0.4, 0.8, coral));
+          reefTop = mix(reefTop, vec3(0.1, 0.2, 0.16), smoothstep(0.62, 0.8, coral) * 0.55);   // dark coral heads
+          vec3 sc = s < 0.35 ? mix(uDeep, mid, s / 0.35) : s < 0.7 ? mix(mid, lagoon, (s - 0.35) / 0.35) : mix(lagoon, reefTop, (s - 0.7) / 0.3);
+          vec3 lit = sc * (amb * 1.15 + SKY_SUNC * sunUp * 0.9 * shade);
+          body = mix(body, lit, smoothstep(0.0, 0.25, s));
+        }
+        float surfF = 0.0;
+        if (surf > 0.0) {
+          float n1 = texture2D(uNoise, vWorld.xz / 140.0 + vec2(uTime * 0.01, 0.0)).b;
+          float n2 = texture2D(uNoise, vWorld.xz / 37.0 - vec2(0.0, uTime * 0.03)).a;
+          surfF = surf * smoothstep(0.35, 0.75, 0.5 + 0.5 * sin(uTime * 1.3 + n1 * 9.0) * 0.6 + n2 * 0.5) * (1.0 - far * 0.7);
         }
         vec3 col = mix(body, refl, fres) + spec;
         // whitecaps on the steepest, highest crests
         float foam = smoothstep(0.3, 0.9, l2.b * 0.8 + l1.b * 0.5) * smoothstep(0.25, 0.7, vH + l1.a * 0.4) * (1.0 - far) * 0.6;
         foam *= 0.55 + 0.45 * texture2D(uNoise, vWorld.xz / 21.0).a;
+        foam *= 1.0 - smoothstep(0.45, 0.9, s);   // calm water inside the reef
         col = mix(col, (SKY_SUNC * sunUp * 0.9 * shade + amb * 0.9), foam * 0.75);
+        col = mix(col, (SKY_SUNC * sunUp * 0.95 * shade + amb * 1.0), surfF * 0.85);
         gl_FragColor = vec4(col, 1.0);
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
@@ -457,7 +490,9 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     }
   }
   function buildClouds() {
-    const span = 70000, step = hq ? 3000 : 3800;
+    // the field is one period of the cloud noise (2 x 68 km = 4 x CU_SCALE) and wraps round the camera, so the
+    // whole theatre has weather and the cumulus still sit over their own shadows
+    const span = CLOUD_SPAN, step = hq ? 3000 : 3800;
     for (let x = -span; x <= span; x += step) for (let z = -span; z <= span; z += step) {
       const px = x + rr(-0.4, 0.4) * step, pz = z + rr(-0.4, 0.4) * step;
       const c = cuCover(px, pz);
@@ -469,8 +504,10 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     for (let i = 0; i < 4; i++) {
       const a = rnd() * Math.PI * 2, d = rr(85000, 105000);
       const cx = Math.cos(a) * d, cz = Math.sin(a) * d, W = rr(7000, 10000);
+      const first = puffs.length;
       addCluster(cx, cz, W, rr(9000, 12000), CU_BASE, 1.2);
       for (let k = 0; k < 6; k++) puffs.push({ x: cx + rr(-1, 1) * W * 0.9, y: CU_BASE + rr(10500, 12000), z: cz + rr(-0.6, 0.6) * W, s: W * rr(0.5, 0.8), shade: 1, v: Math.floor(rnd() * 4), flip: 0, stretch: 2.2 });
+      for (let k = first; k < puffs.length; k++) puffs[k].cb = true;   // horizon towers keep their distance from the camera
     }
     cloudMat.uniforms.uAtlas.value = puffAtlas();
     const N = puffs.length;
@@ -491,12 +528,16 @@ vec4 cloudDeck(vec3 d, vec3 o) {
     if (!cloudMesh) return;
     const N = puffs.length;
     if (order.length !== N) { order.length = 0; for (let i = 0; i < N; i++) order.push(i); }
-    for (const p of puffs) p.d = (p.x - cam.x) ** 2 + (p.y - cam.y) ** 2 + (p.z - cam.z) ** 2;
+    const W2 = CLOUD_SPAN * 2, wrap = d => d - W2 * Math.floor((d + CLOUD_SPAN) / W2);
+    for (const p of puffs) {
+      p.ex = p.cb ? cam.x + p.x : cam.x + wrap(p.x - cam.x); p.ez = p.cb ? cam.z + p.z : cam.z + wrap(p.z - cam.z);
+      p.d = (p.ex - cam.x) ** 2 + (p.y - cam.y) ** 2 + (p.ez - cam.z) ** 2;
+    }
     order.sort((a, b) => puffs[b].d - puffs[a].d);
     const P = aPuff.array, I = aInfo.array;
     for (let k = 0; k < N; k++) {
       const p = puffs[order[k]];
-      P[k * 4] = p.x; P[k * 4 + 1] = p.y; P[k * 4 + 2] = p.z; P[k * 4 + 3] = p.s;
+      P[k * 4] = p.ex; P[k * 4 + 1] = p.y; P[k * 4 + 2] = p.ez; P[k * 4 + 3] = p.s;
       I[k * 4] = p.shade; I[k * 4 + 1] = p.v; I[k * 4 + 2] = p.flip; I[k * 4 + 3] = p.stretch;
     }
     aPuff.needsUpdate = true; aInfo.needsUpdate = true;
@@ -509,6 +550,8 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   const wPosA = new THREE.BufferAttribute(wPos, 2).setUsage(THREE.DynamicDrawUsage), wAttA = new THREE.BufferAttribute(wAtt, 4).setUsage(THREE.DynamicDrawUsage);
   const wIdxA = new THREE.BufferAttribute(wIdx, 1).setUsage(THREE.DynamicDrawUsage);
   wakeGeo.setAttribute('position', wPosA); wakeGeo.setAttribute('aW', wAttA); wakeGeo.setIndex(wIdxA);
+  // positions are (x, z) pairs, which three cannot bound: give it a sphere so it never tries
+  wakeGeo.boundingSphere = new THREE.Sphere(new THREE.Vector3(), 1e9);
   const wakeMat = new THREE.ShaderMaterial({
     uniforms: Object.assign(THREE.UniformsUtils.clone(THREE.UniformsLib.fog), { uWave, uWave2, uTime, uNoise: noiseTex }),
     fog: true, transparent: true, depthWrite: false, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: -4, polygonOffsetUnits: -4,
@@ -700,7 +743,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
   // the environment map waits for the noise texture (the cloud deck shows in reflections)
   ready.then(() => { if (envRT) envRT.dispose(); envSky.material.needsUpdate = true; envRT = pmrem.fromScene(envScene, 0.015); scene.environment = envRT.texture; });
 
-  let sortT = 0;
+  let sortT = 0, reefT = 0;
   const tmp = new THREE.Vector3();
   return {
     TIMES, SUN, FOG_D, fogColor, sunLight, water, waterMat, ready, smokeTex, glowTex, setTime, waveHeight, wakeTrack,
@@ -709,6 +752,7 @@ vec4 cloudDeck(vec3 d, vec3 o) {
       sky.position.copy(p);
       const sn = hq ? 2 : 3;
       waterUniforms.uCenter.value.set(Math.round(p.x / sn) * sn, Math.round(p.z / sn) * sn);
+      reefT -= dt; if (reefT <= 0) { reefT = 0.5; pickReefs(p); }
       if (flare) flare.position.copy(tmp.copy(SUN).multiplyScalar(90000).add(p));
       sortT -= dt;
       if (sortT <= 0) { sortT = 0.25; sortClouds(p); }

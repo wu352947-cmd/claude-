@@ -178,7 +178,15 @@
   #tac-desc { margin: 0; font-size: 11px; color: var(--muted); line-height: 1.5; min-height: 1.5em; }
   /* ---------- naval command: engine telegraph, ability bar ---------- */
   #gears { position: absolute; left: calc(8px + env(safe-area-inset-left, 0px)); top: 24%; display: grid; gap: 4px; z-index: 2; }
-  #gears[hidden], #abil[hidden], #spec[hidden], #specbar[hidden] { display: none; }
+  #gears[hidden], #abil[hidden], #spec[hidden], #specbar[hidden], #cmdbar[hidden] { display: none; }
+  #cmdbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(62px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; max-width: 96vw; }
+  #cmdbar button { appearance: none; cursor: pointer; font: 700 12px/1.15 var(--f-body); color: var(--fg); background: rgba(20, 16, 6, 0.72); border: 1px solid rgba(227, 178, 87, 0.7); padding: 10px 12px; min-width: 64px; }
+  #cmdbar button.on { background: var(--gold); color: #1c1407; border-color: var(--gold); }
+  #cmdbar button.cd { opacity: 0.5; }
+  #cmdbar button small { display: block; font: 500 10px/1 var(--f-mono); color: var(--muted); margin-top: 3px; }
+  #spec .rhead { padding: 8px 10px; font: 700 12px/1.3 var(--f-body); color: var(--gold); border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
+  #spec .rhead button { appearance: none; cursor: pointer; font: 600 11px/1 var(--f-body); color: var(--fg); background: transparent; border: 1px solid var(--line); padding: 5px 8px; }
+  #spec li.sep { font: 600 10px/1 var(--f-mono); color: var(--muted); letter-spacing: 0.12em; padding: 9px 6px 4px; }
   #gears button { appearance: none; touch-action: none; cursor: pointer; font: 700 11px/1 var(--f-body); color: var(--muted); width: 50px; height: 30px;
     background: rgba(8, 14, 20, 0.55); border: 1px solid rgba(238, 243, 245, 0.25); }
   #gears button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
@@ -194,8 +202,8 @@
   .ab small { position: absolute; right: 3px; top: 2px; font: 600 9px/1 var(--f-mono); color: var(--muted); z-index: 1; }
   .ab.act { border-color: var(--hud); box-shadow: 0 0 0 2px rgba(141, 255, 180, 0.35) inset; }
   .ab.off { opacity: 0.45; }
-  #touch.desk #gears, #touch.desk #abil { display: grid; }
-  #touch.desk #abil { display: flex; }
+  #touch.desk #gears:not([hidden]) { display: grid; }
+  #touch.desk #abil:not([hidden]) { display: flex; }
 
   /* ---------- spectator: unit list and camera bar ---------- */
   #specbar { position: absolute; left: 50%; transform: translateX(-50%); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
@@ -204,6 +212,14 @@
   #spec { position: fixed; left: calc(10px + env(safe-area-inset-left, 0px)); top: calc(54px + env(safe-area-inset-top, 0px)); bottom: calc(64px + env(safe-area-inset-bottom, 0px)); width: min(300px, 44vw);
     background: rgba(6, 10, 14, 0.86); border: 1px solid var(--line); display: grid; grid-template-rows: auto 1fr; pointer-events: auto; }
   #spec .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; border-bottom: 1px solid var(--line); }
+  #spec .tabs[hidden] { display: none; }
+  #e-report table { width: 100%; border-collapse: collapse; font: 500 12px/1.4 var(--f-body); margin: 6px 0 4px; }
+  #e-report th { text-align: left; color: var(--muted); font-weight: 500; padding: 4px 6px 4px 0; white-space: nowrap; }
+  #e-report td { padding: 4px 6px; color: var(--fg); border-left: 1px solid var(--line); }
+  #e-report thead td { color: var(--gold); font-weight: 700; }
+  #e-report tr + tr th, #e-report tr + tr td { border-top: 1px solid rgba(238, 243, 245, 0.07); }
+  #e-report .grade { font: 600 13px/1.5 var(--f-body); color: var(--muted); margin: 6px 0 0; }
+  #e-report .grade b { color: var(--gold); font-size: 20px; margin-left: 4px; }
   #spec .tabs button { appearance: none; cursor: pointer; font: 600 11px/1 var(--f-body); color: var(--muted); background: transparent; border: 1px solid var(--line); padding: 6px 8px; }
   #spec .tabs button.on { color: #1c1407; background: var(--gold); border-color: var(--gold); }
   #spec ul { list-style: none; margin: 0; padding: 4px; overflow-y: auto; }
@@ -269,6 +285,14 @@
     <button type="button" id="sp-free">自由</button>
     <button type="button" id="sp-take">接管</button>
   </div>
+  <div id="cmdbar" hidden>
+    <button type="button" id="cm-alpha">大规模打击</button>
+    <button type="button" id="cm-strike">攻击编队</button>
+    <button type="button" id="cm-cap">加强巡逻</button>
+    <button type="button" id="cm-emcon">电磁静默</button>
+    <button type="button" id="cm-feint">电子佯动</button>
+    <button type="button" id="cm-staff">参谋：手动</button>
+  </div>
   <div class="cluster" id="cap-ctl" hidden>
     <button class="tb sm" id="c-view" type="button">视角</button>
     <button class="tb" id="c-target" type="button">目标</button>
@@ -288,6 +312,7 @@
 </div>
 <div id="topbar" hidden>
   <button type="button" id="b-map" data-act="map">战术地图</button>
+  <button type="button" id="b-units" data-act="units">切换单位</button>
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-support" data-act="support">战区支援</button>
@@ -383,6 +408,7 @@
       <dt>时长</dt><dt>击落</dt><dt>击沉</dt><dt>着舰</dt>
       <dd id="e-time">0</dd><dd id="e-kills">0</dd><dd id="e-ships">0</dd><dd id="e-traps">0</dd>
     </dl>
+    <div id="e-report"></div>
     <div class="row">
       <button class="btn primary" id="b-again" type="button">再战一场</button>
       <button class="btn" id="b-home" type="button">主菜单</button>

@@ -161,11 +161,14 @@ function setTactic(kind, id, side = game.side) {
 }
 // the AI commanders pick their doctrines from the situation
 function aiTactics(side, dt) {
-  if (side === game.side && game.role !== 'watch') return;
+  // the player's side: the commander decides (the staff only advises when told to run things); a pilot's or
+  // captain's staff keeps adapting, but leaves alone for five minutes a doctrine the player set by hand
+  if (side === game.side && game.role !== 'watch' && (game.role === 'cmd' ? !game.staffAuto : game.staffHold > game.t)) return;
   const C = command[side];
   C.tacT = (C.tacT ?? 30) - dt;
   if (C.tacT > 0) return;
   C.tacT = 45;
+  if (C.dodge) return;   // riding out an enemy satellite pass under EMCON
   // read the situation the way a staff would: what threatens us, what the enemy can still see, how strong the
   // main target's defences are, and who is winning the air
   const foeKnown = !!enemyFleet(side);
@@ -216,7 +219,8 @@ function airSweeps(side, dt) {
   // stop short of the enemy ships' missile umbrella
   const own = fleetCentre(side) || ZERO;
   const dir = _a.subVectors(point, own).setY(0); const L = dir.length();
-  if (foeC && t === 'sweep') point = own.clone().addScaledVector(dir.normalize(), Math.max(0, L - 30000));
+  // stop short of the enemy group's area-defence umbrella (SM-6 / HHQ-9B reach plus margin)
+  if (foeC && t === 'sweep') point = own.clone().addScaledVector(dir.normalize(), Math.max(0, L - 52000));
   let n = 0;
   for (const h of homes) for (let i = 0; i < 2 && n < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => h.hangar[x] > 0); if (ty) { const p = launchFrom(h, ty, 'sweep', { point, hunt: t === 'hunt' }); if (p) n++; } }
   if (n && side === game.side) radio('空中指挥', `${n} 架战斗机${t === 'hunt' ? '前出猎杀敌预警机' : '执行战斗机扫荡'}。`, '#9fd4ff');
@@ -242,7 +246,9 @@ function playerIntent(tgt, point) {
   const cur = intentState(game.side);
   if (tgt && cur && cur.tgt === tgt && cur.src === 'player') return;
   setIntent(game.side, tgt ? { tgt, src: 'player' } : { point: point.clone().setY(0), src: 'player' });
-  intentOrders(game.side);
+  // the staff acknowledges (and retasks aircraft already out) once the commander's choice has settled, so a
+  // captain flicking through targets does not flood the net with orders
+  command[game.side].ackAt = game.t + 2.5;
 }
 // the main target if it is still worth pursuing (alive); point intents have none
 function intentTarget(side) {
@@ -269,6 +275,7 @@ function axisDir(side, from, out) {
 // AI commanders: commit to a main effort and hold it (a main effort that changes every minute is no main effort)
 function updateIntent(side, dt) {
   const C = command[side], I = intentState(side);
+  if (C.ackAt && game.t >= C.ackAt) { C.ackAt = 0; intentOrders(side); }
   C.intT = (C.intT ?? 0) - dt;
   const dead = I && I.tgt && (!I.tgt.alive || I.tgt.dying);
   if (dead && I.src === 'player' && side === game.side) radio('作战指挥', `主攻目标${I.tgt.name}已被摧毁！按预案转入下一目标。`, GOLD);
@@ -364,7 +371,12 @@ function updatePackages(side) {
     if (k.phase === 'form') {
       const up = air.filter(p => p.airborne), there = up.filter(p => p.pos.distanceTo(k.rv) < 7000);
       k.ready = there.length; k.total = air.length;
-      if (air.length && (there.length === air.length || game.t - k.t > PKG_FORM_MAX) && up.length) {
+      // packages against the same target from other decks wait for each other and push together
+      const sibs = C.pkgs.filter(o => o !== k && o.phase === 'form' && o.tgt === k.tgt && Math.abs(o.t - k.t) < 120);
+      const sibWait = sibs.some(o => !o.readyAll && game.t - o.t < PKG_FORM_MAX);
+      k.readyAll = air.length && there.length === air.length;
+      if (air.length && ((k.readyAll && !sibWait) || k.pushNow || game.t - k.t > PKG_FORM_MAX) && up.length) {
+        for (const o of sibs) o.pushNow = true;
         k.phase = 'push'; k.pushT = game.t;
         // stragglers still on deck are released to attack on their own
         for (const p of air) if (!p.airborne) p.task.pkg = null;
@@ -439,6 +451,16 @@ function isrFix(side, e, err) {
 }
 function updateISR(side, dt) {
   const C = command[side], R = ISR[side], foe = SIDES[side].foe;
+  // the other side's orbits are known: a staff (AI, or the player's staff on automatic) goes quiet for the pass
+  // unless it is in a missile fight, and restores its posture after; the player is warned 20 s ahead
+  const Cf = command[foe], soon = (Cf.satT ?? 99) < 20 || Cf.satEnd > game.t;
+  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : !(game.staffHold > game.t));
+  if (soon && !C.dodge && staffRuns && tac(side).navy !== 'emcon' && !missiles.some(m => m.alive && m.cls === 'ashm' && m.side === foe && m.target && m.target.side === side)) {
+    C.dodge = tac(side).navy; setTactic('navy', 'emcon', side);
+    if (side === game.side) radio('参谋部', '敌侦察卫星即将过顶，舰队转入电磁静默规避定位。', '#9fd4ff');
+  } else if (!soon && C.dodge) { if (tac(side).navy === 'emcon') setTactic('navy', C.dodge, side); C.dodge = null; C.dodgeEnd = game.t; }
+  if (side === game.side && game.role !== 'watch' && (Cf.satT ?? 99) < 20 && !C.satWarned && !staffRuns) { C.satWarned = true; radio('预警', '敌侦察卫星 20 秒后过顶——考虑电磁静默。', '#ffd28a'); }
+  if (Cf.satT > 25) C.satWarned = false;
   C.satT = (C.satT ?? R.first) - dt;
   if (C.satT <= 0) {
     C.satT = R.period; C.satEnd = game.t + R.dur; C.satN = 0;
@@ -463,6 +485,99 @@ function updateISR(side, dt) {
       for (const e of ships) if (e.side === foe && e.alive && !e.dying && !submerged(e) && (e.carrier || e.S.L > 150) && !(tac(foe).navy === 'emcon' && !(e.emconBreak > game.t)) && Math.random() < 0.7) isrFix(side, e, 6000);
     }
   }
+}
+
+/* ---------- electronic deception: phantom carrier groups ----------
+   A fleet that has gone quiet can project a false picture: decoy emitters (and the jammers' deception modes)
+   paint a carrier group 20-30 km off the real one. The enemy's ESM-quality track of it is as good as any other,
+   so it can draw strikes, ballistic missiles and the enemy's main effort - until a real look exposes it: a radar
+   within 40 km, a satellite pass, or missiles that arrive and find empty sea. */
+let phantomN = 0;
+function deployPhantom(side, quiet) {
+  const C = command[side], foe = SIDES[side].foe;
+  const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
+  if (!cv) return null;
+  const ax = axisDir(side, cv.pos, new V3()), sgn = Math.random() < 0.5 ? 1 : -1, d = rand(20000, 30000);
+  const off = new V3(-ax.z * sgn, 0, ax.x * sgn).multiplyScalar(d).addScaledVector(ax, rand(-6000, 6000));
+  const ph = { kind: 'ship', phantom: true, side, name: cv.name, key: 'ph' + (++phantomN), alive: true, dying: false, carrier: true, value: cv.value,
+    hp: cv.maxHp, maxHp: cv.maxHp, S: { type: cv.S.type, sub: false, model: cv.S.model, L: cv.S.L, B: cv.S.B, radar: 0 }, rcs: cv.rcs, radius: cv.radius,
+    sam: {}, ashm: {}, pos: cv.pos.clone().add(off), vel: cv.vel.clone(), off, until: game.t + 420, heading: cv.heading };
+  C.phantoms = (C.phantoms || []).concat(ph);
+  picture[foe].set(ph, { pos: ph.pos.clone(), vel: ph.vel.clone(), t: game.t - 3, first: game.t, coarse: 900 });
+  if (side === game.side && !quiet) radio('电子战', `电子佯动展开：在${Math.round(d / 1000)} km 外制造一个假航母编队信号。`, '#9fd4ff');
+  return ph;
+}
+function revealPhantom(ph, side, why) {
+  if (!ph.alive) return;
+  picture[side].delete(ph);
+  const wasted = missiles.filter(m => m.alive && m.target === ph).length;
+  if (game.ledger) game.ledger.fooled[ph.side] += wasted;
+  for (const m of missiles) if (m.alive && m.target === ph) m.target = null;
+  if (side === game.side) radio('情报', `识破电子假目标：所谓「${ph.name}」${why}`, '#ffd28a');
+  else if (ph.side === game.side) radio('电子战', `敌方识破了我方佯动信号（${why}）。`, '#ffd28a');
+  ph.exposed = (ph.exposed || 0) + 1;
+}
+function updatePhantoms(side, dt) {
+  const C = command[side], foe = SIDES[side].foe;
+  C.phT = (C.phT ?? 240) - dt;
+  // the staff deploys one when the fleet is quiet and the enemy is hunting for it
+  const staffRuns = side !== game.side || game.role === 'watch' || (game.role === 'cmd' ? game.staffAuto : true);
+  // (not into an enemy satellite pass: a SAR strip of empty sea would expose it at once)
+  const satClear = !(command[foe].satEnd > game.t) && (command[foe].satT ?? 99) > 40;
+  // right after a pass (the enemy has just refreshed its picture) or whenever the fleet is quiet
+  if (staffRuns && C.phT <= 0 && satClear && (tac(side).navy === 'emcon' || game.t - (C.dodgeEnd || -999) < 90) && !(C.phantoms || []).some(p => p.alive)) { C.phT = 420; deployPhantom(side); }
+  for (const ph of C.phantoms || []) {
+    if (!ph.alive) continue;
+    const cv = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
+    if (!cv || game.t > ph.until) { ph.alive = false; picture[foe].delete(ph); continue; }
+    // it keeps station on the real group's course, so it moves like a fleet
+    ph.pos.copy(cv.pos).add(ph.off); ph.vel.copy(cv.vel); ph.heading = cv.heading;
+    ph.tickT = (ph.tickT || 0) - dt;
+    if (ph.tickT <= 0 && picture[foe].has(ph)) { ph.tickT = 6; const tr = picture[foe].get(ph); tr.pos.copy(ph.pos).add(_in1.set(rand(-600, 600), 0, rand(-600, 600))); tr.vel.copy(ph.vel); tr.t = game.t - 3; }
+    if (!picture[foe].has(ph)) continue;
+    // exposure: a real radar looks, a satellite images empty sea, or missiles arrive and find nothing
+    for (const sn of sensorsOf(foe)) if (sn.r > 20000 && sn.u.pos.distanceTo(ph.pos) < 40000) { revealPhantom(ph, foe, '雷达近距离抵近，该海域并无舰船'); break; }
+    if (!picture[foe].has(ph)) continue;
+    if (command[foe].satEnd > game.t && Math.random() < dt * 0.03) { revealPhantom(ph, foe, '卫星成像该海域空无一舰'); continue; }
+    for (const m of missiles) if (m.alive && m.side === foe && m.target === ph && Math.hypot(m.pos.x - ph.pos.x, m.pos.z - ph.pos.z) < 3000) { revealPhantom(ph, foe, '导弹抵达目标区未发现舰船'); break; }
+  }
+}
+
+/* ---------- the commander's force panel: the whole side at a glance ---------- */
+function drawForce() {
+  const me = game.side, foeS = SIDES[me].foe, C = command[me], compact = HH < 480;
+  game.cmdBtnT = (game.cmdBtnT || 0) - 1; if (game.cmdBtnT <= 0) { game.cmdBtnT = 20; cmdButtons(); }
+  const lines = [];
+  const main = intentTarget(me), I = intentState(me), fc = fleetCentre(me);
+  const ip = intentPos(me, _in2);
+  lines.push([main ? `主攻 · ${main.name}${fc && ip ? ` · ${Math.round(ip.distanceTo(fc) / 1000)} km` : ''}${I && I.src !== 'player' ? '（参谋建议）' : ''}` : I && I.point ? '主攻 · 指定海域' : '主攻 · 未定（地图点选敌舰）', GOLD]);
+  const own = ships.filter(s => s.side === me && s.alive && !s.dying);
+  const air = planes.filter(p => p.side === me && p.alive && !p.dying && p.airborne);
+  const by = r => air.filter(p => p.role === r).length;
+  const hangar = own.concat(bases.filter(b => b.side === me && b.alive)).reduce((n, h) => n + (h.hangar ? Object.values(h.hangar).reduce((a, b) => a + b, 0) : 0), 0);
+  lines.push([`我方 · 舰 ${own.length} · 空中 ${air.length}（巡逻 ${by('cap')} · 突击 ${by('strike') + by('bomber')} · 护航 ${by('escort') + by('ew')}）· 机库 ${hangar}`, '#cfe8ff']);
+  for (const h of own.filter(s => s.carrier)) {
+    const c = h.cyc, ph = h.alpha > game.t ? '大规模出动' : c ? (c.phase === 'launch' ? '弹射窗口' : '回收窗口') : '';
+    lines.push([`  ${h.name} ${Math.round(h.hp / h.maxHp * 100)}% · ${ph}${c ? ` ${Math.max(0, Math.ceil(c.until - game.t))}s` : ''} · 待射 ${(h.queue || []).length} · 待降 ${(h.stack || []).length}`, h.hp < h.maxHp * 0.5 ? '#ff8a78' : '#9fb0ba']);
+  }
+  for (const k of (C.pkgs || []).filter(k => k.phase === 'form' || k.phase === 'push'))
+    lines.push([`  第 ${k.id} 编队${k.alpha ? '（大规模）' : ''} · ${k.phase === 'form' ? `集结 ${k.ready || 0}/${k.total || 0}` : '已出发'} → ${k.tgt.name}`, '#9fd4ff']);
+  const kShips = [...picture[me].keys()].filter(e => e.kind === 'ship' && e.alive && !e.dying).length;
+  const kAir = [...picture[me].keys()].filter(e => e.kind === 'plane' && e.alive && !e.dying).length;
+  const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side !== me && m.target && m.target.side === me).length;
+  lines.push([`敌情 · 已知舰 ${kShips} · 机 ${kAir}${inbound ? ` · 来袭导弹 ${inbound}` : ''}`, inbound ? '#ff8a78' : '#ffb4a8']);
+  const Cf = command[foeS];
+  if (Cf.satEnd > game.t) lines.push([`⚠ 敌侦察卫星过顶中 ${Math.ceil(Cf.satEnd - game.t)}s`, '#ffd28a']);
+  else if ((Cf.satT ?? 99) < 30) lines.push([`敌侦察卫星 ${Math.ceil(Cf.satT)}s 后过顶`, '#ffd28a']);
+  const T = tac(me); lines.push([`战术 · ${TACTICS.navy[T.navy].name} / ${TACTICS.air[T.air].name} · 参谋${game.staffAuto ? '自动' : '手动'}`, '#9fb0ba']);
+  const x = 12, y0 = compact ? 50 : 58, lh = compact ? 14 : 16;
+  hc.save();
+  hc.font = `600 ${compact ? 10 : 11}px ${SANS}`;
+  const w = Math.min(HW * 0.46, Math.max(...lines.map(l => hc.measureText(l[0]).width)) + 16);
+  hc.fillStyle = 'rgba(6,10,14,0.62)'; hc.fillRect(x - 6, y0 - lh + 2, w, lines.length * lh + 8);
+  hc.textAlign = 'left';
+  lines.forEach(([t, c], i) => { hc.fillStyle = c; hc.fillText(t, x, y0 + i * lh); });
+  hc.restore();
 }
 
 /* ---------- anti-submarine warfare: hunter-killer groups ----------
@@ -533,7 +648,7 @@ function toggleMap() {
   $('tac').hidden = !TM.open; $('touch').style.visibility = $('topbar').style.visibility = TM.open ? 'hidden' : '';
   if (TM.open) { TM.follow = true; TM.sel = null; TM.pt = null; renderTacOrders(); renderTacCard(); }
 }
-function tacOwn() { return player || flagship || (game.role === 'watch' ? game.focus : null); }
+function tacOwn() { return player || flagship || (camRole() ? game.focus : null); }
 function tacToScreen(x, z) { const s = Math.min(HW, HH) / TM.span; return [HW / 2 + (x - TM.cx) * s, HH / 2 + (z - TM.cz) * s]; }
 function tacToWorld(px, py) { const s = Math.min(HW, HH) / TM.span; return [TM.cx + (px - HW / 2) / s, TM.cz + (py - HH / 2) / s]; }
 function drawTacMap() {
@@ -548,7 +663,17 @@ function drawTacMap() {
   const [wx0, wz0] = tacToWorld(0, 0), [wx1, wz1] = tacToWorld(HW, HH);
   for (let g = Math.floor(wx0 / step) * step; g <= wx1; g += step) { const [x] = P(g, 0); hc.beginPath(); hc.moveTo(x, 0); hc.lineTo(x, HH); hc.stroke(); }
   for (let g = Math.floor(wz0 / step) * step; g <= wz1; g += step) { const [, y] = P(0, g); hc.beginPath(); hc.moveTo(0, y); hc.lineTo(HW, y); hc.stroke(); }
-  for (const I of ISLANDS) { const [x, y] = P(I.x, I.z); hc.fillStyle = 'rgba(201,187,142,0.8)'; hc.beginPath(); hc.ellipse(x, y, Math.max(2, I.rx * s), Math.max(1.5, I.rz * s), -(I.rot || 0), 0, Math.PI * 2); hc.fill(); }
+  // the reefs: atoll rings and reef platforms in reef cyan, banks faint, land in sand, names when there is room
+  for (const F of REEFS) {
+    const [x, y] = P(F.x, F.z), rx = Math.max(2, F.rx * s), ry = Math.max(1.5, F.rz * s);
+    if (x < -rx - 60 || y < -ry - 60 || x > HW + rx + 60 || y > HH + ry + 60) continue;
+    hc.beginPath(); hc.ellipse(x, y, rx, ry, F.rot, 0, Math.PI * 2);
+    if (F.type === 0) { hc.strokeStyle = 'rgba(98,214,205,0.55)'; hc.lineWidth = Math.max(1.5, (F.w || 200) * 2 * s); hc.stroke(); hc.fillStyle = 'rgba(40,150,160,0.12)'; hc.fill(); }
+    else if (F.type === 1) { hc.fillStyle = 'rgba(98,214,205,0.35)'; hc.fill(); }
+    else { hc.fillStyle = 'rgba(60,140,170,0.1)'; hc.fill(); }
+    if (TM.span < 140000 || F.base) { hc.font = `500 10px ${SANS}`; hc.fillStyle = 'rgba(160,220,215,0.75)'; hc.textAlign = 'center'; hc.fillText(F.name, x, y + ry + 12); }
+  }
+  for (const I of ISLANDS) { const [x, y] = P(I.x, I.z); hc.fillStyle = 'rgba(214,200,158,0.9)'; hc.beginPath(); hc.ellipse(x, y, Math.max(1.5, I.rx * s), Math.max(1.2, I.rz * s), I.rot || 0, 0, Math.PI * 2); hc.fill(); }
   // own weapon envelopes around the player's unit
   if (own && own.pos && own.kind === 'ship') {
     const rings = [];
@@ -627,6 +752,13 @@ function drawTacMap() {
   if (Cm.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#9fd4ff'; hc.textAlign = 'left'; hc.fillText(`🛰 己方侦察卫星过顶 · ${Math.ceil(Cm.satEnd - game.t)} s`, 16, 72); }
   const Cf = command[SIDES[me].foe];
   if (Cf.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#ffd28a'; hc.textAlign = 'left'; hc.fillText(`⚠ 敌方侦察卫星过顶 · ${Math.ceil(Cf.satEnd - game.t)} s`, 16, 88); }
+  // our own deception: the phantom groups we are projecting (dashed, so they are never mistaken for real ships)
+  for (const ph of command[me].phantoms || []) {
+    if (!ph.alive) continue;
+    const [x, y] = P(ph.pos.x, ph.pos.z), seen = picture[SIDES[me].foe].has(ph);
+    hc.strokeStyle = BLUE; hc.globalAlpha = 0.7; hc.setLineDash([3, 3]); hc.lineWidth = 1.2; hc.beginPath(); hc.arc(x, y, 9, 0, Math.PI * 2); hc.stroke(); hc.setLineDash([]);
+    hc.font = `600 10px ${SANS}`; hc.fillStyle = BLUE; hc.textAlign = 'center'; hc.fillText(`佯动${seen ? ' · 在敌方态势图中' : ' · 已被识破'}`, x, y - 13); hc.globalAlpha = 1;
+  }
   // strike packages of the player's side: rendezvous, the two attack axes through their initial points, the target
   for (const k of command[me].pkgs || []) {
     if (k.phase !== 'form' && k.phase !== 'push') continue;
@@ -714,8 +846,8 @@ function renderTacCard() {
       if (flagship.tlamN > 0) acts.push(['战斧打击', () => { designate(u); useAbility(flagship, 'tlam', u); }]);
       if (tac(game.side).navy !== 'focus') acts.push(['舰队集火', () => { designate(u); setTactic('navy', 'focus'); renderTacOrders(); }]);
     }
-  } else if (game.role === 'watch' || (u.kind === 'ship' || (u.kind === 'plane' && u.state === 'air'))) {
-    acts.push(['镜头跟随', () => { toggleMap(); if (game.role === 'watch') specFollow(u); }]);
+  } else if (camRole() || (u.kind === 'ship' || (u.kind === 'plane' && u.state === 'air'))) {
+    acts.push(['镜头跟随', () => { toggleMap(); if (camRole()) specFollow(u); }]);
     if (u.kind === 'ship' || u.kind === 'plane') acts.push(['接管', () => { toggleMap(); takeRole(u.kind === 'ship' ? 'captain' : 'pilot', u); }]);
   }
   el.innerHTML = html + `<div class="acts">${acts.map((a, i) => `<button type="button" data-i="${i}">${a[0]}</button>`).join('')}</div>`;
@@ -728,7 +860,7 @@ function renderTacOrders() {
     box.innerHTML = '';
     for (const [id, t] of Object.entries(TACTICS[kind])) {
       const b = document.createElement('button'); b.type = 'button'; b.textContent = t.name; if (id === cur) b.className = 'on';
-      b.onclick = () => { if (kind === 'wing') { game.wingOrder = id; radio('僚机', `收到：${t.name}。`, '#9fd4ff'); } else setTactic(kind, id); renderTacOrders(); $('tac-desc').textContent = t.desc; };
+      b.onclick = () => { if (kind === 'wing') { game.wingOrder = id; radio('僚机', `收到：${t.name}。`, '#9fd4ff'); } else { setTactic(kind, id); game.staffHold = game.t + 300; } renderTacOrders(); $('tac-desc').textContent = t.desc; };
       b.onpointerenter = () => { $('tac-desc').textContent = t.desc; };
       box.appendChild(b);
     }

@@ -313,7 +313,7 @@ function updateBallistic(m, i, dt) {
   if (m.pos.y < 60) {
     let hit = null;
     for (const s of ships) if (s.alive && !s.dying && s.side !== m.side && !submerged(s)) { const steps = Math.max(1, Math.ceil(m.prev.distanceTo(m.pos) / 10)); for (let k = 1; k <= steps; k++) { _d.lerpVectors(m.prev, m.pos, k / steps); if (insideShip(s, _d, 6)) { hit = s; break; } } if (hit) break; }
-    if (hit) { dbg.hit++; dbg.hitBy[m.side]++; damageShip(hit, S.dmg * rand(0.85, 1.15), { owner: m.owner, kind: 'missile', name: S.name }, _d.clone()); explode(_d, 4, null); if (hit.carrier) { hit.deckClosed = game.t + 90; if (mine(hit) || game.side === m.side) radio(mine(hit) ? hit.name : '火箭军', mine(hit) ? '飞行甲板被击穿！弹射器停止工作！' : `东风命中${hit.name}！`, mine(hit) ? '#ff5a4f' : '#8dffb4'); } endMissile(m, i, false); return; }
+    if (hit) { dbg.hit++; dbg.hitBy[m.side]++; game.flags.dfHit = (game.flags.dfHit || 0) + 1; damageShip(hit, S.dmg * rand(0.85, 1.15), { owner: m.owner, kind: 'missile', name: S.name }, _d.clone()); explode(_d, 4, null); if (hit.carrier) { hit.deckClosed = game.t + 90; if (mine(hit) || game.side === m.side) radio(mine(hit) ? hit.name : '火箭军', mine(hit) ? '飞行甲板被击穿！弹射器停止工作！' : `东风命中${hit.name}！`, mine(hit) ? '#ff5a4f' : '#8dffb4'); } endMissile(m, i, false); return; }
     if (m.pos.y < 0.5) {
       // a near miss still sends a shock wave through a hull close by
       for (const s of ships) if (s.alive && !s.dying && s.side !== m.side && s.pos.distanceTo(_d.set(m.pos.x, 0, m.pos.z)) < s.radius + 60) damageShip(s, S.dmg * 0.25, { owner: m.owner, kind: 'missile', name: S.name }, null);
@@ -380,13 +380,14 @@ const ABIL = {
   torp:   { name: '鱼雷齐射', short: '鱼雷', key: 'KeyE', cd: 8, can: s => s.torpsN > 0, use: (s, t) => subTorpedoes(s, t) },
   depth:  { name: '深度', short: '深度', key: 'KeyQ', cd: 0.5, use: s => { const D = [18, 60, 140]; const i = D.indexOf(s.depthWant ?? 60); s.depthWant = D[(i + 1) % 3]; message(`深度 ${s.depthWant} 米`, s.depthWant === 18 ? '潜望镜深度 · 可发射导弹 · 易被发现' : s.depthWant === 140 ? '深潜 · 最安静' : '巡航深度', '#9fd4ff', 1.6); return true; } },
   strike: { name: '出动攻击波', short: '攻击波', key: 'Digit8', cd: 120, can: s => s.carrier, use: (s, t) => carrierStrike(s, t) },
+  alpha:  { name: '大规模打击', short: '大规模', key: 'Digit0', cd: 600, can: s => s.carrier && !!(intentTarget(s.side) || game.ashmSel), use: (s, t) => !!alphaStrike(s, (t && t.kind !== 'plane' && !(t.S && t.S.sub) ? t : null) || intentTarget(s.side)) },
   cap:    { name: '加强空中巡逻', short: '加强巡逻', key: 'Digit9', cd: 60, can: s => s.carrier, use: s => { let n = 0; for (let i = 0; i < 4; i++) { const ty = ['j35', 'f35c', 'fa18', 'j15'].find(x => s.hangar[x] > 0); if (ty) { launchFrom(s, ty, 'cap', { off: rand(6000, 14000), latZ: rand(-9000, 9000) }); n++; } } if (n) radio(s.name, `${n} 架战斗机加强空中巡逻。`, '#9fd4ff'); return n > 0; } },
   dc:     { name: '损管', short: '损管', key: 'KeyK', cd: 90, dur: 25, use: s => { s.dcT = 25; message('损管队全力抢修', '灭火、堵漏、抢修主炮与动力 · 25 秒', '#e3b257', 2); radio(s.name, '全舰损管！', '#9fd4ff'); return true; } },
   decoy:  { name: '诱饵', short: '诱饵', key: 'KeyX', cd: 15, can: s => s.decoys > 0, use: s => { fireDecoy(s); return true; } }
 };
 function abilitiesOf(s) {
   if (s.S.sub) return ['torp', 'salvo', 'depth', 'sprint', 'sonar', 'decoy', 'dc'];
-  if (s.carrier) return ['strike', 'cap', 'aegis', 'ew', 'sprint', 'decoy', 'dc'];
+  if (s.carrier) return ['strike', 'alpha', 'cap', 'aegis', 'ew', 'sprint', 'decoy', 'dc'];
   const a = ['salvo', 'fleet', 'aegis', 'ew', 'sprint', 'sonar', 'asw'];
   if (s.S.tlam) a.push('tlam');
   return a.concat(['decoy', 'dc']);
@@ -425,17 +426,10 @@ function subTorpedoes(s, t) {
   return n > 0;
 }
 function carrierStrike(s, t) {
-  t = t || bestTarget(s.side, s.pos, 160000);
+  t = t || intentTarget(s.side) || bestTarget(s.side, s.pos, 160000);
   if (!t) { if (s === flagship) message('无打击目标', '等待预警机发现敌舰', '#9fb0ba', 1.6); return false; }
-  const strikers = ['j15', 'fa18'].filter(x => s.hangar[x] > 0);
-  const avail = strikers.reduce((n, x) => n + s.hangar[x], 0);
-  if (avail < 2) { if (s === flagship) message('机库无可用攻击机', '', '#9fb0ba', 1.6); return false; }
-  const n = Math.min(6, avail);
-  let lead = null;
-  for (let i = 0; i < n; i++) { const ty = strikers.find(x => s.hangar[x] > 0); const p = launchFrom(s, ty, 'strike', { target: t }); if (!lead) lead = p; }
-  for (let i = 0; i < 2; i++) { const ty = ['j35', 'f35c'].find(x => s.hangar[x] > 0); if (ty) launchFrom(s, ty, 'escort', { lead, slot: i ? -160 : 160 }); }
-  const ew = ['j15d', 'ea18g'].find(x => s.hangar[x] > 0); if (ew) launchFrom(s, ew, 'escort', { lead, slot: 320 });
-  radio(s.name, `攻击波起飞：${n} 架突击机，目标${t.name}。`, '#9fd4ff');
+  const k = launchPackage(s, t, { n: 6, esc: 2 });
+  if (!k) { if (s === flagship) message('机库无可用攻击机', '', '#9fb0ba', 1.6); return false; }
   return true;
 }
 // AI captains use their abilities by the same rules
