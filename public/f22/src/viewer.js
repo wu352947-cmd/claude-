@@ -184,7 +184,7 @@ function applyHD() {
   for (const id of ['t-bay', 't-brake']) { $(id).disabled = on; $(id).title = on ? '切换到可动结构模型后可用' : ''; }
 }
 $('t-hd').onclick = () => { state.hd = !state.hd; applyHD(); };
-RaptorHD.build('assets/hi/raptor.gltf', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
+RaptorHD.build('assets/raptor.json', 'assets/hi/', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
   hd = m; holder.add(m.group); applyHD();
   if (state.wire) m.wireMats.forEach(x => { x.wireframe = true; });
 }).catch(() => { $('t-hd').disabled = true; $('t-hd').textContent = '高精度模型加载失败'; state.hd = false; applyHD(); });

@@ -176,7 +176,7 @@ function loadHD() {
   const level = HQ() ? 'hi' : 'lo';
   if (hdLevel === level) return;
   hdLevel = level;
-  RaptorHD.build(`assets/${level}/raptor.gltf`, { physical: HQ(), anisotropy: HQ() ? 8 : 4 }).then(api => {
+  RaptorHD.build('assets/raptor.json', `assets/${level}/`, { physical: HQ(), anisotropy: HQ() ? 8 : 4 }).then(api => {
     if (hdLevel !== level) return;
     api.setGear(playerJet.gear);
     playerRoot.remove(playerJet.group);
@@ -185,7 +185,7 @@ function loadHD() {
     player.exhausts = RaptorHD.EXHAUSTS.map(e => new V3(...e));
   }).catch(err => console.warn('HD Raptor unavailable, keeping the procedural model', err));
   // the wingman always flies the light mesh
-  if (!wingHD) RaptorHD.build('assets/lo/raptor.gltf', { physical: false, shadows: false, anisotropy: 4, plumes: false }).then(api => {
+  if (!wingHD) RaptorHD.build('assets/raptor.json', 'assets/lo/', { physical: false, shadows: false, anisotropy: 4, plumes: false }).then(api => {
     wingHD = api.group;
     if (wingman && wingman.alive) swapWingman();
   }).catch(() => {});

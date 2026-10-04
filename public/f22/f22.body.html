@@ -1232,15 +1232,33 @@ const RaptorHD = (() => {
   const CANOPY_HINGE = [3.95, 0.42];
   const cache = {};
 
-  function load(url) {
-    if (!cache[url]) cache[url] = new Promise((res, rej) => new GLTFLoader().load(url, res, undefined, rej));
-    return cache[url];
+  // raptor.json = { gltf: glTF JSON without a buffer uri, bin: base64 geometry }; assembled into a GLB in memory,
+  // so the asset set is only JSON and WebP files. Textures come from texDir (assets/hi = 4K, assets/lo = 2K).
+  async function fetchGLB(url, texDir) {
+    const r = await fetch(url);
+    if (!r.ok) throw new Error(url + ' ' + r.status);
+    const { gltf, bin } = await r.json();
+    const raw = atob(bin), body = new Uint8Array((raw.length + 3) & ~3);
+    for (let i = 0; i < raw.length; i++) body[i] = raw.charCodeAt(i);
+    let js = new TextEncoder().encode(JSON.stringify(gltf));
+    const pad = (4 - js.length % 4) % 4;
+    if (pad) { const t = new Uint8Array(js.length + pad).fill(0x20); t.set(js); js = t; }
+    const out = new Uint8Array(12 + 8 + js.length + 8 + body.length), dv = new DataView(out.buffer);
+    dv.setUint32(0, 0x46546C67, true); dv.setUint32(4, 2, true); dv.setUint32(8, out.length, true);
+    dv.setUint32(12, js.length, true); dv.setUint32(16, 0x4E4F534A, true); out.set(js, 20);
+    dv.setUint32(20 + js.length, body.length, true); dv.setUint32(24 + js.length, 0x004E4942, true); out.set(body, 28 + js.length);
+    return new Promise((res, rej) => new GLTFLoader().parse(out.buffer, texDir, res, rej));
+  }
+  function load(url, texDir) {
+    const key = url + '|' + texDir;
+    if (!cache[key]) cache[key] = fetchGLB(url, texDir);
+    return cache[key];
   }
 
-  // url: path of raptor.gltf. Resolves to an API compatible with F22.build().
-  async function build(url, opt = {}) {
+  // url: path of raptor.json, texDir: folder of its textures (ending in /). Resolves to an API compatible with F22.build().
+  async function build(url, texDir, opt = {}) {
     const o = Object.assign({ shadows: true, anisotropy: 4, plumes: true }, opt);
-    const gltf = await load(url);
+    const gltf = await load(url, texDir);
     const group = new THREE.Group();
     const model = gltf.scene.clone(true);
     const parts = {};
@@ -1499,7 +1517,7 @@ function applyHD() {
   for (const id of ['t-bay', 't-brake']) { $(id).disabled = on; $(id).title = on ? '切换到可动结构模型后可用' : ''; }
 }
 $('t-hd').onclick = () => { state.hd = !state.hd; applyHD(); };
-RaptorHD.build('assets/hi/raptor.gltf', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
+RaptorHD.build('assets/raptor.json', 'assets/hi/', { anisotropy: renderer.capabilities.getMaxAnisotropy() }).then(m => {
   hd = m; holder.add(m.group); applyHD();
   if (state.wire) m.wireMats.forEach(x => { x.wireframe = true; });
 }).catch(() => { $('t-hd').disabled = true; $('t-hd').textContent = '高精度模型加载失败'; state.hd = false; applyHD(); });
