@@ -4342,7 +4342,7 @@ function flight(pl, c, dt) {
 /* ---------- AI pilot ---------- */
 const MODE_TEXT = { pullup: '拉起避海', notch: '切向置尾 · 规避雷达弹', break: '急转规避', bvr: '超视距接敌', pursuit: '追踪', guns: '机炮咬尾',
   lag: '滞后追踪', cap: '战斗空中巡逻', aew: '预警巡逻', sweep: '前出搜索', escort: '护航', strike: '反舰突击', ingress: '低空突防', release: '发射反舰导弹',
-  bomber: '远程突击', rtb: '返航', barcap: '前出拦截巡逻 · 主攻轴线', eyes: '隐身前出 · 目标指示', ewesc: '随队电子干扰', ewsoj: '远距支援干扰 · 压制敌雷达', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
+  bomber: '远程突击', rtb: '返航', barcap: '前出拦截巡逻 · 主攻轴线', rearm: '返航挂弹 · 准备再次出击', eyes: '隐身前出 · 目标指示', ewesc: '随队电子干扰', ewsoj: '远距支援干扰 · 压制敌雷达', final: '着舰进近', energy: '俯冲增速', extend: '拉开距离', holding: '盘旋等待着舰', crank: '偏置机动 · 维持制导' };
 class Pilot {
   constructor(pl, skill) {
     Object.assign(this, { pl, skill, target: null, threat: null, think: rand(0, 0.5), lockT: 0, mslCd: rand(2, 5), mode: 'cap', desired: new V3(1, 0, 0), react: lerp(0.7, 0.08, skill), ashmT: 0 });
@@ -4582,7 +4582,7 @@ function roleFly(pl, d, c, out, dt) {
       break;
     }
     default: {   // rtb
-      P.mode = 'rtb';
+      P.mode = task.rearm ? 'rearm' : 'rtb';
       const h = pl.home;
       if (!h || !h.alive || h.dying) {
         const alt = altHome(pl);
@@ -4599,7 +4599,8 @@ function roleFly(pl, d, c, out, dt) {
       // the marshal stack: returning aircraft queue in order and hold at stacked altitudes; only the next in line
       // commences the approach, and it may not start final until the deck is clear of the one ahead
       h.stack = (h.stack || []).filter(q => q.alive && !q.dying && q.role === 'rtb' && q.home === h && q.state === 'air');
-      if (!h.stack.includes(pl)) h.stack.push(pl);
+      // the player's aircraft is taken first (the deck is kept ready for the sortie the player is flying)
+      if (!h.stack.includes(pl)) { if (pl === player) h.stack.unshift(pl); else h.stack.push(pl); }
       const slot = h.stack.indexOf(pl);
       if (slot > 0 || (h.finalUntil > game.t && s < 8000)) {
         P.mode = 'holding';
@@ -4665,6 +4666,16 @@ function playerAutoTask(p) {
     return;
   }
   const same = p.task && (p.task.target === sel || p.task.on === sel);
+  if (p.T.ashm > 0 && p.ashmN === 0 && p.fuel >= 400) {
+    // a striker out of anti-ship rounds goes back to the deck to rearm and comes back for the same target
+    // (the carrier's cyclic operations), instead of loitering with weapons that cannot hurt a ship
+    if (!(p.role === 'rtb' && p.task && p.task.rearm)) {
+      p.role = 'rtb'; p.task = { rearm: true, target: sel };
+      message('自动驾驶：返航挂弹', `反舰弹已打完 · 返回${p.home ? p.home.name : '母舰'}重新挂弹后再次出击${sel.name}`, '#e3b257', 3);
+      radio(p.name, `Winchester，返航挂弹，稍后再打${sel.name}。`, '#9fd4ff');
+    }
+    return;
+  }
   if (p.ashmN > 0 && p.T.ashmType) {
     p.role = p.T.role === 'bomber' ? 'bomber' : 'strike';
     p.task = Object.assign(same ? p.task : {}, { target: sel, low: tac(p.side).air === 'low' });
@@ -4781,7 +4792,7 @@ function updateDeck(pl, dt) {
   if (pl === player) {
     pl.rearm(); pl.hp = pl.maxHp; pl.role = 'cap'; pl.task = null; pl.pilot.mode = 'cap';
     if (!spotOnCatapult(pl)) { pl.deckT = 2; return; }
-    message('补给完成', h.kind === 'ship' ? '已就位弹射器 · 推满油门后弹射' : '已滑入跑道 · 推满油门起飞', '#e3b257', 3);
+    message('补给完成', game.ai ? '自动驾驶：弹射起飞，再次出击' : h.kind === 'ship' ? '已就位弹射器 · 推满油门后弹射' : '已滑入跑道 · 推满油门起飞', '#e3b257', 3);
   } else { h.ready.push({ type: pl.type, t: game.t + 50 }); removePlane(pl); }
 }
 // spot an aircraft on a free catapult (carrier) or the runway threshold (island)
