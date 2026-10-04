@@ -29,6 +29,8 @@
     -webkit-touch-callout: none; -webkit-tap-highlight-color: transparent; overscroll-behavior: none;
   }
   #stage, #hud, #flash { position: fixed; inset: 0; width: 100%; height: 100%; }
+  /* the page never scrolls or zooms: every touch belongs to the game (otherwise the browser claims a swipe and cancels it) */
+  html, body, #stage, #stage canvas, #touch { touch-action: none; }
   #stage canvas { display: block; width: 100%; height: 100%; }
   #hud { pointer-events: none; }
   #flash { pointer-events: none; opacity: 0; background: radial-gradient(ellipse at center, transparent 45%, rgba(255, 40, 30, 0.55) 100%); }
@@ -184,7 +186,7 @@
   <button type="button" id="b-scale" data-act="scale">时间 ×1</button>
   <button type="button" id="b-ai" data-act="ai">AI 驾驶</button>
   <button type="button" id="b-pause" data-act="pause">暂停</button>
-  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：WASD 舵与航速 · R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
+  <div id="keys">飞行：WASD 操纵 · Shift 加力 · Ctrl 减速<br>空格 机炮 · F 空空弹 · R 反舰弹 · X 干扰<br>G 着舰构型 · H 自动着舰 · Enter 弹射<br>舰长：A/D 改航向 · W/S 车钟（触屏：摇杆指向即航向，推得越远越快）· R 齐射 · Tab/点击 目标 · X 诱饵 · K 损管<br>炮瞄：B 进出 · WASD/拖动 瞄准 · 空格 开火 · F 火控 · U 引信 · Z 望远<br>M 地图 · T 倍速 · Y AI · V 视角 · P 暂停 · 拖动旋转</div>
 </div>
 
 <section class="screen" id="menu" hidden>

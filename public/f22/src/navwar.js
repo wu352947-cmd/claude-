@@ -369,6 +369,8 @@ class Ship {
     this.obj = hd ? hd.group : built.group.clone();
     this.hd = !!hd;
     scene.add(this.obj);
+    // level of detail: past a few km the detailed model gives way to the light procedural one
+    if (hd) { this.lo = built.group.clone(); this.lo.visible = false; scene.add(this.lo); }
     this.pos = new V3(); this.vel = new V3(); this.heading = 0; this.speed = 10; this.order = 10; this.rudder = 0; this.helm = 0;
     this.hp = this.maxHp = S.hp; this.alive = true; this.sinking = 0; this.dying = false;
     this.sam = Object.assign({}, S.sam); this.ashm = Object.assign({}, S.ashm); this.decoys = S.decoys;
@@ -393,6 +395,7 @@ class Ship {
     const roll = this.list + Math.sin(game.t * 0.47 + this.pos.z * 0.001) * (this.carrier ? 0.004 : 0.02) - this.rudder * this.speed * 0.0016;
     const pitch = this.trim + Math.sin(game.t * 0.33 + this.pos.x * 0.002) * (this.carrier ? 0.002 : 0.008);
     this.obj.rotation.set(roll, this.heading, pitch, 'YZX');
+    if (this.lo) { this.lo.position.copy(this.obj.position); this.lo.rotation.copy(this.obj.rotation); }
   }
 }
 
@@ -483,7 +486,7 @@ function setBasis(q, f, u) {
 function removePlane(pl) { pl.alive = false; scene.remove(pl.obj); const i = planes.indexOf(pl); if (i >= 0) planes.splice(i, 1); }
 
 /* ---------- effects ---------- */
-const _a = new V3(), _b = new V3(), _c = new V3(), _d = new V3();
+const _a = new V3(), _b = new V3(), _c = new V3(), _d = new V3(), _e = new V3(), _f = new V3();
 function explode(pos, scale = 1, vel = null) {
   const vx = vel ? vel.x * 0.3 : 0, vy = vel ? vel.y * 0.3 : 0, vz = vel ? vel.z * 0.3 : 0;
   const k = near(pos, 9000) ? 1 : 0.35;
@@ -1661,11 +1664,11 @@ function updateShip(s, dt) {
     fwdOf(s.heading, _a); s.pos.addScaledVector(_a, s.speed * dt); s.vel.copy(_a).multiplyScalar(s.speed);
     shipSmoke(s, 3);
     s.sync();
-    if (s.sinkT > 85) { s.alive = false; scene.remove(s.obj); }
+    if (s.sinkT > 85) { s.alive = false; scene.remove(s.obj); if (s.lo) scene.remove(s.lo); }
     return;
   }
   // helm: AI keeps station on the guide; the player's ship follows the player's orders
-  if (s !== flagship || game.ai) shipAI(s);
+  if (s !== flagship || (game.ai && !(s.helmT > game.t))) shipAI(s);
   const vmax = s.vmax();
   s.order = clamp(s.order, s === flagship ? -5 : 0, vmax);
   s.speed += clamp(s.order - s.speed, -0.22 * dt, 0.12 * dt);
@@ -1948,7 +1951,7 @@ function chapterEvent(kind, side, unit) {
 }
 
 /* ---------- input ---------- */
-const input = { stickX: 0, stickY: 0, keys: new Set(), gun: false, boost: false, brake: false, msl: false, flare: false, ashm: false, gear: false, acls: false, launch: false, decoy: false, target: false, fire: false, dc: false };
+const input = { stickX: 0, stickY: 0, rawX: 0, rawY: 0, keys: new Set(), gun: false, boost: false, brake: false, msl: false, flare: false, ashm: false, gear: false, acls: false, launch: false, decoy: false, target: false, fire: false, dc: false };
 addEventListener('keydown', e => {
   if (game.mode !== 'play' && game.mode !== 'paused') return;
   const k = e.code;
@@ -1978,26 +1981,35 @@ addEventListener('blur', () => { input.keys.clear(); input.gun = input.boost = i
   let id = null, ox = 0, oy = 0;
   const R = 62;
   const home = () => { base_.style.left = ''; base_.style.top = ''; knob.style.transform = ''; };
+  // one finger owns the stick until it lifts. A lost capture or cancel also releases it, and a new touch
+  // takes over from a finger that has gone quiet (the browser never reported it lifting), so the stick cannot wedge.
+  let lastT = 0;
+  const release = () => { id = null; input.stickX = input.stickY = input.rawX = input.rawY = 0; home(); };
   zone.addEventListener('pointerdown', e => {
-    if (id !== null) return;
-    id = e.pointerId; zone.setPointerCapture(id);
+    e.preventDefault();
+    if (id !== null && id !== e.pointerId && performance.now() - lastT < 600) return;
+    id = e.pointerId; lastT = performance.now();
+    try { zone.setPointerCapture(id); } catch (_) {}
     const r = zone.getBoundingClientRect();
     ox = e.clientX; oy = e.clientY;
     base_.style.left = (e.clientX - r.left) + 'px'; base_.style.top = (e.clientY - r.top) + 'px';
-    e.preventDefault();
+    knob.style.transform = '';
   });
   zone.addEventListener('pointermove', e => {
     if (e.pointerId !== id) return;
+    if (e.pointerType === 'mouse' && !e.buttons) { release(); return; }
+    e.preventDefault(); lastT = performance.now();
     let dx = e.clientX - ox, dy = e.clientY - oy;
     const d = Math.hypot(dx, dy);
     if (d > R) { dx *= R / d; dy *= R / d; }
     knob.style.transform = `translate(${dx}px, ${dy}px)`;
     const cx = dx / R, cy = -dy / R;
+    input.rawX = cx; input.rawY = cy;
     input.stickX = cx * (0.35 + 0.65 * Math.abs(cx));
     input.stickY = cy * (0.35 + 0.65 * Math.abs(cy));
   });
-  const end = e => { if (e.pointerId !== id) return; id = null; input.stickX = input.stickY = 0; home(); };
-  zone.addEventListener('pointerup', end); zone.addEventListener('pointercancel', end);
+  const end = e => { if (e.pointerId === id) release(); };
+  for (const ev of ['pointerup', 'pointercancel', 'lostpointercapture']) zone.addEventListener(ev, end);
   const hold = (el, key) => {
     const on = e => { e.preventDefault(); el.setPointerCapture?.(e.pointerId); input[key] = true; el.classList.add('on'); };
     const off = () => { input[key] = false; el.classList.remove('on'); };
@@ -2231,12 +2243,29 @@ function captainTargets() {
 function updateCaptain(dt) {
   const s = flagship, k = input.keys;
   if (!s || !s.alive || s.dying) return;
-  const rud = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0) + input.stickX;
-  const thr = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0) + input.stickY;
-  if (!game.gunsight && (!game.ai || Math.abs(rud) + Math.abs(thr) > 0.15)) {
-    s.rudder = clamp(rud, -1, 1);
-    s.order = clamp(s.order + thr * 3 * dt, -5, s.vmax());
+  // helm: the stick points where the ship should go, as seen on screen (its throw sets the speed);
+  // A/D swing the ordered course, W/S ring the telegraph. The quartermaster then steers that course.
+  if (s.course == null) s.course = s.heading;
+  if (!game.gunsight) {
+    const kc = (k.has('KeyD') || k.has('ArrowRight') ? 1 : 0) - (k.has('KeyA') || k.has('ArrowLeft') ? 1 : 0);
+    const ks = (k.has('KeyW') || k.has('ArrowUp') ? 1 : 0) - (k.has('KeyS') || k.has('ArrowDown') ? 1 : 0);
+    const mag = Math.hypot(input.rawX, input.rawY);
+    if (mag > 0.22) {
+      camera.getWorldDirection(_a).setY(0);
+      if (_a.lengthSq() < 0.04) _a.set(0, 1, 0).applyQuaternion(camera.quaternion).setY(0);   // looking straight down
+      _a.normalize(); _b.set(-_a.z, 0, _a.x);                                                   // screen up / screen right on the sea
+      _c.copy(_a).multiplyScalar(input.rawY).addScaledVector(_b, input.rawX);
+      s.course = headingOf(_c);
+      s.order = s.vmax() * clamp(0.25 + (mag - 0.22) / 0.7 * 0.75, 0.25, 1);
+      s.helmT = game.t + 20;
+    }
+    if (kc) { s.course = wrapA(s.course - kc * 0.25 * dt); s.helmT = game.t + 20; }
+    if (ks) { s.order = clamp(s.order + ks * 3 * dt, -5, s.vmax()); s.helmT = game.t + 20; }
   }
+  if (!game.ai || s.helmT > game.t) {
+    // heading hold with a little lead so the ship meets her course without overshooting
+    s.rudder = clamp(wrapA(s.heading - s.course) * 2.2 - s.helm * 0.6, -1, 1);
+  } else s.course = s.heading;
   const list = captainTargets();
   if (input.target) { input.target = false; if (list.length) { const i = list.indexOf(game.ashmSel); game.ashmSel = list[(i + 1) % list.length]; } }
   if (!list.includes(game.ashmSel)) game.ashmSel = list[0] || null;
@@ -2330,39 +2359,60 @@ let orbitA = 0.6, orbitE = 0.32;
 {
   // free look: drag anywhere that is not a control to swing the camera, pinch or wheel to zoom.
   // Pilots get a look-around that springs back behind the jet; captains and spectators orbit freely.
+  // The stage captures each finger, so its lift always comes back here (lostpointercapture is the backstop);
+  // the first finger of a fresh gesture also clears any finger the browser never reported lifting.
   const pts = new Map();
   let pinch0 = 0, zoom0 = 1;
+  const pinchStart = () => { const [a, b] = [...pts.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = game.zoom || 1; };
   stage.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    if (e.isPrimary || e.pointerType === 'mouse') pts.clear();
+    try { stage.setPointerCapture(e.pointerId); } catch (_) {}
     pts.set(e.pointerId, { x: e.clientX, y: e.clientY, x0: e.clientX, y0: e.clientY, t0: performance.now() });
-    if (pts.size === 2) { const [a, b] = [...pts.values()]; pinch0 = Math.hypot(a.x - b.x, a.y - b.y); zoom0 = game.zoom || 1; }
+    if (pts.size === 2) pinchStart();
     look.active = true;
   });
-  addEventListener('pointermove', e => {
+  stage.addEventListener('pointermove', e => {
     const q = pts.get(e.pointerId);
     if (!q) return;
+    if (e.pointerType === 'mouse' && !e.buttons) { drop(e); return; }
     const dx = e.clientX - q.x, dy = e.clientY - q.y;
     q.x = e.clientX; q.y = e.clientY;
-    if (pts.size >= 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0 > 10) game.zoom = clamp(zoom0 * pinch0 / d, 0.3, 6); return; }
+    if (pts.size >= 2) { const [a, b] = [...pts.values()]; const d = Math.hypot(a.x - b.x, a.y - b.y); if (pinch0 > 10 && d > 10) game.zoom = clamp(zoom0 * pinch0 / d, 0.3, 6); return; }
     if (game.gunsight) { gunLay(dx, dy); return; }
     if (game.role === 'pilot') { look.yaw = clamp(look.yaw - dx * 0.008, -Math.PI, Math.PI); look.pitch = clamp(look.pitch + dy * 0.006, -1.2, 1.2); look.idle = 0; }
-    else if (game.role === 'captain' && game.view === 1) { look.yaw -= dx * 0.004; look.pitch = clamp(look.pitch - dy * 0.003, -0.6, 0.5); }
-    else { orbitA -= dx * 0.006; orbitE = clamp(orbitE + dy * 0.004, 0.04, 1.45); }
+    else if (game.role === 'captain' && game.view === 1) { look.yaw -= dx * 0.005; look.pitch = clamp(look.pitch - dy * 0.004, -0.6, 0.5); }
+    else { orbitA -= dx * 0.007; orbitE = clamp(orbitE + dy * 0.005, 0.04, 1.45); }
   });
-  const up = e => {
+  const drop = e => {
     const q = pts.get(e.pointerId);
-    if (q && pts.size === 1 && Math.hypot(e.clientX - q.x0, e.clientY - q.y0) < 9 && performance.now() - q.t0 < 350) selectAt(e.clientX, e.clientY);
-    pts.delete(e.pointerId); if (!pts.size) look.active = false;
+    if (!q) return;
+    pts.delete(e.pointerId);
+    if (pts.size === 2) pinchStart();
+    if (!pts.size) look.active = false;
   };
-  addEventListener('pointerup', up); addEventListener('pointercancel', up);
-  stage.addEventListener('wheel', e => { game.zoom = clamp((game.zoom || 1) * (e.deltaY > 0 ? 1.12 : 0.89), 0.3, 6); }, { passive: true });
+  stage.addEventListener('pointerup', e => {
+    const q = pts.get(e.pointerId);
+    if (q && pts.size === 1 && Math.hypot(e.clientX - q.x0, e.clientY - q.y0) < 12 && performance.now() - q.t0 < 350) selectAt(e.clientX, e.clientY);
+    drop(e);
+  });
+  for (const ev of ['pointercancel', 'lostpointercapture']) stage.addEventListener(ev, drop);
+  stage.addEventListener('wheel', e => { e.preventDefault(); game.zoom = clamp((game.zoom || 1) * (e.deltaY > 0 ? 1.12 : 0.89), 0.3, 6); }, { passive: false });
 }
 const look = { yaw: 0, pitch: 0, active: false, idle: 0 };
+// the dragged angles are followed quickly (the finger should feel attached); the point looked at follows the
+// subject more softly. The camera sits exactly on the sphere around that point, so a swing never cuts a chord.
+let oA = orbitA, oE = orbitE, oD = 0;
 function orbit(target, dist, dt, smoothK = 3) {
-  const ce = Math.cos(orbitE), se = Math.sin(orbitE);
-  camPos.set(target.x + Math.cos(orbitA) * ce * dist, target.y + se * dist, target.z + Math.sin(orbitA) * ce * dist);
-  camera.position.lerp(camPos, 1 - Math.exp(-dt * smoothK));
-  camera.up.copy(Y_AXIS);
+  const kA = 1 - Math.exp(-dt * 16);
+  oA += wrapA(orbitA - oA) * kA; oE += (orbitE - oE) * kA;
+  oD = oD ? oD + (dist - oD) * (1 - Math.exp(-dt * 4)) : dist;
   camTarget.lerp(target, 1 - Math.exp(-dt * smoothK * 1.5));
+  const ce = Math.cos(oE), se = Math.sin(oE);
+  camPos.set(camTarget.x + Math.cos(oA) * ce * oD, camTarget.y + se * oD, camTarget.z + Math.sin(oA) * ce * oD);
+  camPos.y = Math.max(camPos.y, 2.5);
+  camera.position.copy(camPos);
+  camera.up.copy(Y_AXIS);
   camera.lookAt(camTarget);
 }
 // chase a missile from behind, looking along its path (and at its target once it is close)
@@ -2721,14 +2771,33 @@ function drawCaptain() {
   drawContacts(s.pos, 40000, 150000);
   const sx = 16, sy = compact ? 46 : 54;
   hc.save();
-  hc.fillStyle = 'rgba(6,12,18,0.5)'; hc.fillRect(sx - 8, sy - 16, 250, compact ? 160 : 168);
+  hc.fillStyle = 'rgba(6,12,18,0.5)'; hc.fillRect(sx - 8, sy - 16, 330, compact ? 160 : 168);
   hc.restore();
   hc.strokeStyle = HUDC; hc.lineWidth = 1.2;
   text(`${s.name} · ${s.spec.name || ''}`, sx, sy, GOLD, `700 13px ${SANS}`);
   bar(sx, sy + 8, 140, s.hp / s.maxHp, s.hp > s.maxHp * 0.4 ? HUDC : WARN);
   text(`舰体 ${Math.max(0, Math.round(s.hp / s.maxHp * 100))}%${s.fires > 0.3 ? ' · 起火' : ''}${s.radarDmg ? ' · 雷达受损' : ''}`, sx + 148, sy + 15, s.fires > 0.3 ? WARN : HUDC, `500 10px ${SANS}`);
-  const hdg = Math.round(((90 - s.heading / D2R) % 360 + 360) % 360);
-  text(`航速 ${(s.speed * 1.94).toFixed(0)} 节 → 令 ${(s.order * 1.94).toFixed(0)} 节   航向 ${String(hdg).padStart(3, '0')}°   舵 ${s.rudder > 0.05 ? '右' : s.rudder < -0.05 ? '左' : '正'}${Math.round(Math.abs(s.rudder) * 35)}°`, sx, sy + 34, HUDC, `500 10px ${MONO}`);
+  const deg = h => String(Math.round(((90 - h / D2R) % 360 + 360) % 360) % 360).padStart(3, '0');
+  const ordered = s.course != null && !(game.ai && !(s.helmT > game.t));
+  text(`航速 ${(s.speed * 1.94).toFixed(0)} 节 → 令 ${(s.order * 1.94).toFixed(0)} 节   航向 ${deg(s.heading)}°${ordered ? ` → 令 ${deg(s.course)}°` : ''}   舵 ${s.rudder > 0.05 ? '右' : s.rudder < -0.05 ? '左' : '正'}${Math.round(Math.abs(s.rudder) * 35)}°`, sx, sy + 34, HUDC, `500 10px ${MONO}`);
+  // ordered course on the sea: a dotted track from the bow to a marker, so the stick visibly "points" the ship
+  if (ordered && !game.gunsight && game.view !== 3) {
+    const L = s.S.L, steer = Math.abs(input.rawX) + Math.abs(input.rawY) > 0.2;
+    hc.save(); hc.setLineDash([4, 6]); hc.lineWidth = steer ? 2 : 1.2;
+    hc.strokeStyle = steer ? 'rgba(255,214,120,0.95)' : 'rgba(150,230,190,0.6)';
+    fwdOf(s.course, _e); hc.beginPath(); let started = false, last = null;
+    for (let i = 0; i <= 12; i++) {
+      const d = L * 0.5 + i * L * 0.5;
+      const q = proj(_f.copy(s.pos).addScaledVector(_e, d).setY(1));
+      if (q.behind) { started = false; continue; }
+      if (!started) { hc.moveTo(q.x, q.y); started = true; } else hc.lineTo(q.x, q.y);
+      last = q;
+    }
+    hc.stroke(); hc.setLineDash([]);
+    if (last) { hc.fillStyle = hc.strokeStyle; hc.beginPath(); hc.arc(last.x, last.y, steer ? 6 : 4, 0, Math.PI * 2); hc.fill();
+      text(`${deg(s.course)}°`, last.x, last.y - 10, hc.strokeStyle, `600 11px ${MONO}`, 'center'); }
+    hc.restore();
+  }
   text(`舰空：${Object.entries(s.sam).map(([k, n]) => `${MSL[k].name} ${n}`).join('  ')}`, sx, sy + 50, HUDC, `500 10px ${SANS}`);
   const ash = Object.entries(s.ashm);
   text(`反舰：${ash.length ? ash.map(([k, n]) => `${MSL[k].name} ${n}`).join('  ') : '无'}`, sx, sy + 66, AMBER, `500 10px ${SANS}`);
@@ -2748,7 +2817,7 @@ function drawCaptain() {
     text(`目标 ${t.name} · ${km(d)} km · ${inR.length ? '射程内：' + inR.join('/') : '超出射程'}`, sx, sy + (compact ? 118 : 120), inR.length ? GOLD : '#9fb0ba', `600 11px ${SANS}`);
     if (tp) { const pp = proj(tp); if (onScreen(pp)) { hc.save(); hc.strokeStyle = GOLD; hc.lineWidth = 2; hc.beginPath(); hc.arc(pp.x, pp.y, 20, 0, Math.PI * 2); hc.stroke(); hc.restore(); } else edgeArrow(tp, GOLD, km(d)); }
   } else text('没有掌握敌舰位置 · 等待舰载机或预警机侦察', sx, sy + (compact ? 118 : 120), '#9fb0ba', `500 11px ${SANS}`);
-  if (game.ai) text('AI 舰长指挥中 · 操纵摇杆即可临时接管', HW / 2, compact ? 60 : 70, GOLD, `700 12px ${SANS}`, 'center');
+  if (game.ai && !(s.helmT > game.t)) text('AI 舰长指挥中 · 摇杆指向即可接管航向', HW / 2, compact ? 60 : 70, GOLD, `700 12px ${SANS}`, 'center');
   drawScope(s.pos, fwdOf(s.heading, _c), 90000, '雷达 90 km');
 }
 // gunsight: reticle with mil ticks, fire-control diamond, rangefinder and fall of shot
@@ -2919,6 +2988,12 @@ const ROLES = {
     { role: 'watch', pick: null, title: '战区指挥 · 观战', sub: '双方 AI 交战 · 自动镜头 · 最高 8 倍速' }
   ]
 };
+// compile every material in the battle up front (both detail levels), so nothing stalls a frame mid-fight
+function precompile() {
+  for (const sh of ships) if (sh.lo) sh.lo.visible = sh.obj.visible = true;
+  try { renderer.compile(scene, camera); } catch (_) {}
+  lod();
+}
 function startGame() {
   Sound.init();
   setupBattle();
@@ -2931,6 +3006,7 @@ function startGame() {
   chapter(1);
   radio(game.side === 'cn' ? '舰队司令部' : 'Strike Group', game.side === 'cn' ? '各舰进入一级战备。空警-600 准备起飞。' : 'All stations, general quarters. Launch the Hawkeye.', '#ffd28a');
   show(null);
+  precompile();
   if (isTouch) {
     document.documentElement.requestFullscreen?.().catch(() => {});
     screen.orientation?.lock?.('landscape').catch(() => {});
@@ -3074,11 +3150,11 @@ $('s-quality').onclick = () => { settings.quality = HQ() ? 'low' : 'high'; store
 $('s-sound').onclick = () => { settings.sound = !settings.sound; store.set('sound', settings.sound); Sound.setVolume(settings.sound); renderSettings(); };
 $('s-time').onclick = () => { settings.time = TIME_ORDER[(TIME_ORDER.indexOf(settings.time) + 1) % 3]; store.set('time', settings.time); world.setTime(settings.time); renderSettings(); };
 $('s-invert').onclick = () => { settings.invert = !settings.invert; store.set('invert', settings.invert); renderSettings(); };
-function applyQuality() { renderer.setPixelRatio(Math.min(devicePixelRatio, HQ() ? 2 : 1.25)); sunLight.castShadow = HQ(); resize(); }
+function applyQuality() { renderer.setPixelRatio(Math.min(devicePixelRatio, HQ() ? 2 : 1.25) * perf.scale); sunLight.castShadow = HQ(); resize(); }
 function resize() {
   const w = innerWidth, h = innerHeight;
   renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix();
-  HDPR = Math.min(devicePixelRatio, 2); HW = w; HH = h;
+  HDPR = Math.min(devicePixelRatio, isTouch ? 1.5 : 2); HW = w; HH = h;
   hud.width = Math.round(w * HDPR); hud.height = Math.round(h * HDPR);
   const scale = renderer.domElement.height * camera.projectionMatrix.elements[5] * 0.5;
   fire.mat.uniforms.uScale.value = scale; smoke.mat.uniforms.uScale.value = scale;
@@ -3088,9 +3164,27 @@ addEventListener('resize', resize);
 /* ---------- main loop ---------- */
 const clock = new THREE.Clock();
 let queueT = 0;
+// adaptive resolution: if frames run long the render scale steps down (and back up when there is headroom),
+// so a busy moment on a tablet costs sharpness rather than responsiveness
+const perf = { avg: 1 / 60, t: 0, scale: 1 };
+function adapt(raw) {
+  perf.avg += (Math.min(raw, 0.2) - perf.avg) * 0.05;
+  perf.t += raw;
+  if (perf.t < 2) return;
+  perf.t = 0;
+  const was = perf.scale;
+  if (perf.avg > 1 / 36 && perf.scale > 0.5) perf.scale = Math.max(0.5, perf.scale - 0.15);
+  else if (perf.avg < 1 / 54 && perf.scale < 1) perf.scale = Math.min(1, perf.scale + 0.1);
+  if (perf.scale !== was) applyQuality();
+}
+function lod() {
+  const far = HQ() ? 9000 : 5000;
+  for (const s of ships) if (s.lo && s.alive) { const lo = s.obj.position.distanceTo(camera.position) > far; s.obj.visible = !lo; s.lo.visible = lo; }
+}
 function frame() {
   requestAnimationFrame(frame);
-  const rdt = Math.min(clock.getDelta(), 0.05);
+  const raw = clock.getDelta(), rdt = Math.min(raw, 0.05);
+  adapt(raw);
   if (game.mode === 'paused') { renderer.render(scene, camera); return; }
   const sim = rdt * (game.mode === 'play' ? game.scale : 1);
   const n = Math.max(1, Math.ceil(sim / (1 / 30)));
@@ -3098,6 +3192,7 @@ function frame() {
   fire.update(sim); smoke.update(sim);
   updateCamera(rdt);
   world.follow(camera.position);
+  lod();
   $('keys').hidden = game.t > 30 && game.mode === 'play';
   renderer.render(scene, camera);
   drawHUD(rdt);
@@ -3150,4 +3245,4 @@ NavyHD.loadAll((n, total) => { $('loading').textContent = `正在下载舰船与
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf };

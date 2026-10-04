@@ -1,6 +1,8 @@
 /* High-detail warships and naval aircraft for 南海决战, from CC-licensed Sketchfab models (credits in NavyHD.CREDITS).
-   Each model ships as assets/navy/<key>.txt: base64 of a gzipped GLB (WebP textures, quantized geometry).
-   It is decompressed with the browser's DecompressionStream and fitted to the game frame:
+   Each model ships as assets/navy/<key>/model.txt (base64 of a gzipped GLB with quantized geometry) next to its
+   WebP textures. The textures stay separate files loaded by relative URL: textures embedded in a GLB are read
+   through blob: URLs, which the artifact host's content policy blocks, and the models then render untextured.
+   The GLB is decompressed with the browser's DecompressionStream and fitted to the game frame:
    ships: +x bow, +y up, waterline at y = 0, real length; aircraft: +x nose, gear contact at y = -gearH.
    Stand-ins for the other side's types (Nimitz for Fujian, E-2D for KJ-600, F-35 for J-35) are desaturated
    and tinted in PLA grey so the source markings do not read.
@@ -30,14 +32,15 @@ const NavyHD = (() => {
   const templates = {};
 
   async function fetchGLB(key) {
-    const r = await fetch(`assets/navy/${key}.txt`);
+    const dir = `assets/navy/${key}/`;
+    const r = await fetch(dir + 'model.txt');
     if (!r.ok) throw new Error(key + ' ' + r.status);
     const b64 = (await r.text()).trim();
     const raw = atob(b64), bytes = new Uint8Array(raw.length);
     for (let i = 0; i < raw.length; i++) bytes[i] = raw.charCodeAt(i);
     const ds = new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip')));
     const buf = await ds.arrayBuffer();
-    return new Promise((res, rej) => new GLTFLoader().parse(buf, '', res, rej));
+    return new Promise((res, rej) => new GLTFLoader().parse(buf, dir, res, rej));
   }
   // wraps a model so it sits in the game frame
   function fitGroup(key, scene) {
@@ -101,7 +104,15 @@ const NavyHD = (() => {
     if (typeof DecompressionStream === 'undefined') return {};
     let n = 0;
     await Promise.all(keys.map(k => fetchGLB(k).then(g => {
-      g.scene.traverse(m => { if (m.isMesh) { m.castShadow = m.receiveShadow = true; } });
+      g.scene.traverse(m => {
+        if (!m.isMesh) return;
+        m.castShadow = m.receiveShadow = true;
+        for (const mat of [].concat(m.material)) {
+          if (mat.map) mat.map.anisotropy = 4;
+          // mirror-smooth paint (roughness 0) turns the whole hull into a white sky reflection
+          if (mat.roughness !== undefined) mat.roughness = Math.max(mat.roughness, 0.42);
+        }
+      });
       templates[k] = g.scene;
     }).catch(e => console.warn('model', k, e)).finally(() => onProgress && onProgress(++n, keys.length, k))));
     return templates;
