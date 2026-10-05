@@ -262,5 +262,116 @@
     };
   }
 
-  window.AeonGL = { silk: silk, water: water };
+
+  /* —— lens —— one fixed canvas that takes over the artwork under the cursor:
+     the painting bulges like a drop of water, and splits into RGB as the cursor moves */
+  var LENS = [
+    'precision highp float;',
+    'uniform sampler2D uTex;uniform vec2 uRes;uniform float uDpr;uniform vec4 uBox;uniform vec2 uMouse;uniform vec2 uVel;uniform float uHover;uniform float uTime;',
+    NOISE,
+    'void main(){',
+    ' vec2 px=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr;',
+    ' vec2 uv=(px-uBox.xy)/uBox.zw;',
+    ' vec2 m=(uMouse-uBox.xy)/uBox.zw;',
+    ' vec2 asp=vec2(uBox.z/uBox.w,1.);',
+    ' vec2 d=(uv-m)*asp;float r=length(d);',
+    ' float bulge=exp(-r*r*9.)*uHover;',
+    ' uv-=d/asp*bulge*.16;',
+    ' uv=(uv-.5)/(1.+.035*uHover)+.5;',
+    ' float n=fbm(uv*4.+uTime*.3)-.5;',
+    ' float sp=clamp(length(uVel)*.004,0.,1.);',
+    ' uv+=n*.012*sp*uHover;',
+    ' vec2 v=uVel/max(1.,length(uVel)/240.);',
+    ' vec2 ca=v*.000028*uHover+d/asp*.006*bulge;',
+    ' vec3 col;',
+    ' col.r=texture2D(uTex,uv+ca).r;',
+    ' col.g=texture2D(uTex,uv).g;',
+    ' col.b=texture2D(uTex,uv-ca).b;',
+    ' col+=vec3(1.,.93,.8)*pow(bulge,3.)*.07;',
+    ' gl_FragColor=vec4(col,1.);',
+    '}'
+  ].join('\n');
+
+  function lens(canvas) {
+    var P = program(canvas, LENS, true);
+    if (!P) return null;
+    var gl = P.gl, cache = {}, cur = null, h = 0, target = 0, raf = 0, t0 = performance.now();
+    var mouse = { x: 0, y: 0 }, sm = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
+
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
+    }
+    function texture(src, done) {
+      if (cache[src]) { if (cache[src].ready) done(cache[src]); else cache[src].wait.push(done); return; }
+      var e = cache[src] = { ready: false, wait: [done] }, img = new Image();
+      img.onload = function () {
+        try {
+          e.tex = gl.createTexture();
+          gl.bindTexture(gl.TEXTURE_2D, e.tex);
+          ['TEXTURE_WRAP_S', 'TEXTURE_WRAP_T'].forEach(function (k) { gl.texParameteri(gl.TEXTURE_2D, gl[k], gl.CLAMP_TO_EDGE); });
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+          if (gl.getError() !== gl.NO_ERROR) throw 0;
+        } catch (x) { e.failed = true; return; }
+        e.ready = true; e.w = img.naturalWidth; e.h = img.naturalHeight;
+        e.wait.forEach(function (f) { f(e); }); e.wait = [];
+      };
+      img.src = src;
+    }
+    // where the picture really sits: the clip box, and the image box after object-fit: cover
+    function boxes(c) {
+      var clip = c.box.getBoundingClientRect(), r = c.img.getBoundingClientRect();
+      var k = Math.max(r.width / c.tex.w, r.height / c.tex.h), w = c.tex.w * k, hh = c.tex.h * k;
+      return { clip: clip, img: [r.left + (r.width - w) / 2, r.top + (r.height - hh) / 2, w, hh] };
+    }
+    function frame() {
+      raf = 0;
+      h += (target - h) * .09;
+      sm.x += (mouse.x - sm.x) * .16; sm.y += (mouse.y - sm.y) * .16;
+      vel.x += ((mouse.x - sm.x) * 6 - vel.x) * .2; vel.y += ((mouse.y - sm.y) * 6 - vel.y) * .2;
+      var dpr = canvas.width / innerWidth;
+      gl.disable(gl.SCISSOR_TEST);
+      gl.clearColor(0, 0, 0, 0); gl.clear(gl.COLOR_BUFFER_BIT);
+      if (cur) {
+        var b = boxes(cur), c = b.clip;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.enable(gl.SCISSOR_TEST);
+        gl.scissor(Math.floor(c.left * dpr), Math.floor((innerHeight - c.bottom) * dpr), Math.ceil(c.width * dpr), Math.ceil(c.height * dpr));
+        gl.bindTexture(gl.TEXTURE_2D, cur.tex.tex);
+        gl.uniform2f(P.u('uRes'), canvas.width, canvas.height);
+        gl.uniform1f(P.u('uDpr'), dpr);
+        gl.uniform4f(P.u('uBox'), b.img[0], b.img[1], b.img[2], b.img[3]);
+        gl.uniform2f(P.u('uMouse'), sm.x, sm.y);
+        gl.uniform2f(P.u('uVel'), vel.x, vel.y);
+        gl.uniform1f(P.u('uHover'), h);
+        gl.uniform1f(P.u('uTime'), (performance.now() - t0) / 1000);
+        P.draw();
+      }
+      if (cur && target === 0 && h < .01) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; }
+      if (cur) raf = requestAnimationFrame(frame);
+    }
+    size();
+    window.addEventListener('resize', size);
+    return {
+      enter: function (box, img) {
+        var src = img.currentSrc || img.src;
+        texture(src, function (tex) {
+          if (cur && cur.img !== img) cur.img.style.opacity = '';
+          cur = { box: box, img: img, tex: tex };
+          target = 1;
+          canvas.style.opacity = 1;
+          img.style.opacity = 0;
+          if (!raf) raf = requestAnimationFrame(frame);
+        });
+      },
+      leave: function (img) { if (cur && cur.img === img) target = 0; },
+      move: function (x, y) { mouse.x = x; mouse.y = y; if (!cur) { sm.x = x; sm.y = y; } },
+      drop: function () { if (cur) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; target = 0; h = 0; } }
+    };
+  }
+
+  window.AeonGL = { silk: silk, water: water, lens: lens };
 })();

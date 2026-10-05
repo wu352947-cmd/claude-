@@ -423,6 +423,7 @@
     gsap.from('.hs__top > *', { opacity: 0, y: 24, duration: 1.4, stagger: .12, ease: 'expo.out', scrollTrigger: { trigger: '.hs__stage', start: 'top 65%', once: true } });
     var stamp = gsap.timeline({ paused: true })
       .fromTo('#seal', { scale: 2.8, opacity: 0, rotate: -18 }, { scale: 1, opacity: 1, rotate: -4, duration: .42, ease: 'power4.in' })
+      .call(function () { if (window.AeonSound) AeonSound.thump(); })
       .to('.hs__roll', { keyframes: { y: [0, 4, -2, 1, 0] }, duration: .32, ease: 'none' });
     gsap.set('#seal', { opacity: 0 });
     tl.fromTo(view, { clipPath: 'inset(0% 50% 0% 50%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1, ease: 'power2.inOut' }, 0)
@@ -574,6 +575,7 @@
       gsap.fromTo([hudNum, hudName], { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .5, ease: 'expo.out' });
     } });
     railLinks.forEach(function (a) { a.classList.toggle('is-active', a.getAttribute('href') === '#' + sec.id); });
+    if (window.AeonSound) AeonSound.chapter(sec.dataset.num);
   }
   $$('[data-bg]').forEach(function (sec) {
     ScrollTrigger.create({
@@ -688,6 +690,7 @@
   function openWork(id, srcEl) {
     var w = WORKS[id];
     if (!w || lbOpen) return;
+    if (lens) lens.drop();
     lbOpen = true;
     cursor && cursor.classList.remove('is-view');
     $('#lbNo').textContent = w.no;
@@ -756,6 +759,66 @@
   });
 
   $('#backTop').addEventListener('click', function () { go(0); });
+
+  /* ————————————————————————— liquid lens over every work ————————————————————————— */
+  var lens = fine && !reduce && window.AeonGL && AeonGL.lens($('#lens'));
+  ['.frame__img', '.phi__img', '.work figure', '.card__img', '.pillars__img', '.qm__slit'].forEach(function (sel) {
+    $$(sel).forEach(function (box) {
+      var img = $('img', box);
+      if (!img) return;
+      box.addEventListener('pointerenter', function () {
+        if (lens && !lbOpen && !menuOpen) lens.enter(box, img);
+        if (window.AeonSound) AeonSound.hover();
+      });
+      box.addEventListener('pointerleave', function () { if (lens) lens.leave(img); });
+    });
+  });
+  if (lens) window.addEventListener('pointermove', function (e) { lens.move(e.clientX, e.clientY); }, { passive: true });
+
+  /* ————————————————————————— sound ————————————————————————— */
+  var soundBtn = $('#soundBtn');
+  soundBtn.addEventListener('click', function () {
+    if (!window.AeonSound) return;
+    var on = AeonSound.toggle(current ? current.dataset.num : '序');
+    soundBtn.setAttribute('aria-pressed', on);
+    $('#soundLabel').textContent = on ? '声音 Sound on' : '声音 Sound off';
+  });
+
+  /* ————————————————————————— gold dust over the silk ————————————————————————— */
+  (function () {
+    var c = $('#heroDust'), x = c.getContext('2d'), pts = [], w, h, dpr, raf = 0, on = true;
+    var N = narrow() ? 70 : 170, m = { x: -9999, y: -9999 };
+    function size() { dpr = Math.min(devicePixelRatio || 1, 2); w = c.width = c.clientWidth * dpr; h = c.height = c.clientHeight * dpr; }
+    function seed(p, any) {
+      p.x = Math.random() * w; p.y = any ? Math.random() * h : h + 10;
+      p.r = (Math.random() * 1.4 + .4) * dpr; p.vy = -(Math.random() * .25 + .08) * dpr; p.vx = 0;
+      p.ph = Math.random() * 6.28; p.tw = Math.random() * .03 + .01;
+      return p;
+    }
+    size();
+    for (var i = 0; i < N; i++) pts.push(seed({}, true));
+    window.addEventListener('resize', size);
+    window.addEventListener('pointermove', function (e) { var r = c.getBoundingClientRect(); m.x = (e.clientX - r.left) * dpr; m.y = (e.clientY - r.top) * dpr; }, { passive: true });
+    function frame() {
+      raf = 0;
+      x.clearRect(0, 0, w, h);
+      for (var i = 0; i < N; i++) {
+        var p = pts[i], dx = p.x - m.x, dy = p.y - m.y, d2 = dx * dx + dy * dy, R = 140 * dpr;
+        if (d2 < R * R) { var f = (1 - Math.sqrt(d2) / R) * .9; p.vx += dx / Math.sqrt(d2 + 1) * f; p.vy += dy / Math.sqrt(d2 + 1) * f * .5; }
+        p.vx *= .94; p.vy += (-(.12 * dpr) - p.vy) * .02;
+        p.x += p.vx + Math.sin(p.ph * .7) * .15 * dpr; p.y += p.vy; p.ph += p.tw;
+        if (p.y < -10 || p.x < -20 || p.x > w + 20) seed(p, false);
+        var a = (.35 + .65 * Math.abs(Math.sin(p.ph))) * .8;
+        var g = x.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        g.addColorStop(0, 'rgba(255,226,170,' + a + ')'); g.addColorStop(1, 'rgba(255,200,120,0)');
+        x.fillStyle = g; x.beginPath(); x.arc(p.x, p.y, p.r * 4, 0, 6.283); x.fill();
+      }
+      if (on) raf = requestAnimationFrame(frame);
+    }
+    if (reduce) { frame(); return; }
+    ScrollTrigger.create({ trigger: '#hero', start: 'top bottom', end: 'bottom top', onToggle: function (s) { on = s.isActive; if (on && !raf) raf = requestAnimationFrame(frame); } });
+    raf = requestAnimationFrame(frame);
+  })();
 
   /* ————————————————————————— start ————————————————————————— */
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });

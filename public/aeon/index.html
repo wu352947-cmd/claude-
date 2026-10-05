@@ -49,6 +49,7 @@
 
 <div class="grain" aria-hidden="true"></div>
 <canvas class="stars" id="stars" aria-hidden="true"></canvas>
+<canvas class="lens" id="lens" aria-hidden="true"></canvas>
 
 <div class="cursor" id="cursor" aria-hidden="true">
   <div class="cursor__ring"><span class="cursor__label" id="cursorLabel">观</span></div>
@@ -72,6 +73,10 @@
   <span class="mono year__era" id="yearEra">BC</span>
 </div>
 
+<button class="hud hud--sound mono" id="soundBtn" type="button" aria-pressed="false" data-magnetic>
+  <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span id="soundLabel">声音 Sound off</span>
+</button>
+
 <nav class="rail" id="rail" aria-label="章节">
   <a href="#nile"><em>尼罗</em><span>I</span></a>
   <a href="#marble"><em>大理石</em><span>II</span></a>
@@ -86,6 +91,7 @@
   <!-- 序：丝绸与星盘 -->
   <section class="hero" id="hero" data-bg="#0b0a09" data-fg="#ebe5d9" data-num="序" data-name="Prologue">
     <canvas class="hero__gl" id="heroGL" aria-hidden="true"></canvas>
+    <canvas class="hero__dust" id="heroDust" aria-hidden="true"></canvas>
     <svg class="astrolabe" id="astrolabe" viewBox="-500 -500 1000 1000" aria-hidden="true"></svg>
     <div class="hero__inner">
       <p class="hero__eyebrow mono"><span>A Chronicle of Beauty</span><i></i><span>3000 BC — MMXXVI</span></p>
@@ -419,6 +425,7 @@
 <script src="vendor/ScrollTrigger.min.js"></script>
 <script src="vendor/lenis.min.js"></script>
 <script src="gl.js"></script>
+<script src="sound.js"></script>
 <script src="main.js"></script>
 </body>
 </html>

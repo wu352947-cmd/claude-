@@ -140,7 +140,8 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
 }
 .cursor__label { font: 500 12px/1 var(--f-cn); letter-spacing: .2em; color: #000; opacity: 0; transform: scale(.6); transition: opacity .3s, transform .5s var(--ease); padding-left: .2em; }
 .cursor.is-hover .cursor__ring { width: 70px; height: 70px; margin: -35px 0 0 -35px; border-color: rgba(255, 255, 255, .9); }
-.cursor.is-view .cursor__ring { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: #fff; border-color: #fff; }
+.has-cursor .cursor.is-view { mix-blend-mode: normal; }
+.cursor.is-view .cursor__ring { width: 92px; height: 92px; margin: -46px 0 0 -46px; background: rgba(235, 229, 217, .92); border-color: transparent; backdrop-filter: blur(4px); }
 .cursor.is-view .cursor__label { opacity: 1; transform: none; }
 .cursor.is-view .cursor__dot { opacity: 0; }
 .cursor.is-down .cursor__ring { width: 30px; height: 30px; margin: -15px 0 0 -15px; }
@@ -184,6 +185,21 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
 .year__col { display: flex; flex-direction: column; transition: transform 1s var(--ease), opacity .6s; }
 .year__col span { display: block; height: 1em; width: .62em; text-align: center; }
 .year__era { min-width: 2.4em; }
+
+.hud--sound {
+  right: var(--gutter); bottom: calc(var(--bottom) + 22px);
+  display: inline-flex; align-items: center; gap: 12px; padding: 6px 0;
+  pointer-events: auto;
+}
+.eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; }
+.eq i { width: 2px; height: 3px; background: currentColor; transition: height .4s var(--ease); }
+.hud--sound[aria-pressed="true"] .eq i { animation: eq 1.1s ease-in-out infinite alternate; }
+.hud--sound[aria-pressed="true"] .eq i:nth-child(2) { animation-delay: -.4s; }
+.hud--sound[aria-pressed="true"] .eq i:nth-child(3) { animation-delay: -.8s; }
+.hud--sound[aria-pressed="true"] .eq i:nth-child(4) { animation-delay: -.2s; }
+@keyframes eq { from { height: 3px; } to { height: 12px; } }
+.lens { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 45; pointer-events: none; opacity: 0; }
+.hero__dust { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; mix-blend-mode: screen; }
 
 .rail {
   position: fixed; z-index: 60; right: var(--gutter); top: 50%; transform: translateY(-50%);
@@ -467,7 +483,6 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
 .work { flex: none; display: grid; gap: 20px; }
 .work figure { position: relative; overflow: hidden; height: var(--h); aspect-ratio: var(--ar); max-width: 86vw; transform-origin: 50% 50%; }
 .work img { position: absolute; top: 0; left: -8%; width: 116%; max-width: none; height: 100%; object-fit: cover; transition: scale 1.2s var(--ease); }
-.work:hover img { scale: 1.04; }
 .w1 { --h: 54vh; align-self: flex-start; margin-top: 16vh; }
 .w2 { --h: 66vh; align-self: center; }
 .w3 { --h: 38vh; align-self: flex-end; margin-bottom: 18vh; }
@@ -493,7 +508,7 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   font: 400 clamp(20px, 2.2vw, 34px)/1 var(--f-cn);
 }
 .wave__cartouche .vc span { padding-block: .14em; }
-.wave__hint { position: absolute; right: var(--gutter); bottom: calc(var(--bottom) + 26px); color: #fff; mix-blend-mode: difference; opacity: .8; }
+.wave__hint { position: absolute; right: var(--gutter); bottom: calc(var(--bottom) + 64px); color: #fff; mix-blend-mode: difference; opacity: .8; }
 .wave__after { display: flex; justify-content: space-between; align-items: flex-start; gap: 32px; flex-wrap: wrap; padding: clamp(36px, 6vh, 64px) var(--gutter) 0; }
 .wave__en { font: italic 400 clamp(22px, 2.6vw, 40px)/1.3 var(--f-display); max-width: 22ch; }
 
@@ -678,6 +693,7 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   .hud--year { bottom: calc(var(--bottom) + 16px); }
   .year__digits { font-size: 24px; }
   .hero__foot > span:last-child { display: none; }
+  #soundLabel { display: none; }
   .hero__foot { justify-content: center; bottom: calc(var(--bottom) + 70px); }
   .plate { grid-template-columns: 1fr; row-gap: 12px; }
   .nile__line { top: calc(var(--top) + 84px); left: var(--gutter); }
