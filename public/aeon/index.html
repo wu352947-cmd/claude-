@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ÆON 万古</title>
+<meta name="description" content="万古 ÆON：横跨五千年的二十四件作品，一座只为美而建的数字展厅。">
+<meta name="theme-color" content="#0b0a09">
+<script>document.documentElement.classList.add('js');setTimeout(function(){document.documentElement.classList.add('is-ready')},12000)</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..600;1,6..96,400..600&family=IBM+Plex+Mono:wght@400;500&family=Noto+Serif+SC:wght@200..600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<svg class="defs" aria-hidden="true" focusable="false">
+  <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="5"/>
+  </filter>
+</svg>
+
+<!-- 开场：五千年的倒数 -->
+<div class="loader" id="loader" aria-hidden="true">
+  <i class="loader__lid loader__lid--top"></i>
+  <i class="loader__lid loader__lid--bot"></i>
+  <div class="loader__core">
+    <div class="loader__frame" id="loaderFrame">
+      <img src="img/s/pyramids.webp" alt="" class="on">
+      <img src="img/s/nefertiti.webp" alt="">
+      <img src="img/s/nike.webp" alt="">
+      <img src="img/s/qianli.webp" alt="">
+      <img src="img/s/monalisa.webp" alt="">
+      <img src="img/s/pearl.webp" alt="">
+      <img src="img/s/wave.webp" alt="">
+      <img src="img/s/starry.webp" alt="">
+      <img src="img/s/earthrise.webp" alt="">
+    </div>
+    <p class="loader__year"><b id="loaderYear">3000</b><i id="loaderEra">BC</i></p>
+  </div>
+  <i class="loader__line" id="loaderLine"></i>
+  <div class="loader__meta mono">
+    <span>ÆON · 万古</span>
+    <span class="loader__bar"><i id="loaderBar"></i></span>
+    <span>A Chronicle of Beauty</span>
+  </div>
+</div>
+
+<div class="grain" aria-hidden="true"></div>
+<canvas class="stars" id="stars" aria-hidden="true"></canvas>
+
+<div class="cursor" id="cursor" aria-hidden="true">
+  <div class="cursor__ring"><span class="cursor__label" id="cursorLabel">观</span></div>
+  <div class="cursor__dot"></div>
+</div>
+
+<header class="hud hud--top">
+  <a class="brand" href="#top" data-magnetic aria-label="ÆON 万古，回到开头">
+    <span class="brand__mark">Æ</span><span class="brand__txt">ÆON<span>万古</span></span>
+  </a>
+  <p class="hud__chapter mono"><span id="hudNum">序</span><i></i><span id="hudName">Prologue</span></p>
+  <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu" data-magnetic>
+    <span class="menu-btn__label mono">目录 Index</span>
+    <span class="menu-btn__icon" aria-hidden="true"><i></i><i></i></span>
+  </button>
+</header>
+
+<div class="hud hud--year" aria-hidden="true">
+  <span class="mono">Anno</span>
+  <span class="year__digits" id="yearDigits"></span>
+  <span class="mono year__era" id="yearEra">BC</span>
+</div>
+
+<nav class="rail" id="rail" aria-label="章节">
+  <a href="#nile"><em>尼罗</em><span>I</span></a>
+  <a href="#marble"><em>大理石</em><span>II</span></a>
+  <a href="#handscroll"><em>长卷</em><span>III</span></a>
+  <a href="#rebirth"><em>重生</em><span>IV</span></a>
+  <a href="#sublime"><em>崇高</em><span>V</span></a>
+  <a href="#cosmos"><em>星辰</em><span>VI</span></a>
+</nav>
+
+<main id="top">
+
+  <!-- 序：丝绸与星盘 -->
+  <section class="hero" id="hero" data-bg="#0b0a09" data-fg="#ebe5d9" data-num="序" data-name="Prologue">
+    <canvas class="hero__gl" id="heroGL" aria-hidden="true"></canvas>
+    <svg class="astrolabe" id="astrolabe" viewBox="-500 -500 1000 1000" aria-hidden="true"></svg>
+    <div class="hero__inner">
+      <p class="hero__eyebrow mono"><span>A Chronicle of Beauty</span><i></i><span>3000 BC — MMXXVI</span></p>
+      <h1 class="hero__title" aria-label="ÆON"><span class="l"><span>Æ</span></span><span class="l"><span>O</span></span><span class="l"><span>N</span></span></h1>
+      <p class="hero__cn">五千年，只为一瞬的美</p>
+      <p class="hero__en">Twenty-four works, five thousand years, one long exposure of human light.</p>
+    </div>
+    <div class="hero__foot mono">
+      <span class="scroll-cue"><i></i>Scroll · 向下</span>
+      <span class="hero__hint" id="heroHint">移动光标，丝绸会追着光</span>
+      <span>VI Capita · XXIV Opera</span>
+    </div>
+  </section>
+
+  <section class="manifesto" id="prologue" data-bg="#0b0a09" data-fg="#ebe5d9" data-num="序" data-name="Prologue">
+    <p class="mono manifesto__kicker">Prologue · 序</p>
+    <p class="manifesto__cn" data-scrub>二十四件作品，横跨五千年。一尊石像的侧脸，一卷山水的留白，一道浪的弧线，还有一颗星球回望自己的那一眼。</p>
+    <p class="manifesto__en" data-scrub>A profile in limestone, the empty silk of a landscape, the curl of a wave, and a planet looking back at itself.</p>
+  </section>
+
+  <!-- I 尼罗 -->
+  <section class="ch nile" id="nile" data-bg="#000000" data-fg="#efe4cf" data-num="I" data-name="Nile · 尼罗">
+    <div class="nile__stage">
+      <figure class="nile__portrait" data-work="nefertiti">
+        <img src="img/nefertiti.webp" width="1093" height="1600" alt="奈费尔提蒂胸像，石灰岩彩绘，约公元前 1345 年">
+      </figure>
+      <p class="nile__word" aria-hidden="true">NILE</p>
+      <header class="nile__plate">
+        <span class="plate-num">I</span>
+        <div>
+          <h2><span class="cn">尼罗</span> <em>Nile</em></h2>
+          <p class="mono">c. 2560 — 1323 BC · N 29°58′ E 31°08′</p>
+        </div>
+      </header>
+      <p class="nile__line">沙漠记得一切，<br>却只把最美的侧脸交给时间。<em>The desert remembers everything, and gives time only its finest profile.</em></p>
+      <p class="tag nile__tag" data-tag="nefertiti"></p>
+    </div>
+
+    <div class="nile__after">
+      <figure class="frame nile__pyr" data-work="pyramids" data-reveal>
+        <div class="frame__img"><img src="img/pyramids.webp" width="1600" height="1063" loading="lazy" alt="吉萨金字塔群"><i class="sweep"></i></div>
+        <figcaption class="tag" data-tag="pyramids"></figcaption>
+      </figure>
+      <figure class="frame nile__tut" data-work="tut" data-reveal>
+        <div class="frame__img sheen"><img src="img/tut.webp" width="1280" height="1600" loading="lazy" alt="图坦卡蒙黄金面具"></div>
+        <figcaption class="tag" data-tag="tut"></figcaption>
+      </figure>
+      <p class="nile__quote" data-split>黄金不会生锈，<br>所以他们把永恒交给了它。</p>
+    </div>
+  </section>
+
+  <!-- II 大理石 -->
+  <section class="ch marble" id="marble" data-bg="#e7e2d8" data-fg="#1d1b17" data-num="II" data-name="Marble · 大理石">
+    <header class="plate">
+      <span class="plate-num" data-split>II</span>
+      <div class="plate__body">
+        <h2><span class="cn" data-split>大理石</span> <em data-split>Marble</em></h2>
+        <p class="mono">447 BC — 125 AD · Athens · Samothrace · Melos · Roma</p>
+      </div>
+      <i class="plate__rule"></i>
+    </header>
+
+    <div class="phi__stage">
+      <div class="phi__head">
+        <p class="phi__num"><span id="phiNum">1.0000000000</span><em>φ</em></p>
+        <p class="phi__line">美，是比例的胜利。<em>Beauty is proportion, made visible.</em></p>
+      </div>
+      <div class="phi" id="phi">
+        <figure class="phi__cell" data-work="milo"><div class="phi__img"><img src="img/milo.webp" width="954" height="1600" alt="米洛的维纳斯"></div></figure>
+        <figure class="phi__cell" data-work="parthenon"><div class="phi__img"><img src="img/parthenon.webp" width="1600" height="1124" alt="帕特农神庙"></div></figure>
+        <figure class="phi__cell" data-work="nike"><div class="phi__img"><img src="img/nike.webp" width="1056" height="1600" alt="萨莫色雷斯的胜利女神"></div></figure>
+        <figure class="phi__cell" data-work="pantheon"><div class="phi__img"><img src="img/pantheon.webp" width="1227" height="1600" alt="万神殿内景"></div></figure>
+        <svg class="phi__svg" id="phiSvg" viewBox="0 0 1618.034 1000" preserveAspectRatio="none" aria-hidden="true"></svg>
+      </div>
+    </div>
+
+    <div class="phi__tags">
+      <p class="tag" data-tag="milo"></p>
+      <p class="tag" data-tag="parthenon"></p>
+      <p class="tag" data-tag="nike"></p>
+      <p class="tag" data-tag="pantheon"></p>
+    </div>
+  </section>
+
+  <!-- III 长卷 -->
+  <section class="ch handscroll" id="handscroll" data-bg="#e3d8c0" data-fg="#2a2219" data-num="III" data-name="Handscroll · 长卷">
+    <div class="hs__stage">
+      <div class="hs__top">
+        <header class="hs__plate">
+          <span class="plate-num">III</span>
+          <div>
+            <h2><span class="cn">长卷</span> <em>Handscroll</em></h2>
+            <p class="mono">1113 — 1127 AD · 汴京 Kaifeng · N 34°47′ E 114°18′</p>
+          </div>
+        </header>
+        <p class="hs__vert vt">千里江山图<br>王希孟　北宋政和三年</p>
+      </div>
+      <div class="hs__roll" id="hsRoll">
+        <div class="hs__view" id="hsView" data-work="qianli">
+          <div class="hs__track" id="hsTrack"><img src="img/qianli.webp" width="3840" height="820" alt="王希孟《千里江山图》，北宋，绢本设色"></div>
+        </div>
+        <i class="hs__rod hs__rod--l"></i><i class="hs__rod hs__rod--r"></i>
+        <div class="seal" id="seal" role="img" aria-label="朱印：萬古流光"><span>萬</span><span>古</span><span>流</span><span>光</span></div>
+      </div>
+      <div class="hs__bottom">
+        <p class="hs__line">一千一百九十一厘米的山水，<br>要慢慢走完。<em>Twelve metres of rivers and mountains, unrolled from right to left.</em></p>
+      </div>
+    </div>
+
+    <figure class="qm" data-work="qingming">
+      <div class="qm__slit" id="qmSlit">
+        <img src="img/qingming.webp" width="1920" height="960" loading="lazy" alt="张择端《清明上河图》局部">
+      </div>
+      <figcaption class="tag" data-tag="qingming"></figcaption>
+    </figure>
+  </section>
+
+  <!-- IV 重生 -->
+  <section class="ch rebirth" id="rebirth" data-bg="#120d0a" data-fg="#efe6d6" data-num="IV" data-name="Rinascimento · 重生">
+    <div class="gal__stage">
+      <div class="gal__track" id="galTrack">
+        <header class="gal__plate">
+          <span class="plate-num">IV</span>
+          <h2><span class="cn">重生</span> <em>Rinascimento</em></h2>
+          <p class="mono">1485 — 1665 · Firenze · Roma · Delft</p>
+          <p class="gal__lead">光，重新回到人的脸上。<em>Light returns to the human face.</em></p>
+        </header>
+        <article class="work w1" data-work="venus">
+          <figure style="--ar:1600/1005"><img src="img/venus.webp" width="1600" height="1005" loading="lazy" alt="波提切利《维纳斯的诞生》"></figure>
+          <p class="tag" data-tag="venus"></p>
+        </article>
+        <article class="work w2" data-work="monalisa">
+          <figure style="--ar:1078/1600"><img src="img/monalisa.webp" width="1078" height="1600" loading="lazy" alt="达·芬奇《蒙娜丽莎》"></figure>
+          <p class="tag" data-tag="monalisa"></p>
+        </article>
+        <article class="work w3" data-work="adam">
+          <figure style="--ar:1600/726"><img src="img/adam.webp" width="1600" height="726" loading="lazy" alt="米开朗基罗《创造亚当》"></figure>
+          <p class="tag" data-tag="adam"></p>
+        </article>
+        <article class="work w4" data-work="athens">
+          <figure style="--ar:1600/1237"><img src="img/athens.webp" width="1600" height="1237" loading="lazy" alt="拉斐尔《雅典学院》"></figure>
+          <p class="tag" data-tag="athens"></p>
+        </article>
+        <article class="work w5" data-work="pearl">
+          <figure style="--ar:1351/1600"><img src="img/pearl.webp" width="1351" height="1600" loading="lazy" alt="维米尔《戴珍珠耳环的少女》"></figure>
+          <p class="tag" data-tag="pearl"></p>
+        </article>
+        <p class="gal__end">一百八十年，<br>从佛罗伦萨<br>走到代尔夫特。<em>From Florence to Delft.</em></p>
+      </div>
+      <div class="gal__progress" aria-hidden="true"><i id="galBar"></i></div>
+    </div>
+  </section>
+
+  <!-- V 崇高 -->
+  <section class="ch sublime" id="sublime" data-bg="#0a0f18" data-fg="#e8ecf2" data-num="V" data-name="The Sublime · 崇高">
+    <header class="plate">
+      <span class="plate-num" data-split>V</span>
+      <div class="plate__body">
+        <h2><span class="cn" data-split>崇高</span> <em data-split>The Sublime</em></h2>
+        <p class="mono">1818 — 1908 · Edo · Hamburg · London · Paris · Saint-Rémy · Wien</p>
+      </div>
+      <i class="plate__rule"></i>
+    </header>
+
+    <div class="wave__stage" id="waveStage" data-work="wave">
+      <img class="wave__fallback" src="img/wave.webp" width="1600" height="1076" loading="lazy" alt="葛饰北斋《神奈川冲浪里》">
+      <canvas class="wave__gl" id="waveGL" aria-hidden="true"></canvas>
+      <p class="wave__cartouche vt" aria-label="浪，是海屏住的一口气。">浪<br>是海屏住的一口气</p>
+      <p class="wave__hint mono">Move · 拨动水面</p>
+    </div>
+    <div class="wave__after">
+      <p class="wave__en">A wave is the sea, holding its breath.</p>
+      <p class="tag" data-tag="wave"></p>
+    </div>
+
+    <div class="stack">
+      <article class="card" style="--c:#2b3440" data-work="wanderer">
+        <div class="card__text">
+          <p class="mono card__no">V.2 · 1818</p>
+          <div>
+            <h3>Der Wanderer über dem Nebelmeer</h3>
+            <p class="card__cn">雾海上的旅人</p>
+          </div>
+          <p class="card__line">他背对着我们，替我们看。<em>He turns his back to us, and looks on our behalf.</em></p>
+          <p class="mono card__meta">Caspar David Friedrich · Hamburger Kunsthalle</p>
+        </div>
+        <figure class="card__img"><img src="img/wanderer.webp" width="1249" height="1600" loading="lazy" alt="弗里德里希《雾海上的旅人》"></figure>
+      </article>
+      <article class="card" style="--c:#4a3a26" data-work="temeraire">
+        <div class="card__text">
+          <p class="mono card__no">V.3 · 1839</p>
+          <div>
+            <h3>The Fighting Temeraire</h3>
+            <p class="card__cn">被拖去解体的战舰无畏号</p>
+          </div>
+          <p class="card__line">一艘老战舰被拖向最后的码头，夕阳替它降旗。<em>Towed to her last berth, while the sun lowers the flag.</em></p>
+          <p class="mono card__meta">J. M. W. Turner · National Gallery, London</p>
+        </div>
+        <figure class="card__img"><img src="img/temeraire.webp" width="1600" height="1188" loading="lazy" alt="透纳《被拖去解体的战舰无畏号》"></figure>
+      </article>
+      <article class="card" style="--c:#4a1d12" data-work="ninthwave">
+        <div class="card__text">
+          <p class="mono card__no">V.4 · 1850</p>
+          <div>
+            <h3>Девятый вал</h3>
+            <p class="card__cn">九级浪</p>
+          </div>
+          <p class="card__line">第九道浪最高。他们还抱着桅杆。<em>The ninth wave is the highest. They are still holding on.</em></p>
+          <p class="mono card__meta">Ivan Aivazovsky · State Russian Museum</p>
+        </div>
+        <figure class="card__img"><img src="img/ninthwave.webp" width="1600" height="1057" loading="lazy" alt="艾瓦佐夫斯基《九级浪》"></figure>
+      </article>
+      <article class="card" style="--c:#2c4246" data-work="impression">
+        <div class="card__text">
+          <p class="mono card__no">V.5 · 1872</p>
+          <div>
+            <h3>Impression, soleil levant</h3>
+            <p class="card__cn">日出·印象</p>
+          </div>
+          <p class="card__line">一个早晨的印象，后来成了一个画派的名字。<em>One harbour morning gave a whole movement its name.</em></p>
+          <p class="mono card__meta">Claude Monet · Musée Marmottan Monet</p>
+        </div>
+        <figure class="card__img"><img src="img/impression.webp" width="1600" height="1241" loading="lazy" alt="莫奈《日出·印象》"></figure>
+      </article>
+      <article class="card" style="--c:#14244a" data-work="starry">
+        <div class="card__text">
+          <p class="mono card__no">V.6 · 1889</p>
+          <div>
+            <h3>De sterrennacht</h3>
+            <p class="card__cn">星月夜</p>
+          </div>
+          <p class="card__line">画于圣雷米疗养院的窗前，天还没有亮。<em>Painted from a window in Saint-Rémy, just before dawn.</em></p>
+          <p class="mono card__meta">Vincent van Gogh · MoMA, New York</p>
+        </div>
+        <figure class="card__img"><img src="img/starry.webp" width="1600" height="1267" loading="lazy" alt="梵高《星月夜》"></figure>
+      </article>
+      <article class="card" style="--c:#4b3b14" data-work="kiss">
+        <div class="card__text">
+          <p class="mono card__no">V.7 · 1908</p>
+          <div>
+            <h3>Der Kuss</h3>
+            <p class="card__cn">吻</p>
+          </div>
+          <p class="card__line">金箔之下的两个人，替一个世纪落幕。<em>Two figures under gold leaf, as the old century closes.</em></p>
+          <p class="mono card__meta">Gustav Klimt · Belvedere, Wien</p>
+        </div>
+        <figure class="card__img"><img src="img/kiss.webp" width="1395" height="1400" loading="lazy" alt="克里姆特《吻》"></figure>
+      </article>
+    </div>
+  </section>
+
+  <!-- VI 星辰 -->
+  <section class="ch cosmos" id="cosmos" data-bg="#000000" data-fg="#e9ecf2" data-num="VI" data-name="Cosmos · 星辰">
+    <div class="rise__stage" data-work="earthrise">
+      <div class="rise__frame">
+        <img class="rise__sky" src="img/earthrise.webp" width="1600" height="1600" loading="lazy" alt="地出，阿波罗 8 号，1968 年 12 月 24 日">
+        <img class="rise__ground" src="img/earthrise.webp" width="1600" height="1600" loading="lazy" alt="">
+      </div>
+      <header class="rise__plate">
+        <span class="plate-num">VI</span>
+        <div>
+          <h2><span class="cn">星辰</span> <em>Cosmos</em></h2>
+          <p class="mono">1968 — 2026 · Apollo 8 · Apollo 17 · Hubble</p>
+        </div>
+      </header>
+      <p class="rise__date" id="riseDate" aria-label="1968 年 12 月 24 日">1968·12·24</p>
+      <p class="rise__line">飞出三十八万公里，<br>他们回头看了一眼。<em>Three hundred and eighty thousand kilometres out, they turned around.</em></p>
+    </div>
+
+    <div class="pillars">
+      <figure class="pillars__img" data-work="pillars"><img src="img/pillars.webp" width="1534" height="1600" loading="lazy" alt="创生之柱，哈勃空间望远镜"></figure>
+      <div class="pillars__text">
+        <p class="pillars__big" data-split>六千五百光年外，<br>星星还在出生。</p>
+        <p class="tag" data-tag="pillars"></p>
+      </div>
+    </div>
+
+    <div class="home">
+      <figure class="home__earth" data-work="marble"><img src="img/marble.webp" width="1599" height="1600" loading="lazy" alt="蓝色弹珠，阿波罗 17 号，1972 年"></figure>
+      <p class="home__line" data-split>所有的历史，<br>都发生在这一粒蓝色之上。</p>
+      <p class="home__en">Every age in this chronicle happened here.</p>
+      <p class="tag home__tag" data-tag="marble"></p>
+    </div>
+  </section>
+
+  <footer class="fin" id="fin" data-bg="#0b0a09" data-fg="#ebe5d9" data-num="终" data-name="Fin">
+    <div class="fin__marquee" aria-hidden="true">
+      <div class="fin__row"><span>ÆON</span><i>✦</i><span class="cn">万古</span><i>✦</i><span>ÆON</span><i>✦</i><span class="cn">万古</span><i>✦</i></div>
+    </div>
+    <div class="fin__grid">
+      <div class="fin__col">
+        <p class="mono fin__label">Index · 二十四件作品</p>
+        <ol class="fin__index" id="finIndex"></ol>
+      </div>
+      <div class="fin__col fin__end">
+        <button class="back" id="backTop" type="button" data-magnetic><span>回到公元前 3000 年</span><i aria-hidden="true">↑</i></button>
+        <p class="fin__credit">图像均为公有领域作品，经由 Wikimedia Commons 获取；太空影像来自 NASA 与 ESA/Hubble。</p>
+        <p class="mono">ÆON · MMXXVI</p>
+      </div>
+    </div>
+  </footer>
+</main>
+
+<!-- 目录 -->
+<div class="menu" id="menu" inert>
+  <div class="menu__bg"></div>
+  <ol class="menu__list">
+    <li><a href="#nile" data-img="img/s/nefertiti.webp"><span class="mono">I</span><span class="menu__cn">尼罗</span><em>Nile</em><span class="mono menu__yr">2560 BC</span></a></li>
+    <li><a href="#marble" data-img="img/s/milo.webp"><span class="mono">II</span><span class="menu__cn">大理石</span><em>Marble</em><span class="mono menu__yr">447 BC</span></a></li>
+    <li><a href="#handscroll" data-img="img/s/qianli.webp"><span class="mono">III</span><span class="menu__cn">长卷</span><em>Handscroll</em><span class="mono menu__yr">1113 AD</span></a></li>
+    <li><a href="#rebirth" data-img="img/s/venus.webp"><span class="mono">IV</span><span class="menu__cn">重生</span><em>Rinascimento</em><span class="mono menu__yr">1485 AD</span></a></li>
+    <li><a href="#sublime" data-img="img/s/wave.webp"><span class="mono">V</span><span class="menu__cn">崇高</span><em>The Sublime</em><span class="mono menu__yr">1818 AD</span></a></li>
+    <li><a href="#cosmos" data-img="img/s/earthrise.webp"><span class="mono">VI</span><span class="menu__cn">星辰</span><em>Cosmos</em><span class="mono menu__yr">1968 AD</span></a></li>
+  </ol>
+  <div class="menu__preview" id="menuPreview" aria-hidden="true"><img alt=""></div>
+  <p class="menu__foot mono"><span>ÆON · 万古</span><span>一座只为美而建的展厅</span></p>
+</div>
+
+<!-- 展签 -->
+<div class="lb" id="lb" role="dialog" aria-modal="true" aria-labelledby="lbTitle" inert>
+  <div class="lb__bg"></div>
+  <div class="lb__stage" id="lbStage"></div>
+  <aside class="lb__info" id="lbInfo">
+    <p class="mono" id="lbNo"></p>
+    <h3 id="lbTitle"></h3>
+    <p class="lb__cn" id="lbCn"></p>
+    <dl id="lbDl"></dl>
+  </aside>
+  <button class="lb__close mono" id="lbClose" type="button">Close · 关闭</button>
+</div>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script src="gl.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
