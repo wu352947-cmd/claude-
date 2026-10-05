@@ -2598,7 +2598,9 @@ function echelonReserve(side) {
   let p = 0;
   const st = echState(side);
   for (const E of ECHELONS[side]) {
-    const left = E.uses - ((st[E.id] && st[E.id].called) || 0);
+    // a group already ordered but still under way counts as reserve until it arrives (not as a loss)
+    const transit = st[E.id] && st[E.id].due > game.t ? 1 : 0;
+    const left = E.uses - ((st[E.id] && st[E.id].called) || 0) + transit;
     if (left <= 0) continue;
     for (const [cls] of E.units || []) { const S = CLS[cls]; p += S.value + Object.values(S.ashm).reduce((a, b) => a + b, 0) * 2 + (S.tlam || 0) * 2; for (const [t, n] of Object.entries(S.wing || {})) p += AC[t].value * n * 0.45; }
     for (const [t, n] of Object.entries(E.wing || {})) p += AC[t].value * n * 0.45;
