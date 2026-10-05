@@ -1,7 +1,8 @@
 // Inlines the shared model and terrain into each page.
 // Outputs: *.body.html (published as artifacts) and standalone documents for the site.
 import { readFileSync, writeFileSync } from 'node:fs';
-const here = new URL('.', import.meta.url).pathname;
+import { fileURLToPath } from 'node:url';
+const here = fileURLToPath(new URL('.', import.meta.url));   // decodes non-ASCII folder names
 const read = f => readFileSync(here + f, 'utf8');
 const model = read('src/model.js'), terrain = read('src/terrain.js'), aircraft = read('src/aircraft.js'), world = read('src/world.js'), raptorhd = read('src/raptorglb.js'), navy = read('src/navy.js'), navyhd = read('src/navyhd.js'), seaenv = read('src/seaenv.js'), naval = read('src/naval.js'), ui = read('src/ui.js'), campaign = read('src/campaign.js'), tactical = read('src/tactical.js'), reefs = read('src/reefs.js'), joint = read('src/joint.js');
 const doc = body => `<!doctype html>\n<html lang="zh-CN">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n${body}</html>\n`;
