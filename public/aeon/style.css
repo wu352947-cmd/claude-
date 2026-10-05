@@ -381,11 +381,12 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   position: relative;
   height: 100vh; height: 100svh;
   overflow: hidden;
-  display: grid; grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: clamp(16px, 3vh, 32px);
-  padding: calc(var(--top) + 84px) var(--gutter) calc(var(--bottom) + 72px);
+  display: grid; grid-template-rows: auto minmax(0, 1fr);
+  gap: clamp(20px, 4vh, 44px);
+  padding: calc(var(--top) + 84px) var(--gutter) calc(var(--bottom) + 76px);
 }
-.hs__top { display: flex; justify-content: space-between; align-items: flex-start; gap: 24px; }
+.hs__top { display: flex; align-items: flex-start; gap: clamp(24px, 4vw, 72px); }
+.hs__top .hs__line { margin-left: auto; padding-top: 8px; text-align: right; }
 .hs__plate { display: flex; align-items: flex-end; gap: clamp(16px, 2.4vw, 36px); }
 .hs__plate .plate-num { font-size: clamp(70px, 8vw, 130px); }
 .hs__plate h2 .cn { font-size: clamp(38px, 4.6vw, 76px); }
@@ -428,7 +429,6 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
 .hs__rod::after { bottom: -14px; }
 .hs__rod--l { left: calc(clamp(12px, 1.1vw, 18px) / -2); }
 .hs__rod--r { right: calc(clamp(12px, 1.1vw, 18px) / -2); }
-.hs__bottom { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; }
 .hs__line { font: 300 clamp(16px, 1.6vw, 22px)/1.8 var(--f-cn); letter-spacing: .12em; }
 .hs__line em { display: block; font-size: .75em; letter-spacing: 0; opacity: .65; margin-top: 6px; }
 .seal {
@@ -523,7 +523,7 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
 /* —— VI Cosmos —— */
 .stars { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; }
 .rise__stage { position: relative; height: 100vh; height: 100svh; overflow: hidden; }
-.rise__frame { position: absolute; left: 50%; top: 50%; width: max(100vw, 160vh); aspect-ratio: 1; transform: translate(-53%, -63%); }
+.rise__frame { position: absolute; left: 50%; top: 50%; width: max(110vw, 165vh); aspect-ratio: 1; transform: translate(-52%, -63%); }
 .rise__frame img { position: absolute; inset: 0; width: 100%; height: 100%; }
 .rise__ground { clip-path: polygon(0 75.6%, 50% 80%, 100% 85%, 100% 100%, 0 100%); }
 .rise__plate { position: absolute; left: var(--gutter); top: calc(var(--top) + 96px); display: flex; align-items: flex-end; gap: clamp(16px, 2.4vw, 36px); }
@@ -680,7 +680,7 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   .hero__foot > span:last-child { display: none; }
   .hero__foot { justify-content: center; bottom: calc(var(--bottom) + 70px); }
   .plate { grid-template-columns: 1fr; row-gap: 12px; }
-  .nile__line { top: auto; bottom: 40vh; left: var(--gutter); }
+  .nile__line { top: calc(var(--top) + 84px); left: var(--gutter); }
   .nile__tag { display: none; }
   .nile__plate { bottom: calc(var(--bottom) + 76px); }
   .nile__after { grid-template-columns: 1fr; }
@@ -690,7 +690,8 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   .phi__line { text-align: left; }
   .hs__vert { display: none; }
   .seal { left: 5%; bottom: 9%; }
-  .hs__bottom { align-items: center; }
+  .hs__top { flex-wrap: wrap; }
+  .hs__top .hs__line { margin-left: 0; text-align: left; flex-basis: 100%; }
   .w1 { --h: 34vh; margin-top: 20vh; }
   .w2 { --h: 48vh; }
   .w3 { --h: 24vh; margin-bottom: 22vh; }
@@ -702,7 +703,10 @@ html.has-cursor, html.has-cursor a, html.has-cursor button, html.has-cursor [dat
   .card__text { gap: 12px; padding: 20px; }
   .card__line em, .card__meta { display: none; }
   .rise__date { top: auto; bottom: 46vh; right: auto; left: var(--gutter); }
-  .rise__line { top: auto; bottom: calc(var(--bottom) + 70px); }
+  .rise__line { top: auto; bottom: 27vh; }
+  .hs__roll { max-height: 44vh; }
+  .hero__eyebrow { flex-direction: column; gap: 6px; }
+  .hero__eyebrow i { display: none; }
   .pillars { grid-template-columns: 1fr; }
   .lb__stage { right: var(--gutter); bottom: 42vh; }
   .lb__info { left: var(--gutter); width: auto; }

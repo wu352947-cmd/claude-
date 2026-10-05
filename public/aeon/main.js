@@ -420,7 +420,7 @@
     var view = $('#hsView'), track = $('#hsTrack');
     var pan = function () { return Math.max(0, track.scrollWidth - view.clientWidth); };
     var tl = gsap.timeline({ scrollTrigger: { trigger: '.hs__stage', start: 'top top', end: function () { return '+=' + (pan() * 1.1 + innerHeight * 1.6); }, pin: true, scrub: 1, invalidateOnRefresh: true, refreshPriority: 1 } });
-    gsap.from('.hs__top > *, .hs__line', { opacity: 0, y: 24, duration: 1.4, stagger: .12, ease: 'expo.out', scrollTrigger: { trigger: '.hs__stage', start: 'top 65%', once: true } });
+    gsap.from('.hs__top > *', { opacity: 0, y: 24, duration: 1.4, stagger: .12, ease: 'expo.out', scrollTrigger: { trigger: '.hs__stage', start: 'top 65%', once: true } });
     var stamp = gsap.timeline({ paused: true })
       .fromTo('#seal', { scale: 2.8, opacity: 0, rotate: -18 }, { scale: 1, opacity: 1, rotate: -4, duration: .42, ease: 'power4.in' })
       .to('.hs__roll', { keyframes: { y: [0, 4, -2, 1, 0] }, duration: .32, ease: 'none' });
