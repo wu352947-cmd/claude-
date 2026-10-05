@@ -13,8 +13,8 @@ function airInventory(side) {
 }
 const AC_NOTE = {
   j15: '舰载多用途 · 霹雳-15 ×4、霹雳-10 ×2、鹰击-83K ×2', j35: '隐身制空 · 先敌发现先敌开火 · 霹雳-15 ×4 内埋', j15d: '电子战 · 远距支援干扰 · 鹰击-91 反辐射导弹 ×2', kj600: '舰载预警 · 130 km 雷达',
-  j16: '陆基多用途 · 岛礁跑道起飞', h6k: '远程轰炸 · 鹰击-12 超音速反舰导弹 ×4', fa18: '舰载多用途 · AIM-120D ×4、LRASM ×2', ea18g: '电子战 · 远距支援干扰 · AARGM-ER 反辐射导弹 ×2',
-  f35c: '隐身制空 · 先敌发现先敌开火 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · 隐身 LRASM ×8 · 从关岛突入'
+  j16: '陆基多用途 · 岛礁跑道起飞', h6k: '远程轰炸 · 鹰击-12 超音速反舰导弹 ×6', fa18: '舰载多用途 · AIM-120D ×4、LRASM ×2', ea18g: '电子战 · 远距支援干扰 · AARGM-ER 反辐射导弹 ×2',
+  f35c: '隐身制空 · 先敌发现先敌开火 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · 隐身 LRASM ×16 · 从关岛突入'
 };
 function shipNote(s) {
   const a = Object.entries(s.ashm).filter(([, n]) => n > 0).map(([k, n]) => `${MSL[k].name} ×${n}`).join('、');
@@ -345,7 +345,7 @@ function callSupport() {
         pl.pos.set(THEATRE.air - 14000, 6500, rand(-15000, 15000) + i * 500); setBasis(pl.q, new V3(-1, 0, 0), Y_AXIS); pl.speed = 260; pl.axes(); pl.sync();
         planes.push(pl);
       }
-      radio('空中指挥', `B-1B 双机携 8 枚 LRASM 突入，目标${t.name}。`, '#9fd4ff');
+      radio('空中指挥', `B-1B 双机携 32 枚 LRASM 突入，目标${t.name}。`, '#9fd4ff');
       ok = true;
     }
   }

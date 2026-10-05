@@ -677,7 +677,7 @@ const JCC_TABS = {
   roe(side, C) {
     const M = magazines(side), A = airStock(side), low = planes.filter(p => p.side === side && p.alive && p.airborne && p.fuel < p.T.fuel * 0.25).length;
     const tk = planes.filter(p => p.side === side && p.alive && p.airborne && p.role === 'tank').length;
-    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 6} 个波次（每波 8 枚）` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
+    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 7} 个波次（每波 8 枚）` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
     return `<div class="prow"><i>武器控制</i>${segJ('wcs', Object.entries(ROE.wcs).map(([k, v]) => [k, v[0]]), C.roe.wcs)}</div>
       <div class="prow"><i>电磁管控</i>${segJ('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), tac(side).navy === 'emcon' ? 'A' : C.roe.emcon)}</div>
       <div class="prow"><i>参谋权限</i>${segJ('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), C.auth)}</div>
@@ -783,9 +783,9 @@ function strikePotential(side, tp) {
   let air = 0, sea = 0;
   for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying && h.hangar) {
     const n = ['j15', 'j16', 'fa18'].reduce((a, t) => a + (h.hangar[t] || 0), 0) - (C.resvOut ? 0 : (C.resvN || {})[h.name] || 0);
-    air += Math.min(12, Math.max(0, n)) * 2 + (h.hangar.h6k ? Math.min(3, h.hangar.h6k) * 2 : 0);
+    air += Math.min(12, Math.max(0, n)) * 2 + (h.hangar.h6k ? Math.min(3, h.hangar.h6k) * 6 : 0);
   }
-  if (side === 'us') air += Math.min(2, C.b1b || 0) * 4;
+  if (side === 'us') air += Math.min(2, C.b1b || 0) * 16;
   for (const s of ships) if (s.side === side && s.alive && !s.dying && !s.S.sub)
     for (const [k, n] of Object.entries(s.ashm)) if (n > 0 && MSL[k].range * 0.95 > s.pos.distanceTo(tp)) sea += Math.min(n, 4);
   return { air, sea: Math.min(sea, side === 'cn' ? 16 : 10), total: air + Math.min(sea, side === 'cn' ? 16 : 10) };
@@ -920,7 +920,7 @@ function jointFiresPlan(side, tgt) {
     if (side === 'us' && tgt.kind === 'ship' && (s.tlamN || 0) > 0) for (let j = 0; j < Math.min(s.tlamN, 12); j++) { items.push({ kind: 'mst', s, k: 'mst', tof: d / MSL.mst.v + 3 }); count.mst++; }
   }
   // ballistic missiles need a fix no older than 30 s (they fly 50 s; the target moves 800 m in that time)
-  if (side === 'cn' && tgt.kind === 'ship' && (command.cn.dfN ?? 6) > 0 && age < 30 && tr && !tr.coarse) for (let j = 0; j < 8; j++) { items.push({ kind: 'df', k: j % 2 ? 'df26' : 'df21d', tof: 55 }); count.df++; }
+  if (side === 'cn' && tgt.kind === 'ship' && (command.cn.dfN ?? 7) > 0 && age < 30 && tr && !tr.coarse) for (let j = 0; j < 8; j++) { items.push({ kind: 'df', k: j % 2 ? 'df26' : 'df21d', tof: 55 }); count.df++; }
   // the slowest shooters (subsonic Tomahawks) set the time on target; nothing waits longer than ten minutes
   const fit = items.filter(i => i.tof < 600).sort((a, b) => (b.kind === 'df') - (a.kind === 'df') || a.tof - b.tof).slice(0, 120);
   for (const k in count) count[k] = 0;
@@ -936,7 +936,7 @@ function jointFires(side, P) {
   if (!P || !P.N) return 0;
   const C = command[side], tgt = P.tgt, t0 = game.t;
   // a Rocket Force wave is one of its six
-  if (P.count.df) { command.cn.dfN = (command.cn.dfN ?? 6) - 1; command.cn.dfCd = Math.max(command.cn.dfCd ?? 0, 300); }
+  if (P.count.df) { command.cn.dfN = (command.cn.dfN ?? 7) - 1; command.cn.dfCd = Math.max(command.cn.dfCd ?? 0, 300); }
   for (const it of P.items) {
     const at = t0 + P.T - it.tof;
     if (it.kind === 'df') { /* counted above */ }

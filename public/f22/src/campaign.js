@@ -518,6 +518,13 @@ function battleCasualties(side) {
   n += (L.crew ? L.crew[side] : 0);
   return Math.round(n);
 }
+// the losses set against the great carrier battles: how bad was it, really
+function historyCompare(me, them) {
+  const L = game.ledger, n = side => FLEET[side].units.filter(([, name]) => L.sunk[side].includes(name)).length, N = side => FLEET[side].units.length;
+  const cv = side => FLEET[side].units.filter(([c, name]) => CLS[c].carrier && L.sunk[side].includes(name)).length;
+  const pct = side => Math.round(n(side) / N(side) * 100);
+  return `${SIDES[me].short}沉没 ${n(me)}/${N(me)} 艘（${pct(me)}%，航母 ${cv(me)}）· ${SIDES[them].short}沉没 ${n(them)}/${N(them)} 艘（${pct(them)}%，航母 ${cv(them)}）——对照：中途岛日军四艘航母全部沉没，美军损失一艘；莱特湾日军损失约 29 艘军舰、约占参战兵力四成，此后再未能组织舰队决战。`;
+}
 function runFinale(win, done) {
   const R = game.result || { tier: win ? 'win' : 'lose', why: '' }, T = RESULT_TIERS[R.tier], me = game.side, them = foe(me), L = game.ledger;
   const el = $('finale'), cine = settings.cine;
@@ -538,7 +545,7 @@ function runFinale(win, done) {
   const casMe = battleCasualties(me), casThem = battleCasualties(them);
   const evs = (game.chron || []).slice(-22);
   el.innerHTML = `<div class="fwords"></div>
-    <div class="fstamp"><em>南海大会战 · ${Math.floor(game.t / 60)} 分钟</em><h1 style="--c:${T.color}">${T.name}</h1><p>${R.why || ''}</p></div>
+    <div class="fstamp"><em>南海大会战 · ${Math.floor(game.t / 60)} 分钟</em><h1 style="--c:${T.color}">${T.name}</h1><p>${R.why || ''}</p><p class="hist">${historyCompare(me, them)}</p></div>
     <div class="fbody">
       <section class="fchron"><h3>战史</h3><ol>${evs.map(e => `<li class="${e.big ? 'big' : ''}${e.side ? ' s-' + (e.side === me ? 'me' : 'them') : ''}"><em>${String(Math.floor(e.t / 60)).padStart(2, '0')}:${String(Math.floor(e.t % 60)).padStart(2, '0')}</em>${e.text}</li>`).join('')}</ol></section>
       <section class="ftally"><h3>代价</h3>

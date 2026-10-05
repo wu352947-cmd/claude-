@@ -175,9 +175,9 @@ const SIDES = {
     id: 'cn', name: '中国人民解放军海军', short: '解放军海军', color: '#ff7a6b', foe: 'us',
     perks: [
       ['侦察-打击体系', '遥感卫星、天波超视距雷达、无侦-7 高空无人机与空警-600 编织杀伤网；只要拿到 30 秒内的精确航迹，火箭军就能出手。'],
-      ['火箭军', '六个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
+      ['火箭军', '七个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
       ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
-      ['岛礁要塞与陆基航空兵', '永暑礁机场起降歼-16 与轰-6K（每机 4 枚鹰击-12）；歼-15D 以鹰击-91 反辐射导弹压制宙斯盾雷达。']
+      ['岛礁要塞与陆基航空兵', '永暑礁机场起降歼-16 与轰-6K（每机 6 枚鹰击-12）；歼-15D 以鹰击-91 反辐射导弹压制宙斯盾雷达。']
     ]
   },
   us: {
@@ -186,7 +186,7 @@ const SIDES = {
       ['协同作战能力 CEC / NIFC-CA', '每艘宙斯盾舰都能用 E-2D 与友舰的航迹开火，标准-6 拦截地平线以外的目标；标准-3 在大气层外拦截东风。'],
       ['分布式杀伤', '两百余枚海上打击型战斧分布在每一艘驱逐舰与潜艇的垂发单元里；联合火力打击一次可齐射上百枚。'],
       ['隐身与电子战', 'F-35C 先敌发现、先敌开火；EA-18G 以 AARGM-ER 反辐射导弹摧毁敌舰雷达；MQ-4C 人鱼海神提供持续海面监视。'],
-      ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 8 枚隐身 LRASM。']
+      ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 16 枚隐身 LRASM。']
     ]
   }
 };
@@ -200,12 +200,12 @@ const AC = {
   kj600: { name: '空警-600', side: 'cn', model: 'kj600', hp: 80, radius: 13, pitch: 0.3, roll: 0.8, mil: 34, ab: 34, drag: 9e-4, vs: 52, rcs: 1.3, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 12, radar: 130000, aew: true, fuel: 3200, value: 22, gearH: 2.2, role: 'aew', cat: true },
   j16:   { name: '歼-16', side: 'cn', model: 'j16', hp: 140, radius: 9, pitch: 0.82, roll: 2.2, mil: 60, ab: 106, drag: 7.1e-4, vs: 68, rcs: 1, srm: 2, mrm: 4, srmType: 'pl10', mrmType: 'pl15', ashm: 2, ashmType: 'yj12', ammo: 150, cm: 24, radar: 44000, fuel: 2100, value: 12, gearH: 2.6, role: 'multi' },
   j15d:  { name: '歼-15D 电子战机', side: 'cn', model: 'j15', hp: 130, radius: 9, pitch: 0.78, roll: 2.1, mil: 58, ab: 104, drag: 7.4e-4, vs: 66, rcs: 1.1, srm: 0, mrm: 2, srmType: 'pl10', mrmType: 'pl15', ashm: 0, ammo: 150, cm: 30, radar: 42000, fuel: 1700, value: 18, gearH: 2.6, role: 'ew', ew: true, cat: true, arm: 2, armType: 'yj91' },
-  h6k:   { name: '轰-6K', side: 'cn', model: 'h6k', hp: 380, radius: 16, pitch: 0.26, roll: 0.6, mil: 40, ab: 40, drag: 5.4e-4, vs: 78, rcs: 1.6, srm: 0, mrm: 0, ashm: 4, ashmType: 'yj12', ammo: 0, cm: 16, radar: 30000, fuel: 3000, value: 25, gearH: 3, role: 'bomber' },
+  h6k:   { name: '轰-6K', side: 'cn', model: 'h6k', hp: 380, radius: 16, pitch: 0.26, roll: 0.6, mil: 40, ab: 40, drag: 5.4e-4, vs: 78, rcs: 1.6, srm: 0, mrm: 0, ashm: 6, ashmType: 'yj12', ammo: 0, cm: 16, radar: 30000, fuel: 3000, value: 25, gearH: 3, role: 'bomber' },
   fa18:  { name: 'F/A-18E', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.86, roll: 2.4, mil: 56, ab: 100, drag: 7.2e-4, vs: 60, rcs: 0.9, srm: 2, mrm: 4, srmType: 'aim9', mrmType: 'aim120', ashm: 2, ashmType: 'lrasm', ammo: 400, cm: 24, radar: 44000, fuel: 1650, value: 12, gearH: 2.4, role: 'multi', cat: true },
   f35c:  { name: 'F-35C', side: 'us', model: 'f35c', hp: 105, radius: 7, pitch: 0.86, roll: 2.4, mil: 60, ab: 100, drag: 7.0e-4, vs: 58, rcs: 0.3, srm: 0, mrm: 4, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 180, cm: 20, radar: 48000, fuel: 1800, value: 16, gearH: 2.2, role: 'fighter', cat: true },
   ea18g: { name: 'EA-18G 咆哮者', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.82, roll: 2.3, mil: 56, ab: 100, drag: 7.5e-4, vs: 60, rcs: 1, srm: 0, mrm: 2, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 0, cm: 30, radar: 44000, fuel: 1650, value: 18, gearH: 2.4, role: 'ew', ew: true, cat: true, arm: 2, armType: 'aargm' },
   e2d:   { name: 'E-2D', side: 'us', model: 'e2d', hp: 80, radius: 13, pitch: 0.3, roll: 0.8, mil: 34, ab: 34, drag: 9e-4, vs: 52, rcs: 1.3, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 12, radar: 140000, aew: true, fuel: 3200, value: 22, gearH: 2.2, role: 'aew', cat: true },
-  b1b:   { name: 'B-1B', side: 'us', model: 'b1b', hp: 460, radius: 17, pitch: 0.3, roll: 0.7, mil: 62, ab: 80, drag: 4.8e-4, vs: 80, rcs: 0.9, srm: 0, mrm: 0, ashm: 8, ashmType: 'lrasm', ammo: 0, cm: 30, radar: 30000, fuel: 2400, value: 25, gearH: 3, role: 'bomber' }
+  b1b:   { name: 'B-1B', side: 'us', model: 'b1b', hp: 460, radius: 17, pitch: 0.3, roll: 0.7, mil: 62, ab: 80, drag: 4.8e-4, vs: 80, rcs: 0.9, srm: 0, mrm: 0, ashm: 16, ashmType: 'lrasm', ammo: 0, cm: 30, radar: 30000, fuel: 2400, value: 25, gearH: 3, role: 'bomber' }
 };
 /* ---------- weapons ---------- */
 // air-to-air: seeker ir / radar as in 猛禽制空
@@ -2253,11 +2253,11 @@ function updateCommand(side, dt) {
   // --- strategic strikes: the PLA Rocket Force against carriers, US Tomahawks against the island ---
   if (side === 'cn') {
     C.dfCd = (C.dfCd ?? 300) - dt;
-    if (C.dfCd <= 0 && (C.dfN ?? 6) > 0) {
+    if (C.dfCd <= 0 && (C.dfN ?? 7) > 0) {
       // the kill chain: a ballistic shot needs a precise track (radar, not a satellite's coarse fix) under 30 s old
       const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && !e.phantom && game.t - tr.t < 30 && !tr.coarse);
       if (!cvT) C.dfCd = 20;
-      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 6} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 6) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 6) - 1; C.dfCd = 300; } } }); }
+      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 7} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 7) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 7) - 1; C.dfCd = 300; } } }); }
     }
   } else {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
@@ -2425,9 +2425,9 @@ function updateCommand(side, dt) {
   }
   // US: B-1B raids from outside the theatre
   if (side === 'us' && C.b1b > 0 && game.t > C.raidT) {
-    C.raidT = game.t + 420;
+    C.raidT = game.t + 330;
     const tgt = main && main.kind === 'ship' ? main : bestTarget('us', new V3(0, 0, 0), 200000);
-    if (tgt && release('us', tgt) === 'ask') { C.raidT = game.t + 90; staffAct('us', { key: 'b1b', title: 'B-1B 远程突击', detail: `关岛 B-1B 双机携 8 枚 LRASM 突入，目标${tgt.name}`, ttl: 20, run: () => b1bRaid(tgt) }); return; }
+    if (tgt && release('us', tgt) === 'ask') { C.raidT = game.t + 90; staffAct('us', { key: 'b1b', title: 'B-1B 远程突击', detail: `关岛 B-1B 双机携 32 枚 LRASM 突入，目标${tgt.name}`, ttl: 20, run: () => b1bRaid(tgt) }); return; }
     b1bRaid(tgt);
   }
 }
@@ -2508,7 +2508,7 @@ function potential(side) {
   if (side === 'cn' && bases.some(b => b.alive)) p += 3 * AC.h6k.value * 0.45;
   // what is left in the magazines: a fleet with empty cells cannot fight on
   for (const s of ships) if (s.side === side && s.alive && !s.dying) p += (Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0)) * 2;
-  if (side === 'cn') p += (command.cn.dfN ?? 6) * 30;
+  if (side === 'cn') p += (command.cn.dfN ?? 7) * 30;
   return p;
 }
 const potential0 = { cn: 1, us: 1 };
@@ -3648,8 +3648,8 @@ function setupBattle() {
   // a new battle starts from a clean staff: no cooldowns, packages or intents left over from the last one
   for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
   Object.assign(command.cn, { course: 0, speed: 11, salvoCd: 40, airT: 0, strikeCd: {}, sweepCd: 30, h6Cd: 150 });
-  Object.assign(command.us, { course: Math.PI, speed: 11, salvoCd: 50, airT: 0, strikeCd: {}, sweepCd: 30, b1b: 10, raidT: 240 });
-  command.cn.reinf = 600;
+  Object.assign(command.us, { course: Math.PI, speed: 11, salvoCd: 50, airT: 0, strikeCd: {}, sweepCd: 30, b1b: 10, raidT: 180 });
+  command.cn.reinf = 600; command.cn.dfN = 7;
   potential0.cn = potential('cn'); potential0.us = potential('us');
 }
 // compile every material in the battle up front (both detail levels), so nothing stalls a frame mid-fight
@@ -3664,7 +3664,7 @@ function startGame() {
   Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffHold: 0, wall: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
     ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
     stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 }, result: null,
-    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 }, crew: { cn: 0, us: 0 } }, chron: [] });
+    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 }, crew: { cn: 0, us: 0 } }, chron: [], lossInfo: null });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
   $('act').hidden = $('finale').hidden = true;
   initJoint();
@@ -3727,11 +3727,22 @@ function checkEnd(dt) {
   game.endCheck = (game.endCheck || 0) - dt;
   if (game.endCheck > 0 || game.over) return;
   game.endCheck = 1;
+  // a side is beaten when its war potential collapses, when its carriers have gone and the window for a last
+  // blow has passed, when two fifths of its fleet is on the bottom, or when its magazines and decks are empty
   for (const side of ['cn', 'us']) {
     const alive = ships.some(s => s.side === side && s.alive && !s.dying) || bases.some(b => b.side === side && b.alive);
-    const p = potential(side) / potential0[side];
+    const p = potential(side) / potential0[side], C = command[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
-    if (!alive || p < 0.33 || (!carriers && p < 0.42)) { finish(foe(side), `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`); return; }
+    if (!carriers && C.cvLostT == null) { C.cvLostT = game.t; if (side === game.side && game.role !== 'watch') radio('战区指挥部', '我方航母已全部损失！舰队还有最后的打击力量——在撤出之前，打出去。', '#ff8a78'); }
+    const hulls = FLEET[side].units.length, lost = FLEET[side].units.filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
+    const M = magazines(side), A = airStock(side), dry = M.ashm < M.ashm0 * 0.08 && A.strike < A.strike0 * 0.08 && !planes.some(q => q.side === side && q.alive && q.ashmN > 0);
+    let why = null;
+    if (!alive) why = '舰队全军覆没';
+    else if (p < 0.33) why = '战争潜力崩溃';
+    else if (!carriers && game.t - C.cvLostT > 180 && p < 0.5) why = '航母全部损失，残存舰艇撤出战区';
+    else if (lost / hulls >= 0.4 && p < 0.5) why = `舰艇损失 ${lost}/${hulls} 艘，超过四成，失去作战能力`;
+    else if (dry) why = '反舰弹药与攻击机耗尽，无力再战';
+    if (why) { game.lossInfo = { side, lost, hulls, p, carriers }; finish(foe(side), `${SIDES[side].name}${why}`); return; }
   }
   // campaign deadline: after 45 minutes both fleets are spent; a close result is a strategic stalemate
   if (game.t > 2700) {
@@ -3745,8 +3756,9 @@ function checkEnd(dt) {
 function finish(winner, why) {
   game.over = winner || 'draw'; game.endT = 5;
   const me = game.side, them = foe(me), L = game.ledger;
-  const cv = side => ships.filter(s => s.side === side && s.carrier);
-  const cvLost = side => cv(side).filter(s => !s.alive || s.dying).length;
+  // counted from the order of battle (a sunk ship has already left the live list)
+  const cv = side => FLEET[side].units.filter(([c]) => CLS[c].carrier);
+  const cvLost = side => cv(side).filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
   let tier;
   if (!winner) tier = 'draw';
   else if (winner === me) tier = cvLost(them) === cv(them).length && cvLost(me) === 0 ? 'decisive' : cvLost(me) > 0 ? 'pyrrhic' : 'win';
@@ -3797,6 +3809,7 @@ function afterAction(win) {
       ${row('反舰导弹 发射 / 命中', `${fired} / ${hits}`, `${dbg.by[them] || 0} / ${dbg.hitBy[them] || 0}`)}
       ${row('拦截敌导弹', stopped, Object.entries(dbg.fate[me] || {}).filter(([k]) => ['sam', 'ciws', 'decoy'].includes(k)).reduce((a, [, n]) => a + n, 0))}
       ${row('被佯动骗走的敌弹', L.fooled[me], L.fooled[them])}
+      ${row('判负依据', R.why || '—', '')}
       ${L.phases ? row('作战构想', CONCEPTS[game.plans[me].concept].name, CONCEPTS[game.plans[them].concept].name) : ''}
       ${L.phases ? row('达成阶段', phasesDone(me), phasesDone(them)) : ''}
       ${game.role === 'cmd' && game.jstat ? row('指挥决策', `决策点 ${game.jstat.dps} · 批准 ${game.jstat.approved} · 否决 ${game.jstat.vetoed} · 默认执行 ${game.jstat.auto}`, '—') : ''}
