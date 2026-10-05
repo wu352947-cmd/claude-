@@ -14,7 +14,8 @@ function airInventory(side) {
 const AC_NOTE = {
   j15: '舰载多用途 · 霹雳-15 ×4、霹雳-10 ×2、鹰击-83K ×2', j35: '隐身制空 · 先敌发现先敌开火 · 霹雳-15 ×4 内埋', j15d: '电子战 · 远距支援干扰 · 鹰击-91 反辐射导弹 ×2', kj600: '舰载预警 · 130 km 雷达',
   j16: '陆基多用途 · 岛礁跑道起飞', h6k: '远程轰炸 · 鹰击-12 超音速反舰导弹 ×6', fa18: '舰载多用途 · AIM-120D ×4、LRASM ×2', ea18g: '电子战 · 远距支援干扰 · AARGM-ER 反辐射导弹 ×2',
-  f35c: '隐身制空 · 先敌发现先敌开火 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · 隐身 LRASM ×16 · 从关岛突入'
+  f35c: '隐身制空 · 先敌发现先敌开火 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · 隐身 LRASM ×16 · 从关岛突入',
+  j20: '隐身重型制空 · 霹雳-15 ×4、霹雳-10 ×2 内埋 · 鸭式布局', p8: '反潜巡逻 · 声呐浮标阵、Mk 54 鱼雷 ×5', b2: '隐身轰炸 · JASSM-ER ×16 · 打击岛礁机场'
 };
 function shipNote(s) {
   const a = Object.entries(s.ashm).filter(([, n]) => n > 0).map(([k, n]) => `${MSL[k].name} ×${n}`).join('、');
@@ -46,7 +47,7 @@ function renderRoles() {
   } else if (game.roleTab === 'air') {
     const inv = {};
     for (const s of ships.filter(x => x.side === side && x.carrier)) for (const [t, n] of Object.entries(s.S.wing)) { inv[t] = inv[t] || []; inv[t].push(`${s.name} ${n}`); }
-    if (side === 'cn') for (const [t, n] of Object.entries(BASE.wing)) { inv[t] = inv[t] || []; inv[t].push(`岛礁 ${n}`); }
+    if (side === 'cn') for (const B of BASES) for (const [t, n] of Object.entries(B.wing)) { inv[t] = inv[t] || []; inv[t].push(`${B.isl.name} ${n}`); }
     if (side === 'us') inv.b1b = ['关岛 12'];
     for (const [t, homes] of Object.entries(inv)) pickButton(list, AC[t].name, `${AC_NOTE[t] || ''} · ${homes.join(' / ')} 架`, '飞行员', go('pilot', t));
   } else {

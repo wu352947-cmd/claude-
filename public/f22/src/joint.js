@@ -328,7 +328,7 @@ function airStock(side) {
     for (const [t, n] of Object.entries(h.hangar)) { r.types[t] = (r.types[t] || 0) + n; if (['j15', 'j16', 'fa18'].includes(t)) r.strike += n; if (['j35', 'f35c', 'j15', 'fa18', 'j16'].includes(t)) r.fighter += n; }
     for (const q of h.ready) if (['j15', 'j16', 'fa18'].includes(q.type)) r.strike++;
   }
-  for (const h of ships.concat(bases)) if (h.side === side && h.S && (h.S.wing || (h.kind === 'base' && BASE.wing))) for (const t of ['j15', 'j16', 'fa18']) r.strike0 += ((h.kind === 'base' ? BASE.wing : h.S.wing)[t] || 0);
+  for (const h of ships.concat(bases)) if (h.side === side && (h.kind === 'base' ? h.wing0 : h.S && h.S.wing)) for (const t of ['j15', 'j16', 'fa18']) r.strike0 += ((h.kind === 'base' ? h.wing0 : h.S.wing)[t] || 0);
   return r;
 }
 
@@ -426,7 +426,7 @@ function openPlan() {
 function planWarnings(P, side) {
   const out = [], g = Object.values(P.groups), C = CONCEPTS[P.concept];
   const n = k => g.filter(x => x === k).length;
-  if (!n('asw')) out.push(['未编组反潜警戒群', `敌方 2 艘攻击核潜艇可能潜近航母，只能临时抽调护航舰猎潜。`]);
+  if (!n('asw')) out.push(['未编组反潜警戒群', `敌方 ${FLEET[foe(side)].units.filter(([c]) => CLS[c].sub).length} 艘潜艇可能潜近航母，只能临时抽调护航舰猎潜。`]);
   if (!n('sag') && C.phases.some(id => PHASES[id].sag)) out.push(['无水面突击群', '突击阶段只能依靠舰载机与远程火力。']);
   if (n('screen') < 3) out.push(['掩护群不足 3 艘', '航母区域防空薄弱，饱和攻击下拦截通道不够。']);
   if (P.ap.air < 20) out.push(['制空兵力不足 20%', '攻击编队缺乏护航，战斗机巡逻稀疏。']);
@@ -454,13 +454,13 @@ function planEstimate(P, side) {
   for (const [c] of FLEET[side].units) { const w = CLS[c].wing; if (!w) continue; const st = (w.j15 || 0) + (w.fa18 || 0); N += Math.min(Math.round(st * (1 - P.reserve / 100)), per) * 2; }
   N += side === 'cn' ? per * 2 + 16 : 8 + 10;
   const hits = Math.max(0, N * 0.85 - D) * 0.85, need = Math.ceil((cvHp / (AVG_ASHM_DMG * 0.85) + D) / 0.85);
-  out.push(['首波突击推演', `约 ${N} 枚反舰导弹对敌航母编队（估计拦截能力 ${D.toFixed(0)} 枚/波）：预计命中 ${hits.toFixed(0)} 枚，约为击沉一艘航母所需（${need} 枚）的 ${Math.round(Math.min(1, (hits * AVG_ASHM_DMG) / cvHp) * 100)}%——需要 ${Math.max(1, Math.ceil(cvHp / Math.max(1, hits * AVG_ASHM_DMG)))} 波`]);
+  out.push(['首波突击推演', `约 ${N} 枚反舰导弹对敌航母编队（估计拦截能力 ${D.toFixed(0)} 枚/波）：预计命中 ${hits.toFixed(0)} 枚，约为击沉一艘航母所需（${need} 枚）的 ${Math.round(Math.min(1, (hits * AVG_ASHM_DMG) / cvHp) * 100)}%—${hits < 1 ? `——单一波次无法突破，必须以联合火力（舰射、空射${side === 'cn' ? '与东风' : '与战斧'}）同时抵达，凑足 ${need} 枚以上` : `——需要 ${Math.ceil(cvHp / (hits * AVG_ASHM_DMG))} 波`}`]);
   // the air battle: fighters committed by the air share, by quality, against the enemy's whole wing
   let own = 0, them = 0;
   for (const [c] of FLEET[side].units) for (const [t, n] of Object.entries(CLS[c].wing || {})) own += (FQ[t] || 0) * n;
-  if (side === 'cn') for (const [t, n] of Object.entries(BASE.wing)) own += (FQ[t] || 0) * n;
+  if (side === 'cn') for (const [t, n] of Object.entries(baseWing())) own += (FQ[t] || 0) * n;
   for (const [c] of FLEET[fo].units) for (const [t, n] of Object.entries(CLS[c].wing || {})) them += (FQ[t] || 0) * n;
-  if (fo === 'cn') for (const [t, n] of Object.entries(BASE.wing)) them += (FQ[t] || 0) * n;
+  if (fo === 'cn') for (const [t, n] of Object.entries(baseWing())) them += (FQ[t] || 0) * n;
   const share = P.ap.air / 100 + 0.25, R = Math.pow((own * share) / (them * 0.45), 2);
   out.push(['空战推演', `兰彻斯特平方律：投入制空的战斗力 ${(own * share).toFixed(0)} 对敌方典型投入 ${(them * 0.45).toFixed(0)}，战斗力比 ${R.toFixed(2)}——${R > 1.5 ? '有望夺取制空权' : R > 0.8 ? '空中将是均势消耗战' : '制空不利，攻击编队将遭受严重损失'}`]);
   return out;
@@ -470,8 +470,8 @@ function renderPlan() {
   const seg = (k, opts, cur) => `<div class="seg" data-k="${k}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   const d = Math.round(Math.hypot(FLEET[fo].origin[0] - FLEET[side].origin[0], FLEET[fo].origin[1] - FLEET[side].origin[1]) / 1000);
   const intel = side === 'cn'
-    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×6、弗吉尼亚级 ×2），预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B 与水面舰战斧可从战区外打击。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
-    : `解放军福建舰、山东舰双航母编队（055 ×2、052D ×4、054A ×2、093B ×2），预计在我以西约 ${d} km 海域；永暑礁机场驻歼-16、轰-6K，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
+    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×9、弗吉尼亚级 ×4），第三航母打击群林肯号正在菲律宾海集结，预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B、B-2 隐身轰炸机与水面舰战斧可从战区外打击，P-8A 反潜巡逻机将猎杀我潜艇。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
+    : `解放军福建舰、山东舰双航母编队（055 ×3、052D ×6、054A ×2、093B ×2、039B ×2），辽宁舰编队在三亚待命，预计在我以西约 ${d} km 海域；永暑、美济、渚碧三座岛礁机场驻歼-16、轰-6K，海南陆基航空兵可随时增援，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
   const units = FLEET[side].units.map(([c, name], i) => ({ key: side + i, c, name, S: CLS[c] }));
   body.innerHTML = `
   <div class="pgrid">
@@ -499,6 +499,10 @@ function renderPlan() {
       <div class="prow"><i>电磁管控</i>${seg('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), P.roe.emcon)}</div>
       <div class="prow"><i>参谋权限</i>${seg('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), P.auth)}</div>
       <p class="pnote">${ROE.wcs[P.roe.wcs][1]}<br>${ROE.emcon[P.roe.emcon][1]}<br>${ROE.auth[P.auth][1]}</p>
+    </section>
+    <section class="psec span2"><h3>⑥ 国家体系特性 · 后续梯队</h3>
+      <div class="natgrid"><ul class="staffnote">${NAT[side].pros.map(([a, b]) => `<li class="est"><b>${a}</b> ${b}</li>`).join('')}</ul><ul class="staffnote">${NAT[side].cons.map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}</ul></div>
+      <p class="pnote"><b>后续梯队（战中在联合指挥中心「增援梯队」投入）</b>：${ECHELONS[side].map(E => `<b>${E.name}</b>（${Math.round(E.ready / 60)} 分钟后可用，${Math.round(E.eta / 60)} 分钟抵达${E.uses > 1 ? `，${E.uses} 次` : ''}）`).join('；')}。</p>
     </section>
     <section class="psec span2"><h3>参谋部意见 · 兵棋推演</h3><ul class="staffnote">${planEstimate(P, side).map(([a, b]) => `<li class="est"><b>${a}</b> ${b}</li>`).join('')}${planWarnings(P, side).map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}</ul></section>
   </div>`;
@@ -548,7 +552,7 @@ function drawPlanMap() {
   for (let x = -160000; x <= 160000; x += 20000) { const [a] = P2(x, 0); g.beginPath(); g.moveTo(a, 0); g.lineTo(a, H); g.stroke(); }
   for (let z = -120000; z <= 120000; z += 20000) { const [, b] = P2(0, z); g.beginPath(); g.moveTo(0, b); g.lineTo(W, b); g.stroke(); }
   for (const F of REEFS) { const [x, y] = P2(F.x, F.z); g.fillStyle = F.type === 2 ? 'rgba(60,140,170,0.18)' : 'rgba(98,214,205,0.5)'; g.beginPath(); g.ellipse(x, y, Math.max(1, F.rx * s), Math.max(1, F.rz * s), F.rot, 0, Math.PI * 2); g.fill(); }
-  { const [x, y] = P2(BASE_LAND.x, BASE_LAND.z); g.fillStyle = '#d6c89e'; g.fillRect(x - 3, y - 3, 6, 6); g.font = `500 10px ${SANS}`; g.fillStyle = '#d6c89e'; g.textAlign = 'center'; g.fillText('永暑礁', x, y - 7); }
+  for (const I of BASE_LANDS) { const [x, y] = P2(I.x, I.z); g.fillStyle = '#d6c89e'; g.fillRect(x - 3, y - 3, 6, 6); g.font = `500 10px ${SANS}`; g.fillStyle = '#d6c89e'; g.textAlign = 'center'; g.fillText(I.name, x, y - 7); }
   const o = FLEET[side].origin, e = FLEET[fo].origin, [ox, oy] = P2(o[0], o[1]), [ex, ey] = P2(e[0], e[1]);
   g.strokeStyle = 'rgba(255,138,120,0.6)'; g.setLineDash([3, 4]); g.beginPath(); g.ellipse(ex, ey, 32000 * s, 26000 * s, 0, 0, Math.PI * 2); g.stroke(); g.setLineDash([]);
   g.font = `600 11px ${SANS}`; g.textAlign = 'center'; g.fillStyle = '#ff8a78'; g.fillText('敌航母编队（估计）', ex, ey - 26000 * s - 6);
@@ -700,6 +704,15 @@ const JCC_TABS = {
       <h4>参谋长判断 ${B ? `<small>${mmss(B.t)}</small>` : ''}</h4>
       <ul class="jlist">${B ? B.lines.map(l => `<li>${l}</li>`).join('') : '<li>首次推演进行中</li>'}</ul>`;
   },
+  // the echelons held back: when to commit each is the commander's call
+  ech(side) {
+    const ST = { ok: ['可投入', '#8dffb4'], notready: ['准备中', '#9fb0ba'], enroute: ['在途', '#ffd28a'], rearm: ['再次出动准备中', '#9fb0ba'], used: ['已投入', '#9fb0ba'], nobase: ['机场已毁', '#ff8a78'] }, st = echState(side);
+    return `<p class="jnote">后续梯队是战区的战略预备队：未投入时计入战争潜力，投入后才能作战、也可能被歼灭。投入得早，可以在敌方远程火力最猛时增加目标与火力；投入得晚，可以在对手弹药耗尽后一锤定音。${side === 'us' ? '美军远离本土，梯队抵达更慢。' : '我方主场作战，梯队距离近、抵达快。'}</p>
+      <table class="jtab"><tbody>${ECHELONS[side].map(E => { const a = echAvail(side, E), x = st[E.id] || {}, left = E.uses - (x.called || 0);
+        const when = a === 'notready' ? `${mmss(E.ready - game.t)} 后可投入` : a === 'enroute' ? `${mmss(x.due - game.t)} 后抵达` : a === 'rearm' ? `${mmss(x.due + 240 - game.t)} 后可再次投入` : `抵达需 ${Math.round(E.eta / 60)} 分钟`;
+        return `<tr><td><b>${E.name}</b><small>${E.sub}</small></td><td><b style="color:${ST[a][1]}">${ST[a][0]}</b><small>${when}${E.uses > 1 ? ` · 剩余 ${left} 次` : ''}</small></td><td class="acts">${a === 'ok' ? `<button type="button" data-act="ech" data-v="${E.id}">投入</button>` : ''}</td></tr>`; }).join('')}</tbody></table>
+      <h4>国家体系特性</h4><ul class="jlist">${NAT[side].pros.map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}${NAT[side].cons.map(([a, b]) => `<li class="warn"><b>${a}</b> ${b}</li>`).join('')}</ul>`;
+  },
   // the plan: concept, phases, the decision log
   plan(side, C, P) {
     return `<p class="jnote"><b>${CONCEPTS[P.concept].name}</b> · 主攻方向${AXES[P.main]}${P.second !== 'none' ? ` · 助攻方向${AXES[P.second]}` : ''}。${CONCEPTS[P.concept].desc}</p>
@@ -717,6 +730,7 @@ function jccAct(a, v) {
   else if (a === 'joint') { const e = find(v); if (e) orderJointFires(e); }
   else if (a === 'asw') { const e = find(v); if (e) { game.desigShip = e; jlog(side, `命令：反潜猎杀${e.name}`); } }
   else if (a === 'resv-air') commitReserve(side, 'air');
+  else if (a === 'ech') callEchelon(side, v);
   else if (a === 'undeploy') { C[v] = null; jlog(side, `取消部署：${DEPLOY.find(d => d[0] === v)[2]}`); }
   else if (a === 'grp-sag') { C.sagOrder = v; jlog(side, `水面突击群：${{ auto: '按阶段行动', push: '前出接敌', hold: '撤回编队' }[v]}`); }
   else if (a === 'grp-screen') { C.screenK = +v; jlog(side, `掩护群阵位：${{ 0.6: '收拢', 1: '标准', 1.4: '展开' }[v]}`); }
@@ -759,7 +773,7 @@ function defenceOf(side, tgt, exclude) {
   for (const [e, tr] of picture[side]) {
     if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || (e.S && e.S.sub) || e === exclude) continue;
     if (e !== tgt && tr.pos.distanceTo(tp) > 10000) continue;
-    const S = e.kind === 'base' ? Object.assign({ ciws: 2 }, BASE) : e.S;
+    const S = e.kind === 'base' ? Object.assign({ ciws: 2 }, e.spec) : e.S;
     const sam = Object.values(S.sam || {}).reduce((a, b) => a + b, 0);
     // two shots per fire channel in the short window a sea-skimmer is above the horizon; against anti-ship
     // missiles (low, fast, manoeuvring) an interceptor kills about one time in five
@@ -791,7 +805,7 @@ function strikePotential(side, tp) {
   return { air, sea: Math.min(sea, side === 'cn' ? 16 : 10), total: air + Math.min(sea, side === 'cn' ? 16 : 10) };
 }
 // Lanchester square law: fighting strength of each side's fighter force
-const FQ = { j35: 1.6, f35c: 1.7, j15: 1, j16: 1.05, fa18: 1.05 };
+const FQ = { j35: 1.6, f35c: 1.7, j20: 1.65, j15: 1, j16: 1.05, fa18: 1.05 };
 function airBalance(side) {
   const fo = foe(side);
   let own = 0, them = 0;
@@ -801,7 +815,7 @@ function airBalance(side) {
   // what intelligence believes is still on the enemy decks: the order of battle less the losses seen
   let foeWing = 0;
   for (const [cls] of FLEET[fo].units) for (const [t, n] of Object.entries(CLS[cls].wing || {})) foeWing += (FQ[t] || 0) * n;
-  if (fo === 'cn') for (const [t, n] of Object.entries(BASE.wing)) foeWing += (FQ[t] || 0) * n;
+  if (fo === 'cn') for (const [t, n] of Object.entries(baseWing())) foeWing += (FQ[t] || 0) * n;
   them += Math.max(0, foeWing - game.ledger.air[fo] * 1.1) * 0.35;
   const aewO = planes.some(p => p.side === side && p.alive && p.T.aew && p.airborne) ? 1.2 : 0.85;
   const aewF = [...picture[side].keys()].some(e => e.kind === 'plane' && e.alive && e.T.aew) ? 1.2 : 0.9;

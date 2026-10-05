@@ -40,9 +40,15 @@ for (const L of REEF_LAND) {
   const F = REEFS.find(f => f.name === L.on);
   L.x = F.x + L.u * F.c - L.v * F.s; L.z = F.z + L.u * F.s + L.v * F.c; L.rot = (L.rot || 0) + F.rot;
 }
-// the artificial island (永暑礁) in its own frame: runway along +x, the harbour basin cut into the east end
+// the artificial islands in their own frame: runway along +x, the harbour basin cut into the east end. 永暑礁 fills
+// its reef; 渚碧礁 and 美济礁 were built on the rims of their atolls, each with its own 3 km runway
 const BASE_REEF = REEFS[0];
 const BASE_LAND = { name: '永暑礁', x: BASE_REEF.x + 300 * BASE_REEF.c, z: BASE_REEF.z + 300 * BASE_REEF.s, rot: BASE_REEF.rot, base: true, rx: 1800, rz: 520 };
+const BASE_LANDS = [BASE_LAND];
+for (const [name, reef, u, v] of [['渚碧礁', '渚碧礁', 0, -1500], ['美济礁', '美济礁', 0, -2550]]) {
+  const F = REEFS.find(f => f.name === reef);
+  BASE_LANDS.push({ name, x: F.x + u * F.c - v * F.s, z: F.z + u * F.s + v * F.c, rot: F.rot, base: true, rx: 1800, rz: 520 });
+}
 function inBaseLand(lx, lz) {
   if (lx > -1700 && lx < 1650 && lz > -230 && lz < 130) return true;
   if (lx > 250 && lx < 1650 && lz >= 130 && lz < 560) return !(lx > 1050 && lz > 380 && lz < 500);
@@ -76,8 +82,8 @@ function reefH(x, z) {
     const c = Math.cos(I.rot), s = Math.sin(I.rot), e = Math.hypot((dx * c + dz * s) / I.rx, (-dx * s + dz * c) / I.rz);
     if (e < 1.08) h = Math.max(h, e < 1 ? I.h * (1 - smoothR(0.55, 1, e)) + 0.4 * (1 - e) : -0.6);
   }
-  {
-    const I = BASE_LAND, dx = x - I.x, dz = z - I.z;
+  for (const I of BASE_LANDS) {
+    const dx = x - I.x, dz = z - I.z;
     if (Math.abs(dx) < 2200 && Math.abs(dz) < 2200) { const c = Math.cos(I.rot), s = Math.sin(I.rot); if (inBaseLand(dx * c + dz * s, -dx * s + dz * c)) h = Math.max(h, 4.2); }
   }
   return h;

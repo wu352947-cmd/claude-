@@ -294,6 +294,9 @@
   .staffnote { margin: 0; padding-left: 16px; display: grid; gap: 3px; font-size: 12px; color: var(--muted); line-height: 1.5; }
   .staffnote b { color: #ffd28a; font-weight: 600; margin-right: 4px; }
   .staffnote li.est b { color: #8fc8ff; }
+  .natgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  @media (max-width: 720px) { .natgrid { grid-template-columns: 1fr; } }
+  .jlist li.warn b { color: #ffd28a; }
   #cmdbar button.lead { border-color: var(--gold); background: rgba(227, 178, 87, 0.25); }
   #jcc { position: fixed; z-index: 14; top: calc(8px + env(safe-area-inset-top, 0px)); bottom: calc(8px + env(safe-area-inset-bottom, 0px)); right: calc(8px + env(safe-area-inset-right, 0px));
     width: min(760px, calc(100vw - 16px)); background: rgba(5, 10, 15, 0.94); border: 1px solid rgba(227, 178, 87, 0.45); display: grid; grid-template-rows: auto auto 1fr; pointer-events: auto; }
@@ -542,11 +545,11 @@
     <div class="sides">
       <button class="side-card" data-side="cn" type="button">
         <h3>中国人民解放军海军</h3>
-        <ul><li>福建舰 · 山东舰 · 055 ×2 · 052D ×4 · 054A ×2 · 093B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 七个波次 · 鹰击-18 / 21 饱和协同打击</li><li>岛礁机场：歼-16、轰-6K · 歼-15D 反辐射压制</li></ul>
+        <ul><li>福建舰 · 山东舰 · 055 ×3 · 052D ×6 · 054A ×2 · 093B ×2 · 039B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 七个波次 · 鹰击-18 / 21 饱和协同打击</li><li>永暑 · 美济 · 渚碧三座岛礁机场 · 歼-15D 反辐射压制</li><li>后续梯队：辽宁舰编队 · 岛礁歼-20 · 海南轰-6K 团</li></ul>
       </button>
       <button class="side-card" data-side="us" type="button">
         <h3>美国海军</h3>
-        <ul><li>福特号 · 里根号 · 提康德罗加级 ×2 · 伯克级 ×6 · 弗吉尼亚级 ×2</li><li>宙斯盾 CEC / NIFC-CA · 标准-3 反导 · 标准-6</li><li>分布式杀伤：两百余枚海上打击型战斧 · B-1B ×16 LRASM</li><li>F-35C · F/A-18E · EA-18G 反辐射压制 · E-2D · MQ-4C</li></ul>
+        <ul><li>福特号 · 里根号 · 提康德罗加级 ×2 · 伯克级 ×9 · 弗吉尼亚级 ×4</li><li>宙斯盾 CEC / NIFC-CA · 标准-3 反导 · 标准-6</li><li>分布式杀伤：两百余枚海上打击型战斧 · B-1B ×16 LRASM</li><li>F-35C · F/A-18E · EA-18G 反辐射压制 · E-2D · MQ-4C</li><li>后续梯队：林肯号打击群 · P-8A 反潜 · B-2 隐身突防</li></ul>
       </button>
     </div>
     <div class="row"><button class="btn" id="b-side-back" type="button">返回</button></div>
@@ -642,7 +645,7 @@
 </div>
 <div id="jcc" hidden>
   <div class="jhead"><b>战区联合指挥中心</b><span id="jcc-phase"></span><button type="button" id="jcc-close">✕</button></div>
-  <div class="jtabs" id="jcc-tabs"><button type="button" data-t="sit" class="on">态势</button><button type="button" data-t="tgt">目标清单</button><button type="button" data-t="est">兵棋推演</button><button type="button" data-t="frc">兵力编组</button><button type="button" data-t="ap">兵力分配</button><button type="button" data-t="roe">规则与保障</button><button type="button" data-t="plan">作战计划</button></div>
+  <div class="jtabs" id="jcc-tabs"><button type="button" data-t="sit" class="on">态势</button><button type="button" data-t="tgt">目标清单</button><button type="button" data-t="est">兵棋推演</button><button type="button" data-t="frc">兵力编组</button><button type="button" data-t="ap">兵力分配</button><button type="button" data-t="roe">规则与保障</button><button type="button" data-t="ech">增援梯队</button><button type="button" data-t="plan">作战计划</button></div>
   <div id="jcc-body"></div>
 </div>
 <div id="props" hidden></div>

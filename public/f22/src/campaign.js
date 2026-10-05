@@ -82,8 +82,8 @@ const CAMPAIGN = {
   try { $('cine').style.setProperty('--grain', `url(${c.toDataURL()})`); } catch (_) { /* no grain */ }
 }
 // crews, for the memorial (approximate complements; aircraft crew per airframe)
-const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
-const AC_CREW = { j15: 1, j35: 1, kj600: 5, j16: 2, j15d: 2, h6k: 4, fa18: 1, f35c: 1, ea18g: 2, e2d: 5, b1b: 4 };
+const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, t039b: 58, liaoning: 2000, lincoln: 5000, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
+const AC_CREW = { j15: 1, j35: 1, kj600: 5, j16: 2, j15d: 2, h6k: 4, fa18: 1, f35c: 1, ea18g: 2, e2d: 5, b1b: 4, j20: 1, p8: 9, b2: 2 };
 
 /* ---------- music: a small synthesised orchestra ---------- */
 const Music = {
@@ -512,7 +512,7 @@ function battleCasualties(side) {
   let n = 0;
   const L = game.ledger;
   // ships: a third of the crew of a ship that went down, a share of the crew of a damaged one
-  for (const name of L.sunk[side]) { const u = FLEET[side].units.find(x => x[1] === name); n += u ? (CREW[u[0]] || 300) * 0.36 : name === BASE.name ? 260 : 0; }
+  for (const name of L.sunk[side]) { const u = ORBAT[side].find(x => x[1] === name); n += u ? (CREW[u[0]] || 300) * 0.36 : BASES.some(B => B.name === name) ? 260 : 0; }
   for (const s of ships) if (s.side === side && s.alive && !s.dying) n += (CREW[s.S.cls] || 300) * (1 - s.hp / s.maxHp) * 0.1;
   for (const b of bases) if (b.side === side && b.alive) n += 400 * (1 - b.hp / b.maxHp) * 0.15;
   n += (L.crew ? L.crew[side] : 0);
@@ -520,8 +520,8 @@ function battleCasualties(side) {
 }
 // the losses set against the great carrier battles: how bad was it, really
 function historyCompare(me, them) {
-  const L = game.ledger, n = side => FLEET[side].units.filter(([, name]) => L.sunk[side].includes(name)).length, N = side => FLEET[side].units.length;
-  const cv = side => FLEET[side].units.filter(([c, name]) => CLS[c].carrier && L.sunk[side].includes(name)).length;
+  const L = game.ledger, n = side => ORBAT[side].filter(([, name]) => L.sunk[side].includes(name)).length, N = side => ORBAT[side].length;
+  const cv = side => ORBAT[side].filter(([c, name]) => CLS[c].carrier && L.sunk[side].includes(name)).length;
   const pct = side => Math.round(n(side) / N(side) * 100);
   return `${SIDES[me].short}沉没 ${n(me)}/${N(me)} 艘（${pct(me)}%，航母 ${cv(me)}）· ${SIDES[them].short}沉没 ${n(them)}/${N(them)} 艘（${pct(them)}%，航母 ${cv(them)}）——对照：中途岛日军四艘航母全部沉没，美军损失一艘；莱特湾日军损失约 29 艘军舰、约占参战兵力四成，此后再未能组织舰队决战。`;
 }

@@ -468,7 +468,9 @@ const Navy = (() => {
   // shrouded pump-jet; 093B carries the VLS hump abaft the sail, Virginia the sail fillet and end-plated stern planes
   const SUBS = {
     t093b: { side: 'cn', name: '093B 型攻击核潜艇', L: 110, B: 11, sail: { x: 22, l: 15, h: 7.2, w: 3.8 }, hump: { x: 4, l: 20, h: 1.4 }, fillet: false, number: '' },
-    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.6, w: 3.4 }, hump: null, fillet: true, number: '' }
+    virginia: { side: 'us', name: '弗吉尼亚级攻击核潜艇', L: 115, B: 10.4, sail: { x: 30, l: 16, h: 6.6, w: 3.4 }, hump: null, fillet: true, number: '' },
+    // 039B: the short conventional boat, its tall sail well forward with the stepped fillet ahead of it
+    t039b: { side: 'cn', name: '039B 型常规潜艇', L: 77, B: 8.4, sail: { x: 14, l: 10, h: 5.5, w: 3 }, hump: null, fillet: true, number: '' }
   };
   let subMats = null;
   function submarine(cls) {
@@ -625,6 +627,102 @@ const Navy = (() => {
     return { obj: F22.bake({ group }), exhausts, radius: 15 };
   }
   const P0 = (add, geo, mat, x, y, z) => { const m = add(geo, mat); m.position.set(x, y, z); return m; };
+  // P-8A Poseidon: the 737-800 airframe - a 3.76 m tube with the swept low wing and raked tips, two CFM56s with
+  // their flat-bottomed nacelles slung forward of the leading edge, a tall fin with its dorsal fillet; the navy
+  // adds the APY-10 radome, the ventral weapons-bay canoe, rotary sonobuoy launchers aft and the ESM fairings
+  function p8() {
+    const M = Craft.materials('usn', 0xa4adb5, 4), group = new THREE.Group(), add = Craft.adder(group), lin = Craft.lin;
+    const W = curve([[19.8, 0], [19.4, 0.62], [18.6, 1.12], [17.2, 1.56], [15, 1.84], [12, 1.88], [-8, 1.88], [-12, 1.72], [-15, 1.34], [-18, 0.78], [-19.8, 0.3]]);
+    const TOP = curve([[19.8, -0.25], [19.4, 0.42], [18.6, 0.95], [17.4, 1.45], [16.2, 1.76], [14, 1.88], [-8, 1.88], [-12, 1.86], [-16, 1.62], [-19.8, 1.25]]);
+    const BOT = curve([[19.8, -0.25], [19.4, -0.78], [18.4, -1.32], [17, -1.72], [14, -1.88], [-6, -1.88], [-10, -1.55], [-14, -0.7], [-17, 0.15], [-19.8, 0.85]]);
+    Craft.body(add, M.skin, W, TOP, BOT, 19.8, -19.8, 2, 80, 26);
+    // radome, flight-deck windows, the cabin window line (the Poseidon keeps only a few)
+    const k = 1.01, radome = new THREE.MeshStandardMaterial({ color: 0x8b939a, roughness: 0.55, metalness: 0.1, side: THREE.DoubleSide });
+    Craft.body(add, radome, x => W(x) * k, x => TOP(x) * k, x => BOT(x) * k, 19.85, 18.3, 2, 10, 26);
+    for (const sg of [1, -1]) {
+      for (const [x, w] of [[17.35, 0.62], [16.75, 0.5], [16.25, 0.42]]) P0(add, new THREE.BoxGeometry(w, 0.42, 0.05), M.glass, x, 1.02, sg * (W(x) - 0.08)).rotation.y = sg * 0.35;
+      for (const x of [9, 2, -6]) P0(add, new THREE.BoxGeometry(0.28, 0.36, 0.04), M.dark, x, 0.75, sg * 1.885);
+      // ESM pods either side of the nose
+      const esm = new THREE.CapsuleGeometry(0.22, 1.4, 4, 10); esm.rotateZ(Math.PI / 2); P0(add, esm, M.white, 14.2, 0.4, sg * 1.92);
+    }
+    // wing: 25 degree sweep, the trailing-edge kink at the nacelle, 6 degrees dihedral, raked tips
+    const wy = z => -1.15 + (z - 1.8) * Math.tan(6 * D2R);
+    const le = z => 4.2 - (z - 1.8) * Math.tan(27 * D2R), te = z => z < 6.2 ? -3.4 - (z - 1.8) * 0.02 : -3.49 - (z - 6.2) * Math.tan(14 * D2R);
+    Craft.surface(add, M.skin, { le, te, th: lin(1.8, 16.6, 0.82, 0.2), y: wy }, 1.8, 16.6, 14);
+    Craft.surface(add, M.skin, { le: z => le(16.6) - (z - 16.6) * Math.tan(55 * D2R), te: z => te(16.6) - (z - 16.6) * Math.tan(40 * D2R), th: lin(16.6, 18.8, 0.2, 0.06), y: z => wy(16.6) + (z - 16.6) * 0.12 }, 16.6, 18.8, 4);
+    // wing-to-body fairing
+    { const f = new THREE.CapsuleGeometry(1.0, 7, 4, 12); f.rotateZ(Math.PI / 2); f.scale(1, 0.6, 1.9); P0(add, f, M.skin, 0.6, -1.45, 0); }
+    // CFM56 nacelles: hamster-pouch flat bottom, pylon to the wing, fan face, the long cold-stream nozzle
+    const exhausts = [];
+    for (const sg of [1, -1]) {
+      const zc = 4.95 * sg, yc = wy(4.95) - 1.15, rings = [];
+      for (let i = 0; i <= 18; i++) { const t = i / 18, x = lerp(7.4, 2.6, t), r = t < 0.15 ? lerp(0.92, 1.02, t / 0.15) : lerp(1.02, 0.78, Math.pow((t - 0.15) / 0.85, 1.4)); rings.push(Craft.ring(x, yc, zc, r, r, r * 0.86, 2.4, 22)); }
+      add(gridGeometry(rings), M.skin);
+      add(capGeometry(rings[1].slice(0, -1), p => [p[2], p[1]]), M.dark);
+      const lip = new THREE.TorusGeometry(0.9, 0.07, 6, 22); lip.rotateY(Math.PI / 2); P0(add, lip, M.metal, 7.42, yc, zc);
+      Craft.nozzle(add, M, 2.6, 1.6, yc + 0.05, zc, 0.62, 0.42);
+      exhausts.push([1.5, yc + 0.05, zc]);
+      P0(add, new THREE.BoxGeometry(4.4, 0.9, 0.22), M.skin, 3.6, yc + 1.0, zc);
+      // hardpoints outboard for Harpoons / Mk 54s
+      P0(add, new THREE.BoxGeometry(1.8, 0.4, 0.14), M.skin, le(9.6) - 1.6, wy(9.6) - 0.35, sg * 9.6);
+    }
+    // the fin, its dorsal fillet, the stabilisers
+    Craft.fins(add, M.skin, group, { z: 0, y: 1.55, le: -11.2, te: -16.8, h: 7.0, sLE: 38, sTE: 18, th0: 0.55, th1: 0.18 });
+    Craft.surface(add, M.skin, { le: z => -7.8 - z * 4.6, te: () => -11.6, th: lin(0, 0.8, 0.3, 0.1), y: () => 0 }, 0, 0.8, 2, true, (() => { const f = new THREE.Group(); f.rotation.x = -Math.PI / 2; f.position.set(0, 1.7, 0); group.add(f); return f; })());
+    Craft.surface(add, M.skin, { le: z => -14.8 - (z - 0.8) * Math.tan(33 * D2R), te: z => -18.4 - (z - 0.8) * Math.tan(12 * D2R), th: lin(0.8, 7, 0.32, 0.1), y: z => 0.75 + (z - 0.8) * 0.12 }, 0.8, 7, 6);
+    // mission fit: the weapons-bay canoe, sonobuoy launch tubes aft, the SATCOM blister and the antenna farm
+    { const c = new THREE.CapsuleGeometry(0.75, 9, 4, 14); c.rotateZ(Math.PI / 2); c.scale(1, 0.55, 1); P0(add, c, M.skin, -3.2, -1.95, 0); }
+    for (let i = 0; i < 6; i++) { const d = new THREE.CircleGeometry(0.12, 10); d.rotateX(Math.PI / 2); P0(add, d, M.dark, -11.2 - (i % 3) * 0.5, -1.25 + (i % 3) * 0.06, (i < 3 ? 1 : -1) * 0.35); }
+    { const b = new THREE.SphereGeometry(0.7, 14, 8, 0, Math.PI * 2, 0, Math.PI / 2); b.scale(1.6, 0.5, 1); P0(add, b, M.white, 6, 1.86, 0); }
+    for (const [x, h] of [[12, 0.45], [4, 0.35], [-3, 0.5], [-9, 0.35]]) P0(add, new THREE.BoxGeometry(0.6, h, 0.06), M.dark, x, 1.86 + h / 2, 0);
+    P0(add, new THREE.SphereGeometry(0.42, 12, 8), M.dark, 13.5, -1.9, 0);                 // EO/IR turret
+    return { obj: F22.bake({ group }), exhausts, radius: 20 };
+  }
+  // B-2A Spirit: a pure flying wing - the 33 degree leading edge runs nose to tip in one straight line, the trailing
+  // edge folds into the double-W sawtooth; the crew hump and the four buried engines rise out of the centre
+  // section, the S-ducted intakes on top behind their serrated lips, exhaust troughs set back into the upper skin
+  function b2() {
+    const M = Craft.materials('bomber', 0x4a4f55, 4), group = new THREE.Group(), add = Craft.adder(group), lin = Craft.lin;
+    M.skin.metalness = 0.2; M.skin.roughness = 0.62;
+    const LE = z => 10.6 - z * Math.tan(33 * D2R);
+    const TEP = [[0, -9.9], [5.4, -4.7], [10.6, -9.5], [16.2, -4.3], [26.2, -7.6]];
+    const TE = z => { for (let i = 0; i < TEP.length - 1; i++) { const [z0, x0] = TEP[i], [z1, x1] = TEP[i + 1]; if (z <= z1) return lerp(x0, x1, (z - z0) / (z1 - z0)); } return TEP[TEP.length - 1][1]; };
+    const th = z => z < 7 ? lerp(2.5, 1.25, z / 7) : lerp(1.25, 0.16, (z - 7) / 19.2);
+    const wy = z => -0.1 + z * 0.006;
+    for (let i = 0; i < TEP.length - 1; i++) Craft.surface(add, M.skin, { le: LE, te: TE, th, y: wy }, TEP[i][0], TEP[i + 1][0], i === TEP.length - 2 ? 10 : 4);
+    // the crew compartment hump and the windshield
+    const HW = curve([[10.6, 0], [9.6, 0.9], [8, 1.55], [5, 1.9], [1, 1.8], [-3, 1.2], [-6, 0.3]]);
+    const HT = curve([[10.6, -0.1], [9.6, 0.55], [8, 1.1], [6, 1.42], [3, 1.45], [0, 1.18], [-3, 0.8], [-6, 0.35]]);
+    Craft.body(add, M.skin, HW, HT, x => -0.5, 10.6, -6, 2.6, 40, 20);
+    for (const sg of [1, -1]) for (const [x, w] of [[7.6, 1.0], [6.7, 0.7]]) { const g = new THREE.BoxGeometry(w, 0.05, 0.62); g.rotateZ(-0.42); P0(add, g, M.glass, x, HT(x) - 0.02, sg * 0.42); }
+    // engine humps either side of the hump, intakes with the saw-tooth lip and the auxiliary inlets
+    const exhausts = [];
+    for (const sg of [1, -1]) {
+      const zc = 4.3 * sg, rings = [];
+      for (let i = 0; i <= 20; i++) { const t = i / 20, x = lerp(4.6, -7.2, t), h = 0.95 * Math.pow(Math.sin(Math.PI * Math.min(1, t * 1.15)), 0.6) + 0.02; rings.push(Craft.ring(x, wy(4.3) + th(4.3) * 0.32, zc, 1.9 * (0.55 + 0.45 * Math.sin(Math.PI * t)), h, 0.05, 2.6, 18)); }
+      add(gridGeometry(rings), M.skin);
+      const lip = new THREE.BoxGeometry(0.5, 0.42, 2.6); P0(add, lip, M.dark, 3.2, wy(4.3) + th(4.3) * 0.32 + 0.62, zc);
+      for (let k = 0; k < 4; k++) { const tri = new THREE.ConeGeometry(0.22, 0.5, 3); tri.rotateZ(-Math.PI / 2); P0(add, tri, M.skin, 3.55, wy(4.3) + th(4.3) * 0.32 + 0.85, zc - 0.97 + k * 0.65); }
+      P0(add, new THREE.BoxGeometry(0.6, 0.06, 0.5), M.dark, 0.9, wy(4.3) + th(4.3) * 0.32 + 1.0, zc + sg * 0.6);
+      // exhaust troughs: the hot gas spills over a recessed deck ahead of the trailing edge
+      for (const dz of [-0.55, 0.55]) { const tr = new THREE.BoxGeometry(2.6, 0.06, 0.9); P0(add, tr, M.dark, -6.6, wy(4.3) + th(4.3) * 0.2, zc + dz); exhausts.push([-7.6, wy(4.3) + th(4.3) * 0.2, zc + dz]); }
+    }
+    // panel lines and the drag rudders split at the tips
+    for (const sg of [1, -1]) { P0(add, new THREE.BoxGeometry(2.6, 0.05, 0.08), M.dark, TE(23.5) + 1.2, wy(23.5) + 0.12, sg * 23.5); P0(add, new THREE.BoxGeometry(2.0, 0.05, 0.08), M.dark, TE(19) + 1.0, wy(19) + 0.18, sg * 19); }
+    return { obj: F22.bake({ group }), exhausts, radius: 26 };
+  }
+  // J-20: the long-coupled canard delta - the F-22 kit airframe stretched to 20.4 m, with all-moving canards on
+  // the intake shoulders, ventral strakes under the engines, in PLA dark grey
+  function j20() {
+    const api = F22.build({ physical: false, detail: 0.55, gear: false, cockpit: true, bay: false, lights: true, plumes: false, shadows: false, anisotropy: 4 });
+    const M = Craft.materials('plan', 0xffffff, 4), add = Craft.adder(api.group), lin = Craft.lin;
+    Craft.surface(add, M.skin, { le: z => 6.6 - (z - 1.5) * Math.tan(47 * D2R), te: z => 3.7 - (z - 1.5) * Math.tan(8 * D2R), th: lin(1.5, 3.9, 0.14, 0.04), y: z => 0.32 + (z - 1.5) * 0.04 }, 1.5, 3.9, 4);
+    Craft.fins(add, M.skin, api.group, { z: 1.25, y: -0.55, le: -5.9, te: -8.1, h: 0.95, sLE: 45, sTE: 10, th0: 0.1, th1: 0.04, cant: 28, down: true });
+    const g = F22.bake(api);
+    tint(g, 0x8f9aa5);
+    const k = 1.08; g.scale.setScalar(k);
+    return { obj: g, exhausts: [[-9.9 * k, -0.15 * k, 0.62 * k], [-9.9 * k, -0.15 * k, -0.62 * k]], radius: 7.6 * k };
+  }
   const cache = {};
   function plane(type) {
     if (cache[type]) { const c = cache[type]; return { obj: c.obj.clone(), exhausts: c.exhausts, radius: c.radius }; }
@@ -637,6 +735,9 @@ const Navy = (() => {
     else if (type === 'kj600') r = aew('cn');
     else if (type === 'e2d') r = aew('us');
     else if (type === 'h6k') r = h6k();
+    else if (type === 'p8') r = p8();
+    else if (type === 'b2') r = b2();
+    else if (type === 'j20') r = j20();
     else { const c = Craft.bomber(4); tint(c.group, 0x6c7178); r = { obj: F22.bake(c), exhausts: c.exhausts, radius: c.radius }; } // b1b
     cache[type] = r;
     return { obj: r.obj.clone(), exhausts: r.exhausts, radius: r.radius };

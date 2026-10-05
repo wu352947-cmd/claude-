@@ -24,13 +24,15 @@ MSL.mst = { name: '海上打击战斧', cls: 'ashm', profile: 'sub', v: 245, ran
 // anti-radiation missiles: home on a radiating ship's radar (a quiet ship gives them nothing to home on)
 MSL.aargm = { name: 'AARGM-ER', cls: 'ashm', profile: 'high', v: 1050, range: 60000, dmg: 55, rcs: 0.4, cruise: 9000, skimAt: 7000, arm: true };
 MSL.yj91 = { name: '鹰击-91', cls: 'ashm', profile: 'high', v: 1100, range: 55000, dmg: 60, rcs: 0.5, cruise: 8000, skimAt: 7000, arm: true };
+MSL.jassm = { name: 'JASSM-ER', cls: 'ashm', profile: 'sub', v: 240, range: 90000, dmg: 150, rcs: 0.25, skim: 25, smart: true };
 MSL.sm3 = { name: '标准-3', cls: 'sam', v: 3000, range: 400000, pk: 1.5, exo: true };   // pk scaled by PK_MUL.ballistic
 PK_MUL.ballistic = 0.38;
 CIWS_PK.ballistic = 0.03;
 const TORP = {
   yu6: { name: '鱼-6 重型鱼雷', v: 32, range: 30000, dmg: 430, seek: 2600 },
   mk48: { name: 'Mk 48 重型鱼雷', v: 33, range: 32000, dmg: 450, seek: 2800 },
-  light: { name: '轻型反潜鱼雷', v: 24, range: 3000, dmg: 160, seek: 1500 }
+  light: { name: '轻型反潜鱼雷', v: 24, range: 3000, dmg: 160, seek: 1500 },
+  mk54: { name: 'Mk 54 轻型鱼雷', v: 26, range: 8000, dmg: 190, seek: 1800 }
 };
 const torps = [];
 
@@ -90,7 +92,7 @@ function subNoise(sub) {
   if (game.t - (sub.lastLaunch || -99) < 30) k *= 2.6;
   if (sub.pingT > 0) k *= 3;
   if (sub.depth > 90) k *= 0.8;
-  return k;
+  return k * (sub.S.quiet || 1);
 }
 let sonarT = 0;
 function updateSonar(dt) {
@@ -102,7 +104,7 @@ function updateSonar(dt) {
     const noise = subNoise(sub);
     for (const s of ships) {
       if (!s.alive || s.dying || s.side === sub.side || !s.S.sonar) continue;
-      const R = s.S.sonar * noise * (s.pingT > 0 ? 2.2 : 1) * (isSub(s) ? 1.2 : 1);
+      const R = s.S.sonar * noise * (s.pingT > 0 ? 2.2 : 1) * (isSub(s) ? 1.2 : 1) * (NAT[s.side].sonar || 1);
       if (s.pos.distanceTo(sub.pos) > R) continue;
       const P = picture[s.side];
       let tr = P.get(sub);

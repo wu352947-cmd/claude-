@@ -52,7 +52,7 @@ const HQ = () => settings.quality === 'high';
 const THEATRE = { sea: 115000, air: 150000, exit: 170000 };
 /*@REEFS@*/
 // land pieces (the artificial island first) for the code that only needs outlines
-const ISLANDS = [BASE_LAND, ...REEF_LAND];
+const ISLANDS = [...BASE_LANDS, ...REEF_LAND];
 const terrainH = reefH;
 const groundAt = (x, z) => Math.max(terrainH(x, z), 0);
 
@@ -177,7 +177,8 @@ const SIDES = {
       ['侦察-打击体系', '遥感卫星、天波超视距雷达、无侦-7 高空无人机与空警-600 编织杀伤网；只要拿到 30 秒内的精确航迹，火箭军就能出手。'],
       ['火箭军', '七个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
       ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
-      ['岛礁要塞与陆基航空兵', '永暑礁机场起降歼-16 与轰-6K（每机 6 枚鹰击-12）；歼-15D 以鹰击-91 反辐射导弹压制宙斯盾雷达。']
+      ['岛礁要塞与陆基航空兵', '永暑、美济、渚碧三座岛礁机场起降歼-16、歼-20 与轰-6K（每机 6 枚鹰击-12），跑道被炸后工程兵抢修、大陆机场补充战机；歼-15D 以鹰击-91 压制宙斯盾雷达。'],
+      ['后续梯队', '辽宁舰编队、岛礁歼-20 进驻、海南轰-6K 团突击——距离近、抵达快，何时投入由指挥员决定。']
     ]
   },
   us: {
@@ -186,11 +187,31 @@ const SIDES = {
       ['协同作战能力 CEC / NIFC-CA', '每艘宙斯盾舰都能用 E-2D 与友舰的航迹开火，标准-6 拦截地平线以外的目标；标准-3 在大气层外拦截东风。'],
       ['分布式杀伤', '两百余枚海上打击型战斧分布在每一艘驱逐舰与潜艇的垂发单元里；联合火力打击一次可齐射上百枚。'],
       ['隐身与电子战', 'F-35C 先敌发现、先敌开火；EA-18G 以 AARGM-ER 反辐射导弹摧毁敌舰雷达；MQ-4C 人鱼海神提供持续海面监视。'],
-      ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 16 枚隐身 LRASM。']
+      ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 16 枚隐身 LRASM；B-2A 隐身轰炸机以 JASSM-ER 摧毁岛礁机场。'],
+      ['后续梯队', '林肯号第三航母打击群、P-8A 反潜巡逻机——远离本土，抵达更慢，何时投入由指挥员决定。']
     ]
   }
 };
 const foe = s => SIDES[s].foe;
+// national system traits: what each side's force structure buys it, and what it costs.
+// pilot: AI pilot skill; turn: deck turnaround (s) on a carrier / an island runway; sonar: surface-ship hull and
+// towed-array range factor; reinfDelay: how long a committed echelon takes to arrive (a home-field fleet is close)
+const NAT = {
+  cn: { pilot: 0.76, turnCv: 58, turnBase: 34, sonar: 0.85, reinfDelay: 1, repair: true,
+    pros: [['主场作战', '岛礁机场距战区几十公里，陆基飞机出动距离短、周转快；岛礁跑道遭袭后工程兵持续抢修，大陆机场源源补充战机。'],
+      ['火力密度', '舰载反舰导弹总量与火箭军东风波次构成饱和打击；055/052D 垂发单元多、鹰击-21 高超声速。'],
+      ['数量与第二梯队', '辽宁舰编队、渚碧与美济岛礁航空兵、海南陆基轰炸机团作为后续梯队，指挥员决定何时投入。']],
+    cons: [['舰载航空兵年轻', '山东、辽宁两舰滑跃起飞——歼-15 只能挂 1 枚反舰弹、带 80% 燃油；甲板周转比美军慢，飞行员实战经验不足。'],
+      ['远海反潜短板', '水面舰声呐探测距离 ×0.85；对美攻击核潜艇缺乏 P-8A 这样的大型反潜巡逻机。'],
+      ['垂发不能海上再装填', '打光的垂发单元只能回港补充——每一次齐射都是一次性的。']] },
+  us: { pilot: 0.84, turnCv: 40, turnBase: 50, sonar: 1, reinfDelay: 1.6, repair: false,
+    pros: [['成熟的航母航空兵', '八十年航母作战传统：甲板周转快、出动架次率高，飞行员训练与实战经验更足（AI 技能更高）。'],
+      ['水下优势', '弗吉尼亚级极其安静（被探测距离 ×0.75）；P-8A 海神反潜巡逻机投放声呐浮标、Mk 54 鱼雷猎杀潜艇。'],
+      ['体系与远程火力', 'CEC 协同交战、全球卫星与 MQ-4C 侦察；战斧齐射成百枚；B-2 隐身轰炸机突入打击岛礁机场。']],
+    cons: [['远离本土', '最近的大型基地在关岛与日本：后续梯队（第三航母打击群）抵达更慢，战区内舰体数量少于对手。'],
+      ['缺少前沿陆基机场', '全部战术航空兵依赖航母甲板——航母一沉，整个航空联队无处降落。'],
+      ['垂发不能海上再装填', '标准-6 与战斧打光之后，只有撤出战区一条路。']] }
+};
 
 /* ---------- aircraft ---------- */
 // pitch / roll in rad/s at full stick; thrust and drag tuned so mil power cruises ~280 m/s; vs = stall speed (clean)
@@ -205,6 +226,9 @@ const AC = {
   f35c:  { name: 'F-35C', side: 'us', model: 'f35c', hp: 105, radius: 7, pitch: 0.86, roll: 2.4, mil: 60, ab: 100, drag: 7.0e-4, vs: 58, rcs: 0.3, srm: 0, mrm: 4, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 180, cm: 20, radar: 48000, fuel: 1800, value: 16, gearH: 2.2, role: 'fighter', cat: true },
   ea18g: { name: 'EA-18G 咆哮者', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.82, roll: 2.3, mil: 56, ab: 100, drag: 7.5e-4, vs: 60, rcs: 1, srm: 0, mrm: 2, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 0, cm: 30, radar: 44000, fuel: 1650, value: 18, gearH: 2.4, role: 'ew', ew: true, cat: true, arm: 2, armType: 'aargm' },
   e2d:   { name: 'E-2D', side: 'us', model: 'e2d', hp: 80, radius: 13, pitch: 0.3, roll: 0.8, mil: 34, ab: 34, drag: 9e-4, vs: 52, rcs: 1.3, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 12, radar: 140000, aew: true, fuel: 3200, value: 22, gearH: 2.2, role: 'aew', cat: true },
+  j20:   { name: '歼-20', side: 'cn', model: 'j20', hp: 120, radius: 8, pitch: 0.88, roll: 2.5, mil: 64, ab: 112, drag: 6.6e-4, vs: 64, rcs: 0.25, srm: 2, mrm: 4, srmType: 'pl10', mrmType: 'pl15', ashm: 0, ammo: 0, cm: 24, radar: 50000, fuel: 2200, value: 18, gearH: 2.4, role: 'fighter' },
+  p8:    { name: 'P-8A 海神', side: 'us', model: 'p8', hp: 300, radius: 20, pitch: 0.3, roll: 0.75, mil: 30, ab: 30, drag: 5.6e-4, vs: 72, rcs: 1.6, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 30, radar: 60000, fuel: 4200, value: 30, gearH: 3, role: 'asw', torp: 5, glow: 0.4 },
+  b2:    { name: 'B-2A 幽灵', side: 'us', model: 'b2', hp: 420, radius: 26, pitch: 0.28, roll: 0.65, mil: 34, ab: 34, drag: 5.4e-4, vs: 75, rcs: 0.08, srm: 0, mrm: 0, ashm: 16, ashmType: 'jassm', ammo: 0, cm: 0, radar: 30000, fuel: 4000, value: 45, gearH: 3, role: 'bomber', glow: 0.15 },
   b1b:   { name: 'B-1B', side: 'us', model: 'b1b', hp: 460, radius: 17, pitch: 0.3, roll: 0.7, mil: 62, ab: 80, drag: 4.8e-4, vs: 80, rcs: 0.9, srm: 0, mrm: 0, ashm: 16, ashmType: 'lrasm', ammo: 0, cm: 30, radar: 30000, fuel: 2400, value: 25, gearH: 3, role: 'bomber' }
 };
 /* ---------- weapons ---------- */
@@ -255,8 +279,13 @@ const CLS = {
   reagan:   { model: 'reagan', side: 'us', type: '尼米兹级核动力航母', hp: 3100, vmax: 16, turn: 0.9, mast: 48, radar: 95000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 300, wing: { fa18: 36, ea18g: 5, f35c: 10, e2d: 4 }, top: 24, L: 333, B: 77, sonar: 0 },
   tico:     { model: 'tico', side: 'us', type: '提康德罗加级巡洋舰', hp: 640, vmax: 16, turn: 1.6, mast: 36, radar: 110000, sam: { sm6: 22, sm2: 40 }, ashm: { harpoon: 8, sm6s: 8 }, channels: 8, ciws: 2, decoys: 10, gun: 'mk45', value: 100, top: 28, L: 173, B: 17, sonar: 18000, asw: 8, tlam: 32, sm3: 8 },
   burke:    { model: 'burke', side: 'us', type: '阿利·伯克级驱逐舰', hp: 560, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20, sonar: 18000, asw: 6, tlam: 24, sm3: 4 },
-  virginia: { model: 'virginia', side: 'us', type: '弗吉尼亚级攻击核潜艇', sub: true, hp: 300, vmax: 16, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { harpoon: 4 }, tlam: 16, torps: 22, torpType: 'mk48', channels: 0, ciws: 0, decoys: 6, value: 100, top: 9, L: 115, B: 10.4, sonar: 46000 }
+  // 039B: air-independent propulsion - on its Stirling engines at patrol speed it is the quietest boat in the sea
+  t039b:    { model: 't039b', side: 'cn', type: '039B 型 AIP 常规潜艇', sub: true, hp: 220, vmax: 10, turn: 2.8, mast: 9, radar: 0, sam: {}, ashm: { yj18: 4 }, torps: 14, torpType: 'yu6', channels: 0, ciws: 0, decoys: 4, value: 55, top: 8, L: 77, B: 8.4, sonar: 32000, quiet: 0.65 },
+  virginia: { model: 'virginia', side: 'us', type: '弗吉尼亚级攻击核潜艇', sub: true, hp: 300, vmax: 16, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { harpoon: 4 }, tlam: 16, torps: 22, torpType: 'mk48', channels: 0, ciws: 0, decoys: 6, value: 100, top: 9, L: 115, B: 10.4, sonar: 46000, quiet: 0.75 }
 };
+// the echelon carriers: 辽宁舰 on the Shandong hull and deck, 林肯号 a Nimitz
+CLS.liaoning = Object.assign({}, CLS.shandong, { type: '辽宁舰 · 滑跃起飞航母', hp: 2400, value: 200, wing: { j15: 24, j15d: 2 } });
+CLS.lincoln = Object.assign({}, CLS.reagan, { type: '尼米兹级核动力航母（林肯号）', wing: { fa18: 36, ea18g: 5, f35c: 10, e2d: 4 } });
 // fleets: [class, name, hull number, station ahead (m), station to starboard (m)] in the guide carrier's frame.
 // Submarines patrol ahead of the screen on their own.
 const FLEET = {
@@ -265,17 +294,30 @@ const FLEET = {
     ['t055', '南昌舰', '101', 3800, -2600], ['t055', '拉萨舰', '102', -3300, -4200],
     ['t052d', '昆明舰', '172', 1600, 3200], ['t052d', '长沙舰', '173', 1600, -10600], ['t052d', '合肥舰', '174', -2000, 3000], ['t052d', '银川舰', '175', -2000, -10800],
     ['t054a', '黄山舰', '570', 6400, 900], ['t054a', '衡阳舰', '568', 6400, -8200],
-    ['t093b', '093B 长征-15', '', 16000, 4000], ['t093b', '093B 长征-16', '', 15000, -11000]] },
+    ['t093b', '093B 长征-15', '', 16000, 4000], ['t093b', '093B 长征-16', '', 15000, -11000],
+    ['t055', '大连舰', '105', 2400, 6400], ['t052d', '南宁舰', '162', 4800, -5200], ['t052d', '呼和浩特舰', '161', -4600, 1200],
+    ['t039b', '039B 335 艇', '', 22000, -2000], ['t039b', '039B 336 艇', '', 20000, 6000]] },
   us: { origin: [56000, -8000], heading: Math.PI, units: [
     ['ford', '福特号', '78', 0, 0], ['reagan', '里根号', '76', 0, 8000],
     ['tico', '普林斯顿号', '59', 4200, 3800], ['tico', '钱斯勒斯维尔号', '62', -3400, 4200],
     ['burke', '杰克·H·卢卡斯号', '125', 1500, -3200], ['burke', '平克尼号', '91', 1500, 11200], ['burke', '米利厄斯号', '69', -2200, -3000],
     ['burke', '斯普鲁恩斯号', '111', -2200, 11000], ['burke', '迪凯特号', '73', 6400, 1200], ['burke', '希金斯号', '76', 6400, 7000],
-    ['virginia', '夏威夷号 SSN-776', '', 16000, -4000], ['virginia', '北卡罗来纳号 SSN-777', '', 15000, 12000]] }
+    ['virginia', '夏威夷号 SSN-776', '', 16000, -4000], ['virginia', '北卡罗来纳号 SSN-777', '', 15000, 12000],
+    ['burke', '拉尔夫·约翰逊号', '114', 4800, 9800], ['burke', '约翰·芬恩号', '113', -4800, 5600], ['burke', '本福德号', '65', 2600, -6200],
+    ['virginia', '明尼苏达号 SSN-783', '', 20000, 3000], ['virginia', '伊利诺伊号 SSN-786', '', 18000, -9000]] }
 };
 const SH = {};
 for (const side of ['cn', 'us']) FLEET[side].units.forEach(([cls, name, number], i) => { SH[`${side}${i}`] = Object.assign({}, CLS[cls], { cls, name, number }); });
-const BASE = { side: 'cn', name: '永暑礁机场', hp: 2000, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48 }, channels: 8, wing: { j16: 16, h6k: 10 }, isl: BASE_LAND };
+// the island air bases: 永暑 (the H-6K regiment and a J-16 brigade), 美济 (J-16s on the eastern flank); 渚碧 is built
+// and defended but its hangars stand empty until the commander moves the island air echelon in
+const BASES = [
+  { side: 'cn', name: '永暑礁机场', hp: 3200, value: 200, mast: 60, radar: 120000, sam: { hhq9: 48, hhq10: 32 }, channels: 8, ciws: 4, wing: { j16: 16, h6k: 10 }, isl: BASE_LANDS[0] },
+  { side: 'cn', name: '渚碧礁机场', hp: 2600, value: 120, mast: 55, radar: 110000, sam: { hhq9: 32, hhq10: 24 }, channels: 6, ciws: 4, wing: {}, isl: BASE_LANDS[1] },
+  { side: 'cn', name: '美济礁机场', hp: 2800, value: 140, mast: 55, radar: 110000, sam: { hhq9: 32, hhq10: 24 }, channels: 6, ciws: 4, wing: { j16: 10 }, isl: BASE_LANDS[2] }
+];
+const BASE = BASES[0];
+// the aircraft the island bases hold at the start (what an enemy staff would count)
+const baseWing = () => { const w = {}; for (const B of BASES) for (const [t, n] of Object.entries(B.wing)) w[t] = (w[t] || 0) + n; return w; };
 const WIND = { dir: new V3(-0.85, 0, 0.53).normalize(), speed: 8 };   // wind blows toward this direction (from the north-east)
 
 /* ---------- audio: synthesised with WebAudio (from 猛禽制空) ---------- */
@@ -469,18 +511,18 @@ const PLANE_HD = { fa18: { m: 'fa18' }, ea18g: { m: 'fa18' }, f35c: { m: 'f35' }
   j15: { m: 'fa18', pla: true, scale: 1.2 }, j15d: { m: 'fa18', pla: true, scale: 1.2 }, j16: { m: 'fa18', pla: true, scale: 1.2 } };
 
 /* ---------- island base ---------- */
-function buildBase() {
-  const I = BASE.isl, g = new THREE.Group();
+function buildBase(B) {
+  const I = B.isl, g = new THREE.Group();
   g.position.set(I.x, 0, I.z); g.rotation.y = -I.rot;
   buildBaseIsland(g);
   scene.add(g);
   const base = {
-    kind: 'base', side: BASE.side, name: BASE.name, value: BASE.value, hp: BASE.hp, maxHp: BASE.hp, alive: true, dying: false,
-    pos: new V3(I.x, 4, I.z), vel: new V3(), radius: 1600, h: 50, mast: BASE.mast, rcs: 2, obj: g, isl: I,
-    sam: Object.assign({}, BASE.sam), ashm: {}, channels: BASE.channels, busy: 0, samCd: 0, decoys: 0, decoyCd: 99, fires: 0, radarDmg: false,
-    hangar: Object.assign({}, BASE.wing), ready: [], heading: -I.rot, S: { radar: BASE.radar, ciws: 2, gun: false, carrier: false, top: 50 },
+    kind: 'base', side: B.side, name: B.name, value: B.value, hp: B.hp, maxHp: B.hp, alive: true, dying: false, spec: B, wing0: B.wing,
+    pos: new V3(I.x, 4, I.z), vel: new V3(), radius: 1600, h: 50, mast: B.mast, rcs: 2, obj: g, isl: I,
+    sam: Object.assign({}, B.sam), ashm: {}, channels: B.channels, busy: 0, samCd: 0, decoys: 0, decoyCd: 99, fires: 0, radarDmg: false,
+    hangar: Object.assign({}, B.wing), ready: [], heading: -I.rot, S: { radar: B.radar, ciws: B.ciws || 2, gun: false, carrier: false, top: 50 },
     runway: { a: new V3(I.x, 4, I.z).add(new V3(-1450, 0, -120).applyAxisAngle(Y_AXIS, -I.rot)), dir: new V3(1, 0, 0).applyAxisAngle(Y_AXIS, -I.rot) },
-    lastLaunch: -99
+    lastLaunch: -99, hangarCount() { return Object.values(this.hangar).reduce((a, b) => a + b, 0); }
   };
   return base;
 }
@@ -510,7 +552,11 @@ class Plane {
     this.state = 'air'; this.gear = 0; this.hook = false; this.landing = false; this.cat = null; this.catT = 0; this.deckT = 0;
     this.role = 'cap'; this.task = null; this.chaffT = -9;
   }
-  rearm() { const T = this.T; Object.assign(this, { srm: T.srm, mrm: T.mrm, ashmN: T.ashm, armN: T.arm || 0, ammo: T.ammo, cm: T.cm, fuel: T.fuel, hp: this.maxHp || T.hp }); }
+  rearm() {
+    const T = this.T; Object.assign(this, { srm: T.srm, mrm: T.mrm, ashmN: T.ashm, armN: T.arm || 0, torpN: T.torp || 0, ammo: T.ammo, cm: T.cm, fuel: T.fuel, hp: this.maxHp || T.hp });
+    // STOBAR: a ski-jump launch cannot lift a full load - one anti-ship missile and 80 % fuel
+    if (this.home && this.home.deck && this.home.deck.ski) { this.ashmN = Math.min(this.ashmN, 1); this.fuel *= 0.8; }
+  }
   axes() {
     this.fwd.set(1, 0, 0).applyQuaternion(this.q);
     this.up.set(0, 1, 0).applyQuaternion(this.q);
@@ -1488,7 +1534,7 @@ function roleFly(pl, d, c, out, dt) {
     const tk = planes.find(q => q.side === pl.side && q.role === 'tank' && q.alive && !q.dying && q.airborne && (q.give || 0) > 150 && q.pos.distanceTo(pl.pos) < 70000);
     if (tk) { pl.refuel = { tk, role: pl.role, task: pl.task }; pl.role = 'refuel'; if (mine(pl) && (pl === player || Math.random() < 0.3)) radio(pl.name, `油量不足，前往${tk.name}空中加油。`, '#9fd4ff'); }
   }
-  if ((pl.fuel < bingo || (pl.role !== 'aew' && pl.role !== 'ew' && pl.mrm + pl.srm + pl.ashmN === 0 && pl.T.role !== 'bomber')) && pl.role !== 'rtb' && !(pl.role === 'refuel' && pl.fuel > 120)) { pl.role = 'rtb'; if (mine(pl) && Math.random() < 0.3) radio(pl.name, pl.fuel < bingo ? 'Bingo 油量，返航。' : '弹药耗尽，返航。', '#9fd4ff'); }
+  if ((pl.fuel < bingo || (pl.role !== 'aew' && pl.role !== 'ew' && pl.role !== 'asw' && pl.mrm + pl.srm + pl.ashmN === 0 && pl.T.role !== 'bomber')) && pl.role !== 'rtb' && !(pl.role === 'refuel' && pl.fuel > 120)) { pl.role = 'rtb'; if (mine(pl) && Math.random() < 0.3) radio(pl.name, pl.fuel < bingo ? 'Bingo 油量，返航。' : '弹药耗尽，返航。', '#9fd4ff'); }
   switch (pl.role) {
     case 'cap': case 'aew': {
       P.mode = pl.role;
@@ -1600,6 +1646,38 @@ function roleFly(pl, d, c, out, dt) {
       }
       break;
     }
+    case 'asw': {
+      // maritime patrol: a sonobuoy barrier ahead of the fleet; a boat inside the field is held (its quieting
+      // shrinks the field), the aircraft runs in over the datum and drops a lightweight torpedo
+      P.mode = 'asw';
+      task.buoyT = (task.buoyT || 0) - dt; task.dropCd = (task.dropCd || 0) - dt;
+      if (task.buoyT <= 0) {
+        task.buoyT = 2;
+        for (const s of ships) if (isSub(s) && s.side !== pl.side && s.alive && !s.dying && s.pos.distanceTo(pl.pos) < 14000 * clamp(subNoise(s) * 2, 0.45, 1.2)) {
+          let tr = picture[pl.side].get(s);
+          if (!tr) { tr = { pos: new V3(), vel: new V3(), t: 0, first: game.t }; picture[pl.side].set(s, tr); if (mine(pl)) radio(pl.name, `声呐浮标接触！水下目标，${s.S.type}。`, '#ffd28a'); else if (mine(s)) radio(s.name, '头顶有反潜巡逻机投放浮标——我们暴露了！', '#ff8a78'); }
+          tr.pos.copy(s.pos); tr.vel.copy(s.vel); tr.t = game.t; tr.sonar = true;
+          if (!task.hunt || !task.hunt.alive) task.hunt = s;
+        }
+      }
+      const H = task.hunt && task.hunt.alive && !task.hunt.dying && fresh(pl.side, task.hunt, 30) ? task.hunt : null;
+      if (H) {
+        const tp = trackPos(pl.side, H, _ai3) || H.pos;
+        fly(d, pl, tp.x, 250, tp.z);
+        if ((pl.torpN ?? 0) > 0 && task.dropCd <= 0 && Math.hypot(tp.x - pl.pos.x, tp.z - pl.pos.z) < 1100) {
+          pl.torpN--; task.dropCd = 25; torpedo(pl, H, 'mk54');
+          if (mine(pl) || game.side === pl.side) radio(pl.name, `Mk 54 鱼雷投放，目标${H.name}！`, '#9fd4ff');
+        }
+      } else {
+        task.hunt = null;
+        // the barrier: a racetrack across the axis ahead of the fleet
+        const c = fleetCentre(pl.side) || pl.pos, ax = axisDir(pl.side, c, _ai4);
+        const lat = Math.sin(game.t * 0.02 + (task.ph || 0)) * 22000;
+        fly(d, pl, c.x + ax.x * 32000 - ax.z * lat, 600, c.z + ax.z * 32000 + ax.x * lat);
+      }
+      if ((pl.torpN ?? 0) <= 0 || pl.fuel < 300) pl.role = 'rtb';
+      break;
+    }
     case 'sweep': {
       P.mode = 'sweep';
       const tp = task.point || anchor;
@@ -1631,7 +1709,7 @@ function roleFly(pl, d, c, out, dt) {
       const tp = trackPos(pl.side, tgt, _ai3) || task.last || tgt.pos;
       task.last = (task.last || new V3()).copy(tp);
       const dist = Math.hypot(tp.x - pl.pos.x, tp.z - pl.pos.z), spec = MSL[pl.T.ashmType];
-      const bomberHigh = pl.type === 'h6k';
+      const bomberHigh = pl.type === 'h6k' || pl.type === 'b2';
       // a package member: marshal at the rendezvous, then push to its initial point before turning in
       const leg = pkgSteer(pl, task, _ai4);
       if (leg === 'marshal') {
@@ -1706,7 +1784,9 @@ function fleetCentre(side) {
 function altHome(pl) {
   const c = pl.T.cat && ships.find(s => s.side === pl.side && s.carrier && s.alive && !s.dying);
   if (c) return c;
-  return bases.find(b => b.side === pl.side && b.alive) || null;
+  let best = null, bd = 1e12;
+  for (const b of bases) if (b.side === pl.side && b.alive) { const d = b.pos.distanceToSquared(pl.pos); if (d < bd) { bd = d; best = b; } }
+  return best;
 }
 // aircraft without a home in the theatre (B-1Bs from Guam, H-6Ks and J-16s once the island is lost) fly out to the
 // mainland or to Guam; the bombers come back to the pool for a later raid
@@ -1716,8 +1796,9 @@ function exitTheatre(pl, d) {
   pl.pilot.mode = 'rtb';
   if (east ? pl.pos.x > THEATRE.exit : pl.pos.x < -THEATRE.exit) {
     if (pl === player) { game.cause = east ? '已返回关岛 · 任务完成' : '已返回大陆机场 · 任务完成'; game.mode = 'dead'; game.deadT = 0.5; game.deathPos = pl.pos.clone(); removePlane(pl); return; }
-    if (pl.type === 'b1b') pending.push({ t: game.t + 600, fn: () => { command.us.b1b++; } });
-    if (pl.type === 'h6k' && pl.side === 'cn') { const b = bases.find(x => x.alive); if (b) pending.push({ t: game.t + 600, fn: () => { b.hangar.h6k = (b.hangar.h6k || 0) + 1; } }); }
+    if (pl.offmap) potential0[pl.side] -= pl.value * 0.45;   // a raid flown home is spent, not lost
+    else if (pl.type === 'b1b') pending.push({ t: game.t + 600, fn: () => { command.us.b1b++; } });
+    else if (pl.type === 'h6k' && pl.side === 'cn') { const b = bases.find(x => x.alive); if (b) pending.push({ t: game.t + 600, fn: () => { b.hangar.h6k = (b.hangar.h6k || 0) + 1; } }); }
     removePlane(pl);
   }
 }
@@ -1881,7 +1962,7 @@ function updateDeck(pl, dt) {
     pl.rearm(); pl.hp = pl.maxHp; pl.role = 'cap'; pl.task = null; pl.pilot.mode = 'cap'; pl.tanked = false;
     if (!spotOnCatapult(pl)) { pl.deckT = 2; return; }
     message('补给完成', game.ai ? '自动驾驶：弹射起飞，再次出击' : h.kind === 'ship' ? '已就位弹射器 · 推满油门后弹射' : '已滑入跑道 · 推满油门起飞', '#e3b257', 3);
-  } else { h.ready.push({ type: pl.type, t: game.t + 50 }); removePlane(pl); }
+  } else { h.ready.push({ type: pl.type, t: game.t + (h.kind === 'ship' ? NAT[h.side].turnCv : NAT[h.side].turnBase) }); removePlane(pl); }
 }
 // spot an aircraft on a free catapult (carrier) or the runway threshold (island)
 function spotOnCatapult(pl) {
@@ -1982,15 +2063,16 @@ function exhaust(pl, k) {
   if (!near(pl.pos, 5000)) return;
   for (const ex of pl.exhausts) {
     _a.copy(ex).applyQuaternion(pl.q).add(pl.pos);
-    fire.emit(_a.x, _a.y, _a.z, pl.vel.x * 0.9, pl.vel.y * 0.9, pl.vel.z * 0.9, 0.08, (pl.boost ? 5 : 3) * k, 1.5, 1.4, 0.7, 0.3, 0.9);
+    fire.emit(_a.x, _a.y, _a.z, pl.vel.x * 0.9, pl.vel.y * 0.9, pl.vel.z * 0.9, 0.08, (pl.boost ? 5 : 3) * k * (pl.T.glow ?? 1), 1.5, 1.4, 0.7, 0.3, 0.9);
   }
 }
 // launch an aircraft from a home (spots it on a free catapult, or queues it)
 function launchFrom(home, type, role, task = {}) {
   if (!home || !home.alive || home.dying || !(home.hangar[type] > 0)) return null;
+  if (home.kind === 'base' && home.cratered) return null;
   home.hangar[type]--;
   const pl = new Plane(home.side, type, home);
-  pl.pilot = new Pilot(pl, home.side === 'us' ? 0.82 : 0.78);
+  pl.pilot = new Pilot(pl, NAT[home.side].pilot);
   pl.role = role; pl.task = task;
   pl.name = `${AC[type].name} ${callsign(home.side)}`;
   planes.push(pl);
@@ -2190,7 +2272,7 @@ function bestTarget(side, from, range) {
 function updateCommand(side, dt) {
   const C = command[side];
   updateJoint(side, dt);
-  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt); updatePhantoms(side, dt);
+  updateIntent(side, dt); aswTasking(side, dt); updateISR(side, dt); updatePhantoms(side, dt); echelonStaff(side, dt);
   aiTactics(side, dt); airSweeps(side, dt); jointStrikes(side);
   const T = tac(side);
   const carrier = ships.find(s => s.side === side && s.carrier && s.alive && !s.dying);
@@ -2405,9 +2487,15 @@ function updateCommand(side, dt) {
   // the island's H-6K regiment, topped up from the mainland while the island can still take them
   if (side === 'cn') {
     C.h6Cd -= 2.5;
-    const b = bases.find(x => x.alive);
+    const b = bases.find(x => x.alive && !x.cratered && x.hangar.h6k > 0) || bases.find(x => x.alive && !x.cratered);
     C.reinf = (C.reinf ?? 600) - 2.5;
-    if (b && C.reinf <= 0) { C.reinf = 600; const add = Math.min(3, 6 - (b.hangar.h6k || 0)); if (add > 0) { b.hangar.h6k = (b.hangar.h6k || 0) + add; if (game.side === 'cn') radio('南部战区', `大陆机场增援 ${add} 架轰-6K 进驻岛礁。`, '#9fd4ff'); } }
+    if (b && C.reinf <= 0) {
+      C.reinf = 600; const add = Math.min(3, 6 - (b.hangar.h6k || 0)); if (add > 0) { b.hangar.h6k = (b.hangar.h6k || 0) + add; if (game.side === 'cn') radio('南部战区', `大陆机场增援 ${add} 架轰-6K 进驻岛礁。`, '#9fd4ff'); }
+      // the mainland tops up the islands' fighter regiments: the home field's depth
+      let n = 0;
+      for (const x of bases) if (x.side === 'cn' && x.alive && !x.cratered && (x.hangar.j16 || 0) < (x.wing0.j16 || 0)) { x.hangar.j16 = (x.hangar.j16 || 0) + 2; n += 2; }
+      if (n && game.side === 'cn') radio('南部战区', `大陆机场转场 ${n} 架歼-16 补充岛礁航空兵。`, '#9fd4ff');
+    }
     if (b && C.h6Cd <= 0 && b.hangar.h6k > 0) {
       const tgt = main && main.kind === 'ship' && fresh('cn', main, 150) && main.pos.distanceTo(b.pos) < 220000 ? main : bestTarget('cn', b.pos, 160000);
       const rel = tgt && release('cn', tgt);
@@ -2443,6 +2531,149 @@ function b1bRaid(tgt) {
     planes.push(pl);
   }
   radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
+}
+
+/* ---------- echelons: the forces each theatre commander holds back and decides when to commit ---------- */
+// ready: the earliest a call can go out (the group is still sailing / the regiment is still re-arming); eta: from
+// the call to its arrival; uses: how many times it can be called. A fleet echelon joins astern of the main body;
+// uncommitted, it still counts in the side's war potential as a strategic reserve - committed, it can be lost.
+const ECHELONS = {
+  cn: [
+    { id: 'liaoning', name: '辽宁舰编队', sub: '辽宁舰（歼-15 ×24、歼-15D ×2）+ 西宁舰 + 徐州舰，自三亚南下', ready: 240, eta: 300, uses: 1,
+      units: [['liaoning', '辽宁舰', '16', -2500, 10500], ['t052d', '西宁舰', '117', 600, 8400], ['t054a', '徐州舰', '530', 600, 12600]] },
+    { id: 'isl', name: '岛礁航空兵进驻', sub: '歼-20 ×8、歼-16 ×8 自海南转场进驻渚碧礁机场', ready: 60, eta: 240, uses: 1, base: '渚碧礁机场', wing: { j20: 8, j16: 8 } },
+    { id: 'hainan', name: '海南陆基航空兵突击', sub: '轰-6K ×6 携 36 枚鹰击-12，歼-16 ×4 护航，自西面突入', ready: 120, eta: 150, uses: 2, raid: 'hainan' }
+  ],
+  us: [
+    { id: 'csg3', name: '第三航母打击群', sub: '林肯号（F/A-18E ×36、F-35C ×10）+ 斯托克代尔号 + 格里德利号，自菲律宾海西进', ready: 360, eta: 540, uses: 1,
+      units: [['lincoln', '林肯号', '72', -2500, -10500], ['burke', '斯托克代尔号', '106', 600, -8400], ['burke', '格里德利号', '101', 600, -12600]] },
+    { id: 'p8', name: 'P-8A 反潜巡逻', sub: 'P-8A ×2 自克拉克基地起飞：声呐浮标阵 + Mk 54 鱼雷猎杀潜艇', ready: 60, eta: 90, uses: 2, raid: 'p8' },
+    { id: 'b2', name: 'B-2 隐身突防', sub: 'B-2A ×2 远程奔袭，32 枚 JASSM-ER 打击岛礁机场跑道与机库', ready: 180, eta: 300, uses: 2, raid: 'b2' }
+  ]
+};
+const ORBAT = { cn: [], us: [] };   // the hulls in the fight: the main body plus every fleet echelon that has arrived
+for (const side of ['cn', 'us']) ECHELONS[side].forEach(E => (E.units || []).forEach(([cls, name, number], j) => { SH[`${side}e${E.id}${j}`] = Object.assign({}, CLS[cls], { cls, name, number }); }));
+const echOf = (side, id) => ECHELONS[side].find(E => E.id === id);
+function echState(side) { const C = command[side]; return C.ech || (C.ech = {}); }
+// the reserve's share of war potential: its hulls, their magazines and air wings, the raid aircraft not yet flown
+function echelonReserve(side) {
+  let p = 0;
+  const st = echState(side);
+  for (const E of ECHELONS[side]) {
+    const left = E.uses - ((st[E.id] && st[E.id].called) || 0);
+    if (left <= 0) continue;
+    for (const [cls] of E.units || []) { const S = CLS[cls]; p += S.value + Object.values(S.ashm).reduce((a, b) => a + b, 0) * 2 + (S.tlam || 0) * 2; for (const [t, n] of Object.entries(S.wing || {})) p += AC[t].value * n * 0.45; }
+    for (const [t, n] of Object.entries(E.wing || {})) p += AC[t].value * n * 0.45;
+    if (E.raid === 'hainan') p += left * (6 * AC.h6k.value + 4 * AC.j16.value) * 0.45;
+    if (E.raid === 'p8') p += left * 2 * AC.p8.value * 0.45;
+    if (E.raid === 'b2') p += left * 2 * AC.b2.value * 0.45;
+  }
+  return p;
+}
+function echAvail(side, E) {
+  const st = echState(side)[E.id] || {};
+  if ((st.called || 0) >= E.uses) return 'used';
+  if (st.due > game.t) return 'enroute';
+  if (st.due && game.t < st.due + 240) return 'rearm';
+  if (game.t < E.ready) return 'notready';
+  if (E.base && !bases.some(b => b.name === E.base && b.alive)) return 'nobase';
+  return 'ok';
+}
+function callEchelon(side, id) {
+  const E = echOf(side, id); if (!E || echAvail(side, E) !== 'ok') return false;
+  const st = echState(side)[id] = echState(side)[id] || { called: 0 };
+  st.called++; st.due = game.t + E.eta;
+  pending.push({ t: st.due, fn: () => echelonArrive(side, E) });
+  chron(`${SIDES[side].short}投入后续梯队：${E.name}`, side, true);
+  if (side === game.side) { radio('战区指挥部', `${E.name}已下达出动命令，预计 ${Math.round(E.eta / 60)} 分钟后抵达战区。`, GOLD); message('投入后续梯队', `${E.name} · 预计 ${Math.round(E.eta / 60)} 分钟后抵达`, GOLD, 3); }
+  if (typeof jlog === 'function') jlog(side, `投入后续梯队：${E.name}（${Math.round(E.eta / 60)} 分钟后抵达）`, GOLD);
+  return true;
+}
+function echelonArrive(side, E) {
+  if (game.over) return;
+  const fo = foe(side), mineS = side === game.side;
+  if (E.units) {
+    // the group comes up astern of the main body (or on the old start line if the main body is gone)
+    const guide = ships.find(x => x.side === side && x.alive && !x.dying && x.carrier && !x.ech) || ships.find(x => x.side === side && x.alive && !x.dying && !x.S.sub);
+    const O = FLEET[side], back = side === 'cn' ? -1 : 1;
+    const cx = guide ? guide.pos.x + back * 26000 : O.origin[0] + back * 20000, cz = guide ? guide.pos.z + (side === 'cn' ? 9000 : -9000) : O.origin[1];
+    let lead = null;
+    E.units.forEach(([cls, name, num, sx, sz], j) => {
+      const s = new Ship(`${side}e${E.id}${j}`);
+      s.station = [sx, sz]; s.ech = E.id;
+      s.heading = O.heading; s.pos.set(cx + (lead ? (sx - E.units[0][3]) * (side === 'cn' ? 1 : -1) : 0), 0, cz + (lead ? (sz - E.units[0][4]) * (side === 'cn' ? 1 : -1) : 0));
+      if (terrainH(s.pos.x, s.pos.z) > -15) s.pos.z += 6000;
+      s.speed = s.order = 14; s.sync();
+      ships.push(s); ORBAT[side].push([cls, name, num, sx, sz]);
+      // the PLA's command net puts the new hulls in the plan's screen; the US the same
+      s.grp = s.carrier ? 'cv' : 'screen';
+      if (!lead) lead = s;
+    });
+    // the enemy's satellites see a carrier group join (it cannot hide a transit)
+    const tr = { pos: lead.pos.clone(), vel: new V3(), t: game.t, first: game.t, coarse: true };
+    picture[fo].set(lead, tr);
+    radio(mineS ? '战区指挥部' : '情报', mineS ? `${E.name}抵达战区，编入主力编队后方！` : `卫星发现敌方新的航母编队进入战区：${lead.name}！`, mineS ? GOLD : '#ff5a4f');
+    message(mineS ? '后续梯队抵达' : '敌增援抵达', `${E.name}`, mineS ? GOLD : '#ff8a78', 4);
+  } else if (E.base) {
+    const b = bases.find(x => x.name === E.base && x.alive);
+    if (!b) { if (mineS) radio('战区指挥部', `${E.base}已失去作战能力，${E.name}转场取消。`, '#ff8a78'); return; }
+    for (const [t, n] of Object.entries(E.wing)) b.hangar[t] = (b.hangar[t] || 0) + n;
+    b.wing0 = Object.assign({}, b.wing0); for (const [t, n] of Object.entries(E.wing)) b.wing0[t] = (b.wing0[t] || 0) + n;
+    radio(mineS ? '南部战区' : '情报', mineS ? `${E.name}完成：歼-20、歼-16 已落地${E.base}，随时可以出动。` : `${E.base}出现大批新到战机！`, mineS ? GOLD : '#ff8a78');
+  } else if (E.raid) offmapRaid(side, E.raid);
+}
+// aircraft that come in from beyond the theatre for one raid and leave again
+function offmapPlane(side, type, x, y, z, dir, skill) {
+  const pl = new Plane(side, type, null);
+  pl.pilot = new Pilot(pl, skill); pl.offmap = true;
+  pl.name = `${AC[type].name} ${callsign(side)}`;
+  pl.pos.set(x, y, z); setBasis(pl.q, dir, Y_AXIS); pl.speed = 230; pl.axes(); pl.sync();
+  planes.push(pl);
+  return pl;
+}
+function offmapRaid(side, kind) {
+  const mineS = side === game.side, W = new V3(1, 0, 0), E = new V3(-1, 0, 0);
+  if (kind === 'hainan') {
+    const main = intentTarget('cn'), tgt = main && main.kind === 'ship' ? main : bestTarget('cn', new V3(), 400000) || ships.find(s => s.side === 'us' && s.alive && !s.S.sub);
+    const z0 = rand(-15000, 25000);
+    let lead = null;
+    for (let i = 0; i < 6; i++) { const p = offmapPlane('cn', 'h6k', -(THEATRE.air - 12000) - i * 300, 8500, z0 + i * 600, W, NAT.cn.pilot); p.role = 'bomber'; p.task = { target: tgt }; if (!lead) lead = p; }
+    for (let i = 0; i < 4; i++) { const p = offmapPlane('cn', 'j16', -(THEATRE.air - 12000) + 800, 9000, z0 + (i - 1.5) * 900, W, NAT.cn.pilot); p.offmap = false; p.role = 'escort'; p.task = { lead, slot: [200, -200, 340, -340][i] }; }
+    radio(mineS ? '南部战区' : 'E-2D', mineS ? `海南陆基轰炸机团起飞：轰-6K ×6，${tgt ? `目标${tgt.name}` : '搜索攻击'}，歼-16 ×4 护航。` : '西面发现大批轰-6K 来袭！', mineS ? GOLD : '#ff5a4f');
+  } else if (kind === 'p8') {
+    for (let i = 0; i < 2; i++) { const p = offmapPlane('us', 'p8', THEATRE.air - 15000, 2500, rand(-20000, 20000), E, NAT.us.pilot); p.role = 'asw'; p.task = { ph: i * Math.PI }; }
+    radio(mineS ? '空中指挥' : '预警', mineS ? 'P-8A 双机进入战区，在舰队前方布设声呐浮标拦阻线。' : '东面发现反潜巡逻机——我方潜艇注意隐蔽！', mineS ? '#9fd4ff' : '#ff8a78');
+  } else if (kind === 'b2') {
+    // fixed targets: the national reconnaissance system always holds the island airfields
+    const tgt = bases.filter(b => b.side === 'cn' && b.alive).sort((a, b) => b.hangarCount() - a.hangarCount())[0];
+    if (!tgt) return;
+    for (let i = 0; i < 2; i++) { const p = offmapPlane('us', 'b2', THEATRE.air - 12000, 9500, tgt.pos.z + rand(-20000, 20000), E, 0.9); p.role = 'bomber'; p.task = { target: tgt }; }
+    // nobody sees a B-2 coming: no warning goes out to the other side
+    if (mineS) radio('空中指挥', `B-2A 双机已越过战区边界，32 枚 JASSM-ER，目标${tgt.name}。`, '#9fd4ff');
+  }
+}
+// the staff's judgement on when to commit each echelon (the AI side commits on it; the commander's side gets proposals)
+function echelonStaff(side, dt) {
+  const C = command[side];
+  C.echT = (C.echT ?? 10) - dt;
+  if (C.echT > 0) return;
+  C.echT = 10;
+  const fo = foe(side), pm = potential(side) / potential0[side];
+  const myCv = ships.filter(s => s.side === side && s.carrier && s.alive && !s.dying).length;
+  const foeCvSeen = [...picture[side]].some(([e, tr]) => e.carrier && e.alive && !e.dying && game.t - tr.t < 90);
+  for (const E of ECHELONS[side]) {
+    if (echAvail(side, E) !== 'ok') continue;
+    let why = null;
+    if (E.units) {
+      if (pm < 0.85 || myCv < (side === 'cn' ? 2 : 2)) why = '主力已有损失，需要第二梯队稳住战线';
+      else if (game.t > E.ready + 120) why = '敌方远程打击火力已部分消耗，此时投入风险较低';
+    } else if (E.base) why = '渚碧礁机场空置，进驻后可在东北方向形成第二个空中支点';
+    else if (E.raid === 'hainan') { if (foeCvSeen) why = '敌航母航迹清晰，陆基轰炸机可以从西面形成多方向饱和攻击'; }
+    else if (E.raid === 'p8') { if ([...picture[side]].some(([e]) => isSub(e) && e.alive) || game.t > E.ready + 120) why = '敌潜艇威胁上升，需要大型反潜巡逻机'; }
+    else if (E.raid === 'b2') { if (bases.some(b => b.side === fo && b.alive && b.hangarCount() > 4)) why = '敌岛礁机场仍在持续出动，需要隐身轰炸机摧毁跑道与机库'; }
+    if (!why) continue;
+    staffAct(side, { key: 'ech:' + E.id, title: `投入${E.name}`, detail: `${E.sub} · ${why}（约 ${Math.round(E.eta / 60)} 分钟后抵达）`, ttl: 30, strategic: !!E.units, hold: 240, valid: () => echAvail(side, E) === 'ok', run: () => callEchelon(side, E.id) });
+  }
 }
 const pending = [];
 /*@NAVAL@*/
@@ -2509,7 +2740,7 @@ function potential(side) {
   // what is left in the magazines: a fleet with empty cells cannot fight on
   for (const s of ships) if (s.side === side && s.alive && !s.dying) p += (Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0)) * 2;
   if (side === 'cn') p += (command.cn.dfN ?? 7) * 30;
-  return p;
+  return p + echelonReserve(side);
 }
 const potential0 = { cn: 1, us: 1 };
 
@@ -2981,6 +3212,13 @@ function updateDying(pl, dt) {
   if (pl.dieT <= 0 || pl.pos.y < 0) { if (pl.pos.y < 2) splash(pl.pos, 1.2); else explode(pl.pos, 1.2, null); removePlane(pl); }
 }
 function updateBase(b, dt) {
+  if (b.alive) {
+    // the runway: cratered below 35 % (no launches) until the engineers have it back above 50 %; the PLA's
+    // airfield repair battalions work on through the raids, a home-field advantage
+    if (NAT[b.side].repair && b.hp < b.maxHp * 0.9 && !(b.fires > 1)) b.hp = Math.min(b.maxHp * 0.9, b.hp + 4 * dt);
+    if (!b.cratered && b.hp < b.maxHp * 0.35) { b.cratered = true; if (b.side === game.side) radio(b.name, '跑道被炸断！停止起飞，工程兵正在抢修！', '#ff8a78'); }
+    else if (b.cratered && b.hp > b.maxHp * 0.5) { b.cratered = false; if (b.side === game.side) radio(b.name, '跑道抢修完成，恢复起飞！', '#8dffb4'); }
+  }
   if (!b.alive) { if (near(b.pos, 30000) && Math.random() < 0.4) { const p = b.pos; smoke.emit(p.x + rand(-1200, 1200), 8, p.z + rand(-300, 300), WIND.dir.x * 6, rand(10, 16), WIND.dir.z * 6, rand(10, 15), 30, 160, 0.1, 0.1, 0.11, 0.8, 0.1, -1); } return; }
   defend(b, dt);
   ciws(b, dt);
@@ -3618,13 +3856,13 @@ function drawHUD(dt) {
 }
 
 /* ---------- battle setup ---------- */
-let baseGroup = null;
+const baseGroups = [];
 function clearBattle() {
   for (const s of ships) { scene.remove(s.obj); if (s.lo) scene.remove(s.lo); }
   for (const p of planes) { scene.remove(p.obj); if (p.lo) scene.remove(p.lo); }
   for (const m of missiles) scene.remove(m.mesh);
   for (const d of debris) scene.remove(d.mesh);
-  if (baseGroup) scene.remove(baseGroup);
+  for (const g of baseGroups) scene.remove(g); baseGroups.length = 0;
   ships.length = planes.length = missiles.length = bullets.length = flares.length = debris.length = decoys.length = shells.length = bases.length = pending.length = torps.length = 0;
   picture.cn.clear(); picture.us.clear(); firstSeen.cn = firstSeen.us = false;
   fire.clear(); smoke.clear(); tracerMesh.count = 0;
@@ -3634,6 +3872,7 @@ function setupBattle() {
   clearBattle();
   for (const side of ['cn', 'us']) {
     const O = FLEET[side];
+    ORBAT[side] = O.units.slice();
     let guide = null;
     O.units.forEach(([cls, name, num, sx, sz], i) => {
       const s = new Ship(`${side}${i}`);
@@ -3644,7 +3883,7 @@ function setupBattle() {
       ships.push(s);
     });
   }
-  const b = buildBase(); baseGroup = b.obj; bases.push(b);
+  for (const B of BASES) { const b = buildBase(B); baseGroups.push(b.obj); bases.push(b); }
   // a new battle starts from a clean staff: no cooldowns, packages or intents left over from the last one
   for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
   Object.assign(command.cn, { course: 0, speed: 11, salvoCd: 40, airT: 0, strikeCd: {}, sweepCd: 30, h6Cd: 150 });
@@ -3734,7 +3973,7 @@ function checkEnd(dt) {
     const p = potential(side) / potential0[side], C = command[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
     if (!carriers && C.cvLostT == null) { C.cvLostT = game.t; if (side === game.side && game.role !== 'watch') radio('战区指挥部', '我方航母已全部损失！舰队还有最后的打击力量——在撤出之前，打出去。', '#ff8a78'); }
-    const hulls = FLEET[side].units.length, lost = FLEET[side].units.filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
+    const hulls = ORBAT[side].length, lost = ORBAT[side].filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
     const M = magazines(side), A = airStock(side), dry = M.ashm < M.ashm0 * 0.08 && A.strike < A.strike0 * 0.08 && !planes.some(q => q.side === side && q.alive && q.ashmN > 0);
     let why = null;
     if (!alive) why = '舰队全军覆没';
@@ -3757,7 +3996,7 @@ function finish(winner, why) {
   game.over = winner || 'draw'; game.endT = 5;
   const me = game.side, them = foe(me), L = game.ledger;
   // counted from the order of battle (a sunk ship has already left the live list)
-  const cv = side => FLEET[side].units.filter(([c]) => CLS[c].carrier);
+  const cv = side => ORBAT[side].filter(([c]) => CLS[c].carrier);
   const cvLost = side => cv(side).filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
   let tier;
   if (!winner) tier = 'draw';
@@ -3982,4 +4221,4 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate, openPlan, toggleJCC, updateJointUI, PHASES, dpQueue, finish, settings };
+window.__navwar = { offmapPlane, callEchelon, echelonArrive, ECHELONS, ORBAT, NAT, Ship, dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate, openPlan, toggleJCC, updateJointUI, PHASES, dpQueue, finish, settings };
