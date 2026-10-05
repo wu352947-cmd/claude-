@@ -267,7 +267,7 @@
      the painting bulges like a drop of water, and splits into RGB as the cursor moves */
   var LENS = [
     'precision highp float;',
-    'uniform sampler2D uTex;uniform vec2 uRes;uniform float uDpr;uniform vec4 uBox;uniform vec2 uMouse;uniform vec2 uVel;uniform float uHover;uniform float uTime;',
+    'uniform sampler2D uTex;uniform vec2 uRes;uniform float uDpr;uniform vec4 uBox;uniform vec2 uMouse;uniform vec2 uVel;uniform float uHover;uniform float uTime;uniform float uDrop;',
     NOISE,
     'void main(){',
     ' vec2 px=vec2(gl_FragCoord.x,uRes.y-gl_FragCoord.y)/uDpr;',
@@ -277,12 +277,15 @@
     ' vec2 d=(uv-m)*asp;float r=length(d);',
     ' float bulge=exp(-r*r*9.)*uHover;',
     ' uv-=d/asp*bulge*.16;',
+    ' vec2 dropCa=vec2(0.);',
+    ' if(uDrop>=0.){float f=r-uDrop*.38;float w=sin(f*36.)*exp(-f*f*40.)*exp(-uDrop*1.)*smoothstep(0.,.08,uDrop);',
+    '  vec2 dir=d/(r+1e-4)/asp;uv-=dir*w*.034;dropCa=dir*w*.012;}',
     ' uv=(uv-.5)/(1.+.035*uHover)+.5;',
     ' float n=fbm(uv*4.+uTime*.3)-.5;',
     ' float sp=clamp(length(uVel)*.004,0.,1.);',
     ' uv+=n*.012*sp*uHover;',
     ' vec2 v=uVel/max(1.,length(uVel)/240.);',
-    ' vec2 ca=v*.000028*uHover+d/asp*.006*bulge;',
+    ' vec2 ca=v*.000028*uHover+d/asp*.006*bulge+dropCa;',
     ' vec3 col;',
     ' col.r=texture2D(uTex,uv+ca).r;',
     ' col.g=texture2D(uTex,uv).g;',
@@ -296,7 +299,7 @@
     var P = program(canvas, LENS, true);
     if (!P) return null;
     var gl = P.gl, cache = {}, cur = null, h = 0, target = 0, raf = 0, t0 = performance.now();
-    var mouse = { x: 0, y: 0 }, sm = { x: 0, y: 0 }, vel = { x: 0, y: 0 };
+    var mouse = { x: 0, y: 0 }, sm = { x: 0, y: 0 }, vel = { x: 0, y: 0 }, dropAt = -1, dropTimer = 0;
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
 
     function size() {
@@ -347,10 +350,12 @@
         gl.uniform2f(P.u('uMouse'), sm.x, sm.y);
         gl.uniform2f(P.u('uVel'), vel.x, vel.y);
         gl.uniform1f(P.u('uHover'), h);
+        gl.uniform1f(P.u('uDrop'), dropAt < 0 ? -1 : (performance.now() - dropAt) / 1000);
         gl.uniform1f(P.u('uTime'), (performance.now() - t0) / 1000);
         P.draw();
       }
-      if (cur && target === 0 && h < .01) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; }
+      if (dropAt >= 0 && performance.now() - dropAt > 3200) dropAt = -1;
+      if (cur && target === 0 && h < .01 && dropAt < 0) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; }
       if (cur) raf = requestAnimationFrame(frame);
     }
     size();
@@ -368,8 +373,15 @@
         });
       },
       leave: function (img) { if (cur && cur.img === img) target = 0; },
+      drop: function (box, img, x, y) { // touch: a drop of water where the finger lands
+        mouse.x = sm.x = x; mouse.y = sm.y = y;
+        this.enter(box, img);
+        dropAt = performance.now();
+        clearTimeout(dropTimer);
+        dropTimer = setTimeout(function () { if (cur && cur.img === img) target = 0; }, 1900);
+      },
       move: function (x, y) { mouse.x = x; mouse.y = y; if (!cur) { sm.x = x; sm.y = y; } },
-      drop: function () { if (cur) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; target = 0; h = 0; } }
+      reset: function () { dropAt = -1; if (cur) { cur.img.style.opacity = ''; cur = null; canvas.style.opacity = 0; target = 0; h = 0; } }
     };
   }
 

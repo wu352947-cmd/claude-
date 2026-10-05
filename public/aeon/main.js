@@ -690,7 +690,7 @@
   function openWork(id, srcEl) {
     var w = WORKS[id];
     if (!w || lbOpen) return;
-    if (lens) lens.drop();
+    if (lens) lens.reset();
     lbOpen = true;
     cursor && cursor.classList.remove('is-view');
     $('#lbNo').textContent = w.no;
@@ -750,7 +750,10 @@
     }
     if (lbOpen || menuOpen) return;
     var t = e.target.closest('[data-work]');
-    if (t) openWork(t.dataset.work, t);
+    if (t) {
+      if (Date.now() - lastDrop < 700) setTimeout(function () { openWork(t.dataset.work, t); }, 650);
+      else openWork(t.dataset.work, t);
+    }
   });
   $('#lbClose').addEventListener('click', closeWork);
   $('.lb__bg').addEventListener('click', closeWork);
@@ -761,16 +764,24 @@
   $('#backTop').addEventListener('click', function () { go(0); });
 
   /* ————————————————————————— liquid lens over every work ————————————————————————— */
-  var lens = fine && !reduce && window.AeonGL && AeonGL.lens($('#lens'));
+  var lens = !reduce && window.AeonGL && AeonGL.lens($('#lens'));
+  var lastDrop = 0;
   ['.frame__img', '.phi__img', '.work figure', '.card__img', '.pillars__img', '.qm__slit'].forEach(function (sel) {
     $$(sel).forEach(function (box) {
       var img = $('img', box);
       if (!img) return;
-      box.addEventListener('pointerenter', function () {
+      box.addEventListener('pointerenter', function (e) {
+        if (e.pointerType !== 'mouse') return;
         if (lens && !lbOpen && !menuOpen) lens.enter(box, img);
         if (window.AeonSound) AeonSound.hover();
       });
-      box.addEventListener('pointerleave', function () { if (lens) lens.leave(img); });
+      box.addEventListener('pointerleave', function (e) { if (lens && e.pointerType !== 'touch') lens.leave(img); });
+      box.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' || !lens || lbOpen || menuOpen) return;
+        lens.drop(box, img, e.clientX, e.clientY);
+        lastDrop = Date.now();
+      });
+      box.addEventListener('pointermove', function (e) { if (lens && e.pointerType !== 'mouse') lens.move(e.clientX, e.clientY); });
     });
   });
   if (lens) window.addEventListener('pointermove', function (e) { lens.move(e.clientX, e.clientY); }, { passive: true });
