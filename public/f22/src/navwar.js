@@ -175,7 +175,7 @@ const SIDES = {
     id: 'cn', name: '中国人民解放军海军', short: '解放军海军', color: '#ff7a6b', foe: 'us',
     perks: [
       ['侦察-打击体系', '遥感卫星、天波超视距雷达、无侦-7 高空无人机与空警-600 编织杀伤网；只要拿到 30 秒内的精确航迹，火箭军就能出手。'],
-      ['火箭军', '七个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
+      ['火箭军', '五个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
       ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
       ['岛礁要塞与陆基航空兵', '永暑、美济、渚碧三座岛礁机场起降歼-16、歼-20 与轰-6K（每机 6 枚鹰击-12），跑道被炸后工程兵抢修、大陆机场补充战机；歼-15D 以鹰击-91 压制宙斯盾雷达。'],
       ['后续梯队与补给舰', '辽宁舰编队、第二、三水面群、第二潜艇群、岛礁歼-20 进驻、海南轰-6K 团突击——距离近、抵达快；901 型补给舰维持甲板出动节奏，被击沉后航母周转变慢。何时投入由指挥员决定。']
@@ -2346,11 +2346,11 @@ function updateCommand(side, dt) {
   // --- strategic strikes: the PLA Rocket Force against carriers, US Tomahawks against the island ---
   if (side === 'cn') {
     C.dfCd = (C.dfCd ?? 300) - dt;
-    if (C.dfCd <= 0 && (C.dfN ?? 7) > 0) {
+    if (C.dfCd <= 0 && (C.dfN ?? 5) > 0) {
       // the kill chain: a ballistic shot needs a precise track (radar, not a satellite's coarse fix) under 30 s old
       const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && !e.phantom && game.t - tr.t < 30 && !tr.coarse);
       if (!cvT) C.dfCd = 20;
-      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 7} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 7) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 7) - 1; C.dfCd = 300; } } }); }
+      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 5} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 5) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 5) - 1; C.dfCd = 300; } } }); }
     }
   } else {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
@@ -2787,7 +2787,7 @@ function potential(side) {
   if (side === 'cn' && bases.some(b => b.alive)) p += 3 * AC.h6k.value * 0.45;
   // what is left in the magazines: a fleet with empty cells cannot fight on
   for (const s of ships) if (s.side === side && s.alive && !s.dying) p += (Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0)) * 2;
-  if (side === 'cn') p += (command.cn.dfN ?? 7) * 30;
+  if (side === 'cn') p += (command.cn.dfN ?? 5) * 30;
   return p + echelonReserve(side);
 }
 const potential0 = { cn: 1, us: 1 };
@@ -3937,7 +3937,7 @@ function setupBattle() {
   for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
   Object.assign(command.cn, { course: 0, speed: 11, salvoCd: 40, airT: 0, strikeCd: {}, sweepCd: 30, h6Cd: 150 });
   Object.assign(command.us, { course: Math.PI, speed: 11, salvoCd: 50, airT: 0, strikeCd: {}, sweepCd: 30, b1b: 10, raidT: 180 });
-  command.cn.reinf = 600; command.cn.dfN = 7;
+  command.cn.reinf = 600; command.cn.dfN = 5;
   potential0.cn = potential('cn'); potential0.us = potential('us');
 }
 // compile every material in the battle up front (both detail levels), so nothing stalls a frame mid-fight

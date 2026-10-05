@@ -550,7 +550,7 @@
     <div class="sides">
       <button class="side-card" data-side="cn" type="button">
         <h3>中国人民解放军海军</h3>
-        <ul><li>福建舰 · 山东舰 · 055 ×3 · 052D ×6 · 054A ×2 · 093B ×2 · 039B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 七个波次 · 鹰击-18 / 21 饱和协同打击</li><li>永暑 · 美济 · 渚碧三座岛礁机场 · 歼-15D 反辐射压制</li><li>补给舰：901 型 · 维持甲板出动节奏</li><li>后续梯队：辽宁舰编队 · 第二、三水面群 · 第二潜艇群 · 岛礁歼-20 · 海南轰-6K 团</li></ul>
+        <ul><li>福建舰 · 山东舰 · 055 ×3 · 052D ×6 · 054A ×2 · 093B ×2 · 039B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 五个波次 · 鹰击-18 / 21 饱和协同打击</li><li>永暑 · 美济 · 渚碧三座岛礁机场 · 歼-15D 反辐射压制</li><li>补给舰：901 型 · 维持甲板出动节奏</li><li>后续梯队：辽宁舰编队 · 第二、三水面群 · 第二潜艇群 · 岛礁歼-20 · 海南轰-6K 团</li></ul>
       </button>
       <button class="side-card" data-side="us" type="button">
         <h3>美国海军</h3>
@@ -4114,7 +4114,7 @@ const SIDES = {
     id: 'cn', name: '中国人民解放军海军', short: '解放军海军', color: '#ff7a6b', foe: 'us',
     perks: [
       ['侦察-打击体系', '遥感卫星、天波超视距雷达、无侦-7 高空无人机与空警-600 编织杀伤网；只要拿到 30 秒内的精确航迹，火箭军就能出手。'],
-      ['火箭军', '七个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
+      ['火箭军', '五个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
       ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
       ['岛礁要塞与陆基航空兵', '永暑、美济、渚碧三座岛礁机场起降歼-16、歼-20 与轰-6K（每机 6 枚鹰击-12），跑道被炸后工程兵抢修、大陆机场补充战机；歼-15D 以鹰击-91 压制宙斯盾雷达。'],
       ['后续梯队与补给舰', '辽宁舰编队、第二、三水面群、第二潜艇群、岛礁歼-20 进驻、海南轰-6K 团突击——距离近、抵达快；901 型补给舰维持甲板出动节奏，被击沉后航母周转变慢。何时投入由指挥员决定。']
@@ -6285,11 +6285,11 @@ function updateCommand(side, dt) {
   // --- strategic strikes: the PLA Rocket Force against carriers, US Tomahawks against the island ---
   if (side === 'cn') {
     C.dfCd = (C.dfCd ?? 300) - dt;
-    if (C.dfCd <= 0 && (C.dfN ?? 7) > 0) {
+    if (C.dfCd <= 0 && (C.dfN ?? 5) > 0) {
       // the kill chain: a ballistic shot needs a precise track (radar, not a satellite's coarse fix) under 30 s old
       const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && !e.phantom && game.t - tr.t < 30 && !tr.coarse);
       if (!cvT) C.dfCd = 20;
-      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 7} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 7) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 7) - 1; C.dfCd = 300; } } }); }
+      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 5} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 5) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 5) - 1; C.dfCd = 300; } } }); }
     }
   } else {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
@@ -7203,7 +7203,7 @@ function potential(side) {
   if (side === 'cn' && bases.some(b => b.alive)) p += 3 * AC.h6k.value * 0.45;
   // what is left in the magazines: a fleet with empty cells cannot fight on
   for (const s of ships) if (s.side === side && s.alive && !s.dying) p += (Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0)) * 2;
-  if (side === 'cn') p += (command.cn.dfN ?? 7) * 30;
+  if (side === 'cn') p += (command.cn.dfN ?? 5) * 30;
   return p + echelonReserve(side);
 }
 const potential0 = { cn: 1, us: 1 };
@@ -10356,7 +10356,7 @@ const JCC_TABS = {
   roe(side, C) {
     const M = magazines(side), A = airStock(side), low = planes.filter(p => p.side === side && p.alive && p.airborne && p.fuel < p.T.fuel * 0.25).length;
     const tk = planes.filter(p => p.side === side && p.alive && p.airborne && p.role === 'tank').length;
-    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 7} 个波次（每波 8 枚）` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
+    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 5} 个波次（每波 8 枚）` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
     return `<div class="prow"><i>武器控制</i>${segJ('wcs', Object.entries(ROE.wcs).map(([k, v]) => [k, v[0]]), C.roe.wcs)}</div>
       <div class="prow"><i>电磁管控</i>${segJ('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), tac(side).navy === 'emcon' ? 'A' : C.roe.emcon)}</div>
       <div class="prow"><i>参谋权限</i>${segJ('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), C.auth)}</div>
@@ -10609,7 +10609,7 @@ function jointFiresPlan(side, tgt) {
     if (side === 'us' && tgt.kind === 'ship' && (s.tlamN || 0) > 0) for (let j = 0; j < Math.min(s.tlamN, 12); j++) { items.push({ kind: 'mst', s, k: 'mst', tof: d / MSL.mst.v + 3 }); count.mst++; }
   }
   // ballistic missiles need a fix no older than 30 s (they fly 50 s; the target moves 800 m in that time)
-  if (side === 'cn' && tgt.kind === 'ship' && (command.cn.dfN ?? 7) > 0 && age < 30 && tr && !tr.coarse) for (let j = 0; j < 8; j++) { items.push({ kind: 'df', k: j % 2 ? 'df26' : 'df21d', tof: 55 }); count.df++; }
+  if (side === 'cn' && tgt.kind === 'ship' && (command.cn.dfN ?? 5) > 0 && age < 30 && tr && !tr.coarse) for (let j = 0; j < 8; j++) { items.push({ kind: 'df', k: j % 2 ? 'df26' : 'df21d', tof: 55 }); count.df++; }
   // the slowest shooters (subsonic Tomahawks) set the time on target; nothing waits longer than ten minutes
   const fit = items.filter(i => i.tof < 600).sort((a, b) => (b.kind === 'df') - (a.kind === 'df') || a.tof - b.tof).slice(0, 120);
   for (const k in count) count[k] = 0;
@@ -10625,7 +10625,7 @@ function jointFires(side, P) {
   if (!P || !P.N) return 0;
   const C = command[side], tgt = P.tgt, t0 = game.t;
   // a Rocket Force wave is one of its six
-  if (P.count.df) { command.cn.dfN = (command.cn.dfN ?? 7) - 1; command.cn.dfCd = Math.max(command.cn.dfCd ?? 0, 300); }
+  if (P.count.df) { command.cn.dfN = (command.cn.dfN ?? 5) - 1; command.cn.dfCd = Math.max(command.cn.dfCd ?? 0, 300); }
   for (const it of P.items) {
     const at = t0 + P.T - it.tof;
     if (it.kind === 'df') { /* counted above */ }
@@ -10917,7 +10917,7 @@ function setupBattle() {
   for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
   Object.assign(command.cn, { course: 0, speed: 11, salvoCd: 40, airT: 0, strikeCd: {}, sweepCd: 30, h6Cd: 150 });
   Object.assign(command.us, { course: Math.PI, speed: 11, salvoCd: 50, airT: 0, strikeCd: {}, sweepCd: 30, b1b: 10, raidT: 180 });
-  command.cn.reinf = 600; command.cn.dfN = 7;
+  command.cn.reinf = 600; command.cn.dfN = 5;
   potential0.cn = potential('cn'); potential0.us = potential('us');
 }
 // compile every material in the battle up front (both detail levels), so nothing stalls a frame mid-fight
