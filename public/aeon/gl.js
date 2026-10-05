@@ -385,5 +385,63 @@
     };
   }
 
-  window.AeonGL = { silk: silk, water: water, lens: lens };
+
+  /* —— ink —— the page ground: a new chapter's colour bleeds in like ink on paper,
+     from the edge the reader is scrolling toward */
+  var INK = [
+    'precision highp float;',
+    'uniform vec2 uRes;uniform vec3 uA;uniform vec3 uB;uniform float uP;uniform vec2 uO;uniform float uT;',
+    NOISE,
+    'void main(){',
+    ' vec2 uv=gl_FragCoord.xy/uRes;vec2 asp=vec2(uRes.x/uRes.y,1.);',
+    ' float n=fbm(uv*2.6*asp+vec2(uT*.05,0.))*.55+fbm(uv*9.*asp-uT*.03)*.12+length((uv-uO)*asp)*.62;',
+    ' float edge=uP*1.3+.28;',
+    ' float m=smoothstep(edge-.06,edge,n);',
+    ' vec3 col=mix(uB,uA,m);',
+    ' float rim=exp(-pow((n-edge+.03)*28.,2.))*step(.001,uP)*step(uP,.999);',
+    ' col=mix(col,col*.72+uB*.1,rim*.55);',
+    ' col+=(hash(gl_FragCoord.xy+uT)-.5)*.012;',
+    ' gl_FragColor=vec4(col,1.);',
+    '}'
+  ].join('\n');
+
+  function ink(canvas, start) {
+    var P = program(canvas, INK, false);
+    if (!P) return null;
+    var gl = P.gl, a = hex(start), b = a, p = 1, o = [.5, -.3], raf = 0, tw = null, t0 = performance.now();
+    function hex(h) { h = h.replace('#', ''); return [0, 2, 4].map(function (i) { return parseInt(h.substr(i, 2), 16) / 255; }); }
+    function size() {
+      var dpr = Math.min(window.devicePixelRatio || 1, 1.5) * .7;
+      canvas.width = Math.round(innerWidth * dpr); canvas.height = Math.round(innerHeight * dpr);
+      gl.viewport(0, 0, canvas.width, canvas.height); draw();
+    }
+    function draw() {
+      gl.uniform2f(P.u('uRes'), canvas.width, canvas.height);
+      gl.uniform3f(P.u('uA'), a[0], a[1], a[2]);
+      gl.uniform3f(P.u('uB'), b[0], b[1], b[2]);
+      gl.uniform1f(P.u('uP'), p);
+      gl.uniform2f(P.u('uO'), o[0], o[1]);
+      gl.uniform1f(P.u('uT'), (performance.now() - t0) / 1000);
+      P.draw();
+    }
+    function loop() { raf = 0; draw(); if (p < 1) raf = requestAnimationFrame(loop); }
+    size();
+    window.addEventListener('resize', size);
+    return {
+      peek: function (from, color, v) { a = hex(from); b = hex(color); p = v; o = [.5, -.35]; draw(); },
+      to: function (color, down, dur) {
+        // freeze the current mix as the new "from" colour
+        a = [0, 1, 2].map(function (i) { return a[i] + (b[i] - a[i]) * (p >= 1 ? 1 : p * .5); });
+        if (p >= 1) a = b.slice();
+        b = hex(color); p = 0;
+        o = down ? [.5, -.35] : [.5, 1.35];
+        if (tw) tw.kill();
+        var st = { v: 0 };
+        tw = window.gsap.to(st, { v: 1, duration: dur || 1.8, ease: 'power2.inOut', onUpdate: function () { p = st.v; } });
+        if (!raf) raf = requestAnimationFrame(loop);
+      }
+    };
+  }
+
+  window.AeonGL = { silk: silk, water: water, lens: lens, ink: ink };
 })();

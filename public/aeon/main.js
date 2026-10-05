@@ -209,6 +209,28 @@
 
   if (!fine) $('#heroHint').textContent = '轻触屏幕，丝绸会追着光';
 
+  // the letters nearest the light grow heavier
+  var letters = $$('.hero__title .l > span').map(function (el) {
+    var L = { el: el, w: 400, t: 400 };
+    L.to = function (v) { L.t = v; };
+    return L;
+  });
+  gsap.ticker.add(function () {
+    if (!heroActive) return;
+    letters.forEach(function (L) {
+      if (Math.abs(L.t - L.w) < .5) return;
+      L.w += (L.t - L.w) * .08;
+      L.el.style.setProperty('--w', L.w.toFixed(1));
+    });
+  });
+  function weigh(x, y) {
+    letters.forEach(function (L) {
+      var r = L.el.getBoundingClientRect();
+      var d = Math.hypot(x - (r.left + r.width / 2), y - (r.top + r.height / 2));
+      L.to(400 + 420 * Math.exp(-Math.pow(d / (innerWidth * .16), 2)));
+    });
+  }
+
   /* ————————————————————————— cursor & pointer ————————————————————————— */
   var cursor = $('#cursor'), label = $('#cursorLabel');
   var pointer = { x: innerWidth / 2, y: innerHeight / 2 };
@@ -233,6 +255,7 @@
     pointer.x = e.clientX; pointer.y = e.clientY;
     if (silk) silk.pointer(e.clientX, e.clientY);
     if (heroActive && !reduce) {
+      weigh(e.clientX, e.clientY);
       tiltX((e.clientY / innerHeight - .5) * -14);
       tiltY((e.clientX / innerWidth - .5) * 14);
     }
@@ -326,13 +349,13 @@
   $$('[data-scrub]').forEach(function (el) {
     var w = split(el);
     el.classList.add('is-scrub');
-    gsap.fromTo(w, { opacity: .12 }, { opacity: 1, ease: 'none', stagger: .1, scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 50%', scrub: true } });
+    gsap.fromTo(w, { opacity: .1, filter: 'blur(7px)' }, { opacity: 1, filter: 'blur(0px)', ease: 'none', stagger: .1, scrollTrigger: { trigger: el, start: 'top 82%', end: 'bottom 50%', scrub: true } });
   });
 
   // rising words
   $$('[data-split]').forEach(function (el) {
     var w = split(el);
-    gsap.from(w, { yPercent: 115, duration: 1.4, ease: 'expo.out', stagger: Math.min(.06, 1 / w.length), scrollTrigger: { trigger: el, start: 'top 86%', once: true } });
+    gsap.from(w, { yPercent: 115, filter: 'blur(10px)', duration: 1.6, ease: 'expo.out', stagger: Math.min(.06, 1 / w.length), clearProps: 'filter', scrollTrigger: { trigger: el, start: 'top 86%', once: true } });
   });
 
   // rules
@@ -438,11 +461,11 @@
   })();
 
   // IV · Rebirth — horizontal gallery
-  var galActive = false, galSkew = 0;
+  var galActive = false, galSkew = 0, galTween = null;
   (function () {
     var track = $('#galTrack');
     var dist = function () { return Math.max(0, track.scrollWidth - innerWidth); };
-    var tween = gsap.to(track, {
+    var tween = galTween = gsap.to(track, {
       x: function () { return -dist(); }, ease: 'none',
       scrollTrigger: {
         trigger: '.gal__stage', start: 'top top', end: function () { return '+=' + dist(); },
@@ -566,10 +589,14 @@
   });
   var hudNum = $('#hudNum'), hudName = $('#hudName'), railLinks = $$('#rail a');
   var current = null;
+  var inkBg = window.AeonGL && AeonGL.ink($('#ink'), '#0b0a09');
+  var lastY = 0;
   function setChapter(sec) {
     if (current === sec) return;
+    var down = scrollY >= lastY;
+    if (inkBg && current && current.dataset.bg !== sec.dataset.bg) inkBg.to(sec.dataset.bg, down, reduce ? .01 : 1.9);
     current = sec;
-    gsap.to(document.body, { '--bg': sec.dataset.bg, '--fg': sec.dataset.fg, duration: 1.4, ease: 'power2.out', overwrite: 'auto' });
+    gsap.to(document.body, { '--bg': sec.dataset.bg, '--fg': sec.dataset.fg, duration: 1.9, ease: 'power2.inOut', overwrite: 'auto' });
     gsap.to([hudNum, hudName], { opacity: 0, y: -8, duration: .25, onComplete: function () {
       hudNum.textContent = sec.dataset.num; hudName.textContent = sec.dataset.name;
       gsap.fromTo([hudNum, hudName], { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: .5, ease: 'expo.out' });
@@ -580,8 +607,8 @@
   $$('[data-bg]').forEach(function (sec) {
     ScrollTrigger.create({
       trigger: sec, start: 'top 55%', end: 'bottom 55%',
-      onEnter: function () { setChapter(sec); },
-      onEnterBack: function () { setChapter(sec); }
+      onEnter: function () { lastY = scrollY - 1; setChapter(sec); },
+      onEnterBack: function () { lastY = scrollY + 1; setChapter(sec); }
     });
   });
 
@@ -630,6 +657,16 @@
     eraEl.textContent = y < 0 ? 'BC' : 'AD';
   }
   gsap.ticker.add(paintYear);
+
+  (function () {
+    var mark = $('.brand__mark');
+    var svg = svgEl('svg', { class: 'brand__ring', viewBox: '0 0 44 44', 'aria-hidden': 'true' }, mark);
+    var c = svgEl('circle', { cx: 22, cy: 22, r: 21, pathLength: 1 }, svg);
+    gsap.ticker.add(function () {
+      var max = document.documentElement.scrollHeight - innerHeight;
+      c.style.strokeDashoffset = (1 - Math.min(1, scrollY / Math.max(1, max))).toFixed(4);
+    });
+  })();
 
   /* ————————————————————————— menu ————————————————————————— */
   var menu = $('#menu'), menuBtn = $('#menuBtn'), menuOpen = false, menuTl = null;
@@ -706,6 +743,7 @@
     var file = 'img/' + id + '.webp';
     fly = new Image();
     fly.className = 'lb__fly';
+    fly.style.cursor = 'zoom-in';
     fly.alt = w.cn;
     fly.src = file;
     lb.appendChild(fly);
@@ -727,6 +765,7 @@
   function closeWork() {
     if (!lbOpen) return;
     var img = source, f = fly;
+    if (zoomed) { zoomed = false; lb.classList.remove('is-zoom'); gsap.set(f, { scale: 1 }); }
     var done = function () {
       if (img) gsap.set(img, { opacity: 1 });
       if (f) f.remove();
@@ -755,6 +794,20 @@
       else openWork(t.dataset.work, t);
     }
   });
+  var zoomed = false;
+  function zoomAt(x, y) {
+    if (!fly) return;
+    var r = fly.getBoundingClientRect();
+    fly.style.transformOrigin = ((x - r.left) / r.width * 100) + '% ' + ((y - r.top) / r.height * 100) + '%';
+  }
+  lb.addEventListener('click', function (e) {
+    if (!fly || e.target !== fly) return;
+    zoomed = !zoomed;
+    lb.classList.toggle('is-zoom', zoomed);
+    zoomAt(e.clientX, e.clientY);
+    gsap.to(fly, { scale: zoomed ? 2.4 : 1, duration: 1, ease: 'expo.inOut' });
+  });
+  lb.addEventListener('pointermove', function (e) { if (zoomed) zoomAt(e.clientX, e.clientY); });
   $('#lbClose').addEventListener('click', closeWork);
   $('.lb__bg').addEventListener('click', closeWork);
   document.addEventListener('keydown', function (e) {
@@ -763,10 +816,35 @@
 
   $('#backTop').addEventListener('click', function () { go(0); });
 
+  /* ————————————————————————— ambient glow behind works in the dark rooms ————————————————————————— */
+  (function () {
+    var glows = [];
+    ['.nile__pyr .frame__img', '.nile__tut .frame__img', '.work figure', '.pillars__img'].forEach(function (sel) {
+      $$(sel).forEach(function (box) {
+        var img = $('img', box), host = box.parentNode;
+        var g = document.createElement('i');
+        g.className = 'glow'; g.setAttribute('aria-hidden', 'true');
+        g.style.backgroundImage = 'url("' + img.getAttribute('src') + '")';
+        host.classList.add('has-glow');
+        host.insertBefore(g, box);
+        glows.push({ g: g, box: box, host: host });
+        ScrollTrigger.create({ trigger: box, containerAnimation: box.closest('.gal__track') ? galTween : undefined, start: box.closest('.gal__track') ? 'left 85%' : 'top 80%', onEnter: function () { g.classList.add('is-in'); } });
+      });
+    });
+    function place() {
+      glows.forEach(function (o) {
+        o.g.style.left = o.box.offsetLeft + 'px'; o.g.style.top = o.box.offsetTop + 'px';
+        o.g.style.width = o.box.offsetWidth + 'px'; o.g.style.height = o.box.offsetHeight + 'px';
+      });
+    }
+    place();
+    ScrollTrigger.addEventListener('refreshInit', place);
+  })();
+
   /* ————————————————————————— liquid lens over every work ————————————————————————— */
   var lens = !reduce && window.AeonGL && AeonGL.lens($('#lens'));
   var lastDrop = 0;
-  ['.frame__img', '.phi__img', '.work figure', '.card__img', '.pillars__img', '.qm__slit'].forEach(function (sel) {
+  ['.frame__img', '.phi__img', '.work figure', '.card__img', '.qm__slit'].forEach(function (sel) {
     $$(sel).forEach(function (box) {
       var img = $('img', box);
       if (!img) return;
@@ -834,6 +912,6 @@
   /* ————————————————————————— start ————————————————————————— */
   window.addEventListener('load', function () { ScrollTrigger.refresh(); });
   measure();
-  window.__aeon = { lenis: lenis, refresh: function () { ScrollTrigger.refresh(); } };
+  window.__aeon = { lenis: lenis, ink: inkBg, refresh: function () { ScrollTrigger.refresh(); } };
   runLoader();
 })();
