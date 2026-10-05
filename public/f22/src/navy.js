@@ -179,6 +179,10 @@ const Navy = (() => {
       P.push([cyl(0.22, 0.22, 3, x + 2, y + 1.3, z, 8, 'x'), M.dark]);
     }
   }
+  function gun76(P, M, x, y) {
+    P.push([block(x, 0, 5, 4.2, 3.2, 3, y, 2.2, -0.5), M.grey]);
+    P.push([cyl(0.14, 0.18, 4, x + 3.4, y + 1.2, 0, 8, 'x'), M.grey]);
+  }
   const vls = (P, M, x, y, l, w) => P.push([(() => { const g = plate(l, w, x, y + 0.06, 0); const uv = g.attributes.uv; for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * l / 4.2, uv.getY(i) * w / 4.2); return g; })(), M.vls]);
   function mast(P, M, x, y, h, w) {
     P.push([block(x, 0, w, w, w * 0.5, w * 0.5, y, h), M.light]);
@@ -195,15 +199,79 @@ const Navy = (() => {
     const S = Object.assign({}, SPECS[cls], number ? { number } : {}), M = mats(S.side), P = [];
     const L = S.L, B = S.B;
     const fbK = S.fbK || [[0, 6.5], [0.5, 7], [0.85, 8.6], [1, 9.6]];
-    const fbC = curve(fbK), fb = u => fbC(u) * S.fbScale;
-    const H = hull({ L, B, T: S.T, fb, hw: STD_HULL.hw, flare: STD_HULL.flare, rake: 0.55, grey: M.grey.color.getHex() });
+    const fbC = curve(fbK), fb = u => fbC(u) * S.fbScale, HS = S.hullShape || STD_HULL;
+    const H = hull({ L, B, T: S.T, fb, hw: HS.hw, flare: HS.flare, rake: 0.55, grey: M.grey.color.getHex() });
     P.push([H.hull, M.hull], [H.deck, M.deck], [H.stern, M.grey]);
     const dk = x => fb((x + L / 2) / L);
-    const half = x => (STD_HULL.hw((x + L / 2) / L) + STD_HULL.flare((x + L / 2) / L)) * B / 2;
+    const half = x => (HS.hw((x + L / 2) / L) + HS.flare((x + L / 2) / L)) * B / 2;
     for (const [g, m] of hullNumber(S.number, L * 0.34, dk(L * 0.34) - 3.1, half(L * 0.34), 0.12, S.side === 'us' ? 3.6 : 3.2)) P.push([g, m]);
     S.build(P, M, dk, L, B);
     const group = assemble(P);
     return { group, spec: S };
+  }
+
+
+  /* ---------- replenishment ships ---------- */
+  const FULL_HULL = {
+    hw: curve([[0, 0.86], [0.08, 0.97], [0.25, 1], [0.7, 1], [0.86, 0.8], [0.95, 0.48], [1, 0.03]]),
+    flare: curve([[0, 0], [0.8, 0.02], [0.95, 0.1], [1, 0.05]])
+  };
+  // straight strut between two points
+  function strut(a, b, r, seg = 6) {
+    const d = new THREE.Vector3(b[0] - a[0], b[1] - a[1], b[2] - a[2]), len = d.length();
+    const g = new THREE.CylinderGeometry(r, r, len, seg);
+    g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()));
+    g.translate((a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2); return g;
+  }
+  // king post with a slewed boom and a hanging transfer hose, on the given side (s = +1 starboard)
+  function unrep(P, M, x, y, zEdge, s, h = 11) {
+    const z = zEdge * s;
+    P.push([block(x, z, 2.6, 2.6, 1.6, 1.6, y, h), M.light]);
+    P.push([strut([x, y + h, z], [x - 0.5, y + h + 0.3, z + s * 11], 0.28), M.grey]);          // boom out over the side
+    P.push([strut([x, y + h + 0.5, z], [x + 4.5, y + h - 0.5, z + s * 1.2], 0.12, 4), M.dark]);  // topping lift
+    P.push([strut([x - 0.5, y + h + 0.3, z + s * 11], [x - 0.5, y + 2.2, z + s * 11.4], 0.1, 4), M.dark]); // hose to the receiving ship
+    P.push([block(x - 0.5, z + s * 11.4, 1.4, 1.2, 1.2, 1, y + 1.4, 0.9), M.red]);
+    P.push([block(x, z, 4.2, 3.4, 3.4, 2.8, y, 1.6), M.grey]);                                   // winch house
+  }
+  // cargo crane: pedestal, cab and angled jib
+  function crane(P, M, x, y, zEdge, s) {
+    const z = zEdge * s;
+    P.push([cyl(1.0, 1.4, 7, x, y + 3.5, z, 8), M.light], [block(x, z, 3.2, 2.6, 2.6, 2.4, y + 7, 2.2), M.light]);
+    P.push([strut([x, y + 8, z], [x + 7, y + 17, z + s * 1.5], 0.3), M.grey], [strut([x, y + 8, z], [x - 6, y + 12, z], 0.22, 4), M.dark]);
+  }
+  function cargoDeck(P, M, x0, x1, y, B, rows) {
+    // hatch covers (rows of low boxes) and a centreline pipe run
+    const n = Math.floor((x1 - x0) / 17);
+    for (let i = 0; i < n; i++) {
+      const x = x0 + 8.5 + i * 17;
+      for (const z of rows) P.push([box(11, 1.2, 6, x, y + 0.6, z), i % 2 ? M.panel : M.red]);
+      P.push([box(3.4, 1.6, 1.4, x, y + 0.8, 0), M.dark]);
+    }
+    P.push([box(x1 - x0, 0.5, 0.7, (x0 + x1) / 2, y + 1.8, 0), M.dark]);
+  }
+  function house(P, M, x, y, l, w, floors, setback) {
+    for (let i = 0; i < floors; i++) {
+      const k = 1 - i * setback;
+      P.push([block(x - i * 0.4, 0, l * k, w * k, l * k, w * k, y + i * 3.3, 3.3), M.grey]);
+      P.push([box(0.2, 0.9, w * k * 0.9, x + l * k / 2 + 0.05 - i * 0.4, y + i * 3.3 + 2.0, 0), M.glass]);
+    }
+    return y + floors * 3.3;
+  }
+  function bridge(P, M, x, y, w) {
+    P.push([block(x, 0, 9, w, 8, w + 3, y, 3.2, 0), M.light]);                                    // wheelhouse with wing overhang
+    P.push([box(0.3, 1.2, w + 2, x + 4.3, y + 1.8, 0), M.glass]);
+    P.push([block(x - 1, 0, 6, 8, 4, 5, y + 3.2, 2.4), M.grey]);
+    P.push([cyl(0.15, 0.15, 9, x - 1, y + 7.5, 0, 6), M.dark], [box(0.3, 0.3, 5, x - 1, y + 6.6, 0), M.dark]);
+  }
+  function heliAft(P, M, L, dk, w, hangarX, hangarL, padX, padL) {
+    P.push([block(hangarX, 0, hangarL, w, hangarL, w, dk(hangarX), 7), M.grey]);
+    P.push([box(0.2, 5, w * 0.7, hangarX - hangarL / 2 - 0.1, dk(hangarX) + 3.5, 0), M.dark]);
+    P.push([plate(padL, w + 2, padX, dk(padX) + 0.08, 0), M.pad]);
+  }
+  function funnel(P, M, x, y, r, stripe) {
+    P.push([block(x, 0, 9, 8, 6, 5, y, 7, -1), M.grey]);
+    P.push([block(x - 1.4, 0, 5.6, 4.6, 5, 4.2, y + 7, 2), M.dark]);
+    if (stripe) P.push([block(x - 1, 0, 6.4, 5.2, 5.8, 4.8, y + 4, 1.4, -0.8), stripe]);
   }
 
   const SPECS = {
@@ -305,7 +373,54 @@ const Navy = (() => {
         for (const s of [1, -1]) P.push([array(2.8, -30, dk(-26) + 7, 6.2 * s, s * 3 * Math.PI / 4, 12 * D2R, 8), M.panel]);
         ciws(P, M, 14, dk(14) + 12, 5, 'phalanx'); ciws(P, M, -40, dk(-26) + 11, -4, 'phalanx');
       }
-    }
+    },
+    t901: {
+      side: 'cn', name: '901 型综合补给舰', short: '901', number: '966', L: 234, B: 28, T: 9.2, fbScale: 1.0, hullShape: FULL_HULL,
+      fbK: [[0, 7.2], [0.3, 7.2], [0.78, 7.6], [0.9, 9.6], [1, 11.2]],
+      build(P, M, dk, L, B) {
+        const y = dk(40), zE = 13.4;
+        P.push([block(88, 0, 24, 14, 22, 12, dk(88), 1.2), M.grey]);                      // forecastle break
+        gun76(P, M, 98, dk(98));                                                        // fwd H/PJ-76 mount
+        const top = house(P, M, 60, dk(60), 30, 25, 3, 0.12); bridge(P, M, 62, top, 17);
+        P.push([block(48, 0, 12, 9, 9, 7, top, 5), M.light]);                             // aft of the bridge
+        mast(P, M, 50, top + 5, 8, 3);
+        ciws(P, M, 70, dk(60) + 11, 0, 'type1130');
+        cargoDeck(P, M, -36, 36, y, B, [-6.5, 6.5]);
+        for (const x of [24, 4, -16]) for (const s of [1, -1]) unrep(P, M, x, y, zE, s, 11);
+        // aft house with the funnel
+        const t2 = house(P, M, -50, dk(-50), 22, 24, 2, 0.1);
+        funnel(P, M, -52, t2, 3, M.red);
+        P.push([block(-44, 0, 8, 9, 6, 7, t2 + 1, 4), M.light]);
+        P.push([cyl(0.15, 0.15, 6, -45, t2 + 7, 0, 6), M.dark]);
+        // crane pair beside the aft house
+        for (const s of [1, -1]) crane(P, M, -38, y, zE - 2, s);
+        heliAft(P, M, L, dk, 15, -72, 18, -98, 30);
+        gun76(P, M, -82, dk(-82) + 7);
+        ciws(P, M, -57, dk(-50) + 9.9, 7, 'type1130');
+        for (const s of [1, -1]) P.push([cyl(1.1, 1.1, 6, -62, dk(-62) + 2, 10.4 * s, 10, 'x'), M.light]); // boats
+      }
+    },
+    lewis: {
+      side: 'us', name: '刘易斯与克拉克级干货补给舰', short: 'T-AKE', number: '1', L: 210, B: 32, T: 9.1, fbScale: 1.0, hullShape: FULL_HULL,
+      fbK: [[0, 7.4], [0.3, 7.4], [0.8, 7.8], [0.91, 9.8], [1, 11.4]],
+      build(P, M, dk, L, B) {
+        const y = dk(40), zE = 15.4;
+        const top = house(P, M, 50, dk(50), 26, 28, 3, 0.1); bridge(P, M, 51, top, 19);
+        P.push([block(40, 0, 14, 11, 11, 8, top, 4), M.light]);
+        mast(P, M, 42, top + 4, 8, 3);
+        // cargo holds: five hatches with cranes between them
+        cargoDeck(P, M, -42, 30, y, B, [-8, 8]);
+        for (const x of [14, -8]) for (const s of [1, -1]) unrep(P, M, x, y, zE, s, 10);
+        for (const x of [24, 0, -26]) for (const s of [1, -1]) crane(P, M, x, y, zE - 0.5, s);
+        P.push([box(1.6, 3, 1.6, 60, dk(60) + 1.5, 0), M.light]);
+        // aft house with the funnel, hangar and flight deck
+        const t2 = house(P, M, -56, dk(-56), 22, 26, 2, 0.1);
+        funnel(P, M, -58, t2, 3, M.white);
+        heliAft(P, M, L, dk, 16, -78, 18, -97, 28);
+        ciws(P, M, -64, dk(-56) + 7, 8, 'phalanx');
+        for (const s of [1, -1]) P.push([cyl(1.1, 1.1, 6, -44, dk(-44) + 2, 12.4 * s, 10, 'x'), M.light]);
+      }
+    },
   };
 
   /* ---------- carriers ---------- */
