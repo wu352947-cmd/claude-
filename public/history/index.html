@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>万年</title>
+<meta name="description" content="一万两千年的人类历史，沿着一次滚动展开：从第一粒驯化的麦种，到第一个网页。">
+<meta name="theme-color" content="#14110D">
+<link rel="icon" href="/history/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/history/fonts/fonts.css">
+<link rel="stylesheet" href="/history/history.css">
+</head>
+<body>
+
+<a class="skip" href="#scale">跳到正文</a>
+
+<header class="nav" id="nav">
+  <a class="nav-mark" href="#top" aria-label="万年，回到开头">万年</a>
+  <nav aria-label="页面目录">
+    <a href="#scale">尺度</a>
+    <a href="#moments">九个时刻</a>
+    <a href="#sameyear">同一年</a>
+  </nav>
+</header>
+
+<!-- 固定在右侧的年份刻度：只在“九个时刻”里出现 -->
+<aside class="dial" id="dial" aria-hidden="true">
+  <span class="dial-era" data-era></span>
+  <span class="dial-num odo" data-odo="dial"></span>
+  <span class="dial-track"><span class="dial-fill" id="dialFill"></span></span>
+</aside>
+
+<main>
+
+<section class="hero" id="top">
+  <div class="hero-inner">
+    <p class="hero-era" id="heroEra" aria-hidden="true">公元</p>
+    <h1 class="hero-year" aria-label="一万两千年">
+      <span class="odo" data-odo="hero" aria-hidden="true"></span>
+    </h1>
+    <svg class="hero-horizon" viewBox="0 0 1000 2" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 1 L1000 1" pathLength="1"/>
+    </svg>
+    <p class="hero-lede" data-hero-line>一万两千年，从第一粒种子到第一个网页。</p>
+    <p class="hero-hint" data-hero-line>向下滚动，时间会往前走。</p>
+  </div>
+</section>
+
+<!-- 尺度：把一万两千年画成一条线 -->
+<section class="scene scale" id="scale" data-scene="scale" style="--len:520vh">
+  <div class="stage">
+    <div class="scale-copy" aria-live="polite">
+      <h2 class="scale-title">把一万两千年<wbr>画成一条线。</h2>
+      <p class="scale-note" data-note="0">一万两千年前，人类开始种地。到今天，大约过去了四百代人。</p>
+      <p class="scale-note" data-note="1">走到第六千八百年，才有人在泥板上写下第一个字。</p>
+      <p class="scale-note" data-note="2">印刷机出现之前的一切，占去了这条线的百分之九十五。</p>
+      <p class="scale-note" data-note="3">蒸汽机至今，只有最后的两百五十七年。登月和互联网，都挤在这一小段里。</p>
+    </div>
+    <div class="ruler" id="ruler">
+      <canvas class="ruler-canvas" id="rulerCanvas" aria-hidden="true"></canvas>
+      <ol class="ruler-marks" id="rulerMarks" aria-label="时间线上的标记">
+        <li data-year="-9000">农业</li>
+        <li data-year="-3200">文字</li>
+        <li data-year="-2560">金字塔</li>
+        <li data-year="-221">秦统一</li>
+        <li data-year="1450">印刷机</li>
+        <li data-year="1769">蒸汽机</li>
+        <li data-year="1969">登月</li>
+        <li data-year="1991">万维网</li>
+      </ol>
+      <div class="ruler-ends" aria-hidden="true">
+        <span id="rulerFrom"></span><span id="rulerTo">2026</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="moments">
+
+<section class="scene chapter" data-scene="chapter" data-year="-9000" data-tone="#1A140E" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">9000</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>约公元前 9000 年</span><span>新月沃地</span></p>
+      <h2 class="ch-title">有人留下了<wbr>最饱满的那几粒种子。</h2>
+      <p class="ch-body">在今天土耳其东南部的卡拉贾山一带，野生一粒小麦被一年年挑选、播种，麦穗成熟后不再一碰就散落。人类第一次把来年的口粮，交给了土地。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="wheat" role="img" aria-label="一株麦穗的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="-3200" data-tone="#1B1610" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">3200</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>约公元前 3200 年</span><span>乌鲁克</span></p>
+      <h2 class="ch-title">一笔账，变成了文字。</h2>
+      <p class="ch-body">乌鲁克的书吏用削尖的芦苇在湿泥板上压出楔形。最早被记下来的，是谷物、啤酒和羊的数目。诗和法律，是后来的事。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="tablet" role="img" aria-label="一块刻着楔形文字的泥板"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="-2560" data-tone="#1C1813" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">2560</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>约公元前 2560 年</span><span>吉萨</span></p>
+      <h2 class="ch-title">此后三千八百年，没有更高的建筑。</h2>
+      <p class="ch-body">胡夫金字塔原高约 146 米，由大约 230 万块石块垒成。直到 1311 年英格兰林肯大教堂的尖塔落成，它才不再是世界上最高的人造建筑。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="pyramid" role="img" aria-label="吉萨金字塔与太阳的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="-221" data-tone="#18171A" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">221</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>公元前 221 年</span><span>咸阳与罗马</span></p>
+      <h2 class="ch-title">欧亚大陆的两端，各自长成了帝国。</h2>
+      <p class="ch-body">秦统一六国，书同文，车同轨。不到两百年后，屋大维成为罗马的第一位皇帝。两个帝国只知道彼此一个模糊的名字：罗马人说丝绸来自“赛里斯”，汉人说西方有“大秦”。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="empires" role="img" aria-label="长城的城垛与罗马拱门的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="1405" data-tone="#121722" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">1405</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>1405 年</span><span>刘家港</span></p>
+      <h2 class="ch-title">两百多艘船<wbr>驶出长江口。</h2>
+      <p class="ch-body">郑和的船队载着两万七千余人，前后七次远航，最远到达东非沿岸。八十七年后，哥伦布带着三艘船从西班牙出发。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="compass" role="img" aria-label="一枚罗盘的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="1450" data-tone="#111626" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">1450</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>约 1450 年</span><span>美因茨</span></p>
+      <h2 class="ch-title">知识开始<wbr>可以复制。</h2>
+      <p class="ch-body">古腾堡把金属活字、油性墨和葡萄压榨机组合在一起。据估计，到 1500 年欧洲已印出约八百万册书。早在四百年前，毕昇已经在中国用泥活字印书。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="books" role="img" aria-label="三本一模一样的摊开的书"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="1769" data-tone="#0F1528" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">1769</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>1769 年</span><span>格拉斯哥</span></p>
+      <h2 class="ch-title">热，第一次被<wbr>高效地变成了力。</h2>
+      <p class="ch-body">瓦特为分离式冷凝器取得专利，蒸汽机的耗煤量降到旧式纽科门机的四分之一左右。工厂从此不必建在河边。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="gear" role="img" aria-label="一只蒸汽机飞轮的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="1969" data-tone="#0C1226" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">1969</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>1969 年 7 月 20 日</span><span>静海</span></p>
+      <h2 class="ch-title">从三十八万公里外，回头看见地球。</h2>
+      <p class="ch-body">阿波罗 11 号的登月舱降落在月球的静海。距离莱特兄弟第一次动力飞行，只过去了六十六年。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="moon" role="img" aria-label="地球、飞行轨道与月面的线描"></svg>
+  </div>
+</section>
+
+<section class="scene chapter" data-scene="chapter" data-year="1991" data-tone="#0B1024" style="--len:200vh">
+  <div class="stage">
+    <span class="ch-ghost" aria-hidden="true">1991</span>
+    <div class="ch-copy">
+      <p class="ch-when"><span>1991 年 8 月</span><span>日内瓦</span></p>
+      <h2 class="ch-title">一个网页，链接到另一个网页。</h2>
+      <p class="ch-body">欧洲核子研究中心的蒂姆·伯纳斯-李让世界上第一个网站上线，它介绍的正是万维网本身。这项技术后来被免费开放，没有人为它收取专利费。</p>
+    </div>
+    <svg class="ch-art" viewBox="0 0 400 400" data-draw="web" role="img" aria-label="互相连接的节点"></svg>
+  </div>
+</section>
+
+</div>
+
+<!-- 同一年：按真实经纬度摆放 -->
+<section class="sameyear" id="sameyear" data-tone="#0E1630">
+  <div class="sy-top">
+    <div class="sy-head">
+      <h2 class="sy-title">同一年，在世界的不同地方。</h2>
+      <p class="sy-sub">拖动或点按年份，看看同时发生的事。</p>
+    </div>
+    <div class="sy-scrub" id="scrub">
+      <div class="sy-rail" aria-hidden="true"><span class="sy-rail-fill" id="scrubFill"></span></div>
+      <div class="sy-stops" role="radiogroup" aria-label="选择年份" id="scrubStops"></div>
+      <span class="sy-knob" id="scrubKnob" aria-hidden="true"></span>
+    </div>
+  </div>
+
+  <div class="sy-board" id="syBoard">
+    <div class="sy-map" id="syMap" aria-hidden="true">
+      <svg class="sy-grid" id="syGrid"></svg>
+      <ol class="sy-dots" id="syDots"></ol>
+    </div>
+    <svg class="sy-leads" id="syLeads" aria-hidden="true"></svg>
+    <ol class="sy-cols" id="syCols" aria-live="polite"></ol>
+  </div>
+</section>
+
+<section class="now" id="now">
+  <p class="now-era">公元</p>
+  <p class="now-year"><span class="odo" data-odo="now" aria-label="2026"></span></p>
+  <h2 class="now-title">这条线，还在往前画。</h2>
+  <p class="now-body">你读到这里的这一刻，是它最新的一端。</p>
+  <button class="now-again" id="again" type="button">回到公元前一万年</button>
+</section>
+
+</main>
+
+<footer class="foot">
+  <p>年代与数字采用通行的学术估计，其中不少是约数。</p>
+  <p><a href="/">拾光手帐</a></p>
+</footer>
+
+<script src="/history/history.js" type="module"></script>
+</body>
+</html>
