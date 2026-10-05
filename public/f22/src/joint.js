@@ -11,6 +11,7 @@ const AXES = { N: '北翼', C: '中央', S: '南翼' };
 const axisOff = a => a === 'N' ? 1 : a === 'S' ? -1 : 0;
 const GROUPS = {
   cv: ['航母核心', '航母与舰载机联队，舰队的中心'],
+  train: ['后勤编队', '补给舰跟随航母：补充干扰弹与弹药、维持甲板出动节奏；被击沉后航母周转变慢'],
   sag: ['水面突击群', '突击阶段前出接敌，以舰舰导弹与舰炮打击敌水面舰艇'],
   screen: ['防空掩护群', '环绕航母组成区域防空，拦截来袭导弹与飞机'],
   asw: ['反潜警戒群', '在主攻轴线前方组成反潜屏障，发现潜艇即转入猎杀'],
@@ -137,6 +138,7 @@ function staffGroups(side, concept) {
   U.forEach(([cls], i) => {
     const S = CLS[cls], k = side + i;
     if (S.carrier) g[k] = 'cv';
+    else if (S.supply) g[k] = 'train';
     else if (S.sub) g[k] = concept === 'defense' && U.slice(0, i).some(([c]) => CLS[c].sub) ? 'esc' : 'fwd';
     else g[k] = pref.sag.slice(0, concept === 'defense' ? 1 : 2).includes(i) ? 'sag' : pref.asw.includes(i) ? 'asw' : pref.reserve.includes(i) || (concept === 'defense' && i === pref.sag[1]) ? 'reserve' : 'screen';
   });
@@ -470,8 +472,8 @@ function renderPlan() {
   const seg = (k, opts, cur) => `<div class="seg" data-k="${k}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   const d = Math.round(Math.hypot(FLEET[fo].origin[0] - FLEET[side].origin[0], FLEET[fo].origin[1] - FLEET[side].origin[1]) / 1000);
   const intel = side === 'cn'
-    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×9、弗吉尼亚级 ×4），第三航母打击群林肯号正在菲律宾海集结，预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B、B-2 隐身轰炸机与水面舰战斧可从战区外打击，P-8A 反潜巡逻机将猎杀我潜艇。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
-    : `解放军福建舰、山东舰双航母编队（055 ×3、052D ×6、054A ×2、093B ×2、039B ×2），辽宁舰编队在三亚待命，预计在我以西约 ${d} km 海域；永暑、美济、渚碧三座岛礁机场驻歼-16、轰-6K，海南陆基航空兵可随时增援，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
+    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×9、弗吉尼亚级 ×4，随队补给舰），第三航母打击群、日美澳联合编队与第七舰队驱逐舰支队正在向战区集结，预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B、B-2 隐身轰炸机与水面舰战斧可从战区外打击，P-8A 反潜巡逻机将猎杀我潜艇。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
+    : `解放军福建舰、山东舰双航母编队（055 ×3、052D ×6、054A ×2、093B ×2、039B ×2，随队 901 型补给舰），辽宁舰编队、第二水面群、东部战区支援群与第二潜艇群在后方待命，预计在我以西约 ${d} km 海域；永暑、美济、渚碧三座岛礁机场驻歼-16、轰-6K，海南陆基航空兵可随时增援，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
   const units = FLEET[side].units.map(([c, name], i) => ({ key: side + i, c, name, S: CLS[c] }));
   body.innerHTML = `
   <div class="pgrid">
@@ -485,7 +487,7 @@ function renderPlan() {
       <div class="concepts">${Object.entries(CONCEPTS).map(([k, c]) => `<button type="button" class="concept${k === P.concept ? ' on' : ''}" data-k="concept" data-v="${k}"><b>${c.name}</b><span class="chain">${c.phases.map((id, j) => `<em>${j + 1} ${PHASES[id].name}</em>`).join('<s>›</s>')}</span><small>${c.desc}</small></button>`).join('')}</div>
     </section>
     <section class="psec span2"><h3>③ 兵力编组</h3>
-      <div class="orbat">${units.map(u => u.S.carrier ? `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span><div class="seg fixed"><button type="button" class="on" disabled>航母核心</button></div></div>`
+      <div class="orbat">${units.map(u => u.S.carrier || u.S.supply ? `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span><div class="seg fixed"><button type="button" class="on" disabled>${u.S.carrier ? '航母核心' : '后勤编队'}</button></div></div>`
         : `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span>${seg('g:' + u.key, (u.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(g => [g, GROUPS[g][0]]), P.groups[u.key])}</div>`).join('')}</div>
       <p class="pnote">${SHIP_GROUPS.map(g => `<b>${GROUPS[g][0]}</b>：${GROUPS[g][1]}`).join('　')}</p>
     </section>
@@ -655,7 +657,7 @@ const JCC_TABS = {
       if (!list.length && g !== 'reserve') continue;
       const o = grpOrder[g];
       html += `<div class="jgrp"><h4>${GROUPS[g][0]} <small>${list.length} 艘</small></h4>${o && list.length ? segJ('grp-' + g, o[1], g === 'screen' ? String(C.screenK || 1) : g === 'reserve' ? '' : g === 'fwd' ? (C.subOrder || '') : C[o[0]]) : ''}
-        ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
+        ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier || s.S.supply ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
     }
     const dep = DEPLOY.filter(([k]) => C[k]);
     html += `<div class="jgrp"><h4>地图部署 <small>在战术地图上点选海域下达</small></h4>${dep.length ? dep.map(([k, , who]) => `<div class="jship"><b>${who}</b><span>${Math.round(C[k].x / 1000)}, ${Math.round(C[k].z / 1000)} km</span><span></span><button type="button" data-act="undeploy" data-v="${k}">取消</button></div>`).join('') : '<p class="jnote">尚未指定部署点——各群按计划阵位行动。</p>'}</div>`;

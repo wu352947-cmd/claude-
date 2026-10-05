@@ -752,6 +752,7 @@ const Navy = (() => {
     return mergeGeometries(g.map(x => x.toNonIndexed()));
   }
 
-  function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
+  // (a class without its own model yet borrows the 052D hull so a battle can never fail to load)
+  function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(SPECS[cls] ? cls : 't052d', number); }
   return { ship, plane, ashmGeometry, skiRamp, SPECS, CARRIERS, SUBS };
 })();

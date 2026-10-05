@@ -545,11 +545,11 @@
     <div class="sides">
       <button class="side-card" data-side="cn" type="button">
         <h3>中国人民解放军海军</h3>
-        <ul><li>福建舰 · 山东舰 · 055 ×3 · 052D ×6 · 054A ×2 · 093B ×2 · 039B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 七个波次 · 鹰击-18 / 21 饱和协同打击</li><li>永暑 · 美济 · 渚碧三座岛礁机场 · 歼-15D 反辐射压制</li><li>后续梯队：辽宁舰编队 · 岛礁歼-20 · 海南轰-6K 团</li></ul>
+        <ul><li>福建舰 · 山东舰 · 055 ×3 · 052D ×6 · 054A ×2 · 093B ×2 · 039B ×2</li><li>侦察-打击体系：卫星 · 天波雷达 · 无侦-7 · 空警-600</li><li>火箭军东风-21D / 26 七个波次 · 鹰击-18 / 21 饱和协同打击</li><li>永暑 · 美济 · 渚碧三座岛礁机场 · 歼-15D 反辐射压制</li><li>补给舰：901 型 · 维持甲板出动节奏</li><li>后续梯队：辽宁舰编队 · 第二、三水面群 · 第二潜艇群 · 岛礁歼-20 · 海南轰-6K 团</li></ul>
       </button>
       <button class="side-card" data-side="us" type="button">
         <h3>美国海军</h3>
-        <ul><li>福特号 · 里根号 · 提康德罗加级 ×2 · 伯克级 ×9 · 弗吉尼亚级 ×4</li><li>宙斯盾 CEC / NIFC-CA · 标准-3 反导 · 标准-6</li><li>分布式杀伤：两百余枚海上打击型战斧 · B-1B ×16 LRASM</li><li>F-35C · F/A-18E · EA-18G 反辐射压制 · E-2D · MQ-4C</li><li>后续梯队：林肯号打击群 · P-8A 反潜 · B-2 隐身突防</li></ul>
+        <ul><li>福特号 · 里根号 · 提康德罗加级 ×2 · 伯克级 ×9 · 弗吉尼亚级 ×4</li><li>宙斯盾 CEC / NIFC-CA · 标准-3 反导 · 标准-6</li><li>分布式杀伤：两百余枚海上打击型战斧 · B-1B ×16 LRASM</li><li>F-35C · F/A-18E · EA-18G 反辐射压制 · E-2D · MQ-4C</li><li>补给舰：刘易斯与克拉克级 · 维持甲板出动节奏</li><li>后续梯队：林肯号打击群 · 日美澳联合编队 · 第七舰队驱逐舰支队 · P-8A 反潜 · B-2 隐身突防 · 关岛 B-1B 增援</li></ul>
       </button>
     </div>
     <div class="row"><button class="btn" id="b-side-back" type="button">返回</button></div>
@@ -3397,7 +3397,8 @@ const Navy = (() => {
     return mergeGeometries(g.map(x => x.toNonIndexed()));
   }
 
-  function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(cls, number); }
+  // (a class without its own model yet borrows the 052D hull so a battle can never fail to load)
+  function ship(cls, number) { return SUBS[cls] ? submarine(cls) : CARRIERS[cls] ? carrier(cls) : combatant(SPECS[cls] ? cls : 't052d', number); }
   return { ship, plane, ashmGeometry, skiRamp, SPECS, CARRIERS, SUBS };
 })();
 
@@ -3996,7 +3997,7 @@ const SIDES = {
       ['火箭军', '七个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
       ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
       ['岛礁要塞与陆基航空兵', '永暑、美济、渚碧三座岛礁机场起降歼-16、歼-20 与轰-6K（每机 6 枚鹰击-12），跑道被炸后工程兵抢修、大陆机场补充战机；歼-15D 以鹰击-91 压制宙斯盾雷达。'],
-      ['后续梯队', '辽宁舰编队、岛礁歼-20 进驻、海南轰-6K 团突击——距离近、抵达快，何时投入由指挥员决定。']
+      ['后续梯队与补给舰', '辽宁舰编队、第二、三水面群、第二潜艇群、岛礁歼-20 进驻、海南轰-6K 团突击——距离近、抵达快；901 型补给舰维持甲板出动节奏，被击沉后航母周转变慢。何时投入由指挥员决定。']
     ]
   },
   us: {
@@ -4006,7 +4007,7 @@ const SIDES = {
       ['分布式杀伤', '两百余枚海上打击型战斧分布在每一艘驱逐舰与潜艇的垂发单元里；联合火力打击一次可齐射上百枚。'],
       ['隐身与电子战', 'F-35C 先敌发现、先敌开火；EA-18G 以 AARGM-ER 反辐射导弹摧毁敌舰雷达；MQ-4C 人鱼海神提供持续海面监视。'],
       ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 16 枚隐身 LRASM；B-2A 隐身轰炸机以 JASSM-ER 摧毁岛礁机场。'],
-      ['后续梯队', '林肯号第三航母打击群、P-8A 反潜巡逻机——远离本土，抵达更慢，何时投入由指挥员决定。']
+      ['后续梯队与盟军', '林肯号第三航母打击群、日美澳联合编队（摩耶、爱宕、霍巴特）、第七舰队驱逐舰支队、P-8A、B-2、关岛 B-1B 增援——远离本土，抵达更慢；补给舰维持出动节奏。何时投入由指挥员决定。']
     ]
   }
 };
@@ -4102,6 +4103,14 @@ const CLS = {
   virginia: { model: 'virginia', side: 'us', type: '弗吉尼亚级攻击核潜艇', sub: true, hp: 300, vmax: 16, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { harpoon: 4 }, tlam: 16, torps: 22, torpType: 'mk48', channels: 0, ciws: 0, decoys: 6, value: 100, top: 9, L: 115, B: 10.4, sonar: 46000, quiet: 0.75 }
 };
 // the echelon carriers: 辽宁舰 on the Shandong hull and deck, 林肯号 a Nimitz
+// fleet train: the replenishment ships keep a deck's sortie rate up and top up decoys and gun magazines; they carry
+// no VLS to reload (cells cannot be refilled at sea). Lose them and the carriers' turnaround slows.
+CLS.t901 = { model: 't901', side: 'cn', type: '901 型综合补给舰', supply: true, hp: 650, vmax: 12.5, turn: 0.9, mast: 24, radar: 40000, sam: {}, ashm: {}, channels: 0, ciws: 1, decoys: 6, value: 45, top: 24, L: 234, B: 28, sonar: 0, rcs: 1.4 };
+CLS.lewis = { model: 'lewis', side: 'us', type: '刘易斯与克拉克级干货补给舰', supply: true, hp: 600, vmax: 10.5, turn: 0.9, mast: 24, radar: 40000, sam: {}, ashm: {}, channels: 0, ciws: 1, decoys: 6, value: 45, top: 24, L: 210, B: 32, sonar: 0, rcs: 1.4 };
+// allied hulls under the US command: JMSDF Maya / Atago (SM-3 capable, no Tomahawk) and a RAN Hobart
+CLS.maya = Object.assign({}, CLS.burke, { type: '摩耶级导弹驱逐舰（海上自卫队）', sam: { sm6: 16, sm2: 24, essm: 24 }, ashm: { harpoon: 8 }, tlam: 0, sm3: 8, hp: 580, value: 90, L: 170, B: 21 });
+CLS.atago = Object.assign({}, CLS.maya, { type: '爱宕级导弹驱逐舰（海上自卫队）', sam: { sm6: 12, sm2: 28, essm: 24 }, sm3: 8, hp: 570, L: 165 });
+CLS.hobart = Object.assign({}, CLS.burke, { type: '霍巴特级驱逐舰（澳大利亚皇家海军）', sam: { sm2: 24, essm: 32 }, ashm: { harpoon: 8 }, tlam: 0, sm3: 0, hp: 480, value: 60, L: 147, B: 18.6, asw: 4 });
 CLS.liaoning = Object.assign({}, CLS.shandong, { type: '辽宁舰 · 滑跃起飞航母', hp: 2400, value: 200, wing: { j15: 24, j15d: 2 } });
 CLS.lincoln = Object.assign({}, CLS.reagan, { type: '尼米兹级核动力航母（林肯号）', wing: { fa18: 36, ea18g: 5, f35c: 10, e2d: 4 } });
 // fleets: [class, name, hull number, station ahead (m), station to starboard (m)] in the guide carrier's frame.
@@ -4114,7 +4123,8 @@ const FLEET = {
     ['t054a', '黄山舰', '570', 6400, 900], ['t054a', '衡阳舰', '568', 6400, -8200],
     ['t093b', '093B 长征-15', '', 16000, 4000], ['t093b', '093B 长征-16', '', 15000, -11000],
     ['t055', '大连舰', '105', 2400, 6400], ['t052d', '南宁舰', '162', 4800, -5200], ['t052d', '呼和浩特舰', '161', -4600, 1200],
-    ['t039b', '039B 335 艇', '', 22000, -2000], ['t039b', '039B 336 艇', '', 20000, 6000]] },
+    ['t039b', '039B 335 艇', '', 22000, -2000], ['t039b', '039B 336 艇', '', 20000, 6000],
+    ['t901', '微山湖舰', '903', -4600, -3800]] },
   us: { origin: [56000, -8000], heading: Math.PI, units: [
     ['ford', '福特号', '78', 0, 0], ['reagan', '里根号', '76', 0, 8000],
     ['tico', '普林斯顿号', '59', 4200, 3800], ['tico', '钱斯勒斯维尔号', '62', -3400, 4200],
@@ -4122,7 +4132,8 @@ const FLEET = {
     ['burke', '斯普鲁恩斯号', '111', -2200, 11000], ['burke', '迪凯特号', '73', 6400, 1200], ['burke', '希金斯号', '76', 6400, 7000],
     ['virginia', '夏威夷号 SSN-776', '', 16000, -4000], ['virginia', '北卡罗来纳号 SSN-777', '', 15000, 12000],
     ['burke', '拉尔夫·约翰逊号', '114', 4800, 9800], ['burke', '约翰·芬恩号', '113', -4800, 5600], ['burke', '本福德号', '65', 2600, -6200],
-    ['virginia', '明尼苏达号 SSN-783', '', 20000, 3000], ['virginia', '伊利诺伊号 SSN-786', '', 18000, -9000]] }
+    ['virginia', '明尼苏达号 SSN-783', '', 20000, 3000], ['virginia', '伊利诺伊号 SSN-786', '', 18000, -9000],
+    ['lewis', '刘易斯与克拉克号 T-AKE-1', '1', -4600, 4200]] }
 };
 const SH = {};
 for (const side of ['cn', 'us']) FLEET[side].units.forEach(([cls, name, number], i) => { SH[`${side}${i}`] = Object.assign({}, CLS[cls], { cls, name, number }); });
@@ -5780,7 +5791,7 @@ function updateDeck(pl, dt) {
     pl.rearm(); pl.hp = pl.maxHp; pl.role = 'cap'; pl.task = null; pl.pilot.mode = 'cap'; pl.tanked = false;
     if (!spotOnCatapult(pl)) { pl.deckT = 2; return; }
     message('补给完成', game.ai ? '自动驾驶：弹射起飞，再次出击' : h.kind === 'ship' ? '已就位弹射器 · 推满油门后弹射' : '已滑入跑道 · 推满油门起飞', '#e3b257', 3);
-  } else { h.ready.push({ type: pl.type, t: game.t + (h.kind === 'ship' ? NAT[h.side].turnCv : NAT[h.side].turnBase) }); removePlane(pl); }
+  } else { h.ready.push({ type: pl.type, t: game.t + (h.kind === 'ship' ? NAT[h.side].turnCv * (trainAlive(h.side) ? 1 : 1.4) : NAT[h.side].turnBase) }); removePlane(pl); }
 }
 // spot an aircraft on a free catapult (carrier) or the runway threshold (island)
 function spotOnCatapult(pl) {
@@ -6045,6 +6056,7 @@ function shipAI(s) {
     // screen opened or closed up on the commander's order
     let st = s.station || [1500, 0];
     const C = command[s.side], g = s.grp;
+    if (s.S.supply) st = [-4200 - (s.trainIdx || 0) * 1800, st[1] * 0.9];
     if (g === 'reserve') st = [-5200 - (s.resIdx || 0) * 1800, ((s.resIdx || 0) % 2 ? 1 : -1) * 2600 + st[1] * 0.3];
     else if (g === 'asw') st = [8200, st[1] * 0.7];
     const T = tac(s.side).navy, k = (T === 'ring' ? 0.55 : T === 'disperse' ? 1.5 : 1) * (g === 'screen' || g === 'asw' ? (C.screenK || 1) : 1);
@@ -6351,22 +6363,49 @@ function b1bRaid(tgt) {
   radio(game.side === 'us' ? '空中指挥' : '预警', game.side === 'us' ? 'B-1B 编队进入战区，携带 LRASM。' : '东面发现 B-1B 编队来袭！', game.side === 'us' ? '#9fd4ff' : '#ff8a78');
 }
 
+/* ---------- the fleet train ---------- */
+const trainAlive = side => ships.some(s => s.side === side && s.S.supply && s.alive && !s.dying);
+let supplyT = 0;
+function updateSupply(dt) {
+  supplyT -= dt; if (supplyT > 0) return; supplyT = 2;
+  for (const t of ships) {
+    if (!t.S.supply || !t.alive || t.dying) continue;
+    for (const s of ships) {
+      if (s === t || s.side !== t.side || !s.alive || s.dying || s.pos.distanceToSquared(t.pos) > 6000 * 6000) continue;
+      // underway replenishment: decoys, gun and close-in ammunition (never the VLS cells)
+      if (s.decoys < s.S.decoys && game.t > (s.restockT || 0)) { s.decoys++; s.restockT = game.t + 20; }
+      if (s.gun && s.gun.ammo < s.gun.spec.ammo) s.gun.ammo = Math.min(s.gun.spec.ammo, s.gun.ammo + 8);
+      if (s.hp < s.maxHp * 0.9 && !s.sinking && !s.dying && s.hp > 0) s.hp = Math.min(s.maxHp * 0.9, s.hp + 0.4);
+    }
+  }
+}
 /* ---------- echelons: the forces each theatre commander holds back and decides when to commit ---------- */
 // ready: the earliest a call can go out (the group is still sailing / the regiment is still re-arming); eta: from
 // the call to its arrival; uses: how many times it can be called. A fleet echelon joins astern of the main body;
 // uncommitted, it still counts in the side's war potential as a strategic reserve - committed, it can be lost.
 const ECHELONS = {
   cn: [
-    { id: 'liaoning', name: '辽宁舰编队', sub: '辽宁舰（歼-15 ×24、歼-15D ×2）+ 西宁舰 + 徐州舰，自三亚南下', ready: 240, eta: 300, uses: 1,
+    { id: 'liaoning', name: '辽宁舰编队', sub: '辽宁舰（歼-15 ×24、歼-15D ×2）+ 西宁舰 + 徐州舰，自三亚南下', ready: 240, eta: 300, uses: 1, pm: 0.85, late: 120,
       units: [['liaoning', '辽宁舰', '16', -2500, 10500], ['t052d', '西宁舰', '117', 600, 8400], ['t054a', '徐州舰', '530', 600, 12600]] },
+    { id: 'sag2', name: '南部战区第二水面群', sub: '055 遵义舰 + 052D 太原舰、海口舰 + 054A 湘潭舰，自湛江、榆林出航', ready: 360, eta: 420, uses: 1, pm: 0.9, late: 240,
+      units: [['t055', '遵义舰', '107', 0, 2600], ['t052d', '太原舰', '131', 2600, 900], ['t052d', '海口舰', '171', -2400, 900], ['t054a', '湘潭舰', '531', 5200, 2600]] },
+    { id: 'sag3', name: '东部战区支援群', sub: '055 延安舰 + 052D 兰州舰、贵阳舰 + 054A 舟山舰，自东海南下', ready: 600, eta: 660, uses: 1, pm: 0.8, late: 420,
+      units: [['t055', '延安舰', '106', 0, -2600], ['t052d', '兰州舰', '170', 2600, -900], ['t052d', '贵阳舰', '119', -2400, -900], ['t054a', '舟山舰', '529', 5200, -2600]] },
+    { id: 'subs2', name: '第二潜艇群', sub: '093B ×2、039B ×2 自榆林基地前出伏击', ready: 180, eta: 420, uses: 1, pm: 0.95, late: 60, spawn: 'ahead',
+      units: [['t093b', '093B 长征-17', '', 0, 0], ['t093b', '093B 长征-18', '', -2000, 7000], ['t039b', '039B 337 艇', '', -1000, -7000], ['t039b', '039B 338 艇', '', -3000, 13000]] },
     { id: 'isl', name: '岛礁航空兵进驻', sub: '歼-20 ×8、歼-16 ×8 自海南转场进驻渚碧礁机场', ready: 60, eta: 240, uses: 1, base: '渚碧礁机场', wing: { j20: 8, j16: 8 } },
     { id: 'hainan', name: '海南陆基航空兵突击', sub: '轰-6K ×6 携 36 枚鹰击-12，歼-16 ×4 护航，自西面突入', ready: 120, eta: 150, uses: 2, raid: 'hainan' }
   ],
   us: [
-    { id: 'csg3', name: '第三航母打击群', sub: '林肯号（F/A-18E ×36、F-35C ×10）+ 斯托克代尔号 + 格里德利号，自菲律宾海西进', ready: 360, eta: 540, uses: 1,
+    { id: 'csg3', name: '第三航母打击群', sub: '林肯号（F/A-18E ×36、F-35C ×10）+ 斯托克代尔号 + 格里德利号，自菲律宾海西进', ready: 360, eta: 540, uses: 1, pm: 0.85, late: 120,
       units: [['lincoln', '林肯号', '72', -2500, -10500], ['burke', '斯托克代尔号', '106', 600, -8400], ['burke', '格里德利号', '101', 600, -12600]] },
+    { id: 'ally', name: '日美澳联合编队', sub: '海自摩耶号、爱宕号 + 澳大利亚霍巴特号，自冲绳、佐世保出航', ready: 420, eta: 660, uses: 1, pm: 0.88, late: 300,
+      units: [['maya', '摩耶号 DDG-179', '179', 0, -2600], ['atago', '爱宕号 DDG-177', '177', 2600, -900], ['hobart', '霍巴特号 DDG-39', '39', -2400, -900]] },
+    { id: 'ddg7', name: '第七舰队驱逐舰支队', sub: '伯克级 罗斯号、马斯廷号、麦凯恩号 + 弗吉尼亚级 得克萨斯号，自关岛、横须贺出航', ready: 540, eta: 780, uses: 1, pm: 0.85, late: 420,
+      units: [['burke', '罗斯号', '71', 0, 2600], ['burke', '马斯廷号', '89', 2600, 900], ['burke', '麦凯恩号', '56', -2400, 900], ['virginia', '得克萨斯号 SSN-775', '', 12000, 0]] },
     { id: 'p8', name: 'P-8A 反潜巡逻', sub: 'P-8A ×2 自克拉克基地起飞：声呐浮标阵 + Mk 54 鱼雷猎杀潜艇', ready: 60, eta: 90, uses: 2, raid: 'p8' },
-    { id: 'b2', name: 'B-2 隐身突防', sub: 'B-2A ×2 远程奔袭，32 枚 JASSM-ER 打击岛礁机场跑道与机库', ready: 180, eta: 300, uses: 2, raid: 'b2' }
+    { id: 'b2', name: 'B-2 隐身突防', sub: 'B-2A ×2 远程奔袭，32 枚 JASSM-ER 打击岛礁机场跑道与机库', ready: 180, eta: 300, uses: 2, raid: 'b2' },
+    { id: 'guam', name: '关岛轰炸机增援', sub: '第二批 B-1B ×6 自关岛转场，补充远程轰炸力量（每批 2 架携 32 枚 LRASM）', ready: 300, eta: 360, uses: 1, raid: 'guam' }
   ]
 };
 const ORBAT = { cn: [], us: [] };   // the hulls in the fight: the main body plus every fleet echelon that has arrived
@@ -6385,6 +6424,7 @@ function echelonReserve(side) {
     if (E.raid === 'hainan') p += left * (6 * AC.h6k.value + 4 * AC.j16.value) * 0.45;
     if (E.raid === 'p8') p += left * 2 * AC.p8.value * 0.45;
     if (E.raid === 'b2') p += left * 2 * AC.b2.value * 0.45;
+    if (E.raid === 'guam') p += left * 6 * AC.b1b.value * 0.45;
   }
   return p;
 }
@@ -6414,24 +6454,24 @@ function echelonArrive(side, E) {
     // the group comes up astern of the main body (or on the old start line if the main body is gone)
     const guide = ships.find(x => x.side === side && x.alive && !x.dying && x.carrier && !x.ech) || ships.find(x => x.side === side && x.alive && !x.dying && !x.S.sub);
     const O = FLEET[side], back = side === 'cn' ? -1 : 1;
-    const cx = guide ? guide.pos.x + back * 26000 : O.origin[0] + back * 20000, cz = guide ? guide.pos.z + (side === 'cn' ? 9000 : -9000) : O.origin[1];
+    const ahead = E.spawn === 'ahead', dx = ahead ? -back * 24000 : back * 26000;
+    const cx = guide ? guide.pos.x + dx : O.origin[0] + dx * 0.8, cz = guide ? guide.pos.z + (ahead ? 0 : side === 'cn' ? 9000 : -9000) : O.origin[1];
     let lead = null;
     E.units.forEach(([cls, name, num, sx, sz], j) => {
       const s = new Ship(`${side}e${E.id}${j}`);
       s.station = [sx, sz]; s.ech = E.id;
       s.heading = O.heading; s.pos.set(cx + (lead ? (sx - E.units[0][3]) * (side === 'cn' ? 1 : -1) : 0), 0, cz + (lead ? (sz - E.units[0][4]) * (side === 'cn' ? 1 : -1) : 0));
       if (terrainH(s.pos.x, s.pos.z) > -15) s.pos.z += 6000;
-      s.speed = s.order = 14; s.sync();
+      s.speed = s.order = s.S.sub ? 8 : 14; s.sync();
       ships.push(s); ORBAT[side].push([cls, name, num, sx, sz]);
-      // the PLA's command net puts the new hulls in the plan's screen; the US the same
-      s.grp = s.carrier ? 'cv' : 'screen';
+      // the new hulls take their group from their type: boats go forward, the rest join the screen
+      s.grp = s.carrier ? 'cv' : s.S.sub ? 'fwd' : 'screen';
       if (!lead) lead = s;
     });
     // the enemy's satellites see a carrier group join (it cannot hide a transit)
-    const tr = { pos: lead.pos.clone(), vel: new V3(), t: game.t, first: game.t, coarse: true };
-    picture[fo].set(lead, tr);
-    radio(mineS ? '战区指挥部' : '情报', mineS ? `${E.name}抵达战区，编入主力编队后方！` : `卫星发现敌方新的航母编队进入战区：${lead.name}！`, mineS ? GOLD : '#ff5a4f');
-    message(mineS ? '后续梯队抵达' : '敌增援抵达', `${E.name}`, mineS ? GOLD : '#ff8a78', 4);
+    if (!lead.S.sub) picture[fo].set(lead, { pos: lead.pos.clone(), vel: new V3(), t: game.t, first: game.t, coarse: true });
+    radio(mineS ? '战区指挥部' : '情报', mineS ? `${E.name}抵达战区${lead.S.sub ? '，潜入预定海域' : '，编入主力编队后方'}！` : lead.S.sub ? '' : `卫星发现敌方新的舰艇编队进入战区：${lead.name}！`, mineS ? GOLD : '#ff5a4f');
+    if (mineS || !lead.S.sub) message(mineS ? '后续梯队抵达' : '敌增援抵达', `${E.name}`, mineS ? GOLD : '#ff8a78', 4);
   } else if (E.base) {
     const b = bases.find(x => x.name === E.base && x.alive);
     if (!b) { if (mineS) radio('战区指挥部', `${E.base}已失去作战能力，${E.name}转场取消。`, '#ff8a78'); return; }
@@ -6461,6 +6501,9 @@ function offmapRaid(side, kind) {
   } else if (kind === 'p8') {
     for (let i = 0; i < 2; i++) { const p = offmapPlane('us', 'p8', THEATRE.air - 15000, 2500, rand(-20000, 20000), E, NAT.us.pilot); p.role = 'asw'; p.task = { ph: i * Math.PI }; }
     radio(mineS ? '空中指挥' : '预警', mineS ? 'P-8A 双机进入战区，在舰队前方布设声呐浮标拦阻线。' : '东面发现反潜巡逻机——我方潜艇注意隐蔽！', mineS ? '#9fd4ff' : '#ff8a78');
+  } else if (kind === 'guam') {
+    command.us.b1b += 6;
+    radio(mineS ? '空中指挥' : '预警', mineS ? '第二批 B-1B 已从关岛转场就位，远程突击力量补充至满编。' : '情报显示关岛增派了大批轰炸机。', mineS ? '#9fd4ff' : '#ffb27a');
   } else if (kind === 'b2') {
     // fixed targets: the national reconnaissance system always holds the island airfields
     const tgt = bases.filter(b => b.side === 'cn' && b.alive).sort((a, b) => b.hangarCount() - a.hangarCount())[0];
@@ -6482,11 +6525,15 @@ function echelonStaff(side, dt) {
   for (const E of ECHELONS[side]) {
     if (echAvail(side, E) !== 'ok') continue;
     let why = null;
-    if (E.units) {
-      if (pm < 0.85 || myCv < (side === 'cn' ? 2 : 2)) why = '主力已有损失，需要第二梯队稳住战线';
-      else if (game.t > E.ready + 120) why = '敌方远程打击火力已部分消耗，此时投入风险较低';
+    if (E.units && E.id === 'subs2') {
+      if (foeCvSeen || game.t > E.ready + E.late) why = foeCvSeen ? '敌航母航迹已掌握，第二潜艇群前出伏击其航渡路线' : '预定前出时间已到，潜艇群需要提前占领伏击阵位';
+    } else if (E.units) {
+      const fleet = ships.filter(s => s.side === side && s.alive && !s.dying && !s.S.supply && !s.ech).length;
+      if (pm < E.pm || (myCv < 2 && E.units.some(([c]) => CLS[c].carrier))) why = '主力已有损失，需要后续梯队稳住战线';
+      else if (game.t > E.ready + E.late) why = fleet < 14 ? '主力舰艇所剩不多，应当增派水面兵力' : '敌方远程打击火力已部分消耗，此时投入风险较低';
     } else if (E.base) why = '渚碧礁机场空置，进驻后可在东北方向形成第二个空中支点';
     else if (E.raid === 'hainan') { if (foeCvSeen) why = '敌航母航迹清晰，陆基轰炸机可以从西面形成多方向饱和攻击'; }
+    else if (E.raid === 'guam') { if (C.b1b <= 4 && game.t > E.ready) why = '关岛 B-1B 库存告急，需要第二批补充远程突击力量'; }
     else if (E.raid === 'p8') { if ([...picture[side]].some(([e]) => isSub(e) && e.alive) || game.t > E.ready + 120) why = '敌潜艇威胁上升，需要大型反潜巡逻机'; }
     else if (E.raid === 'b2') { if (bases.some(b => b.side === fo && b.alive && b.hangarCount() > 4)) why = '敌岛礁机场仍在持续出动，需要隐身轰炸机摧毁跑道与机库'; }
     if (!why) continue;
@@ -7150,7 +7197,7 @@ const CAMPAIGN = {
   try { $('cine').style.setProperty('--grain', `url(${c.toDataURL()})`); } catch (_) { /* no grain */ }
 }
 // crews, for the memorial (approximate complements; aircraft crew per airframe)
-const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, t039b: 58, liaoning: 2000, lincoln: 5000, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
+const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, t039b: 58, t901: 130, lewis: 130, maya: 300, atago: 310, hobart: 186, liaoning: 2000, lincoln: 5000, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
 const AC_CREW = { j15: 1, j35: 1, kj600: 5, j16: 2, j15d: 2, h6k: 4, fa18: 1, f35c: 1, ea18g: 2, e2d: 5, b1b: 4, j20: 1, p8: 9, b2: 2 };
 
 /* ---------- music: a small synthesised orchestra ---------- */
@@ -9515,6 +9562,7 @@ const AXES = { N: '北翼', C: '中央', S: '南翼' };
 const axisOff = a => a === 'N' ? 1 : a === 'S' ? -1 : 0;
 const GROUPS = {
   cv: ['航母核心', '航母与舰载机联队，舰队的中心'],
+  train: ['后勤编队', '补给舰跟随航母：补充干扰弹与弹药、维持甲板出动节奏；被击沉后航母周转变慢'],
   sag: ['水面突击群', '突击阶段前出接敌，以舰舰导弹与舰炮打击敌水面舰艇'],
   screen: ['防空掩护群', '环绕航母组成区域防空，拦截来袭导弹与飞机'],
   asw: ['反潜警戒群', '在主攻轴线前方组成反潜屏障，发现潜艇即转入猎杀'],
@@ -9641,6 +9689,7 @@ function staffGroups(side, concept) {
   U.forEach(([cls], i) => {
     const S = CLS[cls], k = side + i;
     if (S.carrier) g[k] = 'cv';
+    else if (S.supply) g[k] = 'train';
     else if (S.sub) g[k] = concept === 'defense' && U.slice(0, i).some(([c]) => CLS[c].sub) ? 'esc' : 'fwd';
     else g[k] = pref.sag.slice(0, concept === 'defense' ? 1 : 2).includes(i) ? 'sag' : pref.asw.includes(i) ? 'asw' : pref.reserve.includes(i) || (concept === 'defense' && i === pref.sag[1]) ? 'reserve' : 'screen';
   });
@@ -9974,8 +10023,8 @@ function renderPlan() {
   const seg = (k, opts, cur) => `<div class="seg" data-k="${k}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
   const d = Math.round(Math.hypot(FLEET[fo].origin[0] - FLEET[side].origin[0], FLEET[fo].origin[1] - FLEET[side].origin[1]) / 1000);
   const intel = side === 'cn'
-    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×9、弗吉尼亚级 ×4），第三航母打击群林肯号正在菲律宾海集结，预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B、B-2 隐身轰炸机与水面舰战斧可从战区外打击，P-8A 反潜巡逻机将猎杀我潜艇。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
-    : `解放军福建舰、山东舰双航母编队（055 ×3、052D ×6、054A ×2、093B ×2、039B ×2），辽宁舰编队在三亚待命，预计在我以西约 ${d} km 海域；永暑、美济、渚碧三座岛礁机场驻歼-16、轰-6K，海南陆基航空兵可随时增援，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
+    ? `美军福特号、里根号双航母打击群（提康德罗加级 ×2、伯克级 ×9、弗吉尼亚级 ×4，随队补给舰），第三航母打击群、日美澳联合编队与第七舰队驱逐舰支队正在向战区集结，预计在我以东约 ${d} km 海域，正以电磁静默向西航渡；关岛 B-1B、B-2 隐身轰炸机与水面舰战斧可从战区外打击，P-8A 反潜巡逻机将猎杀我潜艇。敌最可能采取外层防御、以 F-35C / F/A-18E 携 LRASM 分布式打击。`
+    : `解放军福建舰、山东舰双航母编队（055 ×3、052D ×6、054A ×2、093B ×2、039B ×2，随队 901 型补给舰），辽宁舰编队、第二水面群、东部战区支援群与第二潜艇群在后方待命，预计在我以西约 ${d} km 海域；永暑、美济、渚碧三座岛礁机场驻歼-16、轰-6K，海南陆基航空兵可随时增援，火箭军东风-21D / 26 可对航母实施弹道打击。敌最可能以饱和协同打击与反舰弹道导弹先发制人。`;
   const units = FLEET[side].units.map(([c, name], i) => ({ key: side + i, c, name, S: CLS[c] }));
   body.innerHTML = `
   <div class="pgrid">
@@ -9989,7 +10038,7 @@ function renderPlan() {
       <div class="concepts">${Object.entries(CONCEPTS).map(([k, c]) => `<button type="button" class="concept${k === P.concept ? ' on' : ''}" data-k="concept" data-v="${k}"><b>${c.name}</b><span class="chain">${c.phases.map((id, j) => `<em>${j + 1} ${PHASES[id].name}</em>`).join('<s>›</s>')}</span><small>${c.desc}</small></button>`).join('')}</div>
     </section>
     <section class="psec span2"><h3>③ 兵力编组</h3>
-      <div class="orbat">${units.map(u => u.S.carrier ? `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span><div class="seg fixed"><button type="button" class="on" disabled>航母核心</button></div></div>`
+      <div class="orbat">${units.map(u => u.S.carrier || u.S.supply ? `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span><div class="seg fixed"><button type="button" class="on" disabled>${u.S.carrier ? '航母核心' : '后勤编队'}</button></div></div>`
         : `<div class="orow"><b>${u.name}</b><span>${u.S.type}</span>${seg('g:' + u.key, (u.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(g => [g, GROUPS[g][0]]), P.groups[u.key])}</div>`).join('')}</div>
       <p class="pnote">${SHIP_GROUPS.map(g => `<b>${GROUPS[g][0]}</b>：${GROUPS[g][1]}`).join('　')}</p>
     </section>
@@ -10159,7 +10208,7 @@ const JCC_TABS = {
       if (!list.length && g !== 'reserve') continue;
       const o = grpOrder[g];
       html += `<div class="jgrp"><h4>${GROUPS[g][0]} <small>${list.length} 艘</small></h4>${o && list.length ? segJ('grp-' + g, o[1], g === 'screen' ? String(C.screenK || 1) : g === 'reserve' ? '' : g === 'fwd' ? (C.subOrder || '') : C[o[0]]) : ''}
-        ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
+        ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier || s.S.supply ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
     }
     const dep = DEPLOY.filter(([k]) => C[k]);
     html += `<div class="jgrp"><h4>地图部署 <small>在战术地图上点选海域下达</small></h4>${dep.length ? dep.map(([k, , who]) => `<div class="jship"><b>${who}</b><span>${Math.round(C[k].x / 1000)}, ${Math.round(C[k].z / 1000)} km</span><span></span><button type="button" data-act="undeploy" data-v="${k}">取消</button></div>`).join('') : '<p class="jnote">尚未指定部署点——各群按计划阵位行动。</p>'}</div>`;
@@ -10740,6 +10789,7 @@ function setupBattle() {
       ships.push(s);
     });
   }
+  for (const side of ['cn', 'us']) ships.filter(x => x.side === side && x.S.supply).forEach((x, i) => { x.trainIdx = i; });
   for (const B of BASES) { const b = buildBase(B); baseGroups.push(b.obj); bases.push(b); }
   // a new battle starts from a clean staff: no cooldowns, packages or intents left over from the last one
   for (const k of ['cn', 'us']) for (const f of Object.keys(command[k])) delete command[k][f];
@@ -11185,7 +11235,7 @@ function checkEnd(dt) {
     const p = potential(side) / potential0[side], C = command[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
     if (!carriers && C.cvLostT == null) { C.cvLostT = game.t; if (side === game.side && game.role !== 'watch') radio('战区指挥部', '我方航母已全部损失！舰队还有最后的打击力量——在撤出之前，打出去。', '#ff8a78'); }
-    const hulls = ORBAT[side].length, lost = ORBAT[side].filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
+    const fight = ORBAT[side].filter(([c]) => !CLS[c].supply), hulls = fight.length, lost = fight.filter(([, name]) => !ships.some(s => s.name === name && s.alive && !s.dying)).length;
     const M = magazines(side), A = airStock(side), dry = M.ashm < M.ashm0 * 0.08 && A.strike < A.strike0 * 0.08 && !planes.some(q => q.side === side && q.alive && q.ashmN > 0);
     let why = null;
     if (!alive) why = '舰队全军覆没';
@@ -11389,7 +11439,7 @@ function update(dt) {
   world.update(game.t);
   if (game.mode === 'menu' || game.mode === 'cine') { for (const s of ships) updateShip(s, dt); return; }
   if (!['play', 'dead', 'over'].includes(game.mode)) return;
-  updateSensors(dt); updateSonar(dt); cruiseGuard(dt);
+  updateSensors(dt); updateSonar(dt); updateSupply(dt); cruiseGuard(dt);
   updateCommand('cn', dt); updateCommand('us', dt);
   for (let i = pending.length - 1; i >= 0; i--) if (pending[i].t <= game.t) { const p = pending[i]; pending.splice(i, 1); p.fn(); }
   queueT -= dt; if (queueT <= 0) { queueT = 1; processQueues(); }

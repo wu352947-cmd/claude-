@@ -82,7 +82,7 @@ const CAMPAIGN = {
   try { $('cine').style.setProperty('--grain', `url(${c.toDataURL()})`); } catch (_) { /* no grain */ }
 }
 // crews, for the memorial (approximate complements; aircraft crew per airframe)
-const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, t039b: 58, liaoning: 2000, lincoln: 5000, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
+const CREW = { fujian: 3000, shandong: 2000, t055: 310, t052d: 280, t054a: 165, t093b: 110, t039b: 58, t901: 130, lewis: 130, maya: 300, atago: 310, hobart: 186, liaoning: 2000, lincoln: 5000, ford: 4550, reagan: 5000, tico: 330, burke: 320, virginia: 135 };
 const AC_CREW = { j15: 1, j35: 1, kj600: 5, j16: 2, j15d: 2, h6k: 4, fa18: 1, f35c: 1, ea18g: 2, e2d: 5, b1b: 4, j20: 1, p8: 9, b2: 2 };
 
 /* ---------- music: a small synthesised orchestra ---------- */
