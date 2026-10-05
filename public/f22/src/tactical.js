@@ -682,7 +682,7 @@ function toggleMap() {
   TM.open = !TM.open; game.map = TM.open;
   $('b-map')?.classList.toggle('on', TM.open);
   $('tac').hidden = !TM.open; $('touch').style.visibility = $('topbar').style.visibility = TM.open ? 'hidden' : '';
-  if (TM.open) { TM.follow = true; TM.sel = null; TM.pt = null; renderTacOrders(); renderTacCard(); }
+  if (TM.open) { $('act').hidden = true; TM.follow = true; TM.sel = null; TM.pt = null; renderTacOrders(); renderTacCard(); }
 }
 function tacOwn() { return player || flagship || (camRole() ? game.focus : null); }
 function tacToScreen(x, z) { const s = Math.min(HW, HH) / TM.span; return [HW / 2 + (x - TM.cx) * s, HH / 2 + (z - TM.cz) * s]; }
@@ -814,6 +814,12 @@ function drawTacMap() {
     hc.font = `600 10px ${SANS}`; hc.fillStyle = BLUE; hc.textAlign = 'center';
     hc.fillText(k.phase === 'form' ? `第${k.id}编队 集结 ${k.ready || 0}/${k.total || 0} · ${Math.max(0, Math.ceil(PKG_FORM_MAX - (game.t - k.t)))}s` : `第${k.id}编队 已出发`, rx, ry - 10);
   }
+  for (const [k, label] of DEPLOY) {
+    const q = command[me][k]; if (!q) continue;
+    const [x, y] = P(q.x, q.z);
+    hc.strokeStyle = GOLD; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(x, y - 9); hc.lineTo(x + 9, y); hc.lineTo(x, y + 9); hc.lineTo(x - 9, y); hc.closePath(); hc.stroke();
+    hc.font = `600 10px ${SANS}`; hc.fillStyle = GOLD; hc.textAlign = 'center'; hc.fillText(label.replace(/前出到此|警戒此处|伏击于此|设于此/, ''), x, y - 13);
+  }
   if (TM.pt) { const [x, y] = P(TM.pt.x, TM.pt.z); hc.strokeStyle = '#eef3f5'; hc.lineWidth = 1.5; hc.beginPath(); hc.moveTo(x - 8, y); hc.lineTo(x + 8, y); hc.moveTo(x, y - 8); hc.lineTo(x, y + 8); hc.stroke(); }
   // the player's own unit: impossible to miss
   if (own && own.pos) {
@@ -856,8 +862,13 @@ function renderTacCard() {
   if (!u && TM.pt && game.role !== 'watch') {
     // open sea: the commander can make it the side's direction of attack
     const own = tacOwn(), d = own && own.pos ? TM.pt.distanceTo(_a.copy(own.pos).setY(0)) : 0;
-    el.innerHTML = `<b style="color:var(--gold, #e3b257)">海域 ${Math.round(TM.pt.x / 1000)}, ${Math.round(TM.pt.z / 1000)}</b><span>距你 ${km(d)} km</span><div class="acts"><button type="button" data-i="0">设为主攻方向</button></div>`;
-    el.querySelector('button').onclick = () => { playerIntent(null, TM.pt); message('主攻方向已确定', '舰队、潜艇与空中力量向该海域集中', GOLD, 2.6); TM.pt = null; renderTacCard(); };
+    // the commander can also put a group on this spot: the surface action group, the ASW screen, the submarines'
+    // ambush box or the fighter barrier
+    const C = command[game.side], pt = TM.pt.clone();
+    const acts = [['设为主攻方向', () => { playerIntent(null, pt); message('主攻方向已确定', '舰队、潜艇与空中力量向该海域集中', GOLD, 2.6); }]];
+    if (game.role === 'cmd') for (const [k, label, who] of DEPLOY) acts.push([label, () => { C[k] = pt; message('部署命令', `${who}前往 ${Math.round(pt.x / 1000)}, ${Math.round(pt.z / 1000)}`, GOLD, 2.4); radio('战区指挥部', `命令：${who}前往指定海域。`, GOLD); jlog(game.side, `部署：${who}前往 ${Math.round(pt.x / 1000)}, ${Math.round(pt.z / 1000)}`, GOLD); }]);
+    el.innerHTML = `<b style="color:var(--gold, #e3b257)">海域 ${Math.round(TM.pt.x / 1000)}, ${Math.round(TM.pt.z / 1000)}</b><span>距你 ${km(d)} km</span><div class="acts">${acts.map((a, i) => `<button type="button" data-i="${i}">${a[0]}</button>`).join('')}</div>`;
+    el.querySelectorAll('.acts button').forEach(b => b.onclick = () => { acts[+b.dataset.i][1](); TM.pt = null; renderTacCard(); });
     el.hidden = false; return;
   }
   if (!u || !u.alive || u.dying) { el.hidden = true; return; }

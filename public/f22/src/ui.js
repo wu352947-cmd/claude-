@@ -323,7 +323,7 @@ $('cm-feint').onclick = () => {
   if (deployPhantom(game.side)) { cmdUse('feint'); if (tac(game.side).navy !== 'emcon') message('建议配合电磁静默', '真编队的雷达信号会让佯动失去意义', '#ffc861', 2.2); }
   else message('无法佯动', '需要航母编队在场', '#9fb0ba', 1.6);
 };
-$('cm-staff').onclick = () => { const order = ['negation', 'approve', 'delegate'], C = command[game.side]; C.auth = order[(order.indexOf(authOf()) + 1) % 3]; radio('参谋部', `指挥方式：${ROE.auth[C.auth][0]}。${ROE.auth[C.auth][1]}`, '#9fd4ff'); jlog(game.side, `参谋权限：${ROE.auth[C.auth][0]}`); renderProps(); cmdButtons(); };
+$('cm-staff').onclick = () => { const order = ['negation', 'approve', 'delegate', 'full'], C = command[game.side]; C.auth = order[(order.indexOf(authOf()) + 1) % 4]; radio('参谋部', `指挥方式：${ROE.auth[C.auth][0]}。${ROE.auth[C.auth][1]}`, '#9fd4ff'); jlog(game.side, `参谋权限：${ROE.auth[C.auth][0]}`); renderProps(); cmdButtons(); };
 $('cm-jcc').onclick = () => toggleJCC();
 
 /* ---------- theatre support: the side's strategic card, open to every role ---------- */

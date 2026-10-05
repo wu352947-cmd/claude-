@@ -232,7 +232,7 @@ function subAI(s, dt) {
   const C = command[s.side];
   let want = C.course, spd = 6, depth = 90;
   // no contact close enough: the boats run ahead of the fleet down the main axis to an ambush position
-  const ip = intentPos(s.side, _c);
+  const ip = (C.subPt && (C.subOrder || s.grp) !== 'esc') ? _c.copy(C.subPt) : intentPos(s.side, _c);
   const esc = (C.subOrder || s.grp) === 'esc';
   if (esc && best && best.pos.distanceTo(s.pos) > 20000) best = null;
   if (esc && !best) {
@@ -338,6 +338,7 @@ function rocketForce(side, n = 4, type = 'df21d') {
   if (!tgt) return false;
   for (let k = 0; k < n; k++) pending.push({ t: game.t + k * 1.6, fn: () => { if (tgt.alive) { const m = launchBallistic(side, tgt, type); if (k === 0) cineOn('ballistic', m); } } });
   const mineSide = side === game.side;
+  chron(`火箭军 ${n} 枚${MSL[type].name}从大陆腾空，扑向${tgt.name}`, side, true);
   radio(mineSide ? '南部战区' : 'SPY-6 / 宙斯盾', mineSide ? `火箭军 ${n} 枚${MSL[type].name}已发射，目标${tgt.name}，约 50 秒后抵达。` : `弹道导弹来袭！${n} 枚，目标${tgt.name}！`, mineSide ? '#ffd28a' : '#ff5a4f');
   if (!mineSide) message('弹道导弹来袭', `${MSL[type].name} × ${n} · 目标 ${tgt.name}`, '#ff5a4f', 4);
   return true;

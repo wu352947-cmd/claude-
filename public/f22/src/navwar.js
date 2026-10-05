@@ -697,7 +697,7 @@ function launchASHM(owner, target, type, aimOverride) {
   const d = from.distanceTo(camera.position);
   Sound.launch(clamp(1 - d / 6000, 0.02, 0.5));
   if (owner === player || owner === flagship) game.stats.launches++;
-  if (!game.flags.firstSalvo) { game.flags.firstSalvo = true; chapterEvent('salvo', owner.side); }
+  if (!game.flags.firstSalvo) { game.flags.firstSalvo = true; chapterEvent('salvo', owner.side); chron(`第一枚反舰导弹升空：${owner.name || ''}发射${MSL[type].name}`, owner.side, true); }
   return m;
 }
 // surface-to-air
@@ -782,6 +782,8 @@ function ledgerPlane(pl) {
   const L = game.ledger, by = foe(pl.side);
   if (!L) return;
   L.air[pl.side]++;
+  if (L.crew) L.crew[pl.side] += (AC_CREW[pl.type] || 1) * 0.55;
+  if (pl.T.aew) chron(`${pl.T.name}被击落——${SIDES[pl.side].short}失去一只眼睛`, pl.side);
   if (pl.ashmN > 0) L.archers[by]++;        // shot down with its anti-ship missiles still on the rails
   if (pl.T.aew) L.aew[by]++;
   if (pl.role === 'tank') L.tankers[by]++;
@@ -1496,6 +1498,9 @@ function roleFly(pl, d, c, out, dt) {
       // tasked on the main target - on the axis just outside the target group's missile umbrella
       const lat = (task.lat || 0) + (task.latZ || 0);
       let cx = anchor.x + dirToFoe.x * off - dirToFoe.z * lat, cz = anchor.z + dirToFoe.z * off + dirToFoe.x * lat;
+      // a barrier the commander drew on the map: the patrols spread along it
+      const CP = command[pl.side].capPt;
+      if (CP && pl.role === 'cap' && !task.on) { cx = CP.x - dirToFoe.z * lat * 0.5; cz = CP.z + dirToFoe.x * lat * 0.5; P.mode = 'barcap'; }
       if (task.on && pl.role === 'cap') {
         // the station sits just outside the known SAM umbrella around the target (a stealth fighter closest)
         let stand = task.stand || 50000;
@@ -2000,6 +2005,7 @@ function alphaStrike(h, tgt) {
   const k = launchPackage(h, tgt, { n: 12, esc: 4, ew: 2, alpha: true });
   if (!k) return null;
   h.alpha = game.t + 150; h.cyc = { phase: 'launch', until: game.t + 150 };
+  chron(`${h.name}甲板全力出动，对${tgt.name}实施大规模打击`, h.side, true);
   if (h.side === game.side) message('大规模打击', `${h.name}甲板全力出动 · 目标 ${tgt.name} · 回收暂停约 2 分钟`, GOLD, 3);
   else if (game.side && game.role !== 'watch') radio('预警', `侦测到${h.name}方向大批飞机起飞——敌方大规模空袭！`, '#ff5a4f');
   return k;
@@ -2119,7 +2125,7 @@ function shipAI(s) {
     if (g === 'reserve') st = [-5200 - (s.resIdx || 0) * 1800, ((s.resIdx || 0) % 2 ? 1 : -1) * 2600 + st[1] * 0.3];
     else if (g === 'asw') st = [8200, st[1] * 0.7];
     const T = tac(s.side).navy, k = (T === 'ring' ? 0.55 : T === 'disperse' ? 1.5 : 1) * (g === 'screen' || g === 'asw' ? (C.screenK || 1) : 1);
-    const p = toWorld(guide, st[0] * k + 1200, 0, st[1] * k, _b);
+    const p = g === 'asw' && C.aswPt ? _b.set(C.aswPt.x + st[1] * 0.4, 0, C.aswPt.z + (s.resIdx || st[0] % 3) * 900) : toWorld(guide, st[0] * k + 1200, 0, st[1] * k, _b);
     _c.subVectors(p, s.pos);
     want = headingOf(_c);
     const along = _c.dot(fwdOf(guide.heading, _d));
@@ -2200,18 +2206,19 @@ function updateCommand(side, dt) {
     if (Math.hypot(guide.pos.x, guide.pos.z) > THEATRE.sea) course = headingOf(_c.set(-guide.pos.x, 0, -guide.pos.z));
     C.course = course; C.speed = spd;
     // surface action group: once the enemy is found, a few escorts push forward down the main axis
-    if (foeShip && game.t > 45) {
-      const tp = (main && main.kind === 'ship' && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
+    if ((foeShip || C.sagPt) && game.t > 45) {
+      const tp = C.sagPt || (main && main.kind === 'ship' && intentPos(side, _b)) || trackPos(side, foeShip, _b) || foeShip.pos;
       const toUs = _c.subVectors(guide.pos, tp).setY(0).normalize();
-      C.sagPoint = (C.sagPoint || new V3()).copy(tp).addScaledVector(toUs, T.navy === 'strike' ? 10000 : 15000);
+      C.sagPoint = (C.sagPoint || new V3()).copy(tp).addScaledVector(toUs, C.sagPt ? 0 : T.navy === 'strike' ? 10000 : 15000);
       // in a feint the surface action group shows itself on the supporting direction instead
       const ph = phaseOf(side), P = planOf(side);
-      if (ph && ph.second && P && P.second !== 'none') C.sagPoint.addScaledVector(latN(guide.pos, tp, _f), axisOff(P.second) * 26000);
+      if (!C.sagPt && ph && ph.second && P && P.second !== 'none') C.sagPoint.addScaledVector(latN(guide.pos, tp, _f), axisOff(P.second) * 26000);
       // the surface action group is the ships the task organisation put in it; it goes forward when the phase (or
       // the commander) says so and comes back under a ring defence
       const sag = ships.filter(x => x.side === side && x.sag && x.alive && !x.dying);
-      const so = C.sagOrder || 'auto', go = so === 'push' || (so === 'auto' && ((ph && ph.sag) || T.navy === 'strike'));
-      if (T.navy === 'ring' || !go) { if (sag.length && side === game.side && !(C.sagSaid > game.t)) { C.sagSaid = game.t + 60; radio('舰队司令部', '水面突击群撤回编队。', '#9fd4ff'); } for (const x of sag) x.sag = false; }
+      // a point the commander put the group on is an order to go there
+      const so = C.sagOrder || 'auto', go = so === 'push' || (so === 'auto' && (C.sagPt || (ph && ph.sag) || T.navy === 'strike'));
+      if ((T.navy === 'ring' && !(C.sagPt && so !== 'hold')) || !go) { if (sag.length && side === game.side && !(C.sagSaid > game.t)) { C.sagSaid = game.t + 60; radio('舰队司令部', '水面突击群撤回编队。', '#9fd4ff'); } for (const x of sag) x.sag = false; }
       else {
         const add = ships.filter(x => x.side === side && x.grp === 'sag' && !x.sag && x.alive && !x.dying && x !== flagship && x.hp > x.maxHp * 0.6);
         for (const x of add) { x.sag = true; x.sagOff = (sag.length + add.indexOf(x) - 1) * 1800; }
@@ -2502,7 +2509,7 @@ const STORY = {
   }
 };
 function chapter() {}
-function onFirstContact(side, e) { if (side === game.side) radio(side === 'cn' ? '空警-600' : 'E-2D', `发现敌舰：${e.name}！坐标已上传数据链。`, '#ffd28a'); }
+function onFirstContact(side, e) { chron(`${SIDES[side].short}首次发现敌舰：${e.name}`, side); if (side === game.side) radio(side === 'cn' ? '空警-600' : 'E-2D', `发现敌舰：${e.name}！坐标已上传数据链。`, '#ffd28a'); }
 function chapterEvent(kind, side, unit) {
   if (kind === 'sunk') { campaignSunk(unit); if (unit.carrier) radio(mine(unit) ? '舰队司令部' : SIDES[game.side].short, mine(unit) ? `我们失去了${unit.name}……舰载机转降友舰或岛礁！` : `敌航母${unit.name}正在下沉！`, mine(unit) ? '#ff8a78' : '#8dffb4'); }
 }
@@ -3009,11 +3016,22 @@ const look = { yaw: 0, pitch: 0, active: false, idle: 0 };
 // the dragged angles are followed quickly (the finger should feel attached); the point looked at follows the
 // subject more softly. The camera sits exactly on the sphere around that point, so a swing never cuts a chord.
 let oA = orbitA, oE = orbitE, oD = 0;
+// the camera rides with its subject (no lag that grows with speed and shakes with every uneven frame); only a cut
+// to another subject leaves an offset, which then glides out
+const oOff = new V3(), oLast = new V3();
+let oHave = false;
+function follow(target, dt, k) {
+  if (!oHave || game.snap > 0) { oOff.set(0, 0, 0); oHave = true; }
+  else if (target.distanceTo(oLast) > 600 + 2500 * Math.min(dt, 0.1)) oOff.copy(camTarget).sub(target);   // a jump, not motion
+  oLast.copy(target);
+  oOff.multiplyScalar(Math.exp(-dt * k));
+  camTarget.copy(target).add(oOff);
+}
 function orbit(target, dist, dt, smoothK = 3) {
   const kA = 1 - Math.exp(-dt * 16);
   oA += wrapA(orbitA - oA) * kA; oE += (orbitE - oE) * kA;
   oD = oD ? oD + (dist - oD) * (1 - Math.exp(-dt * 4)) : dist;
-  camTarget.lerp(target, 1 - Math.exp(-dt * smoothK * 1.5));
+  follow(target, dt, smoothK * 1.5);
   const ce = Math.cos(oE), se = Math.sin(oE);
   camPos.set(camTarget.x + Math.cos(oA) * ce * oD, camTarget.y + se * oD, camTarget.z + Math.sin(oA) * ce * oD);
   camPos.y = Math.max(camPos.y, 2.5);
@@ -3022,14 +3040,21 @@ function orbit(target, dist, dt, smoothK = 3) {
   camera.lookAt(camTarget);
 }
 // chase a missile from behind, looking along its path (and at its target once it is close)
+// The camera is rigidly attached to the missile; only the direction it looks along is smoothed (the seeker's
+// weave and terminal jinks would otherwise shake the whole frame)
+const chase = { m: null, dir: new V3(), aim: new V3() };
 function chaseMissile(m, dt) {
-  camPos.copy(m.pos).addScaledVector(m.dir, -45 * (game.zoom || 1)).addScaledVector(Y_AXIS, 9 * (game.zoom || 1));
-  camera.position.lerp(camPos, 1 - Math.exp(-dt * 10));
+  if (chase.m !== m || game.snap > 0) { chase.m = m; chase.dir.copy(m.dir); chase.aim.set(0, 0, 0); }
+  chase.dir.lerp(m.dir, 1 - Math.exp(-dt * 3)).normalize();
+  const z = game.zoom || 1;
+  camera.position.copy(m.pos).addScaledVector(chase.dir, -45 * z).addScaledVector(Y_AXIS, 9 * z);
   camera.up.copy(Y_AXIS);
+  // near the target the view swings to frame both; the swing is held relative to the missile
   const t = m.target && m.target.pos && m.target.pos.distanceTo(m.pos) < 12000 ? m.target.pos : null;
-  _d.copy(m.pos).addScaledVector(m.dir, 400);
-  if (t) _d.lerp(_c.copy(t).setY(15), 0.5);
-  camTarget.lerp(_d, 1 - Math.exp(-dt * 8));
+  _d.copy(chase.dir).multiplyScalar(400);
+  if (t) _d.lerp(_c.copy(t).setY(15).sub(m.pos), 0.5);
+  chase.aim.lerp(_d, 1 - Math.exp(-dt * 2.5));
+  camTarget.copy(m.pos).add(chase.aim);
   camera.lookAt(camTarget);
 }
 function ownMissile() {
@@ -3085,14 +3110,19 @@ function updateCamera(dt) {
     if (p.state === 'cat' || p.state === 'deck' || p.state === 'trap' || p.state === 'queued') {
       // on deck: a deck-crew view from behind and above
       _a.copy(p.fwd).setY(0).normalize().applyAxisAngle(Y_AXIS, look.yaw);
-      camPos.copy(p.pos).addScaledVector(_a, -34 * (game.zoom || 1)).add(_b.set(0, 9 + look.pitch * 20, 0)).addScaledVector(p.right, 8);
-      camera.position.lerp(camPos, 1 - Math.exp(-dt * 4)); camera.up.copy(Y_AXIS);
+      // attached to the jet (a catapult stroke would otherwise leave the camera behind and shaking)
+      camera.position.copy(p.pos).addScaledVector(_a, -34 * (game.zoom || 1)).add(_b.set(0, 9 + look.pitch * 20, 0)).addScaledVector(p.right, 8); camera.up.copy(Y_AXIS);
       camera.lookAt(_c.copy(p.pos).addScaledVector(_a, 30));
       camQ.copy(p.q); fov = 58;
     } else if (game.view === 1) {
       // view toward the nearest threat or target, aircraft in the foreground
       const tgt = game.lock.target || game.ashmSel || nearestHostile();
-      if (tgt) { _a.subVectors(p.pos, tgt.pos).normalize(); camPos.copy(p.pos).addScaledVector(_a, 36).addScaledVector(Y_AXIS, 9); camera.position.lerp(camPos, 1 - Math.exp(-dt * 5)); camera.up.copy(Y_AXIS); camera.lookAt(_b.copy(p.pos).addScaledVector(_a, -80)); }
+      if (tgt) {
+        // the jet stays fixed in frame; only the bearing to the target is smoothed
+        _a.subVectors(p.pos, tgt.pos).normalize();
+        if (game.snap > 0 || !chase.tv) chase.tv = _a.clone(); else chase.tv.lerp(_a, 1 - Math.exp(-dt * 4)).normalize();
+        camera.position.copy(p.pos).addScaledVector(chase.tv, 36).addScaledVector(Y_AXIS, 9); camera.up.copy(Y_AXIS); camera.lookAt(_b.copy(p.pos).addScaledVector(chase.tv, -80));
+      }
       else game.view = 0;
     } else {
       camQ.slerp(p.q, 1 - Math.exp(-dt * 4.5));
@@ -3132,15 +3162,21 @@ function updateCamera(dt) {
   else director(dt);
   if (camera.position.y < 2) camera.position.y = 2;
   if (game.shake > 0.01 && !reduced) {
-    const sh = game.shake;
-    camera.position.x += rand(-sh, sh); camera.position.y += rand(-sh, sh); camera.position.z += rand(-sh, sh);
+    // a smooth tremor (layered sines), not per-frame noise, which reads as jitter
+    const sh = game.shake, w = performance.now() / 1000;
+    camera.position.x += sh * 0.6 * (Math.sin(w * 31) + Math.sin(w * 47.3 + 1.3));
+    camera.position.y += sh * 0.6 * (Math.sin(w * 37.7 + 2.1) + Math.sin(w * 23.1));
+    camera.position.z += sh * 0.6 * (Math.sin(w * 29.3 + 0.7) + Math.sin(w * 53.9 + 2.9));
     game.shake *= Math.exp(-dt * 6);
   }
   if (Math.abs(camera.fov - fov) > 0.01) { camera.fov = fov; camera.updateProjectionMatrix(); }
   sunLight.target.position.copy(camTarget.lengthSq() ? camTarget : camera.position);
   if (player && game.role === 'pilot') sunLight.target.position.copy(player.pos);
   if (game.role === 'captain' && flagship) sunLight.target.position.copy(flagship.pos);
-  sunLight.position.copy(sunLight.target.position).addScaledVector(SUN, 300);
+  // snap the shadow frustum to its texel grid so shadow edges do not crawl as the view moves
+  const sc = sunLight.shadow.camera, tex = (sc.right - sc.left) / (sunLight.shadow.mapSize.x || 1024), tp = sunLight.target.position;
+  tp.set(Math.round(tp.x / tex) * tex, Math.round(tp.y / tex) * tex, Math.round(tp.z / tex) * tex);
+  sunLight.position.copy(tp).addScaledVector(SUN, 300);
 }
 function nearestHostile() {
   let best = null, bd = 1e12;
@@ -3601,8 +3637,9 @@ function startGame() {
   Object.assign(game, { mode: 'play', t: 0, scale: 1, autoCruise: false, noCruise: false, cruiseT: 0, staffHold: 0, wall: 0, msgs: [], radio: [], shake: 0, flash: 0, map: false, chapter: 0, flags: {}, cause: '', over: null,
     ai: false, view: 0, viewT: 0, focus: null, ashmSel: null, mslCd: 0, card: null, endT: 0, zoom: 1, endShown: false, cine: null, ribbons: [], camp: null, tactic: { cn: { navy: 'balanced', air: 'balanced' }, us: { navy: 'balanced', air: 'balanced' } }, intent: { cn: null, us: null }, wingOrder: 'follow', scopeZ: 1, supportT: 120, supportN: 0, spec: 'auto',
     stats: { kills: 0, shipKills: 0, launches: 0, traps: 0, sorties: 0 }, result: null,
-    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 } } });
+    ledger: { air: { cn: 0, us: 0 }, archers: { cn: 0, us: 0 }, aew: { cn: 0, us: 0 }, tankers: { cn: 0, us: 0 }, sunk: { cn: [], us: [] }, fooled: { cn: 0, us: 0 }, crew: { cn: 0, us: 0 } }, chron: [] });
   game.lock = { target: null, t: 0, locked: false, kind: 'mrm', need: 1 };
+  $('act').hidden = $('finale').hidden = true;
   initJoint();
   $('b-scale').textContent = '时间 ×1'; $('b-ai').classList.remove('on'); $('b-map').classList.remove('on');
   precompile();
@@ -3646,7 +3683,7 @@ function brief() {
   el.innerHTML = '';
   for (const [p] of CAMPAIGN.prologue[s].slice(1)) { const q = document.createElement('p'); q.textContent = p; el.appendChild(q); }
   const ol = document.createElement('dl'); ol.className = 'help';
-  for (const c of CAMPAIGN.chapters[s]) { const dt = document.createElement('dt'); dt.textContent = c.title; const dd = document.createElement('dd'); dd.textContent = c.goal; ol.append(dt, dd); }
+  for (const c of CAMPAIGN.acts) { const dt = document.createElement('dt'); dt.textContent = `${c.num} · ${c.title}`; const dd = document.createElement('dd'); dd.textContent = c.sub; ol.append(dt, dd); }
   el.appendChild(ol);
   const perks = document.createElement('dl'); perks.className = 'help';
   for (const [a, b] of SIDES[s].perks) { const dt = document.createElement('dt'); dt.textContent = a; const dd = document.createElement('dd'); dd.textContent = b; perks.append(dt, dd); }
@@ -3702,7 +3739,7 @@ const RESULT_TIERS = {
 function endGame() {
   game.mode = 'over';
   const win = game.over === game.side || game.over === 'draw';
-  if (settings.cine && !game.endShown) { game.endShown = true; game.mode = 'cine'; runEpilogue(win, () => { game.mode = 'over'; afterAction(win); }); return; }
+  if (!game.endShown) { game.endShown = true; runFinale(win, () => { game.mode = 'over'; afterAction(win); }); return; }
   afterAction(win);
 }
 function afterAction(win) {
@@ -3710,7 +3747,7 @@ function afterAction(win) {
   const me = game.side, them = foe(me), L = game.ledger;
   $('end-tag').textContent = T.name; $('end-tag').style.color = T.color;
   $('end-title').textContent = T.title;
-  const story = CAMPAIGN.end[R.tier === 'draw' ? 'draw' : win ? 'win' : 'lose'][me];
+  const story = CAMPAIGN.finale[R.tier === 'decisive' || R.tier === 'win' ? 'win' : R.tier === 'pyrrhic' ? 'pyrrhic' : R.tier === 'draw' ? 'draw' : 'lose'][me];
   $('end-text').textContent = `${R.why}。` + story.join('');
   const S = game.stats, mm = Math.floor(game.t / 60);
   $('e-time').textContent = `${mm} 分`; $('e-kills').textContent = S.kills; $('e-ships').textContent = S.shipKills; $('e-traps').textContent = S.traps;
@@ -3723,6 +3760,7 @@ function afterAction(win) {
     const phaseN = L.phases ? Math.max(0, L.phases[me].length - 1) : 0;
     const score = Math.round((1 - R.pt) * 600 - (1 - R.pm) * 400 + L.archers[me] * 8 + L.aew[me] * 25 + L.fooled[me] * 4 + phaseN * 30 + (me === 'cn' ? (R.base ? 60 : -60) : (R.base ? -30 : 60)));
     const grade = score > 420 ? 'S' : score > 300 ? 'A' : score > 180 ? 'B' : score > 60 ? 'C' : 'D';
+    const rank = CAMPAIGN.grades[grade];
     $('e-report').innerHTML = `<table><thead><tr><th></th><td>${SIDES[me].short}</td><td>${SIDES[them].short}</td></tr></thead><tbody>
       ${row('剩余战争潜力', `${Math.round(R.pm * 100)}%`, `${Math.round(R.pt * 100)}%`)}
       ${row('舰艇损失', L.sunk[me].length ? L.sunk[me].join('、') : '无', L.sunk[them].length ? L.sunk[them].join('、') : '无')}
@@ -3735,7 +3773,7 @@ function afterAction(win) {
       ${L.phases ? row('作战构想', CONCEPTS[game.plans[me].concept].name, CONCEPTS[game.plans[them].concept].name) : ''}
       ${L.phases ? row('达成阶段', phasesDone(me), phasesDone(them)) : ''}
       ${game.role === 'cmd' && game.jstat ? row('指挥决策', `决策点 ${game.jstat.dps} · 批准 ${game.jstat.approved} · 否决 ${game.jstat.vetoed} · 默认执行 ${game.jstat.auto}`, '—') : ''}
-      </tbody></table><p class="grade">战略目标：${base} · 战役评级 <b>${grade}</b></p>`;
+      </tbody></table><p class="grade">战略目标：${base} · 战役评级 <b>${grade}</b> <span class="rank">${rank}</span></p>`;
   }
   Sound.engine(0, 0, false); Sound.lockTone(false); Sound.rwrTone(false);
   show('end');
@@ -3904,4 +3942,4 @@ Promise.all([world.ready, NavyHD.loadAll((n, total) => { $('loading').textConten
   const cr = $('credits');
   if (cr) cr.innerHTML = '模型：' + NavyHD.CREDITS.map(([t, a, l, u]) => `<a href="${u}" target="_blank" rel="noopener">${t}</a> · ${a} · ${l}`).join('；') + '；其余为程序化建模。';
 });
-window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate, openPlan, toggleJCC, updateJointUI, PHASES, dpQueue };
+window.__navwar = { dbg, game, ships, planes, missiles, bases, picture, command, renderer, pending, torps, decoys, freeCam, REEFS, REEF_LAND, specButtons, get player() { return player; }, get flagship() { return flagship; }, startGame, takeRole, update, potential, chooseSide, input, camera, perf, scene, world, TM, scopeBox, toggleMap, toggleAI, setTactic, designate, openPlan, toggleJCC, updateJointUI, PHASES, dpQueue, finish, settings };

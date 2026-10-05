@@ -19,6 +19,8 @@ const GROUPS = {
   esc: ['伴随护航', '潜艇在编队前方警戒，猎杀接近的敌潜艇']
 };
 const SHIP_GROUPS = ['sag', 'screen', 'asw', 'reserve'], SUB_GROUPS = ['fwd', 'esc'];
+// points on the map the commander can put a group on: [command key, button label, who]
+const DEPLOY = [['sagPt', '突击群前出到此', '水面突击群'], ['aswPt', '反潜群警戒此处', '反潜警戒群'], ['subPt', '潜艇伏击于此', '前出潜艇'], ['capPt', '巡逻屏障设于此', '战斗机巡逻屏障']];
 const AP_KEYS = [['air', '制空'], ['strike', '对海突击'], ['isr', '预警侦察'], ['asw', '反潜'], ['ewt', '电子战 · 加油']];
 const ROE = {
   wcs: {
@@ -32,7 +34,8 @@ const ROE = {
     C: ['C 级 · 不限制', '全部雷达开机，探测与拦截效果最好，但舰队位置暴露。']
   },
   auth: {
-    delegate: ['授权参谋', '参谋部在计划范围内自行决断，只向你报告。'],
+    full: ['全权委托', '参谋长全权指挥：实时调整兵力分配、主攻目标、编组与阶段转换，决策点也由他定，只向你报告。你可随时收回。'],
+    delegate: ['授权参谋', '日常出动与火力由参谋部自行决断；兵力分配、主攻目标与阶段转换等战役级决定仍请示你。'],
     negation: ['否决式指挥', '参谋部提出建议并倒计时，到时自动执行，除非你否决（美军 CWC 的指挥方式）。'],
     approve: ['逐项审批', '每一项建议都要你批准才执行，过期作废。']
   }
@@ -176,6 +179,7 @@ function enterPhase(side, i, why) {
   if (ph.phantom) C.phT = Math.min(C.phT ?? 240, 40);
   if (ph.alpha) C.alphaCd = Math.min(C.alphaCd ?? 420, 30);
   L.phases[side].push({ id, t: game.t });
+  if (why !== 'start') chron(`${SIDES[side].short}转入「${ph.name}」`, side);
   const n = P.phases.length, label = `第 ${i + 1} 阶段 / 共 ${n} · ${ph.name}`;
   jlog(side, `${why === 'start' ? '作战开始' : why === 'branch' ? '启动应急预案' : '转入'} · ${label}`, GOLD);
   if (side === game.side && game.role !== 'watch') {
@@ -194,6 +198,7 @@ function enterPhase(side, i, why) {
 function updateJoint(side, dt) {
   const C = command[side], P = planOf(side);
   if (!P || !C.ph) return;
+  staffBrain(side, dt);
   C.jT = (C.jT || 0) - dt;
   if (C.jT > 0) return;
   C.jT = 2;
@@ -230,7 +235,7 @@ function decisionPoint(side, kind, hurt) {
 }
 // the commander decides at the console; anyone else's staff takes its own recommendation
 function decide(dp) {
-  if (cmdSeat(dp.side)) {
+  if (cmdSeat(dp.side) && authOf() !== 'full') {
     dpQueue.push(dp);
     if (game.scale > 1) { game.scale = 1; game.autoCruise = false; $('b-scale').textContent = '时间 ×1'; }
     Sound.beep(700, 0.12, 0.08); pending.push({ t: game.t + 0.15, fn: () => Sound.beep(940, 0.12, 0.08) });
@@ -331,9 +336,9 @@ const dpQueue = [];
 // the staff wants to do something it may not do alone; for the AI side (or a commander away at a console) it just does
 function staffAct(side, p) {
   const C = command[side];
-  if (!cmdSeat(side)) { p.run(); return true; }
+  if (!cmdSeat(side)) { if (!p.valid || p.valid()) p.run(); return true; }
   const mode = authOf();
-  if (mode === 'delegate') { p.run(); game.jstat.auto++; jlog(side, `参谋部执行：${p.title}${p.detail ? ' · ' + p.detail : ''}`); radio('参谋部', `已执行：${p.title}。`, '#9fd4ff'); return true; }
+  if (mode === 'full' || (mode === 'delegate' && !p.strategic)) { p.run(); game.jstat.auto++; jlog(side, `参谋部执行：${p.title}${p.detail ? ' · ' + p.detail : ''}`); radio('参谋部', `已执行：${p.title}。`, '#9fd4ff'); return true; }
   C.props = C.props || [];
   if (C.props.some(q => q.key === p.key) || (C.veto || {})[p.key] > game.t) return false;
   p.t0 = game.wall || 0; p.ttl = (p.ttl || 20) * (mode === 'approve' ? 2 : 1); p.id = ++propN;
@@ -432,6 +437,32 @@ function planWarnings(P, side) {
   if (!out.length) out.push(['方案可行', '参谋部无异议。']);
   return out;
 }
+// the staff's war game of the plan against the intelligence picture (orders of battle, full magazines)
+function planEstimate(P, side) {
+  const fo = foe(side), out = [];
+  let D = 0, cvHp = 0;
+  for (const [c, , , sx, sz] of FLEET[fo].units) {
+    const S = CLS[c]; if (S.sub || Math.hypot(sx, sz) > 10000) continue;
+    D += Math.min(Object.values(S.sam).reduce((a, b) => a + b, 0), S.channels * 2) * 0.2 + (S.ciws || 0) * 0.4;
+    if (S.carrier && !cvHp) cvHp = S.hp;
+  }
+  // the first wave: one package per deck at the planned strength, the island or the bombers, the ships' cells
+  const per = clamp(Math.round(6 * P.ap.strike / 35), 2, 14);
+  let N = 0;
+  for (const [c] of FLEET[side].units) { const w = CLS[c].wing; if (!w) continue; const st = (w.j15 || 0) + (w.fa18 || 0); N += Math.min(Math.round(st * (1 - P.reserve / 100)), per) * 2; }
+  N += side === 'cn' ? per * 2 + 16 : 8 + 10;
+  const hits = Math.max(0, N * 0.85 - D) * 0.85, need = Math.ceil((cvHp / (AVG_ASHM_DMG * 0.85) + D) / 0.85);
+  out.push(['首波突击推演', `约 ${N} 枚反舰导弹对敌航母编队（估计拦截能力 ${D.toFixed(0)} 枚/波）：预计命中 ${hits.toFixed(0)} 枚，约为击沉一艘航母所需（${need} 枚）的 ${Math.round(Math.min(1, (hits * AVG_ASHM_DMG) / cvHp) * 100)}%——需要 ${Math.max(1, Math.ceil(cvHp / Math.max(1, hits * AVG_ASHM_DMG)))} 波`]);
+  // the air battle: fighters committed by the air share, by quality, against the enemy's whole wing
+  let own = 0, them = 0;
+  for (const [c] of FLEET[side].units) for (const [t, n] of Object.entries(CLS[c].wing || {})) own += (FQ[t] || 0) * n;
+  if (side === 'cn') for (const [t, n] of Object.entries(BASE.wing)) own += (FQ[t] || 0) * n;
+  for (const [c] of FLEET[fo].units) for (const [t, n] of Object.entries(CLS[c].wing || {})) them += (FQ[t] || 0) * n;
+  if (fo === 'cn') for (const [t, n] of Object.entries(BASE.wing)) them += (FQ[t] || 0) * n;
+  const share = P.ap.air / 100 + 0.25, R = Math.pow((own * share) / (them * 0.45), 2);
+  out.push(['空战推演', `兰彻斯特平方律：投入制空的战斗力 ${(own * share).toFixed(0)} 对敌方典型投入 ${(them * 0.45).toFixed(0)}，战斗力比 ${R.toFixed(2)}——${R > 1.5 ? '有望夺取制空权' : R > 0.8 ? '空中将是均势消耗战' : '制空不利，攻击编队将遭受严重损失'}`]);
+  return out;
+}
 function renderPlan() {
   const P = game.planDraft, side = game.side, fo = foe(side), body = $('plan-body');
   const seg = (k, opts, cur) => `<div class="seg" data-k="${k}">${opts.map(([v, l]) => `<button type="button" data-v="${v}" class="${v === cur ? 'on' : ''}">${l}</button>`).join('')}</div>`;
@@ -467,7 +498,7 @@ function renderPlan() {
       <div class="prow"><i>参谋权限</i>${seg('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), P.auth)}</div>
       <p class="pnote">${ROE.wcs[P.roe.wcs][1]}<br>${ROE.emcon[P.roe.emcon][1]}<br>${ROE.auth[P.auth][1]}</p>
     </section>
-    <section class="psec span2"><h3>参谋部意见</h3><ul class="staffnote">${planWarnings(P, side).map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}</ul></section>
+    <section class="psec span2"><h3>参谋部意见 · 兵棋推演</h3><ul class="staffnote">${planEstimate(P, side).map(([a, b]) => `<li class="est"><b>${a}</b> ${b}</li>`).join('')}${planWarnings(P, side).map(([a, b]) => `<li><b>${a}</b> ${b}</li>`).join('')}</ul></section>
   </div>`;
   for (const sg of body.querySelectorAll('.seg:not(.fixed)')) for (const b of sg.querySelectorAll('button')) b.onclick = () => {
     const k = sg.dataset.k, v = b.dataset.v;
@@ -620,6 +651,8 @@ const JCC_TABS = {
       html += `<div class="jgrp"><h4>${GROUPS[g][0]} <small>${list.length} 艘</small></h4>${o && list.length ? segJ('grp-' + g, o[1], g === 'screen' ? String(C.screenK || 1) : g === 'reserve' ? '' : g === 'fwd' ? (C.subOrder || '') : C[o[0]]) : ''}
         ${list.map(s => { const M = magazines(side).ships.find(x => x.s === s); return `<div class="jship"><b>${s.name}</b>${jbar(s.hp / s.maxHp, s.hp < s.maxHp * 0.5 ? '#ff8a78' : '#8dffb4')}<span>${status(s)}${M && M.sam0 ? ` · 防空弹 ${M.sam}` : ''}${M && M.ashm0 ? ` · 反舰弹 ${M.ashm}` : ''}</span>${s.carrier ? '' : `<select data-grp="${s.key}">${(s.S.sub ? SUB_GROUPS : SHIP_GROUPS).map(x => `<option value="${x}"${x === s.grp ? ' selected' : ''}>${GROUPS[x][0]}</option>`).join('')}</select>`}</div>`; }).join('') || '<p class="jnote">预备队已全部投入</p>'}</div>`;
     }
+    const dep = DEPLOY.filter(([k]) => C[k]);
+    html += `<div class="jgrp"><h4>地图部署 <small>在战术地图上点选海域下达</small></h4>${dep.length ? dep.map(([k, , who]) => `<div class="jship"><b>${who}</b><span>${Math.round(C[k].x / 1000)}, ${Math.round(C[k].z / 1000)} km</span><span></span><button type="button" data-act="undeploy" data-v="${k}">取消</button></div>`).join('') : '<p class="jnote">尚未指定部署点——各群按计划阵位行动。</p>'}</div>`;
     const air = planes.filter(p => p.side === side && p.alive && !p.dying && p.airborne);
     const by = r => air.filter(p => p.role === r).length;
     const resv = Object.values(C.resvN || {}).reduce((a, b) => a + b, 0);
@@ -654,6 +687,17 @@ const JCC_TABS = {
       <div class="jgrid"><div><i>可用攻击机</i>${jbar(A.strike / (A.strike0 || 1), '#ffc861')}<b>${A.strike} / ${A.strike0}</b></div><div><i>机库</i><b>${Object.entries(A.types).filter(([, n]) => n > 0).map(([t, n]) => `${AC[t].name} ${n}`).join(' · ') || '空'}</b></div>
       <div><i>低油量在空</i><b>${low}</b></div><div><i>加油机在空</i><b>${tk}</b></div><div><i>战区火力</i><b>${fires}</b></div></div>`;
   },
+  // the staff's estimate: salvo model per target, the air balance, the chief of staff's reasoning
+  est(side, C) {
+    const ab = C.ab || airBalance(side), B = C.brain;
+    return `<p class="jnote">参谋部的兵棋推演：舰艇对抗按齐射模型（Hughes）估算——敌编队每波可拦截 D 枚，我方 N 枚导弹按航迹质量 σ 到达，超出拦截能力的部分命中；敌方弹药按满载估计。空战按兰彻斯特平方律比较双方战斗机的数量与质量。</p>
+      <div class="jgrid"><div><i>空中战斗力（含预警机加成）</i><b>我 ${ab.own.toFixed(0)} : 敌 ${ab.them.toFixed(0)}</b></div><div><i>兰彻斯特战斗力比</i>${jbar(ab.R / 3, ab.R < 0.8 ? '#ff8a78' : '#8dffb4')}<b>${ab.R.toFixed(2)}${ab.R < 0.8 ? ' · 劣势' : ab.R > 1.8 ? ' · 优势' : ' · 均势'}</b></div></div>
+      <table class="jtab"><thead><tr><th>目标</th><th>拦截能力 D</th><th>可用火力 N</th><th>航迹 σ</th><th>预计命中</th><th>毁伤概率</th><th>击沉需</th></tr></thead><tbody>
+      ${(C.est || []).map(q => `<tr class="${q.e === intentTarget(side) ? 'main' : ''}"><td><b>${q.e.name}</b><small>${q.x.n} 艘防空舰</small></td><td>${q.x.D.toFixed(0)}</td><td>${q.pot.total}<small>机 ${q.pot.air} · 舰 ${q.pot.sea}</small></td><td>${q.x.sig.toFixed(1)}</td><td>${q.x.hits.toFixed(1)}</td><td>${jbar(q.x.pk, q.x.pk > 0.6 ? '#8dffb4' : q.x.pk > 0.3 ? '#ffc861' : '#ff8a78')} ${Math.round(q.x.pk * 100)}%</td><td>${q.x.need} 枚</td></tr>`).join('') || '<tr><td colspan="7">等待目标情报</td></tr>'}
+      </tbody></table>
+      <h4>参谋长判断 ${B ? `<small>${mmss(B.t)}</small>` : ''}</h4>
+      <ul class="jlist">${B ? B.lines.map(l => `<li>${l}</li>`).join('') : '<li>首次推演进行中</li>'}</ul>`;
+  },
   // the plan: concept, phases, the decision log
   plan(side, C, P) {
     return `<p class="jnote"><b>${CONCEPTS[P.concept].name}</b> · 主攻方向${AXES[P.main]}${P.second !== 'none' ? ` · 助攻方向${AXES[P.second]}` : ''}。${CONCEPTS[P.concept].desc}</p>
@@ -670,6 +714,7 @@ function jccAct(a, v) {
   else if (a === 'salvo') { const e = find(v); if (e) { const n = fleetStrike(side, e); jlog(side, n ? `命令：舰艇齐射 ${n} 枚，目标${e.name}` : `舰艇齐射：${e.name}超出射程`); if (!n) message('无舰艇在射程内', e.name, '#9fb0ba', 1.6); } }
   else if (a === 'asw') { const e = find(v); if (e) { game.desigShip = e; jlog(side, `命令：反潜猎杀${e.name}`); } }
   else if (a === 'resv-air') commitReserve(side, 'air');
+  else if (a === 'undeploy') { C[v] = null; jlog(side, `取消部署：${DEPLOY.find(d => d[0] === v)[2]}`); }
   else if (a === 'grp-sag') { C.sagOrder = v; jlog(side, `水面突击群：${{ auto: '按阶段行动', push: '前出接敌', hold: '撤回编队' }[v]}`); }
   else if (a === 'grp-screen') { C.screenK = +v; jlog(side, `掩护群阵位：${{ 0.6: '收拢', 1: '标准', 1.4: '展开' }[v]}`); }
   else if (a === 'grp-reserve') commitReserve(side, v);
@@ -691,4 +736,153 @@ function phaseLine(side) {
   const C = command[side], P = planOf(side); if (!C.ph || !P) return null;
   const ph = PHASES[C.ph.id], n = Math.round(clamp(C.ph.prog, 0, 1) * 10);
   return `第 ${C.ph.i + 1}/${P.phases.length} 阶段 · ${ph.name} ${'▮'.repeat(n)}${'▯'.repeat(10 - n)} ${C.ph.label}`;
+}
+
+/* ---------- the chief of staff: estimates and running re-planning ----------
+   The staff reasons with the planner's classic models rather than with the omniscient game state:
+   - salvo model (after Hughes): a group's defence intercepts up to D missiles per wave (fire channels x shots in
+     the engagement window x Pk against anti-ship missiles, plus point defence); of N missiles fired, scouting effectiveness s (a fresh, fine
+     track or a coarse satellite fix) decides how many arrive, D are stopped, the rest hit; enemy magazines are
+     assumed full (that is all intelligence knows);
+   - Lanchester's square law for the air battle: fighting strength goes as (numbers x quality)^2;
+   - expected payoff of a target: value x kill probability with the missiles actually available.
+   Every minute it re-weighs the apportionment, the main target, the screen and the tempo, and says why. The AI
+   side's chief of staff does the same, so both commanders are equally sharp. */
+const AVG_ASHM_DMG = 190;
+// the interceptions a target's group can make against one wave (estimate from its class data, full magazines)
+function defenceOf(side, tgt, exclude) {
+  const tp = trackPos(side, tgt, new V3()) || tgt.pos;
+  let D = 0, n = 0;
+  for (const [e, tr] of picture[side]) {
+    if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || (e.S && e.S.sub) || e === exclude) continue;
+    if (e !== tgt && tr.pos.distanceTo(tp) > 10000) continue;
+    const S = e.kind === 'base' ? Object.assign({ ciws: 2 }, BASE) : e.S;
+    const sam = Object.values(S.sam || {}).reduce((a, b) => a + b, 0);
+    // two shots per fire channel in the short window a sea-skimmer is above the horizon; against anti-ship
+    // missiles (low, fast, manoeuvring) an interceptor kills about one time in five
+    D += Math.min(sam, (S.channels || 2) * 2) * 0.2 + (S.ciws || 0) * 0.4;
+    n++;
+  }
+  return { D, n };
+}
+function salvoEstimate(side, tgt, N, exclude) {
+  const { D, n } = defenceOf(side, tgt, exclude), tr = picture[side].get(tgt);
+  const sig = tr && !tr.coarse && game.t - tr.t < 30 ? 0.9 : tr ? 0.6 : 0.3;
+  const hits = Math.max(0, N * sig - D) * 0.85;                 // decoys and soft kill take their share
+  const hp = Math.max(1, tgt.hp);
+  const need = Math.ceil((hp / (AVG_ASHM_DMG * 0.85) + D) / sig);
+  return { D, n, sig, hits, pk: clamp(hits * AVG_ASHM_DMG / hp, 0, 1), need };
+}
+// anti-ship missiles the side can put into one wave against a point (aircraft on deck outside the reserve, the
+// bombers, the ships' cells within reach)
+function strikePotential(side, tp) {
+  const C = command[side];
+  let air = 0, sea = 0;
+  for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying && h.hangar) {
+    const n = ['j15', 'j16', 'fa18'].reduce((a, t) => a + (h.hangar[t] || 0), 0) - (C.resvOut ? 0 : (C.resvN || {})[h.name] || 0);
+    air += Math.min(12, Math.max(0, n)) * 2 + (h.hangar.h6k ? Math.min(3, h.hangar.h6k) * 2 : 0);
+  }
+  if (side === 'us') air += Math.min(2, C.b1b || 0) * 4;
+  for (const s of ships) if (s.side === side && s.alive && !s.dying && !s.S.sub)
+    for (const [k, n] of Object.entries(s.ashm)) if (n > 0 && MSL[k].range * 0.95 > s.pos.distanceTo(tp)) sea += Math.min(n, 4);
+  return { air, sea: Math.min(sea, side === 'cn' ? 16 : 10), total: air + Math.min(sea, side === 'cn' ? 16 : 10) };
+}
+// Lanchester square law: fighting strength of each side's fighter force
+const FQ = { j35: 1.6, f35c: 1.7, j15: 1, j16: 1.05, fa18: 1.05 };
+function airBalance(side) {
+  const fo = foe(side);
+  let own = 0, them = 0;
+  for (const p of planes) if (p.side === side && p.alive && !p.dying && p.airborne && p.mrm > 0) own += FQ[p.type] || 1;
+  for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying && h.hangar) for (const [t, n] of Object.entries(h.hangar)) own += (FQ[t] || 0) * n * 0.35;
+  for (const [e] of picture[side]) if (e.kind === 'plane' && e.alive && !e.dying && e.T.mrm > 0) them += FQ[e.type] || 1;
+  // what intelligence believes is still on the enemy decks: the order of battle less the losses seen
+  let foeWing = 0;
+  for (const [cls] of FLEET[fo].units) for (const [t, n] of Object.entries(CLS[cls].wing || {})) foeWing += (FQ[t] || 0) * n;
+  if (fo === 'cn') for (const [t, n] of Object.entries(BASE.wing)) foeWing += (FQ[t] || 0) * n;
+  them += Math.max(0, foeWing - game.ledger.air[fo] * 1.1) * 0.35;
+  const aewO = planes.some(p => p.side === side && p.alive && p.T.aew && p.airborne) ? 1.2 : 0.85;
+  const aewF = [...picture[side].keys()].some(e => e.kind === 'plane' && e.alive && e.T.aew) ? 1.2 : 0.9;
+  const R = Math.pow((own * aewO) / Math.max(1, them * aewF), 2);
+  return { own: own * aewO, them: them * aewF, R };
+}
+// one staff cycle: estimates, then the decisions they support
+function staffBrain(side, dt) {
+  const C = command[side], P = planOf(side), ph = phaseOf(side);
+  if (!P || !ph || game.over) return;
+  C.brainT = (C.brainT ?? 25) - dt;
+  if (C.brainT > 0) return;
+  C.brainT = 60;
+  const fo = foe(side), lines = [], est = [];
+  const centre = fleetCentre(side) || ZERO;
+  const ab = airBalance(side);
+  lines.push(`空中力量对比（兰彻斯特平方律）${ab.own.toFixed(0)} : ${ab.them.toFixed(0)}，战斗力比 ${ab.R.toFixed(2)}${ab.R < 0.7 ? '，我处劣势' : ab.R > 1.8 ? '，我占明显优势' : ''}`);
+  // targets: expected payoff of a full wave against each
+  const main = intentTarget(side), I = intentState(side);
+  let best = null, bestSc = 0;
+  for (const [e, tr] of picture[side]) {
+    if ((e.kind !== 'ship' && e.kind !== 'base') || !e.alive || e.dying || (e.S && e.S.sub) || game.t - tr.t > 150) continue;
+    const pot = strikePotential(side, tr.pos), x = salvoEstimate(side, e, pot.total);
+    const sc = e.value * (e.carrier ? 1.8 : 1) * (0.25 + x.pk) * (e === main ? 1.25 : 1);
+    est.push({ e, x, pot, sc });
+    if (sc > bestSc) { bestSc = sc; best = e; }
+  }
+  est.sort((a, b) => b.sc - a.sc);
+  C.est = est.slice(0, 8);
+  C.ab = ab;
+  // 1) the main effort: the highest expected payoff; a carrier wrapped in too strong an umbrella is peeled first
+  if (main && main.carrier) {
+    const me = est.find(q => q.e === main);
+    if (me && me.x.pk < 0.3) {
+      let peel = null, gain = 0;
+      for (const q of est) if (q.e !== main && q.e.kind === 'ship' && q.e.alive) {
+        const tp = trackPos(side, q.e, new V3()); if (!tp || tp.distanceTo(trackPos(side, main, new V3()) || main.pos) > 15000) continue;
+        const g = me.x.D - defenceOf(side, main, q.e).D;
+        if (g > gain && q.x.pk > 0.5) { gain = g; peel = q.e; }
+      }
+      if (peel) {
+        lines.push(`${main.name}防空拦截能力约 ${me.x.D.toFixed(0)} 枚/波，现有一波 ${me.pot.total} 枚只能达成 ${Math.round(me.x.pk * 100)}% 毁伤；先打掉${peel.name}可削弱其 ${gain.toFixed(0)} 枚拦截能力`);
+        const pe = peel, held = I && I.src === 'player';
+        staffAct(side, { key: 'peel:' + pe.key, strategic: true, title: '剥离防空 · 转移主攻', detail: `先打${pe.name}（${main.name}的防空支柱），再打航母——现有火力对航母毁伤概率仅 ${Math.round(me.x.pk * 100)}%`, ttl: 25, hold: 300,
+          valid: () => pe.alive && !pe.dying && (!held || authOf() === 'full'), run: () => { setIntent(side, { tgt: pe }); intentOrders(side); jlog(side, `参谋长：主攻转向${pe.name}，剥离敌航母防空`, GOLD); } });
+      }
+    }
+  } else if (best && best !== main && !(I && I.src === 'player' && main) && bestSc > 0) {
+    const q = est[0];
+    lines.push(`最佳目标：${best.name}，一波 ${q.pot.total} 枚可达成约 ${Math.round(q.x.pk * 100)}% 毁伤（需约 ${q.x.need} 枚击沉）`);
+  }
+  // 2) apportionment: from the phase's plan, corrected by the estimates
+  const want = Object.assign({}, ph.ap), why = [];
+  if (ab.R < 0.7) { want.air += 15; want.strike -= 10; want.isr -= 5; why.push('空中劣势，加强制空'); }
+  else if (ab.R > 2 && ph.alpha) { want.air -= 10; want.strike += 10; why.push('制空优势，转向突击'); }
+  if (!foeCarrierFix(side)) { want.isr += 10; want.strike -= 10; why.push('敌航母位置不明，加强侦察'); }
+  if (C.aswTgt && C.aswTgt.alive) { want.asw += 10; want.strike -= 5; want.isr -= 5; why.push('敌潜艇威胁航母，加强反潜'); }
+  const inbound = missiles.filter(m => m.alive && m.cls === 'ashm' && m.side === fo && m.target && m.target.side === side).length;
+  if (inbound > 10) { want.air += 5; want.ewt -= 5; why.push(`${inbound} 枚导弹来袭`); }
+  for (const k of Object.keys(want)) want[k] = Math.max(0, want[k]);
+  const tot = Object.values(want).reduce((a, b) => a + b, 0) || 1;
+  for (const k of Object.keys(want)) want[k] = Math.round(want[k] * 100 / tot);
+  const diff = AP_KEYS.reduce((a, [k]) => a + Math.abs(want[k] - C.ap[k]), 0);
+  if (why.length && diff >= 12) {
+    lines.push(`兵力分配建议：${AP_KEYS.map(([k, l]) => `${l.split(' ')[0]} ${want[k]}`).join(' / ')}（${why.join('；')}）`);
+    staffAct(side, { key: 'ap:' + AP_KEYS.map(([k]) => want[k]).join('-'), strategic: true, title: '调整兵力分配', detail: `${why.join('；')}：${AP_KEYS.map(([k, l]) => `${l.split(' ')[0]} ${C.ap[k]}→${want[k]}`).join(' · ')}`, ttl: 25, hold: 180,
+      run: () => { C.ap = Object.assign({}, want); jlog(side, `参谋长：兵力分配调整为 ${AP_KEYS.map(([k, l]) => `${l.split(' ')[0]} ${want[k]}`).join(' / ')}`, GOLD); } });
+  }
+  // 3) the screen: a missile storm on a thin screen pulls the surface action group back
+  const screen = ships.filter(s => s.side === side && s.alive && !s.dying && s.grp === 'screen').length;
+  const sag = ships.filter(s => s.side === side && s.alive && !s.dying && s.grp === 'sag');
+  if (inbound >= 10 && screen < 3 && sag.length) {
+    lines.push(`掩护群只剩 ${screen} 艘，面对 ${inbound} 枚来袭导弹拦截通道不足`);
+    staffAct(side, { key: 'sag2screen', strategic: true, title: '突击群回撤加强防空', detail: `掩护群只剩 ${screen} 艘，${inbound} 枚导弹来袭：${sag.map(s => s.name).join('、')}回撤编入掩护群`, ttl: 12, hold: 240,
+      run: () => { for (const s of sag) { s.grp = 'screen'; s.sag = false; } jlog(side, '参谋长：突击群回撤加强防空', GOLD); } });
+  }
+  // 4) tempo: when the enemy is breaking, go for the kill
+  const pm = potential(side) / potential0[side], pf = potential(fo) / potential0[fo];
+  lines.push(`战争潜力 我 ${Math.round(pm * 100)}% · 敌（估计）${Math.round(pf / 0.1) * 10}%`);
+  const last = P.phases.length - 1;
+  if (pf < 0.6 && pm > pf + 0.15 && C.ph.i < last && !C.ph.dp) {
+    lines.push('敌方战争潜力接近崩溃，建议立即转入扩张战果');
+    staffAct(side, { key: 'exploit', strategic: true, title: '提前转入扩张战果', detail: `敌战争潜力估计已降至 ${Math.round(pf * 100)}%，乘胜追击`, ttl: 20, hold: 300,
+      run: () => { const i = P.phases.indexOf('exploit'); if (i > C.ph.i) enterPhase(side, i, 'order'); } });
+  }
+  C.brain = { t: game.t, lines };
 }
