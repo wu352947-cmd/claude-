@@ -1,0 +1,756 @@
+<title>政策的潮汐</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&family=Noto+Sans+SC:wght@300;400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a fixed 1920×1080 stage scaled to fit; a living tide of particles behind every slide.
+   Single deliberate dark world: deep-sea night over Lianjiang, gold for policy money, teal for flow, coral for loss. */
+:root{
+  --abyss:#061420;
+  --deep:#0c2434;
+  --line:rgba(170,214,220,.16);
+  --tide:#46c2b2;
+  --gold:#ddb75e;
+  --coral:#e2785c;
+  --foam:#eef3f2;
+  --mist:#8fa8b3;
+  --display:"Noto Serif SC","Songti SC","STSong",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Menlo,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%;margin:0;overflow:hidden;background:var(--abyss);color:var(--foam);font-family:var(--body)}
+#field{position:fixed;inset:0;width:100%;height:100%;display:block}
+.grain{position:fixed;inset:0;pointer-events:none;opacity:.09;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 45%,transparent 40%,rgba(3,10,16,.75) 100%)}
+#stage{position:fixed;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0}
+.slide{position:absolute;inset:0;padding:110px 150px 120px;box-sizing:border-box;visibility:hidden}
+.slide.on{visibility:visible}
+.edge{position:absolute;top:0;bottom:0;width:2px;left:0;background:linear-gradient(transparent,var(--gold),transparent);box-shadow:0 0 30px 6px rgba(221,183,94,.45);opacity:0;pointer-events:none;z-index:5}
+
+/* type scale */
+.eyebrow{font:500 22px/1 var(--mono);letter-spacing:.32em;color:var(--tide);text-transform:uppercase;display:flex;align-items:center;gap:18px}
+.eyebrow::before{content:"";width:46px;height:1px;background:currentColor}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;font-weight:900}
+h2{font-size:76px;line-height:1.15;letter-spacing:.02em;margin-top:28px}
+h3{font-size:36px;font-weight:700;line-height:1.3}
+p{margin:0}
+.lead{font-size:30px;line-height:1.75;color:var(--mist);max-width:30em;font-weight:300}
+.gold{color:var(--gold)}.tide{color:var(--tide)}.coral{color:var(--coral)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.ch{display:inline-block;white-space:pre}
+.src{position:absolute;left:150px;bottom:64px;font-size:17px;color:var(--mist);opacity:.7;letter-spacing:.04em}
+
+/* chrome */
+.chrome{position:fixed;left:0;right:0;bottom:0;padding:0 28px calc(18px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;gap:22px;font:400 13px/1 var(--mono);letter-spacing:.18em;color:var(--mist);pointer-events:none;z-index:10}
+.chrome .bar{flex:1;height:1px;background:var(--line);position:relative}
+.chrome .bar i{position:absolute;left:0;top:-1px;height:3px;background:linear-gradient(90deg,var(--tide),var(--gold));width:0;transition:width .9s cubic-bezier(.7,0,.2,1)}
+.nav{position:fixed;right:24px;top:calc(20px + env(safe-area-inset-top,0px));display:flex;gap:10px;z-index:11}
+.nav button{all:unset;cursor:pointer;width:42px;height:42px;border:1px solid var(--line);border-radius:50%;display:grid;place-items:center;color:var(--mist);font:16px var(--mono);transition:.3s}
+.nav button:hover,.nav button:focus-visible{color:var(--abyss);background:var(--gold);border-color:var(--gold)}
+.hint{position:fixed;left:28px;top:calc(26px + env(safe-area-inset-top,0px));font:400 13px var(--mono);letter-spacing:.2em;color:var(--mist);opacity:.6;z-index:11}
+
+/* cover */
+.cover{display:flex;flex-direction:column;justify-content:center}
+.cover .school{font:500 24px/1 var(--body);letter-spacing:.5em;color:var(--mist)}
+.cover h1{font-size:118px;line-height:1.12;margin:44px 0 0;letter-spacing:.03em;color:var(--foam);text-shadow:0 0 60px rgba(221,183,94,.25)}
+.cover .sub{font:500 36px/1.5 var(--display);color:var(--foam);margin-top:36px;opacity:.9}
+.cover .sub b{color:var(--gold);font-weight:700}
+.cover .meta{margin-top:84px;display:flex;gap:80px;font-size:22px;color:var(--mist);line-height:1.9}
+.cover .meta strong{display:block;color:var(--foam);font-weight:500;font-size:26px}
+.cover .rule{height:1px;width:820px;background:linear-gradient(90deg,var(--gold),transparent);margin-top:56px;transform-origin:left}
+.seal{position:absolute;right:150px;top:140px;width:150px;height:150px;border:2px solid var(--coral);color:var(--coral);font:900 36px/1.15 var(--display);display:grid;place-items:center;text-align:center;transform:rotate(-8deg);opacity:.85;letter-spacing:.1em}
+
+/* big question */
+.quote-xl{font:900 110px/1.25 var(--display);letter-spacing:.02em}
+.quote-xl .ghost{color:transparent;-webkit-text-stroke:1.5px rgba(238,243,242,.55)}
+.arrowline{display:flex;align-items:center;gap:36px;margin-top:70px;font:700 44px var(--display)}
+.arrowline .ar{flex:0 0 260px;height:2px;background:linear-gradient(90deg,var(--mist),var(--gold));position:relative;transform-origin:left}
+.arrowline .ar::after{content:"";position:absolute;right:-2px;top:-7px;border:8px solid transparent;border-left:14px solid var(--gold)}
+
+/* research questions */
+.rq{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;margin-top:80px}
+.rq article{border-top:1px solid var(--line);padding-top:36px}
+.rq .k{font:600 96px/1 var(--mono);color:transparent;-webkit-text-stroke:1.5px var(--gold)}
+.rq h3{margin-top:28px}
+.rq p{margin-top:22px;font-size:24px;line-height:1.8;color:var(--mist)}
+
+/* six dims */
+.dims{position:absolute;right:150px;top:150px;width:780px;height:780px}
+.dims svg{width:100%;height:100%;overflow:visible}
+.dimlist{margin-top:56px;display:grid;gap:22px;width:820px}
+.dimlist div{display:grid;grid-template-columns:210px 1fr;gap:24px;align-items:baseline;font-size:24px;color:var(--mist);line-height:1.6}
+.dimlist b{font:700 30px var(--display);color:var(--foam)}
+
+/* framework */
+.fw{position:absolute;inset:0}
+.fw svg{position:absolute;inset:0;width:100%;height:100%}
+.node{position:absolute;width:330px;text-align:center;transform:translate(-50%,-50%)}
+.node .ring{width:200px;height:200px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font:900 40px/1.2 var(--display);border:1.5px solid currentColor;background:radial-gradient(circle,rgba(12,36,52,.95) 55%,rgba(12,36,52,.4));box-shadow:0 0 70px -10px currentColor}
+.node p{margin-top:22px;font-size:22px;line-height:1.6;color:var(--mist)}
+.flow{fill:none;stroke-width:2;stroke-dasharray:10 14;animation:dash 1.6s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-48}}
+.lab{font:500 22px var(--body);fill:var(--foam)}
+.lab.m{fill:var(--mist);font-size:19px}
+
+/* method numbers */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);margin-top:90px;border-top:1px solid var(--line)}
+.stats div{padding:48px 36px 0 0;border-right:1px solid var(--line);padding-left:36px}
+.stats div:first-child{padding-left:0}.stats div:last-child{border-right:0}
+.stats .big{font:600 150px/1 var(--mono);color:var(--foam);letter-spacing:-.04em}
+.stats .big small{font-size:40px;color:var(--gold);margin-left:8px;letter-spacing:0}
+.stats h3{font-size:30px;margin-top:26px}
+.stats p{font-size:21px;line-height:1.7;color:var(--mist);margin-top:14px}
+.note{margin-top:70px;font-size:24px;color:var(--mist);padding:26px 34px;border:1px dashed var(--line);border-radius:4px;max-width:1300px;line-height:1.7}
+
+/* bar charts */
+.two{display:grid;grid-template-columns:1.25fr 1fr;gap:110px;margin-top:64px;align-items:start}
+.hbars{display:grid;gap:26px}
+.hb{display:grid;grid-template-columns:170px 1fr 120px;align-items:center;gap:24px;font-size:24px}
+.hb .t{color:var(--foam)}
+.hb .track{height:30px;background:rgba(255,255,255,.04);position:relative;overflow:hidden}
+.hb .fill{position:absolute;inset:0 auto 0 0;width:calc(var(--v)*1%);background:var(--c,var(--mist));transform-origin:left}
+.hb .fill::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,rgba(255,255,255,.25))}
+.hb .v{font:600 26px var(--mono);text-align:right;color:var(--foam)}
+.hb .v small{font-size:17px;color:var(--mist);margin-left:4px}
+blockquote{margin:0;position:relative;padding:40px 0 0 0;font:500 32px/1.75 var(--display);color:var(--foam)}
+blockquote::before{content:"“";position:absolute;left:-14px;top:-40px;font:900 160px/1 var(--display);color:var(--gold);opacity:.35}
+blockquote cite{display:block;margin-top:24px;font:400 20px var(--mono);font-style:normal;color:var(--tide);letter-spacing:.2em}
+.callout{font:900 200px/1 var(--mono);letter-spacing:-.05em;color:var(--gold)}
+.callout small{font-size:70px}
+
+/* grouped */
+.gchart{margin-top:50px;height:560px;display:grid;grid-template-columns:repeat(4,1fr);gap:60px;align-items:end;border-bottom:1px solid var(--line);position:relative}
+.gchart .grp{display:flex;align-items:flex-end;gap:12px;height:100%;justify-content:center;position:relative}
+.gchart .col{width:78px;height:calc(var(--v)/3*100%);background:var(--c);position:relative;transform-origin:bottom}
+.gchart .col span{position:absolute;top:-38px;left:0;right:0;text-align:center;font:600 24px var(--mono);color:var(--foam)}
+.gchart .gl{position:absolute;bottom:-56px;left:0;right:0;text-align:center;font-size:24px;color:var(--mist)}
+.legend{display:flex;gap:40px;font-size:22px;color:var(--mist);margin-top:30px}
+.legend i{display:inline-block;width:18px;height:18px;margin-right:12px;vertical-align:-2px;background:var(--c)}
+
+/* strategy cards */
+.cards{display:grid;gap:34px;margin-top:64px}
+.cards.c3{grid-template-columns:repeat(3,1fr)}
+.cards.c4{grid-template-columns:repeat(4,1fr);gap:26px}
+.card{border:1px solid var(--line);background:linear-gradient(170deg,rgba(12,36,52,.85),rgba(6,20,32,.6));padding:40px 36px 36px;position:relative;overflow:hidden;backdrop-filter:blur(6px)}
+.card::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--c)}
+.card .cnt{font:600 64px/1 var(--mono);color:var(--c)}
+.card .cnt small{font-size:24px;color:var(--mist);margin-left:8px}
+.card h3{margin-top:22px;font-size:34px}
+.card .logic{margin-top:10px;font-size:20px;color:var(--c);letter-spacing:.1em}
+.card p{margin-top:20px;font-size:21px;line-height:1.75;color:var(--mist)}
+.card q{display:block;margin-top:24px;padding-top:22px;border-top:1px dashed var(--line);font:500 21px/1.75 var(--display);color:var(--foam);quotes:"“" "”"}
+.card q::after{content:none}
+.card q em{display:block;font:400 16px var(--mono);font-style:normal;color:var(--mist);margin-top:10px;letter-spacing:.15em}
+
+/* stacked awareness */
+.stack{display:flex;height:96px;margin-top:40px;gap:3px}
+.stack div{flex:var(--v);background:var(--c);display:flex;align-items:center;padding:0 18px;font:600 26px var(--mono);color:var(--abyss);white-space:nowrap;overflow:hidden;transform-origin:left}
+.stackl{display:flex;gap:3px;margin-top:16px;font-size:20px;color:var(--mist)}
+.stackl div{flex:var(--v);min-width:0}
+.steps{display:flex;align-items:flex-end;gap:28px;height:360px;margin-top:40px;border-bottom:1px solid var(--line)}
+.steps .s{flex:1;height:calc(var(--v)*1%);background:linear-gradient(var(--tide),rgba(70,194,178,.15));position:relative;transform-origin:bottom}
+.steps .s span{position:absolute;top:-40px;left:0;right:0;text-align:center;font:600 26px var(--mono)}
+.steps .s em{position:absolute;bottom:-46px;left:-10px;right:-10px;text-align:center;font-size:20px;color:var(--mist);font-style:normal}
+
+/* donut-ish ring for application */
+.ringwrap{display:flex;gap:60px;align-items:center;margin-top:30px}
+.ringwrap svg{width:340px;height:340px;flex:none;transform:rotate(-90deg)}
+.ringwrap .arc{fill:none;stroke-width:38}
+.rlist{display:grid;gap:24px;font-size:24px}
+.rlist div{display:flex;gap:16px;align-items:baseline}
+.rlist i{width:16px;height:16px;background:var(--c);display:inline-block;flex:none}
+.rlist b{font:600 34px var(--mono);min-width:120px}
+
+/* mechanisms */
+.mech{display:grid;grid-template-columns:repeat(3,1fr);gap:50px;margin-top:60px}
+.mech .viz{height:220px;border-bottom:1px solid var(--line);position:relative}
+.mech .viz svg{width:100%;height:100%;overflow:visible}
+.mech h3{margin-top:34px}
+.mech p{margin-top:16px;font-size:22px;line-height:1.75;color:var(--mist)}
+.mech .eff{margin-top:20px;font-size:21px;color:var(--c);line-height:1.6}
+
+/* cases */
+.case{display:grid;grid-template-columns:1fr 1fr;gap:80px;margin-top:70px}
+.case .tag{font:600 20px var(--mono);color:var(--c);letter-spacing:.25em}
+.case h3{font-size:44px;margin-top:20px}
+.case p{font-size:24px;line-height:1.85;color:var(--mist);margin-top:26px}
+.case .take{margin-top:34px;padding:26px 30px;border-left:3px solid var(--c);background:rgba(255,255,255,.03);font:500 26px/1.7 var(--display);color:var(--foam)}
+
+/* five 得 */
+.ladder{display:flex;gap:0;margin-top:80px}
+.ladder div{flex:1;border-left:1px solid var(--line);padding:0 0 0 32px;position:relative}
+.ladder div:last-child{border-right:1px solid var(--line)}
+.ladder .w{font:900 74px/1.1 var(--display);color:var(--foam)}
+.ladder .w b{color:var(--gold)}
+.ladder .d{margin-top:22px;font-size:21px;color:var(--mist);line-height:1.6;padding-right:24px}
+.ladder .k{font:600 18px var(--mono);color:var(--tide);letter-spacing:.2em;margin-bottom:22px}
+
+/* matrix */
+.matrix{margin-top:46px;display:grid;grid-template-columns:330px 1fr 1fr 310px;font-size:21px;line-height:1.55}
+.matrix > div{padding:20px 22px;border-bottom:1px solid var(--line)}
+.matrix .h{font:600 17px var(--mono);letter-spacing:.2em;color:var(--tide);border-bottom-color:var(--tide)}
+.matrix .p{color:var(--coral)}
+.matrix .s{font:700 24px/1.5 var(--display);color:var(--foam)}
+.matrix .t,.matrix .m{color:var(--mist)}
+.matrix .m{font-family:var(--mono);font-size:18px}
+
+/* conclusion */
+.concl{display:grid;grid-template-columns:repeat(2,1fr);gap:40px 90px;margin-top:60px}
+.concl div{display:grid;grid-template-columns:70px 1fr;gap:10px}
+.concl .n{font:600 26px var(--mono);color:var(--gold);padding-top:6px}
+.concl h3{font-size:32px}
+.concl p{grid-column:2;font-size:21px;line-height:1.75;color:var(--mist)}
+.final{font:900 92px/1.3 var(--display);text-align:center;margin-top:20px}
+.thanks{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.thanks .team{margin-top:70px;font-size:24px;color:var(--mist);line-height:2}
+.thanks .team b{color:var(--foam);font-weight:500}
+
+@media (prefers-reduced-motion:reduce){.flow{animation:none}}
+</style>
+
+<canvas id="field" aria-hidden="true"></canvas>
+<div class="vignette"></div>
+<div class="grain"></div>
+<div class="hint">← → / 空格 翻页 · F 全屏</div>
+<div class="nav"><button id="prev" aria-label="上一页">‹</button><button id="next" aria-label="下一页">›</button></div>
+<div class="chrome"><span>连江一中 · 研究性学习结题展示</span><div class="bar"><i id="prog"></i></div><span class="num" id="pg">01 / 20</span></div>
+
+<main id="stage">
+<div class="edge" id="edge"></div>
+
+<!-- 01 cover -->
+<section class="slide cover" data-field="drift">
+  <div class="school" data-a="fade">连江一中 · 2025—2026 高二研究性学习 · 结题报告</div>
+  <h1 data-a="chars">县域治理现代化视角下<br><span class="gold">连江县产业政策执行效能研究</span></h1>
+  <p class="sub" data-a="up">基于 <b>政策文本</b> — <b>街头官僚</b> — <b>企业响应</b> 的三维分析框架</p>
+  <div class="rule" data-a="grow"></div>
+  <div class="meta" data-a="up">
+    <div>指导教师<strong>倪文希</strong></div>
+    <div>课题组长<strong>谢起杭</strong></div>
+    <div>课题成员<strong>黄振楠 郑霖毅 肖锦轩 邱章轲 郭绍然<br>林念勤 曾国宸 郑涵轩</strong></div>
+  </div>
+  <div class="seal" data-a="stamp">连江<br>政研</div>
+</section>
+
+<!-- 02 question -->
+<section class="slide" data-field="split">
+  <div class="eyebrow" data-a="fade">问题意识 · 第一章</div>
+  <p class="quote-xl" style="margin-top:60px" data-a="chars">同一时期的政策，<br>为什么在不同企业之间<br><span class="ghost">天差地别？</span></p>
+  <div class="arrowline" data-a="up"><span>文本上的政策</span><span class="ar" data-a="grow"></span><span class="gold">行动中的政策</span></div>
+  <p class="lead" style="margin-top:44px" data-a="up">有的企业及时拿到补贴，有的企业从不知道政策存在；有的干部主动帮企业补材料，有的只把落实写进汇报。这中间究竟发生了什么？</p>
+</section>
+
+<!-- 03 research questions -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">研究问题</div>
+  <h2 data-a="chars">三个问题，沿着政策的执行链条追问</h2>
+  <div class="rq">
+    <article data-a="up"><div class="k">Q1</div><h3>政策文本长什么样？</h3><p>2020—2025 年主要产业政策在政策工具、执行标准、适用范围和责任安排上呈现何种结构特征？</p></article>
+    <article data-a="up"><div class="k">Q2</div><h3>基层执行者怎么做？</h3><p>执行者形成了哪些行动策略？其行为逻辑受到哪些制度与情境因素影响？</p></article>
+    <article data-a="up"><div class="k">Q3</div><h3>企业如何回应？</h3><p>企业如何感知并回应政策？三者之间通过何种机制共同塑造执行效能？</p></article>
+  </div>
+</section>
+
+<!-- 04 six dimensions -->
+<section class="slide" data-field="ring">
+  <div class="eyebrow" data-a="fade">核心概念 · 表 1</div>
+  <h2 data-a="chars">“执行效能”的<span class="gold">六个维度</span></h2>
+  <p class="lead" style="margin-top:24px;max-width:24em" data-a="up">不只看资金拨付，也不只看满意度，而是看政策在链条中被理解、传递、申请、兑现并产生影响的综合程度。</p>
+  <div class="dimlist">
+    <div data-a="up"><b>政策可达性</b>企业是否知晓，信息能否主动触达</div>
+    <div data-a="up"><b>政策可申请性</b>能否理解条件、准备材料、完成申报</div>
+    <div data-a="up"><b>兑现及时性</b>承诺、审批与资金兑现是否一致且及时</div>
+    <div data-a="up"><b>分配公平性</b>分配标准是否清楚、过程是否透明</div>
+    <div data-a="up"><b>发展带动性</b>是否真正促进技改、扩产、转型</div>
+    <div data-a="up"><b>政企信任结果</b>是否提升企业对政府承诺的信任</div>
+  </div>
+  <div class="dims" data-a="fade"><svg viewBox="-400 -400 800 800" id="hex"></svg></div>
+</section>
+
+<!-- 05 framework -->
+<section class="slide" data-field="tri">
+  <div class="eyebrow" data-a="fade">理论框架 · 图 1</div>
+  <h2 data-a="chars">三维互动分析框架</h2>
+  <div class="fw">
+    <svg viewBox="0 0 1920 1080" aria-hidden="true">
+      <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#ddb75e"/></marker>
+      <marker id="ahc" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="#46c2b2"/></marker></defs>
+      <path class="flow" data-a="draw" d="M890 420 Q700 560 640 760" stroke="#ddb75e" marker-end="url(#ah)"/>
+      <path class="flow" data-a="draw" d="M780 870 Q1060 960 1250 870" stroke="#ddb75e" marker-end="url(#ah)"/>
+      <path class="flow" data-a="draw" d="M1260 790 Q1060 720 790 800" stroke="#46c2b2" marker-end="url(#ahc)"/>
+      <path class="flow" data-a="draw" d="M1360 740 Q1300 520 1080 420" stroke="#46c2b2" marker-end="url(#ahc)"/>
+      <text class="lab" x="560" y="560" text-anchor="end" data-a="fade">设定目标 · 工具 · 流程 · 边界</text>
+      <text class="lab" x="1010" y="985" text-anchor="middle" data-a="fade">解释 · 筛选 · 服务 · 审核</text>
+      <text class="lab m" x="1030" y="742" text-anchor="middle" data-a="fade">申请经验与信任变化</text>
+      <text class="lab m" x="1390" y="560" data-a="fade">反馈 → 修订操作办法</text>
+    </svg>
+    <div class="node gold" style="left:980px;top:330px" data-a="pop"><div class="ring">政策<br>文本</div></div>
+    <div class="node tide" style="left:640px;top:820px" data-a="pop"><div class="ring" style="font-size:34px">基层<br>执行者</div></div>
+    <div class="node coral" style="left:1360px;top:820px" data-a="pop"><div class="ring">企业<br>响应</div></div>
+    <div style="position:absolute;left:1500px;top:250px;width:300px" data-a="up"><p class="lead" style="font-size:24px">三者不是一条直线，而是<span class="gold">带反馈的回路</span>：执行效能在互动中被动态建构、放大或损耗。</p></div>
+  </div>
+</section>
+
+<!-- 06 method -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">研究设计 · 混合方法</div>
+  <h2 data-a="chars">四类数据，三角互证</h2>
+  <div class="stats">
+    <div data-a="up"><div class="big"><span data-count="12">0</span><small>项</small></div><h3>政策文本</h3><p>逐条编码，共 182 条具体措施</p></div>
+    <div data-a="up"><div class="big"><span data-count="18">0</span><small>人</small></div><h3>半结构化访谈</h3><p>8 名基层执行者 + 10 名企业负责人，每次 45—95 分钟</p></div>
+    <div data-a="up"><div class="big"><span data-count="56">0</span><small>份</small></div><h3>企业问卷</h3><p>发放 80 份，有效回收率 70%</p></div>
+    <div data-a="up"><div class="big"><span data-count="4">0</span><small>年</small></div><h3>研究日记</h3><p>2025.01—2026.02 田野笔记与工作报告</p></div>
+  </div>
+  <p class="note" data-a="up">问卷只做描述和三角验证，不推断连江县全部企业；访谈全部去识别化，报告中不出现真实姓名与企业名称。</p>
+</section>
+
+<!-- 07 tools -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">发现一 · 政策文本 · 图 2</div>
+  <h2 data-a="chars">财政补贴，一家独大</h2>
+  <div class="two">
+    <div>
+      <div class="hbars">
+        <div class="hb" style="--v:100;--c:var(--gold)" data-a="bar"><span class="t">财政补贴</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="v"><span data-count="79">0</span><small>条</small></span></div>
+        <div class="hb" style="--c:var(--tide)" data-a="bar"><span class="t">行政服务</span><span class="track"><span class="fill" style="width:49.4%"></span></span><span class="v"><span data-count="39">0</span><small>条</small></span></div>
+        <div class="hb" style="--c:#7d9cae" data-a="bar"><span class="t">税费减免</span><span class="track"><span class="fill" style="width:38%"></span></span><span class="v"><span data-count="30">0</span><small>条</small></span></div>
+        <div class="hb" style="--c:#5c7a8c" data-a="bar"><span class="t">土地与基建</span><span class="track"><span class="fill" style="width:25.3%"></span></span><span class="v"><span data-count="20">0</span><small>条</small></span></div>
+        <div class="hb" style="--c:var(--coral)" data-a="bar"><span class="t">金融支持</span><span class="track"><span class="fill" style="width:17.7%"></span></span><span class="v"><span data-count="14">0</span><small>条</small></span></div>
+      </div>
+      <p class="lead" style="margin-top:50px;font-size:24px" data-a="up">补贴结果可见、金额可量化、容易考核；金融、平台与制度性服务工具相对不足。</p>
+    </div>
+    <div>
+      <div class="callout num" data-a="up"><span data-count="43.4" data-dec="1">0</span><small>%</small></div>
+      <p style="font-size:24px;color:var(--mist);margin-top:12px" data-a="fade">182 条措施中的财政补贴占比</p>
+      <blockquote data-a="up" style="margin-top:50px">补贴和奖励最直接，企业看得到，领导也容易考核。平台建设、产业链整合需要长期投入，不是短期就能见效。<cite>— 受访者 A1 · 部门负责人</cite></blockquote>
+    </div>
+  </div>
+  <div class="src">资料来源：课题组对 12 项政策文本的编码统计，N=182</div>
+</section>
+
+<!-- 08 ambiguity -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">发现一 · 模糊性梯度 · 图 3</div>
+  <h2 data-a="chars">越是“综合性”的文件，越模糊</h2>
+  <div class="legend" data-a="fade"><span style="--c:var(--tide)"><i></i>模糊性较低 P04 P06 P07</span><span style="--c:var(--gold)"><i></i>中等 P02 P03 P05 P08 P11</span><span style="--c:var(--coral)"><i></i>较高 P01 P09 P10 P12</span><span style="margin-left:auto">平均得分　3 = 清晰　1 = 高度模糊</span></div>
+  <div class="gchart">
+    <div class="grp"><div class="col" style="--v:2.8;--c:var(--tide)" data-a="col"><span>2.8</span></div><div class="col" style="--v:2.2;--c:var(--gold)" data-a="col"><span>2.2</span></div><div class="col" style="--v:1.3;--c:var(--coral)" data-a="col"><span>1.3</span></div><div class="gl">目标明确性</div></div>
+    <div class="grp"><div class="col" style="--v:2.7;--c:var(--tide)" data-a="col"><span>2.7</span></div><div class="col" style="--v:1.8;--c:var(--gold)" data-a="col"><span>1.8</span></div><div class="col" style="--v:1.2;--c:var(--coral)" data-a="col"><span>1.2</span></div><div class="gl">标准具体性</div></div>
+    <div class="grp"><div class="col" style="--v:2.5;--c:var(--tide)" data-a="col"><span>2.5</span></div><div class="col" style="--v:2.0;--c:var(--gold)" data-a="col"><span>2.0</span></div><div class="col" style="--v:1.5;--c:var(--coral)" data-a="col"><span>1.5</span></div><div class="gl">范围清晰度</div></div>
+    <div class="grp"><div class="col" style="--v:2.3;--c:var(--tide)" data-a="col"><span>2.3</span></div><div class="col" style="--v:1.6;--c:var(--gold)" data-a="col"><span>1.6</span></div><div class="col" style="--v:1.0;--c:var(--coral)" data-a="col"><span>1.0</span></div><div class="gl">责任可操作性</div></div>
+  </div>
+  <p class="lead" style="margin-top:90px;max-width:40em;font-size:26px" data-a="up">模糊是把双刃剑：适度模糊为基层保留弹性，过度模糊则扩大裁量空间，容易滑向<span class="coral">选择性执行</span>。</p>
+</section>
+
+<!-- 09 strategies -->
+<section class="slide" data-field="tri">
+  <div class="eyebrow" data-a="fade">发现二 · 基层执行者 · 表 8 / 图 4</div>
+  <h2 data-a="chars">三种执行策略：是情境，不是性格</h2>
+  <div class="cards c3">
+    <div class="card" style="--c:#7d9cae" data-a="up"><div class="cnt num">2<small>/ 8 人</small></div><h3>忠实执行型</h3><div class="logic">风险厌恶 · 规则优先</div><p>严格按文本办事，模糊条款上报而不自决。多见于登记、审核、拨付等有审计风险的环节。</p><q>材料不齐就要补，条件不明确就请示。随便放宽条件风险太大。<em>— A7 · 经办干部</em></q></div>
+    <div class="card" style="--c:var(--gold)" data-a="up"><div class="cnt num">5<small>/ 8 人</small></div><h3>策略变通型</h3><div class="logic">目标导向 · 务实适配</div><p>在政策精神框架内做解释性、程序性、资源性变通，降低企业跑动成本。</p><q>先看电子版，有问题一次性告诉它，不让企业反复跑。<em>— A4 · 基层干部</em></q></div>
+    <div class="card" style="--c:var(--coral)" data-a="up"><div class="cnt num">2<small>/ 8 人</small></div><h3>选择性执行型</h3><div class="logic">避责理性 · 成本最小</div><p>按考核权重分配注意力：有金额、有流程的条款优先，“优化服务”类条款被弱化。</p><q>没有具体指标的条款，更多是在材料里体现。<em>— A8 · 经办干部</em></q></div>
+  </div>
+  <div class="src">资料来源：课题组访谈资料主题分析，N=8</div>
+</section>
+
+<!-- 10 awareness -->
+<section class="slide" data-field="fade">
+  <div class="eyebrow" data-a="fade">发现三 · 企业响应 · 图 5 / 图 7</div>
+  <div class="two" style="margin-top:20px;grid-template-columns:1fr 1fr">
+    <div>
+      <div class="callout num" data-a="up" style="color:var(--coral)"><span data-count="66.1" data-dec="1">0</span><small>%</small></div>
+      <h3 style="margin-top:20px;font-size:46px" data-a="up">约三分之二的受访企业<br>“不太了解”或“完全不知道”</h3>
+      <div class="stack" data-a="stack">
+        <div style="--v:7.1;--c:var(--tide)">7.1</div><div style="--v:26.8;--c:#7fd6c9">26.8%</div><div style="--v:42.9;--c:#e9a58e">42.9%</div><div style="--v:23.2;--c:var(--coral)">23.2%</div>
+      </div>
+      <div class="stackl" data-a="fade"><div style="--v:7.1"></div><div style="--v:26.8">比较了解</div><div style="--v:42.9">听说过但不太了解</div><div style="--v:23.2">完全不知道</div></div>
+      <p style="font-size:19px;color:var(--mist);margin-top:8px" data-a="fade">最左侧为“非常了解” 7.1%</p>
+    </div>
+    <div>
+      <h3 data-a="up">规模越小，越不知道</h3>
+      <p style="font-size:22px;color:var(--mist);margin-top:10px" data-a="up">各规模企业中“了解”的比例</p>
+      <div class="steps">
+        <div class="s" style="--v:12.5" data-a="col"><span>12.5%</span><em>10人以下</em></div>
+        <div class="s" style="--v:25" data-a="col"><span>25.0%</span><em>10—50人</em></div>
+        <div class="s" style="--v:42.9" data-a="col"><span>42.9%</span><em>51—100人</em></div>
+        <div class="s" style="--v:66.7" data-a="col"><span>66.7%</span><em>101—500人</em></div>
+        <div class="s" style="--v:100" data-a="col"><span>100%</span><em>500人以上*</em></div>
+      </div>
+      <p style="font-size:18px;color:var(--mist);margin-top:66px" data-a="fade">* 500 人以上仅 3 家，比例不作总体推断</p>
+    </div>
+  </div>
+  <div class="src">资料来源：课题组企业问卷，N=56</div>
+</section>
+
+<!-- 11 channels + application -->
+<section class="slide" data-field="fade">
+  <div class="eyebrow" data-a="fade">发现三 · 图 6 / 图 8</div>
+  <h2 data-a="chars">覆盖面 ≠ 触达面</h2>
+  <div class="two" style="grid-template-columns:1fr 1fr">
+    <div>
+      <h3 data-a="up">政策信息从哪来？<span style="font-size:22px;color:var(--mist);font-weight:400">（多选）</span></h3>
+      <div class="hbars" style="margin-top:36px">
+        <div class="hb" style="--c:var(--gold)" data-a="bar"><span class="t">政府主动告知</span><span class="track"><span class="fill" style="width:77%"></span></span><span class="v">48.2%</span></div>
+        <div class="hb" style="--c:var(--tide)" data-a="bar"><span class="t">朋友 / 同行</span><span class="track"><span class="fill" style="width:65.8%"></span></span><span class="v">41.1%</span></div>
+        <div class="hb" style="--c:#7d9cae" data-a="bar"><span class="t">政府网站</span><span class="track"><span class="fill" style="width:54.2%"></span></span><span class="v">33.9%</span></div>
+        <div class="hb" style="--c:#5c7a8c" data-a="bar"><span class="t">行业协会</span><span class="track"><span class="fill" style="width:28.6%"></span></span><span class="v">17.9%</span></div>
+        <div class="hb" style="--c:#4a6474" data-a="bar"><span class="t">新闻媒体</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="v">12.5%</span></div>
+      </div>
+      <p style="font-size:22px;color:var(--mist);margin-top:36px;line-height:1.7" data-a="up">非正式的熟人网络几乎与政府渠道同等重要，政府网站并不是主要入口。</p>
+    </div>
+    <div>
+      <h3 data-a="up">申请过政策扶持吗？</h3>
+      <div class="ringwrap" data-a="up">
+        <svg viewBox="0 0 200 200" aria-hidden="true">
+          <circle cx="100" cy="100" r="80" stroke="rgba(255,255,255,.05)" class="arc"/>
+          <circle cx="100" cy="100" r="80" class="arc seg" stroke="var(--tide)" data-from="0" data-len="32.1"/>
+          <circle cx="100" cy="100" r="80" class="arc seg" stroke="var(--gold)" data-from="32.1" data-len="14.3"/>
+          <circle cx="100" cy="100" r="80" class="arc seg" stroke="var(--coral)" data-from="46.4" data-len="53.6"/>
+        </svg>
+        <div class="rlist">
+          <div style="--c:var(--tide)"><i></i><b>32.1%</b>申请且获批</div>
+          <div style="--c:var(--gold)"><i></i><b>14.3%</b>申请未获批</div>
+          <div style="--c:var(--coral)"><i></i><b class="coral">53.6%</b>从未申请</div>
+        </div>
+      </div>
+      <p style="font-size:24px;line-height:1.7;margin-top:30px" data-a="up"><span class="coral num" style="font-size:34px">17</span> 家企业没申请的原因是“不知道怎么申请”或“觉得跟自己没关系”，约占全部样本 <b class="gold">30.4%</b>。</p>
+    </div>
+  </div>
+  <div class="src">资料来源：课题组企业问卷，N=56；多选题比例之和超过 100%</div>
+</section>
+
+<!-- 12 four responses -->
+<section class="slide" data-field="quad">
+  <div class="eyebrow" data-a="fade">发现三 · 表 9 / 图 9</div>
+  <h2 data-a="chars">企业的四种响应</h2>
+  <div class="cards c4">
+    <div class="card" style="--c:var(--tide)" data-a="up"><div class="cnt num"><span data-count="17.9" data-dec="1">0</span><small>%</small></div><h3>主动利用型</h3><div class="logic">中大型 · 信息强 · 核心行业</div><p>专人跟踪政策、建立申报档案，把政策当作竞争资源。</p><q>关键不是找关系，而是材料要规范，项目要看得出带动作用。<em>— B1 水产加工出口</em></q></div>
+    <div class="card" style="--c:#7d9cae" data-a="up"><div class="cnt num"><span data-count="28.6" data-dec="1">0</span><small>%</small></div><h3>被动遵从型</h3><div class="logic">小型 · 信息弱 · 关系松散</div><p>政府要求才行动，以最低成本完成合规。</p><q>镇上通知要改造，我们就跟着做；主动申请，没那个门路。<em>— B6 养殖转型</em></q></div>
+    <div class="card" style="--c:var(--gold)" data-a="up"><div class="cnt num"><span data-count="21.4" data-dec="1">0</span><small>%</small></div><h3>规避博弈型</h3><div class="logic">中型 · 博弈性关系</div><p>吸收激励、拖延约束，政策目标被“截断式实现”。</p><q>补贴肯定要争取，配套要求只能分阶段慢慢做。<em>— B5 水产贸易</em></q></div>
+    <div class="card" style="--c:var(--coral)" data-a="up"><div class="cnt num"><span data-count="32.1" data-dec="1">0</span><small>%</small></div><h3>沉默放弃型</h3><div class="logic">小微 · 边缘行业 · 低信任</div><p>不申请、不询问、不参与，是最容易被忽视的群体。</p><q>感觉都是大企业的事，后来就不费这个心了。<em>— B9 小型水产加工</em></q></div>
+  </div>
+  <div class="src">资料来源：课题组访谈与问卷综合编码，N=56；比例为估算</div>
+</section>
+
+<!-- 13 satisfaction + problems -->
+<section class="slide" data-field="fade">
+  <div class="eyebrow" data-a="fade">企业评价 · 图 10 / 图 11</div>
+  <h2 data-a="chars">不算普遍不满，但卡在<span class="coral">信息</span>上</h2>
+  <div class="two" style="grid-template-columns:1fr 1.1fr">
+    <div>
+      <h3 data-a="up">整体满意度</h3>
+      <div class="stack" data-a="stack" style="height:80px;margin-top:34px">
+        <div style="--v:5.4;--c:var(--tide)"></div><div style="--v:23.2;--c:#7fd6c9">23.2%</div><div style="--v:41.1;--c:#6d8796">41.1%</div><div style="--v:21.4;--c:#e9a58e">21.4%</div><div style="--v:8.9;--c:var(--coral)"></div>
+      </div>
+      <div class="stackl" data-a="fade"><div style="--v:5.4"></div><div style="--v:23.2">比较满意</div><div style="--v:41.1">一般</div><div style="--v:21.4">不太满意</div><div style="--v:8.9"></div></div>
+      <p style="font-size:19px;color:var(--mist);margin-top:10px" data-a="fade">两端：非常满意 5.4% · 非常不满意 8.9%</p>
+      <p class="lead" style="margin-top:50px;font-size:26px" data-a="up">满意（28.6%）与不满意（30.3%）几乎持平，主体态度偏中性，不宜夸大为“普遍不满”。</p>
+    </div>
+    <div>
+      <h3 data-a="up">执行中的主要问题 <span style="font-size:22px;color:var(--mist);font-weight:400">（多选）</span></h3>
+      <div class="hbars" style="margin-top:36px">
+        <div class="hb" style="--c:var(--coral)" data-a="bar"><span class="t">信息不透明</span><span class="track"><span class="fill" style="width:100%"></span></span><span class="v">62.5%</span></div>
+        <div class="hb" style="--c:#d0866d" data-a="bar"><span class="t">申报流程复杂</span><span class="track"><span class="fill" style="width:85.8%"></span></span><span class="v">53.6%</span></div>
+        <div class="hb" style="--c:var(--gold)" data-a="bar"><span class="t">门槛太高</span><span class="track"><span class="fill" style="width:71.4%"></span></span><span class="v">44.6%</span></div>
+        <div class="hb" style="--c:#7d9cae" data-a="bar"><span class="t">执行不公平</span><span class="track"><span class="fill" style="width:48.6%"></span></span><span class="v">30.4%</span></div>
+        <div class="hb" style="--c:#5c7a8c" data-a="bar"><span class="t">兑现不及时</span><span class="track"><span class="fill" style="width:40%"></span></span><span class="v">25.0%</span></div>
+      </div>
+    </div>
+  </div>
+  <div class="src">资料来源：课题组企业问卷，N=56</div>
+</section>
+
+<!-- 14 mechanisms -->
+<section class="slide" data-field="tri">
+  <div class="eyebrow" data-a="fade">三维互动机制 · 表 10 / 图 12</div>
+  <h2 data-a="chars">效能是怎样被损耗的</h2>
+  <div class="mech">
+    <div style="--c:var(--tide)" data-a="up">
+      <div class="viz"><svg viewBox="0 0 500 220" id="wave"></svg></div>
+      <h3>信息不对称传导</h3>
+      <p>文本解码损耗 → 基层传递筛选 → 企业认知重构，信号层层衰减。</p>
+      <p class="eff">→ 政策可达性下降，效能分化</p>
+    </div>
+    <div style="--c:var(--gold)" data-a="up">
+      <div class="viz"><svg viewBox="0 0 500 220" id="matthew"></svg></div>
+      <h3>资源竞争与分配</h3>
+      <p>基层“守门”、项目择优、企业策略性争取：信息强、关系深、会讲项目的企业更容易进入政策通道。</p>
+      <p class="eff">→ 可能形成强者更强的马太效应</p>
+    </div>
+    <div style="--c:var(--coral)" data-a="up">
+      <div class="viz"><svg viewBox="0 0 500 220" id="trust"></svg></div>
+      <h3>信任建构与侵蚀</h3>
+      <p>信任靠一次次兑现缓慢积累；一次不透明的失败，就可能让它迅速坍塌。</p>
+      <p class="eff">→ 转化为后续的沉默放弃</p>
+    </div>
+  </div>
+  <div class="src">示意图，表现机制形态，不代表测量数值</div>
+</section>
+
+<!-- 15 voices -->
+<section class="slide" data-field="split">
+  <div class="eyebrow" data-a="fade">信任的两面</div>
+  <div class="two" style="grid-template-columns:1fr 1fr;margin-top:90px;gap:120px">
+    <blockquote data-a="up" style="font-size:40px">补贴虽然审批慢，但最后到位了，部门也一直帮我们协调。这个过程让我们觉得在连江继续投是靠谱的。<cite style="color:var(--tide)">— B2 · 冷链物流 · 信任建构</cite></blockquote>
+    <blockquote data-a="up" style="font-size:40px">申报花了很多时间，最后没通过，也没人说清楚原因。后来听说名额给了规模更大的企业，心里肯定不舒服。<cite style="color:var(--coral)">— B8 · 水产育苗 · 信任侵蚀</cite></blockquote>
+  </div>
+  <p class="lead" style="margin-top:100px;font-size:26px;max-width:46em" data-a="up">研究日记 2025.03.22：受访者说“从那以后对政策不再抱太大希望”。一次不透明的经历，可能造成持续的信任损耗。</p>
+</section>
+
+<!-- 16 cases -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">微观案例</div>
+  <h2 data-a="chars">两个案例，两种裁量</h2>
+  <div class="case">
+    <div style="--c:var(--tide)" data-a="up"><div class="tag">CASE 01 · 低模糊性政策</div><h3>技术改造补贴的差异化落地</h3>
+      <p>条款写得清楚，却仍有两处要判断：处在“规模以上”门槛附近的企业算不算？补贴比例在 10%—15% 之间怎么定？</p>
+      <div class="take">裁量没有消失，只是从“执行不执行”转向“如何解释边界、确定资源强度”。</div></div>
+    <div style="--c:var(--gold)" data-a="up"><div class="tag">CASE 02 · 承诺管理</div><h3>招商优惠的承诺—兑现博弈</h3>
+      <p>招商时的口头承诺与弹性表达抬高了企业对土地、租金、配套和专项资金的预期；执行时却要回到正式文件和财政程序。</p>
+      <div class="take">过度承诺换来短期吸引力，代价是后续的信任消耗。需要承诺清单与兑现条件。</div></div>
+  </div>
+</section>
+
+<!-- 17 five de -->
+<section class="slide" data-field="ring">
+  <div class="eyebrow" data-a="fade">讨论 · 县域治理现代化的政策含义</div>
+  <h2 data-a="chars">企业要的不只是“有没有政策”</h2>
+  <div class="ladder">
+    <div data-a="up"><div class="k">可理解</div><div class="w">看<b>得</b>懂</div><div class="d">文本清楚，弹性条款有操作指南</div></div>
+    <div data-a="up"><div class="k">可达性</div><div class="w">找<b>得</b>到</div><div class="d">政策主动找企业，而非企业找政策</div></div>
+    <div data-a="up"><div class="k">可申请</div><div class="w">申<b>得</b>上</div><div class="d">小微企业门槛与成本可承受</div></div>
+    <div data-a="up"><div class="k">及时性</div><div class="w">兑<b>得</b>出</div><div class="d">承诺、审批与资金一致</div></div>
+    <div data-a="up"><div class="k">公平性</div><div class="w">说<b>得</b>清</div><div class="d">未通过有原因，结果可解释</div></div>
+  </div>
+  <p class="lead" style="margin-top:80px;font-size:26px;max-width:44em" data-a="up">理论上，本研究为街头官僚理论在中国县域的适用边界提供经验补充：基层裁量更受<span class="tide">层级审批</span>约束、更响应<span class="gold">考核</span>、更嵌入<span class="coral">熟人关系</span>。</p>
+</section>
+
+<!-- 18 recommendations -->
+<section class="slide" data-field="drift">
+  <div class="eyebrow" data-a="fade">政策建议 · 表 11</div>
+  <h2 data-a="chars" style="font-size:64px">从“出台政策”转向“治理执行链条”</h2>
+  <div class="matrix">
+    <div class="h">问题</div><div class="h">建议</div><div class="h">实施工具</div><div class="h">评价指标</div>
+    <div class="p" data-a="row">文本模糊、可操作性不稳</div><div class="s" data-a="row">政策文本质量审核 + 实施细则联动</div><div class="t" data-a="row">可执行性评估、企业代表预审、弹性条款清单化</div><div class="m" data-a="row">条款可操作性评分</div>
+    <div class="p" data-a="row">执行者专业能力不足</div><div class="s" data-a="row">产业政策专题培训与案例库</div><div class="t" data-a="row">年度培训、常见问题手册、跨部门答疑群</div><div class="m" data-a="row">一次性答复率</div>
+    <div class="p" data-a="row">信息不对称、依赖熟人</div><div class="s" data-a="row">主动触达型政策传播体系</div><div class="t" data-a="row">企业标签化、政策匹配推送、信息员上门</div><div class="m" data-a="row">小微企业触达率</div>
+    <div class="p" data-a="row">小微企业参与成本高</div><div class="s" data-a="row">小微专项与代办辅导机制</div><div class="t" data-a="row">简化材料、代理申报、分档扶持、轮候制</div><div class="m" data-a="row">小微申请占比</div>
+    <div class="p" data-a="row">分配不透明、信任易损</div><div class="s" data-a="row">结果公开、反馈说明、申诉救济</div><div class="t" data-a="row">未通过原因告知、执行年报、申诉通道</div><div class="m" data-a="row">结果告知率</div>
+  </div>
+</section>
+
+<!-- 19 conclusion -->
+<section class="slide" data-field="converge">
+  <div class="eyebrow" data-a="fade">结论</div>
+  <div class="concl">
+    <div data-a="up"><span class="n">01</span><h3>补贴占优，模糊有梯度</h3><p>财政补贴可量化、易考核而成为主工具；综合性文件责任边界宽、操作标准弱。</p></div>
+    <div data-a="up"><span class="n">02</span><h3>执行者三种策略</h3><p>忠实执行降风险，策略变通提适配，选择性执行致服务不均衡。</p></div>
+    <div data-a="up"><span class="n">03</span><h3>企业响应分化</h3><p>主动利用、被动遵从、规避博弈、沉默放弃，取决于规模、信息、关系与行业位置。</p></div>
+    <div data-a="up"><span class="n">04</span><h3>效能在互动中建构</h3><p>信息不对称、资源竞争、信任建构与侵蚀，共同造成同一政策的差异化效能。</p></div>
+  </div>
+  <p class="final" style="margin-top:110px" data-a="chars">政策的效能，<span class="gold">不只写在文本里</span></p>
+</section>
+
+<!-- 20 thanks -->
+<section class="slide thanks" data-field="converge">
+  <div class="eyebrow" data-a="fade" style="justify-content:center">感谢聆听 · 敬请指正</div>
+  <h1 data-a="chars" style="font-size:150px;margin-top:40px;letter-spacing:.2em">谢谢</h1>
+  <div class="team" data-a="up">指导教师 <b>倪文希</b>　·　课题组长 <b>谢起杭</b><br>黄振楠　郑霖毅　肖锦轩　邱章轲　郭绍然　林念勤　曾国宸　郑涵轩</div>
+</section>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script>
+(() => {
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const stage = document.getElementById('stage');
+const slides = [...document.querySelectorAll('.slide')];
+const N = slides.length;
+let cur = -1, busy = false;
+
+/* ---------- fit 1920×1080 stage ---------- */
+function fit(){
+  const s = Math.min(innerWidth/1920, innerHeight/1080);
+  stage.style.transform = `scale(${s}) translate(-50%,-50%)`;
+}
+addEventListener('resize', fit); fit();
+
+/* ---------- split chars for [data-a=chars] ---------- */
+document.querySelectorAll('[data-a="chars"]').forEach(el => {
+  const walk = node => {
+    [...node.childNodes].forEach(n => {
+      if (n.nodeType === 3) {
+        const frag = document.createDocumentFragment();
+        [...n.textContent].forEach(c => { const s = document.createElement('span'); s.className = 'ch'; s.textContent = c; frag.appendChild(s); });
+        n.replaceWith(frag);
+      } else if (n.nodeType === 1 && n.tagName !== 'BR') walk(n);
+    });
+  };
+  walk(el);
+});
+
+/* ---------- six-dimension hexagon ---------- */
+(() => {
+  const svg = document.getElementById('hex'), ns = 'http://www.w3.org/2000/svg';
+  const names = ['可达性','可申请性','兑现及时性','分配公平性','发展带动性','政企信任'];
+  const pt = (r,i) => { const a = -Math.PI/2 + i*Math.PI/3; return [r*Math.cos(a), r*Math.sin(a)]; };
+  let h = '';
+  [300,200,100].forEach((r,k) => h += `<polygon points="${[0,1,2,3,4,5].map(i=>pt(r,i).join(',')).join(' ')}" fill="none" stroke="rgba(170,214,220,${.10+k*.04})"/>`);
+  for (let i=0;i<6;i++){ const [x,y]=pt(300,i); h += `<line x1="0" y1="0" x2="${x}" y2="${y}" stroke="rgba(170,214,220,.12)"/>`; }
+  h += `<polygon class="hexfill" points="${[0,1,2,3,4,5].map(i=>pt(300,i).join(',')).join(' ')}" fill="rgba(221,183,94,.10)" stroke="#ddb75e" stroke-width="2"/>`;
+  for (let i=0;i<6;i++){ const [x,y]=pt(300,i), [lx,ly]=pt(352,i);
+    h += `<circle class="hexdot" cx="${x}" cy="${y}" r="9" fill="#46c2b2"/>`;
+    h += `<text x="${lx}" y="${ly+9}" text-anchor="middle" font-family="Noto Serif SC,serif" font-weight="700" font-size="28" fill="#eef3f2">${names[i]}</text>`; }
+  h += `<text x="0" y="-6" text-anchor="middle" font-family="Noto Serif SC,serif" font-weight="900" font-size="44" fill="#ddb75e">执行效能</text><text x="0" y="36" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="18" letter-spacing="5" fill="#8fa8b3">EFFECTIVENESS</text>`;
+  svg.innerHTML = h;
+})();
+
+/* ---------- mechanism mini-visuals ---------- */
+(() => {
+  // decaying, noisier signal from 文本 to 企业
+  let d = '', d2 = '';
+  for (let x=0;x<=500;x+=4){ const k=x/500, amp=70*(1-k*.8), noise=(Math.sin(x*.9)+Math.sin(x*.37))*14*k;
+    d += (x?'L':'M')+x+','+(110+Math.sin(x/22)*amp+noise).toFixed(1); }
+  document.getElementById('wave').innerHTML =
+    `<path class="mpath" d="${d}" fill="none" stroke="#46c2b2" stroke-width="3"/>`+
+    ['文本','基层','企业'].map((t,i)=>`<text x="${[10,250,490][i]}" y="214" text-anchor="${['start','middle','end'][i]}" font-size="20" fill="#8fa8b3" font-family="Noto Sans SC,sans-serif">${t}</text>`).join('');
+  // matthew: circles grow left->right
+  document.getElementById('matthew').innerHTML = [12,20,30,44,64].map((r,i)=>
+    `<circle class="mdot" cx="${[30,95,185,300,430][i]}" cy="${180-r}" r="${r}" fill="rgba(221,183,94,${.18+i*.14})" stroke="#ddb75e" stroke-width="1.5"/>`).join('')+
+    `<text x="10" y="214" font-size="20" fill="#8fa8b3" font-family="Noto Sans SC,sans-serif">信息弱</text><text x="490" y="214" text-anchor="end" font-size="20" fill="#8fa8b3" font-family="Noto Sans SC,sans-serif">信息强</text>`;
+  // trust: slow climb, sharp drop
+  document.getElementById('trust').innerHTML =
+    `<path class="mpath" d="M0,180 L40,170 L80,162 L120,150 L160,142 L200,128 L240,118 L280,104 L320,92 L350,82 L362,186 L500,190" fill="none" stroke="#e2785c" stroke-width="3" stroke-linejoin="round"/>`+
+    `<text x="150" y="70" font-size="20" fill="#8fa8b3" font-family="Noto Sans SC,sans-serif">缓慢积累</text><text x="372" y="140" font-size="20" fill="#e2785c" font-family="Noto Sans SC,sans-serif">一次落差</text>`;
+})();
+
+/* ---------- particle tide ---------- */
+const cv = document.getElementById('field'), cx = cv.getContext('2d');
+let W, H, DPR;
+function size(){ DPR = Math.min(devicePixelRatio||1, 2); W = cv.width = innerWidth*DPR; H = cv.height = innerHeight*DPR; cx.fillStyle='#061420'; cx.fillRect(0,0,W,H); }
+addEventListener('resize', size); size();
+const P = [], COUNT = reduce ? 0 : Math.round(Math.min(1400, innerWidth*innerHeight/1300));
+const pal = ['70,194,178','221,183,94','238,243,242','226,120,92'];
+for (let i=0;i<COUNT;i++) P.push({x:Math.random(), y:Math.random(), v:.4+Math.random()*.8, c:Math.random()<.62?0:Math.random()<.6?1:Math.random()<.7?2:3, a:.25+Math.random()*.55});
+const F = {flow:1, pull:0, swirl:0}; let targets = [];
+const modes = {
+  drift:   {flow:1,   pull:0,    swirl:0,   t:[]},
+  split:   {flow:1.4, pull:.0,   swirl:.6,  t:[]},
+  ring:    {flow:.3,  pull:.012, swirl:1.2, t:[[.72,.5]]},
+  tri:     {flow:.4,  pull:.010, swirl:.8,  t:[[.51,.31],[.33,.76],[.71,.76]]},
+  quad:    {flow:.6,  pull:.006, swirl:.6,  t:[[.2,.6],[.4,.6],[.6,.6],[.8,.6]]},
+  fade:    {flow:.7,  pull:0,    swirl:.2,  t:[]},
+  converge:{flow:.2,  pull:.014, swirl:1.6, t:[[.5,.5]]}
+};
+function setField(name){ const m = modes[name]||modes.drift; targets = m.t; gsap.to(F,{flow:m.flow,pull:m.pull,swirl:m.swirl,duration:2.2,ease:'power2.inOut'}); }
+let T = 0;
+function tick(){
+  T += .004;
+  cx.fillStyle = 'rgba(6,20,32,.16)'; cx.fillRect(0,0,W,H);
+  for (const p of P){
+    const ang = Math.sin(p.y*6+T*2)*.9 + Math.cos(p.x*5-T*1.3)*.6;
+    let vx = Math.cos(ang)*.0009*p.v + .0011*F.flow*p.v, vy = Math.sin(ang)*.0009*p.v;
+    if (targets.length && F.pull>0){
+      let best = targets[0], bd = 9;
+      for (const t of targets){ const d=(t[0]-p.x)**2+(t[1]-p.y)**2; if (d<bd){bd=d;best=t;} }
+      const dx = best[0]-p.x, dy = best[1]-p.y, dist = Math.sqrt(bd)+.0001;
+      const ring = dist - (.09 + (p.c*.02));
+      vx += dx/dist*ring*F.pull*.25*p.v - dy/dist*F.swirl*.0014*p.v;
+      vy += dy/dist*ring*F.pull*.25*p.v + dx/dist*F.swirl*.0014*p.v*(W/H);
+    }
+    p.x += vx; p.y += vy*(W/H)*.56;
+    if (p.x>1.02) p.x=-.02; if (p.x<-.02) p.x=1.02; if (p.y>1.02) p.y=-.02; if (p.y<-.02) p.y=1.02;
+    cx.fillStyle = `rgba(${pal[p.c]},${p.a})`;
+    cx.fillRect(p.x*W, p.y*H, 1.6*DPR, 1.6*DPR);
+  }
+  requestAnimationFrame(tick);
+}
+if (!reduce) tick();
+
+/* ---------- per-slide entrance ---------- */
+function countUp(el, delay){
+  const to = parseFloat(el.dataset.count), dec = +(el.dataset.dec||0), o = {v:0};
+  gsap.to(o,{v:to,duration:1.6,delay,ease:'power3.out',onUpdate:()=>el.textContent=o.v.toFixed(dec)});
+}
+function enter(s){
+  const tl = gsap.timeline({defaults:{ease:'expo.out'}});
+  let t = .25;
+  gsap.set(s.querySelectorAll('[data-a="chars"],[data-a="stack"],[data-a="col"],[data-a="grow"],[data-a="draw"]'),{opacity:1});
+  s.querySelectorAll('[data-a]').forEach(el => {
+    const a = el.dataset.a;
+    if (a==='chars'){ const cs = el.querySelectorAll('.ch'); tl.fromTo(cs,{opacity:0,y:60,rotateX:-80,filter:'blur(10px)'},{opacity:1,y:0,rotateX:0,filter:'blur(0px)',duration:1.1,stagger:.028},t); t += Math.min(cs.length*.028,.7)*.6; }
+    else if (a==='fade'){ tl.fromTo(el,{opacity:0},{opacity:1,duration:1.2},t); t+=.08; }
+    else if (a==='up'){ tl.fromTo(el,{opacity:0,y:50,filter:'blur(6px)'},{opacity:1,y:0,filter:'blur(0px)',duration:1.2},t); t+=.1; }
+    else if (a==='grow'){ tl.fromTo(el,{scaleX:0},{scaleX:1,duration:1.4,ease:'power4.inOut'},t); }
+    else if (a==='pop'){ tl.fromTo(el,{opacity:0,scale:.4},{opacity:1,scale:1,duration:1.3,ease:'elastic.out(1,.6)'},t); t+=.18; }
+    else if (a==='stamp'){ tl.fromTo(el,{opacity:0,scale:2.4,rotate:-30},{opacity:.85,scale:1,rotate:-8,duration:.7,ease:'back.out(2.2)'},t+.6); }
+    else if (a==='draw'){ const L = el.getTotalLength(); tl.fromTo(el,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:1.4,ease:'power2.inOut',onComplete:()=>{el.style.strokeDasharray='';el.style.strokeDashoffset='';}},t+.3); t+=.12; }
+    else if (a==='bar'){ tl.fromTo(el,{opacity:0,x:-30},{opacity:1,x:0,duration:.9},t); tl.fromTo(el.querySelector('.fill'),{scaleX:0},{scaleX:1,duration:1.5,ease:'power4.out'},t+.1); t+=.1; }
+    else if (a==='col'){ tl.fromTo(el,{scaleY:0},{scaleY:1,duration:1.4,ease:'power4.out'},t); tl.fromTo(el.querySelector('span'),{opacity:0},{opacity:1,duration:.6},t+.8); t+=.07; }
+    else if (a==='stack'){ tl.fromTo(el.children,{scaleX:0,opacity:0},{scaleX:1,opacity:1,duration:1,stagger:.12,ease:'power3.out'},t); t+=.3; }
+    else if (a==='row'){ tl.fromTo(el,{opacity:0,x:-24},{opacity:1,x:0,duration:.8},t); t+=.035; }
+    else tl.fromTo(el,{opacity:0},{opacity:1,duration:1},t);
+  });
+  s.querySelectorAll('[data-count]').forEach(el => countUp(el, .5));
+  // donut segments
+  s.querySelectorAll('.seg').forEach((c,i) => {
+    const C = 2*Math.PI*80, len = +c.dataset.len/100*C, off = -(+c.dataset.from)/100*C;
+    gsap.fromTo(c,{strokeDasharray:`0 ${C}`,strokeDashoffset:off},{strokeDasharray:`${len-2} ${C}`,duration:1.4,delay:.6+i*.35,ease:'power3.inOut'});
+  });
+  s.querySelectorAll('.mpath').forEach(p => { const L=p.getTotalLength(); gsap.fromTo(p,{strokeDasharray:L,strokeDashoffset:L},{strokeDashoffset:0,duration:2,delay:.8,ease:'power2.inOut'}); });
+  s.querySelectorAll('.mdot').forEach((c,i) => gsap.fromTo(c,{scale:0,transformOrigin:'50% 100%'},{scale:1,duration:1,delay:.9+i*.15,ease:'back.out(1.8)'}));
+  s.querySelectorAll('.hexfill').forEach(p => gsap.fromTo(p,{scale:0,transformOrigin:'0 0',opacity:0},{scale:1,opacity:1,duration:1.6,delay:.4,ease:'elastic.out(1,.55)'}));
+  s.querySelectorAll('.hexdot').forEach((c,i) => gsap.fromTo(c,{opacity:0,scale:0,transformOrigin:'50% 50%'},{opacity:1,scale:1,duration:.6,delay:.9+i*.1,ease:'back.out(3)'}));
+  return tl;
+}
+
+/* ---------- transitions: a gold tide-line sweeps the new slide in ---------- */
+const edge = document.getElementById('edge');
+function go(n){
+  n = Math.max(0, Math.min(N-1, n));
+  if (n===cur || busy) return;
+  const dir = n > cur ? 1 : -1, prev = slides[cur], next = slides[n];
+  busy = true;
+  slides.forEach(s => s.classList.toggle('on', s===next || s===prev));
+  setField(next.dataset.field);
+  document.getElementById('prog').style.width = ((n+1)/N*100)+'%';
+  document.getElementById('pg').textContent = String(n+1).padStart(2,'0')+' / '+String(N).padStart(2,'0');
+  try { history.replaceState(null,'','#s'+(n+1)); } catch(e){}
+  if (reduce || !prev){
+    if (prev) prev.classList.remove('on');
+    gsap.set(next,{clipPath:'none',opacity:1});
+    cur = n; busy = false; if (!reduce) enter(next); return;
+  }
+  const from = dir>0 ? 'inset(0 0 0 100%)' : 'inset(0 100% 0 0)';
+  gsap.set(next,{clipPath:from,zIndex:2,opacity:1}); gsap.set(prev,{zIndex:1});
+  const tl = gsap.timeline({onComplete:()=>{ prev.classList.remove('on'); gsap.set(prev,{clearProps:'all'}); gsap.set(next,{clipPath:'none'}); busy=false; }});
+  tl.to(prev,{opacity:.0,scale:.96,filter:'blur(8px)',duration:1,ease:'power3.inOut'},0)
+    .to(next,{clipPath:'inset(0 0 0 0%)',duration:1,ease:'expo.inOut'},0)
+    .fromTo(edge,{left:dir>0?1920:0,opacity:1},{left:dir>0?0:1920,duration:1,ease:'expo.inOut'},0)
+    .to(edge,{opacity:0,duration:.3},.85);
+  next.querySelectorAll('[data-a]').forEach(el => gsap.set(el,{opacity:0}));
+  setTimeout(()=>enter(next), 350);
+  cur = n;
+}
+
+addEventListener('keydown', e => {
+  if (['ArrowRight','PageDown',' ','Enter'].includes(e.key)) { e.preventDefault(); go(cur+1); }
+  else if (['ArrowLeft','PageUp','Backspace'].includes(e.key)) { e.preventDefault(); go(cur-1); }
+  else if (e.key==='Home') go(0); else if (e.key==='End') go(N-1);
+  else if (e.key==='f'||e.key==='F'){ const d=document.documentElement; (document.fullscreenElement?document.exitFullscreen():d.requestFullscreen?.())?.catch?.(()=>{}); }
+});
+document.getElementById('next').onclick = () => go(cur+1);
+document.getElementById('prev').onclick = () => go(cur-1);
+let wheelLock = 0;
+addEventListener('wheel', e => { const now=Date.now(); if (now-wheelLock<900||Math.abs(e.deltaY)<20) return; wheelLock=now; go(cur+(e.deltaY>0?1:-1)); }, {passive:true});
+let sx = null;
+addEventListener('touchstart', e => sx = e.touches[0].clientX, {passive:true});
+addEventListener('touchend', e => { if (sx==null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx)>40) go(cur+(dx<0?1:-1)); sx=null; });
+
+const h = parseInt((location.hash.match(/s(\d+)/)||[])[1]);
+go(h ? h-1 : 0);
+})();
+</script>
