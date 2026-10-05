@@ -21,8 +21,11 @@ MSL.df21d = { name: '东风-21D', cls: 'ashm', profile: 'ballistic', v: 2900, ra
 MSL.df26 = { name: '东风-26', cls: 'ashm', profile: 'ballistic', v: 3200, range: 1e7, dmg: 500, rcs: 0.55, call: '火箭军 东风-26' };
 MSL.tlam = { name: '战斧', cls: 'ashm', profile: 'sub', v: 245, range: 1.6e6, dmg: 130, rcs: 0.7, skim: 12 };
 MSL.mst = { name: '海上打击战斧', cls: 'ashm', profile: 'sub', v: 245, range: 1e6, dmg: 200, rcs: 0.7, skim: 8, smart: true };
+// anti-radiation missiles: home on a radiating ship's radar (a quiet ship gives them nothing to home on)
+MSL.aargm = { name: 'AARGM-ER', cls: 'ashm', profile: 'high', v: 1050, range: 60000, dmg: 55, rcs: 0.4, cruise: 9000, skimAt: 7000, arm: true };
+MSL.yj91 = { name: '鹰击-91', cls: 'ashm', profile: 'high', v: 1100, range: 55000, dmg: 60, rcs: 0.5, cruise: 8000, skimAt: 7000, arm: true };
 MSL.sm3 = { name: '标准-3', cls: 'sam', v: 3000, range: 400000, pk: 1.5, exo: true };   // pk scaled by PK_MUL.ballistic
-PK_MUL.ballistic = 0.32;
+PK_MUL.ballistic = 0.38;
 CIWS_PK.ballistic = 0.03;
 const TORP = {
   yu6: { name: '鱼-6 重型鱼雷', v: 32, range: 30000, dmg: 430, seek: 2600 },
@@ -331,7 +334,7 @@ function updateBallistic(m, i, dt) {
 // the PLA Rocket Force: a volley at the most valuable carrier the picture holds
 function rocketForce(side, n = 4, type = 'df21d') {
   let tgt = null;
-  for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30 && (!tgt || e.value > tgt.value)) tgt = e;
+  for (const [e, tr] of picture[side]) if (e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30 && !tr.coarse && (!tgt || e.value > tgt.value)) tgt = e;
   // the main effort, if it is a ship with a fresh enough track for a ballistic shot
   const main = intentTarget(side);
   if (main && main.kind === 'ship' && fresh(side, main, 30)) tgt = main;
@@ -348,7 +351,7 @@ function tomahawk(side, target, max = 16) {
   const shooters = ships.filter(s => s.side === side && s.alive && !s.dying && (s.tlamN || 0) > 0);
   let n = 0;
   for (const s of shooters) {
-    const k = Math.min(s.tlamN, target.kind === 'base' ? 6 : 3);
+    const k = Math.min(s.tlamN, target.kind === 'base' ? 8 : 4);
     for (let j = 0; j < k && n < max; j++, n++) { s.tlamN--; const sh = s, idx = n; pending.push({ t: game.t + idx * 0.9, fn: () => { if (sh.alive && !sh.dying) { const m = launchASHM(sh, target, target.kind === 'base' ? 'tlam' : 'mst'); if (idx === 0) cineOn('salvo', m); } } }); }
   }
   if (n) radio(side === game.side ? '打击协调' : '侦听', side === game.side ? `${n} 枚战斧巡航导弹发射，目标${target.name}。` : `敌方巡航导弹齐射！${n} 枚飞向${target.name}！`, side === game.side ? '#9fd4ff' : '#ff8a78');

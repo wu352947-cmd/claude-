@@ -12,9 +12,9 @@ function airInventory(side) {
   return inv;
 }
 const AC_NOTE = {
-  j15: '舰载多用途 · 霹雳-15 ×4、霹雳-10 ×2、鹰击-83K ×2', j35: '隐身制空 · 霹雳-15 ×4 内埋', j15d: '电子战 · 压制敌雷达与导弹', kj600: '舰载预警 · 130 km 雷达',
-  j16: '陆基多用途 · 岛礁跑道起飞', h6k: '远程轰炸 · 鹰击-12 ×2', fa18: '舰载多用途 · AIM-120D ×4、LRASM ×2', ea18g: '电子战 · 压制敌雷达与导弹',
-  f35c: '隐身制空 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · LRASM ×4 · 从战区外突入'
+  j15: '舰载多用途 · 霹雳-15 ×4、霹雳-10 ×2、鹰击-83K ×2', j35: '隐身制空 · 先敌发现先敌开火 · 霹雳-15 ×4 内埋', j15d: '电子战 · 远距支援干扰 · 鹰击-91 反辐射导弹 ×2', kj600: '舰载预警 · 130 km 雷达',
+  j16: '陆基多用途 · 岛礁跑道起飞', h6k: '远程轰炸 · 鹰击-12 超音速反舰导弹 ×4', fa18: '舰载多用途 · AIM-120D ×4、LRASM ×2', ea18g: '电子战 · 远距支援干扰 · AARGM-ER 反辐射导弹 ×2',
+  f35c: '隐身制空 · 先敌发现先敌开火 · AIM-120D ×4 内埋', e2d: '舰载预警 · 140 km 雷达', b1b: '远程轰炸 · 隐身 LRASM ×8 · 从关岛突入'
 };
 function shipNote(s) {
   const a = Object.entries(s.ashm).filter(([, n]) => n > 0).map(([k, n]) => `${MSL[k].name} ×${n}`).join('、');
@@ -290,6 +290,7 @@ function cmdButtons() {
   $('cm-emcon').classList.toggle('on', tac(game.side).navy === 'emcon');
   const C = command[game.side], ph = phaseOf(game.side), P = planOf(game.side);
   $('cm-jcc').innerHTML = `指挥中心${ph && P ? `<small>${C.ph.i + 1}/${P.phases.length} ${ph.name}</small>` : ''}`;
+  { const jl = C.jfCd > game.t ? Math.ceil(C.jfCd - game.t) : 0; $('cm-joint').innerHTML = `联合火力${jl ? `<small>${jl}s</small>` : ''}`; $('cm-joint').classList.toggle('cd', !!jl); }
   $('cm-staff').innerHTML = `参谋权限<small>${ROE.auth[authOf()][0]}</small>`;
 }
 $('cm-alpha').onclick = () => {
@@ -325,13 +326,14 @@ $('cm-feint').onclick = () => {
 };
 $('cm-staff').onclick = () => { const order = ['negation', 'approve', 'delegate', 'full'], C = command[game.side]; C.auth = order[(order.indexOf(authOf()) + 1) % 4]; radio('参谋部', `指挥方式：${ROE.auth[C.auth][0]}。${ROE.auth[C.auth][1]}`, '#9fd4ff'); jlog(game.side, `参谋权限：${ROE.auth[C.auth][0]}`); renderProps(); cmdButtons(); };
 $('cm-jcc').onclick = () => toggleJCC();
+$('cm-joint').onclick = () => orderJointFires(cmdTarget());
 
 /* ---------- theatre support: the side's strategic card, open to every role ---------- */
 function supportReady() { return game.mode === 'play' && game.t > (game.supportT || 120); }
 function callSupport() {
   if (!supportReady()) { message('战区支援准备中', `${Math.ceil((game.supportT || 120) - game.t)} 秒`, '#9fb0ba', 1.6); return; }
   let ok = false;
-  if (game.side === 'cn') ok = rocketForce('cn', 4, (game.supportN || 0) % 2 ? 'df26' : 'df21d');
+  if (game.side === 'cn') ok = rocketForce('cn', 8, (game.supportN || 0) % 2 ? 'df26' : 'df21d');
   else {
     const t = game.ashmSel || bestTarget('us', fleetCentre('us') || new V3(), 220000);
     if (t && command.us.b1b > 0) {

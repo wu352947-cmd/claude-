@@ -788,6 +788,8 @@ function drawTacMap() {
   if (Cm.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#9fd4ff'; hc.textAlign = 'left'; hc.fillText(`🛰 己方侦察卫星过顶 · ${Math.ceil(Cm.satEnd - game.t)} s`, 16, 72); }
   const Cf = command[SIDES[me].foe];
   if (Cf.satEnd > game.t) { hc.font = `700 11px ${SANS}`; hc.fillStyle = '#ffd28a'; hc.textAlign = 'left'; hc.fillText(`⚠ 敌方侦察卫星过顶 · ${Math.ceil(Cf.satEnd - game.t)} s`, 16, 88); }
+  // our high-altitude ISR drone's orbit
+  { const U = command[me].uav; if (U && U.up) { const [x, y] = P(U.pos.x, U.pos.z); hc.strokeStyle = BLUE; hc.globalAlpha = 0.6; hc.setLineDash([2, 4]); hc.beginPath(); hc.arc(x, y, 160000 * s, 0, Math.PI * 2); hc.stroke(); hc.setLineDash([]); hc.globalAlpha = 1; hc.fillStyle = BLUE; hc.font = `600 10px ${SANS}`; hc.textAlign = 'center'; hc.fillText(`✈ ${UAV[me].name}`, x, y + 4); } }
   // our own deception: the phantom groups we are projecting (dashed, so they are never mistaken for real ships)
   for (const ph of command[me].phantoms || []) {
     if (!ph.alive) continue;

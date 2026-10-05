@@ -199,9 +199,11 @@ function updateJoint(side, dt) {
   const C = command[side], P = planOf(side);
   if (!P || !C.ph) return;
   staffBrain(side, dt);
+  updateUAV(side, dt);
   C.jT = (C.jT || 0) - dt;
   if (C.jT > 0) return;
   C.jT = 2;
+  sitrep(side);
   const ph = PHASES[C.ph.id], [p, label] = ph.prog(side, C);
   C.ph.prog = p; C.ph.label = label;
   ccirCheck(side);
@@ -635,7 +637,7 @@ const JCC_TABS = {
     return `<p class="jnote">目标按价值、主攻方向与航迹质量排序。BDA 为毁伤评估（估计值）。粗略航迹（卫星 / 超视距雷达）可以引导攻击编队，导弹末段需要自行搜索。</p>
       <table class="jtab"><thead><tr><th>#</th><th>目标</th><th>航迹</th><th>评估</th><th>在途</th><th></th></tr></thead><tbody>
       ${rows.map((r, i) => `<tr class="${r.e === main ? 'main' : ''}"><td>${r.sub ? '潜' : i + 1}</td><td><b>${r.e.name}</b><small>${r.e.kind === 'base' ? '岛礁机场' : r.e.S.type}</small></td><td>${q(r)}</td><td>${r.sub ? '—' : bda(r)}</td><td>${r.pk ? `${r.pk} 编队 ` : ''}${r.ms ? `${r.ms} 弹` : ''}${!r.pk && !r.ms ? '—' : ''}</td>
-        <td class="acts">${r.sub ? `<button type="button" data-act="asw" data-v="${r.e.key}">反潜猎杀</button>` : `${r.e === main ? '<em>主攻</em>' : `<button type="button" data-act="main" data-v="${r.e.key || r.e.name}">设为主攻</button>`}<button type="button" data-act="pkg" data-v="${r.e.key || r.e.name}">${hitOnce(side, r.e) ? '再次打击' : '攻击编队'}</button><button type="button" data-act="salvo" data-v="${r.e.key || r.e.name}">舰艇齐射</button>`}</td></tr>`).join('') || '<tr><td colspan="6">态势图中暂无敌方水面目标</td></tr>'}
+        <td class="acts">${r.sub ? `<button type="button" data-act="asw" data-v="${r.e.key}">反潜猎杀</button>` : `${r.e === main ? '<em>主攻</em>' : `<button type="button" data-act="main" data-v="${r.e.key || r.e.name}">设为主攻</button>`}<button type="button" data-act="pkg" data-v="${r.e.key || r.e.name}">${hitOnce(side, r.e) ? '再次打击' : '攻击编队'}</button><button type="button" data-act="salvo" data-v="${r.e.key || r.e.name}">舰艇齐射</button><button type="button" data-act="joint" data-v="${r.e.key || r.e.name}">联合火力</button>`}</td></tr>`).join('') || '<tr><td colspan="6">态势图中暂无敌方水面目标</td></tr>'}
       </tbody></table>`;
   },
   // task organisation and the state of each group
@@ -675,7 +677,7 @@ const JCC_TABS = {
   roe(side, C) {
     const M = magazines(side), A = airStock(side), low = planes.filter(p => p.side === side && p.alive && p.airborne && p.fuel < p.T.fuel * 0.25).length;
     const tk = planes.filter(p => p.side === side && p.alive && p.airborne && p.role === 'tank').length;
-    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 4} 次齐射` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
+    const fires = side === 'cn' ? `火箭军东风：剩余 ${command.cn.dfN ?? 6} 个波次（每波 8 枚）` : `B-1B：剩余 ${command.us.b1b} 架 · 战斧 ${ships.filter(s => s.side === 'us' && s.alive).reduce((a, s) => a + (s.tlamN || 0), 0)} 枚`;
     return `<div class="prow"><i>武器控制</i>${segJ('wcs', Object.entries(ROE.wcs).map(([k, v]) => [k, v[0]]), C.roe.wcs)}</div>
       <div class="prow"><i>电磁管控</i>${segJ('emcon', Object.entries(ROE.emcon).map(([k, v]) => [k, v[0]]), tac(side).navy === 'emcon' ? 'A' : C.roe.emcon)}</div>
       <div class="prow"><i>参谋权限</i>${segJ('auth', Object.entries(ROE.auth).map(([k, v]) => [k, v[0]]), C.auth)}</div>
@@ -685,7 +687,7 @@ const JCC_TABS = {
       <table class="jtab"><tbody>${M.ships.filter(x => !x.s.carrier).map(x => `<tr><td><b>${x.s.name}</b></td><td>防空 ${jbar(x.sam / (x.sam0 || 1))} ${x.sam}</td><td>反舰 ${jbar(x.ashm / (x.ashm0 || 1), '#ffc861')} ${x.ashm}</td></tr>`).join('')}</tbody></table>
       <h4>航空保障</h4>
       <div class="jgrid"><div><i>可用攻击机</i>${jbar(A.strike / (A.strike0 || 1), '#ffc861')}<b>${A.strike} / ${A.strike0}</b></div><div><i>机库</i><b>${Object.entries(A.types).filter(([, n]) => n > 0).map(([t, n]) => `${AC[t].name} ${n}`).join(' · ') || '空'}</b></div>
-      <div><i>低油量在空</i><b>${low}</b></div><div><i>加油机在空</i><b>${tk}</b></div><div><i>战区火力</i><b>${fires}</b></div></div>`;
+      <div><i>低油量在空</i><b>${low}</b></div><div><i>加油机在空</i><b>${tk}</b></div><div><i>战区火力</i><b>${fires}</b></div><div><i>${UAV[side].name}</i><b>${C.uav ? (C.uav.up ? '在空侦察' : C.uav.n > 0 ? '准备起飞' : '已全部损失') + ` · 剩余 ${C.uav.n} 架` : '—'}</b></div><div><i>联合火力</i><b>${C.jfCd > game.t ? `${Math.ceil(C.jfCd - game.t)} 秒后可组织` : '可组织'}</b></div></div>`;
   },
   // the staff's estimate: salvo model per target, the air balance, the chief of staff's reasoning
   est(side, C) {
@@ -712,6 +714,7 @@ function jccAct(a, v) {
   else if (a === 'main') { const e = find(v); if (e) { designate(e); message('主攻目标已变更', e.name, GOLD, 2); jlog(side, `主攻目标改为${e.name}`, GOLD); } }
   else if (a === 'pkg') { const e = find(v); if (e) { let n = 0; for (const h of cmdCarriers().concat(bases.filter(b => b.side === side && b.alive))) if (launchPackage(h, e, { n: 6, esc: 2 })) n++; jlog(side, `命令：对${e.name}出动 ${n} 个攻击编队`); if (!n) message('机库无可用攻击机', '', '#9fb0ba', 1.6); } }
   else if (a === 'salvo') { const e = find(v); if (e) { const n = fleetStrike(side, e); jlog(side, n ? `命令：舰艇齐射 ${n} 枚，目标${e.name}` : `舰艇齐射：${e.name}超出射程`); if (!n) message('无舰艇在射程内', e.name, '#9fb0ba', 1.6); } }
+  else if (a === 'joint') { const e = find(v); if (e) orderJointFires(e); }
   else if (a === 'asw') { const e = find(v); if (e) { game.desigShip = e; jlog(side, `命令：反潜猎杀${e.name}`); } }
   else if (a === 'resv-air') commitReserve(side, 'air');
   else if (a === 'undeploy') { C[v] = null; jlog(side, `取消部署：${DEPLOY.find(d => d[0] === v)[2]}`); }
@@ -875,6 +878,19 @@ function staffBrain(side, dt) {
     staffAct(side, { key: 'sag2screen', strategic: true, title: '突击群回撤加强防空', detail: `掩护群只剩 ${screen} 艘，${inbound} 枚导弹来袭：${sag.map(s => s.name).join('、')}回撤编入掩护群`, ttl: 12, hold: 240,
       run: () => { for (const s of sag) { s.grp = 'screen'; s.sag = false; } jlog(side, '参谋长：突击群回撤加强防空', GOLD); } });
   }
+  // the enemy's intent, read from his weapons
+  const ei = enemyIntent(side);
+  if (ei) lines.push(`敌情研判：敌方打击重心指向${ei.tgt.name}（在途导弹与攻击机折合 ${Math.round(ei.n)}）${ei.tgt.carrier ? '——敌意在我航母' : ''}`);
+  // 5) joint fires: when the war game says one wave can do it
+  const jt = intentTarget(side);
+  if (jt && jt.kind === 'ship' && !(C.jfCd > game.t) && fresh(side, jt, 60)) {
+    const JP = jointFiresPlan(side, jt);
+    if (JP.N >= 16 && JP.x.pk >= 0.45) {
+      lines.push(`联合火力推演：${JP.N} 枚可同时抵达${jt.name}，毁伤概率约 ${Math.round(JP.x.pk * 100)}%`);
+      C.jfCd = game.t + 90;
+      staffAct(side, { key: 'jf:' + jt.key, strategic: true, title: '联合火力打击', detail: jointFiresText(JP), ttl: 25, hold: 180, valid: () => jt.alive && !jt.dying, run: () => jointFires(side, jointFiresPlan(side, jt)) });
+    }
+  }
   // 4) tempo: when the enemy is breaking, go for the kill
   const pm = potential(side) / potential0[side], pf = potential(fo) / potential0[fo];
   lines.push(`战争潜力 我 ${Math.round(pm * 100)}% · 敌（估计）${Math.round(pf / 0.1) * 10}%`);
@@ -885,4 +901,122 @@ function staffBrain(side, dt) {
       run: () => { const i = P.phases.indexOf('exploit'); if (i > C.ph.i) enterPhase(side, i, 'order'); } });
   }
   C.brain = { t: game.t, lines };
+}
+
+/* ---------- 联合火力打击: joint fires with one time on target ----------
+   Every launcher that can reach the target - surface ships, submarines, the Rocket Force's ballistic missiles,
+   the US Navy's maritime-strike Tomahawks - is scheduled so that everything arrives in the same few seconds:
+   the defence meets one wave far beyond its fire channels instead of several it can work through. */
+function jointFiresPlan(side, tgt) {
+  const tp = trackPos(side, tgt, new V3()) || tgt.pos.clone(), tr = picture[side].get(tgt), age = tr ? game.t - tr.t : 999;
+  const items = [], count = { ship: 0, sub: 0, df: 0, mst: 0 };
+  for (const s of ships) if (s.side === side && s.alive && !s.dying && s !== flagship) {
+    const d = s.pos.distanceTo(tp);
+    for (const [k, n] of Object.entries(s.ashm)) {
+      const S = MSL[k]; if (!(n > 0) || S.arm || S.range * 0.95 < d) continue;
+      const v = S.sprint ? (S.v + S.sprint) / 2 : S.profile === 'hyper' ? S.v * 0.8 : S.v;
+      for (let j = 0; j < Math.min(n, s.S.sub ? 4 : 8); j++) { items.push({ kind: s.S.sub ? 'sub' : 'ship', s, k, tof: d / v + 3 }); count[s.S.sub ? 'sub' : 'ship']++; }
+    }
+    if (side === 'us' && tgt.kind === 'ship' && (s.tlamN || 0) > 0) for (let j = 0; j < Math.min(s.tlamN, 12); j++) { items.push({ kind: 'mst', s, k: 'mst', tof: d / MSL.mst.v + 3 }); count.mst++; }
+  }
+  // ballistic missiles need a fix no older than 30 s (they fly 50 s; the target moves 800 m in that time)
+  if (side === 'cn' && tgt.kind === 'ship' && (command.cn.dfN ?? 6) > 0 && age < 30 && tr && !tr.coarse) for (let j = 0; j < 8; j++) { items.push({ kind: 'df', k: j % 2 ? 'df26' : 'df21d', tof: 55 }); count.df++; }
+  // the slowest shooters (subsonic Tomahawks) set the time on target; nothing waits longer than ten minutes
+  const fit = items.filter(i => i.tof < 600).sort((a, b) => (b.kind === 'df') - (a.kind === 'df') || a.tof - b.tof).slice(0, 120);
+  for (const k in count) count[k] = 0;
+  for (const i of fit) count[i.kind]++;
+  const N = fit.length, T = N ? Math.max(...fit.map(i => i.tof)) + 3 : 0;
+  return { tgt, items: fit, N, T, count, x: salvoEstimate(side, tgt, N), age };
+}
+function jointFiresText(P) {
+  const c = P.count, parts = [c.df && `东风 ${c.df} 枚`, c.mst && `海上打击战斧 ${c.mst} 枚`, c.ship && `舰射反舰导弹 ${c.ship} 枚`, c.sub && `潜射 ${c.sub} 枚`].filter(Boolean).join(' + ');
+  return `${parts || '无可用火力'}，共 ${P.N} 枚，统一在 ${Math.round(P.T)} 秒后抵达${P.tgt.name}。敌编队估计拦截能力 ${P.x.D.toFixed(0)} 枚/波，预计命中 ${P.x.hits.toFixed(0)} 枚，毁伤概率约 ${Math.round(P.x.pk * 100)}%。`;
+}
+function jointFires(side, P) {
+  if (!P || !P.N) return 0;
+  const C = command[side], tgt = P.tgt, t0 = game.t;
+  // a Rocket Force wave is one of its six
+  if (P.count.df) { command.cn.dfN = (command.cn.dfN ?? 6) - 1; command.cn.dfCd = Math.max(command.cn.dfCd ?? 0, 300); }
+  for (const it of P.items) {
+    const at = t0 + P.T - it.tof;
+    if (it.kind === 'df') { /* counted above */ }
+    else if (it.kind === 'mst') it.s.tlamN--;
+    else it.s.ashm[it.k]--;
+    pending.push({ t: at, fn: () => {
+      if (!tgt.alive || tgt.dying) return;
+      let m = null;
+      if (it.kind === 'df') m = launchBallistic(side, tgt, it.k);
+      else if (it.s.alive && !it.s.dying) m = launchASHM(it.s, tgt, it.k);
+      if (m && !P.cined && game.t - t0 > 1) { P.cined = true; cineOn('salvo', m); }
+    } });
+  }
+  C.jfCd = game.t + 360;
+  chron(`${SIDES[side].short}联合火力打击：${P.N} 枚导弹统一时间扑向${tgt.name}`, side, true);
+  jlog(side, `联合火力打击 · ${jointFiresText(P)}`, GOLD);
+  if (side === game.side) { radio('联合火力协调', `${side === 'cn' ? '饱和协同打击' : '分布式杀伤'}开始！${jointFiresText(P)}`, GOLD); message('联合火力打击', `${P.N} 枚 · ${Math.round(P.T)} 秒后同时抵达 ${tgt.name}`, GOLD, 3.5); Music.stinger(true); }
+  else if (game.side && game.role !== 'watch') radio('预警', `侦测到敌方大规模协同齐射！多方向、多类型导弹正在升空，判断目标${tgt.name}！`, '#ff5a4f');
+  return P.N;
+}
+// the commander's order: the plan is war-gamed and put to him before it fires
+function orderJointFires(tgt) {
+  const side = game.side, C = command[side];
+  if (!tgt) { message('先指定主攻目标', '在战术地图或目标清单上选择敌舰', '#9fb0ba', 1.8); return; }
+  if (C.jfCd > game.t) { message('联合火力准备中', `${Math.ceil(C.jfCd - game.t)} 秒后可再次组织`, '#9fb0ba', 1.8); return; }
+  const P = jointFiresPlan(side, tgt);
+  if (P.N < 4) { message('火力不足', `只有 ${P.N} 枚导弹能打到${tgt.name}`, '#9fb0ba', 2); return; }
+  decide({ side, title: `联合火力打击 · ${tgt.name}`, text: `参谋部推演：${jointFiresText(P)}${P.age > 30 && side === 'cn' ? '（航迹已超过 30 秒，火箭军不参加——需要新鲜定位）' : ''}`,
+    opts: [{ label: '执行联合火力打击', run: () => jointFires(side, jointFiresPlan(side, tgt)) }, { label: '取消', run: () => {} }], def: 0, done: () => {} });
+}
+
+/* ---------- theatre ISR drones: the kill web's long eyes ----------
+   The PLA's WZ-7 and the US Navy's MQ-4C Triton hold high orbits ahead of their fleets and feed coarse but
+   steady tracks of everything on the surface within ~160 km; flown into a long-range SAM umbrella with the radar
+   on, they get shot down. Each side has two airframes. */
+const UAV = { cn: { name: '无侦-7', n: 2 }, us: { name: 'MQ-4C 人鱼海神', n: 2 } };
+function updateUAV(side, dt) {
+  const C = command[side], U = C.uav || (C.uav = { n: UAV[side].n, up: false, pos: new V3(), next: 60, tick: 0 });
+  if (!U.up) {
+    if (U.n > 0 && game.t > U.next) { U.up = true; if (side === game.side) radio('战区侦察', `${UAV[side].name}进入侦察航线。`, '#9fd4ff'); }
+    return;
+  }
+  const c = fleetCentre(side); if (!c) return;
+  axisDir(side, c, _in1);
+  U.pos.copy(c).addScaledVector(_in1, 60000).setY(16000);
+  U.tick -= dt; if (U.tick > 0) return;
+  U.tick = 15;
+  const foe_ = foe(side);
+  for (const e of ships) if (e.side === foe_ && e.alive && !e.dying && !submerged(e) && Math.hypot(e.pos.x - U.pos.x, e.pos.z - U.pos.z) < 160000 && Math.random() < 0.8) isrFix(side, e, shipQuiet(e) ? 2600 : 1400);
+  // a long-range SAM ship with its radar on near the orbit can reach it
+  const threat = ships.find(e => e.side === foe_ && e.alive && !e.dying && !shipQuiet(e) && (e.sam.sm6 > 0 || e.sam.hhq9 > 0) && Math.hypot(e.pos.x - U.pos.x, e.pos.z - U.pos.z) < 60000);
+  if (threat && Math.random() < 0.18) {
+    U.up = false; U.n--; U.next = game.t + 240;
+    const k = threat.sam.sm6 > 0 ? 'sm6' : 'hhq9'; threat.sam[k]--;
+    chron(`${UAV[side].name}被${threat.name}的${MSL[k].name}击落`, side);
+    if (side === game.side) radio('战区侦察', `${UAV[side].name}被敌${MSL[k].name}击落！${U.n ? '备份机 4 分钟后接替。' : '无人侦察机已全部损失。'}`, '#ff8a78');
+    else if (game.side && game.role !== 'watch') radio('战果', `${threat.name}击落敌${UAV[side].name}高空侦察机！`, '#8dffb4');
+  }
+}
+
+/* ---------- situation reports and the enemy's intent ---------- */
+function sitrep(side) {
+  const C = command[side];
+  if (side !== game.side || game.role === 'watch') return;
+  C.repT = (C.repT ?? 300) - 2;
+  if (C.repT > 0) return;
+  C.repT = 300;
+  const L = game.ledger, fo = foe(side);
+  const pm = Math.round(potential(side) / potential0[side] * 100), pf = Math.round(potential(fo) / potential0[fo] * 20) * 5;
+  const ph = phaseOf(side);
+  const text = `战况通报（${Math.floor(game.t / 60)} 分）：我方损失舰艇 ${L.sunk[side].length} 艘、飞机 ${L.air[side]} 架；敌方损失舰艇 ${L.sunk[fo].length} 艘、飞机 ${L.air[fo]} 架。战争潜力 我 ${pm}% · 敌约 ${pf}%。${ph ? `目前处于「${ph.name}」阶段。` : ''}`;
+  radio('战区指挥部', text, '#ffd28a');
+  jlog(side, text, '#ffd28a');
+}
+// what the enemy is going for, read from his weapons in flight and his strike aircraft
+function enemyIntent(side) {
+  const fo = foe(side), hits = new Map();
+  for (const m of missiles) if (m.alive && m.side === fo && m.cls === 'ashm' && m.target && m.target.side === side) hits.set(m.target, (hits.get(m.target) || 0) + 1);
+  for (const [e] of picture[side]) if (e.kind === 'plane' && e.alive && e.ashmN > 0 && e.task && e.task.target && e.task.target.side === side) hits.set(e.task.target, (hits.get(e.task.target) || 0) + 0.5);
+  let best = null, n = 0;
+  for (const [u, k] of hits) if (k > n) { n = k; best = u; }
+  return best ? { tgt: best, n } : null;
 }

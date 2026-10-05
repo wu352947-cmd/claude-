@@ -174,17 +174,19 @@ const SIDES = {
   cn: {
     id: 'cn', name: '中国人民解放军海军', short: '解放军海军', color: '#ff7a6b', foe: 'us',
     perks: [
-      ['饱和协同打击', '各舰反舰导弹统一时间齐射；鹰击-18 末段三倍音速突防，鹰击-21 高超音速俯冲。'],
-      ['岛礁要塞', '岛礁机场起降歼-16 与轰-6K，岛上远程雷达与红旗-9 阵地扩展防御圈。'],
-      ['电磁弹射', '福建舰三条电磁弹射器，满载起飞歼-15T、歼-35 与空警-600。']
+      ['侦察-打击体系', '遥感卫星、天波超视距雷达、无侦-7 高空无人机与空警-600 编织杀伤网；只要拿到 30 秒内的精确航迹，火箭军就能出手。'],
+      ['火箭军', '六个波次、每波 8 枚东风-21D / 26 反舰弹道导弹，从大气层边缘俯冲，单发即可重创驱逐舰；标准-3 是唯一的克星。'],
+      ['饱和协同打击', '鹰击-18 末段三倍音速、鹰击-21 高超音速；联合火力打击让舰射、潜射与东风在同一秒抵达。'],
+      ['岛礁要塞与陆基航空兵', '永暑礁机场起降歼-16 与轰-6K（每机 4 枚鹰击-12）；歼-15D 以鹰击-91 反辐射导弹压制宙斯盾雷达。']
     ]
   },
   us: {
     id: 'us', name: '美国海军', short: '美国海军', color: '#7fb7ff', foe: 'cn',
     perks: [
-      ['协同作战能力 CEC', '舰空导弹可用 E-2D 与友舰数据拦截本舰雷达地平线以外的目标；标准-6 射程最远。'],
-      ['隐身舰载航空', '福特号舰载机联队规模更大，F-35C 雷达截面极小，F/A-18E 挂载 LRASM 远程反舰导弹。'],
-      ['远程轰炸', 'B-1B 编队从战区外分批突入，每架携带 4 枚 LRASM。']
+      ['协同作战能力 CEC / NIFC-CA', '每艘宙斯盾舰都能用 E-2D 与友舰的航迹开火，标准-6 拦截地平线以外的目标；标准-3 在大气层外拦截东风。'],
+      ['分布式杀伤', '两百余枚海上打击型战斧分布在每一艘驱逐舰与潜艇的垂发单元里；联合火力打击一次可齐射上百枚。'],
+      ['隐身与电子战', 'F-35C 先敌发现、先敌开火；EA-18G 以 AARGM-ER 反辐射导弹摧毁敌舰雷达；MQ-4C 人鱼海神提供持续海面监视。'],
+      ['远程轰炸', '关岛 B-1B 双机编队从战区外突入，每架携带 8 枚隐身 LRASM。']
     ]
   }
 };
@@ -197,13 +199,13 @@ const AC = {
   j35:   { name: '歼-35', side: 'cn', model: 'j35', hp: 110, radius: 7.5, pitch: 0.9, roll: 2.6, mil: 62, ab: 108, drag: 6.8e-4, vs: 62, rcs: 0.4, srm: 2, mrm: 4, srmType: 'pl10', mrmType: 'pl15', ashm: 0, ammo: 180, cm: 24, radar: 46000, fuel: 1800, value: 16, gearH: 2.3, role: 'fighter', cat: true },
   kj600: { name: '空警-600', side: 'cn', model: 'kj600', hp: 80, radius: 13, pitch: 0.3, roll: 0.8, mil: 34, ab: 34, drag: 9e-4, vs: 52, rcs: 1.3, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 12, radar: 130000, aew: true, fuel: 3200, value: 22, gearH: 2.2, role: 'aew', cat: true },
   j16:   { name: '歼-16', side: 'cn', model: 'j16', hp: 140, radius: 9, pitch: 0.82, roll: 2.2, mil: 60, ab: 106, drag: 7.1e-4, vs: 68, rcs: 1, srm: 2, mrm: 4, srmType: 'pl10', mrmType: 'pl15', ashm: 2, ashmType: 'yj12', ammo: 150, cm: 24, radar: 44000, fuel: 2100, value: 12, gearH: 2.6, role: 'multi' },
-  j15d:  { name: '歼-15D 电子战机', side: 'cn', model: 'j15', hp: 130, radius: 9, pitch: 0.78, roll: 2.1, mil: 58, ab: 104, drag: 7.4e-4, vs: 66, rcs: 1.1, srm: 0, mrm: 2, srmType: 'pl10', mrmType: 'pl15', ashm: 0, ammo: 150, cm: 30, radar: 42000, fuel: 1700, value: 18, gearH: 2.6, role: 'ew', ew: true, cat: true },
-  h6k:   { name: '轰-6K', side: 'cn', model: 'h6k', hp: 380, radius: 16, pitch: 0.26, roll: 0.6, mil: 40, ab: 40, drag: 5.4e-4, vs: 78, rcs: 1.6, srm: 0, mrm: 0, ashm: 2, ashmType: 'yj12', ammo: 0, cm: 16, radar: 30000, fuel: 3000, value: 25, gearH: 3, role: 'bomber' },
+  j15d:  { name: '歼-15D 电子战机', side: 'cn', model: 'j15', hp: 130, radius: 9, pitch: 0.78, roll: 2.1, mil: 58, ab: 104, drag: 7.4e-4, vs: 66, rcs: 1.1, srm: 0, mrm: 2, srmType: 'pl10', mrmType: 'pl15', ashm: 0, ammo: 150, cm: 30, radar: 42000, fuel: 1700, value: 18, gearH: 2.6, role: 'ew', ew: true, cat: true, arm: 2, armType: 'yj91' },
+  h6k:   { name: '轰-6K', side: 'cn', model: 'h6k', hp: 380, radius: 16, pitch: 0.26, roll: 0.6, mil: 40, ab: 40, drag: 5.4e-4, vs: 78, rcs: 1.6, srm: 0, mrm: 0, ashm: 4, ashmType: 'yj12', ammo: 0, cm: 16, radar: 30000, fuel: 3000, value: 25, gearH: 3, role: 'bomber' },
   fa18:  { name: 'F/A-18E', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.86, roll: 2.4, mil: 56, ab: 100, drag: 7.2e-4, vs: 60, rcs: 0.9, srm: 2, mrm: 4, srmType: 'aim9', mrmType: 'aim120', ashm: 2, ashmType: 'lrasm', ammo: 400, cm: 24, radar: 44000, fuel: 1650, value: 12, gearH: 2.4, role: 'multi', cat: true },
   f35c:  { name: 'F-35C', side: 'us', model: 'f35c', hp: 105, radius: 7, pitch: 0.86, roll: 2.4, mil: 60, ab: 100, drag: 7.0e-4, vs: 58, rcs: 0.3, srm: 0, mrm: 4, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 180, cm: 20, radar: 48000, fuel: 1800, value: 16, gearH: 2.2, role: 'fighter', cat: true },
-  ea18g: { name: 'EA-18G 咆哮者', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.82, roll: 2.3, mil: 56, ab: 100, drag: 7.5e-4, vs: 60, rcs: 1, srm: 0, mrm: 2, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 0, cm: 30, radar: 44000, fuel: 1650, value: 18, gearH: 2.4, role: 'ew', ew: true, cat: true },
+  ea18g: { name: 'EA-18G 咆哮者', side: 'us', model: 'fa18', hp: 120, radius: 8, pitch: 0.82, roll: 2.3, mil: 56, ab: 100, drag: 7.5e-4, vs: 60, rcs: 1, srm: 0, mrm: 2, srmType: 'aim9', mrmType: 'aim120', ashm: 0, ammo: 0, cm: 30, radar: 44000, fuel: 1650, value: 18, gearH: 2.4, role: 'ew', ew: true, cat: true, arm: 2, armType: 'aargm' },
   e2d:   { name: 'E-2D', side: 'us', model: 'e2d', hp: 80, radius: 13, pitch: 0.3, roll: 0.8, mil: 34, ab: 34, drag: 9e-4, vs: 52, rcs: 1.3, srm: 0, mrm: 0, ashm: 0, ammo: 0, cm: 12, radar: 140000, aew: true, fuel: 3200, value: 22, gearH: 2.2, role: 'aew', cat: true },
-  b1b:   { name: 'B-1B', side: 'us', model: 'b1b', hp: 460, radius: 17, pitch: 0.3, roll: 0.7, mil: 62, ab: 80, drag: 4.8e-4, vs: 80, rcs: 0.9, srm: 0, mrm: 0, ashm: 4, ashmType: 'lrasm', ammo: 0, cm: 30, radar: 30000, fuel: 2400, value: 25, gearH: 3, role: 'bomber' }
+  b1b:   { name: 'B-1B', side: 'us', model: 'b1b', hp: 460, radius: 17, pitch: 0.3, roll: 0.7, mil: 62, ab: 80, drag: 4.8e-4, vs: 80, rcs: 0.9, srm: 0, mrm: 0, ashm: 8, ashmType: 'lrasm', ammo: 0, cm: 30, radar: 30000, fuel: 2400, value: 25, gearH: 3, role: 'bomber' }
 };
 /* ---------- weapons ---------- */
 // air-to-air: seeker ir / radar as in 猛禽制空
@@ -243,17 +245,17 @@ const CIWS_PK = { sub: 0.32, super: 0.16, high: 0.2, hyper: 0.06, plane: 0.3 };
 // sonar = range (m) at which the hull sonar / towed array can hold a submarine, asw = anti-submarine rockets, torps = heavyweight torpedoes,
 // tlam = Tomahawk land-attack, sm3 = exo-atmospheric interceptors against ballistic missiles. wing = full-load air wing.
 const CLS = {
-  fujian:   { model: 'fujian', side: 'cn', type: '福建舰 · 电磁弹射航母', hp: 4400, vmax: 16, turn: 0.9, mast: 48, radar: 100000, carrier: true, sam: { hhq10: 24 }, ashm: {}, channels: 4, ciws: 3, decoys: 10, value: 300, wing: { j35: 20, j15: 24, j15d: 4, kj600: 4 }, top: 22, L: 316, B: 76, sonar: 0 },
-  shandong: { model: 'shandong', side: 'cn', type: '山东舰 · 滑跃起飞航母', hp: 3700, vmax: 15.5, turn: 0.95, mast: 44, radar: 90000, carrier: true, sam: { hhq10: 18 }, ashm: {}, channels: 3, ciws: 3, decoys: 8, value: 220, wing: { j15: 32 }, top: 22, L: 305, B: 75, sonar: 0 },
-  t055:     { model: 't055', side: 'cn', type: '055 型万吨大驱', hp: 1100, vmax: 15.5, turn: 1.6, mast: 40, radar: 115000, sam: { hhq9: 48, hhq10: 24 }, ashm: { yj21: 4, yj18: 14 }, channels: 8, ciws: 1, decoys: 8, gun: 'h130', value: 130, top: 30, L: 180, B: 20, sonar: 18000, asw: 8, rcs: 0.7 },
-  t052d:    { model: 't052d', side: 'cn', type: '052D 型驱逐舰', hp: 800, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 10 }, channels: 6, ciws: 1, decoys: 8, gun: 'h130', value: 80, top: 26, L: 157, B: 18, sonar: 15000, asw: 6 },
-  t054a:    { model: 't054a', side: 'cn', type: '054A 型护卫舰', hp: 560, vmax: 14.5, turn: 2, mast: 28, radar: 80000, sam: { hhq16: 32 }, ashm: { yj83: 8 }, channels: 4, ciws: 1, decoys: 6, gun: 'h76', value: 50, top: 22, L: 134, B: 16, sonar: 22000, asw: 12 },
-  t093b:    { model: 't093b', side: 'cn', type: '093B 型攻击核潜艇', sub: true, hp: 420, vmax: 15, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { yj18: 6 }, torps: 18, torpType: 'yu6', channels: 0, ciws: 0, decoys: 6, value: 90, top: 9, L: 110, B: 11, sonar: 42000 },
-  ford:     { model: 'ford', side: 'us', type: '福特级核动力航母', hp: 4800, vmax: 16.5, turn: 0.9, mast: 50, radar: 100000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 340, wing: { fa18: 40, ea18g: 5, f35c: 10, e2d: 5 }, top: 24, L: 333, B: 78, sonar: 0 },
-  reagan:   { model: 'reagan', side: 'us', type: '尼米兹级核动力航母', hp: 4400, vmax: 16, turn: 0.9, mast: 48, radar: 95000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 300, wing: { fa18: 36, ea18g: 5, f35c: 10, e2d: 4 }, top: 24, L: 333, B: 77, sonar: 0 },
-  tico:     { model: 'tico', side: 'us', type: '提康德罗加级巡洋舰', hp: 950, vmax: 16, turn: 1.6, mast: 36, radar: 110000, sam: { sm6: 22, sm2: 40 }, ashm: { harpoon: 8, sm6s: 6 }, channels: 8, ciws: 2, decoys: 10, gun: 'mk45', value: 100, top: 28, L: 173, B: 17, sonar: 18000, asw: 8, tlam: 16, sm3: 4 },
-  burke:    { model: 'burke', side: 'us', type: '阿利·伯克级驱逐舰', hp: 820, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20, sonar: 18000, asw: 6, tlam: 8, sm3: 2 },
-  virginia: { model: 'virginia', side: 'us', type: '弗吉尼亚级攻击核潜艇', sub: true, hp: 420, vmax: 16, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { harpoon: 4 }, tlam: 12, torps: 22, torpType: 'mk48', channels: 0, ciws: 0, decoys: 6, value: 100, top: 9, L: 115, B: 10.4, sonar: 46000 }
+  fujian:   { model: 'fujian', side: 'cn', type: '福建舰 · 电磁弹射航母', hp: 3000, vmax: 16, turn: 0.9, mast: 48, radar: 100000, carrier: true, sam: { hhq10: 24 }, ashm: {}, channels: 4, ciws: 3, decoys: 10, value: 300, wing: { j35: 20, j15: 24, j15d: 4, kj600: 4 }, top: 22, L: 316, B: 76, sonar: 0 },
+  shandong: { model: 'shandong', side: 'cn', type: '山东舰 · 滑跃起飞航母', hp: 2500, vmax: 15.5, turn: 0.95, mast: 44, radar: 90000, carrier: true, sam: { hhq10: 18 }, ashm: {}, channels: 3, ciws: 3, decoys: 8, value: 220, wing: { j15: 32 }, top: 22, L: 305, B: 75, sonar: 0 },
+  t055:     { model: 't055', side: 'cn', type: '055 型万吨大驱', hp: 720, vmax: 15.5, turn: 1.6, mast: 40, radar: 115000, sam: { hhq9: 48, hhq10: 24 }, ashm: { yj21: 8, yj18: 16 }, channels: 8, ciws: 1, decoys: 8, gun: 'h130', value: 130, top: 30, L: 180, B: 20, sonar: 18000, asw: 8, rcs: 0.7 },
+  t052d:    { model: 't052d', side: 'cn', type: '052D 型驱逐舰', hp: 520, vmax: 15.5, turn: 1.8, mast: 34, radar: 100000, sam: { hhq9: 32 }, ashm: { yj18: 12, yj21: 4 }, channels: 6, ciws: 1, decoys: 8, gun: 'h130', value: 80, top: 26, L: 157, B: 18, sonar: 15000, asw: 6 },
+  t054a:    { model: 't054a', side: 'cn', type: '054A 型护卫舰', hp: 380, vmax: 14.5, turn: 2, mast: 28, radar: 80000, sam: { hhq16: 32 }, ashm: { yj83: 8 }, channels: 4, ciws: 1, decoys: 6, gun: 'h76', value: 50, top: 22, L: 134, B: 16, sonar: 22000, asw: 12 },
+  t093b:    { model: 't093b', side: 'cn', type: '093B 型攻击核潜艇', sub: true, hp: 300, vmax: 15, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { yj18: 8 }, torps: 18, torpType: 'yu6', channels: 0, ciws: 0, decoys: 6, value: 90, top: 9, L: 110, B: 11, sonar: 42000 },
+  ford:     { model: 'ford', side: 'us', type: '福特级核动力航母', hp: 3300, vmax: 16.5, turn: 0.9, mast: 50, radar: 100000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 340, wing: { fa18: 40, ea18g: 5, f35c: 10, e2d: 5 }, top: 24, L: 333, B: 78, sonar: 0 },
+  reagan:   { model: 'reagan', side: 'us', type: '尼米兹级核动力航母', hp: 3100, vmax: 16, turn: 0.9, mast: 48, radar: 95000, carrier: true, sam: { essm: 16, ram: 21 }, ashm: {}, channels: 4, ciws: 3, decoys: 12, value: 300, wing: { fa18: 36, ea18g: 5, f35c: 10, e2d: 4 }, top: 24, L: 333, B: 77, sonar: 0 },
+  tico:     { model: 'tico', side: 'us', type: '提康德罗加级巡洋舰', hp: 640, vmax: 16, turn: 1.6, mast: 36, radar: 110000, sam: { sm6: 22, sm2: 40 }, ashm: { harpoon: 8, sm6s: 8 }, channels: 8, ciws: 2, decoys: 10, gun: 'mk45', value: 100, top: 28, L: 173, B: 17, sonar: 18000, asw: 8, tlam: 32, sm3: 8 },
+  burke:    { model: 'burke', side: 'us', type: '阿利·伯克级驱逐舰', hp: 560, vmax: 16, turn: 1.8, mast: 34, radar: 110000, sam: { sm6: 14, sm2: 22, essm: 24 }, ashm: { harpoon: 8, sm6s: 4 }, channels: 6, ciws: 2, decoys: 10, gun: 'mk45', value: 80, top: 26, L: 155, B: 20, sonar: 18000, asw: 6, tlam: 24, sm3: 4 },
+  virginia: { model: 'virginia', side: 'us', type: '弗吉尼亚级攻击核潜艇', sub: true, hp: 300, vmax: 16, turn: 2.6, mast: 10, radar: 0, sam: {}, ashm: { harpoon: 4 }, tlam: 16, torps: 22, torpType: 'mk48', channels: 0, ciws: 0, decoys: 6, value: 100, top: 9, L: 115, B: 10.4, sonar: 46000 }
 };
 // fleets: [class, name, hull number, station ahead (m), station to starboard (m)] in the guide carrier's frame.
 // Submarines patrol ahead of the screen on their own.
@@ -508,7 +510,7 @@ class Plane {
     this.state = 'air'; this.gear = 0; this.hook = false; this.landing = false; this.cat = null; this.catT = 0; this.deckT = 0;
     this.role = 'cap'; this.task = null; this.chaffT = -9;
   }
-  rearm() { const T = this.T; Object.assign(this, { srm: T.srm, mrm: T.mrm, ashmN: T.ashm, ammo: T.ammo, cm: T.cm, fuel: T.fuel, hp: this.maxHp || T.hp }); }
+  rearm() { const T = this.T; Object.assign(this, { srm: T.srm, mrm: T.mrm, ashmN: T.ashm, armN: T.arm || 0, ammo: T.ammo, cm: T.cm, fuel: T.fuel, hp: this.maxHp || T.hp }); }
   axes() {
     this.fwd.set(1, 0, 0).applyQuaternion(this.q);
     this.up.set(0, 1, 0).applyQuaternion(this.q);
@@ -801,7 +803,9 @@ function killPlayer(cause) {
 }
 function damageShip(s, dmg, src, at) {
   if (!s.alive || s.dying) return;
-  s.hp -= dmg; s.hitT = game.t;
+  // a supercarrier's size and compartmentation absorb a share of every blast
+  if (s.carrier) dmg *= 0.8;
+  s.hp -= dmg; s.hitT = game.t; s.struct = (s.struct || 0) + dmg * 0.75;
   const wasFire = s.fires > 0.5;
   s.fires = Math.min(6, s.fires + (src && src.kind === 'torp' ? 0.3 : dmg > 60 ? 1 : 0.4));
   if (playerOwns(src)) { ribbon(src.kind === 'gun' ? '命中' : src.kind === 'torp' ? '鱼雷命中' : '导弹命中', '#ffd28a'); if (!wasFire && s.fires > 0.5) ribbon('起火', '#ff9a4a'); }
@@ -961,7 +965,13 @@ function updateASHM(m, i, dt) {
     let inside = false;
     for (let k = 1; k <= steps && !inside; k++) { _d.lerpVectors(m.prev, m.pos, k / steps); inside = insideShip(s, _d, 2); }
     if (inside && tac(s.side).navy === 'disperse' && !m.evaded) { m.evaded = true; if (Math.random() < 0.15) { if (mine(s)) radio(s.name, '规避机动成功，导弹从舰旁掠过！', '#9fd4ff'); continue; } }
-    if (inside) { m.pos.copy(_d); dbg.hit++; dbg.hitBy[m.side]++; if (m.pkg) m.pkg.hits = (m.pkg.hits || 0) + 1; damageShip(s, S.dmg * rand(0.8, 1.2), { owner: m.owner, kind: 'missile', name: S.name }, m.pos.clone()); endMissile(m, i, false); return; }
+    if (inside) {
+      m.pos.copy(_d); dbg.hit++; dbg.hitBy[m.side]++; if (m.pkg) m.pkg.hits = (m.pkg.hits || 0) + 1;
+      damageShip(s, S.dmg * rand(0.8, 1.2), { owner: m.owner, kind: 'missile', name: S.name }, m.pos.clone());
+      // an anti-radiation hit takes the radar out: half the fire channels, half the detection range
+      if (S.arm && !s.radarDmg) { s.radarDmg = true; s.channels = Math.max(1, Math.floor(s.channels / 2)); radio(mine(s) ? s.name : '战果', mine(s) ? '雷达阵面被反辐射导弹摧毁！火控通道减半！' : `${s.name}雷达被摧毁！`, mine(s) ? '#ff5a4f' : '#8dffb4'); chron(`${s.name}雷达被反辐射导弹摧毁`, s.side); }
+      endMissile(m, i, false); return;
+    }
   }
   for (const b of bases) if (b.alive && b.side !== m.side && m.pos.distanceTo(b.pos) < 900 && m.pos.y < 40) { damageBase(b, S.dmg, { owner: m.owner }, m.pos.clone()); endMissile(m, i, false); return; }
   m.dist = (m.dist || 0) + m.speed * dt;
@@ -974,6 +984,7 @@ function acquire(m) {
   let best = null, bs = 1e9;
   for (const s of ships) {
     if (!s.alive || s.dying || s.side === m.side || submerged(s)) continue;
+    if (m.spec.arm && (shipQuiet(s) || s.radarDmg)) continue;      // an anti-radiation seeker needs an emitter
     _a.subVectors(s.pos, m.pos).setY(0);
     const d = _a.length();
     if (d > 22000) continue;
@@ -1531,6 +1542,18 @@ function roleFly(pl, d, c, out, dt) {
       // inside jamming range of the target group (90 km) but outside its area-defence missiles
       const L = task.pkg;
       const tgt = task.on && task.on.alive && !task.on.dying ? task.on : intentTarget(pl.side);
+      // SEAD: an anti-radiation missile at the nearest enemy ship whose radar is on (a ship under EMCON gives it
+      // nothing to home on); one shot every 20 s
+      if (pl.armN > 0 && !(pl.armT > game.t)) {
+        let best = null, bd = MSL[pl.T.armType].range * 0.9;
+        for (const [e, tr] of picture[pl.side]) if (e.kind === 'ship' && e.alive && !e.dying && !e.phantom && !e.S.sub && !e.radarDmg && !shipQuiet(e)) { const d0 = tr.pos.distanceTo(pl.pos); if (d0 < bd) { bd = d0; best = e; } }
+        if (best) {
+          pl.armT = game.t + 20; pl.armN--;
+          launchASHM(pl, best, pl.T.armType);
+          if (mine(pl)) radio(pl.name, `${MSL[pl.T.armType].name}发射，压制${best.name}的雷达！`, '#9fd4ff');
+          else if (mine(best) && Math.random() < 0.6) radio(best.name, '反辐射导弹来袭！', '#ff8a78');
+        }
+      }
       if (L && L.alive && !L.dying && L.role === 'strike' && L.ashmN > 0) {
         P.mode = 'ewesc';
         const slot = _ai3.copy(L.pos).addScaledVector(L.right, 320).addScaledVector(L.fwd, -900).setY(Math.max(L.pos.y + 900, 1500));
@@ -2072,7 +2095,7 @@ function updateShip(s, dt) {
   // fires burn until damage control puts them out
   // damage control: crews fight fires and flooding; a focused effort (player order, or the AI when burning) works much faster
   s.dcCd -= dt;
-  if (s.dcT > 0) { s.dcT -= dt; s.fires = Math.max(0, s.fires - dt * 0.08); s.hp = Math.min(s.maxHp * 0.85, s.hp + s.maxHp * 0.0025 * dt); s.list *= Math.exp(-dt * 0.05); }
+  if (s.dcT > 0) { s.dcT -= dt; s.fires = Math.max(0, s.fires - dt * 0.08); s.hp = Math.min(s.maxHp - (s.struct || 0), s.hp + s.maxHp * 0.0008 * dt); s.list *= Math.exp(-dt * 0.05); }
   if (s.fires > 0) { s.hp -= s.fires * 0.5 * dt; s.fires = Math.max(0, s.fires - dt * 0.012); shipSmoke(s, s.fires); if (s.hp <= 0) sinkShip(s, null); }
   fwdOf(s.heading, _a);
   if (!submerged(s)) world.wakeTrack(s, s.pos.x, s.pos.z, _a.x, _a.z, s.speed * tact(s).move, s.S.L, s.carrier ? 40 : s.S.B);
@@ -2230,21 +2253,22 @@ function updateCommand(side, dt) {
   // --- strategic strikes: the PLA Rocket Force against carriers, US Tomahawks against the island ---
   if (side === 'cn') {
     C.dfCd = (C.dfCd ?? 300) - dt;
-    if (C.dfCd <= 0 && (C.dfN ?? 4) > 0) {
-      const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && game.t - tr.t < 30);
+    if (C.dfCd <= 0 && (C.dfN ?? 6) > 0) {
+      // the kill chain: a ballistic shot needs a precise track (radar, not a satellite's coarse fix) under 30 s old
+      const cvT = [...picture.cn].find(([e, tr]) => e.kind === 'ship' && e.carrier && e.alive && !e.dying && !e.phantom && game.t - tr.t < 30 && !tr.coarse);
       if (!cvT) C.dfCd = 20;
-      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求东风齐射 4 枚`, ttl: 15, run: () => { if (rocketForce('cn', 4, (C.dfN ?? 4) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 4) - 1; C.dfCd = 420; } } }); }
+      else { C.dfCd = 90; staffAct('cn', { key: 'df', title: '请求火箭军打击', detail: `${cvT[0].name}航迹新鲜（${Math.round(game.t - cvT[1].t)} s），请求一个波次 8 枚东风齐射（剩余 ${C.dfN ?? 6} 个波次）`, ttl: 15, run: () => { if (rocketForce('cn', 8, (C.dfN ?? 6) % 2 ? 'df26' : 'df21d')) { C.dfN = (C.dfN ?? 6) - 1; C.dfCd = 300; } } }); }
     }
   } else {
     C.tlamCd = (C.tlamCd ?? 150) - dt;
     const b = bases.find(x => x.alive && known('us', x));
-    if (C.tlamCd <= 0 && b) { C.tlamCd = 120; if (release('us', b) !== 'no') staffAct('us', { key: 'tlam', title: '战斧对陆打击', detail: `16 枚战斧打击${b.name}跑道与雷达`, ttl: 20, run: () => { C.tlamCd = tomahawk('us', b, 16) ? 300 : 30; } }); }
+    if (C.tlamCd <= 0 && b) { C.tlamCd = 120; if (release('us', b) !== 'no') staffAct('us', { key: 'tlam', title: '战斧对陆打击', detail: `24 枚战斧打击${b.name}跑道、机库与雷达`, ttl: 20, run: () => { C.tlamCd = tomahawk('us', b, 24) ? 300 : 30; } }); }
     // maritime-strike Tomahawks: the surface fleet's long arm against ships, on the main target first
     C.mstCd = (C.mstCd ?? 120) - dt;
     const t = main && main.kind === 'ship' && fresh('us', main, 120) ? main : bestTarget('us', guide ? guide.pos : ZERO, 400000);
     const held = t && (C.pkgs || []).some(k => k.tgt === t && (k.phase === 'form' || k.phase === 'push') && !k.jointDone && game.t - k.t < 300);
     const rel = t && release('us', t);
-    if (C.mstCd <= 0 && t && t.kind === 'ship' && !held && rel !== 'no') { C.mstCd = 90; staffAct('us', { key: 'mst:' + t.key, title: '海上打击型战斧', detail: `8 枚 MST 打击${t.name}`, ttl: 18, valid: () => t.alive && !t.dying, run: () => { C.mstCd = tomahawk('us', t, 8) ? 150 : 30; } }); }
+    if (C.mstCd <= 0 && t && t.kind === 'ship' && !held && rel !== 'no') { C.mstCd = 90; staffAct('us', { key: 'mst:' + t.key, title: '海上打击型战斧', detail: `24 枚 MST 分布式齐射打击${t.name}`, ttl: 18, valid: () => t.alive && !t.dying, run: () => { C.mstCd = tomahawk('us', t, 24) ? 160 : 30; } }); }
   }
   // --- ship-launched anti-ship salvos (player's own ship fires only on the player's order) ---
   C.salvoCd -= dt;
@@ -2476,12 +2500,15 @@ function potential(side) {
   for (const s of ships) if (s.side === side && s.alive && !s.dying) p += s.value * (0.5 + 0.5 * s.hp / s.maxHp);
   for (const b of bases) if (b.side === side && b.alive) p += b.value * (0.5 + 0.5 * b.hp / b.maxHp);
   for (const h of ships.concat(bases)) if (h.side === side && h.alive && !h.dying) {
-    for (const [t, n] of Object.entries(h.hangar)) p += AC[t].value * n;
-    for (const r of h.ready) p += AC[r.type].value;
+    for (const [t, n] of Object.entries(h.hangar)) p += AC[t].value * n * 0.45;
+    for (const r of h.ready) p += AC[r.type].value * 0.45;
   }
-  for (const pl of planes) if (pl.side === side && pl.alive && !pl.dying) p += pl.value;
-  if (side === 'us') p += command.us.b1b * AC.b1b.value;
-  if (side === 'cn' && bases.some(b => b.alive)) p += 3 * AC.h6k.value;
+  for (const pl of planes) if (pl.side === side && pl.alive && !pl.dying) p += pl.value * 0.45;
+  if (side === 'us') p += command.us.b1b * AC.b1b.value * 0.45;
+  if (side === 'cn' && bases.some(b => b.alive)) p += 3 * AC.h6k.value * 0.45;
+  // what is left in the magazines: a fleet with empty cells cannot fight on
+  for (const s of ships) if (s.side === side && s.alive && !s.dying) p += (Object.values(s.ashm).reduce((a, b) => a + b, 0) + (s.tlamN || 0)) * 2;
+  if (side === 'cn') p += (command.cn.dfN ?? 6) * 30;
   return p;
 }
 const potential0 = { cn: 1, us: 1 };
@@ -3704,7 +3731,7 @@ function checkEnd(dt) {
     const alive = ships.some(s => s.side === side && s.alive && !s.dying) || bases.some(b => b.side === side && b.alive);
     const p = potential(side) / potential0[side];
     const carriers = ships.some(s => s.side === side && s.carrier && s.alive && !s.dying);
-    if (!alive || p < 0.4 || (!carriers && p < 0.55)) { finish(foe(side), `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`); return; }
+    if (!alive || p < 0.33 || (!carriers && p < 0.42)) { finish(foe(side), `${SIDES[side].name}${!carriers ? '航母全部损失，' : ''}战争潜力${alive ? '崩溃' : '归零'}`); return; }
   }
   // campaign deadline: after 45 minutes both fleets are spent; a close result is a strategic stalemate
   if (game.t > 2700) {
