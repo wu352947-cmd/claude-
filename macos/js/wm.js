@@ -6,11 +6,11 @@
 
   /* ---------- Spaces ---------- */
   OS.spaces = { list: [], current: 0 };
-  function makeSpace() {
+  function makeSpace(at = OS.spaces.list.length) {
     const el = h('div.space');
     $('#spaces-track').appendChild(el);
     const s = { id: OS.uid(), el };
-    OS.spaces.list.push(s);
+    OS.spaces.list.splice(at, 0, s);
     layoutSpaces();
     OS.emit('spaces');
     return s;
@@ -19,7 +19,33 @@
     OS.spaces.list.forEach((s, i) => (s.el.style.left = i * 100 + '%'));
     $('#spaces-track').style.transform = `translateX(${-OS.spaces.current * 100}%)`;
     parkSpaces();
+    syncFullscreen();
   }
+  function syncFullscreen() {
+    const cur = OS.spaces.currentSpace();
+    const full = wm.windows.some((w) => w.state === 'full' && !w.closed && w.space === cur);
+    document.body.classList.toggle('has-fullscreen', full);
+  }
+  wm.syncFullscreen = syncFullscreen;
+  // a full-screen app lives in its own Space, right after the desktop it came from (like macOS)
+  function dropSpace(s) {
+    const i = OS.spaces.list.indexOf(s);
+    if (i < 0) return;
+    wm.windows.filter((w) => w.space === s && !w.closed).forEach((w) => {
+      const to = OS.spaces.list[Math.max(0, i - 1)];
+      w.space = to;
+      to.el.appendChild(w.el);
+    });
+    s.el.remove();
+    OS.spaces.list.splice(i, 1);
+    if (OS.spaces.current > i) OS.spaces.current--;
+    OS.spaces.current = Math.min(OS.spaces.current, OS.spaces.list.length - 1);
+    const track = $('#spaces-track');
+    track.style.transition = 'none';
+    layoutSpaces();
+    OS.emit('spaces');
+  }
+  wm.dropSpace = dropSpace;
   // Spaces that are off screen leave the render tree entirely once the slide has settled
   let parkTimer = 0;
   OS.spaces.wake = () => (clearTimeout(parkTimer), OS.spaces.list.forEach((s) => s.el.classList.remove('away')));
@@ -32,6 +58,7 @@
   OS.spaces.remove = (i) => {
     if (OS.spaces.list.length <= 1) return;
     const s = OS.spaces.list[i];
+    if (s.fsWin) return wm.toggleFull(s.fsWin, false);
     const target = OS.spaces.list[i === 0 ? 1 : i - 1];
     wm.windows.filter((w) => w.space === s).forEach((w) => {
       w.space = target;
@@ -466,19 +493,62 @@
   wm.toggleFull = (win, on) => {
     if (win.app.resizable === false) return;
     on = on ?? win.state !== 'full';
+    if (on === (win.state === 'full')) return;
+    const own = OS.settings.fullscreenSpace !== false && !OS.reducedMotion();
     if (on) {
       if (win.state !== 'max' && win.state !== 'tiled') win.saved = { ...win.bounds };
       win.state = 'full';
       const { w, h: H } = wm.screen();
       win.el.classList.add('fullscreen');
-      document.body.classList.add('has-fullscreen');
-      animateBounds(win, { x: 0, y: 0, w, h: H }, 420);
-      wm.focus(win);
+      if (own) {
+        // grow in place, then slide into a brand new Space
+        const from = win.space;
+        const s = makeSpace(OS.spaces.list.indexOf(from) + 1);
+        s.fsWin = win;
+        win.fsSpace = s;
+        win.fsFrom = from;
+        animateBounds(win, { x: 0, y: 0, w, h: H }, 300);
+        setTimeout(() => {
+          if (win.closed || win.fsSpace !== s) return;
+          if (win._flip) win._flip.finish();
+          s.el.appendChild(win.el);
+          win.space = s;
+          OS.spaces.go(OS.spaces.list.indexOf(s));
+          wm.focus(win);
+          OS.emit('spaces');
+        }, 280);
+        if (!win._fsHook) {
+          win._fsHook = true;
+          win.on('close', () => {
+            const s2 = win.fsSpace;
+            if (!s2) return;
+            win.fsSpace = null;
+            const back = OS.spaces.list.includes(win.fsFrom) ? win.fsFrom : OS.spaces.list[0];
+            if (OS.spaces.currentSpace() === s2) OS.spaces.go(OS.spaces.list.indexOf(back));
+            setTimeout(() => dropSpace(s2), OS.spring("gentle").duration + 60);
+          });
+        }
+      } else {
+        animateBounds(win, { x: 0, y: 0, w, h: H }, 420);
+        wm.focus(win);
+      }
+      syncFullscreen();
     } else {
       win.state = 'normal';
       win.el.classList.remove('fullscreen');
-      document.body.classList.toggle('has-fullscreen', wm.windows.some((w) => w.state === 'full' && w !== win));
-      animateBounds(win, win.saved || win.bounds, 420);
+      const s = win.fsSpace;
+      if (s) {
+        // slide back to the original desktop, then shrink back to the old frame
+        win.fsSpace = null;
+        const back = OS.spaces.list.includes(win.fsFrom) ? win.fsFrom : OS.spaces.list[0];
+        back.el.appendChild(win.el);
+        win.space = back;
+        OS.spaces.go(OS.spaces.list.indexOf(back));
+        wm.focus(win);
+        setTimeout(() => animateBounds(win, win.saved || win.bounds, 380), 260);
+        setTimeout(() => dropSpace(s), OS.spring("gentle").duration + 60);
+      } else animateBounds(win, win.saved || win.bounds, 420);
+      syncFullscreen();
     }
     OS.emit('windows');
   };
@@ -591,6 +661,31 @@
     const prev = $('#snap-preview');
     const el = win.el;
     let base = null; // the left/top the element is laid out at; motion happens via transform
+    // magnetic edges: other windows on this Space plus the usable screen area
+    const SNAP = 10;
+    const ex = [], ey = [];
+    {
+      const a = wm.area();
+      ex.push(a.x, a.x + a.w);
+      ey.push(a.y, a.y + a.h);
+      wm.windows.forEach((o) => {
+        if (o === win || o.closed || o.state === 'min' || o.hiddenApp || o.space !== win.space || !o.bounds) return;
+        ex.push(o.bounds.x, o.bounds.x + o.bounds.w);
+        ey.push(o.bounds.y, o.bounds.y + o.bounds.h);
+      });
+    }
+    const near = (v, list) => {
+      let best = null, d = SNAP + 1;
+      for (const e of list) if (Math.abs(e - v) < d) (d = Math.abs(e - v)), (best = e);
+      return best;
+    };
+    // returns the shift that brings either edge [lo, hi] onto the closest magnetic edge
+    const magnet = (lo, hi, list) => {
+      const a = near(lo, list), b = near(hi, list);
+      if (a == null && b == null) return 0;
+      if (b == null || (a != null && Math.abs(a - lo) <= Math.abs(b - hi))) return a - lo;
+      return b - hi;
+    };
     if (win._flip) win._flip.finish();
     el.setPointerCapture && el.setPointerCapture(e.pointerId);
 
@@ -620,6 +715,10 @@
       if (drag) {
         const mb = wm.menubarH();
         const nb = { ...win.bounds, w: b0.w, h: b0.h, x: Math.round(b0.x + dx), y: Math.round(Math.max(mb, b0.y + dy)) };
+        if (!ev.altKey) {
+          nb.x += magnet(nb.x, nb.x + nb.w, ex);
+          nb.y = Math.max(mb, nb.y + magnet(nb.y, nb.y + nb.h, ey));
+        }
         win.bounds = nb;
         // compositor-only move: no layout while dragging
         wm.nextFrame('drag' + win.id, () => (el.style.transform = `translate3d(${win.bounds.x - base.x}px, ${win.bounds.y - base.y}px, 0)`));
@@ -650,6 +749,14 @@
           H = Math.max(win.minH, b0.h - dy);
           y = Math.max(wm.menubarH(), b0.y + b0.h - H);
           H = b0.y + b0.h - y;
+        }
+        // magnetic resize: the moving edge sticks to neighbouring edges
+        if (!ev.altKey) {
+          let m;
+          if (d.includes('e') && (m = near(x + w, ex)) != null && m - x >= win.minW) w = m - x;
+          if (d.includes('w') && (m = near(x, ex)) != null && x + w - m >= win.minW) (w = x + w - m), (x = m);
+          if (d.includes('s') && (m = near(y + H, ey)) != null && m - y >= win.minH) H = m - y;
+          if (d.includes('n') && (m = near(y, ey)) != null && m >= wm.menubarH() && y + H - m >= win.minH) (H = y + H - m), (y = m);
         }
         win.bounds = { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(H) };
         win.state = 'normal';

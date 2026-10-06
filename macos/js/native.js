@@ -23,9 +23,9 @@
     const t = v ? `translate3d(0, ${v.toFixed(2)}px, 0)` : '';
     for (const c of b.el.children) c.style.transform = t;
   };
-  const release = (b) => {
-    // critically damped spring back to rest
-    let x = b.off, vel = 0, last = performance.now();
+  const release = (b, v0 = 0) => {
+    // critically damped spring back to rest (optionally kicked with the incoming scroll velocity)
+    let x = b.off, vel = v0, last = performance.now();
     const k = 260, c = 2 * Math.sqrt(k);
     const step = (t) => {
       const dt = Math.min(0.032, (t - last) / 1000);
@@ -46,7 +46,7 @@
   document.addEventListener(
     'wheel',
     (e) => {
-      if (OS.reducedMotion() || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (OS.reducedMotion() || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || notched(e)) return;
       const t = e.target;
       if (!(t instanceof Element) || t.closest(SKIP)) return;
       let el = t;
@@ -79,6 +79,69 @@
       b.timer = setTimeout(() => release(b), 90);
     },
     { passive: true }
+  );
+
+  /* ---------- momentum for notched mouse wheels ---------- */
+  // Trackpads already deliver momentum; a notched wheel jumps in fixed steps. Give it a glide that decays like
+  // NSScrollView and bounces when it runs into the end.
+  function notched(e) {
+    if (e.deltaMode === 1) return true;
+    const w = e.wheelDeltaY;
+    return e.deltaX === 0 && !!w && Math.abs(w) >= 120 && w % 120 === 0;
+  }
+  const glides = new WeakMap();
+  function findScroller(t) {
+    let el = t;
+    while (el && el !== document.body && !canScrollY(el)) el = el.parentElement;
+    return el && el !== document.body && el.closest('.win') ? el : null;
+  }
+  function bounce(el, v) {
+    if (band && band.el !== el) (cancelAnimationFrame(band.raf), setOff(band, 0), band.el.classList.remove('rubber'));
+    if (!band || band.el !== el) {
+      band = { el, off: 0, raf: 0, timer: 0 };
+      el.classList.add('rubber');
+    }
+    cancelAnimationFrame(band.raf);
+    // scroll velocity (px/frame) → overshoot velocity (px/s), content moves opposite to scroll direction
+    release(band, Math.max(-1400, Math.min(1400, -v * 60 * 0.7)));
+  }
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (!notched(e) || e.ctrlKey || OS.reducedMotion()) return;
+      const t = e.target;
+      if (!(t instanceof Element) || t.closest(SKIP)) return;
+      const el = findScroller(t);
+      if (!el) return;
+      e.preventDefault();
+      const dy = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY;
+      let g = glides.get(el);
+      if (!g) glides.set(el, (g = { v: 0, raf: 0, last: 0, pos: el.scrollTop }));
+      if (!g.raf) g.pos = el.scrollTop;
+      g.v += dy * 0.16;
+      if (g.raf) return;
+      g.last = performance.now();
+      const step = (now) => {
+        const dt = Math.min(48, now - g.last) / 16.667;
+        g.last = now;
+        const max = el.scrollHeight - el.clientHeight;
+        g.pos += g.v * dt;
+        g.v *= Math.pow(0.9, dt);
+        if (g.pos <= 0 || g.pos >= max) {
+          g.pos = Math.max(0, Math.min(max, g.pos));
+          el.scrollTop = g.pos;
+          if (Math.abs(g.v) > 2) bounce(el, g.v);
+          g.v = 0;
+          g.raf = 0;
+          return;
+        }
+        el.scrollTop = g.pos;
+        if (Math.abs(g.v) < 0.15) return (g.raf = 0), (g.v = 0);
+        g.raf = requestAnimationFrame(step);
+      };
+      g.raf = requestAnimationFrame(step);
+    },
+    { passive: false }
   );
 
   /* ---------- Spaces swipe ---------- */

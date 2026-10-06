@@ -667,6 +667,8 @@
             target = dirEl;
             dirEl.classList.add('drop-hover');
           }
+          if (!target && OS.dock.dropTarget(ev.clientX, ev.clientY, paths)) target = 'dock:' + OS.dock.dropTarget(ev.clientX, ev.clientY, paths);
+          else OS.dock.dropTarget(-1, -1, []);
           if (!target && under) {
             const w = under.closest('.win[data-drop-path]');
             if (w && w !== win.el) (target = w), w.classList.add('drop-hover');
@@ -679,6 +681,7 @@
           ghost.remove();
           $$('.drop-hover').forEach((x) => x.classList.remove('drop-hover'));
           if (!target) return;
+          if (typeof target === 'string') return OS.dock.dropOpen(target.slice(5), paths);
           if (target.classList.contains('trash')) return paths.forEach((p) => vfs.trash(p));
           const dest = target.id === 'desktop' ? HOME + '/Desktop' : target.dataset.path || target.dataset.drop || target.dataset.dropPath;
           if (!dest) return;

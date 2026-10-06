@@ -235,7 +235,7 @@
       };
       return [
         group('程序坞', row('大小', slider('dockSize', 32, 80, 1, null, { left: '小', right: '大' })), row('放大', h('div.st-inline', toggle('dockMagnify', rerender), S().dockMagnify ? slider('dockMagSize', 56, 128, 1, null, { left: '小', right: '大' }) : null)), row('置于屏幕上的位置', h('div.st-seg', ...[['left', '左边'], ['bottom', '底部'], ['right', '右边']].map(([v, l]) => h('button' + (S().dockPosition === v ? '.on' : ''), { onclick: () => (OS.setSetting('dockPosition', v), rerender()) }, l)))), row('最小化窗口时使用', select('minimizeEffect', [['genie', '神奇效果'], ['scale', '缩放效果']])), row('连按窗口标题栏以', select('doubleClickTitle', [['zoom', '缩放'], ['minimize', '最小化'], ['none', '不执行任何操作']])), row('自动隐藏和显示程序坞', toggle('dockAutohide')), row('在程序坞中显示建议 App 和最近使用的 App', toggle('dockShowRecents'))),
-        group('桌面与台前调度', row('显示项目', toggle('desktopIcons'), '在桌面上显示文件与文件夹'), row('台前调度', toggle('stageManager'))),
+        group('桌面与台前调度', row('显示项目', toggle('desktopIcons'), '在桌面上显示文件与文件夹'), row('台前调度', toggle('stageManager')), row('全屏幕应用使用独立桌面', toggle('fullscreenSpace'))),
         group('窗口', row('将窗口拖到屏幕边缘以平铺', localToggle('st-tile-edge', true)), row('平铺的窗口之间留有边距', localToggle('st-tile-margin', true))),
         group('调度中心', row('根据最近的使用情况自动重新排列空间', localToggle('st-mc-rearrange', false)), row('切换到某个应用时，切换到包含该应用已打开窗口的空间', localToggle('st-mc-switch', true)), row('触发角', h('div.st-corners', corner('tl', '左上'), corner('tr', '右上'), corner('bl', '左下'), corner('br', '右下')), null, { cls: 'tall' })),
       ];

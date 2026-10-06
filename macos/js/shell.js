@@ -701,6 +701,47 @@
     return box;
   }
   dock.minimizedSlot = (w) => (dockEl ? dockEl.querySelector(`.min-win[data-win="${w.id}"] .dock-icon`) : null);
+  /* dropping files onto a Dock icon opens them with that app (the icon darkens when it can) */
+  const ACCEPTS = {
+    finder: () => true,
+    terminal: () => true,
+    preview: (n) => n.kind === 'image',
+    textedit: (n) => n.type !== 'dir' && n.kind !== 'image' && n.kind !== 'app',
+  };
+  dock.dropTarget = (cx, cy, paths) => {
+    let hit = null;
+    if (dockEl && paths && paths.length) {
+      for (const el of dockEl.querySelectorAll('.dock-item[data-app]')) {
+        const ok = ACCEPTS[el.dataset.app];
+        if (!ok) continue;
+        const r = el.getBoundingClientRect();
+        if (cx < r.left - 2 || cx > r.right + 2 || cy < r.top - 8 || cy > r.bottom + 8) continue;
+        if (paths.every((p) => {
+          const n = OS.vfs.resolve(p);
+          return n && ok(n);
+        })) hit = el;
+        break;
+      }
+    }
+    dockEl && dockEl.querySelectorAll('.dock-item.drop-target[data-app]:not(.trash)').forEach((x) => x !== hit && x.classList.remove('drop-target'));
+    hit && hit.classList.add('drop-target');
+    return hit ? hit.dataset.app : null;
+  };
+  dock.dropOpen = (appId, paths) => {
+    dockEl && dockEl.querySelectorAll('.dock-item.drop-target').forEach((x) => x.classList.remove('drop-target'));
+    const vfs = OS.vfs;
+    paths.forEach((p, i) => {
+      const n = vfs.resolve(p);
+      if (!n) return;
+      const dir = n.type === 'dir' ? p : vfs.parentOf(p);
+      setTimeout(() => {
+        if (appId === 'finder') OS.launch('finder', n.type === 'dir' ? { path: p } : { path: dir, select: p });
+        else if (appId === 'terminal') OS.launch('terminal', { cwd: dir });
+        else OS.launch(appId, { path: p });
+      }, i * 120);
+    });
+    dock.bounce(appId);
+  };
   dock.iconRect = (appId) => {
     const el = dockEl && dockEl.querySelector(`.dock-item[data-app="${appId}"] .dock-icon`);
     return el ? el.getBoundingClientRect() : null;
@@ -974,6 +1015,7 @@
         $$('.win[data-drop-path]').forEach((w) => w.classList.remove('drop-target'));
         const under = document.elementsFromPoint(ev.clientX, ev.clientY).find((x) => x.matches && x.matches('.win[data-drop-path]'));
         under && under.classList.add('drop-target');
+        dock.dropTarget(ev.clientX, ev.clientY, origin.map((o) => o.el.dataset.path));
       };
       const up = (ev) => {
         window.removeEventListener('pointermove', move);
@@ -982,6 +1024,12 @@
         const trashEl = $('.dock-item.trash');
         const toTrash = trashEl && trashEl.classList.contains('drop-target');
         trashEl && trashEl.classList.remove('drop-target');
+        const dockApp = dock.dropTarget(ev.clientX, ev.clientY, origin.map((o) => o.el.dataset.path));
+        if (dockApp) {
+          dock.dropOpen(dockApp, origin.map((o) => o.el.dataset.path));
+          renderDesktop();
+          return;
+        }
         const winEl = $('.win.drop-target');
         $$('.win.drop-target').forEach((w) => w.classList.remove('drop-target'));
         if (toTrash) {
@@ -1032,6 +1080,7 @@
         { sep: true },
         { label: '显示简介', action: () => OS.getInfo('~/Desktop') },
         { label: '更改墙纸…', action: () => OS.launch('settings', { pane: 'wallpaper' }) },
+        { label: '编辑小组件…', action: () => OS.nc && OS.nc.open() },
         { label: '编辑小组件…', action: () => OS.nc.open() },
         { sep: true },
         { label: '使用叠放', disabled: true },

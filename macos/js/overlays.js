@@ -342,16 +342,28 @@
     mc.appId = typeof appId === 'string' ? appId : null;
     const scr = wm.screen();
     document.body.classList.add('mission');
+    OS.emit('mission', true);
     const ov = h('div.mc-overlay');
     const bar = h('div.mc-spaces');
     if (!mc.appId) {
+      let deskN = 0;
       OS.spaces.list.forEach((s, i) => {
-        const th = h('div.mc-space' + (i === OS.spaces.current ? '.cur' : ''), { title: '桌面 ' + (i + 1), dataset: { i } },
+        const name = s.fsWin ? s.fsWin.app.name : '桌面 ' + ++deskN;
+        if (s.fsWin) {
+          // full-screen app Space: a live-looking card with the app icon instead of the wallpaper
+          const th = h('div.mc-space.fs' + (i === OS.spaces.current ? '.cur' : ''), { title: name, dataset: { i } },
+            h('div.mc-space-thumb.fs', h('img', { src: OS.icon(s.fsWin.app.icon), alt: '' })),
+            h('span.mc-space-name', name)
+          );
+          th.addEventListener('click', () => (OS.spaces.go(i), mc.close()));
+          return bar.appendChild(th);
+        }
+        const th = h('div.mc-space' + (i === OS.spaces.current ? '.cur' : ''), { title: name, dataset: { i } },
           h('div.mc-space-thumb', { style: { backgroundImage: `url("${OS.thumbOf(OS.currentWallpaperFile())}")` } },
             ...wm.windows.filter((w) => w.space === s && w.state !== 'min').map((w) => h('div.mc-mini', { style: { left: (w.bounds.x / scr.w) * 100 + '%', top: (w.bounds.y / scr.h) * 100 + '%', width: (w.bounds.w / scr.w) * 100 + '%', height: (w.bounds.h / scr.h) * 100 + '%' } }))
           ),
-          h('span.mc-space-name', '桌面 ' + (i + 1)),
-          OS.spaces.list.length > 1 ? h('button.mc-space-x', { 'aria-label': '移除桌面', html: glyph('xmark'), onclick: (e) => (e.stopPropagation(), OS.spaces.remove(i), mc.close(), setTimeout(() => mc.open(), 380)) }) : null
+          h('span.mc-space-name', name),
+          OS.spaces.list.filter((x) => !x.fsWin).length > 1 ? h('button.mc-space-x', { 'aria-label': '移除桌面', html: glyph('xmark'), onclick: (e) => (e.stopPropagation(), OS.spaces.remove(i), mc.close(), setTimeout(() => mc.open(), 380)) }) : null
         );
         th.addEventListener('click', () => {
           OS.spaces.go(i);
@@ -411,6 +423,7 @@
     if (!mc.active) return;
     mc.active = false;
     document.body.classList.remove('mission');
+    OS.emit('mission', false);
     (mc.items || []).forEach((w) => {
       w.el.style.transform = '';
       w.el.removeEventListener('pointerdown', w._mcPick, true);
@@ -448,6 +461,7 @@
       }
     });
     document.body.classList.toggle('showing-desktop', sd.active);
+    OS.emit('showdesktop', sd.active);
   };
 
   /* ======================================================================
@@ -658,35 +672,68 @@
       return off === 0 ? '今天' : (off > 0 ? '+' : '') + Math.round(off) + '小时';
     })()));
   }
+  // each widget can be built on its own so it can live in Notification Center or on the desktop
+  const open = (id) => () => (nc.close(), OS.launch(id));
+  const WIDGETS = {
+    calendar: { name: '日历', size: 'm', make() {
+      const now = new Date();
+      const events = (OS.store.get('calendar.events', []) || []).filter((e) => e.date === now.toISOString().slice(0, 10)).sort((a, b) => (a.start || '').localeCompare(b.start || ''));
+      const el = h('div.widget.w-cal',
+        h('div.w-cal-left', h('div.w-cal-wd', OS.fmt.week(now).replace('周', '星期')), h('div.w-cal-day', now.getDate()), h('div.w-cal-next', events.length ? '' : '今天没有更多日程')),
+        h('div.w-cal-events', events.slice(0, 3).map((e) => h('div.w-ev', { style: { '--c': e.color || '#ff3b30' } }, h('b', e.title), h('small', e.allDay ? '全天' : `${e.start}–${e.end}`))))
+      );
+      el.onclick = open('calendar');
+      return el;
+    } },
+    weather: { name: '天气', size: 's', make() {
+      const wx = OS.store.get('weather.cache', null);
+      const el = h('div.widget.w-weather' + (wx ? '' : '.sample'),
+        h('div.w-wx-city', (wx && wx.city) || '上海', h('span', { html: glyph('location') })),
+        h('div.w-wx-temp', (wx ? Math.round(wx.temp) : 22) + '°'),
+        h('div.w-wx-cond', (wx && wx.cond) || '多云'),
+        h('div.w-wx-hl', `最高 ${wx ? Math.round(wx.hi) : 25}° 最低 ${wx ? Math.round(wx.lo) : 17}°`)
+      );
+      el.onclick = open('weather');
+      return el;
+    } },
+    reminders: { name: '提醒事项', size: 's', make() {
+      const reminders = (OS.store.get('reminders', null) || []).filter((r) => !r.done).slice(0, 4);
+      const el = h('div.widget.w-rem', h('div.w-rem-head', h('span.w-rem-ico', { html: glyph('list') }), h('b', '提醒事项'), h('span.w-rem-count', reminders.length)),
+        reminders.length ? reminders.map((r) => h('div.w-rem-item', h('span.w-rem-c'), r.title)) : h('div.w-rem-empty', '全部完成'));
+      el.onclick = open('reminders');
+      return el;
+    } },
+    clocks: { name: '世界时钟', size: 'm', make() {
+      const el = h('div.widget.w-clocks', analog(Intl.DateTimeFormat().resolvedOptions().timeZone, '本地'), analog('America/Los_Angeles', '库比蒂诺'), analog('Europe/London', '伦敦'), analog('Asia/Tokyo', '东京'));
+      el.onclick = open('clock');
+      return el;
+    } },
+    battery: { name: '电池', size: 's', make() {
+      return h('div.widget.w-bat',
+        h('div.w-bat-ring', { style: { '--p': Math.round(OS.battery.level * 100) } }, h('span', { html: glyph('laptop') })),
+        h('div', h('b', Math.round(OS.battery.level * 100) + '%'), h('small', OS.battery.charging ? '正在充电' : 'MacBook Pro'))
+      );
+    } },
+    photo: { name: '照片', size: 's', make() {
+      const el = h('div.widget.w-photo', { style: { backgroundImage: `url("${OS.wallpaperThumb('tahoe-beach-dusk')}")` } }, h('div.w-photo-cap', h('b', '精选照片'), h('small', '太浩湖 · 黄昏')));
+      el.onclick = open('photos');
+      return el;
+    } },
+  };
+  OS.widgetKinds = WIDGETS;
+  OS.makeWidget = (kind) => {
+    const k = WIDGETS[kind];
+    if (!k) return null;
+    const el = k.make();
+    el.dataset.kind = kind;
+    el.classList.add('w-' + k.size);
+    return el;
+  };
   function widgets() {
-    const now = new Date();
-    const events = (OS.store.get('calendar.events', []) || []).filter((e) => e.date === now.toISOString().slice(0, 10)).sort((a, b) => (a.start || '').localeCompare(b.start || ''));
-    const reminders = (OS.store.get('reminders', null) || []).filter((r) => !r.done).slice(0, 4);
-    const wx = OS.store.get('weather.cache', null);
-    const cal = h('div.widget.w-cal',
-      h('div.w-cal-left', h('div.w-cal-wd', OS.fmt.week(now).replace('周', '星期')), h('div.w-cal-day', now.getDate()), h('div.w-cal-next', events.length ? '' : '今天没有更多日程')),
-      h('div.w-cal-events', events.slice(0, 3).map((e) => h('div.w-ev', { style: { '--c': e.color || '#ff3b30' } }, h('b', e.title), h('small', e.allDay ? '全天' : `${e.start}–${e.end}`))))
-    );
-    cal.onclick = () => (nc.close(), OS.launch('calendar'));
-    const weather = h('div.widget.w-weather' + (wx ? '' : '.sample'),
-      h('div.w-wx-city', (wx && wx.city) || '上海', h('span', { html: glyph('location') })),
-      h('div.w-wx-temp', (wx ? Math.round(wx.temp) : 22) + '°'),
-      h('div.w-wx-cond', (wx && wx.cond) || '多云'),
-      h('div.w-wx-hl', `最高 ${wx ? Math.round(wx.hi) : 25}° 最低 ${wx ? Math.round(wx.lo) : 17}°`)
-    );
-    weather.onclick = () => (nc.close(), OS.launch('weather'));
-    const clocks = h('div.widget.w-clocks', analog(Intl.DateTimeFormat().resolvedOptions().timeZone, '本地'), analog('America/Los_Angeles', '库比蒂诺'), analog('Europe/London', '伦敦'), analog('Asia/Tokyo', '东京'));
-    clocks.onclick = () => (nc.close(), OS.launch('clock'));
-    const rem = h('div.widget.w-rem', h('div.w-rem-head', h('span.w-rem-ico', { html: glyph('list') }), h('b', '提醒事项'), h('span.w-rem-count', reminders.length)),
-      reminders.length ? reminders.map((r) => h('div.w-rem-item', h('span.w-rem-c'), r.title)) : h('div.w-rem-empty', '全部完成'));
-    rem.onclick = () => (nc.close(), OS.launch('reminders'));
-    const bat = h('div.widget.w-bat',
-      h('div.w-bat-ring', { style: { '--p': Math.round(OS.battery.level * 100) } }, h('span', { html: glyph('laptop') })),
-      h('div', h('b', Math.round(OS.battery.level * 100) + '%'), h('small', OS.battery.charging ? '正在充电' : 'MacBook Pro'))
-    );
-    const photo = h('div.widget.w-photo', { style: { backgroundImage: `url("${OS.wallpaperThumb('tahoe-beach-dusk').replace('thumbs', 'wallpapers')}")` } }, h('div.w-photo-cap', h('b', '精选照片'), h('small', '太浩湖 · 黄昏')));
-    photo.onclick = () => (nc.close(), OS.launch('photos'));
-    return h('div.widgets', cal, h('div.w-row', weather, rem), clocks, h('div.w-row', bat, photo));
+    const w = OS.makeWidget;
+    const box = h('div.widgets', w('calendar'), h('div.w-row', w('weather'), w('reminders')), w('clocks'), h('div.w-row', w('battery'), w('photo')));
+    box.querySelectorAll('.widget[data-kind]').forEach((el) => OS.deskWidgets && OS.deskWidgets.draggable(el, () => nc.close()));
+    return box;
   }
   nc.render = () => {
     if (!nc.el) return;
@@ -707,7 +754,7 @@
         list.appendChild(card);
       });
     }
-    nc.el.append(list, widgets(), h('button.nc-edit', { onclick: () => OS.toast('拖动小组件到桌面即可添加（演示）') }, '编辑小组件'));
+    nc.el.append(list, widgets(), h('button.nc-edit', { onclick: () => OS.toast('把小组件拖到桌面上即可添加') }, '编辑小组件'));
   };
   let ncTimer;
   nc.open = () => {

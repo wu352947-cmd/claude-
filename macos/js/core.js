@@ -230,6 +230,8 @@
     iconStyle: 'default',
     desktopIcons: true,
     stageManager: false,
+    fullscreenSpace: true,
+    clickWallpaper: 'stage',
     hotCorners: { tl: 'none', tr: 'notifications', bl: 'launchpad', br: 'desktop' },
     userName: '访客',
     language: 'zh-CN',
