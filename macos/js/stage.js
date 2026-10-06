@@ -39,7 +39,7 @@
     const active = want && !document.body.classList.contains('mission') && !(OS.showDesktop && OS.showDesktop.active);
     const space = OS.spaces.currentSpace();
     if (!active) return wm.windows.forEach(release);
-    const wins = wm.windows.filter((w) => !w.closed && w.state !== 'min' && w.state !== 'full' && !w.hiddenApp && w.space === space && w.bounds);
+    const wins = wm.windows.filter((w) => !w.closed && w.state !== 'min' && w.state !== 'full' && !w.hiddenApp && !w.tabHidden && !w.tabHidden && w.space === space && w.bounds);
     wm.windows.filter((w) => !wins.includes(w)).forEach(release);
     const stageApp = wm.focused && wins.includes(wm.focused) ? wm.focused.app.id : mru.find((id) => wins.some((w) => w.app.id === id));
     wins.filter((w) => w.app.id === stageApp).forEach(release);

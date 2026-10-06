@@ -823,3 +823,54 @@ body.mission #desk-widgets, body.launchpad-open #desk-widgets { opacity: 0; }
 .widget-ghost { position: absolute; z-index: 7000; pointer-events: none; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); filter: none !important; opacity: .96 !important; transition: none; will-change: transform; }
 .widgets .widget[data-kind] { cursor: grab; }
 .desk-widget.w-clocks { align-items: center; }
+.menu-item .mi-alt { display: none; }
+body.opt-down .menu-item.has-alt .mi-main { display: none; }
+body.opt-down .menu-item.has-alt .mi-alt { display: inline; }
+.menu-item .mi-key.mi-alt, .menu-item .mi-key.mi-main { margin-left: auto; }
+/* spring-loaded folders */
+.spring-armed { outline: 2px solid rgba(var(--accent-rgb), .55); outline-offset: 2px; border-radius: 8px; }
+.spring-flash { animation: springFlash .28s steps(2) 1; }
+@keyframes springFlash { 50% { opacity: .35; } }
+/* proxy icon in document titles */
+.proxy-icon { width: 16px; height: 16px; object-fit: contain; margin-right: 5px; vertical-align: -3px; cursor: var(--c-arrow); flex: none; }
+.proxy-icon[hidden] { display: none; }
+.has-proxy { display: inline-flex; align-items: center; }
+.desk-icon.drop-hover .desk-img { background: rgba(255, 255, 255, .28); border-radius: 8px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .6); }
+/* ---------- window tabs ---------- */
+.win.tab-bg { display: none; }
+.win-tabs { display: flex; flex: none; height: 28px; align-items: stretch; background: rgba(0, 0, 0, .055); border-top: .5px solid var(--sep); border-bottom: .5px solid var(--sep); position: relative; z-index: 2; }
+:root.os-dark .win-tabs { background: rgba(0, 0, 0, .28); }
+.wt-tab { flex: 1 1 0; min-width: 0; position: relative; display: flex; align-items: center; justify-content: center; padding: 0 26px; font-size: 12px; color: var(--text2); border-left: .5px solid var(--sep); user-select: none; transition: background .15s; }
+.wt-tab:first-child { border-left: none; }
+.wt-tab:not(.on):hover { background: rgba(0, 0, 0, .05); }
+.wt-tab.on { background: var(--win-bg); color: var(--text); font-weight: 500; }
+.wt-title { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.wt-x { position: absolute; left: 6px; top: 50%; width: 16px; height: 16px; margin-top: -8px; border: 0; border-radius: 4px; background: transparent; color: var(--text2); display: grid; place-items: center; opacity: 0; padding: 0; }
+.wt-x .g, .wt-x svg { width: 9px; height: 9px; }
+.wt-tab:hover .wt-x { opacity: 1; }
+.wt-x:hover { background: rgba(0, 0, 0, .1); }
+.wt-add { width: 30px; flex: none; border: 0; background: transparent; color: var(--text2); display: grid; place-items: center; border-left: .5px solid var(--sep); padding: 0; }
+.wt-add .g, .wt-add svg { width: 12px; height: 12px; }
+.wt-add:hover { background: rgba(0, 0, 0, .05); }
+/* shake to locate: the arrow swells, then settles back */
+#shake-cursor { position: fixed; left: 0; top: 0; z-index: 100000; pointer-events: none; transform-origin: 9px 5px; opacity: 0; will-change: transform; }
+#shake-cursor svg { display: block; transform-origin: 9px 5px; transform: scale(1); transition: transform .35s cubic-bezier(.3, 1.4, .5, 1); }
+#shake-cursor { transition: opacity 0s .34s; }
+#shake-cursor.on { opacity: 1; transition: none; }
+#shake-cursor.on svg { transform: scale(4.2); }
+:root.cursor-located, :root.cursor-located * { cursor: none !important; }
+.ph-big { transition: filter .15s, scale .12s ease-out; }
+/* ---------- Emoji & Symbols ---------- */
+.emoji-panel { position: absolute; z-index: 6500; width: 340px; height: 380px; display: flex; flex-direction: column; border-radius: 14px; background: var(--glass-strong); backdrop-filter: blur(40px) saturate(180%); -webkit-backdrop-filter: blur(40px) saturate(180%); box-shadow: var(--shadow-pop), inset 0 0 0 .5px var(--glass-edge); opacity: 0; transform: scale(.96) translateY(-4px); transform-origin: top left; transition: opacity .16s, transform .22s var(--spring); }
+.emoji-panel.in { opacity: 1; transform: none; }
+.emoji-panel.out { opacity: 0; transition: opacity .15s; }
+.ep-top { padding: 10px 10px 6px; }
+.ep-search { width: 100%; height: 26px; border-radius: 7px; border: none; background: var(--field); padding: 0 10px; outline: none; font-size: 13px; color: var(--text); user-select: text; }
+.ep-grid { flex: 1; overflow-y: auto; padding: 0 8px 6px; }
+.ep-head { font-size: 11.5px; font-weight: 600; color: var(--text2); padding: 8px 4px 4px; position: sticky; top: 0; background: linear-gradient(var(--glass-strong) 70%, transparent); z-index: 1; }
+.ep-cells { display: grid; grid-template-columns: repeat(9, 1fr); gap: 2px; }
+.ep-cell { border: 0; background: transparent; font-size: 22px; line-height: 1; height: 34px; border-radius: 7px; padding: 0; font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", var(--font); }
+.ep-cell:hover { background: rgba(var(--accent-rgb), .18); }
+.ep-tabs { display: flex; justify-content: space-around; padding: 6px 8px 8px; border-top: .5px solid var(--sep); }
+.ep-tab { border: 0; background: transparent; font-size: 15px; width: 30px; height: 26px; border-radius: 6px; filter: grayscale(1); opacity: .65; padding: 0; }
+.ep-tab.on, .ep-tab:hover { filter: none; opacity: 1; background: var(--press); }

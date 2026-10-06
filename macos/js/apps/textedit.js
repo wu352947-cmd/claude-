@@ -46,10 +46,12 @@
       const btn = (g, label, cmd) => h('button.te-btn', { title: label, 'aria-label': label, html: glyph(g), onmousedown: (e) => e.preventDefault(), onclick: () => (document.execCommand(cmd), dirty()) });
       const color = h('input.te-color', { id: 'te-color-' + win.id, type: 'color', value: '#1d1d1f', title: '文本颜色', 'aria-label': '文本颜色' });
       const ruler = h('div.te-ruler', fontSel, sizeSel, h('span.te-sep'), color, h('span.te-sep'), btn('bold', '粗体', 'bold'), btn('italic', '斜体', 'italic'), btn('underline', '下划线', 'underline'), btn('strike', '删除线', 'strikeThrough'), h('span.te-sep'), btn('align-left', '左对齐', 'justifyLeft'), btn('align-center', '居中', 'justifyCenter'), btn('align-right', '右对齐', 'justifyRight'), h('span.te-sep'), btn('list', '列表', 'insertUnorderedList'));
-      const titleBar = h('div.te-title', { 'data-drag': '' }, h('img', { src: OS.icon('textedit'), alt: '' }), h('span.te-name'), h('span.te-edited'));
+      const teName = h('span.te-name');
+      const titleBar = h('div.te-title', { 'data-drag': '' }, h('span.te-proxy', teName), h('span.te-edited'));
       const status = h('div.te-status');
       const root = h('div.app.textedit', titleBar, ruler, h('div.te-page', doc), status);
       win.body.appendChild(root);
+      OS.proxyIcon(win, titleBar.querySelector('.te-proxy'), () => st.path, (p) => ((st.path = p), updateTitle()));
 
       const fonts = { 苹方: 'var(--font)', Helvetica: 'Helvetica, Arial, sans-serif', Georgia: 'Georgia, serif', Menlo: 'var(--mono)' };
       fontSel.onchange = () => (doc.style.fontFamily = fonts[fontSel.value]);

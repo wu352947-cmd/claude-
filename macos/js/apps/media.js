@@ -302,7 +302,8 @@
       const img = h('img.pv-img', { alt: '', draggable: 'false' });
       const canvas = h('div.pv-canvas', img);
       const thumbs = h('div.pv-thumbs');
-      const name = h('div.pv-name');
+      const nameText = h('span');
+      const name = h('div.pv-name', nameText);
       const toolbar = h('div.tbar', { 'data-drag': '' },
         h('div.tb-group', h('button.tb-btn', { 'aria-label': '缩略图', title: '显示缩略图', html: glyph('sidebar'), onclick: () => st.toggleThumbs() })),
         name,
@@ -313,6 +314,7 @@
       );
       const root = h('div.app.preview', toolbar, h('div.pv-body', thumbs, canvas));
       win.body.appendChild(root);
+      OS.proxyIcon(win, name, () => st.path, (p) => ((st.path = p), load()));
 
       const siblings = () => (path ? (vfs.list(vfs.parentOf(st.path)) || []).filter((n) => n.kind === 'image').map((n) => vfs.norm(vfs.parentOf(st.path) + '/' + n.name)) : []);
       function load() {
@@ -323,7 +325,7 @@
           return;
         }
         img.src = n.src;
-        name.textContent = n.name;
+        nameText.textContent = n.name;
         win.setTitle(n.name);
         st.rot = 0;
         st.flipX = false;

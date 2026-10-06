@@ -379,7 +379,7 @@
     ov.addEventListener('click', (e) => e.target === ov && mc.close());
 
     // compute grid layout for visible windows
-    const wins = wm.windows.filter((w) => w.space === OS.spaces.currentSpace() && w.state !== 'min' && !w.hiddenApp && (!mc.appId || w.app.id === mc.appId));
+    const wins = wm.windows.filter((w) => w.space === OS.spaces.currentSpace() && w.state !== 'min' && !w.hiddenApp && !w.tabHidden && !w.tabHidden && (!mc.appId || w.app.id === mc.appId));
     const top = mc.appId ? 60 : 150, pad = 50, bottom = 60;
     const W = scr.w - pad * 2, H = scr.h - top - bottom;
     const n = wins.length;

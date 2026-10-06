@@ -60,7 +60,7 @@
             { label: '复制', key: '⌘D', disabled: !st || !st.sel.size, action: () => [...st.sel].forEach((p) => vfs.copy(p, vfs.parentOf(p))) },
             { label: '快速查看', key: '⌘Y', disabled: !st || !st.sel.size, action: () => OS.quickLook([...st.sel][0]) },
             { sep: true },
-            { label: '移到废纸篓', key: '⌘⌫', disabled: !st || !st.sel.size, action: () => st.trashSel() },
+            { label: '移到废纸篓', key: '⌘⌫', disabled: !st || !st.sel.size, action: () => st.trashSel(), alt: { label: '立即删除…', key: '⌥⌘⌫', action: async () => (await OS.alert({ title: '确定要立即删除所选项目吗？', message: '此操作无法撤销。', icon: OS.icon('trash-full'), buttons: [{ label: '取消' }, { label: '删除', primary: true }], destructive: true })) === 1 && [...st.sel].forEach((p) => vfs.remove(p)) } },
             { sep: true },
             { label: '查找', key: '⌘F', disabled: !st, action: () => st.focusSearch() },
           ],
@@ -68,7 +68,8 @@
         {
           title: '编辑',
           items: [
-            { label: '撤销', key: '⌘Z', disabled: true },
+            { label: OS.fileUndo.label('undo'), key: '⌘Z', disabled: !OS.fileUndo.can('undo'), action: () => OS.fileUndo.undo() },
+            { label: OS.fileUndo.label('redo'), key: '⇧⌘Z', disabled: !OS.fileUndo.can('redo'), action: () => OS.fileUndo.redo() },
             { sep: true },
             { label: '拷贝', key: '⌘C', disabled: !st || !st.sel.size, action: () => st.copySel() },
             { label: '粘贴项目', key: '⌘V', disabled: !st || !OS.finderClipboard, action: () => st.paste() },
@@ -154,7 +155,8 @@
       const sidebar = h('nav.side', { 'data-drag': '' });
       const back = h('button.tb-btn', { 'aria-label': '返回', title: '返回', html: glyph('chevron-left'), onclick: () => st.back() });
       const fwd = h('button.tb-btn', { 'aria-label': '前进', title: '前进', html: glyph('chevron-right'), onclick: () => st.fwd() });
-      const title = h('div.tb-title');
+      const titleText = h('span');
+      const title = h('div.tb-title', titleText);
       const viewSeg = h('div.tb-group.seg',
         ...[['icon', 'grid', '图标'], ['list', 'list', '列表'], ['column', 'columns', '分栏'], ['gallery', 'gallery', '画廊']].map(([v, g, l]) =>
           h('button.tb-btn', { dataset: { v }, 'aria-label': l, title: l, html: glyph(g), onclick: () => st.setView(v) })
@@ -468,11 +470,12 @@
         return el;
       }
 
+      OS.proxyIcon(win, title, () => (!st.special && !st.query && st.path !== '/' ? st.path : null), (p) => st.go(p));
       function render() {
         win.el.dataset.dropPath = st.writable() ? st.path : '';
         if (!st.writable()) delete win.el.dataset.dropPath;
         const name = st.special === 'recents' ? '最近使用' : st.special === 'airdrop' ? '隔空投送' : st.special && st.special.startsWith('tag:') ? SIDEBAR.find((s) => s.tag === st.special.slice(4)).label : vfs.displayName(st.path);
-        title.textContent = st.query ? `正在搜索“${st.query}”` : name;
+        titleText.textContent = st.query ? `正在搜索“${st.query}”` : name;
         win.setTitle(name);
         back.disabled = !st.canBack();
         fwd.disabled = !st.canFwd();
@@ -644,52 +647,9 @@
         window.addEventListener('pointerup', up);
       }
       function startDrag(e, el) {
-        const start = { x: e.clientX, y: e.clientY };
-        let ghost = null, target = null;
+        const img = el.querySelector('img');
         const paths = [...st.sel];
-        const move = (ev) => {
-          if (!ghost && Math.hypot(ev.clientX - start.x, ev.clientY - start.y) < 6) return;
-          if (!ghost) {
-            const img = el.querySelector('img');
-            ghost = h('div.fd-ghost', h('img', { src: img ? img.src : OS.icon('document'), alt: '' }), paths.length > 1 ? h('span', paths.length) : null);
-            $('#overlays').appendChild(ghost);
-          }
-          const p = OS.wm.pt(ev);
-          ghost.style.left = p.x - 24 + 'px';
-          ghost.style.top = p.y - 24 + 'px';
-          ghost.style.display = 'none';
-          const under = document.elementFromPoint(ev.clientX, ev.clientY);
-          ghost.style.display = '';
-          $$('.drop-hover').forEach((x) => x.classList.remove('drop-hover'));
-          target = null;
-          const dirEl = under && under.closest('[data-dir="1"], [data-drop], .dock-item.trash, #desktop');
-          if (dirEl && !(dirEl.dataset.path && paths.includes(dirEl.dataset.path))) {
-            target = dirEl;
-            dirEl.classList.add('drop-hover');
-          }
-          if (!target && OS.dock.dropTarget(ev.clientX, ev.clientY, paths)) target = 'dock:' + OS.dock.dropTarget(ev.clientX, ev.clientY, paths);
-          else OS.dock.dropTarget(-1, -1, []);
-          if (!target && under) {
-            const w = under.closest('.win[data-drop-path]');
-            if (w && w !== win.el) (target = w), w.classList.add('drop-hover');
-          }
-        };
-        const up = () => {
-          window.removeEventListener('pointermove', move);
-          window.removeEventListener('pointerup', up);
-          if (!ghost) return;
-          ghost.remove();
-          $$('.drop-hover').forEach((x) => x.classList.remove('drop-hover'));
-          if (!target) return;
-          if (typeof target === 'string') return OS.dock.dropOpen(target.slice(5), paths);
-          if (target.classList.contains('trash')) return paths.forEach((p) => vfs.trash(p));
-          const dest = target.id === 'desktop' ? HOME + '/Desktop' : target.dataset.path || target.dataset.drop || target.dataset.dropPath;
-          if (!dest) return;
-          paths.forEach((p) => vfs.move(p, dest));
-          st.sel.clear();
-        };
-        window.addEventListener('pointermove', move);
-        window.addEventListener('pointerup', up);
+        OS.dragFiles(e, paths, { icon: img ? img.src : null, sourceWin: win, onDone: () => st.sel.clear() });
       }
       // sidebar items as drop targets are handled through [data-drop]
 

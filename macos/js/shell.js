@@ -19,6 +19,25 @@
   };
 
   /** items: [{label, key, action, disabled, checked, sep, submenu, head, glyph, img, danger, custom}] */
+  /* holding Option turns some menu items into their alternates, like AppKit's alternate menu items */
+  const appWins = () => wm.appWindows(wm.activeApp()).filter((w) => !w.closed);
+  function autoAlt(it) {
+    const l = it.label;
+    if (l === '关闭窗口' || l === '关闭') return { label: '全部关闭', key: '⌥⌘W', action: () => appWins().forEach((w) => wm.close(w)) };
+    if (l === '最小化') return { label: '全部最小化', key: '⌥⌘M', action: () => appWins().forEach((w) => w.state !== 'min' && wm.minimize(w)) };
+    if (l === '缩放') return { label: '全部缩放', action: () => appWins().forEach((w) => wm.zoom(w)) };
+    if (/^退出“/.test(l)) return { label: '退出并保留窗口', key: '⌥⌘Q', action: it.action };
+    if (l === '关于本机') return { label: '系统信息…', action: () => OS.launch('about') };
+    if (l === '重新启动…') return { label: '重新启动', action: () => OS.power.restart() };
+    if (l === '关机…') return { label: '关机', action: () => OS.power.shutdown() };
+    if (/^隐藏“/.test(l)) return { label: '隐藏其他', key: '⌥⌘H', action: () => OS.hideOthers(wm.activeApp()) };
+    if (l === '全部置于顶层') return { label: '排列在前面', action: () => wm.tileAll && wm.tileAll() };
+    return null;
+  }
+  const optDown = (on) => document.body.classList.toggle('opt-down', on);
+  window.addEventListener('keydown', (e) => e.key === 'Alt' && optDown(true));
+  window.addEventListener('keyup', (e) => e.key === 'Alt' && optDown(false));
+  window.addEventListener('blur', () => optDown(false));
   OS.buildMenu = function (items, level = 0) {
     const menu = h('div.menu', { role: 'menu' });
     let subTimer;
@@ -27,11 +46,14 @@
       if (it.sep) return menu.appendChild(h('div.menu-sep'));
       if (it.head) return menu.appendChild(h('div.menu-head', it.head));
       if (it.custom) return menu.appendChild(it.custom);
-      const row = h('div.menu-item' + (it.disabled ? '.disabled' : '') + (it.danger ? '.danger' : ''), { role: 'menuitem', tabindex: -1 },
+      const alt = !it.submenu && !it.disabled ? it.alt || autoAlt(it) : null;
+      const row = h('div.menu-item' + (it.disabled ? '.disabled' : '') + (it.danger ? '.danger' : '') + (alt ? '.has-alt' : ''), { role: 'menuitem', tabindex: -1 },
         h('span.mi-check', it.checked ? '✓' : ''),
         it.img ? h('img.mi-img', { src: it.img, alt: '' }) : it.glyph ? h('span.mi-glyph', { html: glyph(it.glyph) }) : null,
-        h('span.mi-label', it.label),
-        it.key ? h('span.mi-key', it.key) : null,
+        h('span.mi-label' + (alt ? '.mi-main' : ''), it.label),
+        alt ? h('span.mi-label.mi-alt', alt.label) : null,
+        it.key || alt ? h('span.mi-key' + (alt ? '.mi-main' : ''), it.key || '') : null,
+        alt ? h('span.mi-key.mi-alt', alt.key || '') : null,
         it.submenu ? h('span.mi-arrow', { html: glyph('chevron-right') }) : null
       );
       if (it.swatch) row.insertBefore(h('span.mi-swatch', { style: { background: it.swatch } }), row.querySelector('.mi-label'));
@@ -70,9 +92,10 @@
             e.stopPropagation();
             // macOS blinks the chosen item before closing
             row.classList.add('blink');
+            const act = alt && (e.altKey || document.body.classList.contains('opt-down')) ? alt.action : it.action;
             setTimeout(() => {
               OS.closeMenus();
-              it.action && it.action();
+              act && act();
             }, 110);
           });
       }
@@ -200,7 +223,7 @@
     { sep: true },
     { label: '自动填充', disabled: true },
     { label: '开始听写…', disabled: true },
-    { label: '表情与符号', key: '🌐E', disabled: true },
+    { label: '表情与符号', key: '🌐E', action: () => OS.emoji.open() },
   ];
 
   function windowMenu() {
@@ -235,6 +258,16 @@
       { sep: true },
       { label: '移到下一个桌面', disabled: !w || OS.spaces.list.length < 2, action: () => OS.moveToSpace(w, OS.spaces.current + 1) },
       { sep: true },
+      ...(w && OS.tabs && OS.tabs.supports(w.app)
+        ? [
+            { label: '新建标签页', action: () => OS.tabs.newTab(w) },
+            { label: '显示上一个标签页', disabled: !w.tabGroup, action: () => OS.tabs.step(w, -1) },
+            { label: '显示下一个标签页', disabled: !w.tabGroup, action: () => OS.tabs.step(w, 1) },
+            { label: '将标签页移到新窗口', disabled: !w.tabGroup, action: () => OS.tabs.detach(w) },
+            { label: '合并所有窗口', disabled: wins.filter((x) => x.state !== 'min').length < 2, action: () => OS.tabs.merge(appId) },
+            { sep: true },
+          ]
+        : []),
       { label: '全部置于顶层', action: () => wm.focusApp(appId) },
       wins.length ? { sep: true } : null,
       ...wins.map((x) => ({ label: x.title, checked: x === w, action: () => wm.focus(x) })),
@@ -445,7 +478,7 @@
       w.hiddenApp = true;
       w.el.classList.add('app-hidden');
     });
-    const next = wm.windows.filter((w) => !w.hiddenApp && w.state !== 'min' && w.space === OS.spaces.currentSpace()).sort((a, b) => b.z - a.z)[0];
+    const next = wm.windows.filter((w) => !w.hiddenApp && !w.tabHidden && w.state !== 'min' && w.space === OS.spaces.currentSpace()).sort((a, b) => b.z - a.z)[0];
     next ? wm.focus(next) : wm.blurAll();
   };
   OS.hideOthers = (appId) => [...OS.running.keys()].filter((id) => id !== appId).forEach(OS.hideApp);
@@ -484,7 +517,7 @@
       if (appId === 'launchpad' || appId === 'trash') return OS.launch(appId);
       const wins = wm.appWindows(appId);
       if (wins.length) {
-        const vis = wins.filter((w) => w.state !== 'min' && !w.hiddenApp);
+        const vis = wins.filter((w) => w.state !== 'min' && !w.hiddenApp && !w.tabHidden);
         if (vis.length && wm.focused && wm.focused.app.id === appId && vis.length === wins.length) {
           wm.focusApp(appId);
         } else if (vis.length) wm.focusApp(appId);
@@ -525,10 +558,10 @@
       appId === 'finder' ? { label: '新建智能文件夹', disabled: true } : null,
       { sep: true },
       running && wins.length ? { label: '显示所有窗口', action: () => OS.mission.open(appId) } : null,
-      running && wins.length ? { label: '隐藏', action: () => OS.hideApp(appId) } : null,
+      running && wins.length ? { label: '隐藏', action: () => OS.hideApp(appId), alt: { label: '隐藏其他', action: () => OS.hideOthers(appId) } } : null,
       appId === 'trash' ? { label: '清倒废纸篓', disabled: !OS.vfs.trashCount(), action: () => OS.emptyTrash() } : null,
       appId === 'trash' ? { label: '打开', action: () => OS.launch('trash') } : null,
-      running && appId !== 'finder' ? { label: '退出', action: () => wm.quit(appId) } : !running && appId !== 'trash' && appId !== 'finder' ? { label: '打开', action: () => OS.launch(appId) } : null,
+      running && appId !== 'finder' ? { label: '退出', action: () => wm.quit(appId), alt: { label: '强制退出', action: () => (wm.quit(appId), OS.sound && OS.sound.play && OS.sound.play('pop')) } } : !running && appId !== 'trash' && appId !== 'finder' ? { label: '打开', action: () => OS.launch(appId) } : null,
     ];
     OS.contextMenu(e, items);
   }
@@ -997,7 +1030,7 @@
       const start = wm.pt(e);
       const els = $$('.desk-icon.selected', root);
       const origin = els.map((el) => ({ el, x: el.offsetLeft, y: el.offsetTop }));
-      let moved = false;
+      let moved = false, dirTarget = null;
       const move = (ev) => {
         const p = wm.pt(ev);
         const dx = p.x - start.x, dy = p.y - start.y;
@@ -1016,11 +1049,27 @@
         const under = document.elementsFromPoint(ev.clientX, ev.clientY).find((x) => x.matches && x.matches('.win[data-drop-path]'));
         under && under.classList.add('drop-target');
         dock.dropTarget(ev.clientX, ev.clientY, origin.map((o) => o.el.dataset.path));
+        // folders under the pointer (inside Finder windows or on the desktop) accept the drop and spring open
+        $$('.drop-hover').forEach((x) => x.classList.remove('drop-hover'));
+        const dir = document.elementsFromPoint(ev.clientX, ev.clientY).find((x) => x.matches && (x.matches('.win [data-dir="1"], .win [data-drop]') || (x.matches('.desk-icon:not(.selected)') && (OS.vfs.resolve(x.dataset.path) || {}).type === 'dir')));
+        dirTarget = dir || null;
+        dir && dir.classList.add('drop-hover');
+        const sp = dir && OS.springTarget(dir);
+        OS.springLoad(sp ? dir : null, sp || (() => {}));
       };
       const up = (ev) => {
         window.removeEventListener('pointermove', move);
         window.removeEventListener('pointerup', up);
+        OS.springLoad(null);
+        $$('.drop-hover').forEach((x) => x.classList.remove('drop-hover'));
         if (!moved) return;
+        if (dirTarget) {
+          const dest = dirTarget.dataset.path || dirTarget.dataset.drop;
+          $$('.win.drop-target').forEach((w) => w.classList.remove('drop-target'));
+          origin.forEach((o) => o.el.dataset.path !== '/' && OS.vfs.move(o.el.dataset.path, dest));
+          renderDesktop();
+          return;
+        }
         const trashEl = $('.dock-item.trash');
         const toTrash = trashEl && trashEl.classList.contains('drop-target');
         trashEl && trashEl.classList.remove('drop-target');

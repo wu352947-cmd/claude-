@@ -132,7 +132,7 @@
   };
 
   /* is the window actually on screen? Apps pause their animation loops when it is not. */
-  const onScreen = (win) => !!win && !win.closed && win.state !== 'min' && !win.hiddenApp && win.space === OS.spaces.currentSpace();
+  const onScreen = (win) => !!win && !win.closed && win.state !== 'min' && !win.hiddenApp && !win.tabHidden && win.space === OS.spaces.currentSpace();
   wm.isOccluded = (win) => {
     const b = win.bounds;
     if (!b || document.body.classList.contains('mission')) return false;
@@ -319,7 +319,7 @@
   };
   function topVisible(exclude) {
     return wm.windows
-      .filter((w) => w !== exclude && w.state !== 'min' && w.space === OS.spaces.currentSpace())
+      .filter((w) => w !== exclude && w.state !== 'min' && !w.tabHidden && w.space === OS.spaces.currentSpace())
       .sort((a, b) => b.z - a.z)[0];
   }
 
@@ -552,6 +552,17 @@
     }
     OS.emit('windows');
   };
+  // Window ▸ Arrange in Front (⌥): cascade the active app's windows from the top-left of the work area
+  wm.tileAll = () => {
+    const a = wm.area();
+    const ws = wm.appWindows(wm.activeApp()).filter((w) => w.state !== 'min' && w.state !== 'full' && w.space === OS.spaces.currentSpace()).sort((x, y) => x.z - y.z);
+    ws.forEach((w, i) => {
+      w.state = 'normal';
+      w.el.classList.remove('maximized');
+      animateBounds(w, { ...w.bounds, x: a.x + 30 + i * 26, y: a.y + 14 + i * 26 });
+      wm.focus(w);
+    });
+  };
   /* tile positions used by edge snapping, the green-button menu and the Window menu */
   wm.tileRect = (where) => {
     const a = wm.area();
@@ -669,7 +680,7 @@
       ex.push(a.x, a.x + a.w);
       ey.push(a.y, a.y + a.h);
       wm.windows.forEach((o) => {
-        if (o === win || o.closed || o.state === 'min' || o.hiddenApp || o.space !== win.space || !o.bounds) return;
+        if (o === win || o.closed || o.state === 'min' || o.hiddenApp || o.tabHidden || o.space !== win.space || !o.bounds) return;
         ex.push(o.bounds.x, o.bounds.x + o.bounds.w);
         ey.push(o.bounds.y, o.bounds.y + o.bounds.h);
       });

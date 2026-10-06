@@ -159,7 +159,7 @@
     const mode = OS.settings.clickWallpaper || 'stage';
     if (mode !== 'always' && !(mode === 'stage' && OS.settings.stageManager)) return;
     const sd = OS.showDesktop;
-    const any = wm.windows.some((w) => w.space === OS.spaces.currentSpace() && w.state !== 'min' && !w.hiddenApp);
+    const any = wm.windows.some((w) => w.space === OS.spaces.currentSpace() && w.state !== 'min' && !w.hiddenApp && !w.tabHidden && !w.tabHidden);
     if (sd && (sd.active || any)) sd.toggle();
   });
   // bring the windows back when an app is chosen again

@@ -240,4 +240,96 @@
       on ? sessionStorage.setItem('macos.liteGlass', '1') : sessionStorage.removeItem('macos.liteGlass');
     } catch (e) {}
   };
+
+  /* ---------- pinch (trackpad pinch arrives as ctrl + wheel) ---------- */
+  // zoom images in Preview / Photos around the fingers, pinch closed on the desktop for Launchpad, open to leave it
+  let pinchAcc = 0, pinchTimer = 0, pinchUsed = false;
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (!e.ctrlKey) return;
+      const t = e.target instanceof Element ? e.target : null;
+      if (t && t.closest('.leaflet-container')) return; // Maps zooms itself
+      e.preventDefault(); // never let the browser page-zoom the whole Mac
+      const k = Math.exp(-e.deltaY * 0.01);
+      const pv = t && t.closest('.pv-canvas');
+      if (pv) {
+        const w = wm.windows.find((x) => x.el.contains(pv));
+        w && w.state_ && w.state_.zoom && w.state_.zoom(k - 1);
+        return;
+      }
+      const big = t && t.closest('.ph-stage, .ph-big');
+      const img = big && (big.classList.contains('ph-big') ? big : big.querySelector('.ph-big'));
+      if (img) {
+        const r = img.getBoundingClientRect();
+        img._z = Math.max(1, Math.min(5, (img._z || 1) * k));
+        img.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
+        img.style.scale = img._z === 1 ? '' : String(img._z);
+        return;
+      }
+      // system gestures: accumulate the pinch, fire once per gesture
+      // one gesture fires at most once; it ends when the fingers pause
+      clearTimeout(pinchTimer);
+      pinchTimer = setTimeout(() => ((pinchAcc = 0), (pinchUsed = false)), 260);
+      if (pinchUsed) return;
+      pinchAcc += e.deltaY;
+      const lpOpen = document.body.classList.contains('launchpad-open');
+      if (!lpOpen && pinchAcc > 60 && t && (t.id === 'desktop' || t.closest('#wallpaper, #desk-widgets') || t.closest('.space') === t)) {
+        pinchUsed = true;
+        OS.launch('launchpad');
+      } else if (lpOpen && pinchAcc < -60) {
+        pinchUsed = true;
+        OS.closeLaunchpad();
+      }
+    },
+    { passive: false }
+  );
+  // Safari-style gesture events (WebKit) — map to the same pinch
+  ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+
+  /* ---------- shake the pointer to locate it ---------- */
+  const shake = { pts: [], big: null, timer: 0, until: 0 };
+  const bigCursor = () => {
+    if (shake.big) return shake.big;
+    shake.big = OS.h('div#shake-cursor', { html: '<svg viewBox="0 0 32 32" width="32" height="32"><path d="M9 5v19.2l4.6-4.4 3 6.9 3.4-1.5-3-6.7h6.4z" fill="#000" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>' });
+    document.body.appendChild(shake.big);
+    return shake.big;
+  };
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.pointerType !== 'mouse' || OS.settings.shakeToLocate === false) return;
+      const now = performance.now();
+      const pts = shake.pts;
+      pts.push({ x: e.clientX, t: now });
+      while (pts.length && now - pts[0].t > 700) pts.shift();
+      if (shake.big && shake.big.classList.contains('on')) {
+        shake.big.style.transform = `translate(${e.clientX - 9}px, ${e.clientY - 5}px)`;
+        if (now < shake.until) return;
+      }
+      // count fast direction reversals along x
+      let rev = 0, dir = 0, dist = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const dx = pts[i].x - pts[i - 1].x;
+        dist += Math.abs(dx);
+        const d = Math.sign(dx);
+        if (d && dir && d !== dir && Math.abs(dx) > 6) rev++;
+        if (d) dir = d;
+      }
+      if (rev >= 4 && dist > 900) {
+        const el = bigCursor();
+        el.style.transform = `translate(${e.clientX - 9}px, ${e.clientY - 5}px)`;
+        el.classList.add('on');
+        document.documentElement.classList.add('cursor-located');
+        shake.until = now + 120;
+        clearTimeout(shake.timer);
+        shake.timer = setTimeout(() => {
+          el.classList.remove('on');
+          // let the arrow shrink back before handing over to the real cursor
+          setTimeout(() => !el.classList.contains('on') && document.documentElement.classList.remove('cursor-located'), 340);
+        }, 650);
+      }
+    },
+    { passive: true }
+  );
 })();
