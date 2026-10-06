@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>macOS Tahoe Web</title>
+<meta name="description" content="在浏览器中运行的 macOS Tahoe 复刻：Liquid Glass 界面、窗口管理、程序坞、聚焦搜索、控制中心与二十多个可用的应用。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="icon" href="assets/icons/finder.png">
+<link rel="stylesheet" href="css/system.css">
+<link rel="stylesheet" href="css/apps.css">
+</head>
+<body>
+<div id="viewport">
+  <div id="screen" class="booting">
+    <div id="wallpaper"><div class="wp-layer" id="wp-a"></div><div class="wp-layer" id="wp-b"></div></div>
+    <div id="spaces"><div id="spaces-track"></div></div>
+    <div id="desktop"></div>
+    <div id="snap-preview"></div>
+    <div id="dock-wrap"><div id="dock"></div></div>
+    <div id="menubar"></div>
+    <div id="overlays"></div>
+    <div id="brightness"></div>
+    <div id="nightshift"></div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/glyphs.js"></script>
+<script src="js/sound.js"></script>
+<script src="js/vfs.js"></script>
+<script src="js/wm.js"></script>
+<script src="js/shell.js"></script>
+<script src="js/overlays.js"></script>
+<script src="js/apps/finder.js"></script>
+<script src="js/apps/safari.js"></script>
+<script src="js/apps/terminal.js"></script>
+<script src="js/apps/calculator.js"></script>
+<script src="js/apps/notes.js"></script>
+<script src="js/apps/textedit.js"></script>
+<script src="js/apps/media.js"></script>
+<script src="js/apps/music.js"></script>
+<script src="js/apps/calendar.js"></script>
+<script src="js/apps/reminders.js"></script>
+<script src="js/apps/messages.js"></script>
+<script src="js/apps/mail.js"></script>
+<script src="js/apps/maps.js"></script>
+<script src="js/apps/weather.js"></script>
+<script src="js/apps/clock.js"></script>
+<script src="js/apps/settings.js"></script>
+<script src="js/apps/utilities.js"></script>
+<script src="js/boot.js"></script>
+</body>
+</html>
