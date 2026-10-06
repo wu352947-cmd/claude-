@@ -38,12 +38,30 @@
     c._tz = tz;
     return c;
   }
+  // Intl formatting is slow: cache each zone's UTC offset for a minute instead of formatting every frame
+  const tzOff = new Map();
+  const zoneNow = (tz) => {
+    const t = Date.now();
+    let o = tzOff.get(tz);
+    if (!o || t - o.at > 60000) {
+      const d = new Date(new Date(t).toLocaleString('en-US', { timeZone: tz }));
+      o = { at: t, off: d.getTime() - (t - (t % 1000)) };
+      tzOff.set(tz, o);
+    }
+    return new Date(t + o.off);
+  };
+  const dials = new Map();
   function draw(c) {
-    const x = c.getContext('2d');
-    const now = new Date(new Date().toLocaleString('en-US', { timeZone: c._tz }));
+    const now = zoneNow(c._tz);
     const S = c.width, r = S / 2;
     const night = now.getHours() < 6 || now.getHours() >= 18;
-    x.clearRect(0, 0, S, S);
+    const key = S + (night ? 'n' : 'd');
+    const out = c.getContext('2d');
+    out.clearRect(0, 0, S, S);
+    if (dials.has(key)) return drawHands(out, now, S, r, night, dials.get(key));
+    const dial = document.createElement('canvas');
+    dial.width = dial.height = S;
+    const x = dial.getContext('2d');
     x.fillStyle = night ? '#1c1c1e' : '#fff';
     x.beginPath();
     x.arc(r, r, r - 3, 0, Math.PI * 2);
@@ -66,6 +84,11 @@
       const a = (i / 12) * Math.PI * 2 - Math.PI / 2;
       x.fillText(i, r + Math.cos(a) * r * 0.62, r + Math.sin(a) * r * 0.62);
     }
+    dials.set(key, dial);
+    drawHands(out, now, S, r, night, dial);
+  }
+  function drawHands(x, now, S, r, night, dial) {
+    x.drawImage(dial, 0, 0);
     const hand = (ang, len, w, col) => {
       x.strokeStyle = col;
       x.lineWidth = w;
@@ -75,8 +98,7 @@
       x.lineTo(r + Math.cos(ang - Math.PI / 2) * len, r + Math.sin(ang - Math.PI / 2) * len);
       x.stroke();
     };
-    const ms = now.getMilliseconds ? new Date().getMilliseconds() : 0;
-    const sec = now.getSeconds() + ms / 1000;
+    const sec = now.getSeconds() + now.getMilliseconds() / 1000;
     hand(((now.getHours() % 12) + now.getMinutes() / 60) / 12 * Math.PI * 2, r * 0.45, S * 0.035, night ? '#fff' : '#111');
     hand((now.getMinutes() + sec / 60) / 60 * Math.PI * 2, r * 0.68, S * 0.025, night ? '#fff' : '#111');
     hand((sec / 60) * Math.PI * 2, r * 0.76, S * 0.01, '#ff9500');
@@ -100,7 +122,6 @@
       const body = h('div.ck-body');
       const root = h('div.app.clock', h('div.tbar.center', { 'data-drag': '' }, h('div.tb-spacer', { 'data-drag': '' }), tabs, h('div.tb-spacer', { 'data-drag': '' })), body);
       win.body.appendChild(root);
-      let raf;
       const loop = () => {
         $$('canvas', body).forEach((c) => c._tz && draw(c));
         const sw = body.querySelector('.ck-sw-time');
@@ -113,10 +134,9 @@
           const ring = body.querySelector('.ck-ring');
           ring && ring.style.setProperty('--p', timer.total ? (left / timer.total) * 100 : 0);
         }
-        raf = requestAnimationFrame(loop);
       };
       loop();
-      win.on('close', () => cancelAnimationFrame(raf));
+      OS.wm.loop(win, loop, 30);
       const offT = OS.on('clock:timer', () => st.cur === 'timer' && st.tab('timer'));
       win.on('close', offT);
 

@@ -157,45 +157,50 @@
       /* animated sky particles */
       let raf, parts = [];
       function startSky(kind, day) {
-        cancelAnimationFrame(raf);
+        typeof raf === "function" && raf();
         const ctx = sky.getContext('2d');
         const resize = () => {
           sky.width = sky.clientWidth;
           sky.height = sky.clientHeight;
         };
         resize();
+        if (!sky._ro) (sky._ro = new ResizeObserver(() => (sky._dirty = true))).observe(sky);
         const W = () => sky.width, H = () => sky.height;
+        const cloud = document.createElement('canvas');
+        cloud.width = cloud.height = 320;
+        const cg = cloud.getContext('2d'), grad = cg.createRadialGradient(160, 160, 0, 160, 160, 160);
+        grad.addColorStop(0, 'rgba(255,255,255,.22)');
+        grad.addColorStop(1, 'rgba(255,255,255,0)');
+        cg.fillStyle = grad;
+        cg.fillRect(0, 0, 320, 320);
         parts = [];
         const n = kind === 'rain' || kind === 'storm' ? 140 : kind === 'snow' ? 90 : kind === 'cloudy' || kind === 'overcast' || kind === 'fog' ? 7 : day ? 0 : 80;
         for (let i = 0; i < n; i++) parts.push({ x: Math.random() * W(), y: Math.random() * H(), v: Math.random() + 0.5, r: Math.random() });
         let flash = 0;
         const loop = () => {
           if (!sky.isConnected) return;
-          if (sky.width !== sky.clientWidth) resize();
+          if (sky._dirty) ((sky._dirty = false), resize());
           ctx.clearRect(0, 0, W(), H());
+          const rain = kind === 'rain' || kind === 'storm', snow = kind === 'snow';
+          if (rain) {
+            ctx.strokeStyle = 'rgba(255,255,255,.35)';
+            ctx.lineWidth = 1;
+          } else if (snow) ctx.fillStyle = 'rgba(255,255,255,.85)';
+          if (rain || snow) ctx.beginPath();
           parts.forEach((p) => {
-            if (kind === 'rain' || kind === 'storm') {
-              ctx.strokeStyle = 'rgba(255,255,255,.35)';
-              ctx.lineWidth = 1;
-              ctx.beginPath();
+            if (rain) {
               ctx.moveTo(p.x, p.y);
               ctx.lineTo(p.x - 2, p.y + 12 * p.v);
-              ctx.stroke();
               p.y += 14 * p.v;
               p.x -= 1;
-            } else if (kind === 'snow') {
-              ctx.fillStyle = 'rgba(255,255,255,.85)';
-              ctx.beginPath();
-              ctx.arc(p.x, p.y, 1 + p.r * 2.2, 0, 7);
-              ctx.fill();
+            } else if (snow) {
+              const rr = 1 + p.r * 2.2;
+              ctx.moveTo(p.x + rr, p.y);
+              ctx.arc(p.x, p.y, rr, 0, 7);
               p.y += 0.8 * p.v;
               p.x += Math.sin(p.y / 30) * 0.5;
             } else if (n && n < 10) {
-              const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 160);
-              g.addColorStop(0, 'rgba(255,255,255,.22)');
-              g.addColorStop(1, 'rgba(255,255,255,0)');
-              ctx.fillStyle = g;
-              ctx.fillRect(p.x - 160, p.y - 160, 320, 320);
+              ctx.drawImage(cloud, p.x - 160, p.y - 160);
               p.x += 0.15 * p.v;
               if (p.x > W() + 160) p.x = -160;
             } else {
@@ -204,17 +209,18 @@
             }
             if (p.y > H()) (p.y = -10), (p.x = Math.random() * W());
           });
+          if (rain) ctx.stroke();
+          else if (snow) ctx.fill();
           if (kind === 'storm' && Math.random() < 0.004) flash = 1;
           if (flash > 0) {
             ctx.fillStyle = `rgba(255,255,255,${flash * 0.5})`;
             ctx.fillRect(0, 0, W(), H());
             flash -= 0.08;
           }
-          raf = requestAnimationFrame(loop);
         };
-        if (!OS.reducedMotion()) loop();
+        if (!OS.reducedMotion()) raf = OS.wm.loop(win, loop, 30);
       }
-      win.on('close', () => cancelAnimationFrame(raf));
+      win.on('close', () => typeof raf === 'function' && raf());
       render();
       // load the rest of the list in the background
       CITIES.forEach((c, i) => i !== st.city && load(i).then(renderList));

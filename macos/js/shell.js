@@ -7,8 +7,12 @@
      Generic menus (menu bar dropdowns, context menus, submenus)
      ====================================================================== */
   let openMenus = [];
-  OS.closeMenus = () => {
-    openMenus.forEach((m) => m.remove());
+  OS.closeMenus = (instant) => {
+    openMenus.forEach((m) => {
+      if (instant || OS.reducedMotion()) return m.remove();
+      m.classList.add('closing');
+      setTimeout(() => m.remove(), 170);
+    });
     openMenus = [];
     $$('.mb-item.open').forEach((x) => x.classList.remove('open'));
     menubarActive = false;
@@ -78,7 +82,7 @@
   };
 
   OS.showMenu = function (menu, { x, y, keep, level = 0, flipFrom, minWidth, align } = {}) {
-    if (!keep) OS.closeMenus();
+    if (!keep) OS.closeMenus(true);
     menu.dataset.level = level;
     if (minWidth) menu.style.minWidth = minWidth + 'px';
     $('#overlays').appendChild(menu);
@@ -277,7 +281,7 @@
     menusFor(appId).forEach((m) => {
       const el = h('div.mb-item' + (m.cls ? '.' + m.cls : ''), { role: 'menuitem', tabindex: 0, html: m.cls === 'apple' ? m.title : OS.esc(m.title) });
       const open = () => {
-        OS.closeMenus();
+        OS.closeMenus(true);
         el.classList.add('open');
         menubarActive = true;
         const r = el.getBoundingClientRect();
@@ -610,43 +614,64 @@
     });
   }
 
+  /* Keyed, incremental Dock rendering: existing items (and their images and listeners) are reused and
+     only re-ordered, so launching or quitting an app never rebuilds or reloads the whole Dock. */
+  const dockCache = new Map();
+  function cached(key, make) {
+    let el = dockCache.get(key);
+    if (!el) dockCache.set(key, (el = make()));
+    el._key = key;
+    return el;
+  }
   function renderDock() {
     dockEl = $('#dock');
-    dockEl.innerHTML = '';
     dock.pinned = dock.pinned.filter((id) => OS.apps[id]);
-    dock.pinned.forEach((id) => dockEl.appendChild(dockItem(id, '.pinned')));
+    const out = [];
+    dock.pinned.forEach((id) => out.push(cached('p:' + id, () => dockItem(id, '.pinned'))));
     const extra = [...OS.running.keys()].filter((id) => !dock.pinned.includes(id) && OS.apps[id] && !OS.apps[id].hidden && !OS.apps[id].noDock);
-    extra.forEach((id) => dockEl.appendChild(dockItem(id)));
-    // recent apps section
+    extra.forEach((id) => out.push(cached('r:' + id, () => dockItem(id))));
     if (OS.settings.dockShowRecents) {
       const rec = OS.store.get('recentApps', []).filter((id) => OS.apps[id] && !dock.pinned.includes(id) && !OS.running.has(id) && !OS.apps[id].noDock).slice(0, 3);
       if (rec.length) {
-        dockEl.appendChild(h('div.dock-sep'));
-        rec.forEach((id) => dockEl.appendChild(dockItem(id, '.recent')));
+        out.push(cached('sep:recent', () => h('div.dock-sep')));
+        rec.forEach((id) => out.push(cached('c:' + id, () => dockItem(id, '.recent'))));
       }
     }
-    dockEl.appendChild(h('div.dock-sep'));
-    // Downloads stack
-    const dl = h('div.dock-item.stack', { role: 'button', tabindex: 0, 'aria-label': '下载' }, h('div.dock-label', '下载'), h('div.dock-icon', h('img', { src: OS.icon('folder-downloads'), alt: '', draggable: 'false' })), h('div.dock-dot'));
-    dl.addEventListener('click', () => openStack(dl, '~/Downloads'));
-    dl.addEventListener('contextmenu', (e) => OS.contextMenu(e, [{ label: '在访达中打开', action: () => OS.launch('finder', { path: '~/Downloads' }) }]));
-    dockEl.appendChild(dl);
-    // minimized windows
+    out.push(cached('sep:main', () => h('div.dock-sep')));
+    out.push(cached('stack', () => {
+      const dl = h('div.dock-item.stack', { role: 'button', tabindex: 0, 'aria-label': '下载' }, h('div.dock-label', '下载'), h('div.dock-icon', h('img', { src: OS.icon('folder-downloads'), alt: '', draggable: 'false' })), h('div.dock-dot'));
+      dl.addEventListener('click', () => openStack(dl, '~/Downloads'));
+      dl.addEventListener('contextmenu', (e) => OS.contextMenu(e, [{ label: '在访达中打开', action: () => OS.launch('finder', { path: '~/Downloads' }) }]));
+      return dl;
+    }));
     wm.windows.filter((w) => w.state === 'min').forEach((w) => {
-      const m = h('div.dock-item.min-win', { dataset: { win: w.id }, role: 'button', tabindex: 0, 'aria-label': w.title }, h('div.dock-label', w.title), h('div.dock-icon', h('div.min-thumb', thumbFor(w)), h('img.min-badge', { src: OS.icon(w.app.icon), alt: '' })));
-      m.addEventListener('click', () => wm.restore(w));
-      dockEl.appendChild(m);
+      out.push(cached('m:' + w.id, () => {
+        const m = h('div.dock-item.min-win', { dataset: { win: w.id }, role: 'button', tabindex: 0, 'aria-label': w.title }, h('div.dock-label', w.title), h('div.dock-icon', h('div.min-thumb', thumbFor(w)), h('img.min-badge', { src: OS.icon(w.app.icon), alt: '' })));
+        m.addEventListener('click', () => wm.restore(w));
+        return m;
+      }));
     });
-    // trash
-    const full = OS.vfs.trashCount() > 0;
-    const tr = h('div.dock-item.trash', { dataset: { app: 'trash' }, role: 'button', tabindex: 0, 'aria-label': '废纸篓' }, h('div.dock-label', '废纸篓'), h('div.dock-icon', h('img', { src: OS.icon(full ? 'trash-full' : 'trash'), alt: '', draggable: 'false' })), h('div.dock-dot'));
-    tr.addEventListener('click', () => OS.launch('trash'));
-    tr.addEventListener('contextmenu', (e) => dockContext(e, 'trash'));
-    dockEl.appendChild(tr);
+    out.push(cached('trash', () => {
+      const tr = h('div.dock-item.trash', { dataset: { app: 'trash' }, role: 'button', tabindex: 0, 'aria-label': '废纸篓' }, h('div.dock-label', '废纸篓'), h('div.dock-icon', h('img', { src: OS.icon(OS.vfs.trashCount() ? 'trash-full' : 'trash'), alt: '', draggable: 'false' })), h('div.dock-dot'));
+      tr.addEventListener('click', () => OS.launch('trash'));
+      tr.addEventListener('contextmenu', (e) => dockContext(e, 'trash'));
+      return tr;
+    }));
+    // drop stale entries, then reorder only if something changed
+    const keys = new Set(out.map((e) => e._key));
+    [...dockCache.keys()].forEach((k) => !keys.has(k) && dockCache.delete(k));
+    const cur = [...dockEl.children];
+    if (cur.length !== out.length || cur.some((e, i) => e !== out[i])) {
+      const fresh = out.filter((e) => !e.isConnected);
+      dockEl.replaceChildren(...out);
+      // new items grow in like macOS
+      if (!OS.reducedMotion() && OS.started) fresh.forEach((e) => e.classList.contains('dock-item') && e.animate([{ width: '0px', opacity: 0 }, { width: (dock.size || OS.settings.dockSize) + 'px', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' }));
+    }
     updateIndicators();
     fitDock();
     magnify();
   }
+  dock.schedule = () => wm.nextFrame('dock', renderDock);
   /* like macOS, shrink the Dock when its icons no longer fit the screen edge */
   function fitDock() {
     const vertical = OS.settings.dockPosition !== 'bottom';
@@ -657,10 +682,14 @@
     const natural = n * (OS.settings.dockSize + 4) + seps * 13 + 12;
     dock.size = natural > avail ? Math.max(24, Math.floor(((avail - seps * 13 - 12) / n) - 4)) : OS.settings.dockSize;
     document.documentElement.style.setProperty('--dock-size', dock.size + 'px');
+    const max = OS.settings.dockMagnify ? Math.max(dock.size, OS.settings.dockMagSize * (dock.size / OS.settings.dockSize)) : dock.size;
+    dock.max = max;
+    document.documentElement.style.setProperty('--dock-max', max + 'px');
+    document.documentElement.style.setProperty('--dock-k', (dock.size / max).toFixed(4));
   }
   window.addEventListener('resize', OS.debounce(() => dockEl && (fitDock(), magnify()), 100));
   function thumbFor(w) {
-    // static snapshot of the window chrome for the Dock thumbnail
+    // static snapshot of the window chrome for the Dock thumbnail (taken once per minimize)
     const c = w.el.cloneNode(true);
     c.classList.remove('minimized');
     c.style.cssText = `position:absolute;left:0;top:0;width:${w.bounds.w}px;height:${w.bounds.h}px;visibility:visible;transform:scale(${OS.settings.dockSize / Math.max(w.bounds.w, w.bounds.h)});transform-origin:0 0;pointer-events:none;`;
@@ -697,6 +726,7 @@
   };
 
   /* magnification: cosine falloff over ~3 icon widths around the pointer */
+  /* Magnification is pure math over the un-magnified layout (like the real Dock): no layout reads per frame. */
   function magnify() {
     if (!dockEl) return;
     rafPending = false;
@@ -704,17 +734,31 @@
     const max = OS.settings.dockMagnify ? Math.max(base, OS.settings.dockMagSize * (base / OS.settings.dockSize)) : base;
     const vertical = OS.settings.dockPosition !== 'bottom';
     const range = base * 3.2;
-    const items = $$('.dock-item', dockEl);
-    items.forEach((el) => {
+    const kids = dockEl.children;
+    const scr = wm.screen();
+    let total = 12;
+    for (const el of kids) total += el.classList.contains('dock-sep') ? 13 : base + 4;
+    let pos = (vertical ? scr.h / 2 : scr.w / 2) - total / 2 + 6;
+    const m = vertical ? mouseY : mouseX;
+    for (const el of kids) {
+      if (el.classList.contains('dock-sep')) {
+        pos += 13;
+        continue;
+      }
+      const c = pos + 2 + base / 2;
+      pos += base + 4;
       let s = base;
-      if (mouseX != null && max > base) {
-        const r = el.getBoundingClientRect();
-        const c = vertical ? (r.top + r.height / 2) / OS.scale : (r.left + r.width / 2) / OS.scale;
-        const d = Math.abs((vertical ? mouseY : mouseX) - c);
+      if (m != null && max > base) {
+        const d = Math.abs(m - c);
         if (d < range) s = base + (max - base) * Math.cos((d / range) * (Math.PI / 2)) ** 2;
       }
-      el.style.setProperty('--s', s.toFixed(2) + 'px');
-    });
+      const v = s.toFixed(1) + 'px';
+      if (el._s !== v) {
+        el._s = v;
+        el.style.setProperty('--s', v);
+        el.style.setProperty('--k', (s / max).toFixed(4));
+      }
+    }
   }
   function onDockMove(e) {
     const p = wm.pt(e);
@@ -757,8 +801,10 @@
     const wrap = $('#dock-wrap');
     const d = $('#dock');
     d.addEventListener('pointermove', onDockMove);
+    d.addEventListener('pointerenter', () => d.classList.add('hovering'));
     d.addEventListener('pointerleave', () => {
       mouseX = mouseY = null;
+      d.classList.remove('hovering');
       requestAnimationFrame(magnify);
     });
     d.addEventListener('contextmenu', (e) => {
@@ -797,7 +843,7 @@
     applyDockLayout();
     renderDock();
   }
-  OS.on('windows', () => renderDock());
+  OS.on('windows', () => dock.schedule());
   OS.on('vfs:change', () => {
     const tr = dockEl && dockEl.querySelector('.trash img');
     if (tr) tr.src = OS.icon(OS.vfs.trashCount() ? 'trash-full' : 'trash');
@@ -1170,29 +1216,36 @@
     const cur = wpFlip ? b : a;
     if (cur.dataset.src === src) return;
     const next = wpFlip ? a : b;
-    const img = new Image();
-    img.onload = () => {
-      next.style.backgroundImage = `url("${src}")`;
-      next.dataset.src = src;
-      next.classList.add('on');
-      cur.classList.remove('on');
+    const token = (applyWallpaper.token = (applyWallpaper.token || 0) + 1);
+    next.src = src;
+    next.dataset.src = src;
+    // decode off the main thread, then crossfade on the compositor
+    (next.decode ? next.decode() : Promise.resolve()).catch(() => {}).then(() => {
+      if (token !== applyWallpaper.token) return;
+      requestAnimationFrame(() => {
+        next.classList.add('on');
+        cur.classList.remove('on');
+      });
       wpFlip = !wpFlip;
-      // sample wallpaper brightness for the menu bar text color
-      try {
-        const c = document.createElement('canvas');
-        c.width = 64;
-        c.height = 4;
-        const x = c.getContext('2d');
-        x.drawImage(img, 0, 0, img.width, img.height * 0.04, 0, 0, 64, 4);
-        const d = x.getImageData(0, 0, 64, 4).data;
-        let lum = 0;
-        for (let i = 0; i < d.length; i += 4) lum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
-        lum /= d.length / 4;
-        document.documentElement.classList.toggle('wp-light-top', lum > 150);
-      } catch (e) {}
+      // sample wallpaper brightness for the menu bar text color (tiny canvas, idle time)
+      const sample = () => {
+        try {
+          const c = document.createElement('canvas');
+          c.width = 64;
+          c.height = 4;
+          const x = c.getContext('2d');
+          x.drawImage(next, 0, 0, next.naturalWidth, next.naturalHeight * 0.04, 0, 0, 64, 4);
+          const d = x.getImageData(0, 0, 64, 4).data;
+          let lum = 0;
+          for (let i = 0; i < d.length; i += 4) lum += 0.2126 * d[i] + 0.7152 * d[i + 1] + 0.0722 * d[i + 2];
+          lum /= d.length / 4;
+          document.documentElement.classList.toggle('wp-light-top', lum > 150);
+        } catch (e) {}
+      };
+      (window.requestIdleCallback || setTimeout)(sample);
       OS.emit('wallpaper', src);
-    };
-    img.src = src;
+      (window.requestIdleCallback || setTimeout)(() => (OS.blurred(OS.thumbOf(src), 480, 14), OS.blurred(OS.thumbOf(src), 480, 16)));
+    });
   }
   OS.applyAppearance = applyAppearance;
   ['appearance', 'accent', 'wallpaper', 'dynamicWallpaper', 'reduceTransparency', 'menubarBg', 'iconStyle'].forEach((k) => OS.on('setting:' + k, applyAppearance));
@@ -1201,7 +1254,9 @@
   setInterval(() => OS.settings.appearance === 'auto' && applyAppearance(), 60000);
 
   function applyBrightness() {
-    $('#brightness').style.opacity = ((100 - OS.settings.brightness) / 100) * 0.82;
+    const dim = ((100 - OS.settings.brightness) / 100) * 0.82;
+    $('#brightness').style.opacity = dim;
+    $('#brightness').classList.toggle('off', dim < 0.005);
     $('#nightshift').classList.toggle('on', !!OS.settings.nightShift);
   }
   OS.on('setting:brightness', applyBrightness);
@@ -1226,6 +1281,7 @@
       scr.style.width = scr.style.height = scr.style.transform = '';
     }
     document.documentElement.classList.toggle('scaled', s !== 1);
+    wm.invalidate();
   }
   window.addEventListener('resize', fit);
   OS.on('setting:resolution', () => {
@@ -1345,6 +1401,9 @@
      Init
      ====================================================================== */
   OS.initShell = function () {
+    const sp = OS.spring('window');
+    document.documentElement.style.setProperty('--spring-dur', sp.duration + 'ms');
+    document.documentElement.style.setProperty('--spring-ease', sp.easing);
     fit();
     OS.boot.initSpaces();
     applyAppearance();

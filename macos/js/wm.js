@@ -18,7 +18,16 @@
   function layoutSpaces() {
     OS.spaces.list.forEach((s, i) => (s.el.style.left = i * 100 + '%'));
     $('#spaces-track').style.transform = `translateX(${-OS.spaces.current * 100}%)`;
+    parkSpaces();
   }
+  // Spaces that are off screen leave the render tree entirely once the slide has settled
+  let parkTimer = 0;
+  OS.spaces.wake = () => (clearTimeout(parkTimer), OS.spaces.list.forEach((s) => s.el.classList.remove('away')));
+  function parkSpaces(delay = 900) {
+    OS.spaces.wake();
+    parkTimer = setTimeout(() => OS.spaces.list.forEach((s, i) => s.el.classList.toggle('away', i !== OS.spaces.current && !document.body.classList.contains('mission'))), delay);
+  }
+  OS.spaces.park = parkSpaces;
   OS.spaces.add = () => makeSpace();
   OS.spaces.remove = (i) => {
     if (OS.spaces.list.length <= 1) return;
@@ -37,7 +46,8 @@
   OS.spaces.go = (i, animate = true) => {
     i = clamp(i, 0, OS.spaces.list.length - 1);
     const track = $('#spaces-track');
-    track.style.transition = animate && !OS.reducedMotion() ? 'transform .55s cubic-bezier(.3,.9,.25,1)' : 'none';
+    const sp = OS.spring('gentle');
+    track.style.transition = animate && !OS.reducedMotion() ? `transform ${sp.duration}ms ${sp.easing}` : 'none';
     if (i === OS.spaces.current) {
       if (animate) {
         // rubber-band at the ends
@@ -56,11 +66,20 @@
   OS.spaces.currentSpace = () => OS.spaces.list[OS.spaces.current];
 
   /* ---------- geometry ---------- */
-  wm.screen = () => {
+  /* geometry is cached and only re-measured on resize, so pointer handlers never force a layout */
+  let geo = null;
+  const measure = () => {
     const s = $('#screen');
-    return { w: s.clientWidth, h: s.clientHeight };
+    geo = { w: s.clientWidth, h: s.clientHeight, rect: s.getBoundingClientRect(), mb: $('#menubar').offsetHeight || 30 };
+    return geo;
   };
-  wm.menubarH = () => (document.body.classList.contains('menubar-hidden') ? 0 : $('#menubar').offsetHeight || 28);
+  wm.invalidate = () => (geo = null);
+  window.addEventListener('resize', () => (geo = null));
+  wm.screen = () => {
+    const g = geo || measure();
+    return { w: g.w, h: g.h };
+  };
+  wm.menubarH = () => (document.body.classList.contains('menubar-hidden') ? 0 : (geo || measure()).mb);
   /* usable work area (not covered by menu bar or a visible Dock) */
   wm.area = () => {
     const { w, h: H } = wm.screen();
@@ -81,8 +100,48 @@
   };
   /* convert a client pointer coordinate into #screen coordinates (screen may be scaled on small viewports) */
   wm.pt = (e) => {
-    const r = $('#screen').getBoundingClientRect();
+    const r = (geo || measure()).rect;
     return { x: (e.clientX - r.left) / OS.scale, y: (e.clientY - r.top) / OS.scale };
+  };
+
+  /* is the window actually on screen? Apps pause their animation loops when it is not. */
+  const onScreen = (win) => !!win && !win.closed && win.state !== 'min' && !win.hiddenApp && win.space === OS.spaces.currentSpace();
+  wm.isOccluded = (win) => {
+    const b = win.bounds;
+    if (!b || document.body.classList.contains('mission')) return false;
+    return wm.windows.some((o) => o !== win && o.z > win.z && onScreen(o) && o.bounds && !o._flip && o.bounds.x <= b.x && o.bounds.y <= b.y && o.bounds.x + o.bounds.w >= b.x + b.w && o.bounds.y + o.bounds.h >= b.y + b.h);
+  };
+  wm.isVisible = (win) => onScreen(win) && !document.hidden && !(OS.showDesktop && OS.showDesktop.active) && !wm.isOccluded(win);
+
+  /* one write per frame */
+  const frameQueue = new Map();
+  let frameReq = 0;
+  // rAF loop that only runs while the window is actually on screen, capped at `fps`
+  wm.loop = (win, fn, fps = 60) => {
+    let raf = 0, last = 0, stopped = false;
+    const gap = 1000 / fps - 2;
+    const tick = (t) => {
+      if (stopped) return;
+      raf = requestAnimationFrame(tick);
+      if (t - last < gap || !wm.isVisible(win)) return;
+      last = t;
+      fn(t);
+    };
+    raf = requestAnimationFrame(tick);
+    const stop = () => ((stopped = true), cancelAnimationFrame(raf));
+    win.on && win.on('close', stop);
+    return stop;
+  };
+  wm.cancelFrame = (key) => frameQueue.delete(key);
+  wm.nextFrame = (key, fn) => {
+    frameQueue.set(key, fn);
+    if (!frameReq)
+      frameReq = requestAnimationFrame(() => {
+        frameReq = 0;
+        const q = [...frameQueue.values()];
+        frameQueue.clear();
+        q.forEach((f) => f());
+      });
   };
 
   /* ---------- window creation ---------- */
@@ -173,15 +232,11 @@
     }
     if (opts.maximized) wm.zoom(win, false);
 
-    // open animation
+    // open animation: compositor-only (transform + opacity) on a spring
     if (!OS.reducedMotion()) {
-      el.animate(
-        [
-          { opacity: 0, transform: 'scale(.92) translateY(10px)', filter: 'blur(3px)' },
-          { opacity: 1, transform: 'none', filter: 'blur(0)' },
-        ],
-        { duration: 300, easing: 'cubic-bezier(.2,.9,.3,1.05)' }
-      );
+      const sp = OS.spring('window');
+      el.animate([{ transform: 'scale(.9)' }, { transform: 'none' }], { duration: sp.duration, easing: sp.easing });
+      el.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 160, easing: 'ease-out' });
     }
     wm.focus(win);
     OS.emit('app:open', app.id);
@@ -272,7 +327,7 @@
     };
     if (OS.reducedMotion()) return done();
     win.el.style.pointerEvents = 'none';
-    win.el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.94)' }], { duration: 180, easing: 'ease-in' }).onfinish = done;
+    win.el.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.95)' }], { duration: 150, easing: 'cubic-bezier(.4,0,1,1)' }).onfinish = done;
   };
   wm.quit = (appId) => {
     const app = OS.apps[appId];
@@ -368,20 +423,30 @@
   };
 
   /* ---------- zoom / full screen / tiling ---------- */
-  function animateBounds(win, nb, ms = 340) {
+  /* FLIP: lay the window out at its final frame once, then animate only a transform
+     from the old frame on a spring. No per-frame layout, so content never stutters. */
+  function animateBounds(win, nb, ms) {
     const el = win.el;
-    if (OS.reducedMotion()) {
-      win.bounds = nb;
-      return wm.applyBounds(win);
-    }
-    el.classList.add('animating');
+    const ob = { ...win.bounds };
     win.bounds = nb;
     wm.applyBounds(win);
-    clearTimeout(win._animT);
-    win._animT = setTimeout(() => {
+    win.fire('resize');
+    if (OS.reducedMotion()) return;
+    const sp = OS.spring('window');
+    if (win._flip) win._flip.cancel();
+    const sx = ob.w / nb.w, sy = ob.h / nb.h;
+    el.classList.add('animating');
+    win._flip = el.animate(
+      [
+        { transformOrigin: '0 0', transform: `translate(${ob.x - nb.x}px, ${ob.y - nb.y}px) scale(${sx}, ${sy})` },
+        { transformOrigin: '0 0', transform: 'none' },
+      ],
+      { duration: ms || sp.duration, easing: sp.easing }
+    );
+    win._flip.onfinish = win._flip.oncancel = () => {
       el.classList.remove('animating');
-      win.fire('resize');
-    }, ms);
+      win._flip = null;
+    };
   }
   wm.zoom = (win, animate = true) => {
     if (win.app.resizable === false) return;
@@ -525,6 +590,8 @@
     let snap = null;
     const prev = $('#snap-preview');
     const el = win.el;
+    let base = null; // the left/top the element is laid out at; motion happens via transform
+    if (win._flip) win._flip.finish();
     el.setPointerCapture && el.setPointerCapture(e.pointerId);
 
     const move = (ev) => {
@@ -536,6 +603,7 @@
         moved = true;
         el.classList.add(rz ? 'resizing' : 'dragging');
         document.body.classList.add(rz ? 'is-resizing' : 'is-dragging');
+        if (rz) document.body.dataset.rz = rz;
         // un-tile on drag: restore saved size, keep pointer at the same relative x
         if (drag && (win.state === 'max' || win.state === 'tiled') && win.saved) {
           const rel = (start.x - b0.x) / b0.w;
@@ -544,13 +612,17 @@
           b0.x = start.x - rel * b0.w;
           win.state = 'normal';
           el.classList.remove('maximized');
+          win.bounds = { ...b0 };
+          wm.applyBounds(win);
         }
+        base = { x: win.bounds.x, y: win.bounds.y };
       }
       if (drag) {
         const mb = wm.menubarH();
         const nb = { ...win.bounds, w: b0.w, h: b0.h, x: Math.round(b0.x + dx), y: Math.round(Math.max(mb, b0.y + dy)) };
         win.bounds = nb;
-        wm.applyBounds(win);
+        // compositor-only move: no layout while dragging
+        wm.nextFrame('drag' + win.id, () => (el.style.transform = `translate3d(${win.bounds.x - base.x}px, ${win.bounds.y - base.y}px, 0)`));
         // snapping zones
         const edge = 4;
         let s = null;
@@ -582,8 +654,10 @@
         win.bounds = { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(H) };
         win.state = 'normal';
         el.classList.remove('maximized');
-        wm.applyBounds(win);
-        win.fire('resize');
+        wm.nextFrame('rz' + win.id, () => {
+          wm.applyBounds(win);
+          win.fire('resize');
+        });
       }
     };
     const up = () => {
@@ -592,6 +666,13 @@
       window.removeEventListener('pointercancel', up);
       el.classList.remove('resizing', 'dragging');
       document.body.classList.remove('is-resizing', 'is-dragging');
+      delete document.body.dataset.rz;
+      wm.cancelFrame('drag' + win.id);
+      if (moved && drag) {
+        // commit the transform back into layout in the same frame
+        el.style.transform = '';
+        wm.applyBounds(win);
+      }
       prev.classList.remove('show');
       if (moved && drag && snap) {
         win.saved = { ...win.bounds, w: b0.w, h: b0.h };
@@ -643,7 +724,7 @@
     }
     const first = !running.has(appId) || !existing.length;
     if (first && OS.dock) OS.dock.bounce(appId);
-    const delay = first && !OS.reducedMotion() && !(args && args.instant) ? 260 : 0;
+    const delay = first && !OS.reducedMotion() && !(args && args.instant) ? 110 : 0;
     if (delay) {
       if (!running.has(appId)) running.set(appId, { windows: new Set() });
       OS.emit('windows');

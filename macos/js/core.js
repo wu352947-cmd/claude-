@@ -43,6 +43,8 @@
         else el.setAttribute(k, v);
       }
     }
+    // images never block the main thread while decoding
+    if (el.tagName === 'IMG' && !el.hasAttribute('decoding')) el.decoding = 'async';
     const add = (k) => {
       if (k == null || k === false) return;
       if (Array.isArray(k)) return k.forEach(add);
@@ -59,6 +61,74 @@
       return native.apply(this, nodes.filter((n) => n != null && n !== false));
     };
   });
+
+  /* ---------- motion: real spring physics, baked into CSS linear() easing ----------
+     macOS animations are springs (mass 1, stiffness/damping), not bezier curves. We integrate the
+     spring once, sample it, and hand the curve to the compositor so it runs off the main thread. */
+  const springCache = {};
+  const supportsLinear = (() => {
+    try {
+      return CSS.supports('animation-timing-function', 'linear(0, 0.5, 1)');
+    } catch (e) {
+      return false;
+    }
+  })();
+  OS.spring = (name = 'default') => {
+    if (springCache[name]) return springCache[name];
+    const P = { default: [260, 26], snappy: [420, 34], bouncy: [300, 18], gentle: [170, 26], window: [380, 32] }[name] || [260, 26];
+    const [k, c] = P;
+    let x = 0, v = 0, t = 0;
+    const dt = 1 / 240, pts = [0];
+    while (t < 2) {
+      const a = -k * (x - 1) - c * v;
+      v += a * dt;
+      x += v * dt;
+      t += dt;
+      if (Math.round(t * 240) % 4 === 0) pts.push(x);
+      if (Math.abs(1 - x) < 0.0008 && Math.abs(v) < 0.01) break;
+    }
+    pts.push(1);
+    const duration = Math.round(t * 1000);
+    const easing = supportsLinear ? `linear(${pts.map((p) => +p.toFixed(4)).join(', ')})` : 'cubic-bezier(.2,.9,.25,1.05)';
+    return (springCache[name] = { easing, duration });
+  };
+
+  /* ---------- pre-blurred wallpaper: blur once on a tiny canvas instead of a live CSS filter ---------- */
+  const blurCache = new Map();
+  OS.blurBg = (el, src, width, radius) => {
+    el.style.backgroundImage = `url("${OS.thumbOf(src)}")`;
+    OS.blurred(OS.thumbOf(src), width, radius).then((u) => (el.style.backgroundImage = `url("${u}")`));
+    return el;
+  };
+  OS.blurred = (src, width = 360, radius = 10) => {
+    const key = src + '|' + width + '|' + radius;
+    if (blurCache.has(key)) return blurCache.get(key);
+    const p = new Promise((resolve) => {
+      const img = new Image();
+      img.decoding = 'async';
+      img.onload = () => {
+        try {
+          const h = Math.round((img.height / img.width) * width);
+          const c = document.createElement('canvas');
+          c.width = width;
+          c.height = h;
+          const x = c.getContext('2d');
+          x.filter = `blur(${radius}px) saturate(1.25)`;
+          // draw slightly larger so the blur has no dark edges
+          x.drawImage(img, -radius * 2, -radius * 2, width + radius * 4, h + radius * 4);
+          resolve(c.toDataURL('image/jpeg', 0.85));
+        } catch (e) {
+          resolve(src);
+        }
+      };
+      img.onerror = () => resolve(src);
+      img.src = src;
+    });
+    blurCache.set(key, p);
+    return p;
+  };
+  /* small thumbnails for wallpaper-backed images (avoid decoding 3200px files for 64px icons) */
+  OS.thumbOf = (src) => (typeof src === 'string' && src.startsWith('assets/wallpapers/') ? src.replace('assets/wallpapers/', 'assets/thumbs/') : src);
 
   OS.esc = (s) =>
     String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

@@ -249,9 +249,8 @@
           frames = 0;
           lastT = t;
         }
-        raf = requestAnimationFrame(meter);
       };
-      raf = requestAnimationFrame(meter);
+      wm.loop(win, meter);
       const procs = () => {
         const sys = [['kernel_task', 'cpu'], ['WindowServer', 'display'], ['Dock', 'dock-icon'], ['Spotlight', 'search'], ['SystemUIServer', 'menubar-icon'], ['coreaudiod', 'speaker'], ['mds_stores', 'hdd'], ['loginwindow', 'lock']];
         const appList = [...OS.running.keys()].map((id) => ({ id, name: OS.apps[id].name, icon: OS.icon(OS.apps[id].icon), app: true }));
@@ -510,9 +509,9 @@
         } else {
           for (let i = 0; i < 60; i++) x.fillRect(i * (W / 60) + 2, H / 2 - 1.5, W / 60 - 4, 3);
         }
-        raf = requestAnimationFrame(draw);
       }
       draw();
+      wm.loop(win, draw, 30);
       recBtn.onclick = async () => {
         if (st.rec) {
           st.rec.stop();

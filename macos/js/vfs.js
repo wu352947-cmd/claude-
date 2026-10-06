@@ -276,7 +276,7 @@
         return OS.icon('folder');
       }
       if (node.kind === 'app') return OS.icon(OS.apps[node.appId]?.icon || 'document');
-      if (node.kind === 'image') return node.src;
+      if (node.kind === 'image') return OS.thumbOf(node.src);
       if (node.kind === 'text') return OS.icon('textedit');
       return OS.icon('document');
     },

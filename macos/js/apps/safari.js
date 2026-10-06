@@ -152,7 +152,7 @@
       function startPage(t) {
         const hist = OS.store.get('safari.history', []).slice(0, 6);
         const page = h('div.sf-start',
-          h('div.sf-start-bg', { style: { backgroundImage: `url("${OS.currentWallpaperFile()}")` } }),
+          OS.blurBg(h('div.sf-start-bg'), OS.currentWallpaperFile(), 480, 16),
           h('div.sf-start-inner',
             h('h2', '个人收藏'),
             h('div.sf-fav-grid', FAVORITES.map((f) => h('button.sf-fav', { onclick: () => st.nav(f.url) }, monogram(f.name, f.c), h('span', f.name)))),

@@ -14,13 +14,13 @@
     ['~/Desktop', '~/Pictures', '~/Downloads'].forEach((dir) => {
       (vfs.list(dir) || []).forEach((n) => {
         if (n.kind !== 'image' || list.some((x) => x.src === n.src)) return;
-        list.push({ id: dir + '/' + n.name, src: n.src, thumb: n.src, title: n.name.replace(/\.\w+$/, ''), date: n.mtime, album: n.name.startsWith('截屏') ? 'screenshots' : 'user', path: dir + '/' + n.name });
+        list.push({ id: dir + '/' + n.name, src: n.src, thumb: OS.thumbOf(n.src), title: n.name.replace(/\.\w+$/, ''), date: n.mtime, album: n.name.startsWith('截屏') ? 'screenshots' : 'user', path: dir + '/' + n.name });
       });
     });
     list.forEach((p) => Object.assign(p, meta[p.id] || {}));
     return list.sort((a, b) => b.date - a.date);
   }
-  const filterCss = (p) => `brightness(${p.br ?? 100}%) contrast(${p.ct ?? 100}%) saturate(${p.sat ?? 100}%) ${p.filter || ''}`;
+  const filterCss = (p) => ((p.br ?? 100) === 100 && (p.ct ?? 100) === 100 && (p.sat ?? 100) === 100 && !p.filter ? '' : `brightness(${p.br ?? 100}%) contrast(${p.ct ?? 100}%) saturate(${p.sat ?? 100}%) ${p.filter || ''}`);
   const FILTERS = [['', '原片'], ['saturate(140%) contrast(110%)', '鲜明'], ['sepia(35%) saturate(120%)', '暖色'], ['hue-rotate(-12deg) saturate(110%) brightness(103%)', '冷色'], ['grayscale(100%) contrast(115%)', '单色'], ['grayscale(100%) contrast(140%) brightness(95%)', '黑白'], ['sepia(60%) contrast(90%)', '怀旧']];
 
   OS.registerApp({
@@ -99,7 +99,7 @@
           grid.append(
             h('h2', '回忆'),
             h('div.ph-memories', pick.slice(0, 3).map((p, i) => {
-              const card = h('div.ph-memory', { style: { backgroundImage: `url("${p.src}")` } }, h('div.ph-mem-txt', h('b', ['太浩湖之夏', '加州公路旅行', '黄昏时分'][i]), h('small', new Date(p.date).getFullYear() + ' 年')));
+              const card = h('div.ph-memory', { style: { backgroundImage: `url("${OS.thumbOf(p.src)}")` } }, h('div.ph-mem-txt', h('b', ['太浩湖之夏', '加州公路旅行', '黄昏时分'][i]), h('small', new Date(p.date).getFullYear() + ' 年')));
               card.onclick = () => st.open(list.indexOf(p));
               return card;
             })),
@@ -122,7 +122,7 @@
             (groups[k] = groups[k] || []).push(p);
           });
           Object.entries(groups).forEach(([k, ps]) => {
-            const card = h('div.ph-group-card', { style: { backgroundImage: `url("${ps[0].src}")` } }, h('div.ph-group-txt', h('b', k), h('small', ps.length + ' 张照片')));
+            const card = h('div.ph-group-card', { style: { backgroundImage: `url("${OS.thumbOf(ps[0].src)}")` } }, h('div.ph-group-txt', h('b', k), h('small', ps.length + ' 张照片')));
             card.onclick = () => ($$('button', seg).forEach((b) => b.classList.toggle('on', b.dataset.k === 'all')), (st.mode = 'all'), render());
             grid.appendChild(card);
           });
@@ -331,7 +331,7 @@
         apply();
         thumbs.innerHTML = '';
         siblings().forEach((p) => {
-          const t = h('button.pv-thumb' + (p === st.path ? '.on' : ''), h('img', { src: vfs.resolve(p).src, alt: '', loading: 'lazy' }), h('span', vfs.baseName(p)));
+          const t = h('button.pv-thumb' + (p === st.path ? '.on' : ''), h('img', { src: OS.thumbOf(vfs.resolve(p).src), alt: '', loading: 'lazy' }), h('span', vfs.baseName(p)));
           t.onclick = () => ((st.path = p), load());
           thumbs.appendChild(t);
         });

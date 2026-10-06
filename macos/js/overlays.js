@@ -249,7 +249,7 @@
     const search = h('input.lp-search', { id: 'launchpad-search', type: 'search', placeholder: '搜索' });
     const pagesEl = h('div.lp-pages');
     const dots = h('div.lp-dots');
-    const lp = h('div.launchpad', { role: 'dialog', 'aria-label': '启动台' }, h('div.lp-bg', { style: { backgroundImage: `url("${OS.currentWallpaperFile()}")` } }), h('div.lp-top', h('div.lp-search-wrap', h('span', { html: glyph('search') }), search)), pagesEl, dots);
+    const lp = h('div.launchpad', { role: 'dialog', 'aria-label': '启动台' }, OS.blurBg(h('div.lp-bg'), OS.currentWallpaperFile(), 480, 14), h('div.lp-top', h('div.lp-search-wrap', h('span', { html: glyph('search') }), search)), pagesEl, dots);
     const render = (list) => {
       pagesEl.innerHTML = '';
       dots.innerHTML = '';
@@ -347,7 +347,7 @@
     if (!mc.appId) {
       OS.spaces.list.forEach((s, i) => {
         const th = h('div.mc-space' + (i === OS.spaces.current ? '.cur' : ''), { title: '桌面 ' + (i + 1), dataset: { i } },
-          h('div.mc-space-thumb', { style: { backgroundImage: `url("${OS.currentWallpaperFile()}")` } },
+          h('div.mc-space-thumb', { style: { backgroundImage: `url("${OS.thumbOf(OS.currentWallpaperFile())}")` } },
             ...wm.windows.filter((w) => w.space === s && w.state !== 'min').map((w) => h('div.mc-mini', { style: { left: (w.bounds.x / scr.w) * 100 + '%', top: (w.bounds.y / scr.h) * 100 + '%', width: (w.bounds.w / scr.w) * 100 + '%', height: (w.bounds.h / scr.h) * 100 + '%' } }))
           ),
           h('span.mc-space-name', '桌面 ' + (i + 1)),
