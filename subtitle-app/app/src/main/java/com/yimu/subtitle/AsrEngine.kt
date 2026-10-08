@@ -44,13 +44,13 @@ class AsrEngine(context: Context) {
     /**
      * 送入一段 16kHz 单声道音频（每次约 0.1 秒）。
      * @param onPartial 正在说的半句（可能为空，表示清空）
-     * @param onPause 说话人短暂停顿（约 0.2 秒没有新词），可以抢先翻译了
+     * @param onPause 说话人停顿：约 0.2 秒没有新词时 long=false，约 0.4 秒时 long=true（多半是一句话说完了）
      * @param onFinal 说完的一整句
      */
     fun accept(
         samples: FloatArray,
         onPartial: (String) -> Unit,
-        onPause: (String) -> Unit,
+        onPause: (text: String, long: Boolean) -> Unit,
         onFinal: (String) -> Unit,
     ) {
         stream.acceptWaveform(samples, SAMPLE_RATE)
@@ -72,8 +72,8 @@ class AsrEngine(context: Context) {
         } else if (text != lastPartial) {
             lastPartial = text
             onPartial(text)
-        } else if (stableChunks == 2 && text.isNotEmpty()) {
-            onPause(text)
+        } else if ((stableChunks == 2 || stableChunks == 4) && text.isNotEmpty()) {
+            onPause(text, stableChunks == 4)
         }
     }
 

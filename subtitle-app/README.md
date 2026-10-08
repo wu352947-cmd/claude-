@@ -8,13 +8,18 @@
 其他 App 播放的声音
    │  安卓「播放声音捕获」（需要用户授权共享屏幕）
    ▼
-本地语音识别（sherpa-onnx 流式英文模型，平板离线运行，免费）
-   │  说完一句（停顿 0.7 秒，或长句在换气处自动切分）
+本地流式语音识别（sherpa-onnx 英文模型，离线、免费）
+   │
+   ├─▶ ① 本地草稿：ML Kit 离线小模型几十毫秒翻出灰色中文草稿
+   │
+   └─▶ ② 分段定稿：识别结果连续两次一致的词才算确定；
+          短停顿时确定词满 5 个、长停顿或连续 8 个新词时，交给 DeepSeek 翻成白色正式中文
+          ③ 只往后长：后面的段落用 DeepSeek「前缀续写」接着已显示的中文往下翻，已显示的字不再变
    ▼
-DeepSeek 翻译（附带前 3 句做上下文，顺便纠正识别错误、补全标点）
-   ▼
-悬浮字幕条（轻点：双语 / 仅中文；拖动：移动位置）
+悬浮字幕条：上一句（淡）+ 当前句（白色定稿 + 灰色草稿）
 ```
+
+分段规则用真实录音模拟调过：27 秒语音约 15 次请求，没有半截单词被定稿，句末大多只剩 1~5 个词需要续写（期间由灰色草稿顶上）。
 
 ## 安装和首次设置
 
@@ -32,7 +37,7 @@ DeepSeek 翻译（附带前 3 句做上下文，顺便纠正识别错误、补�
 
 - 少数 App 禁止捕获声音，这时字幕条会一直显示"等待声音"。
 - 只识别英文；背景音乐很响时识别准确率会下降。
-- 中文字幕比说话慢 1~2 秒（先识别完一句再翻译）。
+- 灰色草稿质量一般，白色正式译文会随后替换；本地草稿语言包首次下载需要开 VPN。
 
 ## 代码结构
 
@@ -41,7 +46,9 @@ DeepSeek 翻译（附带前 3 句做上下文，顺便纠正识别错误、补�
 | `MainActivity.kt` | 主页：设置步骤、开始/停止、字幕记录 |
 | `CaptureService.kt` | 前台服务：捕获声音 → 识别 → 翻译 |
 | `AsrEngine.kt` | 本地流式语音识别与断句 |
-| `Translator.kt` | DeepSeek 翻译（提示词在这里调） |
+| `Translator.kt` | DeepSeek 翻译与续写（提示词在这里调） |
+| `TranslationPipeline.kt` | 草稿 / 分段定稿 / 续写的调度 |
+| `LocalTranslator.kt` | ML Kit 本地草稿翻译 |
 | `SubtitleOverlay.kt` | 悬浮字幕条的样式和手势 |
 | `ModelManager.kt` | 识别模型下载（断点续传、镜像切换） |
 | `SubtitleBus.kt` | 服务与界面之间共享的实时状态 |
@@ -59,10 +66,10 @@ gradle assembleRelease
 
 ## 在 Edge 浏览器里直接翻译网页（推荐）
 
-`userscript/yimu-web.user.js` 是一个 Tampermonkey 脚本，和 App 内置浏览器用的是同一套整页翻译代码：
+`userscript/yimu-web.user.js` 是一个 Tampermonkey 脚本，核心代码在 `userscript/core.js`：
 
 1. Edge → 菜单 → 扩展 → 安装 Tampermonkey；
 2. 在 Edge 打开 https://raw.githubusercontent.com/wu352947-cmd/claude-/claude/tender-lamport-vb8i8b/subtitle-app/userscript/yimu-web.user.js ，点「安装」；
 3. 打开任意英文网页，点右下角「译」，填入 DeepSeek API Key。
 
-修改翻译核心 `app/src/main/assets/yimu-web.js` 后运行 `userscript/build.sh` 重新生成脚本。
+修改 `core.js` 后运行 `userscript/build.sh` 重新生成脚本。

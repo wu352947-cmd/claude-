@@ -29,35 +29,6 @@
             </intent-filter>
         </activity>
 
-        <!-- 内置浏览器：整页翻译。也作为独立图标「译幕网页」出现在桌面上 -->
-        <activity
-            android:name=".BrowserActivity"
-            android:exported="true"
-            android:label="译幕网页"
-            android:launchMode="singleTask"
-            android:taskAffinity="com.yimu.subtitle.web"
-            android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboardHidden|keyboard"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter android:label="译幕网页">
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-            <!-- 其他浏览器里「分享 → 译幕网页」 -->
-            <intent-filter android:label="译幕网页翻译">
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/plain" />
-            </intent-filter>
-            <!-- 点击链接时可以选择用译幕打开 -->
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-            </intent-filter>
-        </activity>
-
         <service
             android:name=".CaptureService"
             android:exported="false"

@@ -43,15 +43,12 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -172,8 +169,6 @@ private fun HomeScreen(resumeTick: Int) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Header()
-            WebCard()
-            SectionTitle("视频实时字幕")
             Preview()
 
             // 开始 / 停止
@@ -293,6 +288,7 @@ private fun HomeScreen(resumeTick: Int) {
                 }
             }
 
+            LocalDraftCard()
             SpeedCard()
             Tips()
             Spacer(Modifier.height(12.dp))
@@ -374,11 +370,11 @@ private fun Transcript(lines: List<Line>) {
         Text("字幕记录", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
         lines.takeLast(30).asReversed().forEach { l ->
             Column(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                val zh = l.error ?: l.zh
+                val zh = l.error ?: l.zh ?: l.tail
                 if (!zh.isNullOrEmpty()) Text(zh, color = P.text, fontSize = 16.sp)
                 Text(l.englishForDisplay, color = P.muted, fontSize = 13.sp)
                 l.latencyMs?.let {
-                    Text("说完后 %.1f 秒出中文".format(it / 1000f), color = P.muted.copy(alpha = 0.7f), fontSize = 11.sp)
+                    Text("说完后 %.1f 秒出正式中文".format(it / 1000f), color = P.muted.copy(alpha = 0.7f), fontSize = 11.sp)
                 }
             }
         }
@@ -425,47 +421,15 @@ private fun PermissionRow(title: String, desc: String, granted: Boolean, onClick
 }
 
 @Composable
-private fun SectionTitle(text: String) {
-    Text(text, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = P.text, modifier = Modifier.padding(top = 8.dp))
-}
-
-@Composable
-private fun WebCard() {
-    val ctx = LocalContext.current
-    var q by remember { mutableStateOf("") }
-    Card {
-        Text("网页翻译", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = P.text)
-        Caption("打开英文网页，自动整页翻译成自然的中文。也可以在其他浏览器里点「分享 → 译幕网页」。")
-        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
-            OutlinedTextField(
-                value = q,
-                onValueChange = { q = it },
-                singleLine = true,
-                placeholder = { Text("粘贴网址或输入搜索内容") },
-                shape = RoundedCornerShape(14.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
-                keyboardActions = KeyboardActions(onGo = { BrowserActivity.start(ctx, q.ifBlank { null }) }),
-                colors = OutlinedTextFieldDefaults.colors(
-                    focusedBorderColor = P.accent, unfocusedBorderColor = P.line,
-                    focusedTextColor = P.text, unfocusedTextColor = P.text,
-                ),
-                modifier = Modifier.weight(1f),
-            )
-            PrimarySmall("打开") { BrowserActivity.start(ctx, q.ifBlank { null }) }
-        }
-    }
-}
-
-@Composable
 private fun SpeedCard() {
     val ctx = LocalContext.current
     var fast by remember { mutableStateOf(Prefs.fastMode(ctx)) }
     Card {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                Text("抢先翻译", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
+                Text("同传模式", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
                 Text(
-                    "说话人一停顿就开始翻译，不等整句结束，中文更快出现。翻译请求会多一些，费用大约是关闭时的 2 倍。",
+                    "不等整句说完，听到一段就定稿一段，中文跟着说话往后长，已显示的字不会再变。关闭后改为整句说完再翻译，更慢但译文更完整。",
                     color = P.muted, fontSize = 13.sp, lineHeight = 19.sp,
                 )
             }
@@ -474,6 +438,35 @@ private fun SpeedCard() {
                 onCheckedChange = { fast = it; Prefs.setFastMode(ctx, it) },
                 colors = SwitchDefaults.colors(checkedTrackColor = P.accent),
             )
+        }
+    }
+}
+
+@Composable
+private fun LocalDraftCard() {
+    val ctx = LocalContext.current
+    val st by LocalTranslator.state.collectAsState()
+    LaunchedEffect(Unit) { LocalTranslator.check() }
+    Card {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text("本地秒出草稿", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
+                Text(
+                    "在平板上装一个离线小翻译模型（约 30 MB）：英文一出来，灰色中文草稿立刻跟上，" +
+                        "随后被 DeepSeek 的正式译文替换。首次下载需要开 VPN。",
+                    color = P.muted, fontSize = 13.sp, lineHeight = 19.sp,
+                )
+                when (val x = st) {
+                    is LocalTranslator.State.Failed -> Text(x.message, color = Color(0xFFD9534F), fontSize = 13.sp)
+                    LocalTranslator.State.Downloading -> Text("正在下载…", color = P.accent, fontSize = 13.sp)
+                    else -> {}
+                }
+            }
+            when (st) {
+                LocalTranslator.State.Ready -> Text("已就绪", color = P.ok, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+                LocalTranslator.State.Downloading -> {}
+                else -> PrimarySmall("下载") { LocalTranslator.download() }
+            }
         }
     }
 }

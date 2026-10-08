@@ -13,8 +13,8 @@ data class Line(
     val error: String? = null,
     /** 中文是否已经完整生成（false 表示还在逐字输出）。 */
     val done: Boolean = false,
-    /** 正式译文到达前先显示的抢先译文。 */
-    val placeholderZh: String? = null,
+    /** 正式译文还没覆盖到的部分，先显示本地小模型的草稿（灰色）。 */
+    val tail: String? = null,
     /** 说话人说出最后一个词的时间，用来计算延迟。 */
     val spokenAt: Long = 0L,
     /** 从说完到中文出现用了多久（毫秒）。 */
@@ -29,8 +29,10 @@ data class LiveState(
     val level: Float = 0f,
     /** 正在说、还没说完的英文。 */
     val partial: String = "",
-    /** 正在说的这句话的抢先译文。 */
-    val draftZh: String = "",
+    /** 正在说的这句话：已经由 DeepSeek 定稿、不会再变的中文（白色）。 */
+    val liveZh: String = "",
+    /** 正在说的这句话：还没定稿部分的本地草稿（灰色）。 */
+    val liveTail: String = "",
     val lines: List<Line> = emptyList(),
     val updatedAt: Long = 0L,
     val notice: String? = null,

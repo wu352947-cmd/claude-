@@ -9,7 +9,10 @@ import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.text.SpannableStringBuilder
+import android.text.Spanned
 import android.text.TextUtils
+import android.text.style.ForegroundColorSpan
 import android.util.TypedValue
 import android.view.Gravity
 import android.view.MotionEvent
@@ -52,6 +55,13 @@ class SubtitleOverlay(private val context: Context) {
     }
     private val hint = text(sizeSp = 13f, color = Color.argb(170, 255, 255, 255), weight = 500)
 
+    /** 上一句的中文，缩小变淡留在上方，读得慢也跟得上。 */
+    private val prev = text(sizeSp = 15f, color = Color.argb(120, 255, 255, 255), weight = 400).apply {
+        setPadding(0, 0, 0, dp(6f))
+        maxLines = 2
+        ellipsize = TextUtils.TruncateAt.START
+    }
+
     private val card = LinearLayout(context).apply {
         orientation = LinearLayout.VERTICAL
         gravity = Gravity.CENTER_HORIZONTAL
@@ -62,6 +72,7 @@ class SubtitleOverlay(private val context: Context) {
             setStroke(1, Color.argb(36, 255, 255, 255))
         }
         addView(hint)
+        addView(prev)
         addView(zh)
         addView(en)
         addView(live)
@@ -128,7 +139,7 @@ class SubtitleOverlay(private val context: Context) {
             context.resources.displayMetrics.widthPixels
         }
         val width = (w * 0.7f).toInt()
-        listOf(zh, en, live, hint).forEach { it.maxWidth = width - dp(44f) }
+        listOf(zh, en, live, hint, prev).forEach { it.maxWidth = width - dp(44f) }
     }
 
     // 一段时间没有新字幕，就收起成一个小胶囊，不挡画面
@@ -139,7 +150,7 @@ class SubtitleOverlay(private val context: Context) {
         }
     }
 
-    private var lastZh: String? = null
+    private var lastShown = ""
     private var flashText = ""
     private var flashUntil = 0L
 
@@ -151,29 +162,33 @@ class SubtitleOverlay(private val context: Context) {
         val speaking = s.partial.isNotEmpty()
         val idle = now - s.updatedAt > IDLE_MS && !speaking
 
-        var zhText: String? = null
+        var white = ""
+        var gray = ""
         var enText: String? = null
         var liveText: String? = null
-        var isError = false
-        var isDraft = false
+        var prevText: String? = null
+        var errorText: String? = null
+        var hasMain = false
 
-        if (speaking && s.draftZh.isNotEmpty()) {
-            // 正在说：显示抢先译文 + 实时英文
-            zhText = s.draftZh
+        if (speaking && (s.liveZh.isNotEmpty() || s.liveTail.isNotEmpty())) {
+            // 正在说：白色是已定稿的中文，灰色是本地草稿
+            white = s.liveZh
+            gray = s.liveTail
             enText = prettify(s.partial)
-            isDraft = true
+            prevText = last?.let { lineZh(it) }
+            hasMain = true
         } else if (last != null && !idle) {
-            val ph = last.placeholderZh
-            zhText = when {
-                last.error != null -> { isError = true; last.error }
-                // 正式译文比抢先译文还短时，先继续显示抢先译文，避免字幕先变短再变长
-                last.zh != null && !last.done && ph != null && last.zh.length < ph.length -> ph
-                last.zh == null -> ph ?: "…"
-                last.zh.isEmpty() -> null
-                else -> last.zh
+            if (last.error != null) {
+                errorText = last.error
+            } else {
+                white = last.zh.orEmpty()
+                gray = if (last.done) "" else last.tail.orEmpty()
+                if (white.isEmpty() && gray.isEmpty() && !last.done) white = "…"
             }
             enText = last.englishForDisplay
             if (speaking) liveText = prettify(s.partial)
+            prevText = s.lines.getOrNull(s.lines.size - 2)?.let { lineZh(it) }
+            hasMain = true
         } else if (speaking) {
             liveText = prettify(s.partial)
         }
@@ -185,34 +200,50 @@ class SubtitleOverlay(private val context: Context) {
         val hintText = when {
             now < flashUntil -> flashText
             s.notice != null && (last == null || idle) -> s.notice
-            zhText != null || enText != null || liveText != null -> null
+            hasMain || liveText != null -> null
             s.running && s.level < 0.002f -> "译幕 · 等待声音"
             else -> "译幕 · 正在聆听"
         }
 
         hint.show(hintText)
+        prev.show(if (hasMain) prevText?.takeIf { it.isNotEmpty() } else null)
         en.show(enText)
         live.show(liveText)
-        zh.visibility = if (zhText != null) View.VISIBLE else View.GONE
-        if (zhText != null && zhText != lastZh) {
-            zh.text = zhText
-            zh.setTextColor(
-                when {
-                    isError -> Color.argb(170, 255, 190, 180)
-                    isDraft -> Color.argb(235, 255, 255, 255)
-                    else -> Color.WHITE
-                },
-            )
-            zh.setTextSize(TypedValue.COMPLEX_UNIT_SP, if (isError) 14f else 22f)
-            // 只在换成新的一句时淡入；同一句逐字变长时不闪
-            val prev = lastZh
-            val sameSentence = prev != null && (zhText.startsWith(prev) || prev == "…")
-            if (!isError && !sameSentence && zhText != "…") {
-                zh.alpha = 0f
-                zh.animate().alpha(1f).setDuration(160).start()
+
+        val shown = white + gray
+        val showZh = errorText != null || shown.isNotEmpty()
+        zh.visibility = if (showZh) View.VISIBLE else View.GONE
+        if (errorText != null) {
+            if (zh.text.toString() != errorText) {
+                zh.text = errorText
+                zh.setTextColor(Color.argb(170, 255, 190, 180))
+                zh.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14f)
             }
+            lastShown = ""
+        } else if (shown.isNotEmpty() && (shown != lastShown || zh.text !is Spanned)) {
+            val sb = SpannableStringBuilder(white)
+            if (gray.isNotEmpty()) {
+                val start = sb.length
+                sb.append(gray)
+                sb.setSpan(ForegroundColorSpan(Color.argb(140, 255, 255, 255)), start, sb.length, 0)
+            }
+            zh.setTextColor(Color.WHITE)
+            zh.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+            zh.text = sb
+            // 只在换成新的一句时淡入；同一句逐字变长、草稿变正式时不闪
+            val samePrefix = lastShown.length >= 2 && shown.length >= 2 && shown.take(2) == lastShown.take(2)
+            if (!samePrefix && lastShown != "…") {
+                zh.alpha = 0f
+                zh.animate().alpha(1f).setDuration(140).start()
+            }
+            lastShown = shown
         }
-        lastZh = zhText
+    }
+
+    private fun lineZh(l: Line): String? = when {
+        !l.zh.isNullOrEmpty() -> l.zh
+        !l.tail.isNullOrEmpty() -> l.tail
+        else -> null
     }
 
     private fun TextView.show(value: String?) {
