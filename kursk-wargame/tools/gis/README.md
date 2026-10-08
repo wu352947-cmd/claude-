@@ -12,7 +12,9 @@ pip install numpy scipy pillow
 python build_reference.py <存放下载图幅的目录>
 ```
 
-**注意：** 重新运行会**覆盖** `south.hexes.json`。等地图编辑器上线、开始人工核对后，这个脚本只能用来重建参考底图，不能再覆盖人工数据（届时会加保护）。
+重新运行只会更新 `status = auto` 的林地草稿，人工录入或转录的记录（unverified / verified）一律保留。
+
+`sample_transcription.py`：风格样板区（普罗霍罗夫卡—捷捷列维诺）的河流、铁路、道路、居民点转录草稿，状态均为 unverified。
 
 ## 图幅定位精度
 

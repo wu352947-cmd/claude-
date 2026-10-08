@@ -1,19 +1,20 @@
 import { Application } from 'pixi.js';
 import {
   ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, loadMap, sideRecord, toLatLon,
+  formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, linksBetween, loadMap, neighbor, sideFeatures, toLatLon,
 } from '../engine';
 import rawMeta from '../../data/game.json';
 import def from '../../data/maps/south.json';
 import hexes from '../../data/maps/south.hexes.json';
 import hexsides from '../../data/maps/south.hexsides.json';
 import labels from '../../data/maps/south.labels.json';
+import lines from '../../data/maps/south.lines.json';
 import { attachCamera } from './camera';
 import { createMapView } from './map-view';
 import { PX_PER_KM } from './style';
 
 const meta = GameMeta.parse(rawMeta);
-const map = loadMap({ def, hexes, hexsides, labels });
+const map = loadMap({ def, hexes, hexsides, labels, lines });
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const DIR_NAMES = ['北', '东北', '东南', '南', '西南', '西北'];
 
@@ -22,10 +23,16 @@ function showInfo(h: Offset | null): void {
   if (!h) { box.hidden = true; return; }
   const rec = hexRecord(map, h);
   const ll = toLatLon(map.projection, hexCenter(map.grid, h));
-  const sides = ([0, 1, 2, 3, 4, 5] as Direction[])
-    .map((d) => ({ d, r: sideRecord(map, h, d) }))
-    .filter((x) => x.r)
-    .map((x) => `${DIR_NAMES[x.d]}：${x.r!.features.map((f) => SIDE_FEATURE_NAMES[f]).join('、')}`);
+  const dirs = [0, 1, 2, 3, 4, 5] as Direction[];
+  const sides = dirs
+    .map((d) => ({ d, f: sideFeatures(map, h, d) }))
+    .filter((x) => x.f.length)
+    .map((x) => `${DIR_NAMES[x.d]}：${x.f.map((f) => SIDE_FEATURE_NAMES[f]).join('、')}`);
+  const LINK_NAMES = { road: '公路', track: '小路', railway: '铁路', river: '', stream: '' } as const;
+  const links = dirs
+    .map((d) => ({ d, k: linksBetween(map, h, neighbor(h, d)) }))
+    .filter((x) => x.k.length)
+    .map((x) => `${DIR_NAMES[x.d]}：${x.k.map((k) => LINK_NAMES[k]).join('、')}`);
   const isDefault = !map.hexes.has(hexId(h));
   box.innerHTML = `
     <div class="info-head"><span class="hexno">${hexId(h)}</span><button id="info-close" aria-label="关闭">×</button></div>
@@ -34,6 +41,7 @@ function showInfo(h: Offset | null): void {
       ${isDefault ? '' : `<dt>状态</dt><dd class="st-${rec.status}">${STATUS_NAMES[rec.status]}</dd>`}
       ${rec.note ? `<dt>备注</dt><dd>${rec.note}</dd>` : ''}
       <dt>格边</dt><dd>${sides.length ? sides.join('<br>') : '<span class="muted">无</span>'}</dd>
+      <dt>道路</dt><dd>${links.length ? links.join('<br>') : '<span class="muted">无</span>'}</dd>
       <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
       ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>`;
@@ -48,7 +56,7 @@ async function start(): Promise<void> {
   $('subtitle').textContent = `${map.def.name.zh} · 引擎 v${ENGINE_VERSION}`;
   const host = $('app');
   const app = new Application();
-  await app.init({ resizeTo: host, background: '#cfc8ad', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
+  await app.init({ resizeTo: host, background: '#2f2c26', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
   host.appendChild(app.canvas);
 
   view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`);
@@ -71,7 +79,7 @@ async function start(): Promise<void> {
     el.addEventListener('change', f); f();
   };
   bind('ly-ref', (on) => { L.reference.visible = on; });
-  bind('ly-terrain', (on) => { L.terrain.visible = on; L.sides.visible = on; });
+  bind('ly-terrain', (on) => { L.terrain.visible = on; L.sides.visible = on; L.lines.visible = on; });
   bind('ly-grid', (on) => { L.grid.visible = on; });
   bind('ly-num', (on) => { L.numbers.visible = on; });
   bind('ly-labels', (on) => { L.labels.visible = on; });

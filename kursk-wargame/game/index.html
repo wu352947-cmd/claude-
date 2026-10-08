@@ -11,7 +11,7 @@
         --accent: #b3261e; --muted: #9a917a; --auto: #d9822b;
         font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
       }
-      html, body { margin: 0; height: 100%; background: #cfc8ad; overflow: hidden; touch-action: none; }
+      html, body { margin: 0; height: 100%; background: #2f2c26; overflow: hidden; touch-action: none; }
       #app { position: fixed; inset: 0; }
       #app canvas { display: block; }
       .bar {
@@ -46,10 +46,10 @@
       .muted { color: var(--muted); }
       .st-auto { color: var(--auto); }
       #loading {
-        position: fixed; inset: 0; display: grid; place-items: center; background: #cfc8ad; color: var(--ink);
+        position: fixed; inset: 0; display: grid; place-items: center; background: #2f2c26; color: #efe6c8;
         font-size: 16px; z-index: 3;
       }
-      .credit { position: fixed; right: 8px; bottom: 6px; font-size: 10px; color: #5a5442; z-index: 1; pointer-events: none; }
+      .credit { position: fixed; right: 8px; bottom: 6px; font-size: 10px; color: #a39a80; z-index: 1; pointer-events: none; }
     </style>
   </head>
   <body>
@@ -61,15 +61,15 @@
       <button id="layers-toggle">图层</button>
     </header>
     <div id="layers">
-      <label><input type="checkbox" id="ly-ref" checked /> 参考底图（美军 1:25 万）</label>
-      <input type="range" id="ref-opacity" min="0" max="100" value="45" aria-label="参考底图透明度" />
+      <label><input type="checkbox" id="ly-ref" /> 参考底图（美军 1:25 万）</label>
+      <input type="range" id="ref-opacity" min="0" max="100" value="55" aria-label="参考底图透明度" />
       <div class="hint">不透明度 <span id="ref-op-val"></span></div>
       <label><input type="checkbox" id="ly-terrain" checked /> 地形</label>
       <label><input type="checkbox" id="ly-grid" checked /> 六角格网</label>
       <label><input type="checkbox" id="ly-num" checked /> 格号（放大后显示）</label>
       <label><input type="checkbox" id="ly-labels" checked /> 地名</label>
-      <label><input type="checkbox" id="ly-status" checked /> <span class="swatch-auto"></span> 未核对标记（橙色菱形）</label>
-      <div class="hint">橙色菱形 = 程序自动提取、尚未人工核对的格子。<br />地形录入编辑器在下一轮加入。</div>
+      <label><input type="checkbox" id="ly-status" /> <span class="swatch-auto"></span> 未核对标记（橙色菱形）</label>
+      <div class="hint">橙色菱形 = 程序自动提取、尚未人工核对的格子。<br />样板区（普罗霍罗夫卡—捷捷列维诺）的村庄、河流、道路、铁路为 AI 转录草稿，均未核对。</div>
     </div>
     <div id="info" hidden></div>
     <div id="loading">正在绘制地图…</div>

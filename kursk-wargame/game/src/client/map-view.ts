@@ -1,8 +1,8 @@
 /** 地图各图层：参考底图、地形、格边、格网、格号、地名、核对状态、选中框。 */
 import { Assets, BitmapFont, BitmapText, Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
 import {
-  type Direction, type GameMap, type Offset, SIDE_FEATURES, hexCenter, hexCorners, hexId, parseHexId,
-  sideCorners, toWorld,
+  type Direction, type GameMap, type LineFeature, type Offset, type Point, SIDE_FEATURES, hexCenter, hexCorners, hexId,
+  linePoints, parseHexId, sideCorners, toWorld,
 } from '../engine';
 import { hashString } from './noise';
 import { PALETTE, PX_PER_KM } from './style';
@@ -11,7 +11,7 @@ import { renderPaper, renderTerrain, type WorldBounds } from './terrain-render';
 export interface MapView {
   root: Container;
   bounds: WorldBounds;
-  layers: { reference: Sprite; terrain: Sprite; sides: Graphics; grid: Graphics; numbers: Container; labels: Container; status: Graphics };
+  layers: { reference: Sprite; terrain: Sprite; sides: Graphics; lines: Graphics; grid: Graphics; numbers: Container; labels: Container; status: Graphics };
   select(h: Offset | null): void;
   onZoom(zoom: number): void;
 }
@@ -61,6 +61,56 @@ function drawSides(map: GameMap, g: Graphics): void {
   }
 }
 
+/** 平滑折线（Catmull-Rom → 三次贝塞尔） */
+function smoothPath(g: Graphics, pts: Point[]): Graphics {
+  const P = pts.map((p) => ({ x: p.x * K, y: p.y * K }));
+  g.moveTo(P[0]!.x, P[0]!.y);
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[Math.max(0, i - 1)]!, p1 = P[i]!, p2 = P[i + 1]!, p3 = P[Math.min(P.length - 1, i + 2)]!;
+    g.bezierCurveTo(p1.x + (p2.x - p0.x) / 6, p1.y + (p2.y - p0.y) / 6, p2.x - (p3.x - p1.x) / 6, p2.y - (p3.y - p1.y) / 6, p2.x, p2.y);
+  }
+  return g;
+}
+
+/** 河流、道路、铁路：按实际走向画平滑曲线（规则用的格边/连通由引擎另行推算）。 */
+function drawLines(map: GameMap, g: Graphics): void {
+  const byKind = (k: LineFeature['kind'], c?: LineFeature['class']): Point[][] =>
+    map.lines.filter((l) => l.kind === k && (c === undefined || l.class === c)).map((l) => linePoints(map.projection, l));
+  const round = { cap: 'round', join: 'round' } as const;
+  for (const p of byKind('stream')) smoothPath(g, p).stroke({ width: 0.12 * K, color: PALETTE.river, ...round });
+  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.55 * K, color: PALETTE.riverBank, ...round });
+  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.3 * K, color: PALETTE.river, ...round });
+  for (const p of byKind('track')) smoothPath(g, p).stroke({ width: 0.06 * K, color: PALETTE.road, alpha: 0.7, ...round });
+  for (const p of byKind('road', 'secondary')) smoothPath(g, p).stroke({ width: 0.2 * K, color: PALETTE.roadCasing, ...round });
+  for (const p of byKind('road', 'secondary')) smoothPath(g, p).stroke({ width: 0.09 * K, color: PALETTE.road, ...round });
+  for (const p of byKind('road', 'primary')) smoothPath(g, p).stroke({ width: 0.32 * K, color: PALETTE.roadCasing, ...round });
+  for (const p of byKind('road', 'primary')) smoothPath(g, p).stroke({ width: 0.17 * K, color: PALETTE.roadPrimary, ...round });
+  // 铁路：黑线 + 横向枕木短线
+  for (const pts of byKind('railway')) {
+    smoothPath(g, pts).stroke({ width: 0.11 * K, color: PALETTE.rail, ...round });
+    let carry = 0;
+    for (let i = 0; i < pts.length - 1; i++) {
+      const a = pts[i]!, b = pts[i + 1]!;
+      const len = Math.hypot(b.x - a.x, b.y - a.y);
+      const ux = (b.x - a.x) / len, uy = (b.y - a.y) / len;
+      for (let t = carry; t < len; t += 0.45) {
+        const x = a.x + ux * t, y = a.y + uy * t;
+        g.moveTo((x - uy * 0.16) * K, (y + ux * 0.16) * K).lineTo((x + uy * 0.16) * K, (y - ux * 0.16) * K);
+        carry = t + 0.45 - len;
+      }
+    }
+    g.stroke({ width: 0.06 * K, color: PALETTE.rail });
+  }
+}
+
+/** 地图外框：深色边框 + 浅色细内线（桌面兵棋地图的边框） */
+function drawFrame(b: WorldBounds, g: Graphics): void {
+  const w = 1.6;
+  g.rect((b.x0 - w / 2) * K, (b.y0 - w / 2) * K, (b.x1 - b.x0 + w) * K, (b.y1 - b.y0 + w) * K).stroke({ width: w * K, color: PALETTE.frame });
+  g.rect((b.x0 + 0.15) * K, (b.y0 + 0.15) * K, (b.x1 - b.x0 - 0.3) * K, (b.y1 - b.y0 - 0.3) * K).stroke({ width: 0.08 * K, color: PALETTE.frame, alpha: 0.8 });
+  g.rect((b.x0 - w - 0.2) * K, (b.y0 - w - 0.2) * K, (b.x1 - b.x0 + 2 * w + 0.4) * K, (b.y1 - b.y0 + 2 * w + 0.4) * K).stroke({ width: 0.1 * K, color: PALETTE.frameInner, alpha: 0.6 });
+}
+
 export async function createMapView(map: GameMap, referenceUrl: string): Promise<MapView> {
   const root = new Container();
   const bounds = gridBounds(map);
@@ -85,6 +135,10 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
 
   const sides = new Graphics();
   drawSides(map, sides);
+  const lines = new Graphics();
+  drawLines(map, lines);
+  const frame = new Graphics();
+  drawFrame(bounds, frame);
 
   // 格网
   const grid = new Graphics();
@@ -93,19 +147,20 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
       grid.poly(hexCorners(map.grid, { col, row }).flatMap((p) => [p.x * K, p.y * K]), true);
     }
   }
-  grid.stroke({ width: 1, color: PALETTE.hexLine, alpha: 0.5, pixelLine: true });
+  grid.stroke({ width: 1, color: PALETTE.hexLine, alpha: 0.75, pixelLine: true });
 
   // 格号
   BitmapFont.install({ name: 'hexnum', style: { fontFamily: 'Arial, sans-serif', fontSize: 28, fill: PALETTE.hexNumber }, chars: '0123456789', resolution: 2 });
+  // 格号：小而淡，像印刷兵棋地图那样贴在格子上沿
   const numbers = new Container();
   for (let col = 0; col < map.grid.cols; col++) {
     for (let row = 0; row < map.grid.rows; row++) {
       const h = { col, row };
       const c = hexCenter(map.grid, h);
-      const t = new BitmapText({ text: hexId(h), style: { fontFamily: 'hexnum', fontSize: 0.36 * K } });
+      const t = new BitmapText({ text: hexId(h), style: { fontFamily: 'hexnum', fontSize: 0.3 * K } });
       t.anchor.set(0.5, 0);
-      t.position.set(c.x * K, (c.y - map.grid.acrossKm / 2 + 0.12) * K);
-      t.alpha = 0.8;
+      t.position.set(c.x * K, (c.y - map.grid.acrossKm / 2 + 0.1) * K);
+      t.alpha = 0.9;
       numbers.addChild(t);
     }
   }
@@ -143,13 +198,13 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
 
   const selection = new Graphics();
 
-  root.addChild(paper, reference, terrain, sides, grid, status, numbers, labels, selection);
+  root.addChild(paper, reference, terrain, lines, sides, grid, frame, status, numbers, labels, selection);
   reference.alpha = 0.45;
   terrain.alpha = 1;
 
   return {
     root, bounds,
-    layers: { reference, terrain, sides, grid, numbers, labels, status },
+    layers: { reference, terrain, sides, lines, grid, numbers, labels, status },
     select(h) {
       selection.clear();
       if (!h) return;

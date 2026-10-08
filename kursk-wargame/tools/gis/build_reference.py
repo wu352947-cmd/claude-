@@ -131,14 +131,20 @@ def main(dl_dir):
     for c in range(cols):
         for rr in range(rows):
             i = c * rows + rr
-            if tot[i] > 0.6 * (3 * math.sqrt(3) / 2 * (m['hex']['acrossFlatsKm'] / math.sqrt(3)) ** 2 * ppk ** 2) and wd[i] / tot[i] >= 0.45:
+            if tot[i] > 0.6 * (3 * math.sqrt(3) / 2 * (m['hex']['acrossFlatsKm'] / math.sqrt(3)) ** 2 * ppk ** 2) and wd[i] / tot[i] >= 0.33:
                 hexes[f'{c + 1:02d}{rr + 1:02d}'] = {
                     'terrain': 'woods', 'status': 'auto',
                     'note': f'自动提取：林地占比 {wd[i] / tot[i]:.0%}', 'sources': ['SRC-0101', 'SRC-0102']}
     path = os.path.join(GAME, 'data/maps/south.hexes.json')
+    # 保护人工数据：已有的非 auto 记录一律保留，只更新自动提取的草稿
+    if os.path.exists(path):
+        old = json.load(open(path, encoding='utf-8'))['hexes']
+        for k, v in old.items():
+            if v.get('status') != 'auto':
+                hexes[k] = v
     json.dump({'$comment': '只列非开阔地的格子。status: auto = 程序自动提取未核对；verified = 已人工核对。',
                'hexes': hexes}, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('林地草稿格数', len(hexes))
+    print('林地草稿格数', sum(1 for v in hexes.values() if v['status'] == 'auto'), '保留人工记录', sum(1 for v in hexes.values() if v['status'] != 'auto'))
 
 
 if __name__ == '__main__':

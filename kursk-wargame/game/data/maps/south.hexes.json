@@ -10,6 +10,51 @@
     "SRC-0102"
    ]
   },
+  "0708": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 44%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "0814": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 35%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "0816": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 43%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "0829": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 37%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "0907": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 34%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "1018": {
    "terrain": "woods",
    "status": "auto",
@@ -28,6 +73,24 @@
     "SRC-0102"
    ]
   },
+  "1522": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 38%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "1922": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 37%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "1923": {
    "terrain": "woods",
    "status": "auto",
@@ -37,10 +100,37 @@
     "SRC-0102"
    ]
   },
+  "2019": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 33%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2023": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 40%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "2226": {
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 49%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2232": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 43%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -59,6 +149,15 @@
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 64%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2632": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 34%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -91,6 +190,15 @@
     "SRC-0102"
    ]
   },
+  "2829": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 41%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "2830": {
    "terrain": "woods",
    "status": "auto",
@@ -118,10 +226,28 @@
     "SRC-0102"
    ]
   },
+  "2833": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 34%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "2834": {
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 48%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2835": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 44%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -163,6 +289,33 @@
     "SRC-0102"
    ]
   },
+  "2932": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 36%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2937": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 40%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3036": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 34%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "3131": {
    "terrain": "woods",
    "status": "auto",
@@ -199,6 +352,15 @@
     "SRC-0102"
    ]
   },
+  "3135": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 45%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "3136": {
    "terrain": "woods",
    "status": "auto",
@@ -212,6 +374,15 @@
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 86%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3227": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 43%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -257,6 +428,15 @@
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 65%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3233": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 38%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -343,6 +523,15 @@
     "SRC-0102"
    ]
   },
+  "3434": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 34%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
   "3435": {
    "terrain": "woods",
    "status": "auto",
@@ -365,6 +554,15 @@
    "terrain": "woods",
    "status": "auto",
    "note": "自动提取：林地占比 82%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3528": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 35%",
    "sources": [
     "SRC-0101",
     "SRC-0102"
@@ -458,6 +656,334 @@
    "sources": [
     "SRC-0101",
     "SRC-0102"
+   ]
+  },
+  "2515": {
+   "terrain": "town",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Prokhorovka (st.) / Aleksandrovskiy",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2314": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Petrovka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2315": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Oktyabr'skiy",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2116": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Andreyevka；Vasil'yevka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2015": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Kozlovka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2115": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Mikhaylovka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2114": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Polezhayev",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2014": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Klyuchi",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "1915": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Krasnyy Oktyabr'",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2013": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Veselyy",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2012": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Kartashevka；Nizhnyaya Ol'shanka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2412": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Vyshnyaya Ol'shanka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2413": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Beregovoye",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2614": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Mordovka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2615": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Khlamov；Grushki",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2415": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Yamki；Lutovo",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2512": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Malaya Psinka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2713": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Skorovka",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2814": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Borisov",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "2915": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Prizanachnoye",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  "1917": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Malyye Mayachki",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "1819": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Bol'shiye Mayachki",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "1720": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Pokrovka",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "1721": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Yakovlevo",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2020": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Luchki (S)",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "1919": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Luchki (N)",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2119": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Ozerovskiy",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2118": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Khutor Teterevino",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2220": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Teterevino",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2319": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Belenikhino",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2320": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Leski",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2517": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Pravorot'",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2518": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Zhilomostnoye",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2618": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Novoselovka",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2619": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Plota",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2521": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Shakhovo",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2321": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Volobuyevka",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2721": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Ryndinka",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2820": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Vypolzovka",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2918": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Ploskiy",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "2717": {
+   "terrain": "village",
+   "status": "unverified",
+   "note": "AI 从 AMS 图转录：Krasnoye",
+   "sources": [
+    "SRC-0101"
    ]
   }
  }
