@@ -125,7 +125,7 @@ class CaptureService : Service() {
 
         overlay = SubtitleOverlay(this).also { it.show() }
         running = true
-        SubtitleBus.update { it.copy(running = true, partial = "", liveZh = "", liveTail = "", level = 0f, notice = "正在加载识别模型…") }
+        SubtitleBus.update { it.copy(running = true, partial = "", level = 0f, notice = "正在加载识别模型…") }
         pipeline.start()
 
         worker = Thread({ captureLoop(rec, rate) }, "yimu-asr").apply { start() }
@@ -219,7 +219,7 @@ class CaptureService : Service() {
         overlay = null
         try { projection?.stop() } catch (_: Exception) {}
         projection = null
-        SubtitleBus.update { it.copy(running = false, partial = "", liveZh = "", liveTail = "", level = 0f) }
+        SubtitleBus.update { it.copy(running = false, partial = "", level = 0f) }
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }

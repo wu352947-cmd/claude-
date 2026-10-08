@@ -55,10 +55,10 @@ class SubtitleOverlay(private val context: Context) {
     }
     private val hint = text(sizeSp = 13f, color = Color.argb(170, 255, 255, 255), weight = 500)
 
-    /** 上一句的中文，缩小变淡留在上方，读得慢也跟得上。 */
+    /** 上一句的中文，缩小变淡留在上方，读得慢也跟得上；只留一行，太长就省略前面。 */
     private val prev = text(sizeSp = 15f, color = Color.argb(120, 255, 255, 255), weight = 400).apply {
         setPadding(0, 0, 0, dp(6f))
-        maxLines = 2
+        maxLines = 1
         ellipsize = TextUtils.TruncateAt.START
     }
 
@@ -170,23 +170,20 @@ class SubtitleOverlay(private val context: Context) {
         var errorText: String? = null
         var hasMain = false
 
-        if (speaking && (s.liveZh.isNotEmpty() || s.liveTail.isNotEmpty())) {
-            // 正在说：白色是已定稿的中文，灰色是本地草稿
-            white = s.liveZh
-            gray = s.liveTail
-            enText = prettify(s.partial)
-            prevText = last?.let { lineZh(it) }
-            hasMain = true
-        } else if (last != null && !idle) {
+        if (last != null && (!idle || !last.done)) {
+            // 当前这一行：白色是 DeepSeek 译文（只有最后半句可能还会变），灰色是本地草稿
             if (last.error != null) {
                 errorText = last.error
             } else {
                 white = last.zh.orEmpty()
-                gray = if (last.done) "" else last.tail.orEmpty()
+                gray = if (white.isEmpty() && !last.done) last.tail.orEmpty() else ""
                 if (white.isEmpty() && gray.isEmpty() && !last.done) white = "…"
             }
-            enText = last.englishForDisplay
-            if (speaking) liveText = prettify(s.partial)
+            val english = listOf(last.englishForDisplay, if (!last.done) prettify(s.partial) else "")
+                .filter { it.isNotBlank() }.joinToString(" ")
+            enText = english.ifEmpty { null }
+            // 这一行已经结束、新的一句已经开始说但还没建行时，在下方显示正在说的英文
+            if (speaking && last.done) liveText = prettify(s.partial)
             prevText = s.lines.getOrNull(s.lines.size - 2)?.let { lineZh(it) }
             hasMain = true
         } else if (speaking) {

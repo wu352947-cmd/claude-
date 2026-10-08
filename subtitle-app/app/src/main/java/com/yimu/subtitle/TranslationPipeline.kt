@@ -1,306 +1,317 @@
 package com.yimu.subtitle
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 
 /**
  * 识别结果 → 中文字幕的调度。所有方法都在主线程调用。
  *
- * 三层设计，让中文尽量贴着说话出现，同时不乱跳：
+ * 字幕按"句"组织（一行 = 一句话，可能跨越说话人的好几次停顿）：
  *
- * 1. 本地草稿（灰色，几十毫秒）：英文每变一次，平板上的小模型立刻翻出草稿；
- * 2. 分段定稿（白色）：识别结果连续两次一致的词才算"确定"。确定的英文每多出几个词，
- *    或说话人一停顿，就让 DeepSeek 把这部分翻成正式中文；
- * 3. 只往后长：后面每一段都用"续写"——把屏幕上已经定稿的中文交给 DeepSeek，让它只接着往下翻。
- *    已经显示的白色中文不会再被改写，读起来像同声传译。
- *
- * 一句话结束时，如果定稿已经覆盖了整句，字幕零等待直接完成；否则只续写剩下的一小段。
+ * 1. 每次都把这句话目前听到的全部英文交给 DeepSeek，并把已经锁定的中文作为开头让它续写；
+ * 2. 它新写出的中文里，到最后一个标点（，。？！）为止的部分是完整的分句，锁定后不再改动；
+ *    标点后面那半句可能还没说完，下次请求时允许重翻——所以屏幕上会变的只有最后半句，
+ *    而且不会出现"按词数硬拼"造成的病句；
+ * 3. 说话人停顿后接着说，如果上一段中文还没以「。？！」结尾，就接在同一行后面继续翻，
+ *    不会把一句话切成两行；
+ * 4. 这句话刚开始、DeepSeek 还没返回时，先显示本地小模型的灰色草稿。
  */
 class TranslationPipeline(private val ctx: Context, private val scope: CoroutineScope) {
 
     private val translator = Translator { Prefs.apiKey(ctx) }
-    private val slots = Semaphore(4)
+    private val main = Handler(Looper.getMainLooper())
     private var nextId = 1L
     private var lastWordAt = 0L
     private var failStreak = 0
 
-    /** DeepSeek 的续写接口万一不可用，就退回到"整句翻译"。 */
+    /** DeepSeek 的续写接口万一不可用，就退回到"每次整句重翻"。 */
     private var prefixOk = true
 
-    /** 正在说的这一句话。 */
-    private class Utterance {
-        var words: List<String> = emptyList()
-        var prevWords: List<String> = emptyList()
-        /** 已定稿的中文覆盖了前多少个英文词。 */
-        var committedWords = 0
-        var committedZh = ""
-        /** 已经请求定稿到第几个词（包括正在翻译中的）。 */
-        var requested = 0
-        var job: Job? = null
+    /** 正在构建的一行字幕（一句话）。 */
+    private class Seg(val id: Long) {
+        /** 已经说完的几段英文（不含正在说的这段）。 */
+        val doneWords = mutableListOf<String>()
+        /** 锁定的中文（完整分句），不再改动。 */
+        var locked = ""
+        /** 最后半句的中文，下次请求可能重翻。 */
         var tail = ""
-        var whiteAt = 0L
-        /** 这句话说完后对应的字幕行。 */
-        var lineId: Long? = null
+        /** 已经发给 DeepSeek 的英文词数。 */
+        var sentWords = 0
+        var job: Job? = null
+        /** 当前请求进行中又有新内容：请求结束后再发一次。 */
+        var pendingFinal = false
+        var pendingWords = 0
+        var closed = false
+        var localDraft = ""
     }
 
-    private var utt = Utterance()
+    private var seg: Seg? = null
+    private var words: List<String> = emptyList()
+    private var prevWords: List<String> = emptyList()
 
     fun start() {
         scope.launch { translator.warmUp() }
         LocalTranslator.check()
     }
 
+    // ---------- 识别事件 ----------
+
     fun onPartial(p: String) {
         val now = System.currentTimeMillis()
-        val u = utt
-        if (p.isNotEmpty()) lastWordAt = now
-        u.prevWords = u.words
-        u.words = split(p)
+        prevWords = words
+        words = split(p)
         SubtitleBus.update { it.copy(partial = p, updatedAt = now) }
         if (p.isEmpty()) return
-        refreshTail(u)
-        // 一口气说很长不停顿时：确定下来的词每多 8 个就定稿一段
+        lastWordAt = now
+        val s = currentSeg()
+        cancelCloseTimer()
+        refreshDraft(s)
         if (Prefs.fastMode(ctx)) {
-            val stable = stableCount(u)
-            if (stable - u.requested >= 8) commit(u, stable)
+            // 一口气说很长不停顿：确定下来的新词每多 8 个就翻一次
+            val stable = s.doneWords.size + stableCount()
+            if (stable - s.sentWords >= 8) request(s, stable, final = false)
         }
     }
 
-    /**
-     * 说话人停顿。用真实录音模拟调出来的规则：
-     * - 短停顿（0.2 秒）：最后一个词可能还没识别完，不算它；新确定的词够 5 个才定稿一段，
-     *   段太短的话中文语序翻不自然，请求也太频繁；
-     * - 长停顿（0.4 秒）：多半是一句话说完了，整段定稿，这样句末几乎零等待。
-     */
     fun onPause(p: String, long: Boolean) {
-        val u = utt
-        u.words = split(p)
-        if (!Prefs.fastMode(ctx)) return
+        words = split(p)
+        val s = seg ?: return
+        if (!Prefs.fastMode(ctx) || s.closed) return
+        val total = s.doneWords.size + words.size
         if (long) {
-            if (u.words.size - u.requested >= 1) commit(u, u.words.size)
-        } else if (u.words.size - 1 - u.requested >= 5) {
-            commit(u, u.words.size - 1)
+            if (total > s.sentWords) request(s, total, final = false)
+        } else {
+            // 短停顿：最后一个词可能还没识别完，不算它
+            val stable = total - 1
+            if (stable - s.sentWords >= 3) request(s, stable, final = false)
         }
     }
 
     fun onFinal(raw: String) {
-        val u = utt
-        utt = Utterance()
-        SubtitleBus.update { it.copy(liveZh = "", liveTail = "") }
-
+        val finalWords = split(raw)
+        words = emptyList()
+        prevWords = emptyList()
+        SubtitleBus.update { it.copy(partial = "") }
+        val s = seg ?: return
         // 过滤掉 "UH"、"OH" 这类单个语气词
-        if (raw.length < 3) {
-            u.job?.cancel()
+        if (raw.length >= 3) s.doneWords += finalWords
+        SubtitleBus.patchLine(s.id) { it.copy(raw = s.doneWords.joinToString(" ")) }
+        if (s.doneWords.isEmpty()) {
+            dropSeg(s)
             return
         }
-        u.words = split(raw)
-        val id = nextId++
-        u.lineId = id
-        val previous = context()
-        SubtitleBus.addLine(
-            Line(
-                id = id,
-                raw = raw,
-                zh = u.committedZh.ifEmpty { null },
-                tail = u.tail.ifEmpty { null },
-                spokenAt = lastWordAt,
-                latencyMs = if (u.whiteAt > 0) latency(u.whiteAt, lastWordAt) else null,
-            ),
-        )
-        refreshTail(u)
+        request(s, s.doneWords.size, final = true)
+        // 一段时间没人说话，这句就收尾（锁定最后半句）
+        scheduleClose(s)
+    }
 
-        scope.launch {
-            u.job?.join() // 正在定稿的那一段先完成（它会直接写进这一行）
-            when {
-                u.committedZh.isNotEmpty() && u.committedWords >= u.words.size -> {
-                    // 定稿已经覆盖整句：零等待
-                    SubtitleBus.patchLine(id) { it.copy(done = true, tail = null) }
-                }
-                u.committedZh.isEmpty() || !prefixOk -> translateWhole(id, raw, previous)
-                else -> continueLine(id, u, raw, previous)
-            }
+    // ---------- 行（句子）管理 ----------
+
+    private fun currentSeg(): Seg {
+        val s = seg
+        if (s != null && !s.closed) {
+            // 已经很长了，即使没有句号也换行，避免一行太长
+            if (s.locked.length + s.tail.length < MAX_LINE_CHARS && s.doneWords.size < MAX_LINE_WORDS) return s
+            close(s)
         }
+        val n = Seg(nextId++)
+        seg = n
+        SubtitleBus.addLine(Line(id = n.id, raw = "", spokenAt = System.currentTimeMillis()))
+        return n
     }
 
-    // ---------- 分段定稿 ----------
-
-    private fun commit(u: Utterance, target: Int) {
-        u.requested = maxOf(u.requested, target)
-        if (u.job?.isActive == true) return // 当前这段翻完后会自动接着翻
-        runCommit(u)
+    private fun dropSeg(s: Seg) {
+        s.job?.cancel()
+        s.closed = true
+        if (seg === s) seg = null
+        SubtitleBus.update { st -> st.copy(lines = st.lines.filterNot { it.id == s.id }) }
     }
 
-    private fun runCommit(u: Utterance) {
-        val target = u.requested.coerceAtMost(u.words.size)
-        if (target <= u.committedWords) return
-        val prefix = u.committedZh
-        if (prefix.isNotEmpty() && !prefixOk) return
-        val english = u.words.take(target).joinToString(" ")
-        val previous = context()
-        val before = u.committedWords
-        u.job = scope.launch {
-            try {
-                var started = false
-                val cont = slots.withPermit {
-                    translator.continueTranslation(english, prefix, previous) { partial ->
-                        if (!started && partial.isNotEmpty()) {
-                            started = true
-                            u.committedWords = target
-                            refreshTail(u)
-                        }
-                        showWhite(u, prefix + partial)
+    private fun close(s: Seg) {
+        if (s.closed) return
+        s.closed = true
+        if (seg === s) seg = null
+        s.locked += s.tail
+        s.tail = ""
+        SubtitleBus.patchLine(s.id) { it.copy(zh = s.locked.ifEmpty { it.zh }, done = true, tail = null) }
+    }
+
+    private var closeTimer: Runnable? = null
+
+    private fun scheduleClose(s: Seg) {
+        cancelCloseTimer()
+        val r = Runnable {
+            if (s.job?.isActive == true) scheduleClose(s) else close(s)
+        }
+        closeTimer = r
+        main.postDelayed(r, CLOSE_AFTER_MS)
+    }
+
+    private fun cancelCloseTimer() {
+        closeTimer?.let { main.removeCallbacks(it) }
+        closeTimer = null
+    }
+
+    // ---------- 翻译请求 ----------
+
+    private fun englishUpTo(s: Seg, count: Int): String {
+        val all = s.doneWords + words
+        return all.take(count.coerceAtMost(all.size)).joinToString(" ")
+    }
+
+    private fun request(s: Seg, count: Int, final: Boolean) {
+        if (s.job?.isActive == true) {
+            // 同一行同时只发一个请求；结束后用最新内容再发
+            s.pendingWords = maxOf(s.pendingWords, count)
+            s.pendingFinal = s.pendingFinal || final
+            return
+        }
+        val english = englishUpTo(s, count)
+        if (english.isBlank()) return
+        s.sentWords = maxOf(s.sentWords, count)
+        val prefix = if (prefixOk) s.locked else ""
+        val previous = context(s.id)
+        s.job = scope.launch {
+            var ok = false
+            var attempt = 0
+            while (!ok) {
+                try {
+                    val cont = translator.continueTranslation(english, prefix, previous) { partial ->
+                        apply(s, prefix, partial, final = false)
                     }
+                    apply(s, prefix, cont, final = final, done = true)
+                    ok = true
+                    failStreak = 0
+                    clearNoticeIfOk()
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Translator.TranslateException) {
+                    if (prefix.isNotEmpty() && e.code in 400..499 && e.code !in listOf(401, 402, 429)) {
+                        prefixOk = false
+                    }
+                    attempt++
+                    if (e.retryable && attempt < 3 && final) {
+                        delay(400L * attempt)
+                        continue
+                    }
+                    onFailure(s, e)
+                    break
                 }
-                u.committedZh = prefix + cont
-                u.committedWords = target
-                showWhite(u, u.committedZh)
-                refreshTail(u)
-                failStreak = 0
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Translator.TranslateException) {
-                if (prefix.isNotEmpty() && e.code in 400..499 && e.code !in listOf(401, 402, 429)) prefixOk = false
-                u.committedWords = before
-                u.requested = before
-                showWhite(u, prefix)
-                refreshTail(u)
-                return@launch
             }
-            if (u.requested > u.committedWords && u.lineId == null) runCommit(u)
+            // 请求期间又有新内容
+            if (s.pendingWords > 0 && !s.closed) {
+                val c = s.pendingWords
+                val f = s.pendingFinal
+                s.pendingWords = 0
+                s.pendingFinal = false
+                if (c > s.sentWords || f) request(s, maxOf(c, s.sentWords), f)
+            }
         }
     }
 
-    private fun showWhite(u: Utterance, text: String) {
-        val now = System.currentTimeMillis()
-        if (u.whiteAt == 0L && text.isNotEmpty()) u.whiteAt = now
-        val lineId = u.lineId
-        if (lineId != null) {
-            SubtitleBus.patchLine(lineId) { l ->
-                l.copy(zh = text, latencyMs = l.latencyMs ?: if (text.isNotEmpty()) latency(now, l.spokenAt) else null)
+    /**
+     * 把 DeepSeek 的输出写进这一行：[cont] 是接在 [prefix] 后面新写的中文。
+     * 结束时，到最后一个标点为止的部分锁定；剩下的半句留作"可重翻"。
+     */
+    private fun apply(s: Seg, prefix: String, cont: String, final: Boolean, done: Boolean = false) {
+        if (s.closed && !done) return
+        // 续写接口不可用时 prefix 为空，cont 就是整句的新译文，直接替换
+        val base = prefix
+        if (done) {
+            val cut = lastClauseEnd(cont)
+            if (final || cut == cont.length) {
+                s.locked = base + cont
+                s.tail = ""
+            } else {
+                s.locked = base + cont.substring(0, cut)
+                s.tail = cont.substring(cut)
             }
-        } else if (u === utt) {
-            SubtitleBus.update { it.copy(liveZh = text, updatedAt = now) }
+        } else {
+            s.tail = cont
         }
+        val now = System.currentTimeMillis()
+        val zh = (if (done) s.locked else base) + s.tail
+        SubtitleBus.patchLine(s.id) { l ->
+            l.copy(
+                zh = zh.ifEmpty { l.zh },
+                tail = if (zh.isNotEmpty()) null else l.tail,
+                latencyMs = if (done && final) latency(now, lastWordAt) else l.latencyMs,
+            )
+        }
+        SubtitleBus.update { it.copy(updatedAt = now) }
+        // 一句话已经结束（句号/问号/叹号），这一行就收尾，下一段话另起一行
+        if (done && final && endsSentence(s.locked)) close(s)
+    }
+
+    private fun onFailure(s: Seg, e: Translator.TranslateException) {
+        failStreak++
+        SubtitleBus.patchLine(s.id) { l ->
+            if (l.zh != null || l.tail != null) l else l.copy(error = if (e.retryable) "网络不稳，这句没翻译出来" else e.message)
+        }
+        if (failStreak >= 2) {
+            SubtitleBus.update {
+                it.copy(notice = "翻译连接不稳定。如果开着 VPN，建议把 deepseek.com 设为直连（国内服务，直连更快更稳）")
+            }
+        }
+    }
+
+    private fun clearNoticeIfOk() {
+        if (SubtitleBus.state.value.notice?.startsWith("翻译连接") == true) SubtitleBus.update { it.copy(notice = null) }
     }
 
     // ---------- 本地草稿 ----------
 
-    private fun refreshTail(u: Utterance) {
-        val rest = u.words.drop(u.committedWords).joinToString(" ")
-        if (rest.isBlank()) {
-            setTail(u, "")
-            return
-        }
-        LocalTranslator.translate(rest) { zh ->
-            // 草稿翻回来时，这部分可能已经被定稿了
-            if (u.words.drop(u.committedWords).joinToString(" ").isNotBlank()) setTail(u, zh)
-        }
-    }
-
-    private fun setTail(u: Utterance, zh: String) {
-        u.tail = zh
-        val lineId = u.lineId
-        if (lineId != null) {
-            SubtitleBus.patchLine(lineId) { if (it.done) it else it.copy(tail = zh.ifEmpty { null }) }
-        } else if (u === utt) {
-            SubtitleBus.update { it.copy(liveTail = zh, updatedAt = System.currentTimeMillis()) }
-        }
-    }
-
-    // ---------- 一句话结束后的收尾 ----------
-
-    /** 已经定稿了前半句：只续写剩下的部分。 */
-    private suspend fun continueLine(id: Long, u: Utterance, raw: String, previous: List<String>) {
-        val prefix = u.committedZh
-        withRetry(id) {
-            val cont = slots.withPermit {
-                translator.continueTranslation(raw, prefix, previous) { partial -> showWhite(u, prefix + partial) }
-            }
-            SubtitleBus.patchLine(id) { it.copy(zh = prefix + cont, done = true, tail = null, error = null) }
-        }
-    }
-
-    /** 整句翻译（关闭抢先翻译时，或这句话没来得及定稿）。 */
-    private suspend fun translateWhole(id: Long, raw: String, previous: List<String>) {
-        withRetry(id) {
-            val out = slots.withPermit {
-                translator.stream(raw, previous) { partial ->
-                    // 白色译文追上灰色草稿的长度后再替换，避免字幕先变短再变长
-                    val line = SubtitleBus.state.value.lines.firstOrNull { it.id == id }
-                    if (line != null && partial.zh.length >= (line.tail?.length ?: 0) * 0.6) applyWhole(id, partial, false)
-                }
-            }
-            applyWhole(id, out, true)
-        }
-    }
-
-    private fun applyWhole(id: Long, out: Translator.Output, done: Boolean) {
-        val now = System.currentTimeMillis()
-        SubtitleBus.patchLine(id) { l ->
-            l.copy(
-                zh = out.zh,
-                en = out.en ?: l.en,
-                done = done,
-                tail = if (done) null else l.tail,
-                error = null,
-                latencyMs = l.latencyMs ?: if (out.zh.isNotEmpty()) latency(now, l.spokenAt) else null,
-            )
-        }
-    }
-
-    /** 网络抖动时自动重试，不在字幕上报错；实在不行就只显示英文和本地草稿。 */
-    private suspend fun withRetry(id: Long, block: suspend () -> Unit) {
-        var attempt = 0
-        while (true) {
-            try {
-                block()
-                failStreak = 0
-                if (SubtitleBus.state.value.notice?.startsWith("翻译连接") == true) {
-                    SubtitleBus.update { it.copy(notice = null) }
-                }
-                return
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Translator.TranslateException) {
-                attempt++
-                if (e.retryable && attempt < 3) {
-                    delay(400L * attempt)
-                    continue
-                }
-                failStreak++
-                SubtitleBus.patchLine(id) {
-                    it.copy(error = if (it.tail != null || it.zh != null) null else if (e.retryable) "网络不稳，这句没翻译出来" else e.message, done = true)
-                }
-                if (failStreak >= 2) {
-                    SubtitleBus.update {
-                        it.copy(notice = "翻译连接不稳定。如果开着 VPN，建议把 deepseek.com 设为直连（国内服务，直连更快更稳）")
-                    }
-                }
-                return
+    /** DeepSeek 还没给出这一行的任何中文时，先用本地小模型显示灰色草稿。 */
+    private fun refreshDraft(s: Seg) {
+        if (s.locked.isNotEmpty() || s.tail.isNotEmpty()) return
+        val text = englishUpTo(s, Int.MAX_VALUE)
+        LocalTranslator.translate(text) { zh ->
+            if (s.locked.isEmpty() && s.tail.isEmpty() && !s.closed) {
+                s.localDraft = zh
+                SubtitleBus.patchLine(s.id) { it.copy(tail = zh.ifEmpty { null }) }
+                SubtitleBus.update { it.copy(updatedAt = System.currentTimeMillis()) }
             }
         }
     }
 
     // ---------- 小工具 ----------
 
-    /** 识别结果里"连续两次都一样"的前缀词数；最后一个词可能还没说完，不算。 */
-    private fun stableCount(u: Utterance): Int {
-        val a = u.prevWords
-        val b = u.words
+    private fun stableCount(): Int {
         var n = 0
-        while (n < a.size && n < b.size && a[n] == b[n]) n++
-        return minOf(n, b.size - 1).coerceAtLeast(0)
+        while (n < prevWords.size && n < words.size && prevWords[n] == words[n]) n++
+        return minOf(n, words.size - 1).coerceAtLeast(0)
     }
 
-    private fun context(): List<String> = SubtitleBus.state.value.lines.takeLast(3).map { it.englishForDisplay }
+    private fun context(currentId: Long): List<String> =
+        SubtitleBus.state.value.lines.filter { it.id != currentId && it.raw.isNotEmpty() }
+            .takeLast(2).map { it.englishForDisplay }
 
     private fun latency(shownAt: Long, spokenAt: Long) = if (spokenAt == 0L) 0L else (shownAt - spokenAt).coerceAtLeast(0)
 
     private fun split(s: String) = s.trim().split(' ').filter { it.isNotEmpty() }
+
+    companion object {
+        private const val CLOSE_AFTER_MS = 1800L
+        private const val MAX_LINE_CHARS = 46
+        private const val MAX_LINE_WORDS = 40
+        private const val CLAUSE_MARKS = "，。？！；：…,.?!;"
+        private const val SENTENCE_MARKS = "。？！…?!."
+
+        /** 最后一个分句标点之后的位置；没有标点时返回 0。 */
+        fun lastClauseEnd(s: String): Int {
+            for (i in s.length - 1 downTo 0) if (CLAUSE_MARKS.indexOf(s[i]) >= 0) return i + 1
+            return 0
+        }
+
+        fun endsSentence(s: String): Boolean {
+            val t = s.trimEnd('”', '"', '』', '」', ' ')
+            return t.isNotEmpty() && SENTENCE_MARKS.indexOf(t.last()) >= 0
+        }
+    }
 }
