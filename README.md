@@ -5,6 +5,7 @@
 - **落地页** `/`：水墨晕染圆窗、节气罗盘、拾物板、诗笺、千里江山画卷、湖上心愿灯（可试玩，数据只存在本机）
 - **手帐应用** `/app/`：注册登录后使用，数据存在服务器
 - **macOS Tahoe Web** `macos/`：独立的浏览器版 Mac 复刻，见 [macos/README.md](macos/README.md)
+- **库尔斯克 1943 兵棋** `kursk-wargame/`：作战级兵棋的设计、技术架构与史料复原方案（规划文档），见 [kursk-wargame/README.md](kursk-wargame/README.md)
 
 ## 功能
 
