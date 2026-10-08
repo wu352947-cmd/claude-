@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         译幕 · 网页翻译
 // @namespace    com.yimu.subtitle
-// @version      0.1.1
+// @version      0.1.2
 // @description  用 DeepSeek 把英文网页整页翻译成自然的中文。点右下角「译」切换 中文 / 双语 / 原文。
 // @match        *://*/*
 // @noframes
@@ -540,7 +540,11 @@ window.__yimuMode = auto && looksEnglish() ? savedMode : 'off';
   var panel = $('panel');
   var btn = $('btn');
 
+  // 用户在这个页面手动点了「原文」，就不要再自动翻译这个页面
+  var userOff = false;
+
   function setMode(m) {
+    if (m === 'off' && current !== 'off') userOff = true;
     current = m;
     if (m !== 'off') GM_setValue('mode', m);
     window.__yimu.setMode(m);
@@ -598,5 +602,32 @@ window.__yimuMode = auto && looksEnglish() ? savedMode : 'off';
   ui.open = function () { panel.classList.add('show'); render(); };
   document.documentElement.appendChild(host);
   render();
+
+  /*
+   * 常驻：
+   * 1. 有些网站重绘页面时会把「译」按钮删掉，发现不在了就重新挂上；
+   * 2. 很多网站先出一个空架子，内容过一会儿才加载，所以英文检测要多试几次；
+   * 3. YouTube / Reddit / X 这类单页网站换页时不会重新加载，监听地址变化后重新判断；
+   * 4. 从后台切回、返回上一页时（页面从缓存恢复），也重新判断一次。
+   */
+  function maybeAuto() {
+    if (!auto || userOff || current !== 'off' || !apiKey) return;
+    if (looksEnglish()) setMode(GM_getValue('mode', 'zh'));
+  }
+
+  var lastUrl = location.href;
+  setInterval(function () {
+    if (!host.isConnected) (document.body || document.documentElement).appendChild(host);
+    if (location.href !== lastUrl) {
+      lastUrl = location.href;
+      userOff = false;
+      maybeAuto();
+    }
+  }, 1000);
+  [1500, 4000, 8000].forEach(function (t) { setTimeout(maybeAuto, t); });
+  window.addEventListener('pageshow', maybeAuto);
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') maybeAuto();
+  });
 })();
 })();
