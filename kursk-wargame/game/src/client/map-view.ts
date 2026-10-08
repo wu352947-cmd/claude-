@@ -74,8 +74,9 @@ function buildLabels(map: GameMap): Container {
     if (l.names.en) {
       const en = new Text({
         text: l.names.en,
-        style: { fontFamily: FONT_LATIN, fontSize: SIZE[l.kind] * 0.68, fontStyle: 'italic', fill: PALETTE.labelSub, stroke: { color: PALETTE.labelHalo, width: 2.5, join: 'round' } },
-        resolution: 3,
+        style: { fontFamily: FONT_LATIN, fontSize: SIZE[l.kind] * 0.78, fontStyle: 'italic', fill: PALETTE.labelSub, stroke: { color: PALETTE.labelHalo, width: 2.5, join: 'round' } },
+        // 地名在屏幕上 1:1 显示，按屏幕像素密度生成；更高倍生成再缩小会出现锯齿
+        resolution: Math.min(2, window.devicePixelRatio || 1),
       });
       en.anchor.set(0.5, 1);
       en.position.set(0, -3);

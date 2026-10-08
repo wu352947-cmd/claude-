@@ -11,7 +11,7 @@ import labels from '../../data/maps/south.labels.json';
 import lines from '../../data/maps/south.lines.json';
 import { attachCamera } from './camera';
 import { createMapView } from './map-view';
-import { PX_PER_KM } from './style';
+import { MAP_FONTS, PX_PER_KM } from './style';
 
 const meta = GameMeta.parse(rawMeta);
 const map = loadMap({ def, hexes, hexsides, labels, lines });
@@ -59,6 +59,13 @@ async function start(): Promise<void> {
   await app.init({ resizeTo: host, background: '#2b2e30', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
   host.appendChild(app.canvas);
 
+  // 先加载地图字体，否则 PixiJS 会用后备字体把文字画进纹理
+  await Promise.all(MAP_FONTS.map(async (f) => {
+    try {
+      const face = new FontFace(f.family, `url(${import.meta.env.BASE_URL}${f.file})`, { style: f.style });
+      document.fonts.add(await face.load());
+    } catch (e) { console.warn('字体加载失败，使用后备字体', f.family, e); }
+  }));
   view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`,
     map.def.relief ? `${import.meta.env.BASE_URL}${map.def.relief.image}` : undefined);
   app.stage.addChild(view.root);

@@ -52,4 +52,6 @@ export const PALETTE = {
 
 /** 字体：地名用衬线体（印刷地图的质感），界面用无衬线体 */
 export const FONT_SERIF = '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif';
-export const FONT_LATIN = 'Georgia, "Times New Roman", serif';
+/** 拉丁转写：IM Fell English 斜体（仿 17 世纪铅字，自托管子集，见 tools/fonts/fetch-map-fonts.mjs） */
+export const MAP_FONTS = [{ family: 'Map Latin', file: 'fonts/map-latin.woff2', style: 'italic' }] as const;
+export const FONT_LATIN = '"Map Latin", Georgia, serif';
