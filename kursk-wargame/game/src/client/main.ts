@@ -1,68 +1,87 @@
-import { Application, Container, Graphics, Text } from 'pixi.js';
-import { ENGINE_VERSION, GameMeta } from '../engine';
+import { Application } from 'pixi.js';
+import {
+  ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
+  formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, loadMap, sideRecord, toLatLon,
+} from '../engine';
 import rawMeta from '../../data/game.json';
+import def from '../../data/maps/south.json';
+import hexes from '../../data/maps/south.hexes.json';
+import hexsides from '../../data/maps/south.hexsides.json';
+import labels from '../../data/maps/south.labels.json';
+import { attachCamera } from './camera';
+import { createMapView } from './map-view';
+import { PX_PER_KM } from './style';
 
 const meta = GameMeta.parse(rawMeta);
+const map = loadMap({ def, hexes, hexsides, labels });
+const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
+const DIR_NAMES = ['北', '东北', '东南', '南', '西南', '西北'];
 
-const COLORS = {
-  board: 0xe9e2c9,
-  hexLine: 0xa89f80,
-  ink: 0x2b2a24,
-  accent: 0x8c2f1e,
-};
-
-/** 画一个尖顶朝上的六角形（只是开场装饰，正式地图在冲刺 1 实现）。 */
-function hexPath(g: Graphics, cx: number, cy: number, r: number): Graphics {
-  const pts: number[] = [];
-  for (let i = 0; i < 6; i++) {
-    const a = (Math.PI / 180) * (60 * i - 30);
-    pts.push(cx + r * Math.cos(a), cy + r * Math.sin(a));
-  }
-  return g.poly(pts);
+function showInfo(h: Offset | null): void {
+  const box = $('info');
+  if (!h) { box.hidden = true; return; }
+  const rec = hexRecord(map, h);
+  const ll = toLatLon(map.projection, hexCenter(map.grid, h));
+  const sides = ([0, 1, 2, 3, 4, 5] as Direction[])
+    .map((d) => ({ d, r: sideRecord(map, h, d) }))
+    .filter((x) => x.r)
+    .map((x) => `${DIR_NAMES[x.d]}：${x.r!.features.map((f) => SIDE_FEATURE_NAMES[f]).join('、')}`);
+  const isDefault = !map.hexes.has(hexId(h));
+  box.innerHTML = `
+    <div class="info-head"><span class="hexno">${hexId(h)}</span><button id="info-close" aria-label="关闭">×</button></div>
+    <dl>
+      <dt>地形</dt><dd>${TERRAIN_NAMES[rec.terrain]}${isDefault ? '<span class="muted">（未录入，默认）</span>' : ''}</dd>
+      ${isDefault ? '' : `<dt>状态</dt><dd class="st-${rec.status}">${STATUS_NAMES[rec.status]}</dd>`}
+      ${rec.note ? `<dt>备注</dt><dd>${rec.note}</dd>` : ''}
+      <dt>格边</dt><dd>${sides.length ? sides.join('<br>') : '<span class="muted">无</span>'}</dd>
+      <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
+      ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
+    </dl>`;
+  box.hidden = false;
+  $('info-close').onclick = () => { view.select(null); showInfo(null); };
 }
 
+let view: Awaited<ReturnType<typeof createMapView>>;
+
 async function start(): Promise<void> {
-  const host = document.getElementById('app')!;
+  $('title').textContent = meta.title.zh;
+  $('subtitle').textContent = `${map.def.name.zh} · 引擎 v${ENGINE_VERSION}`;
+  const host = $('app');
   const app = new Application();
-  await app.init({ resizeTo: host, background: '#1d1f1b', antialias: true, autoDensity: true, resolution: devicePixelRatio });
+  await app.init({ resizeTo: host, background: '#cfc8ad', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
   host.appendChild(app.canvas);
 
-  const scene = new Container();
-  app.stage.addChild(scene);
+  view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`);
+  app.stage.addChild(view.root);
 
-  const grid = new Graphics();
-  const title = new Text({
-    text: `Hello Kursk\n${meta.title.zh}`,
-    style: { fontFamily: 'serif', fontSize: 44, fill: COLORS.ink, align: 'center', fontWeight: '700', lineHeight: 56 },
+  const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
+    const local = view.root.toLocal({ x: sx, y: sy });
+    const h = hexAt(map.grid, { x: local.x / PX_PER_KM, y: local.y / PX_PER_KM });
+    if (inBounds(map.grid, h)) { view.select(h); showInfo(h); } else { view.select(null); showInfo(null); }
   });
-  title.anchor.set(0.5);
-  const sub = new Text({
-    text: `${meta.subtitle.zh}  ·  引擎 v${ENGINE_VERSION}`,
-    style: { fontFamily: 'sans-serif', fontSize: 16, fill: COLORS.accent, align: 'center' },
-  });
-  sub.anchor.set(0.5);
-  scene.addChild(grid, title, sub);
+  cam.onChange(() => view.onZoom(cam.zoom()));
+  const b = view.bounds;
+  cam.fit(b.x0 * PX_PER_KM, b.y0 * PX_PER_KM, b.x1 * PX_PER_KM, b.y1 * PX_PER_KM);
 
-  const layout = (): void => {
-    const w = app.screen.width;
-    const h = app.screen.height;
-    const r = Math.max(22, Math.min(w, h) / 16);
-    const dx = Math.sqrt(3) * r;
-    const dy = 1.5 * r;
-    grid.clear();
-    for (let row = -1; row * dy < h + r; row++) {
-      for (let col = -1; col * dx < w + dx; col++) {
-        const cx = col * dx + (row % 2 ? dx / 2 : 0);
-        hexPath(grid, cx, row * dy, r).fill(COLORS.board).stroke({ width: 1, color: COLORS.hexLine });
-      }
-    }
-    title.style.fontSize = Math.max(28, Math.min(64, w / 12));
-    title.style.lineHeight = title.style.fontSize * 1.3;
-    title.position.set(w / 2, h / 2 - 20);
-    sub.position.set(w / 2, h / 2 + title.height / 2 + 10);
+  // 图层开关
+  const L = view.layers;
+  const bind = (id: string, apply: (on: boolean) => void): void => {
+    const el = $<HTMLInputElement>(id);
+    const f = (): void => { apply(el.checked); view.onZoom(cam.zoom()); };
+    el.addEventListener('change', f); f();
   };
-  layout();
-  app.renderer.on('resize', layout);
+  bind('ly-ref', (on) => { L.reference.visible = on; });
+  bind('ly-terrain', (on) => { L.terrain.visible = on; L.sides.visible = on; });
+  bind('ly-grid', (on) => { L.grid.visible = on; });
+  bind('ly-num', (on) => { L.numbers.visible = on; });
+  bind('ly-labels', (on) => { L.labels.visible = on; });
+  bind('ly-status', (on) => { L.status.visible = on; });
+  const op = $<HTMLInputElement>('ref-opacity');
+  const setOp = (): void => { L.reference.alpha = Number(op.value) / 100; $('ref-op-val').textContent = `${op.value}%`; };
+  op.addEventListener('input', setOp); setOp();
+  $('layers-toggle').addEventListener('click', () => $('layers').classList.toggle('open'));
+  $('fit').addEventListener('click', () => cam.fit(b.x0 * PX_PER_KM, b.y0 * PX_PER_KM, b.x1 * PX_PER_KM, b.y1 * PX_PER_KM));
+  $('loading').remove();
 }
 
 void start();

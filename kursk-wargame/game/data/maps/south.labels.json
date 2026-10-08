@@ -1,0 +1,170 @@
+{
+ "$comment": "地名位置由 AI 从 AMS 图幅上读取，status = unverified，需人工核对。",
+ "labels": [
+  {
+   "id": "belgorod",
+   "names": {
+    "zh": "别尔哥罗德",
+    "ru": "Белгород",
+    "de": "Belgorod"
+   },
+   "kind": "city",
+   "lat": 50.5973,
+   "lon": 36.5845,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "oboyan",
+   "names": {
+    "zh": "奥博扬",
+    "ru": "Обоянь",
+    "de": "Obojan"
+   },
+   "kind": "town",
+   "lat": 51.2126,
+   "lon": 36.2765,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "prokhorovka-st",
+   "names": {
+    "zh": "普罗霍罗夫卡站",
+    "ru": "ст. Прохоровка",
+    "de": "Prochorowka"
+   },
+   "kind": "town",
+   "lat": 51.0358,
+   "lon": 36.7358,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "oktyabrsky",
+   "names": {
+    "zh": "十月农场",
+    "ru": "Октябрьский",
+    "de": "Oktjabrskij"
+   },
+   "kind": "village",
+   "lat": 51.0259,
+   "lon": 36.6571,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "pravorot",
+   "names": {
+    "zh": "普拉沃罗季",
+    "ru": "Правороть",
+    "de": "Praworot"
+   },
+   "kind": "village",
+   "lat": 50.9809,
+   "lon": 36.7307,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "pokrovka",
+   "names": {
+    "zh": "波克罗夫卡",
+    "ru": "Покровка",
+    "de": "Pokrowka"
+   },
+   "kind": "village",
+   "lat": 50.8894,
+   "lon": 36.4412,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "yakovlevo",
+   "names": {
+    "zh": "雅科夫列沃",
+    "ru": "Яковлево",
+    "de": "Jakowlewo"
+   },
+   "kind": "village",
+   "lat": 50.8624,
+   "lon": 36.4485,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "luchki",
+   "names": {
+    "zh": "卢奇基",
+    "ru": "Лучки",
+    "de": "Lutschki"
+   },
+   "kind": "village",
+   "lat": 50.8774,
+   "lon": 36.5432,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "teterevino",
+   "names": {
+    "zh": "捷捷列维诺",
+    "ru": "Тетеревино",
+    "de": "Teterewino"
+   },
+   "kind": "village",
+   "lat": 50.8761,
+   "lon": 36.6095,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "belenikhino",
+   "names": {
+    "zh": "别列尼希诺",
+    "ru": "Беленихино",
+    "de": "Belenichino"
+   },
+   "kind": "village",
+   "lat": 50.9319,
+   "lon": 36.6429,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "gostishchevo",
+   "names": {
+    "zh": "戈斯季谢沃",
+    "ru": "Гостищево",
+    "de": "Gostischtschewo"
+   },
+   "kind": "village",
+   "lat": 50.7831,
+   "lon": 36.6573,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  }
+ ]
+}

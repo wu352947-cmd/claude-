@@ -1,0 +1,464 @@
+{
+ "$comment": "只列非开阔地的格子。status: auto = 程序自动提取未核对；verified = 已人工核对。",
+ "hexes": {
+  "0629": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 93%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "1018": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 53%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "1408": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 65%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "1923": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 48%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2226": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 49%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2233": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 51%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2326": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 64%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2725": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 47%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2736": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 59%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2737": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 53%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2830": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 53%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2831": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 89%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2832": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 81%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2834": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 48%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2836": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 97%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2837": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 77%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2838": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 52%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "2931": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 60%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3131": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 50%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3132": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 74%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3133": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 100%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3134": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 85%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3136": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 64%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3137": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 86%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3228": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 81%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3229": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 77%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3230": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 79%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3231": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 70%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3232": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 65%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3234": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 50%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3327": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 80%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3328": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 94%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3329": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 97%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3330": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 74%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3331": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 56%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3426": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 84%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3427": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 86%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3428": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 68%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3435": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 55%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3436": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 58%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3527": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 82%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3535": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 75%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3536": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 88%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3634": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 83%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3635": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 76%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3733": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 59%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3734": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 70%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3833": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 60%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3834": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 67%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3933": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 64%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  },
+  "3934": {
+   "terrain": "woods",
+   "status": "auto",
+   "note": "自动提取：林地占比 57%",
+   "sources": [
+    "SRC-0101",
+    "SRC-0102"
+   ]
+  }
+ }
+}
