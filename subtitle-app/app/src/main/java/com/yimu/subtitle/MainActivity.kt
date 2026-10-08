@@ -43,6 +43,10 @@ import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
@@ -168,6 +172,8 @@ private fun HomeScreen(resumeTick: Int) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Header()
+            WebCard()
+            SectionTitle("视频实时字幕")
             Preview()
 
             // 开始 / 停止
@@ -414,6 +420,38 @@ private fun PermissionRow(title: String, desc: String, granted: Boolean, onClick
             Text("已开启", color = P.ok, fontSize = 14.sp, fontWeight = FontWeight.Medium)
         } else {
             PrimarySmall("去开启", onClick = onClick)
+        }
+    }
+}
+
+@Composable
+private fun SectionTitle(text: String) {
+    Text(text, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = P.text, modifier = Modifier.padding(top = 8.dp))
+}
+
+@Composable
+private fun WebCard() {
+    val ctx = LocalContext.current
+    var q by remember { mutableStateOf("") }
+    Card {
+        Text("网页翻译", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = P.text)
+        Caption("打开英文网页，自动整页翻译成自然的中文。也可以在其他浏览器里点「分享 → 译幕网页」。")
+        Row(horizontalArrangement = Arrangement.spacedBy(10.dp), verticalAlignment = Alignment.CenterVertically) {
+            OutlinedTextField(
+                value = q,
+                onValueChange = { q = it },
+                singleLine = true,
+                placeholder = { Text("粘贴网址或输入搜索内容") },
+                shape = RoundedCornerShape(14.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri, imeAction = ImeAction.Go),
+                keyboardActions = KeyboardActions(onGo = { BrowserActivity.start(ctx, q.ifBlank { null }) }),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = P.accent, unfocusedBorderColor = P.line,
+                    focusedTextColor = P.text, unfocusedTextColor = P.text,
+                ),
+                modifier = Modifier.weight(1f),
+            )
+            PrimarySmall("打开") { BrowserActivity.start(ctx, q.ifBlank { null }) }
         }
     }
 }

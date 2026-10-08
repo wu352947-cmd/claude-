@@ -19,6 +19,10 @@ object Prefs {
     fun fastMode(c: Context): Boolean = sp(c).getBoolean("fast_mode", true)
     fun setFastMode(c: Context, v: Boolean) = sp(c).edit().putBoolean("fast_mode", v).apply()
 
+    /** 网页翻译模式：off 原文 / dual 双语 / zh 仅中文。 */
+    fun webMode(c: Context): String = sp(c).getString("web_mode", "zh") ?: "zh"
+    fun setWebMode(c: Context, v: String) = sp(c).edit().putString("web_mode", v).apply()
+
     /** 字幕条位置：距屏幕底部的距离、相对中心的横向偏移（像素）。-1 表示用默认值。 */
     fun overlayY(c: Context): Int = sp(c).getInt("overlay_y", -1)
     fun overlayX(c: Context): Int = sp(c).getInt("overlay_x", 0)
