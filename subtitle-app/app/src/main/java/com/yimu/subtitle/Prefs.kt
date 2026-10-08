@@ -15,9 +15,9 @@ object Prefs {
     fun zhOnly(c: Context): Boolean = sp(c).getBoolean("zh_only", false)
     fun setZhOnly(c: Context, v: Boolean) = sp(c).edit().putBoolean("zh_only", v).apply()
 
-    /** 抢先翻译：说话停顿的瞬间就开始翻译。 */
-    fun fastMode(c: Context): Boolean = sp(c).getBoolean("fast_mode", true)
-    fun setFastMode(c: Context, v: Boolean) = sp(c).edit().putBoolean("fast_mode", v).apply()
+    /** 极速模式：边说边出草稿、译文逐步补全。关闭时为稳定模式：每条字幕一次性出现、不再改动。 */
+    fun liveMode(c: Context): Boolean = sp(c).getBoolean("live_mode", false)
+    fun setLiveMode(c: Context, v: Boolean) = sp(c).edit().putBoolean("live_mode", v).apply()
 
     /** 字幕条位置：距屏幕底部的距离、相对中心的横向偏移（像素）。-1 表示用默认值。 */
     fun overlayY(c: Context): Int = sp(c).getInt("overlay_y", -1)

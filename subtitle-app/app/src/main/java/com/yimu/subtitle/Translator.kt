@@ -61,6 +61,39 @@ class Translator(private val apiKey: () -> String) {
         return cleanContinuation(text)
     }
 
+    /** 稳定模式的一条字幕：中文、纠正后的英文、末尾没说完要并到下一段的英文词。 */
+    data class UnitOutput(val zh: String, val en: String?, val rest: List<String>)
+
+    /**
+     * 稳定模式：翻译一段意思完整的英文。第一行（中文）一写完就通过 [onLine] 交出去上屏，
+     * 第二行（英文）写完再交一次。[allowRest] 为 true 时，允许模型把末尾没说完的几个词退回来。
+     */
+    suspend fun subtitleUnit(
+        english: String,
+        previous: List<String>,
+        allowRest: Boolean,
+        onLine: (zh: String?, en: String?) -> Unit,
+    ): UnitOutput {
+        val note = if (allowRest) "" else "\n（这是说话人停顿前的最后一段，第3行只写 REST:）"
+        val messages = JSONArray()
+            .put(msg("system", UNIT_PROMPT))
+            .put(msg("user", userText(previous, "当前这段：$english$note")))
+        var zhSent = false
+        var enSent = false
+        val text = streamChat(BASE, messages, stop = null) { acc ->
+            val lines = acc.split('\n')
+            if (!zhSent && lines.size >= 2) {
+                zhSent = true
+                onLine(cleanZh(lines[0]), null)
+            }
+            if (zhSent && !enSent && lines.size >= 3) {
+                enSent = true
+                onLine(null, lines[1].trim().ifEmpty { null })
+            }
+        }
+        return parseUnit(text)
+    }
+
     private fun userText(previous: List<String>, current: String) = buildString {
         if (previous.isNotEmpty()) {
             append("上文（仅供理解，不要翻译）：\n")
@@ -180,6 +213,31 @@ class Translator(private val apiKey: () -> String) {
             如果已经有一部分译文，就紧接着往下写剩下的部分，不要重复已有的译文，也不要改写它。
             只输出一行中文译文，不要任何解释。如果只是语气词或噪音，输出 -
         """.trimIndent()
+
+        private val UNIT_PROMPT = """
+            你是专业的视频字幕翻译，风格像优秀的中文字幕组。
+            输入是语音识别得到的一段英文：全大写、没有标点，可能有个别识别错误。上文只用来理解语境，不要翻译。
+            严格只输出三行：
+            第1行：这段英文的简体中文字幕。自然、口语化、简洁，读起来像中文母语者说的话，不要翻译腔；
+                  人名、品牌、频道名保留英文；如果只是语气词或噪音，输出 -
+            第2行：纠正识别错误、恢复大小写和标点后的英文。
+            第3行：以 REST: 开头。如果这段英文的末尾几个词明显还没说完、单独翻译会让意思不完整，
+                  就把这几个词原样照抄在 REST: 后面（最多 6 个词），并且第1行不要翻译它们；
+                  如果意思是完整的，第3行只写 REST:
+            不要输出任何其他内容。
+        """.trimIndent()
+
+        private fun cleanZh(s: String): String = s.trim().let { if (it == "-" || it == "－") "" else it }
+
+        fun parseUnit(text: String): UnitOutput {
+            val lines = text.trim().split('\n').map { it.trim() }.filter { it.isNotEmpty() }
+            val zh = cleanZh(lines.getOrNull(0).orEmpty())
+            val en = lines.getOrNull(1)?.takeUnless { it.startsWith("REST", ignoreCase = true) }
+            val restLine = lines.firstOrNull { it.startsWith("REST", ignoreCase = true) }.orEmpty()
+            val rest = restLine.replaceFirst(Regex("^REST\\s*[:：]?", RegexOption.IGNORE_CASE), "")
+                .trim().split(' ').map { it.trim(',', '.', '?', '!') }.filter { it.isNotEmpty() }
+            return UnitOutput(zh, en, if (rest.size <= 6) rest else emptyList())
+        }
 
         fun parse(text: CharSequence): Output {
             val s = text.toString().trimStart()

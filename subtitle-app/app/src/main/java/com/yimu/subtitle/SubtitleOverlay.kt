@@ -189,6 +189,8 @@ class SubtitleOverlay(private val context: Context) {
         } else if (speaking) {
             liveText = prettify(s.partial)
         }
+        // 稳定模式不显示正在说的英文半句，画面上只有定稿的字幕
+        if (!Prefs.liveMode(context)) liveText = null
         if (zhOnly) {
             enText = null
             liveText = null

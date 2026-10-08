@@ -10,7 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 /**
- * 识别结果 → 中文字幕的调度。所有方法都在主线程调用。
+ * 极速模式：识别结果 → 中文字幕的调度。所有方法都在主线程调用。
  *
  * 字幕按"句"组织（一行 = 一句话，可能跨越说话人的好几次停顿）：
  *
@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
  *    不会把一句话切成两行；
  * 4. 这句话刚开始、DeepSeek 还没返回时，先显示本地小模型的灰色草稿。
  */
-class TranslationPipeline(private val ctx: Context, private val scope: CoroutineScope) {
+class TranslationPipeline(private val ctx: Context, private val scope: CoroutineScope) : SubtitlePipeline {
 
     private val translator = Translator { Prefs.apiKey(ctx) }
     private val main = Handler(Looper.getMainLooper())
@@ -55,14 +55,14 @@ class TranslationPipeline(private val ctx: Context, private val scope: Coroutine
     private var words: List<String> = emptyList()
     private var prevWords: List<String> = emptyList()
 
-    fun start() {
+    override fun start() {
         scope.launch { translator.warmUp() }
         LocalTranslator.check()
     }
 
     // ---------- 识别事件 ----------
 
-    fun onPartial(p: String) {
+    override fun onPartial(p: String) {
         val now = System.currentTimeMillis()
         prevWords = words
         words = split(p)
@@ -72,17 +72,17 @@ class TranslationPipeline(private val ctx: Context, private val scope: Coroutine
         val s = currentSeg()
         cancelCloseTimer()
         refreshDraft(s)
-        if (Prefs.fastMode(ctx)) {
+        run {
             // 一口气说很长不停顿：确定下来的新词每多 8 个就翻一次
             val stable = s.doneWords.size + stableCount()
             if (stable - s.sentWords >= 8) request(s, stable, final = false)
         }
     }
 
-    fun onPause(p: String, long: Boolean) {
+    override fun onPause(p: String, long: Boolean) {
         words = split(p)
         val s = seg ?: return
-        if (!Prefs.fastMode(ctx) || s.closed) return
+        if (s.closed) return
         val total = s.doneWords.size + words.size
         if (long) {
             if (total > s.sentWords) request(s, total, final = false)
@@ -93,7 +93,7 @@ class TranslationPipeline(private val ctx: Context, private val scope: Coroutine
         }
     }
 
-    fun onFinal(raw: String) {
+    override fun onFinal(raw: String) {
         val finalWords = split(raw)
         words = emptyList()
         prevWords = emptyList()

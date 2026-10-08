@@ -41,13 +41,12 @@ class CaptureService : Service() {
     @Volatile private var running = false
     private var overlay: SubtitleOverlay? = null
 
-    private lateinit var pipeline: TranslationPipeline
+    private lateinit var pipeline: SubtitlePipeline
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
-        pipeline = TranslationPipeline(this, scope)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -126,6 +125,7 @@ class CaptureService : Service() {
         overlay = SubtitleOverlay(this).also { it.show() }
         running = true
         SubtitleBus.update { it.copy(running = true, partial = "", level = 0f, notice = "正在加载识别模型…") }
+        pipeline = if (Prefs.liveMode(this)) TranslationPipeline(this, scope) else StablePipeline(this, scope)
         pipeline.start()
 
         worker = Thread({ captureLoop(rec, rate) }, "yimu-asr").apply { start() }

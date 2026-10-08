@@ -17,6 +17,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -423,22 +424,37 @@ private fun PermissionRow(title: String, desc: String, granted: Boolean, onClick
 @Composable
 private fun SpeedCard() {
     val ctx = LocalContext.current
-    var fast by remember { mutableStateOf(Prefs.fastMode(ctx)) }
+    var live by remember { mutableStateOf(Prefs.liveMode(ctx)) }
     Card {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                Text("同传模式", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
-                Text(
-                    "不等整句说完，听到一段就定稿一段，中文跟着说话往后长，已显示的字不会再变。关闭后改为整句说完再翻译，更慢但译文更完整。",
-                    color = P.muted, fontSize = 13.sp, lineHeight = 19.sp,
-                )
+        Text("字幕模式", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
+        Row(
+            Modifier.fillMaxWidth().clip(RoundedCornerShape(12.dp)).background(P.accentSoft).padding(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(3.dp),
+        ) {
+            listOf(false to "稳定模式（推荐）", true to "极速模式").forEach { (value, label) ->
+                val selected = live == value
+                Box(
+                    Modifier
+                        .weight(1f)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(if (selected) P.accent else Color.Transparent)
+                        .clickable { live = value; Prefs.setLiveMode(ctx, value) }
+                        .padding(vertical = 10.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        label, fontSize = 14.sp,
+                        color = if (selected) Color.White else P.text,
+                        fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                    )
+                }
             }
-            Switch(
-                checked = fast,
-                onCheckedChange = { fast = it; Prefs.setFastMode(ctx, it) },
-                colors = SwitchDefaults.colors(checkedTrackColor = P.accent),
-            )
         }
+        Caption(
+            if (live) "边说边出灰色草稿，译文逐步补全，最快但字幕会变化。"
+            else "像电视字幕：每条字幕出现时就是最终译文，不再改动。按意思断句，节奏稳定，比说话晚约 1 秒。",
+        )
+        Caption("切换后，下次点「开始实时字幕」生效。", color = P.muted.copy(alpha = 0.7f))
     }
 }
 
@@ -450,10 +466,10 @@ private fun LocalDraftCard() {
     Card {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f).padding(end = 12.dp)) {
-                Text("本地秒出草稿", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
+                Text("本地备用翻译", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
                 Text(
-                    "在平板上装一个离线小翻译模型（约 30 MB）：英文一出来，灰色中文草稿立刻跟上，" +
-                        "随后被 DeepSeek 的正式译文替换。首次下载需要开 VPN。",
+                    "在平板上装一个离线小翻译模型（约 30 MB）：网络不稳时用它顶上，字幕不会空着；" +
+                        "极速模式下还用它显示灰色草稿。首次下载需要开 VPN。",
                     color = P.muted, fontSize = 13.sp, lineHeight = 19.sp,
                 )
                 when (val x = st) {
