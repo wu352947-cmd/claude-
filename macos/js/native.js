@@ -1,0 +1,335 @@
+/* Native feel: rubber-band overscroll on every scroll view, and trackpad swipes between Spaces that follow the fingers. */
+(function () {
+  const { $ } = OS;
+  const wm = OS.wm;
+
+  /* ---------- rubber-band scrolling ---------- */
+  // Content keeps moving past the edge with growing resistance, then springs back the moment the fingers lift.
+  const scrollable = new WeakMap();
+  const canScrollY = (el) => {
+    let v = scrollable.get(el);
+    if (v === undefined) {
+      const o = getComputedStyle(el).overflowY;
+      v = o === 'auto' || o === 'scroll';
+      scrollable.set(el, v);
+    }
+    return v && el.scrollHeight > el.clientHeight + 1;
+  };
+  const SKIP = '.leaflet-container, canvas, .launchpad, .no-elastic, input[type="range"], .menu, #dock-wrap';
+  let band = null; // { el, off, raf, timer }
+  const MAX = 90;
+  const setOff = (b, v) => {
+    b.off = v;
+    const t = v ? `translate3d(0, ${v.toFixed(2)}px, 0)` : '';
+    for (const c of b.el.children) c.style.transform = t;
+  };
+  const release = (b, v0 = 0) => {
+    // critically damped spring back to rest (optionally kicked with the incoming scroll velocity)
+    let x = b.off, vel = v0, last = performance.now();
+    const k = 260, c = 2 * Math.sqrt(k);
+    const step = (t) => {
+      const dt = Math.min(0.032, (t - last) / 1000);
+      last = t;
+      vel += (-k * x - c * vel) * dt;
+      x += vel * dt;
+      if (Math.abs(x) < 0.3 && Math.abs(vel) < 4) {
+        setOff(b, 0);
+        b.el.classList.remove('rubber');
+        if (band === b) band = null;
+        return;
+      }
+      setOff(b, x);
+      b.raf = requestAnimationFrame(step);
+    };
+    b.raf = requestAnimationFrame(step);
+  };
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (OS.reducedMotion() || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY) || notched(e)) return;
+      const t = e.target;
+      if (!(t instanceof Element) || t.closest(SKIP)) return;
+      let el = t;
+      while (el && el !== document.body && !canScrollY(el)) el = el.parentElement;
+      if (!el || el === document.body || !el.closest('.win')) return;
+      const dy = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY;
+      const atTop = el.scrollTop <= 0 && dy < 0;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 1 && dy > 0;
+      if (!atTop && !atBottom) {
+        if (band && band.el === el && band.off) {
+          // reversing out of the band: give the distance back first
+          cancelAnimationFrame(band.raf);
+          release(band);
+        }
+        return;
+      }
+      if (!band || band.el !== el) {
+        if (band) (cancelAnimationFrame(band.raf), setOff(band, 0), band.el.classList.remove('rubber'));
+        band = { el, off: 0, raf: 0, timer: 0 };
+        el.classList.add('rubber');
+      }
+      cancelAnimationFrame(band.raf);
+      // resistance grows with distance, like UIScrollView / NSScrollView
+      const ratio = 1 - Math.abs(band.off) / MAX;
+      const next = Math.max(-MAX, Math.min(MAX, band.off - dy * 0.35 * Math.max(0.05, ratio)));
+      const b = band;
+      wm.nextFrame('rubber', () => setOff(b, next));
+      b.off = next;
+      clearTimeout(b.timer);
+      b.timer = setTimeout(() => release(b), 90);
+    },
+    { passive: true }
+  );
+
+  /* ---------- momentum for notched mouse wheels ---------- */
+  // Trackpads already deliver momentum; a notched wheel jumps in fixed steps. Give it a glide that decays like
+  // NSScrollView and bounces when it runs into the end.
+  function notched(e) {
+    if (e.deltaMode === 1) return true;
+    const w = e.wheelDeltaY;
+    return e.deltaX === 0 && !!w && Math.abs(w) >= 120 && w % 120 === 0;
+  }
+  const glides = new WeakMap();
+  function findScroller(t) {
+    let el = t;
+    while (el && el !== document.body && !canScrollY(el)) el = el.parentElement;
+    return el && el !== document.body && el.closest('.win') ? el : null;
+  }
+  function bounce(el, v) {
+    if (band && band.el !== el) (cancelAnimationFrame(band.raf), setOff(band, 0), band.el.classList.remove('rubber'));
+    if (!band || band.el !== el) {
+      band = { el, off: 0, raf: 0, timer: 0 };
+      el.classList.add('rubber');
+    }
+    cancelAnimationFrame(band.raf);
+    // scroll velocity (px/frame) → overshoot velocity (px/s), content moves opposite to scroll direction
+    release(band, Math.max(-1400, Math.min(1400, -v * 60 * 0.7)));
+  }
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (!notched(e) || e.ctrlKey || OS.reducedMotion()) return;
+      const t = e.target;
+      if (!(t instanceof Element) || t.closest(SKIP)) return;
+      const el = findScroller(t);
+      if (!el) return;
+      e.preventDefault();
+      const dy = e.deltaMode === 1 ? e.deltaY * 40 : e.deltaY;
+      let g = glides.get(el);
+      if (!g) glides.set(el, (g = { v: 0, raf: 0, last: 0, pos: el.scrollTop }));
+      if (!g.raf) g.pos = el.scrollTop;
+      g.v += dy * 0.16;
+      if (g.raf) return;
+      g.last = performance.now();
+      const step = (now) => {
+        const dt = Math.min(48, now - g.last) / 16.667;
+        g.last = now;
+        const max = el.scrollHeight - el.clientHeight;
+        g.pos += g.v * dt;
+        g.v *= Math.pow(0.9, dt);
+        if (g.pos <= 0 || g.pos >= max) {
+          g.pos = Math.max(0, Math.min(max, g.pos));
+          el.scrollTop = g.pos;
+          if (Math.abs(g.v) > 2) bounce(el, g.v);
+          g.v = 0;
+          g.raf = 0;
+          return;
+        }
+        el.scrollTop = g.pos;
+        if (Math.abs(g.v) < 0.15) return (g.raf = 0), (g.v = 0);
+        g.raf = requestAnimationFrame(step);
+      };
+      g.raf = requestAnimationFrame(step);
+    },
+    { passive: false }
+  );
+
+  /* ---------- Spaces swipe ---------- */
+  // Two-finger horizontal swipe on the desktop drags the Spaces strip 1:1, then settles on a spring.
+  let swipe = null; // { dx, timer, t, v }
+  const track = () => $('#spaces-track');
+  const settle = () => {
+    const s = swipe;
+    swipe = null;
+    if (!s) return;
+    const w = wm.screen().w;
+    const cur = OS.spaces.current;
+    let target = cur;
+    const flick = Math.abs(s.v) > 0.6;
+    if (s.dx > w * 0.2 || (flick && s.v > 0)) target = cur + 1;
+    if (s.dx < -w * 0.2 || (flick && s.v < 0)) target = cur - 1;
+    target = Math.max(0, Math.min(OS.spaces.list.length - 1, target));
+    if (target !== cur) OS.spaces.go(target);
+    else {
+      const sp = OS.spring('snappy');
+      const tr = track();
+      tr.style.transition = `transform ${sp.duration}ms ${sp.easing}`;
+      tr.style.transform = `translateX(${-cur * 100}%)`;
+      OS.spaces.park();
+    }
+  };
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (e.ctrlKey || Math.abs(e.deltaX) < Math.abs(e.deltaY) * 1.4 || Math.abs(e.deltaX) < 1) return;
+      const t = e.target;
+      if (!(t instanceof Element) || t.closest('.win, #dock-wrap, #menubar, #overlays, .menu, .launchpad, .mission')) return;
+      if (document.body.classList.contains('mission')) return;
+      const dx = e.deltaMode === 1 ? e.deltaX * 16 : e.deltaX;
+      const now = performance.now();
+      if (!swipe) ((swipe = { dx: 0, timer: 0, t: now, v: 0 }), OS.spaces.wake());
+      swipe.v = swipe.v * 0.6 + (dx / Math.max(8, now - swipe.t)) * 0.4;
+      swipe.t = now;
+      const n = OS.spaces.list.length, cur = OS.spaces.current, w = wm.screen().w;
+      swipe.dx += dx;
+      // rubber-band past the first and last Space
+      let shown = swipe.dx;
+      if ((cur === 0 && shown < 0) || (cur === n - 1 && shown > 0)) shown = Math.sign(shown) * w * 0.12 * (1 - Math.exp(-Math.abs(shown) / (w * 0.12)));
+      shown = Math.max(-w, Math.min(w, shown));
+      const s = swipe;
+      wm.nextFrame('swipe', () => {
+        const tr = track();
+        tr.style.transition = 'none';
+        tr.style.transform = `translateX(calc(${-cur * 100}% - ${shown.toFixed(1)}px))`;
+      });
+      clearTimeout(s.timer);
+      s.timer = setTimeout(() => (wm.cancelFrame('swipe'), settle()), 110);
+    },
+    { passive: true }
+  );
+
+  /* ---------- adaptive quality ---------- */
+  // Sample frame pacing only while something is moving. If the machine keeps missing frames, drop live blur for the session.
+  const root = document.documentElement;
+  try {
+    if (sessionStorage.getItem('macos.liteGlass') === '1') root.classList.add('lite-glass');
+  } catch (e) {}
+  let sampling = false, strikes = 0;
+  const sample = () => {
+    if (sampling || root.classList.contains('lite-glass') || document.hidden) return;
+    sampling = true;
+    const deltas = [];
+    let last = 0;
+    const f = (t) => {
+      if (last) deltas.push(t - last);
+      last = t;
+      if (deltas.length < 45) return requestAnimationFrame(f);
+      sampling = false;
+      const slow = deltas.filter((d) => d > 26).length / deltas.length;
+      strikes = slow > 0.5 ? strikes + 1 : Math.max(0, strikes - 1);
+      if (strikes >= 3) {
+        root.classList.add('lite-glass');
+        try {
+          sessionStorage.setItem('macos.liteGlass', '1');
+        } catch (e) {}
+      }
+    };
+    requestAnimationFrame(f);
+  };
+  let lastKick = 0;
+  const kick = () => {
+    const t = performance.now();
+    if (t - lastKick > 1500) ((lastKick = t), sample());
+  };
+  ['pointermove', 'wheel'].forEach((ev) => document.addEventListener(ev, kick, { passive: true }));
+  OS.on('windows', kick);
+  OS.liteGlass = (on) => {
+    root.classList.toggle('lite-glass', on);
+    strikes = 0;
+    try {
+      on ? sessionStorage.setItem('macos.liteGlass', '1') : sessionStorage.removeItem('macos.liteGlass');
+    } catch (e) {}
+  };
+
+  /* ---------- pinch (trackpad pinch arrives as ctrl + wheel) ---------- */
+  // zoom images in Preview / Photos around the fingers, pinch closed on the desktop for Launchpad, open to leave it
+  let pinchAcc = 0, pinchTimer = 0, pinchUsed = false;
+  document.addEventListener(
+    'wheel',
+    (e) => {
+      if (!e.ctrlKey) return;
+      const t = e.target instanceof Element ? e.target : null;
+      if (t && t.closest('.leaflet-container')) return; // Maps zooms itself
+      e.preventDefault(); // never let the browser page-zoom the whole Mac
+      const k = Math.exp(-e.deltaY * 0.01);
+      const pv = t && t.closest('.pv-canvas');
+      if (pv) {
+        const w = wm.windows.find((x) => x.el.contains(pv));
+        w && w.state_ && w.state_.zoom && w.state_.zoom(k - 1);
+        return;
+      }
+      const big = t && t.closest('.ph-stage, .ph-big');
+      const img = big && (big.classList.contains('ph-big') ? big : big.querySelector('.ph-big'));
+      if (img) {
+        const r = img.getBoundingClientRect();
+        img._z = Math.max(1, Math.min(5, (img._z || 1) * k));
+        img.style.transformOrigin = `${((e.clientX - r.left) / r.width) * 100}% ${((e.clientY - r.top) / r.height) * 100}%`;
+        img.style.scale = img._z === 1 ? '' : String(img._z);
+        return;
+      }
+      // system gestures: accumulate the pinch, fire once per gesture
+      // one gesture fires at most once; it ends when the fingers pause
+      clearTimeout(pinchTimer);
+      pinchTimer = setTimeout(() => ((pinchAcc = 0), (pinchUsed = false)), 260);
+      if (pinchUsed) return;
+      pinchAcc += e.deltaY;
+      const lpOpen = document.body.classList.contains('launchpad-open');
+      if (!lpOpen && pinchAcc > 60 && t && (t.id === 'desktop' || t.closest('#wallpaper, #desk-widgets') || t.closest('.space') === t)) {
+        pinchUsed = true;
+        OS.launch('launchpad');
+      } else if (lpOpen && pinchAcc < -60) {
+        pinchUsed = true;
+        OS.closeLaunchpad();
+      }
+    },
+    { passive: false }
+  );
+  // Safari-style gesture events (WebKit) — map to the same pinch
+  ['gesturestart', 'gesturechange'].forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+
+  /* ---------- shake the pointer to locate it ---------- */
+  const shake = { pts: [], big: null, timer: 0, until: 0 };
+  const bigCursor = () => {
+    if (shake.big) return shake.big;
+    shake.big = OS.h('div#shake-cursor', { html: '<svg viewBox="0 0 32 32" width="32" height="32"><path d="M9 5v19.2l4.6-4.4 3 6.9 3.4-1.5-3-6.7h6.4z" fill="#000" stroke="#fff" stroke-width="1.6" stroke-linejoin="round"/></svg>' });
+    document.body.appendChild(shake.big);
+    return shake.big;
+  };
+  document.addEventListener(
+    'pointermove',
+    (e) => {
+      if (e.pointerType !== 'mouse' || OS.settings.shakeToLocate === false) return;
+      const now = performance.now();
+      const pts = shake.pts;
+      pts.push({ x: e.clientX, t: now });
+      while (pts.length && now - pts[0].t > 700) pts.shift();
+      if (shake.big && shake.big.classList.contains('on')) {
+        shake.big.style.transform = `translate(${e.clientX - 9}px, ${e.clientY - 5}px)`;
+        if (now < shake.until) return;
+      }
+      // count fast direction reversals along x
+      let rev = 0, dir = 0, dist = 0;
+      for (let i = 1; i < pts.length; i++) {
+        const dx = pts[i].x - pts[i - 1].x;
+        dist += Math.abs(dx);
+        const d = Math.sign(dx);
+        if (d && dir && d !== dir && Math.abs(dx) > 6) rev++;
+        if (d) dir = d;
+      }
+      if (rev >= 4 && dist > 900) {
+        const el = bigCursor();
+        el.style.transform = `translate(${e.clientX - 9}px, ${e.clientY - 5}px)`;
+        el.classList.add('on');
+        document.documentElement.classList.add('cursor-located');
+        shake.until = now + 120;
+        clearTimeout(shake.timer);
+        shake.timer = setTimeout(() => {
+          el.classList.remove('on');
+          // let the arrow shrink back before handing over to the real cursor
+          setTimeout(() => !el.classList.contains('on') && document.documentElement.classList.remove('cursor-located'), 340);
+        }, 650);
+      }
+    },
+    { passive: true }
+  );
+})();
