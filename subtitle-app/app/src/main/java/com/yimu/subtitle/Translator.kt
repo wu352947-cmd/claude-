@@ -65,30 +65,38 @@ class Translator(private val apiKey: () -> String) {
     data class UnitOutput(val zh: String, val en: String?, val rest: List<String>)
 
     /**
-     * 稳定模式：翻译一段意思完整的英文。第一行（中文）一写完就通过 [onLine] 交出去上屏，
-     * 第二行（英文）写完再交一次。[allowRest] 为 true 时，允许模型把末尾没说完的几个词退回来。
+     * 稳定模式：翻译一段英文。输出顺序是 REST（退回的尾巴）→ 中文 → 英文：
+     * 先让模型决定末尾哪几个词留给下一段，再写中文，中文里就不会把它们也翻进去。
+     * 中文那一行一写完就通过 [onLine] 交出去上屏。[lookahead] 是说话人紧接着说的几个词，帮助判断有没有说完。
      */
     suspend fun subtitleUnit(
         english: String,
+        lookahead: String,
         previous: List<String>,
         allowRest: Boolean,
         onLine: (zh: String?, en: String?) -> Unit,
     ): UnitOutput {
-        val note = if (allowRest) "" else "\n（这是说话人停顿前的最后一段，第3行只写 REST:）"
+        val current = buildString {
+            append("当前这段：").append(english)
+            if (lookahead.isNotBlank()) append("\n后文（说话人紧接着说的，不要翻译）：").append(lookahead)
+            if (!allowRest) append("\n（说话人已经说完了，第1行只写 REST:，整段都要翻译）")
+        }
         val messages = JSONArray()
             .put(msg("system", UNIT_PROMPT))
-            .put(msg("user", userText(previous, "当前这段：$english$note")))
+            .put(msg("user", userText(previous, current)))
         var zhSent = false
         var enSent = false
         val text = streamChat(BASE, messages, stop = null) { acc ->
             val lines = acc.split('\n')
-            if (!zhSent && lines.size >= 2) {
+            // 第 1 行应该是 REST；模型偶尔漏写时，第 1 行就是中文
+            val offset = if (lines[0].trimStart().startsWith("REST", ignoreCase = true)) 1 else 0
+            if (!zhSent && lines.size >= offset + 2) {
                 zhSent = true
-                onLine(cleanZh(lines[0]), null)
+                onLine(cleanZh(lines[offset]), null)
             }
-            if (zhSent && !enSent && lines.size >= 3) {
+            if (zhSent && !enSent && lines.size >= offset + 3) {
                 enSent = true
-                onLine(null, lines[1].trim().ifEmpty { null })
+                onLine(null, lines[offset + 1].trim().ifEmpty { null })
             }
         }
         return parseUnit(text)
@@ -216,45 +224,49 @@ class Translator(private val apiKey: () -> String) {
 
         private val UNIT_PROMPT = """
             你是专业的视频字幕翻译，风格像优秀的中文字幕组。
-            输入是语音识别得到的一段英文：全大写、没有标点，可能有个别识别错误。上文只用来理解语境，不要翻译。
+            输入是语音识别得到的一段英文：全大写、没有标点，可能有个别识别错误。上文、后文只用来理解语境，不要翻译。
             语音识别经常把人名、产品名听成发音相近的普通词（例如把 AI 助手 Claude 听成 CLOUD 或 CLAWED），
             请结合上下文还原正确的名字，不要按字面翻译。
             严格只输出三行：
-            第1行：这段英文的简体中文字幕。自然、口语化、简洁，读起来像中文母语者说的话，不要翻译腔；
-                  人名、品牌、频道名保留英文；如果只是语气词或噪音，输出 -
-            第2行：纠正识别错误、恢复大小写和标点后的英文。
-            第3行：以 REST: 开头。如果这段英文的末尾几个词明显还没说完、单独翻译会让意思不完整，
-                  就把这几个词原样照抄在 REST: 后面（最多 6 个词），并且第1行不要翻译它们；
-                  如果意思是完整的，第3行只写 REST:
+            第1行：以 REST: 开头。先判断"当前这段"的末尾是不是话说到一半（结合后文判断），
+                  例如停在 AND / THEN / GIVE IT / THE BIGGEST / IT SAID THE BACKGROUND WAS 这种地方。
+                  如果是，把末尾这几个没说完的词原样照抄在 REST: 后面（最多 6 个词）；意思完整就只写 REST:
+            第2行：简体中文字幕，只翻译 REST 之前的部分。自然、口语化、简洁，读起来像中文母语者说的话，
+                  不要翻译腔，不要以"然后""而且""它"这类悬空的词结尾；人名、品牌保留英文；
+                  如果只是语气词或噪音，输出 -
+            第3行：纠正识别错误、恢复大小写和标点后的英文（只写 REST 之前的部分）。
             不要输出任何其他内容。
 
             示例 1
             当前这段：YOU CAN GIVE IT FILES LIKE PDFS AND IMAGES AND IT
+            后文（说话人紧接着说的，不要翻译）：READS THEM
+            REST: AND IT
             你可以给它 PDF、图片之类的文件
             You can give it files like PDFs and images
-            REST: AND IT
 
             示例 2
-            当前这段：AND IT READS THEM AND WORKS WITH WHAT'S INSIDE
-            它会读取这些文件，根据里面的内容来处理
-            And it reads them and works with what's inside.
+            当前这段：THE BIGGEST TAKEAWAY FOR ME WAS THAT THE BACKGROUND IS DOING TOO MUCH
             REST:
+            对我来说最大的收获是，背景太抢眼了
+            The biggest takeaway for me was that the background is doing too much.
 
             示例 3
-            当前这段：SO WHAT I'M GOING TO DO IS PICK THE FILE FROM THE
-            接下来我要选一个文件
-            So what I'm going to do is pick the file
-            REST: FROM THE
+            当前这段：IT GAVE ME AN ANSWER IN A FEW SECONDS AND THE BIGGEST
+            后文（说话人紧接着说的，不要翻译）：TAKEAWAY WAS
+            REST: AND THE BIGGEST
+            它几秒钟就给出了回答
+            It gave me an answer in a few seconds
         """.trimIndent()
 
         private fun cleanZh(s: String): String = s.trim().let { if (it == "-" || it == "－") "" else it }
 
         fun parseUnit(text: String): UnitOutput {
             val lines = text.trim().split('\n').map { it.trim() }.filter { it.isNotEmpty() }
-            val zh = cleanZh(lines.getOrNull(0).orEmpty())
-            val en = lines.getOrNull(1)?.takeUnless { it.startsWith("REST", ignoreCase = true) }
-            val restLine = lines.firstOrNull { it.startsWith("REST", ignoreCase = true) }.orEmpty()
-            val rest = restLine.replaceFirst(Regex("^REST\\s*[:：]?", RegexOption.IGNORE_CASE), "")
+            val restLine = lines.firstOrNull { it.startsWith("REST", ignoreCase = true) }
+            val body = lines.filter { it !== restLine }
+            val zh = cleanZh(body.getOrNull(0).orEmpty())
+            val en = body.getOrNull(1)
+            val rest = restLine.orEmpty().replaceFirst(Regex("^REST\\s*[:：]?", RegexOption.IGNORE_CASE), "")
                 .trim().split(' ').map { it.trim(',', '.', '?', '!') }.filter { it.isNotEmpty() }
             return UnitOutput(zh, en, if (rest.size <= 6) rest else emptyList())
         }

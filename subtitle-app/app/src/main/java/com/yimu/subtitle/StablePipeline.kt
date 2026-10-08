@@ -45,7 +45,7 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
     private var lastWordAt = 0L
 
     // ---- 翻译侧（按顺序一段一段翻，上一段退回的词要并进下一段） ----
-    private class Unit(val words: List<String>, val spokenAt: Long, val endOfTurn: Boolean)
+    private class Unit(val words: List<String>, val spokenAt: Long, val endOfTurn: Boolean, val allowRest: Boolean = true)
 
     private val queue = ArrayDeque<Unit>()
     private var job: Job? = null
@@ -153,14 +153,14 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
         carry = emptyList()
         val english = unitWords.joinToString(" ")
         val previous = context()
-        // 如果后面已经排着下一段，就允许把没说完的尾巴退回去并进下一段
-        val allowRest = !next.endOfTurn || queue.isNotEmpty()
+        // 说话人紧接着说的几个词（已排队的下一段，或正在说的半句），帮模型判断这段有没有说完
+        val lookahead = (queue.firstOrNull()?.words ?: words.drop(consumed)).take(6).joinToString(" ")
 
         job = scope.launch {
             var shown = false
             var lineId = 0L
             try {
-                val out = translator.subtitleUnit(english, previous, allowRest) { zh, en ->
+                val out = translator.subtitleUnit(english, lookahead, previous, next.allowRest) { zh, en ->
                     if (!shown && zh != null) {
                         shown = true
                         lineId = emit(zh, english, en, spokenAt)
@@ -171,7 +171,7 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
                 if (!shown) lineId = emit(out.zh, english, out.en, spokenAt) else out.en?.let { patchEnglish(lineId, it) }
                 // 尾巴退回：只接受确实是这段英文末尾的几个词
                 val rest = out.rest
-                if (allowRest && rest.isNotEmpty() && rest.size < unitWords.size &&
+                if (next.allowRest && rest.isNotEmpty() && rest.size < unitWords.size &&
                     unitWords.takeLast(rest.size).map { it.lowercase() } == rest.map { it.lowercase() }
                 ) {
                     carry = unitWords.takeLast(rest.size)
@@ -189,7 +189,7 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
                 sendNext()
             } else if (carry.isNotEmpty()) {
                 // 退回的尾巴之后没人接着说：等一会儿还没有新内容就单独翻掉
-                main.postDelayed(flushCarry, 1500)
+                main.postDelayed(flushCarry, 1200)
             }
         }
     }
@@ -198,7 +198,8 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
         if (carry.isNotEmpty() && job?.isActive != true && queue.isEmpty()) {
             val c = carry
             carry = emptyList()
-            queue.addLast(Unit(c, carrySpokenAt, endOfTurn = true))
+            // 退回的尾巴等不到下文：这次必须整段翻掉，不能再退回
+            queue.addLast(Unit(c, carrySpokenAt, endOfTurn = true, allowRest = false))
             sendNext()
         }
     }
@@ -284,7 +285,7 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
             "IS", "ARE", "WAS", "WERE", "BE", "BEEN", "AM", "I", "YOU", "WE", "THEY", "HE", "SHE", "MY", "YOUR",
             "OUR", "THEIR", "HIS", "HER", "ITS", "THIS", "THESE", "THOSE", "CAN", "COULD", "WILL", "WOULD",
             "SHOULD", "MAY", "MIGHT", "MUST", "DO", "DOES", "DID", "HAVE", "HAS", "HAD", "NOT", "VERY", "REALLY",
-            "JUST", "LIKE", "UM", "UH", "GONNA", "WANNA", "LET'S", "THERE", "WHAT", "HOW", "WHY", "WHERE",
+            "JUST", "LIKE", "UM", "UH", "THEN", "ALSO", "GONNA", "WANNA", "LET'S", "THERE", "WHAT", "HOW", "WHY", "WHERE",
             "GET", "GOT", "GOING", "WANT", "NEED", "TRY", "KIND", "SORT", "MORE", "MOST", "SOME", "ANY", "EVERY",
             "I'M", "YOU'RE", "WE'RE", "THEY'RE", "IT'S", "THAT'S", "THERE'S", "I'LL", "I'VE", "DON'T", "CAN'T",
         )
