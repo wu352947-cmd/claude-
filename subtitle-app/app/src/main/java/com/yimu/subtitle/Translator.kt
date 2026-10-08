@@ -217,6 +217,8 @@ class Translator(private val apiKey: () -> String) {
         private val UNIT_PROMPT = """
             你是专业的视频字幕翻译，风格像优秀的中文字幕组。
             输入是语音识别得到的一段英文：全大写、没有标点，可能有个别识别错误。上文只用来理解语境，不要翻译。
+            语音识别经常把人名、产品名听成发音相近的普通词（例如把 AI 助手 Claude 听成 CLOUD 或 CLAWED），
+            请结合上下文还原正确的名字，不要按字面翻译。
             严格只输出三行：
             第1行：这段英文的简体中文字幕。自然、口语化、简洁，读起来像中文母语者说的话，不要翻译腔；
                   人名、品牌、频道名保留英文；如果只是语气词或噪音，输出 -
@@ -225,6 +227,24 @@ class Translator(private val apiKey: () -> String) {
                   就把这几个词原样照抄在 REST: 后面（最多 6 个词），并且第1行不要翻译它们；
                   如果意思是完整的，第3行只写 REST:
             不要输出任何其他内容。
+
+            示例 1
+            当前这段：YOU CAN GIVE IT FILES LIKE PDFS AND IMAGES AND IT
+            你可以给它 PDF、图片之类的文件
+            You can give it files like PDFs and images
+            REST: AND IT
+
+            示例 2
+            当前这段：AND IT READS THEM AND WORKS WITH WHAT'S INSIDE
+            它会读取这些文件，根据里面的内容来处理
+            And it reads them and works with what's inside.
+            REST:
+
+            示例 3
+            当前这段：SO WHAT I'M GOING TO DO IS PICK THE FILE FROM THE
+            接下来我要选一个文件
+            So what I'm going to do is pick the file
+            REST: FROM THE
         """.trimIndent()
 
         private fun cleanZh(s: String): String = s.trim().let { if (it == "-" || it == "－") "" else it }
