@@ -45,7 +45,10 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            // 压缩代码，让安装包小于 30 MB，方便直接发送
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("yimu")
         }
         debug {
