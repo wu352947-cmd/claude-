@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         译幕 · 网页翻译
 // @namespace    com.yimu.subtitle
-// @version      0.1.0
+// @version      0.1.1
 // @description  用 DeepSeek 把英文网页整页翻译成自然的中文。点右下角「译」切换 中文 / 双语 / 原文。
 // @match        *://*/*
 // @noframes
@@ -201,6 +201,55 @@ window.__yimuMode = auto && looksEnglish() ? savedMode : 'off';
     return latin >= 3 && cjk < latin * 0.1;
   }
 
+  var KEEP_SEPARATE = /^(A|BUTTON|LABEL|LI|TD|TH|DT|DD|SUMMARY|OPTION)$/;
+  var SENTENCE = 'h1,h2,h3,h4,h5,h6,p,blockquote,figcaption';
+  var rootCache = new WeakMap();
+
+  function wordCount(t) {
+    t = (t || '').trim();
+    return t ? t.split(/\s+/).length : 0;
+  }
+
+  /*
+   * 很多网站为了做动画，把标题的每个单词放进单独的小块里。
+   * 如果逐块翻译就会变成"一个词一个词"的硬翻，所以要找到整句话所在的元素：
+   * 1. 在标题、段落里面的，整个标题 / 段落算一句；
+   * 2. 一排都是只有一两个词的小块、连起来像一句话的，合并成它们的父元素。
+   */
+  function sentenceRoot(b) {
+    var cached = rootCache.get(b);
+    if (cached) return cached;
+    var r = b;
+    if (!KEEP_SEPARATE.test(b.tagName)) {
+      var sem = b.closest(SENTENCE);
+      if (sem && sem !== b && !sem.closest('[contenteditable]')) {
+        r = sem;
+      } else {
+        for (var level = 0; level < 2; level++) {
+          if (!/^(SPAN|DIV|EM|STRONG|B|I|SMALL)$/.test(r.tagName) || wordCount(r.textContent) > 3) break;
+          var parent = r.parentElement;
+          if (!parent || parent === document.body) break;
+          var kids = parent.children;
+          if (kids.length < 3) break;
+          var ok = true;
+          for (var i = 0; i < kids.length && ok; i++) {
+            var k = kids[i];
+            if (k.tagName === 'BR') continue;
+            if (KEEP_SEPARATE.test(k.tagName) || wordCount(k.textContent) > 3) ok = false;
+          }
+          // flex 排版里单词之间可能没有空格，按子元素拼接
+          var merged = Array.prototype.map.call(kids, function (k) { return (k.textContent || '').trim(); })
+            .join(' ').replace(/\s+/g, ' ').trim();
+          // 像一句话：至少 4 个词，并且有小写开头的词（菜单一般每项都大写开头）
+          if (!ok || wordCount(merged) < 4 || !/\s[a-z]/.test(merged)) break;
+          r = parent;
+        }
+      }
+    }
+    rootCache.set(b, r);
+    return r;
+  }
+
   function scan(root) {
     if (!root || !document.body) return;
     var w = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
@@ -216,6 +265,7 @@ window.__yimuMode = auto && looksEnglish() ? savedMode : 'off';
       var b = p;
       while (b && b !== document.body && !isBlock(b)) b = b.parentElement;
       if (!b) continue;
+      b = sentenceRoot(b);
       var u = unitOf.get(b);
       if (!u) {
         u = { el: b, nodes: [], state: 0, tries: 0 };
