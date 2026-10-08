@@ -55,11 +55,13 @@ function woodsPattern(): FillPattern {
   return p;
 }
 
+let cachedPattern: FillPattern | null = null;
+
 /** 林地：按格填充树冠纹理，只在林地外缘描深色边。 */
 export function drawWoods(map: GameMap, g: Graphics): void {
   const ids = [...map.hexes].filter(([, r]) => r.terrain === 'woods').map(([id]) => id);
   if (ids.length === 0) return;
-  const pattern = woodsPattern();
+  const pattern = (cachedPattern ??= woodsPattern());
   const set = new Set(ids);
   for (const id of ids) g.poly(hexCorners(map.grid, parseHexId(id)).flatMap((p) => [p.x * K, p.y * K]), true);
   g.fill({ fill: pattern });

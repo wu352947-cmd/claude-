@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "check": "tsc --noEmit && vitest run"
+    "check": "tsc --noEmit && vitest run",
+    "apply-edits": "node ../tools/editor/apply-map-edits.mjs"
   },
   "dependencies": {
     "pixi.js": "^8.22.0",

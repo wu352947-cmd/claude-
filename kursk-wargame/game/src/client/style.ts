@@ -48,6 +48,7 @@ export const PALETTE = {
   marginInk: 0x2a2d2b,
   select: 0xb3261e,
   auto: 0xd9822b,
+  verified: 0x3f8f4a,
 };
 
 /** 字体：地名用衬线体（印刷地图的质感），界面用无衬线体 */

@@ -1,6 +1,8 @@
 /** 地图各图层的组装：纸面、地形起伏、参考底图、地形、线状要素、格网、居民点、格号、地名、图边。 */
 import { Assets, BitmapFont, BitmapText, Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
-import { type GameMap, type Offset, hexAt, hexCenter, hexCorners, hexId, parseHexId, toWorld } from '../engine';
+import {
+  type Direction, type GameMap, type Offset, hexAt, hexCenter, hexCorners, hexId, parseHexId, sideCorners, toWorld,
+} from '../engine';
 import { drawLines, drawSettlements, drawSides, drawWoods } from './features';
 import { MARGIN_KM, drawFurniture } from './furniture';
 import { FONT_LATIN, FONT_SERIF, PALETTE, PX_PER_KM } from './style';
@@ -16,7 +18,13 @@ export interface MapView {
     numbers: Container; labels: Container; status: Graphics;
   };
   select(h: Offset | null): void;
+  /** 高亮一条格边（编辑器格边工具） */
+  selectSide(h: Offset, dir: Direction): void;
   onZoom(zoom: number): void;
+  /** 地图数据改变后（编辑器）重画地形、核对标记和地名 */
+  update(map: GameMap): void;
+  /** 核对标记是否同时显示"已核对"（编辑模式） */
+  setShowVerified(on: boolean): void;
 }
 
 const K = PX_PER_KM;
@@ -106,18 +114,32 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
   }
   const reference = await imageLayer(referenceUrl, map.def.reference.boundsKm);
 
-  // 地形（面状位图 + 矢量林地/线状要素/格边）
+  // 地形（面状位图 + 矢量林地/线状要素/格边/居民点）
   const terrain = new Container();
-  const areas = renderAreas(map, bounds);
-  if (areas) {
-    const s = new Sprite(Texture.from(areas));
-    s.position.set(bounds.x0 * K, bounds.y0 * K);
-    terrain.addChild(s);
-  }
-  const woods = new Graphics(); drawWoods(map, woods);
-  const lines = new Graphics(); drawLines(map, lines);
-  const sides = new Graphics(); drawSides(map, sides);
-  terrain.addChild(woods, lines, sides);
+  let areasKey = '';
+  let areasSprite: Sprite | null = null;
+  const buildTerrain = (m: GameMap): void => {
+    // 面状位图重画较慢，只在沼泽/水面/城镇格子变化时才重画
+    const key = [...m.hexes].filter(([, r]) => ['marsh', 'water', 'city', 'town'].includes(r.terrain))
+      .map(([id, r]) => id + r.terrain).sort().join();
+    if (key !== areasKey) {
+      areasKey = key;
+      areasSprite?.destroy(true);
+      areasSprite = null;
+      const areas = renderAreas(m, bounds);
+      if (areas) {
+        areasSprite = new Sprite(Texture.from(areas));
+        areasSprite.position.set(bounds.x0 * K, bounds.y0 * K);
+      }
+    }
+    for (const c of terrain.removeChildren()) if (c !== areasSprite) c.destroy();
+    const woods = new Graphics(); drawWoods(m, woods);
+    const lines = new Graphics(); drawLines(m, lines);
+    const sides = new Graphics(); drawSides(m, sides);
+    const settlements = new Graphics(); drawSettlements(m, settlements);
+    terrain.addChild(...(areasSprite ? [areasSprite] : []), woods, lines, sides, settlements);
+  };
+  buildTerrain(map);
 
   // 格网：细线压在地形之上（东线兵棋地图的做法）
   const grid = new Graphics();
@@ -127,9 +149,6 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     }
   }
   grid.stroke({ width: 0.035 * K, color: PALETTE.hexLine, alpha: 0.9 });
-
-  const settlements = new Graphics(); drawSettlements(map, settlements);
-  terrain.addChild(settlements);
 
   // 格号：小而淡，贴在格子上沿
   BitmapFont.install({ name: 'hexnum', style: { fontFamily: 'Arial, sans-serif', fontSize: 32, fill: PALETTE.hexNumber }, chars: '0123456789', resolution: 2 });
@@ -145,24 +164,38 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     }
   }
 
-  // 未核对标记
+  // 核对标记：橙色菱形 = 未核对；编辑模式下另用绿色小圆点标出已核对
   const status = new Graphics();
-  for (const [id, rec] of map.hexes) {
-    if (rec.status === 'verified') continue;
-    const c = hexCenter(map.grid, parseHexId(id));
-    const x = c.x * K, y = (c.y + 0.75) * K, r = 0.18 * K;
-    status.poly([x, y - r, x + r, y, x, y + r, x - r, y], true);
-  }
-  status.fill({ color: PALETTE.auto, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
+  let showVerified = false;
+  let current = map;
+  const drawStatus = (): void => {
+    status.clear();
+    for (const [id, rec] of current.hexes) {
+      if (rec.status === 'verified') continue;
+      const c = hexCenter(current.grid, parseHexId(id));
+      const x = c.x * K, y = (c.y + 0.75) * K, r = 0.18 * K;
+      status.poly([x, y - r, x + r, y, x, y + r, x - r, y], true);
+    }
+    status.fill({ color: PALETTE.auto, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
+    if (!showVerified) return;
+    for (const [id, rec] of current.hexes) {
+      if (rec.status !== 'verified') continue;
+      const c = hexCenter(current.grid, parseHexId(id));
+      status.circle(c.x * K, (c.y + 0.75) * K, 0.15 * K);
+    }
+    status.fill({ color: PALETTE.verified, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
+  };
+  drawStatus();
 
-  const labels = buildLabels(map);
+  let labels = buildLabels(map);
+  let lastZoom = 1;
   const furniture = drawFurniture(bounds, '库尔斯克 1943', `${map.def.name.zh} · 1:250,000 底图转绘 · 草稿`);
   const selection = new Graphics();
 
   root.addChild(paper, ...(relief ? [relief] : []), reference, terrain, grid, status, numbers, labels, furniture, selection);
   reference.alpha = 0.55;
 
-  return {
+  const view: MapView = {
     root, bounds, fullBounds,
     layers: { reference, relief, terrain, grid, numbers, labels, status },
     select(h) {
@@ -170,7 +203,27 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
       if (!h) return;
       selection.poly(hexCorners(map.grid, h).flatMap((p) => [p.x * K, p.y * K]), true).stroke({ width: 0.15 * K, color: PALETTE.select });
     },
+    selectSide(h, dir) {
+      const [a, b] = sideCorners(map.grid, h, dir);
+      selection.clear().moveTo(a.x * K, a.y * K).lineTo(b.x * K, b.y * K)
+        .stroke({ width: 0.3 * K, color: PALETTE.select, cap: 'round', alpha: 0.85 });
+    },
+    update(m) {
+      current = m;
+      buildTerrain(m);
+      drawStatus();
+      const visible = labels.visible;
+      const idx = root.getChildIndex(labels);
+      labels.destroy({ children: true });
+      labels = buildLabels(m);
+      labels.visible = visible;
+      root.addChildAt(labels, idx);
+      view.layers.labels = labels;
+      view.onZoom(lastZoom);
+    },
+    setShowVerified(on) { showVerified = on; drawStatus(); },
     onZoom(zoom) {
+      lastZoom = zoom;
       numbers.renderable = numbers.visible && zoom >= 0.9;
       // 地名保持屏幕大小不变；按重要性依次放置，与已放置的重叠就隐藏
       const s = 1 / zoom;
@@ -194,4 +247,5 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
       for (const c of labels.children) if (!(c.label in rank)) c.scale.set(s);
     },
   };
+  return view;
 }

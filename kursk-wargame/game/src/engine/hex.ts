@@ -119,3 +119,18 @@ export function sideKey(h: Offset, dir: Direction): string {
   if (dir <= 2) return `${hexId(h)}:${dir}`;
   return `${hexId(neighbor(h, dir))}:${dir - 3}`;
 }
+
+/**
+ * 离某点最近的格边（编辑器点选格边用）。点离格中心太近（小于 minFrac × 内切圆半径）时返回 null，
+ * 避免点在格子中间也误选到某条边。
+ */
+export function nearestSide(g: HexGrid, p: Point, minFrac = 0.45): { hex: Offset; dir: Direction } | null {
+  const hex = hexAt(g, p);
+  const c = hexCenter(g, hex);
+  const dx = p.x - c.x, dy = p.y - c.y;
+  if (Math.hypot(dx, dy) < (g.acrossKm / 2) * minFrac) return null;
+  // 平顶格：各方向格边中点的角度依次为 -90°（北）、-30°、30°、90°、150°、210°
+  const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+  const dir = ((Math.round((deg + 90) / 60) % 6) + 6) % 6;
+  return { hex, dir: dir as Direction };
+}

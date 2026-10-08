@@ -49,6 +49,56 @@
         position: fixed; inset: 0; display: grid; place-items: center; background: #2b2e30; color: #efe6c8;
         font-size: 16px; z-index: 3;
       }
+      /* 编辑器 */
+      .bar button.on { background: var(--accent); border-color: var(--accent); }
+      #editor {
+        position: fixed; top: 48px; left: 10px; background: var(--panel); color: var(--panel-ink);
+        border-radius: 8px; padding: 10px 12px; font-size: 14px; z-index: 2; width: 236px; max-width: calc(100vw - 44px);
+      }
+      #editor[hidden] { display: none; }
+      #editor .row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+      #editor button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px;
+        padding: 6px 9px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+      }
+      #editor button.on { background: #efe6c8; color: #1d1f1b; border-color: #efe6c8; }
+      #editor button:disabled { opacity: 0.4; cursor: default; }
+      #editor .sw { width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.35); }
+      #editor .tabs button { flex: 1; justify-content: center; }
+      #editor label { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 13px; }
+      #editor select { max-width: 100%; width: 100%; font-size: 13px; margin-bottom: 8px; padding: 4px; border-radius: 6px; }
+      #editor .hint { font-size: 12px; color: #b9b096; line-height: 1.5; margin-bottom: 8px; }
+      #editor .stats { font-size: 12px; color: #b9b096; border-top: 1px solid #4a473c; padding-top: 6px; }
+      #editor .collapse { float: right; padding: 0 6px; border: none; font-size: 16px; }
+      #editor.min .body { display: none; }
+      @media (max-width: 520px) {
+        #editor { width: 200px; padding: 8px 10px; font-size: 13px; }
+        #editor button { padding: 4px 7px; font-size: 12px; }
+        #editor .row { gap: 4px; margin-bottom: 6px; }
+        #editor .hint, #editor label, #editor .stats { font-size: 11px; }
+        #editor select { font-size: 12px; }
+      }
+      #toast {
+        position: fixed; left: 50%; top: 56px; transform: translateX(-50%); background: rgba(29,31,27,0.92); color: #efe6c8;
+        padding: 6px 14px; border-radius: 16px; font-size: 13px; z-index: 4; pointer-events: none; opacity: 0; transition: opacity .2s;
+      }
+      #toast.show { opacity: 1; }
+      #info textarea { width: 100%; box-sizing: border-box; min-height: 52px; font-size: 13px; margin-top: 4px; border-radius: 6px; padding: 4px; }
+      #info .note-save { margin-top: 4px; font-size: 13px; border: 1px solid #6b6650; border-radius: 6px; padding: 4px 10px; }
+      #export {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5; display: grid; place-items: center;
+      }
+      #export[hidden] { display: none; }
+      #export .box {
+        background: var(--panel); color: var(--panel-ink); border-radius: 10px; padding: 14px; width: min(560px, calc(100vw - 32px));
+        font-size: 14px; line-height: 1.6;
+      }
+      #export textarea { width: 100%; box-sizing: border-box; height: 40vh; font: 12px/1.4 ui-monospace, Menlo, monospace; border-radius: 6px; padding: 6px; }
+      #export .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      #export button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px; padding: 6px 12px; font-size: 14px; cursor: pointer;
+      }
+      #export button.primary { background: var(--accent); border-color: var(--accent); }
       .credit { position: fixed; right: 8px; bottom: 6px; font-size: 10px; color: #a39a80; z-index: 1; pointer-events: none; }
     </style>
   </head>
@@ -57,6 +107,7 @@
     <header class="bar">
       <h1 id="title">库尔斯克 1943</h1>
       <span class="sub" id="subtitle"></span>
+      <button id="edit-toggle">编辑</button>
       <button id="fit">全图</button>
       <button id="layers-toggle">图层</button>
     </header>
@@ -73,6 +124,44 @@
       <div class="hint">橙色菱形 = 程序自动提取、尚未人工核对的格子。<br />样板区（普罗霍罗夫卡—捷捷列维诺）的村庄、河流、道路、铁路为 AI 转录草稿，均未核对。</div>
     </div>
     <div id="info" hidden></div>
+    <div id="editor" hidden>
+      <div><b>地图编辑</b><button class="collapse" id="ed-min" aria-label="收起">–</button></div>
+      <div class="body">
+        <div class="row tabs" id="ed-tools">
+          <button data-tool="view">查看</button>
+          <button data-tool="terrain">地形</button>
+          <button data-tool="side">格边</button>
+          <button data-tool="verify">核对</button>
+        </div>
+        <div class="hint" id="ed-hint"></div>
+        <div class="row" id="ed-brushes"></div>
+        <label><input type="checkbox" id="ed-ref" /> 显示参考底图（对照原图）</label>
+        <label><input type="checkbox" id="ed-verify" checked /> 修改时同时标为"已核对"</label>
+        <div class="hint" style="margin-bottom:2px">依据的史料</div>
+        <select id="ed-source"></select>
+        <div class="row">
+          <button id="ed-undo">↶ 撤销</button>
+          <button id="ed-export">导出 / 导入</button>
+        </div>
+        <div class="stats" id="ed-stats"></div>
+      </div>
+    </div>
+    <div id="export" hidden>
+      <div class="box">
+        <b>导出修改</b>
+        <div class="hint">修改只保存在这台设备的浏览器里。把下面整段内容复制发给 AI（Claude），它会合并进地图数据并上线。<br />
+          换设备时，可以把这段内容粘贴到另一台设备的这个框里，点"载入"。</div>
+        <textarea id="ex-text" spellcheck="false"></textarea>
+        <div class="row">
+          <button class="primary" id="ex-copy">复制</button>
+          <button id="ex-download">下载文件</button>
+          <button id="ex-load">载入框里的内容</button>
+          <button id="ex-clear">清空全部修改</button>
+          <button id="ex-close">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div id="toast"></div>
     <div id="loading">正在绘制地图…</div>
     <div class="credit">底图：U.S. Army Map Service N501（公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>
     <script type="module" src="/src/client/main.ts"></script>
