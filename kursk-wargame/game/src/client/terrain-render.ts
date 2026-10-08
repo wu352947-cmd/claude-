@@ -8,7 +8,7 @@
  */
 import { type GameMap, type Terrain, hexCenter, hexCorners, parseHexId, radiusOf } from '../engine';
 import { fbm, valueNoise } from './noise';
-import { PALETTE, PX_PER_KM, type RGB } from './style';
+import { PALETTE, PX_PER_KM, THEME, type RGB } from './style';
 
 export interface WorldBounds { x0: number; y0: number; x1: number; y1: number }
 
@@ -43,7 +43,7 @@ export function renderPaper(b: WorldBounds): HTMLCanvasElement {
       const tone = PALETTE.fields[Math.floor(hash2(bx, by, 3) * PALETTE.fields.length)]!;
       // 田埂：很淡的浅色细线，只在放大后隐约可见
       const e = Math.sqrt(second) - Math.sqrt(best);
-      const w = e < 0.06 ? 0.55 * (1 - e / 0.06) : 0;
+      const w = THEME === 'warm' && e < 0.06 ? 0.55 * (1 - e / 0.06) : 0;
       const n = fbm(kx * 0.12, ky * 0.12, 11) * 8 + (valueNoise(x * 0.8, y * 0.8, 5) - 0.5) * 3;
       const f = PALETTE.fieldEdge;
       const c = [tone[0] + (f[0] - tone[0]) * w, tone[1] + (f[1] - tone[1]) * w, tone[2] + (f[2] - tone[2]) * w];
@@ -211,7 +211,15 @@ export function renderTerrain(map: GameMap, b: WorldBounds): HTMLCanvasElement {
     }
   }
 
-  // 3. 林地：一簇簇树冠
+  // 3. 林地
+  if (THEME === 'cool') drawHexWoods(map, b, ctx);
+  else drawOrganicWoods(map, b, ctx);
+  return canvas;
+}
+
+/** 暖调：自然形状的树团（相邻林地格连成一片，边缘起伏） */
+function drawOrganicWoods(map: GameMap, b: WorldBounds, ctx: CanvasRenderingContext2D): void {
+  const K = PX_PER_KM;
   const woods = makeMask(map, b, ['woods'], 'hex', 1.0, 1.0);
   if (woods) {
     const STEP = 0.3;
@@ -235,5 +243,42 @@ export function renderTerrain(map: GameMap, b: WorldBounds): HTMLCanvasElement {
       ctx.beginPath(); ctx.arc((c.x - c.r * 0.3) * K, (c.y - c.r * 0.3) * K, c.r * 0.45 * K, 0, Math.PI * 2); ctx.fill();
     }
   }
-  return canvas;
+}
+
+/** 冷调：林地按格填色（边缘贴合格子、略圆角），格内铺细密树冠纹理 */
+function drawHexWoods(map: GameMap, b: WorldBounds, ctx: CanvasRenderingContext2D): void {
+  const K = PX_PER_KM;
+  const mask = makeMask(map, b, ['woods'], 'hex', 1.0, 0.12);
+  if (!mask) return;
+  const W = ctx.canvas.width, H = ctx.canvas.height;
+  const img = ctx.getImageData(0, 0, W, H);
+  const d = img.data;
+  const cov = new Uint8Array(W * H);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (at(mask, x / K, y / K) > 0.5) cov[y * W + x] = 1;
+  const base = PALETTE.woods as RGB, dark = PALETTE.woodsDark as RGB;
+  for (let y = 0; y < H; y++) {
+    for (let x = 0; x < W; x++) {
+      const k = y * W + x;
+      if (!cov[k]) continue;
+      const edge = !cov[k - 1] || !cov[k + 1] || !cov[k - W] || !cov[k + W];
+      const c = edge ? dark : base;
+      const i = k * 4;
+      d[i] = c[0]; d[i + 1] = c[1]; d[i + 2] = c[2]; d[i + 3] = 255;
+    }
+  }
+  ctx.putImageData(img, 0, 0);
+  // 树冠纹理：小圆点，深浅两色，只画在林地内部
+  const STEP = 0.16;
+  for (let gy = 0; gy < (b.y1 - b.y0) / STEP; gy++) {
+    for (let gx = 0; gx < (b.x1 - b.x0) / STEP; gx++) {
+      const x = (gx + 0.5 + (hash2(gx, gy, 21) - 0.5) * 0.9) * STEP;
+      const y = (gy + 0.5 + (hash2(gx, gy, 22) - 0.5) * 0.9) * STEP;
+      if (at(mask, x, y) < 0.75) continue;
+      const r = 0.055 + hash2(gx, gy, 23) * 0.035;
+      ctx.fillStyle = rgb(PALETTE.woodsDark as RGB, Math.round((hash2(gx, gy, 24) - 0.5) * 14));
+      ctx.beginPath(); ctx.arc((x + 0.02) * K, (y + 0.025) * K, r * K, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = rgb(PALETTE.woodsLight as RGB, Math.round((hash2(gx, gy, 25) - 0.5) * 12));
+      ctx.beginPath(); ctx.arc((x - 0.015) * K, (y - 0.015) * K, r * 0.7 * K, 0, Math.PI * 2); ctx.fill();
+    }
+  }
 }

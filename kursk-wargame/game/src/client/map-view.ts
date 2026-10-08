@@ -5,7 +5,7 @@ import {
   hexAt, linePoints, parseHexId, sideCorners, toWorld,
 } from '../engine';
 import { hashString } from './noise';
-import { PALETTE, PX_PER_KM } from './style';
+import { PALETTE, PX_PER_KM, THEME } from './style';
 import { renderPaper, renderTerrain, type WorldBounds } from './terrain-render';
 
 export interface MapView {
@@ -140,6 +140,7 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     relief.width = (x1 - x0) * K;
     relief.height = (y1 - y0) * K;
     relief.blendMode = 'multiply';
+    relief.alpha = THEME === 'cool' ? 0.75 : 1;
   }
 
   // 地形
@@ -161,8 +162,8 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     }
   }
   grid.stroke({ width: 1, color: PALETTE.hexLine, alpha: 0.75, pixelLine: true });
-  // 格内浅色内边（印刷兵棋地图常见的"压凹"格子）
-  for (let col = 0; col < map.grid.cols; col++) {
+  // 格内浅色内边（印刷兵棋地图常见的"压凹"格子）——仅暖调；冷调学东线地图，只用细格线
+  for (let col = 0; THEME === 'warm' && col < map.grid.cols; col++) {
     for (let row = 0; row < map.grid.rows; row++) {
       const c = hexCenter(map.grid, { col, row });
       grid.poly(hexCorners(map.grid, { col, row }).flatMap((p) => [(c.x + (p.x - c.x) * 0.93) * K, (c.y + (p.y - c.y) * 0.93) * K]), true);
