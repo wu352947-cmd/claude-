@@ -4,13 +4,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-/** 一句字幕。raw 是语音识别的原文；en/zh 由翻译补全。 */
+/** 一句字幕。raw 是语音识别的原文；en/zh 由翻译补全（翻译中 zh 会逐字变长）。 */
 data class Line(
     val id: Long,
     val raw: String,
     val en: String? = null,
     val zh: String? = null,
     val error: String? = null,
+    /** 中文是否已经完整生成（false 表示还在逐字输出）。 */
+    val done: Boolean = false,
+    /** 正式译文到达前先显示的抢先译文。 */
+    val placeholderZh: String? = null,
+    /** 说话人说出最后一个词的时间，用来计算延迟。 */
+    val spokenAt: Long = 0L,
+    /** 从说完到中文出现用了多久（毫秒）。 */
+    val latencyMs: Long? = null,
 ) {
     val englishForDisplay: String get() = en ?: prettify(raw)
 }
@@ -21,6 +29,8 @@ data class LiveState(
     val level: Float = 0f,
     /** 正在说、还没说完的英文。 */
     val partial: String = "",
+    /** 正在说的这句话的抢先译文。 */
+    val draftZh: String = "",
     val lines: List<Line> = emptyList(),
     val updatedAt: Long = 0L,
     val notice: String? = null,

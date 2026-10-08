@@ -58,7 +58,7 @@ class SubtitleOverlay(private val context: Context) {
         setPadding(dp(22f), dp(12f), dp(22f), dp(14f))
         background = GradientDrawable().apply {
             cornerRadius = dp(18f).toFloat()
-            setColor(Color.argb(196, 14, 14, 20))
+            setColor(Color.argb(224, 14, 14, 20))
             setStroke(1, Color.argb(36, 255, 255, 255))
         }
         addView(hint)
@@ -148,17 +148,39 @@ class SubtitleOverlay(private val context: Context) {
         val now = System.currentTimeMillis()
         val zhOnly = Prefs.zhOnly(context)
         val last = s.lines.lastOrNull()
-        val idle = now - s.updatedAt > IDLE_MS && s.partial.isEmpty()
+        val speaking = s.partial.isNotEmpty()
+        val idle = now - s.updatedAt > IDLE_MS && !speaking
 
-        val zhText = when {
-            last == null || idle -> null
-            last.error != null -> last.error
-            last.zh == null -> "…"
-            last.zh.isEmpty() -> null
-            else -> last.zh
+        var zhText: String? = null
+        var enText: String? = null
+        var liveText: String? = null
+        var isError = false
+        var isDraft = false
+
+        if (speaking && s.draftZh.isNotEmpty()) {
+            // 正在说：显示抢先译文 + 实时英文
+            zhText = s.draftZh
+            enText = prettify(s.partial)
+            isDraft = true
+        } else if (last != null && !idle) {
+            val ph = last.placeholderZh
+            zhText = when {
+                last.error != null -> { isError = true; last.error }
+                // 正式译文比抢先译文还短时，先继续显示抢先译文，避免字幕先变短再变长
+                last.zh != null && !last.done && ph != null && last.zh.length < ph.length -> ph
+                last.zh == null -> ph ?: "…"
+                last.zh.isEmpty() -> null
+                else -> last.zh
+            }
+            enText = last.englishForDisplay
+            if (speaking) liveText = prettify(s.partial)
+        } else if (speaking) {
+            liveText = prettify(s.partial)
         }
-        val enText = if (last == null || idle || zhOnly) null else last.englishForDisplay
-        val liveText = if (zhOnly || s.partial.isEmpty()) null else prettify(s.partial)
+        if (zhOnly) {
+            enText = null
+            liveText = null
+        }
 
         val hintText = when {
             now < flashUntil -> flashText
@@ -174,12 +196,20 @@ class SubtitleOverlay(private val context: Context) {
         zh.visibility = if (zhText != null) View.VISIBLE else View.GONE
         if (zhText != null && zhText != lastZh) {
             zh.text = zhText
-            val isError = last?.error != null
-            zh.setTextColor(if (isError) Color.rgb(255, 170, 160) else Color.WHITE)
-            zh.setTextSize(TypedValue.COMPLEX_UNIT_SP, if (isError) 15f else 22f)
-            if (zhText != "…" && !isError) {
+            zh.setTextColor(
+                when {
+                    isError -> Color.argb(170, 255, 190, 180)
+                    isDraft -> Color.argb(235, 255, 255, 255)
+                    else -> Color.WHITE
+                },
+            )
+            zh.setTextSize(TypedValue.COMPLEX_UNIT_SP, if (isError) 14f else 22f)
+            // 只在换成新的一句时淡入；同一句逐字变长时不闪
+            val prev = lastZh
+            val sameSentence = prev != null && (zhText.startsWith(prev) || prev == "…")
+            if (!isError && !sameSentence && zhText != "…") {
                 zh.alpha = 0f
-                zh.animate().alpha(1f).setDuration(180).start()
+                zh.animate().alpha(1f).setDuration(160).start()
             }
         }
         lastZh = zhText

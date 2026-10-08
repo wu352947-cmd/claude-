@@ -25,9 +25,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Semaphore
-import kotlinx.coroutines.sync.withPermit
 import kotlin.math.sqrt
 
 /**
@@ -37,22 +34,20 @@ class CaptureService : Service() {
 
     private val main = Handler(Looper.getMainLooper())
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
-    private val translateSlots = Semaphore(3)
 
     private var projection: MediaProjection? = null
     private var record: AudioRecord? = null
     private var worker: Thread? = null
     @Volatile private var running = false
     private var overlay: SubtitleOverlay? = null
-    private var nextId = 1L
 
-    private lateinit var translator: Translator
+    private lateinit var pipeline: TranslationPipeline
 
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onCreate() {
         super.onCreate()
-        translator = Translator { Prefs.apiKey(this) }
+        pipeline = TranslationPipeline(this, scope)
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -130,7 +125,8 @@ class CaptureService : Service() {
 
         overlay = SubtitleOverlay(this).also { it.show() }
         running = true
-        SubtitleBus.update { it.copy(running = true, partial = "", level = 0f, notice = "正在加载识别模型…") }
+        SubtitleBus.update { it.copy(running = true, partial = "", draftZh = "", level = 0f, notice = "正在加载识别模型…") }
+        pipeline.start()
 
         worker = Thread({ captureLoop(rec, rate) }, "yimu-asr").apply { start() }
         return true
@@ -194,8 +190,9 @@ class CaptureService : Service() {
                 }
                 engine.accept(
                     out,
-                    onPartial = { p -> main.post { SubtitleBus.update { it.copy(partial = p, updatedAt = System.currentTimeMillis()) } } },
-                    onFinal = { t -> main.post { onSentence(t) } },
+                    onPartial = { p -> main.post { pipeline.onPartial(p) } },
+                    onPause = { p -> main.post { pipeline.onPause(p) } },
+                    onFinal = { t -> main.post { pipeline.onFinal(t) } },
                 )
             }
         } catch (e: Throwable) {
@@ -205,24 +202,6 @@ class CaptureService : Service() {
             try { rec.stop() } catch (_: Exception) {}
             rec.release()
             engine.release()
-        }
-    }
-
-    private fun onSentence(raw: String) {
-        // 过滤掉 "UH"、"OH" 这类单个语气词
-        if (raw.length < 3) return
-        val id = nextId++
-        val previous = SubtitleBus.state.value.lines.takeLast(3).map { it.englishForDisplay }
-        SubtitleBus.addLine(Line(id = id, raw = raw))
-        scope.launch {
-            translateSlots.withPermit {
-                try {
-                    val r = translator.translate(raw, previous)
-                    SubtitleBus.patchLine(id) { it.copy(en = r.en, zh = r.zh) }
-                } catch (e: Exception) {
-                    SubtitleBus.patchLine(id) { it.copy(error = e.message ?: "翻译失败") }
-                }
-            }
         }
     }
 
@@ -240,7 +219,7 @@ class CaptureService : Service() {
         overlay = null
         try { projection?.stop() } catch (_: Exception) {}
         projection = null
-        SubtitleBus.update { it.copy(running = false, partial = "", level = 0f) }
+        SubtitleBus.update { it.copy(running = false, partial = "", draftZh = "", level = 0f) }
         stopForeground(STOP_FOREGROUND_REMOVE)
         stopSelf()
     }

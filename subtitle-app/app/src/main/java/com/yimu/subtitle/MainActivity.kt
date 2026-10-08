@@ -42,6 +42,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
@@ -227,8 +229,12 @@ private fun HomeScreen(resumeTick: Int) {
                         testResult = null
                         scope.launch {
                             testResult = try {
-                                val r = Translator { savedKey }.translate("THIS IS A QUICK TEST OF MY NEW SUBTITLE APP", emptyList())
-                                "✓ ${r.zh}"
+                                val t0 = System.currentTimeMillis()
+                                var first = 0L
+                                val r = Translator { savedKey }.stream("THIS IS A QUICK TEST OF MY NEW SUBTITLE APP", emptyList()) {
+                                    if (first == 0L && it.zh.isNotEmpty()) first = System.currentTimeMillis()
+                                }
+                                "✓ ${r.zh}（首字 %.1f 秒）".format(((if (first > 0) first else System.currentTimeMillis()) - t0) / 1000f)
                             } catch (e: Exception) {
                                 "✗ ${e.message}"
                             }
@@ -281,6 +287,7 @@ private fun HomeScreen(resumeTick: Int) {
                 }
             }
 
+            SpeedCard()
             Tips()
             Spacer(Modifier.height(12.dp))
         }
@@ -364,6 +371,9 @@ private fun Transcript(lines: List<Line>) {
                 val zh = l.error ?: l.zh
                 if (!zh.isNullOrEmpty()) Text(zh, color = P.text, fontSize = 16.sp)
                 Text(l.englishForDisplay, color = P.muted, fontSize = 13.sp)
+                l.latencyMs?.let {
+                    Text("说完后 %.1f 秒出中文".format(it / 1000f), color = P.muted.copy(alpha = 0.7f), fontSize = 11.sp)
+                }
             }
         }
     }
@@ -409,6 +419,28 @@ private fun PermissionRow(title: String, desc: String, granted: Boolean, onClick
 }
 
 @Composable
+private fun SpeedCard() {
+    val ctx = LocalContext.current
+    var fast by remember { mutableStateOf(Prefs.fastMode(ctx)) }
+    Card {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f).padding(end = 12.dp)) {
+                Text("抢先翻译", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
+                Text(
+                    "说话人一停顿就开始翻译，不等整句结束，中文更快出现。翻译请求会多一些，费用大约是关闭时的 2 倍。",
+                    color = P.muted, fontSize = 13.sp, lineHeight = 19.sp,
+                )
+            }
+            Switch(
+                checked = fast,
+                onCheckedChange = { fast = it; Prefs.setFastMode(ctx, it) },
+                colors = SwitchDefaults.colors(checkedTrackColor = P.accent),
+            )
+        }
+    }
+}
+
+@Composable
 private fun Tips() {
     Card {
         Text("使用小贴士", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = P.text)
@@ -417,7 +449,8 @@ private fun Tips() {
             "轻点字幕条切换「双语 / 仅中文」，按住拖动可以移动位置。",
             "如果字幕条一直显示「等待声音」，说明这个 App 不允许捕获声音，可以试试用浏览器打开同一个视频。",
             "联想平板建议在 设置 → 应用 → 译幕 → 电池 中选择「允许后台运行」，避免字幕被系统关掉。",
-            "语音识别在平板本地完成，只有识别出的英文句子会发送给 DeepSeek 翻译。",
+            "语音识别在平板本地完成，不需要网络；翻译要连 DeepSeek，所以需要网络。",
+            "开着 VPN 时，建议在 VPN 里把 deepseek.com 设为「直连」：它是国内服务，直连更快、更稳。",
         ).forEach { Text("•  $it", color = P.muted, fontSize = 14.sp, lineHeight = 21.sp) }
     }
 }
