@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 图标：一块字幕条，上面一行是中文（亮），下面一行是英文（淡）。 -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#2B2870"
+        android:pathData="M32,38h44a8,8 0,0 1,8 8v16a8,8 0,0 1,-8 8h-44a8,8 0,0 1,-8 -8v-16a8,8 0,0 1,8 -8z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M36,46.5h36a3.5,3.5 0,0 1,0 7h-36a3.5,3.5 0,0 1,0 -7z" />
+    <path
+        android:fillColor="#8E8CFF"
+        android:pathData="M42,57.5h24a2.5,2.5 0,0 1,0 5h-24a2.5,2.5 0,0 1,0 -5z" />
+</vector>
