@@ -39,7 +39,7 @@ describe('南线地图数据', () => {
     const withLines = loadMap({ def, hexes, hexsides, labels, lines: linesData });
     const csv = readFileSync(fileURLToPath(new URL('../data/sources.csv', import.meta.url)), 'utf8');
     const ids = new Set(csv.split('\n').slice(1).map((l) => l.split(',')[0]).filter(Boolean));
-    const used = [...map.def.reference.sources, ...[...map.hexes.values()].flatMap((h) => h.sources), ...map.labels.flatMap((l) => l.sources), ...withLines.lines.flatMap((l) => l.sources)];
+    const used = [...map.def.reference.sources, ...(map.def.relief?.sources ?? []), ...[...map.hexes.values()].flatMap((h) => h.sources), ...map.labels.flatMap((l) => l.sources), ...withLines.lines.flatMap((l) => l.sources)];
     for (const s of used) expect(ids.has(s), s).toBe(true);
   });
 

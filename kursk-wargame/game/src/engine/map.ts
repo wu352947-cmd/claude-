@@ -57,6 +57,13 @@ export const MapDef = z.object({
     sources: z.array(z.string()),
     note: z.string().optional(),
   }),
+  relief: z.object({
+    image: z.string(),
+    boundsKm: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+    pxPerKm: z.number().positive(),
+    sources: z.array(z.string()),
+    note: z.string().optional(),
+  }).optional(),
 });
 export type MapDef = z.infer<typeof MapDef>;
 

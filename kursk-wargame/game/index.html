@@ -64,6 +64,7 @@
       <label><input type="checkbox" id="ly-ref" /> 参考底图（美军 1:25 万）</label>
       <input type="range" id="ref-opacity" min="0" max="100" value="55" aria-label="参考底图透明度" />
       <div class="hint">不透明度 <span id="ref-op-val"></span></div>
+      <label><input type="checkbox" id="ly-relief" checked /> 地形起伏（高程晕渲）</label>
       <label><input type="checkbox" id="ly-terrain" checked /> 地形</label>
       <label><input type="checkbox" id="ly-grid" checked /> 六角格网</label>
       <label><input type="checkbox" id="ly-num" checked /> 格号（放大后显示）</label>
@@ -73,7 +74,7 @@
     </div>
     <div id="info" hidden></div>
     <div id="loading">正在绘制地图…</div>
-    <div class="credit">底图：U.S. Army Map Service N501（公有领域）· UT Austin PCL</div>
+    <div class="credit">底图：U.S. Army Map Service N501（公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>
     <script type="module" src="/src/client/main.ts"></script>
   </body>
 </html>

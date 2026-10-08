@@ -1,3 +1,4 @@
 id,grade,author,title,publisher,year,language,edition_held,notes
 SRC-0101,A,U.S. Army Map Service,"Eastern Europe 1:250,000, Series N501, Sheet NM 37-4 Belgorod",Army Map Service,1956,en,"Edition 2-AMS, first printing 12-56 (UT Austin PCL scan)","图注：1948 年据德军总参谋部 1943 年版东欧 1:300,000 图编绘，部分据航空照片修正。公有领域"
 SRC-0102,A,U.S. Army Map Service,"Eastern Europe 1:250,000, Series N501, Sheet NM 37-1 Kursk",Army Map Service,,en,"Edition 2-AMS (UT Austin PCL scan)","图注：1953 年据红军总参谋部 1941–43 年 1:100,000 苏联地形图编绘（可靠性：好），地物按 1943 年航空照片修正。公有领域"
+SRC-0103,B,European Space Agency / Copernicus,"Copernicus DEM GLO-30 (Digital Surface Model, 30 m)",ESA,,en,AWS Open Data COG tiles N50–N51 E035–E037,"现代表面模型，仅用于地形明暗。署名：produced using Copernicus WorldDEM-30 © DLR e.V. 2010-2014 and © Airbus Defence and Space GmbH 2014-2018 provided under COPERNICUS by the European Union and ESA; all rights reserved"

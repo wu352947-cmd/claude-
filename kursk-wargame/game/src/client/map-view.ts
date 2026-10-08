@@ -2,7 +2,7 @@
 import { Assets, BitmapFont, BitmapText, Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
 import {
   type Direction, type GameMap, type LineFeature, type Offset, type Point, SIDE_FEATURES, hexCenter, hexCorners, hexId,
-  linePoints, parseHexId, sideCorners, toWorld,
+  hexAt, linePoints, parseHexId, sideCorners, toWorld,
 } from '../engine';
 import { hashString } from './noise';
 import { PALETTE, PX_PER_KM } from './style';
@@ -11,7 +11,7 @@ import { renderPaper, renderTerrain, type WorldBounds } from './terrain-render';
 export interface MapView {
   root: Container;
   bounds: WorldBounds;
-  layers: { reference: Sprite; terrain: Sprite; sides: Graphics; lines: Graphics; grid: Graphics; numbers: Container; labels: Container; status: Graphics };
+  layers: { reference: Sprite; relief: Sprite | null; terrain: Sprite; sides: Graphics; lines: Graphics; grid: Graphics; numbers: Container; labels: Container; status: Graphics };
   select(h: Offset | null): void;
   onZoom(zoom: number): void;
 }
@@ -77,9 +77,11 @@ function drawLines(map: GameMap, g: Graphics): void {
   const byKind = (k: LineFeature['kind'], c?: LineFeature['class']): Point[][] =>
     map.lines.filter((l) => l.kind === k && (c === undefined || l.class === c)).map((l) => linePoints(map.projection, l));
   const round = { cap: 'round', join: 'round' } as const;
-  for (const p of byKind('stream')) smoothPath(g, p).stroke({ width: 0.12 * K, color: PALETTE.river, ...round });
-  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.55 * K, color: PALETTE.riverBank, ...round });
-  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.3 * K, color: PALETTE.river, ...round });
+  for (const p of byKind('stream')) smoothPath(g, p).stroke({ width: 0.17 * K, color: PALETTE.riverEdge, alpha: 0.55, ...round });
+  for (const p of byKind('stream')) smoothPath(g, p).stroke({ width: 0.11 * K, color: PALETTE.river, ...round });
+  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.75 * K, color: PALETTE.riverBank, alpha: 0.85, ...round });
+  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.42 * K, color: PALETTE.riverEdge, ...round });
+  for (const p of byKind('river')) smoothPath(g, p).stroke({ width: 0.32 * K, color: PALETTE.river, ...round });
   for (const p of byKind('track')) smoothPath(g, p).stroke({ width: 0.06 * K, color: PALETTE.road, alpha: 0.7, ...round });
   for (const p of byKind('road', 'secondary')) smoothPath(g, p).stroke({ width: 0.2 * K, color: PALETTE.roadCasing, ...round });
   for (const p of byKind('road', 'secondary')) smoothPath(g, p).stroke({ width: 0.09 * K, color: PALETTE.road, ...round });
@@ -111,7 +113,7 @@ function drawFrame(b: WorldBounds, g: Graphics): void {
   g.rect((b.x0 - w - 0.2) * K, (b.y0 - w - 0.2) * K, (b.x1 - b.x0 + 2 * w + 0.4) * K, (b.y1 - b.y0 + 2 * w + 0.4) * K).stroke({ width: 0.1 * K, color: PALETTE.frameInner, alpha: 0.6 });
 }
 
-export async function createMapView(map: GameMap, referenceUrl: string): Promise<MapView> {
+export async function createMapView(map: GameMap, referenceUrl: string, reliefUrl?: string): Promise<MapView> {
   const root = new Container();
   const bounds = gridBounds(map);
 
@@ -128,6 +130,17 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
   paper.position.set(bounds.x0 * K, bounds.y0 * K);
   paper.width = (bounds.x1 - bounds.x0) * K;
   paper.height = (bounds.y1 - bounds.y0) * K;
+
+  // 地形明暗（正片叠底）
+  let relief: Sprite | null = null;
+  if (map.def.relief && reliefUrl) {
+    relief = new Sprite(await Assets.load<Texture>(reliefUrl));
+    const [x0, y0, x1, y1] = map.def.relief.boundsKm;
+    relief.position.set(x0 * K, y0 * K);
+    relief.width = (x1 - x0) * K;
+    relief.height = (y1 - y0) * K;
+    relief.blendMode = 'multiply';
+  }
 
   // 地形
   const terrain = new Sprite(Texture.from(renderTerrain(map, bounds)));
@@ -148,6 +161,14 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
     }
   }
   grid.stroke({ width: 1, color: PALETTE.hexLine, alpha: 0.75, pixelLine: true });
+  // 格内浅色内边（印刷兵棋地图常见的"压凹"格子）
+  for (let col = 0; col < map.grid.cols; col++) {
+    for (let row = 0; row < map.grid.rows; row++) {
+      const c = hexCenter(map.grid, { col, row });
+      grid.poly(hexCorners(map.grid, { col, row }).flatMap((p) => [(c.x + (p.x - c.x) * 0.93) * K, (c.y + (p.y - c.y) * 0.93) * K]), true);
+    }
+  }
+  grid.stroke({ width: 0.09 * K, color: PALETTE.hexBevel, alpha: 0.55 });
 
   // 格号
   BitmapFont.install({ name: 'hexnum', style: { fontFamily: 'Arial, sans-serif', fontSize: 28, fill: PALETTE.hexNumber }, chars: '0123456789', resolution: 2 });
@@ -190,21 +211,37 @@ export async function createMapView(map: GameMap, referenceUrl: string): Promise
       resolution: 2,
     });
     t.anchor.set(0.5, 1.15);
+    const inTown = ['village', 'town', 'city'].includes(map.hexes.get(hexId(hexAt(map.grid, p)))?.terrain ?? '');
+    if (inTown) {
+      // 地名贴在该居民点格的白点上方
+      const c = hexCenter(map.grid, hexAt(map.grid, p));
+      p.x = c.x; p.y = c.y - 0.25;
+    }
+    const dot = new Graphics();
     t.position.set(p.x * K, p.y * K);
-    const dot = new Graphics().circle(p.x * K, p.y * K, l.kind === 'city' ? 5 : 3.5).fill(PALETTE.label).stroke({ width: 2, color: PALETTE.labelHalo });
+    if (!inTown) dot.circle(p.x * K, p.y * K, l.kind === 'city' ? 5 : 3.5).fill(PALETTE.label).stroke({ width: 2, color: PALETTE.labelHalo });
     t.label = l.kind; dot.label = l.kind;
     labels.addChild(dot, t);
   }
 
+  // 居民点标记：白色圆点加黑边（村庄）、较大（镇）——学《Holland '44》
+  const towns = new Graphics();
+  for (const [id, rec] of map.hexes) {
+    const r = { village: 0.15, town: 0.26, city: 0.36 }[rec.terrain as 'village' | 'town' | 'city'];
+    if (!r) continue;
+    const c = hexCenter(map.grid, parseHexId(id));
+    towns.circle(c.x * K, c.y * K, r * K).fill(0xffffff).stroke({ width: 0.06 * K, color: 0x1f1d1a });
+  }
+
   const selection = new Graphics();
 
-  root.addChild(paper, reference, terrain, lines, sides, grid, frame, status, numbers, labels, selection);
+  root.addChild(paper, ...(relief ? [relief] : []), reference, terrain, lines, sides, grid, towns, frame, status, numbers, labels, selection);
   reference.alpha = 0.45;
   terrain.alpha = 1;
 
   return {
     root, bounds,
-    layers: { reference, terrain, sides, lines, grid, numbers, labels, status },
+    layers: { reference, relief, terrain, sides, lines, grid, numbers, labels, status },
     select(h) {
       selection.clear();
       if (!h) return;

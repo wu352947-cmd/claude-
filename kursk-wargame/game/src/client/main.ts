@@ -59,7 +59,8 @@ async function start(): Promise<void> {
   await app.init({ resizeTo: host, background: '#2f2c26', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
   host.appendChild(app.canvas);
 
-  view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`);
+  view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`,
+    map.def.relief ? `${import.meta.env.BASE_URL}${map.def.relief.image}` : undefined);
   app.stage.addChild(view.root);
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
@@ -79,6 +80,7 @@ async function start(): Promise<void> {
     el.addEventListener('change', f); f();
   };
   bind('ly-ref', (on) => { L.reference.visible = on; });
+  bind('ly-relief', (on) => { if (L.relief) L.relief.visible = on; });
   bind('ly-terrain', (on) => { L.terrain.visible = on; L.sides.visible = on; L.lines.visible = on; });
   bind('ly-grid', (on) => { L.grid.visible = on; });
   bind('ly-num', (on) => { L.numbers.visible = on; });
