@@ -11,7 +11,7 @@ import labels from '../../data/maps/south.labels.json';
 import lines from '../../data/maps/south.lines.json';
 import { attachCamera } from './camera';
 import { createMapView } from './map-view';
-import { PX_PER_KM, THEME } from './style';
+import { PX_PER_KM } from './style';
 
 const meta = GameMeta.parse(rawMeta);
 const map = loadMap({ def, hexes, hexsides, labels, lines });
@@ -56,7 +56,7 @@ async function start(): Promise<void> {
   $('subtitle').textContent = `${map.def.name.zh} · 引擎 v${ENGINE_VERSION}`;
   const host = $('app');
   const app = new Application();
-  await app.init({ resizeTo: host, background: THEME === 'cool' ? '#2b2e30' : '#2f2c26', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
+  await app.init({ resizeTo: host, background: '#2b2e30', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });
   host.appendChild(app.canvas);
 
   view = await createMapView(map, `${import.meta.env.BASE_URL}${map.def.reference.image}`,
@@ -69,7 +69,7 @@ async function start(): Promise<void> {
     if (inBounds(map.grid, h)) { view.select(h); showInfo(h); } else { view.select(null); showInfo(null); }
   });
   cam.onChange(() => view.onZoom(cam.zoom()));
-  const b = view.bounds;
+  const b = view.fullBounds;
   cam.fit(b.x0 * PX_PER_KM, b.y0 * PX_PER_KM, b.x1 * PX_PER_KM, b.y1 * PX_PER_KM);
 
   // 图层开关
@@ -81,7 +81,7 @@ async function start(): Promise<void> {
   };
   bind('ly-ref', (on) => { L.reference.visible = on; });
   bind('ly-relief', (on) => { if (L.relief) L.relief.visible = on; });
-  bind('ly-terrain', (on) => { L.terrain.visible = on; L.sides.visible = on; L.lines.visible = on; });
+  bind('ly-terrain', (on) => { L.terrain.visible = on; });
   bind('ly-grid', (on) => { L.grid.visible = on; });
   bind('ly-num', (on) => { L.numbers.visible = on; });
   bind('ly-labels', (on) => { L.labels.visible = on; });
@@ -91,13 +91,6 @@ async function start(): Promise<void> {
   op.addEventListener('input', setOp); setOp();
   $('layers-toggle').addEventListener('click', () => $('layers').classList.toggle('open'));
   $('fit').addEventListener('click', () => cam.fit(b.x0 * PX_PER_KM, b.y0 * PX_PER_KM, b.x1 * PX_PER_KM, b.y1 * PX_PER_KM));
-  const st = $('style-toggle');
-  st.textContent = THEME === 'cool' ? '风格：冷调' : '风格：暖调';
-  st.addEventListener('click', () => {
-    const u = new URL(location.href);
-    u.searchParams.set('style', THEME === 'cool' ? 'warm' : 'cool');
-    location.href = u.toString();
-  });
   $('loading').remove();
 }
 

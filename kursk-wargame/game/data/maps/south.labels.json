@@ -6,7 +6,8 @@
    "names": {
     "zh": "别尔哥罗德",
     "ru": "Белгород",
-    "de": "Belgorod"
+    "de": "Belgorod",
+    "en": "Belgorod"
    },
    "kind": "city",
    "lat": 50.5973,
@@ -21,7 +22,8 @@
    "names": {
     "zh": "奥博扬",
     "ru": "Обоянь",
-    "de": "Obojan"
+    "de": "Obojan",
+    "en": "Oboyan'"
    },
    "kind": "town",
    "lat": 51.2126,
@@ -36,7 +38,8 @@
    "names": {
     "zh": "普罗霍罗夫卡站",
     "ru": "ст. Прохоровка",
-    "de": "Prochorowka"
+    "de": "Prochorowka",
+    "en": "Prokhorovka"
    },
    "kind": "town",
    "lat": 51.0358,
@@ -51,7 +54,8 @@
    "names": {
     "zh": "十月农场",
     "ru": "Октябрьский",
-    "de": "Oktjabrskij"
+    "de": "Oktjabrskij",
+    "en": "Oktyabr'skiy"
    },
    "kind": "village",
    "lat": 51.0259,
@@ -66,7 +70,8 @@
    "names": {
     "zh": "普拉沃罗季",
     "ru": "Правороть",
-    "de": "Praworot"
+    "de": "Praworot",
+    "en": "Pravorot'"
    },
    "kind": "village",
    "lat": 50.9809,
@@ -81,7 +86,8 @@
    "names": {
     "zh": "波克罗夫卡",
     "ru": "Покровка",
-    "de": "Pokrowka"
+    "de": "Pokrowka",
+    "en": "Pokrovka"
    },
    "kind": "village",
    "lat": 50.8894,
@@ -96,7 +102,8 @@
    "names": {
     "zh": "雅科夫列沃",
     "ru": "Яковлево",
-    "de": "Jakowlewo"
+    "de": "Jakowlewo",
+    "en": "Yakovlevo"
    },
    "kind": "village",
    "lat": 50.8624,
@@ -111,7 +118,8 @@
    "names": {
     "zh": "卢奇基",
     "ru": "Лучки",
-    "de": "Lutschki"
+    "de": "Lutschki",
+    "en": "Luchki"
    },
    "kind": "village",
    "lat": 50.8774,
@@ -126,7 +134,8 @@
    "names": {
     "zh": "捷捷列维诺",
     "ru": "Тетеревино",
-    "de": "Teterewino"
+    "de": "Teterewino",
+    "en": "Teterevino"
    },
    "kind": "village",
    "lat": 50.8761,
@@ -141,7 +150,8 @@
    "names": {
     "zh": "别列尼希诺",
     "ru": "Беленихино",
-    "de": "Belenichino"
+    "de": "Belenichino",
+    "en": "Belenikhino"
    },
    "kind": "village",
    "lat": 50.9319,
@@ -156,11 +166,474 @@
    "names": {
     "zh": "戈斯季谢沃",
     "ru": "Гостищево",
-    "de": "Gostischtschewo"
+    "de": "Gostischtschewo",
+    "en": "Gostishchevo"
    },
    "kind": "village",
    "lat": 50.7831,
    "lon": 36.6573,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2314",
+   "names": {
+    "zh": "彼得罗夫卡",
+    "en": "Petrovka"
+   },
+   "kind": "village",
+   "lat": 51.05737,
+   "lon": 36.63919,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2116",
+   "names": {
+    "zh": "安德烈耶夫卡",
+    "en": "Andreyevka"
+   },
+   "kind": "village",
+   "lat": 51.01822,
+   "lon": 36.59993,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2015",
+   "names": {
+    "zh": "科兹洛夫卡",
+    "en": "Kozlovka"
+   },
+   "kind": "village",
+   "lat": 51.01682,
+   "lon": 36.5499,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2115",
+   "names": {
+    "zh": "米哈伊洛夫卡",
+    "en": "Mikhaylovka"
+   },
+   "kind": "village",
+   "lat": 51.03395,
+   "lon": 36.59632,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2114",
+   "names": {
+    "zh": "波列扎耶夫",
+    "en": "Polezhayev"
+   },
+   "kind": "village",
+   "lat": 51.05508,
+   "lon": 36.58554,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2014",
+   "names": {
+    "zh": "克柳奇",
+    "en": "Klyuchi"
+   },
+   "kind": "village",
+   "lat": 51.03929,
+   "lon": 36.54267,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-1915",
+   "names": {
+    "zh": "红十月",
+    "en": "Krasnyy Oktyabr'"
+   },
+   "kind": "village",
+   "lat": 51.02797,
+   "lon": 36.49266,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2013",
+   "names": {
+    "zh": "韦肖雷",
+    "en": "Veselyy"
+   },
+   "kind": "village",
+   "lat": 51.06628,
+   "lon": 36.54974,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2012",
+   "names": {
+    "zh": "卡尔塔舍夫卡",
+    "en": "Kartashevka"
+   },
+   "kind": "village",
+   "lat": 51.091,
+   "lon": 36.54608,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2412",
+   "names": {
+    "zh": "上奥利尚卡",
+    "en": "Vyshnyaya Ol'shanka"
+   },
+   "kind": "village",
+   "lat": 51.09785,
+   "lon": 36.68568,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2413",
+   "names": {
+    "zh": "别列戈沃耶",
+    "en": "Beregovoye"
+   },
+   "kind": "village",
+   "lat": 51.07537,
+   "lon": 36.69642,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2614",
+   "names": {
+    "zh": "莫尔多夫卡",
+    "en": "Mordovka"
+   },
+   "kind": "village",
+   "lat": 51.04387,
+   "lon": 36.76437,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2615",
+   "names": {
+    "zh": "赫拉莫夫",
+    "en": "Khlamov"
+   },
+   "kind": "village",
+   "lat": 51.02678,
+   "lon": 36.77149,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2415",
+   "names": {
+    "zh": "亚姆基",
+    "en": "Yamki"
+   },
+   "kind": "village",
+   "lat": 51.01466,
+   "lon": 36.71072,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2512",
+   "names": {
+    "zh": "小普辛卡",
+    "en": "Malaya Psinka"
+   },
+   "kind": "village",
+   "lat": 51.11582,
+   "lon": 36.7573,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2713",
+   "names": {
+    "zh": "斯科罗夫卡",
+    "en": "Skorovka"
+   },
+   "kind": "village",
+   "lat": 51.08654,
+   "lon": 36.82885,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2814",
+   "names": {
+    "zh": "鲍里索夫",
+    "en": "Borisov"
+   },
+   "kind": "village",
+   "lat": 51.0528,
+   "lon": 36.84307,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-2915",
+   "names": {
+    "zh": "普里扎纳奇诺耶",
+    "en": "Prizanachnoye"
+   },
+   "kind": "village",
+   "lat": 51.03927,
+   "lon": 36.86805,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ]
+  },
+  {
+   "id": "ams-1917",
+   "names": {
+    "zh": "小马亚奇基",
+    "en": "Malyye Mayachki"
+   },
+   "kind": "village",
+   "lat": 50.98303,
+   "lon": 36.51072,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-1819",
+   "names": {
+    "zh": "大马亚奇基",
+    "en": "Bol'shiye Mayachki"
+   },
+   "kind": "village",
+   "lat": 50.91549,
+   "lon": 36.46107,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-1919",
+   "names": {
+    "zh": "卢奇基",
+    "en": "Luchki"
+   },
+   "kind": "village",
+   "lat": 50.93355,
+   "lon": 36.50022,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2119",
+   "names": {
+    "zh": "奥泽罗夫斯基",
+    "en": "Ozerovskiy"
+   },
+   "kind": "village",
+   "lat": 50.92556,
+   "lon": 36.56803,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2118",
+   "names": {
+    "zh": "捷捷列维诺农庄",
+    "en": "Khutor Teterevino"
+   },
+   "kind": "village",
+   "lat": 50.95841,
+   "lon": 36.60006,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2320",
+   "names": {
+    "zh": "列斯基",
+    "en": "Leski"
+   },
+   "kind": "village",
+   "lat": 50.91123,
+   "lon": 36.64865,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2518",
+   "names": {
+    "zh": "日洛莫斯特诺耶",
+    "en": "Zhilomostnoye"
+   },
+   "kind": "village",
+   "lat": 50.94406,
+   "lon": 36.72712,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2618",
+   "names": {
+    "zh": "诺沃肖洛夫卡",
+    "en": "Novoselovka"
+   },
+   "kind": "village",
+   "lat": 50.94268,
+   "lon": 36.7892,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2619",
+   "names": {
+    "zh": "普洛塔",
+    "en": "Plota"
+   },
+   "kind": "village",
+   "lat": 50.92247,
+   "lon": 36.7642,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2521",
+   "names": {
+    "zh": "沙霍沃",
+    "en": "Shakhovo"
+   },
+   "kind": "village",
+   "lat": 50.87526,
+   "lon": 36.72993,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2321",
+   "names": {
+    "zh": "沃洛布耶夫卡",
+    "en": "Volobuyevka"
+   },
+   "kind": "village",
+   "lat": 50.86178,
+   "lon": 36.6715,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2721",
+   "names": {
+    "zh": "伦金卡",
+    "en": "Ryndinka"
+   },
+   "kind": "village",
+   "lat": 50.86847,
+   "lon": 36.80688,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2820",
+   "names": {
+    "zh": "维波尔佐夫卡",
+    "en": "Vypolzovka"
+   },
+   "kind": "village",
+   "lat": 50.87743,
+   "lon": 36.84253,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2918",
+   "names": {
+    "zh": "普洛斯基",
+    "en": "Ploskiy"
+   },
+   "kind": "village",
+   "lat": 50.9516,
+   "lon": 36.8606,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  {
+   "id": "ams-2717",
+   "names": {
+    "zh": "克拉斯诺耶",
+    "en": "Krasnoye"
+   },
+   "kind": "village",
+   "lat": 50.99214,
+   "lon": 36.80002,
    "status": "unverified",
    "sources": [
     "SRC-0101"

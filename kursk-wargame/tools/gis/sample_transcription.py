@@ -62,6 +62,8 @@ LINES = [
     ('track-yakovlevo-luchki', 'track', None, '', [(887, 1243), (930, 1225), (975, 1215), (1020, 1210)]),
 ]
 
+ZH = {'Prokhorovka (st.) / Aleksandrovskiy': '普罗霍罗夫卡站', 'Petrovka': '彼得罗夫卡', "Oktyabr'skiy": '十月农场', 'Andreyevka': '安德烈耶夫卡', "Vasil'yevka": '瓦西里耶夫卡', 'Kozlovka': '科兹洛夫卡', 'Mikhaylovka': '米哈伊洛夫卡', 'Polezhayev': '波列扎耶夫', 'Klyuchi': '克柳奇', "Krasnyy Oktyabr'": '红十月', 'Veselyy': '韦肖雷', 'Kartashevka': '卡尔塔舍夫卡', "Nizhnyaya Ol'shanka": '下奥利尚卡', "Vyshnyaya Ol'shanka": '上奥利尚卡', 'Beregovoye': '别列戈沃耶', 'Mordovka': '莫尔多夫卡', 'Khlamov': '赫拉莫夫', 'Yamki': '亚姆基', 'Lutovo': '卢托沃', 'Grushki': '格鲁什基', 'Malaya Psinka': '小普辛卡', 'Skorovka': '斯科罗夫卡', 'Borisov': '鲍里索夫', 'Prizanachnoye': '普里扎纳奇诺耶', 'Malyye Mayachki': '小马亚奇基', "Bol'shiye Mayachki": '大马亚奇基', 'Pokrovka': '波克罗夫卡', 'Yakovlevo': '雅科夫列沃', 'Luchki (S)': '卢奇基', 'Luchki (N)': '卢奇基', 'Ozerovskiy': '奥泽罗夫斯基', 'Khutor Teterevino': '捷捷列维诺农庄', 'Teterevino': '捷捷列维诺', 'Belenikhino': '别列尼希诺', 'Leski': '列斯基', "Pravorot'": '普拉沃罗季', 'Zhilomostnoye': '日洛莫斯特诺耶', 'Novoselovka': '诺沃肖洛夫卡', 'Plota': '普洛塔', 'Shakhovo': '沙霍沃', 'Volobuyevka': '沃洛布耶夫卡', 'Ryndinka': '伦金卡', 'Vypolzovka': '维波尔佐夫卡', 'Ploskiy': '普洛斯基', 'Krasnoye': '克拉斯诺耶'}
+
 SETTLEMENTS = [
     # 俄文转写（AMS 图上的拼法）, 类型, 底图像素
     ("Prokhorovka (st.) / Aleksandrovskiy", 'town', 1285, 855),
@@ -101,6 +103,11 @@ def hex_of(px, py):
     return f'{col + 1:02d}{row + 1:02d}'
 
 
+def hex_of_ll(lat, lon):
+    x, y = georef.tm_forward(lat, lon, P['lat0'], P['lon0'])
+    return hex_of((x - B[0]) * PPK, (-y - B[1]) * PPK)
+
+
 def main():
     lines = [{'id': i, 'kind': k, **({'class': c} if c else {}), **({'name': {'zh': n}} if n else {}),
               'points': [ll(*p) for p in pts], 'status': 'unverified', 'sources': src(pts),
@@ -124,7 +131,25 @@ def main():
                             'sources': ['SRC-0101' if py > 935 else 'SRC-0102']}
         added += 1
     json.dump(data, open(path, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    print('线状要素', len(lines), '居民点格', added)
+
+    # 地名：每个转录的居民点一条（中文译名按新华社俄语译音习惯，由 AI 拟定，未核对）
+    lpath = os.path.join(GAME, 'data/maps/south.labels.json')
+    ldata = json.load(open(lpath, encoding='utf-8'))
+    ldata['labels'] = [l for l in ldata['labels'] if not l['id'].startswith('ams-')]
+    manual_hexes = {hex_of_ll(l['lat'], l['lon']) for l in ldata['labels']}
+    seen = set()
+    for name, kind, px, py in SETTLEMENTS:
+        h = hex_of(px, py)
+        if h in manual_hexes or h in seen:
+            continue
+        seen.add(h)
+        lat, lon = ll(px, py)
+        en = name.split(' / ')[0].replace(' (S)', '').replace(' (N)', '')
+        ldata['labels'].append({'id': 'ams-' + h, 'names': {'zh': ZH[name], 'en': en}, 'kind': kind,
+                                'lat': lat, 'lon': lon, 'status': 'unverified',
+                                'sources': ['SRC-0101' if py > 935 else 'SRC-0102']})
+    json.dump(ldata, open(lpath, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    print('线状要素', len(lines), '居民点格', added, '地名', len(ldata['labels']))
 
 
 if __name__ == '__main__':
