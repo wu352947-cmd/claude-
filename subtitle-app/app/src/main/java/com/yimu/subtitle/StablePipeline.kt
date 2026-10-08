@@ -156,11 +156,21 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
         // 说话人紧接着说的几个词（已排队的下一段，或正在说的半句），帮模型判断这段有没有说完
         val lookahead = (queue.firstOrNull()?.words ?: words.drop(consumed)).take(6).joinToString(" ")
 
+        // 合并太长就不再等，直接显示（避免一条字幕太长看不过来）
+        val allowRest = next.allowRest && unitWords.size < MAX_MERGE_WORDS
+
         job = scope.launch {
             var shown = false
             var lineId = 0L
             try {
-                val out = translator.subtitleUnit(english, lookahead, previous, next.allowRest) { zh, en ->
+                val out = translator.subtitleUnit(
+                    english, lookahead, previous, allowRest,
+                    // 只接受确实是这段英文末尾的几个词（模型偶尔会误抄后文）
+                    isIncomplete = { rest ->
+                        rest.isNotEmpty() && rest.size < unitWords.size &&
+                            unitWords.takeLast(rest.size).map { it.lowercase() } == rest.map { it.lowercase() }
+                    },
+                ) { zh, en ->
                     if (!shown && zh != null) {
                         shown = true
                         lineId = emit(zh, english, en, spokenAt)
@@ -168,14 +178,14 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
                         patchEnglish(lineId, en)
                     }
                 }
-                if (!shown) lineId = emit(out.zh, english, out.en, spokenAt) else out.en?.let { patchEnglish(lineId, it) }
-                // 尾巴退回：只接受确实是这段英文末尾的几个词
-                val rest = out.rest
-                if (next.allowRest && rest.isNotEmpty() && rest.size < unitWords.size &&
-                    unitWords.takeLast(rest.size).map { it.lowercase() } == rest.map { it.lowercase() }
-                ) {
-                    carry = unitWords.takeLast(rest.size)
+                if (out.incomplete) {
+                    // 话没说完：这段先不上屏，整段并到下一段一起翻
+                    carry = unitWords
                     carrySpokenAt = spokenAt
+                } else if (!shown) {
+                    emit(out.zh, english, out.en, spokenAt)
+                } else {
+                    out.en?.let { patchEnglish(lineId, it) }
                 }
                 failStreak = 0
                 clearNoticeIfOk()
@@ -188,7 +198,7 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
             if (queue.isNotEmpty()) {
                 sendNext()
             } else if (carry.isNotEmpty()) {
-                // 退回的尾巴之后没人接着说：等一会儿还没有新内容就单独翻掉
+                // 没说完的那段之后没人接着说：等一会儿还没有新内容就整段翻掉
                 main.postDelayed(flushCarry, 1200)
             }
         }
@@ -291,5 +301,8 @@ class StablePipeline(private val ctx: Context, private val scope: CoroutineScope
         )
 
         fun goodEnd(w: String) = w.uppercase() !in CONTINUES
+
+        /** 没说完的段落最多合并到这么长，再长就直接显示。 */
+        private const val MAX_MERGE_WORDS = 28
     }
 }

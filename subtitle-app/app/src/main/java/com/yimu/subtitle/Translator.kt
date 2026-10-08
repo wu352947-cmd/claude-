@@ -62,18 +62,24 @@ class Translator(private val apiKey: () -> String) {
     }
 
     /** 稳定模式的一条字幕：中文、纠正后的英文、末尾没说完要并到下一段的英文词。 */
-    data class UnitOutput(val zh: String, val en: String?, val rest: List<String>)
+    data class UnitOutput(val zh: String, val en: String?, val rest: List<String>, val incomplete: Boolean = false)
+
+    /** 让流式请求提前结束（已经知道这段没说完、不用再往下生成了）。 */
+    private class StopStream : Exception()
 
     /**
-     * 稳定模式：翻译一段英文。输出顺序是 REST（退回的尾巴）→ 中文 → 英文：
-     * 先让模型决定末尾哪几个词留给下一段，再写中文，中文里就不会把它们也翻进去。
-     * 中文那一行一写完就通过 [onLine] 交出去上屏。[lookahead] 是说话人紧接着说的几个词，帮助判断有没有说完。
+     * 稳定模式：翻译一段英文。输出顺序是 REST → 中文 → 英文。
+     * - 第 1 行（REST）一写完就交给 [isIncomplete] 判断：如果这段确实没说完，立即停止生成，
+     *   返回 incomplete = true，调用方会把整段并到下一段一起翻（不会重复、不会挂半截）；
+     * - 否则第 2 行（中文）一写完就通过 [onLine] 交出去上屏。
+     * [lookahead] 是说话人紧接着说的几个词，帮助判断有没有说完。
      */
     suspend fun subtitleUnit(
         english: String,
         lookahead: String,
         previous: List<String>,
         allowRest: Boolean,
+        isIncomplete: (rest: List<String>) -> Boolean,
         onLine: (zh: String?, en: String?) -> Unit,
     ): UnitOutput {
         val current = buildString {
@@ -84,20 +90,30 @@ class Translator(private val apiKey: () -> String) {
         val messages = JSONArray()
             .put(msg("system", UNIT_PROMPT))
             .put(msg("user", userText(previous, current)))
+        var restChecked = false
         var zhSent = false
         var enSent = false
-        val text = streamChat(BASE, messages, stop = null) { acc ->
-            val lines = acc.split('\n')
-            // 第 1 行应该是 REST；模型偶尔漏写时，第 1 行就是中文
-            val offset = if (lines[0].trimStart().startsWith("REST", ignoreCase = true)) 1 else 0
-            if (!zhSent && lines.size >= offset + 2) {
-                zhSent = true
-                onLine(cleanZh(lines[offset]), null)
+        val text = try {
+            streamChat(BASE, messages, stop = null) { acc ->
+                val lines = acc.split('\n')
+                // 第 1 行应该是 REST；模型偶尔漏写时，第 1 行就是中文
+                val hasRest = lines[0].trimStart().startsWith("REST", ignoreCase = true)
+                val offset = if (hasRest) 1 else 0
+                if (!restChecked && (lines.size >= 2 || !hasRest && lines[0].length > 8)) {
+                    restChecked = true
+                    if (allowRest && hasRest && isIncomplete(restWords(lines[0]))) throw StopStream()
+                }
+                if (!zhSent && lines.size >= offset + 2) {
+                    zhSent = true
+                    onLine(cleanZh(lines[offset]), null)
+                }
+                if (zhSent && !enSent && lines.size >= offset + 3) {
+                    enSent = true
+                    onLine(null, lines[offset + 1].trim().ifEmpty { null })
+                }
             }
-            if (zhSent && !enSent && lines.size >= offset + 3) {
-                enSent = true
-                onLine(null, lines[offset + 1].trim().ifEmpty { null })
-            }
+        } catch (e: StopStream) {
+            return UnitOutput("", null, emptyList(), incomplete = true)
         }
         return parseUnit(text)
     }
@@ -228,21 +244,21 @@ class Translator(private val apiKey: () -> String) {
             语音识别经常把人名、产品名听成发音相近的普通词（例如把 AI 助手 Claude 听成 CLOUD 或 CLAWED），
             请结合上下文还原正确的名字，不要按字面翻译。
             严格只输出三行：
-            第1行：以 REST: 开头。先判断"当前这段"的末尾是不是话说到一半（结合后文判断），
+            第1行：以 REST: 开头。判断"当前这段"是不是话说到一半（结合后文判断），
                   例如停在 AND / THEN / GIVE IT / THE BIGGEST / IT SAID THE BACKGROUND WAS 这种地方。
-                  如果是，把末尾这几个没说完的词原样照抄在 REST: 后面（最多 6 个词）；意思完整就只写 REST:
-            第2行：简体中文字幕，只翻译 REST 之前的部分。自然、口语化、简洁，读起来像中文母语者说的话，
-                  不要翻译腔，不要以"然后""而且""它"这类悬空的词结尾；人名、品牌保留英文；
-                  如果只是语气词或噪音，输出 -
-            第3行：纠正识别错误、恢复大小写和标点后的英文（只写 REST 之前的部分）。
+                  如果是，把"当前这段"末尾没说完的那几个词原样照抄在 REST: 后面（最多 6 个词，不能抄后文）；
+                  意思完整就只写 REST:
+            第2行：整段的简体中文字幕。自然、口语化、简洁，读起来像中文母语者说的话，不要翻译腔；
+                  人名、品牌保留英文；如果只是语气词或噪音，输出 -
+            第3行：纠正识别错误、恢复大小写和标点后的英文。
             不要输出任何其他内容。
 
             示例 1
             当前这段：YOU CAN GIVE IT FILES LIKE PDFS AND IMAGES AND IT
             后文（说话人紧接着说的，不要翻译）：READS THEM
             REST: AND IT
-            你可以给它 PDF、图片之类的文件
-            You can give it files like PDFs and images
+            你可以给它 PDF、图片之类的文件，而且它
+            You can give it files like PDFs and images, and it
 
             示例 2
             当前这段：THE BIGGEST TAKEAWAY FOR ME WAS THAT THE BACKGROUND IS DOING TOO MUCH
@@ -251,24 +267,25 @@ class Translator(private val apiKey: () -> String) {
             The biggest takeaway for me was that the background is doing too much.
 
             示例 3
-            当前这段：IT GAVE ME AN ANSWER IN A FEW SECONDS AND THE BIGGEST
-            后文（说话人紧接着说的，不要翻译）：TAKEAWAY WAS
-            REST: AND THE BIGGEST
-            它几秒钟就给出了回答
-            It gave me an answer in a few seconds
+            当前这段：WHAT WOULD YOU IMPROVE ABOUT THIS PRODUCT PHOTO
+            后文（说话人紧接着说的，不要翻译）：TO MAKE IT SELL BETTER
+            REST:
+            这张产品照片你会怎么改进
+            What would you improve about this product photo
         """.trimIndent()
 
         private fun cleanZh(s: String): String = s.trim().let { if (it == "-" || it == "－") "" else it }
+
+        fun restWords(line: String): List<String> =
+            line.replaceFirst(Regex("^REST\\s*[:：]?", RegexOption.IGNORE_CASE), "")
+                .trim().split(' ').map { it.trim(',', '.', '?', '!') }.filter { it.isNotEmpty() }
 
         fun parseUnit(text: String): UnitOutput {
             val lines = text.trim().split('\n').map { it.trim() }.filter { it.isNotEmpty() }
             val restLine = lines.firstOrNull { it.startsWith("REST", ignoreCase = true) }
             val body = lines.filter { it !== restLine }
-            val zh = cleanZh(body.getOrNull(0).orEmpty())
-            val en = body.getOrNull(1)
-            val rest = restLine.orEmpty().replaceFirst(Regex("^REST\\s*[:：]?", RegexOption.IGNORE_CASE), "")
-                .trim().split(' ').map { it.trim(',', '.', '?', '!') }.filter { it.isNotEmpty() }
-            return UnitOutput(zh, en, if (rest.size <= 6) rest else emptyList())
+            val rest = restLine?.let { restWords(it) }.orEmpty()
+            return UnitOutput(cleanZh(body.getOrNull(0).orEmpty()), body.getOrNull(1), if (rest.size <= 6) rest else emptyList())
         }
 
         fun parse(text: CharSequence): Output {
