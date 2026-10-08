@@ -44,7 +44,7 @@
       #info dt { color: #b9b096; }
       #info dd { margin: 0; }
       .muted { color: var(--muted); }
-      .st-auto { color: var(--auto); }
+      .st-auto { color: var(--auto); } .st-verified { color: #7fc78a; } .st-crosschecked { color: #8fb8ea; }
       #loading {
         position: fixed; inset: 0; display: grid; place-items: center; background: #2b2e30; color: #efe6c8;
         font-size: 16px; z-index: 3;
@@ -113,6 +113,7 @@
     </header>
     <div id="layers">
       <label><input type="checkbox" id="ly-ref" /> 参考底图（美军 1:25 万）</label>
+      <label><input type="checkbox" id="ly-ref2" /> 参考底图（红军 1:10 万，仅部分地区）</label>
       <input type="range" id="ref-opacity" min="0" max="100" value="55" aria-label="参考底图透明度" />
       <div class="hint">不透明度 <span id="ref-op-val"></span></div>
       <label><input type="checkbox" id="ly-relief" checked /> 地形起伏（高程晕渲）</label>
@@ -163,7 +164,7 @@
     </div>
     <div id="toast"></div>
     <div id="loading">正在绘制地图…</div>
-    <div class="credit">底图：U.S. Army Map Service N501（公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>
+    <div class="credit">底图：U.S. Army Map Service N501；红军总参谋部 1:100,000（Indiana University Libraries）（均为公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>
     <script type="module" src="/src/client/main.ts"></script>
   </body>
 </html>

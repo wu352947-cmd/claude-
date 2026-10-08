@@ -27,7 +27,7 @@ const HINTS: Record<Tool, string> = {
   view: '点格子查看信息、写备注。',
   terrain: '选一种地形，再点格子。勾选下方"显示参考底图"可对照原图。',
   side: '选一种格边特征，点格边附近（靠近边、别点格子中央）。再点一次去掉。',
-  verify: '对照原图确认格子没错，点一下标为已核对（绿点）；再点取消。',
+  verify: '对照原图确认格子没错，点一下标为已核对（绿点）；再点取消。蓝点 = AI 已交叉核对，你不必逐个再看。',
 };
 
 /** 史料登记表的 ID 与标题（简单 CSV 解析，支持引号） */
@@ -105,7 +105,7 @@ export function createEditor(
   };
   const refreshStats = (): void => {
     const total = base.grid.cols * base.grid.rows;
-    $('ed-stats').textContent = `已核对 ${verifiedCount(current)} / ${total} 格 · 未导出的修改 ${editCount(edits)} 处`;
+    $('ed-stats').textContent = `你已核对 ${verifiedCount(current)} 格 · AI 交叉核对 ${verifiedCount(current, 'crosschecked')} 格（共 ${total} 格）· 未导出的修改 ${editCount(edits)} 处`;
     $<HTMLButtonElement>('ed-undo').disabled = history.length === 0;
   };
   const commit = (next: MapEdits, msg: string): void => {

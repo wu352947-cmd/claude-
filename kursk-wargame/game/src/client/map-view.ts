@@ -14,7 +14,7 @@ export interface MapView {
   /** 含下方图边带的范围（"全图"用） */
   fullBounds: WorldBounds;
   layers: {
-    reference: Sprite; relief: Sprite | null; terrain: Container; grid: Graphics;
+    reference: Sprite; reference2: Sprite | null; relief: Sprite | null; terrain: Container; grid: Graphics;
     numbers: Container; labels: Container; status: Graphics;
   };
   select(h: Offset | null): void;
@@ -113,6 +113,9 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     relief.alpha = 0.75;
   }
   const reference = await imageLayer(referenceUrl, map.def.reference.boundsKm);
+  const reference2 = map.def.reference2
+    ? await imageLayer(`${import.meta.env.BASE_URL}${map.def.reference2.image}`, map.def.reference2.boundsKm) : null;
+  if (reference2) reference2.visible = false;
 
   // 地形（面状位图 + 矢量林地/线状要素/格边/居民点）
   const terrain = new Container();
@@ -164,26 +167,30 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
     }
   }
 
-  // 核对标记：橙色菱形 = 未核对；编辑模式下另用绿色小圆点标出已核对
+  // 核对标记：橙色菱形 = 未核对；编辑模式下另用蓝色小圆点标出 AI 交叉核对、绿色小圆点标出已核对
   const status = new Graphics();
   let showVerified = false;
   let current = map;
   const drawStatus = (): void => {
     status.clear();
     for (const [id, rec] of current.hexes) {
-      if (rec.status === 'verified') continue;
+      if (rec.status === 'verified' || rec.status === 'crosschecked') continue;
       const c = hexCenter(current.grid, parseHexId(id));
       const x = c.x * K, y = (c.y + 0.75) * K, r = 0.18 * K;
       status.poly([x, y - r, x + r, y, x, y + r, x - r, y], true);
     }
     status.fill({ color: PALETTE.auto, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
     if (!showVerified) return;
-    for (const [id, rec] of current.hexes) {
-      if (rec.status !== 'verified') continue;
-      const c = hexCenter(current.grid, parseHexId(id));
-      status.circle(c.x * K, (c.y + 0.75) * K, 0.15 * K);
+    for (const st of ['crosschecked', 'verified'] as const) {
+      let any = false;
+      for (const [id, rec] of current.hexes) {
+        if (rec.status !== st) continue;
+        const c = hexCenter(current.grid, parseHexId(id));
+        status.circle(c.x * K, (c.y + 0.75) * K, 0.15 * K);
+        any = true;
+      }
+      if (any) status.fill({ color: st === 'verified' ? PALETTE.verified : PALETTE.crosschecked, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
     }
-    status.fill({ color: PALETTE.verified, alpha: 0.95 }).stroke({ width: 1.2, color: 0xffffff, alpha: 0.8 });
   };
   drawStatus();
 
@@ -192,12 +199,12 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
   const furniture = drawFurniture(bounds, '库尔斯克 1943', `${map.def.name.zh} · 1:250,000 底图转绘 · 草稿`);
   const selection = new Graphics();
 
-  root.addChild(paper, ...(relief ? [relief] : []), reference, terrain, grid, status, numbers, labels, furniture, selection);
+  root.addChild(paper, ...(relief ? [relief] : []), reference, ...(reference2 ? [reference2] : []), terrain, grid, status, numbers, labels, furniture, selection);
   reference.alpha = 0.55;
 
   const view: MapView = {
     root, bounds, fullBounds,
-    layers: { reference, relief, terrain, grid, numbers, labels, status },
+    layers: { reference, reference2, relief, terrain, grid, numbers, labels, status },
     select(h) {
       selection.clear();
       if (!h) return;

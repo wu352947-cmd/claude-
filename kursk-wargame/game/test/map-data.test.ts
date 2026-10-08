@@ -29,6 +29,14 @@ describe('南线地图数据', () => {
     }
   });
 
+  it('AI 交叉核对的格子都写明了核对方法与依据', () => {
+    for (const [id, h] of map.hexes) {
+      if (h.status !== 'crosschecked') continue;
+      expect(h.note, id).toMatch(/^AI 复查/);
+      expect(h.sources.length, id).toBeGreaterThan(0);
+    }
+  });
+
   it('自动提取的格子都标明了状态和来源', () => {
     for (const [id, h] of map.hexes) {
       expect(h.sources.length, id).toBeGreaterThan(0);

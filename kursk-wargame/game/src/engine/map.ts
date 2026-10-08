@@ -26,12 +26,18 @@ export const SIDE_FEATURE_NAMES: Record<SideFeature, string> = {
   minorRiver: '小河', majorRiver: '大河', stream: '溪流', balka: '冲沟', railEmbankment: '铁路路堤',
 };
 
-/** 数据核对状态：auto = 程序自动提取；unverified = 已录入未核对；verified = 已对照史料核对 */
-export const Status = z.enum(['auto', 'unverified', 'verified']);
+/**
+ * 数据核对状态：
+ * - auto = 程序自动提取，未核对
+ * - unverified = 已录入（人工或 AI 转录），未核对
+ * - crosschecked = AI 已对照两份（或一份）史料地图逐格复查，所有者尚未确认
+ * - verified = 所有者已对照史料核对
+ */
+export const Status = z.enum(['auto', 'unverified', 'crosschecked', 'verified']);
 export type Status = z.infer<typeof Status>;
 
 export const STATUS_NAMES: Record<Status, string> = {
-  auto: '自动提取（未核对）', unverified: '未核对', verified: '已核对',
+  auto: '自动提取（未核对）', unverified: '未核对', crosschecked: 'AI 交叉核对', verified: '已核对',
 };
 
 const LocalNames = z.object({ zh: z.string().min(1), ru: z.string().optional(), de: z.string().optional(), en: z.string().optional() });
@@ -57,6 +63,14 @@ export const MapDef = z.object({
     sources: z.array(z.string()),
     note: z.string().optional(),
   }),
+  /** 第二参考底图（用于交叉核对，可缺） */
+  reference2: z.object({
+    image: z.string(),
+    boundsKm: z.tuple([z.number(), z.number(), z.number(), z.number()]),
+    pxPerKm: z.number().positive(),
+    sources: z.array(z.string()),
+    note: z.string().optional(),
+  }).optional(),
   relief: z.object({
     image: z.string(),
     boundsKm: z.tuple([z.number(), z.number(), z.number(), z.number()]),

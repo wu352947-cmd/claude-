@@ -123,6 +123,7 @@ async function start(): Promise<void> {
     el.addEventListener('change', f); f();
   };
   bind('ly-ref', (on) => { L.reference.visible = on; });
+  bind('ly-ref2', (on) => { if (L.reference2) L.reference2.visible = on; });
   bind('ly-relief', (on) => { if (L.relief) L.relief.visible = on; });
   bind('ly-terrain', (on) => { L.terrain.visible = on; });
   bind('ly-grid', (on) => { L.grid.visible = on; });
@@ -130,7 +131,7 @@ async function start(): Promise<void> {
   bind('ly-labels', (on) => { L.labels.visible = on; });
   bind('ly-status', (on) => { L.status.visible = on; });
   const op = $<HTMLInputElement>('ref-opacity');
-  const setOp = (): void => { L.reference.alpha = Number(op.value) / 100; $('ref-op-val').textContent = `${op.value}%`; };
+  const setOp = (): void => { L.reference.alpha = Number(op.value) / 100; if (L.reference2) L.reference2.alpha = Number(op.value) / 100; $('ref-op-val').textContent = `${op.value}%`; };
   op.addEventListener('input', setOp); setOp();
   // 编辑面板里的"参考底图"开关与图层面板同步
   const edRef = $<HTMLInputElement>('ed-ref'), lyRef = $<HTMLInputElement>('ly-ref');

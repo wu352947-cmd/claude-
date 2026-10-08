@@ -61,7 +61,7 @@ export function pruneEdits(base: GameMap, e: MapEdits): MapEdits {
 
 /** 无需存储的记录：开阔地、未核对、没有备注——与"数据里没有这个格子"等价。 */
 function isDefaultHex(r: HexRecord): boolean {
-  return r.terrain === 'clear' && r.status !== 'verified' && !r.note;
+  return r.terrain === 'clear' && (r.status === 'auto' || r.status === 'unverified') && !r.note;
 }
 
 function putHex(base: GameMap, e: MapEdits, id: string, rec: HexRecord | null): MapEdits {
@@ -133,9 +133,9 @@ export function toggleSideFeature(
   });
 }
 
-/** 核对进度：全图格子中已核对的数量。 */
-export function verifiedCount(m: GameMap): number {
+/** 核对进度：全图格子中某状态（默认"已核对"）的数量。 */
+export function verifiedCount(m: GameMap, status: Status = 'verified'): number {
   let n = 0;
-  for (const r of m.hexes.values()) if (r.status === 'verified') n++;
+  for (const r of m.hexes.values()) if (r.status === status) n++;
   return n;
 }
