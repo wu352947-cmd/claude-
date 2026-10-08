@@ -31,16 +31,16 @@ export const PALETTE = {
   river: 0x3f80c4,
   riverEdge: 0x2a5a8c,
   riverBank: 0xd4e3ee,
-  road: 0x35363a,
+  road: 0x5e4f40,
   roadPrimary: 0x7c3a2c,
   roadCasing: 0xeef1ec,
-  track: 0x55575a,
-  rail: 0x1f1d1a,
+  track: 0x6b6156,
+  rail: 0x7a3326,
   balka: 0x8a5a2b,
   // 格网与文字
   hexLine: 0x7f8a80,
   hexNumber: '#6f7a72',
-  label: '#1f2124',
+  label: '#24262a',
   labelSub: '#4f5752',
   labelHalo: '#e4eadc',
   frame: 0x3b3f3c,
@@ -50,6 +50,17 @@ export const PALETTE = {
   auto: 0xd9822b,
 };
 
-/** 字体：地名用衬线体（印刷地图的质感），界面用无衬线体 */
-export const FONT_SERIF = '"Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", "SimSun", serif';
-export const FONT_LATIN = 'Georgia, "Times New Roman", serif';
+/**
+ * 字体（自托管子集，见 tools/fonts/fetch-map-fonts.mjs）：
+ *  - 地名：站酷小薇（细长复古宋体）
+ *  - 标题：马善政（毛笔行楷）
+ *  - 拉丁转写：IM Fell English 斜体（仿 17 世纪铅字）
+ */
+export const MAP_FONTS = [
+  { family: 'Map ZH', file: 'fonts/map-zh.woff2', style: 'normal' },
+  { family: 'Map Title', file: 'fonts/map-title.woff2', style: 'normal' },
+  { family: 'Map Latin', file: 'fonts/map-latin.woff2', style: 'italic' },
+] as const;
+export const FONT_SERIF = '"Map ZH", "Songti SC", "STSong", "SimSun", serif';
+export const FONT_TITLE = '"Map Title", "Map ZH", serif';
+export const FONT_LATIN = '"Map Latin", Georgia, serif';

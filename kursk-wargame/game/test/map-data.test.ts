@@ -104,3 +104,14 @@ describe('由线状要素推算规则数据', () => {
     expect([...full.links.values()].some((k) => k.includes('railway'))).toBe(true);
   });
 });
+
+describe('地图字体', () => {
+  it('打包的字体子集覆盖所有地名（地名有改动时需重新运行 tools/fonts/fetch-map-fonts.mjs）', () => {
+    const fonts = JSON.parse(readFileSync(fileURLToPath(new URL('../public/fonts/fonts.json', import.meta.url)), 'utf8'));
+    const all = loadMap({ def, hexes, hexsides, labels, lines: linesData });
+    const missing = [...new Set(all.labels.flatMap((l) => [...l.names.zh]).filter((c) => !fonts.zh.includes(c)))];
+    expect(missing).toEqual([]);
+    const missingLatin = [...new Set(all.labels.flatMap((l) => [...(l.names.en ?? '')]).filter((c) => !fonts.latin.includes(c)))];
+    expect(missingLatin).toEqual([]);
+  });
+});

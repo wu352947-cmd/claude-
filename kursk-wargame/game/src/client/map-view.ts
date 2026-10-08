@@ -1,5 +1,5 @@
 /** 地图各图层的组装：纸面、地形起伏、参考底图、地形、线状要素、格网、居民点、格号、地名、图边。 */
-import { Assets, BitmapFont, BitmapText, Container, Graphics, Sprite, Text, Texture } from 'pixi.js';
+import { Assets, BitmapFont, BitmapText, Container, Graphics, Sprite, Text, type TextStyleOptions, Texture } from 'pixi.js';
 import { type GameMap, type Offset, hexAt, hexCenter, hexCorners, hexId, parseHexId, toWorld } from '../engine';
 import { drawLines, drawSettlements, drawSides, drawWoods } from './features';
 import { MARGIN_KM, drawFurniture } from './furniture';
@@ -39,10 +39,27 @@ async function imageLayer(url: string, bounds: [number, number, number, number])
   return s;
 }
 
+/**
+ * 带白边的文字：底层画浅色描边做"光晕"，上层文字自身再描一圈同色细边加粗笔画——
+ * 站酷小薇笔画很细，普通分辨率屏幕上不加粗会显得断断续续。
+ */
+// 地名在屏幕上以 1:1 显示，文字纹理按屏幕实际像素密度生成；
+// 用更高分辨率再由显卡缩小反而会让细笔画出现锯齿、断笔
+const TEXT_RES = Math.min(2, window.devicePixelRatio || 1);
+
+function inked(text: string, style: Partial<TextStyleOptions>, color: string, halo: number): Container {
+  const base = { ...style, fill: color, align: 'center' as const };
+  const back = new Text({ text, style: { ...base, stroke: { color: PALETTE.labelHalo, width: halo + 0.8, join: 'round' } }, resolution: TEXT_RES, roundPixels: true });
+  const front = new Text({ text, style: { ...base, stroke: { color, width: 0.35, join: 'round' } }, resolution: TEXT_RES, roundPixels: true });
+  back.anchor.set(0.5, 1);
+  front.anchor.set(0.5, 1);
+  return new Container({ children: [back, front] });
+}
+
 /** 地名：中文衬线体 + 下方小号拉丁转写（放大后出现），屏幕上大小固定，按重要性避让。 */
 function buildLabels(map: GameMap): Container {
   const labels = new Container();
-  const SIZE = { city: 20, town: 16, village: 13, river: 13, height: 12, other: 12 } as const;
+  const SIZE = { city: 18, town: 15, village: 12.5, river: 12, height: 11, other: 11 } as const;
   for (const l of map.labels) {
     const p = toWorld(map.projection, l.lat, l.lon);
     const h = hexAt(map.grid, p);
@@ -59,25 +76,12 @@ function buildLabels(map: GameMap): Container {
       const dot = new Graphics().circle(0, 0, l.kind === 'city' ? 4 : 3).fill(PALETTE.label).stroke({ width: 1.5, color: PALETTE.labelHalo });
       labels.addChild(new Container({ position: c.position, children: [dot] }));
     }
-    const zh = new Text({
-      text: l.names.zh,
-      style: {
-        fontFamily: FONT_SERIF, fontSize: SIZE[l.kind], fontWeight: l.kind === 'city' || l.kind === 'town' ? '700' : '500',
-        fill: PALETTE.label, stroke: { color: PALETTE.labelHalo, width: 3, join: 'round' },
-      },
-      resolution: 3,
-    });
-    zh.anchor.set(0.5, 1);
+    const zh = inked(l.names.zh, { fontFamily: FONT_SERIF, fontSize: SIZE[l.kind], letterSpacing: SIZE[l.kind] * 0.06 }, PALETTE.label, 3);
     zh.position.set(0, -4);
     zh.label = 'zh';
     c.addChild(zh);
     if (l.names.en) {
-      const en = new Text({
-        text: l.names.en,
-        style: { fontFamily: FONT_LATIN, fontSize: SIZE[l.kind] * 0.68, fontStyle: 'italic', fill: PALETTE.labelSub, stroke: { color: PALETTE.labelHalo, width: 2.5, join: 'round' } },
-        resolution: 3,
-      });
-      en.anchor.set(0.5, 1);
+      const en = inked(l.names.en, { fontFamily: FONT_LATIN, fontSize: SIZE[l.kind] * 0.82, fontStyle: 'italic' }, PALETTE.labelSub, 2.5);
       en.position.set(0, -3);
       en.label = 'latin';
       c.addChild(en);
@@ -101,7 +105,7 @@ export async function createMapView(map: GameMap, referenceUrl: string, reliefUr
   if (map.def.relief && reliefUrl) {
     relief = await imageLayer(reliefUrl, map.def.relief.boundsKm);
     relief.blendMode = 'multiply';
-    relief.alpha = 0.75;
+    relief.alpha = 0.4;
   }
   const reference = await imageLayer(referenceUrl, map.def.reference.boundsKm);
 

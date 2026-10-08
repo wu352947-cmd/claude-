@@ -2,17 +2,17 @@
  * 地图"装饰"：外框、下方图边带（标题、比例尺、指北针、图例）。印刷兵棋地图的精致感有一半来自这里。
  */
 import { Container, Graphics, Text } from 'pixi.js';
-import { FONT_LATIN, FONT_SERIF, PALETTE, PX_PER_KM } from './style';
+import { FONT_LATIN, FONT_SERIF, FONT_TITLE, PALETTE, PX_PER_KM } from './style';
 import type { WorldBounds } from './terrain-render';
 
 const K = PX_PER_KM;
 export const MARGIN_KM = 9;
 
-function text(s: string, size: number, opts: { serif?: boolean; latin?: boolean; bold?: boolean; color?: number } = {}): Text {
+function text(s: string, size: number, opts: { serif?: boolean; latin?: boolean; title?: boolean; bold?: boolean; color?: number } = {}): Text {
   return new Text({
     text: s,
     style: {
-      fontFamily: opts.latin ? FONT_LATIN : opts.serif ? FONT_SERIF : 'system-ui, sans-serif',
+      fontFamily: opts.title ? FONT_TITLE : opts.latin ? FONT_LATIN : opts.serif ? FONT_SERIF : 'system-ui, sans-serif',
       fontSize: size, fontWeight: opts.bold ? '700' : '400', fill: opts.color ?? PALETTE.marginInk,
       letterSpacing: opts.bold ? size * 0.08 : 0,
     },
@@ -34,7 +34,7 @@ export function drawFurniture(b: WorldBounds, title: string, subtitle: string): 
 
   const cy = y1 + band / 2;
   // 标题
-  const t = text(title, 2.4 * K, { serif: true, bold: true });
+  const t = text(title, 3 * K, { title: true });
   t.anchor.set(0, 1); t.position.set(x0 + 2 * K, cy + 0.2 * K);
   const st = text(subtitle, 0.95 * K, { serif: true, color: 0x4f5752 });
   st.anchor.set(0, 0); st.position.set(x0 + 2.1 * K, cy + 0.7 * K);
@@ -58,7 +58,7 @@ export function drawFurniture(b: WorldBounds, title: string, subtitle: string): 
   g.poly([nx, ny - r, nx + r * 0.28, ny, nx, ny + r, nx - r * 0.28, ny]).stroke({ width: 0.04 * K, color: PALETTE.marginInk });
   g.poly([nx, ny - r, nx + r * 0.28, ny, nx, ny]).fill(PALETTE.marginInk);
   g.poly([nx, ny + r, nx - r * 0.28, ny, nx, ny]).fill(PALETTE.marginInk);
-  const n = text('N', 0.75 * K, { latin: true, bold: true });
+  const n = text('N', 0.85 * K, { latin: true });
   n.anchor.set(0.5, 1); n.position.set(nx, ny - r - 0.05 * K); root.addChild(n);
 
   // 图例
