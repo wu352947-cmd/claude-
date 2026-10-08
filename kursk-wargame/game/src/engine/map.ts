@@ -110,6 +110,7 @@ export const Label = z.object({
   lat: z.number(),
   lon: z.number(),
   status: Status,
+  note: z.string().optional(),
   sources: z.array(z.string()).default([]),
 });
 export type Label = z.infer<typeof Label>;

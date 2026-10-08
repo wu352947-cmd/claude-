@@ -29,11 +29,16 @@ describe('南线地图数据', () => {
     }
   });
 
-  it('AI 交叉核对的格子都写明了核对方法与依据', () => {
-    for (const [id, h] of map.hexes) {
-      if (h.status !== 'crosschecked') continue;
-      expect(h.note, id).toMatch(/^AI 复查/);
-      expect(h.sources.length, id).toBeGreaterThan(0);
+  it('AI 交叉核对的格子、线、地名都写明了核对方法与依据', () => {
+    const all = loadMap({ def, hexes, hexsides, labels, lines: linesData });
+    const recs: [string, { status: string; note?: string; sources: string[] }][] = [
+      ...all.hexes, ...all.lines.map((l) => [l.id, l] as [string, typeof l]),
+      ...all.labels.map((l) => [l.id, l] as [string, typeof l]),
+    ];
+    for (const [id, r] of recs) {
+      if (r.status !== 'crosschecked') continue;
+      expect(r.note, id).toMatch(/^AI 复查/);
+      expect(r.sources.length, id).toBeGreaterThan(0);
     }
   });
 
