@@ -56,3 +56,13 @@ gradle assembleRelease
 ```
 
 输出在 `app/build/outputs/apk/release/app-release.apk`。签名密钥在 `keystore/` 里（个人自用项目，固定签名，方便以后的新版本直接覆盖安装）。
+
+## 在 Edge 浏览器里直接翻译网页（推荐）
+
+`userscript/yimu-web.user.js` 是一个 Tampermonkey 脚本，和 App 内置浏览器用的是同一套整页翻译代码：
+
+1. Edge → 菜单 → 扩展 → 安装 Tampermonkey；
+2. 在 Edge 打开 https://raw.githubusercontent.com/wu352947-cmd/claude-/claude/tender-lamport-vb8i8b/subtitle-app/userscript/yimu-web.user.js ，点「安装」；
+3. 打开任意英文网页，点右下角「译」，填入 DeepSeek API Key。
+
+修改翻译核心 `app/src/main/assets/yimu-web.js` 后运行 `userscript/build.sh` 重新生成脚本。
