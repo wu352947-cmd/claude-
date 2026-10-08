@@ -5,3 +5,6 @@ local.properties
 .idea/
 app/libs/*.aar
 *.apk
+
+# 最新安装包，供平板直接下载
+!release/YiMu.apk
