@@ -43,7 +43,7 @@ function derivation(p: PlacedUnit): string {
 }
 
 /** 堆叠列表 + 选中单位详情。stack 从下到上；列表从上到下显示。 */
-export function unitSectionHtml(stack: readonly PlacedUnit[], selectedId: string | null, moving = false): string {
+export function unitSectionHtml(stack: readonly PlacedUnit[], selectedId: string | null, moveNote = ''): string {
   if (!stack.length) return '';
   const rows = [...stack].reverse().map((p) => `
     <button class="unit-row${p.unit.id === selectedId ? ' on' : ''}" data-unit="${esc(p.unit.id)}">
@@ -73,7 +73,7 @@ export function unitSectionHtml(stack: readonly PlacedUnit[], selectedId: string
           ${u.note ? `<dt>备注</dt><dd><small>${esc(u.note)}</small></dd>` : ''}
         </dl>
       </div>
-      <button class="move-btn${moving ? ' on' : ''}" id="move-btn">${moving ? '点地图上的目标格…（再点此取消）' : '移到另一格（临时；冲刺 4 换成正式移动）'}</button>
+      ${moveNote ? `<div class="move-note">${moveNote}</div>` : ''}
       ${derivation(p)}`;
   }
   return `<div class="units"><div class="units-head">部队（${stack.length}）</div>${rows}${detail}</div>`;

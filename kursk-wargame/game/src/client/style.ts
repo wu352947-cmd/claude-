@@ -47,6 +47,9 @@ export const PALETTE = {
   margin: 0xe9ece2,
   marginInk: 0x2a2d2b,
   select: 0xb3261e,
+  /** 可到达范围；敌控制区（到此停止） */
+  reach: 0x2f7fd0,
+  reachZoc: 0xe08a1e,
   auto: 0xd9822b,
   verified: 0x3f8f4a,
   crosschecked: 0x3a78c2,

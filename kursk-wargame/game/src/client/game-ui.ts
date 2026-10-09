@@ -41,7 +41,7 @@ export function createGameUi(
   const unitName = (id: string): string => ctx.oob.units.get(id)?.names.zh ?? id;
   const describe = (e: GameEvent): string => {
     switch (e.type) {
-      case 'UnitRelocated': return `${unitName(e.unit)}：${e.from} → ${e.to}（临时移动）`;
+      case 'UnitMoved': return `${unitName(e.unit)}：${e.from} → ${e.path.at(-1)}（${e.path.length} 格，移动力 ${e.cost}）`;
       case 'DieRolled': return `${e.purpose}骰 d${e.sides} = ${e.value}`;
       case 'PhaseChanged': return `进入${ctx.sequence.phases[e.phase]!.name}`;
       case 'TurnStarted': return `—— 第 ${e.turn} 回合 ——`;

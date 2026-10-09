@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type Command, CommandError, type GameContext, type GameState, RatingsParams, Sequence, actingSide, apply, canRedo, canUndo,
+  type Command, CommandError, type GameContext, type GameState, MovementRules, RatingsParams, Sequence, actingSide, apply, canRedo, canUndo,
   emptyHistory, initialState, loadDeployment, loadMap, loadOob, loadSave, makeSave, placedUnits, push, redo, replay, stateHash,
   undo, withFullSteps,
 } from '../src/engine';
@@ -12,11 +12,12 @@ import oobData from '../data/units/south.oob.json';
 import demo from '../data/scenarios/demo.deployment.json';
 import rawParams from '../data/rules/ratings.json';
 import rawSeq from '../data/rules/sequence.json';
+import rawMove from '../data/rules/movement.json';
 
 const map = loadMap({ def, hexes, hexsides, labels });
 const oob = loadOob(oobData, RatingsParams.parse(rawParams));
 const { deployment } = loadDeployment(oob, map.grid, demo);
-const ctx: GameContext = { grid: map.grid, oob, sequence: Sequence.parse(rawSeq) };
+const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement: MovementRules.parse(rawMove) };
 const start = (seed = 42): GameState => withFullSteps(ctx, initialState('demo', deployment.first, seed, deployment));
 const s0 = start();
 const U = s0.units[0]!.id;
@@ -31,18 +32,11 @@ describe('指令与状态', () => {
     expect(placedUnits(ctx, s0).map((p) => p.unit.id)).toEqual(s0.units.map((u) => u.id));
   });
 
-  it('临时移动：单位到新格并放在堆叠最上面，产生事件；原状态不被修改', () => {
+  it('非法指令被拒绝且不改变状态：单位不存在、非移动阶段移动', () => {
     const before = JSON.stringify(s0);
-    const { state, events } = apply(ctx, s0, { type: 'Relocate', unit: U, to: '1010' });
-    expect(state.units.at(-1)).toMatchObject({ id: U, hex: '1010' });
-    expect(events).toEqual([{ type: 'UnitRelocated', unit: U, from: s0.units[0]!.hex, to: '1010' }]);
+    expect(() => apply(ctx, s0, { type: 'Move', unit: 'nope', path: ['1010'] })).toThrow(CommandError);
+    expect(() => apply(ctx, s0, { type: 'Move', unit: U, path: ['1010'] })).toThrow(/不能移动/);
     expect(JSON.stringify(s0)).toBe(before);
-  });
-
-  it('非法指令被拒绝：单位不存在、格子出界、原地不动', () => {
-    expect(() => apply(ctx, s0, { type: 'Relocate', unit: 'nope', to: '1010' })).toThrow(CommandError);
-    expect(() => apply(ctx, s0, { type: 'Relocate', unit: U, to: '9999' })).toThrow(/不在地图内/);
-    expect(() => apply(ctx, s0, { type: 'Relocate', unit: U, to: s0.units[0]!.hex })).toThrow(CommandError);
   });
 
   it('骰子只来自状态里的种子：同种子同结果，不同种子不同序列', () => {
@@ -85,7 +79,7 @@ describe('指令与状态', () => {
 
 describe('撤销、重做与存档', () => {
   const cmds: Command[] = [
-    { type: 'Relocate', unit: U, to: '1010' },
+    { type: 'EndPhase' },
     { type: 'RollDie', sides: 6, purpose: '测试' },
     { type: 'EndPhase' },
   ];
@@ -95,7 +89,7 @@ describe('撤销、重做与存档', () => {
     let h = build(cmds);
     const full = replay(ctx, s0, h).state;
     h = undo(h);
-    expect(replay(ctx, s0, h).state.phase).toBe(0);
+    expect(replay(ctx, s0, h).state.phase).toBe(1);
     expect(canRedo(h)).toBe(true);
     h = redo(h);
     expect(replay(ctx, s0, h).state).toEqual(full);
@@ -108,7 +102,7 @@ describe('撤销、重做与存档', () => {
 
   it('非法指令不会进入历史', () => {
     const h = build(cmds);
-    expect(() => push(ctx, s0, h, { type: 'Relocate', unit: 'nope', to: '1010' })).toThrow(CommandError);
+    expect(() => push(ctx, s0, h, { type: 'Move', unit: 'nope', path: ['1010'] })).toThrow(CommandError);
     expect(h.commands.length).toBe(3);
   });
 
@@ -119,7 +113,7 @@ describe('撤销、重做与存档', () => {
     const all: Command[] = [];
     for (let i = 0; i < 200; i++) {
       const k = next(3);
-      if (k === 0) all.push({ type: 'Relocate', unit: s0.units[next(s0.units.length)]!.id, to: `${String(10 + next(20)).padStart(2, '0')}${String(10 + next(20)).padStart(2, '0')}` });
+      if (k === 0) { const u = s0.units[next(s0.units.length)]!; const h = Number(u.hex); all.push({ type: 'Move', unit: u.id, path: [String(h + 1).padStart(4, '0')] }); }
       else if (k === 1) all.push({ type: 'RollDie', sides: 6, purpose: '测试' });
       else all.push({ type: 'EndPhase' });
     }
@@ -138,7 +132,7 @@ describe('撤销、重做与存档', () => {
     const save = makeSave(ctx, s0, build(cmds), 42, 'test');
     expect(() => loadSave(ctx, { ...save, seed: 43 }, (_s, seed) => start(seed))).toThrow(/不一致/);
     expect(() => loadSave(ctx, { hello: 1 }, (_s, seed) => start(seed))).toThrow(/不是有效的存档/);
-    expect(() => loadSave(ctx, { ...save, commands: [{ type: 'Relocate', unit: 'nope', to: '1010' }] }, (_s, seed) => start(seed))).toThrow(/第 1 条/);
+    expect(() => loadSave(ctx, { ...save, commands: [{ type: 'Move', unit: 'nope', path: ['1010'] }] }, (_s, seed) => start(seed))).toThrow(/第 1 条/);
   });
 
   it('状态指纹与键的顺序无关，状态不同则指纹不同', () => {

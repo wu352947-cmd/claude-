@@ -2,10 +2,12 @@
  * 引擎骨架（docs/03 §2.1）：一局游戏的状态、指令、事件，以及唯一改变状态的入口 apply()。
  * apply 是纯函数：同样的状态 + 同样的指令 → 同样的新状态与事件。随机数的状态放在 GameState.rng 里，
  * 所以文档里的 apply(state, command, rng) 在这里写作 apply(ctx, state, command)。
- * ctx 是不随对局变化的数据（地图网格、战斗序列、回合顺序）。
+ * ctx 是不随对局变化的数据（地图、战斗序列、回合顺序、移动规则）。
  */
 import { z } from 'zod';
-import { type HexGrid, inBounds, parseHexId } from './hex';
+import { parseHexId } from './hex';
+import type { GameMap } from './map';
+import { type MovementRules, checkPath, whyCannotMove } from './movement';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
 
@@ -18,9 +20,10 @@ export type Sequence = z.infer<typeof Sequence>;
 
 /** 不随对局变化的规则数据 */
 export interface GameContext {
-  grid: HexGrid;
+  map: GameMap;
   oob: Oob;
   sequence: Sequence;
+  movement: MovementRules;
 }
 
 /** 单位在对局中的可变部分；数组顺序 = 同格堆叠从下到上 */
@@ -35,11 +38,13 @@ export interface GameState {
   phase: number;
   rng: RngState;
   units: UnitState[];
+  /** 本阶段已经移动过的单位 */
+  moved: string[];
 }
 
 export const Command = z.discriminatedUnion('type', [
-  /** 临时：把单位直接放到某格（冲刺 4 用正式的移动规则替换） */
-  z.object({ type: z.literal('Relocate'), unit: z.string().min(1), to: z.string().regex(/^\d{4}$/) }),
+  /** 移动：path 是出发格之后依次经过的格子，最后一格是目的地 */
+  z.object({ type: z.literal('Move'), unit: z.string().min(1), path: z.array(z.string().regex(/^\d{4}$/)).min(1) }),
   /** 测试骰：验证随机数可回放 */
   z.object({ type: z.literal('RollDie'), sides: z.number().int().min(2).max(100), purpose: z.string().default('测试') }),
   z.object({ type: z.literal('EndPhase') }),
@@ -47,7 +52,7 @@ export const Command = z.discriminatedUnion('type', [
 export type Command = z.infer<typeof Command>;
 
 export type GameEvent =
-  | { type: 'UnitRelocated'; unit: string; from: string; to: string }
+  | { type: 'UnitMoved'; unit: string; from: string; path: string[]; cost: number }
   | { type: 'DieRolled'; sides: number; value: number; purpose: string }
   | { type: 'PhaseChanged'; turn: number; phase: number }
   | { type: 'TurnStarted'; turn: number };
@@ -57,7 +62,7 @@ export class CommandError extends Error {}
 
 export function initialState(scenario: string, first: Side, seed: number, deployment: Deployment): GameState {
   return {
-    scenario, first, turn: 1, phase: 0, rng: createRng(seed),
+    scenario, first, turn: 1, phase: 0, rng: createRng(seed), moved: [],
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
   };
 }
@@ -69,15 +74,19 @@ export function withFullSteps(ctx: GameContext, s: GameState): GameState {
 
 export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: GameState; events: GameEvent[] } {
   switch (cmd.type) {
-    case 'Relocate': {
+    case 'Move': {
+      const why = whyCannotMove(ctx, s, cmd.unit, actingSide(ctx, s));
+      if (why) throw new CommandError(why);
+      const r = checkPath(ctx, s, cmd.unit, cmd.path);
+      if ('error' in r) throw new CommandError(r.error);
       const i = s.units.findIndex((u) => u.id === cmd.unit);
-      if (i < 0) throw new CommandError(`单位 ${cmd.unit} 不在地图上`);
-      if (!inBounds(ctx.grid, parseHexId(cmd.to))) throw new CommandError(`格子 ${cmd.to} 不在地图内`);
       const u = s.units[i]!;
-      if (u.hex === cmd.to) throw new CommandError('单位已经在这一格');
-      // 移到新格后放在堆叠最上面
-      const units = [...s.units.slice(0, i), ...s.units.slice(i + 1), { ...u, hex: cmd.to }];
-      return { state: { ...s, units }, events: [{ type: 'UnitRelocated', unit: u.id, from: u.hex, to: cmd.to }] };
+      // 到达后放在目的格堆叠的最上面
+      const units = [...s.units.slice(0, i), ...s.units.slice(i + 1), { ...u, hex: cmd.path.at(-1)! }];
+      return {
+        state: { ...s, units, moved: [...s.moved, u.id] },
+        events: [{ type: 'UnitMoved', unit: u.id, from: u.hex, path: cmd.path, cost: r.cost }],
+      };
     }
     case 'RollDie': {
       const [value, rng] = rollDie(s.rng, cmd.sides);
@@ -89,7 +98,7 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
       const phase = last ? 0 : s.phase + 1;
       const events: GameEvent[] = [{ type: 'PhaseChanged', turn, phase }];
       if (last) events.unshift({ type: 'TurnStarted', turn });
-      return { state: { ...s, turn, phase }, events };
+      return { state: { ...s, turn, phase, moved: [] }, events };
     }
   }
 }

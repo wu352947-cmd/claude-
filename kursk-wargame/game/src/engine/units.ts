@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { type HexGrid, type Offset, hexId, inBounds, parseHexId } from './hex';
 import { Status } from './map';
-import { type Derived, type RatingsParams, deriveRatings } from './ratings';
+import { type Derived, type Mobility, type RatingsParams, deriveRatings } from './ratings';
 
 export const Side = z.enum(['DE', 'SU']);
 export type Side = z.infer<typeof Side>;
@@ -133,6 +133,8 @@ export interface Unit extends UnitData {
   confidence: Confidence;
   /** 公式明细（手填占位的单位没有） */
   derived?: Derived;
+  /** 机动类型（由兵种查 ratings.json 的 mobility） */
+  mobility: Mobility;
 }
 
 export const OobFile = z.object({
@@ -202,13 +204,13 @@ export function loadOob(raw: unknown, params: RatingsParams): Oob {
     if (u.quality !== 3 && !u.qualityNote) throw new Error(`单位 ${u.id} 素质不是 3，但没有写理由`);
     if (u.ratings && u.steps && !u.strength.length) {
       // 手填的占位数值
-      units.set(u.id, { ...u, steps: u.steps, ratings: u.ratings, confidence: 'placeholder' });
+      units.set(u.id, { ...u, steps: u.steps, ratings: u.ratings, confidence: 'placeholder', mobility: params.mobility[u.type] ?? 'foot' });
     } else {
       // 按公式算；没有兵力数字时公式用类型占位分（没有占位分的兵种会报错）
       const d = deriveRatings(params, u.type, u.size, u.strength);
       if (!d.lines.length) throw new Error(`单位 ${u.id} 没有兵力数字，兵种 ${u.type} 也没有占位分，请手填占位数值`);
       units.set(u.id, {
-        ...u, steps: d.steps, derived: d, confidence: judge(u, d),
+        ...u, steps: d.steps, derived: d, confidence: judge(u, d), mobility: params.mobility[u.type] ?? 'foot',
         ratings: { attack: d.attack, defense: d.defense, movement: d.movement },
       });
     }

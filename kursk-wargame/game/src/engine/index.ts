@@ -15,3 +15,4 @@ export * from './ratings';
 export * from './units';
 export * from './game';
 export * from './session';
+export * from './movement';

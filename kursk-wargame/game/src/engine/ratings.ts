@@ -5,6 +5,10 @@
  */
 import { z } from 'zod';
 
+/** 机动类型：徒步 / 摩托化（轮式） / 履带 */
+export const Mobility = z.enum(['foot', 'motorized', 'tracked']);
+export type Mobility = z.infer<typeof Mobility>;
+
 export const RatingsParams = z.object({
   status: z.enum(['draft', 'approved']),
   items: z.record(z.string(), z.object({ name: z.string(), class: z.string() })),
@@ -20,7 +24,7 @@ export const RatingsParams = z.object({
   artilleryDefense: z.number(),
   pointsPerStep: z.number().positive(),
   steps: z.record(z.string(), z.tuple([z.number().int(), z.number().int()])),
-  mobility: z.record(z.string(), z.enum(['foot', 'motorized', 'tracked'])),
+  mobility: z.record(z.string(), Mobility),
   movement: z.record(z.string(), z.number()),
   /** 只有上级（师）数字时，按单位类型分到本单位的份额（设计参数） */
   shares: z.record(z.string(), z.union([z.string(), z.object({ name: z.string(), fraction: z.number().positive().max(1) })])).default({}),
