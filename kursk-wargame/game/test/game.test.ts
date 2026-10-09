@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type Command, CommandError, type GameContext, type GameState, MovementRules, RatingsParams, Sequence, actingSide, apply, canRedo, canUndo,
+  type Command, CommandError, type GameContext, type GameState, CombatRules, MovementRules, RatingsParams, Sequence, actingSide, apply, canRedo, canUndo,
   emptyHistory, initialState, loadDeployment, loadMap, loadOob, loadSave, makeSave, placedUnits, push, redo, replay, stateHash,
   undo, withFullSteps,
 } from '../src/engine';
@@ -13,11 +13,12 @@ import demo from '../data/scenarios/demo.deployment.json';
 import rawParams from '../data/rules/ratings.json';
 import rawSeq from '../data/rules/sequence.json';
 import rawMove from '../data/rules/movement.json';
+import rawCombat from '../data/rules/combat.json';
 
 const map = loadMap({ def, hexes, hexsides, labels });
 const oob = loadOob(oobData, RatingsParams.parse(rawParams));
 const { deployment } = loadDeployment(oob, map.grid, demo);
-const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement: MovementRules.parse(rawMove) };
+const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement: MovementRules.parse(rawMove), combat: CombatRules.parse(rawCombat) };
 const start = (seed = 42): GameState => withFullSteps(ctx, initialState('demo', deployment.first, seed, deployment));
 const s0 = start();
 const U = s0.units[0]!.id;

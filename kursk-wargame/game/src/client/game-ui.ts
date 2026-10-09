@@ -45,6 +45,12 @@ export function createGameUi(
       case 'DieRolled': return `${e.purpose}骰 d${e.sides} = ${e.value}`;
       case 'PhaseChanged': return `进入${ctx.sequence.phases[e.phase]!.name}`;
       case 'TurnStarted': return `—— 第 ${e.turn} 回合 ——`;
+      case 'CombatResolved': return `进攻 ${e.hex}：${e.odds}${e.shift ? `（列偏移 ${e.shift > 0 ? '+' : ''}${e.shift}）` : ''}，掷 ${e.dice[0]}+${e.dice[1]}${e.drm ? `${e.drm > 0 ? '+' : ''}${e.drm}` : ''} → ${e.result}`;
+      case 'StepsLost': return `${unitName(e.unit)} 损失 ${e.steps} 步${e.damagedPool ? '（进入受损池）' : ''}`;
+      case 'UnitEliminated': return `${unitName(e.unit)} 被消灭`;
+      case 'Retreated': return `${e.units.map(unitName).join('、')} 撤退到 ${e.path.at(-1)}`;
+      case 'RetreatLoss': return `${e.reason}：每个单位再损失 ${e.steps} 步`;
+      case 'Advanced': return `${e.units.map(unitName).join('、')} 推进到 ${e.to}`;
     }
   };
 
@@ -58,7 +64,8 @@ export function createGameUi(
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);
     const lines = cur.events.flatMap((evs, i) => evs.map((e) => `<li${i === cur.events.length - 1 ? ' class="new"' : ''}>${esc(describe(e))}</li>`));
     $('g-log').innerHTML = lines.length ? lines.slice(-60).reverse().join('') : '<li class="muted">还没有行动</li>';
-    $('g-meta').textContent = `种子 ${seed} · 指令 ${history.cursor} 条 · 指纹 ${stateHash(s)}`;
+    const pool = (side: 'DE' | 'SU'): number => s.damaged.filter((d) => ctx.oob.formations.get(d.formation)?.side === side).reduce((n, d) => n + d.steps, 0);
+    $('g-meta').textContent = `受损池（装甲步数，回合末分流以后做）：德 ${pool('DE')} · 苏 ${pool('SU')} · 已消灭 ${s.eliminated.length} 个单位 · 种子 ${seed} · 指令 ${history.cursor} 条 · 指纹 ${stateHash(s)}`;
     try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(makeSave(ctx, initial, history, seed, engineVersion))); } catch { /* 隐私模式等 */ }
     onChange(s);
   }

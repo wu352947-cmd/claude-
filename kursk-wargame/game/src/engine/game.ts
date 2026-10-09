@@ -8,6 +8,8 @@ import { z } from 'zod';
 import { parseHexId } from './hex';
 import type { GameMap } from './map';
 import { type MovementRules, checkPath, whyCannotMove } from './movement';
+import { type CombatRules, whyCannotAttack } from './combat';
+import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
 
@@ -24,6 +26,7 @@ export interface GameContext {
   oob: Oob;
   sequence: Sequence;
   movement: MovementRules;
+  combat: CombatRules;
 }
 
 /** 单位在对局中的可变部分；数组顺序 = 同格堆叠从下到上 */
@@ -40,6 +43,18 @@ export interface GameState {
   units: UnitState[];
   /** 本阶段已经移动过的单位 */
   moved: string[];
+  /** 本回合移动过的单位（炮兵移动后本回合不能支援） */
+  movedThisTurn: string[];
+  /** 本阶段已经进攻过的单位、被进攻过的格子、已经支援过的炮兵 */
+  attacked: string[];
+  attackedHexes: string[];
+  fired: string[];
+  /** 战斗后可以推进（只在紧接着的下一条指令有效） */
+  advance: { hex: string; units: string[] } | null;
+  /** 受损池：装甲单位损失的步数（02 §4.4），回合末分流在冲刺 6 */
+  damaged: { unit: string; formation: string; steps: number; hex: string; turn: number }[];
+  /** 被消灭的单位 */
+  eliminated: string[];
 }
 
 export const Command = z.discriminatedUnion('type', [
@@ -47,6 +62,10 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Move'), unit: z.string().min(1), path: z.array(z.string().regex(/^\d{4}$/)).min(1) }),
   /** 测试骰：验证随机数可回放 */
   z.object({ type: z.literal('RollDie'), sides: z.number().int().min(2).max(100), purpose: z.string().default('测试') }),
+  /** 进攻：attackers 进攻 hex 里的全部敌军 */
+  z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
+  /** 战斗后推进 */
+  z.object({ type: z.literal('Advance'), units: z.array(z.string().min(1)).min(1) }),
   z.object({ type: z.literal('EndPhase') }),
 ]);
 export type Command = z.infer<typeof Command>;
@@ -55,14 +74,21 @@ export type GameEvent =
   | { type: 'UnitMoved'; unit: string; from: string; path: string[]; cost: number }
   | { type: 'DieRolled'; sides: number; value: number; purpose: string }
   | { type: 'PhaseChanged'; turn: number; phase: number }
-  | { type: 'TurnStarted'; turn: number };
+  | { type: 'TurnStarted'; turn: number }
+  | { type: 'CombatResolved'; hex: string; attackers: string[]; odds: string; shift: number; dice: [number, number]; drm: number; result: string }
+  | { type: 'StepsLost'; unit: string; steps: number; damagedPool: boolean }
+  | { type: 'UnitEliminated'; unit: string }
+  | { type: 'Retreated'; units: string[]; path: string[] }
+  | { type: 'RetreatLoss'; units: string[]; steps: number; reason: string }
+  | { type: 'Advanced'; units: string[]; to: string };
 
 /** 非法指令（例如单位不存在）：界面应提示玩家，不会改变状态 */
 export class CommandError extends Error {}
 
 export function initialState(scenario: string, first: Side, seed: number, deployment: Deployment): GameState {
   return {
-    scenario, first, turn: 1, phase: 0, rng: createRng(seed), moved: [],
+    scenario, first, turn: 1, phase: 0, rng: createRng(seed),
+    moved: [], movedThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null, damaged: [], eliminated: [],
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
   };
 }
@@ -73,6 +99,8 @@ export function withFullSteps(ctx: GameContext, s: GameState): GameState {
 }
 
 export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: GameState; events: GameEvent[] } {
+  // 推进的机会只保留到下一条指令
+  if (cmd.type !== 'Advance' && s.advance) s = { ...s, advance: null };
   switch (cmd.type) {
     case 'Move': {
       const why = whyCannotMove(ctx, s, cmd.unit, actingSide(ctx, s));
@@ -84,10 +112,17 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
       // 到达后放在目的格堆叠的最上面
       const units = [...s.units.slice(0, i), ...s.units.slice(i + 1), { ...u, hex: cmd.path.at(-1)! }];
       return {
-        state: { ...s, units, moved: [...s.moved, u.id] },
+        state: { ...s, units, moved: [...s.moved, u.id], movedThisTurn: [...s.movedThisTurn, u.id] },
         events: [{ type: 'UnitMoved', unit: u.id, from: u.hex, path: cmd.path, cost: r.cost }],
       };
     }
+    case 'Attack': {
+      const why = whyCannotAttack(ctx, s, cmd.attackers, cmd.hex, actingSide(ctx, s));
+      if (why) throw new CommandError(why);
+      return resolveAttack(ctx, s, cmd.attackers, cmd.hex);
+    }
+    case 'Advance':
+      return resolveAdvance(ctx, s, cmd.units);
     case 'RollDie': {
       const [value, rng] = rollDie(s.rng, cmd.sides);
       return { state: { ...s, rng }, events: [{ type: 'DieRolled', sides: cmd.sides, value, purpose: cmd.purpose }] };
@@ -98,7 +133,8 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
       const phase = last ? 0 : s.phase + 1;
       const events: GameEvent[] = [{ type: 'PhaseChanged', turn, phase }];
       if (last) events.unshift({ type: 'TurnStarted', turn });
-      return { state: { ...s, turn, phase, moved: [] }, events };
+      const reset = { moved: [], attacked: [], attackedHexes: [], fired: [], advance: null };
+      return { state: { ...s, turn, phase, ...reset, movedThisTurn: last ? [] : s.movedThisTurn }, events };
     }
   }
 }

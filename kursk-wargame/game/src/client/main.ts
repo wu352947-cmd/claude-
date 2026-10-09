@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
   ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  CombatRules, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -15,6 +15,7 @@ import ratingsParams from '../../data/rules/ratings.json';
 import demoDeployment from '../../data/scenarios/demo.deployment.json';
 import sequence from '../../data/rules/sequence.json';
 import movementRules from '../../data/rules/movement.json';
+import combatRules from '../../data/rules/combat.json';
 import { attachCamera } from './camera';
 import { createEditor } from './editor';
 import { type GameUi, createGameUi } from './game-ui';
@@ -23,6 +24,7 @@ import { MAP_FONTS, PX_PER_KM } from './style';
 import { unitSectionHtml } from './unit-panel';
 import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
+import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
 
 const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
@@ -31,7 +33,7 @@ let map = baseMap;
 const oob = loadOob(oobData, RatingsParams.parse(ratingsParams));
 const { deployment } = loadDeployment(oob, baseMap.grid, demoDeployment);
 // 规则用数据文件里的地图（编辑器里未合并的修改不影响对局，保证存档可回放）
-const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules) };
+const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules), combat: CombatRules.parse(combatRules) };
 /** 想定 + 种子 → 初始状态（目前只有演示摆放） */
 const initialFor = (scenario: string, seed: number) => {
   if (scenario !== deployment.id) throw new Error(`没有想定 ${scenario}`);
@@ -41,6 +43,8 @@ const initialFor = (scenario: string, seed: number) => {
 let stackMap = new Map<string, ReturnType<typeof placedUnits>>();
 /** 信息面板里选中的单位 */
 let selectedUnit: string | null = null;
+/** 进攻时勾选的单位（换格子就重置为全选） */
+let attackPick: { hex: string; units: Set<string> } | null = null;
 /** 选中单位现在能到达的格子（不能移动时为 null） */
 let reach: Map<string, Reach> | null = null;
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -81,6 +85,7 @@ function showInfo(h: Offset | null): void {
       <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
       ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
+    ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
     ${editor.active ? '' : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote())}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
@@ -91,6 +96,20 @@ function showInfo(h: Offset | null): void {
     b.onclick = () => { selectUnit(b.dataset.unit ?? null); showInfo(h); };
   }
   $('info-close').onclick = () => { selectUnit(null); view.select(null); showInfo(null); };
+  const id = hexId(h);
+  const picks = [...box.querySelectorAll<HTMLInputElement>('.atk-pick')];
+  for (const c of picks) {
+    c.onchange = () => { attackPick = { hex: id, units: new Set(picks.filter((x) => x.checked).map((x) => x.dataset.unit!)) }; showInfo(h); };
+  }
+  const go = document.getElementById('atk-go');
+  if (go) go.onclick = () => {
+    if (game.dispatch({ type: 'Attack', attackers: picks.filter((x) => x.checked).map((x) => x.dataset.unit!), hex: id })) { attackPick = null; showInfo(h); }
+  };
+  const adv = document.getElementById('adv-go');
+  if (adv) adv.onclick = () => {
+    const units = [...box.querySelectorAll<HTMLInputElement>('.adv-pick')].filter((x) => x.checked).map((x) => x.dataset.unit!);
+    if (game.dispatch({ type: 'Advance', units })) { selectUnit(units.at(-1) ?? null); showInfo(h); }
+  };
 }
 
 /** 选中单位：高亮，并算出可到达范围 */

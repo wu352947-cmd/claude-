@@ -16,3 +16,5 @@ export * from './units';
 export * from './game';
 export * from './session';
 export * from './movement';
+export * from './combat';
+export * from './combat-resolve';

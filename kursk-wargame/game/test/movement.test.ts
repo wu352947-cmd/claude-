@@ -1,39 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import {
-  type GameContext, type GameState, MovementRules, RatingsParams, Sequence, actingSide, apply, checkPath, createRng, linkKey, loadMap,
-  loadOob, parseHexId, reachable, whyCannotMove, zocOf,
-} from '../src/engine';
-import def from '../data/maps/south.json';
-import oobData from '../data/units/south.oob.json';
-import rawParams from '../data/rules/ratings.json';
-import rawSeq from '../data/rules/sequence.json';
-import rawMove from '../data/rules/movement.json';
+import { type GameContext, type GameState, actingSide, apply, checkPath, reachable, whyCannotMove, zocOf } from '../src/engine';
+import { ART, DEINF, INF, MOT, TANK, at, movement, oob, phase, world } from './helpers';
 
-/**
- * 小测试地图（12×12，默认全是开阔地）。第 5 列从北往南：0502、0503 …… 南北相邻。
- * 用到的单位：TANK = 党卫军第 1 装甲团（履带，移动 7）；INF = 近卫步兵第 13 师（徒步 4）；
- * MOT = 摩托化步兵第 53 旅（摩托化 8）；ART = 警卫旗队炮兵团（不施加控制区）。
- */
-const TANK = 'DE.IISS.LSSAH.PzRgt1', INF = 'SU.5GA.13GvSD', MOT = 'SU.29TK.53MSBr', ART = 'DE.IISS.LSSAH.ArtRgt', DEINF = 'DE.IISS.LSSAH.PzGrenRgt1';
-const oob = loadOob(oobData, RatingsParams.parse(rawParams));
-const sequence = Sequence.parse(rawSeq);
-const movement = MovementRules.parse(rawMove);
-const phase = (id: string): number => sequence.phases.findIndex((p) => p.id === id);
-
-function world(opts: { hexes?: Record<string, string>; sides?: Record<string, string[]>; roads?: [string, string, string][] } = {}): GameContext {
-  const map = loadMap({
-    def: { ...def, hex: { ...def.hex, cols: 12, rows: 12 } },
-    hexes: { hexes: Object.fromEntries(Object.entries(opts.hexes ?? {}).map(([k, t]) => [k, { terrain: t, status: 'unverified' }])) },
-    hexsides: { hexsides: Object.fromEntries(Object.entries(opts.sides ?? {}).map(([k, f]) => [k, { features: f, status: 'unverified' }])) },
-    labels: { labels: [] },
-  });
-  for (const [a, b, kind] of opts.roads ?? []) map.links.set(linkKey(parseHexId(a), parseHexId(b)), [kind as 'road']);
-  return { map, oob, sequence, movement };
-}
-const at = (units: Record<string, string>, ph = 'first.movement'): GameState => ({
-  scenario: 't', first: 'DE', turn: 1, phase: phase(ph), rng: createRng(1), moved: [],
-  units: Object.entries(units).map(([id, hex]) => ({ id, hex, steps: 2 })),
-});
 const cost = (ctx: GameContext, s: GameState, unit: string, hex: string): number | undefined => reachable(ctx, s, unit).get(hex)?.cost;
 
 describe('移动消耗', () => {
