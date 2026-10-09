@@ -94,6 +94,90 @@
    "hex": "2014"
   },
   {
+   "unit": "DE.III.6PD.PzRgt11",
+   "hex": "2725"
+  },
+  {
+   "unit": "DE.III.6PD.PzG4",
+   "hex": "2725"
+  },
+  {
+   "unit": "DE.III.6PD.PzG114",
+   "hex": "2724"
+  },
+  {
+   "unit": "DE.III.6PD.Aufkl6",
+   "hex": "2724"
+  },
+  {
+   "unit": "DE.III.6PD.PzJg41",
+   "hex": "2824"
+  },
+  {
+   "unit": "DE.III.6PD.AR76",
+   "hex": "2824"
+  },
+  {
+   "unit": "DE.III.7PD.PzRgt25",
+   "hex": "2527"
+  },
+  {
+   "unit": "DE.III.7PD.PzG6",
+   "hex": "2527"
+  },
+  {
+   "unit": "DE.III.7PD.PzG7",
+   "hex": "2526"
+  },
+  {
+   "unit": "DE.III.7PD.Aufkl7",
+   "hex": "2526"
+  },
+  {
+   "unit": "DE.III.7PD.PzJg42",
+   "hex": "2626"
+  },
+  {
+   "unit": "DE.III.7PD.AR78",
+   "hex": "2626"
+  },
+  {
+   "unit": "DE.III.19PD.PzRgt27",
+   "hex": "2926"
+  },
+  {
+   "unit": "DE.III.19PD.PzG73",
+   "hex": "2926"
+  },
+  {
+   "unit": "DE.III.19PD.PzG74",
+   "hex": "2925"
+  },
+  {
+   "unit": "DE.III.19PD.Aufkl19",
+   "hex": "2925"
+  },
+  {
+   "unit": "DE.III.19PD.PzJg19",
+   "hex": "3025"
+  },
+  {
+   "unit": "DE.III.19PD.AR19",
+   "hex": "3025"
+  },
+  {
+   "unit": "DE.III.sPzAbt503",
+   "hex": "2728"
+  },
+  {
+   "unit": "DE.III.StuG228",
+   "hex": "2728"
+  },
+  {
+   "unit": "DE.168ID.div",
+   "hex": "2325"
+  },
+  {
    "unit": "SU.18TK.110TBr",
    "hex": "2415"
   },

@@ -15,7 +15,7 @@ const val = (text: string | number, c: Confidence): string =>
 
 function sources(list: Provenance[]): string {
   if (!list.length) return '<span class="muted">无</span>';
-  return list.map((p) => esc(`${p.field}：${p.source}${p.page ? ` 第 ${p.page} 页` : ''}${p.grade ? `（${p.grade} 级）` : ''}${p.note ? ` ${p.note}` : ''}`)).join('<br>');
+  return list.map((p) => esc(`${p.field}：${p.source}${p.page ? (/^\d[\d–-]*$/.test(p.page) ? ` 第 ${p.page} 页` : ` · ${p.page}`) : ''}${p.grade ? `（${p.grade} 级）` : ''}${p.note ? ` ${p.note}` : ''}`)).join('<br>');
 }
 
 const fmt = (n: number): string => (Math.round(n * 10) / 10).toString();

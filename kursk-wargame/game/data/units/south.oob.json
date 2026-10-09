@@ -1,5 +1,5 @@
 {
- "$comment": "S1 普罗霍罗夫卡想定的战斗序列（AI 考据，2026-10-09，所有者未核对）。strength 里每个数字都抄自史料原文，带口径、日期、出处与原文摘录；攻击/防御/移动/步数由 data/rules/ratings.json 的公式自动算出（公式为草案）。德军取 1943-07-04；苏军没有 7 月 4 日数字，取 7 月 12 日晨开战前最近的数字，日期照实记录。没有数字的单位用类型占位分并显示为占位。德军第 3 装甲军另行补充。详见 docs/reviews/2026-10-09-S1战斗序列AI考据.md",
+ "$comment": "S1 普罗霍罗夫卡想定的战斗序列（AI 考据，2026-10-09，所有者未核对）。strength 里每个数字都抄自史料原文，带口径、日期、出处与原文摘录；攻击/防御/移动/步数由 data/rules/ratings.json 的公式自动算出（公式为草案）。德军取 1943-07-04；苏军没有 7 月 4 日数字，取 7 月 12 日晨开战前最近的数字，日期照实记录。没有数字的单位用类型占位分并显示为占位。德军第 3 装甲军坦克为 7 月 1 日在编数（没有 7 月 4 日可作战数）。详见 docs/reviews/2026-10-09-S1战斗序列AI考据.md",
  "formations": [
   {
    "id": "DE.IISS.LSSAH",
@@ -72,6 +72,127 @@
     }
    ],
    "status": "unverified"
+  },
+  {
+   "id": "DE.III.6PD",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第6装甲师",
+    "en": "6th Panzer Division",
+    "de": "6. Panzer-Division"
+   },
+   "abbr": "6 PD",
+   "color": "#e2c26b",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0214",
+     "page": "4.07.1943 编制表",
+     "grade": "B",
+     "note": "师与团营番号"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.III.7PD",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第7装甲师",
+    "en": "7th Panzer Division",
+    "de": "7. Panzer-Division"
+   },
+   "abbr": "7 PD",
+   "color": "#8fb4d9",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0214",
+     "page": "4.07.1943 编制表",
+     "grade": "B",
+     "note": "师与团营番号"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.III.19PD",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第19装甲师",
+    "en": "19th Panzer Division",
+    "de": "19. Panzer-Division"
+   },
+   "abbr": "19 PD",
+   "color": "#c98bb0",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0214",
+     "page": "4.07.1943 编制表",
+     "grade": "B",
+     "note": "师与团营番号"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.III",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第3装甲军直属与配属部队",
+    "en": "III Panzer Corps troops",
+    "de": "III. Panzerkorps"
+   },
+   "abbr": "III PzK",
+   "color": "#d0d0c4",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0215",
+     "page": "4.07.1943",
+     "grade": "B",
+     "note": "军直属；s.Pz.Abt. 503、StuG-Abt. 228 的隶属见 SRC-0205 9 July 文章"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.168ID",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第168步兵师",
+    "en": "168th Infantry Division",
+    "de": "168. Infanterie-Division"
+   },
+   "abbr": "168 ID",
+   "color": "#a7a98f",
+   "guards": false,
+   "confidence": "estimated",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0215",
+     "page": "4.07.1943 编制表",
+     "grade": "B",
+     "note": "隶属第 3 装甲军"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号只见于 Lexikon der Wehrmacht 的两份不同清单（417/442 或 417/429/442），按师级做一个算子"
   },
   {
    "id": "SU.18TK",
@@ -1038,6 +1159,658 @@
    ],
    "status": "unverified",
    "note": "KDB 记 Hummel 5 门，Wheatley 记 6 门（见争议登记）；牵引火炮缺失。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.III.6PD.PzRgt11",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第11装甲团",
+    "en": "Panzer Regiment 11",
+    "de": "Panzer-Regiment 11"
+   },
+   "designation": "11",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzII",
+     "count": 13,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "PzIII_flame",
+     "count": 14,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "PzIII_75",
+     "count": 18,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "PzIII_long",
+     "count": 34,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "PzIV_long",
+     "count": 32,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 6,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "坦克为 7 月 1 日在编数（Niehorster 第 74 页，含维修中），没有找到 7 月 4 日可作战数；数值因此偏高"
+  },
+  {
+   "id": "DE.III.6PD.PzG4",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第4装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 4",
+    "de": "Panzergrenadier-Regiment 4"
+   },
+   "designation": "4",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.6PD.PzG114",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第114装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 114",
+    "de": "Panzergrenadier-Regiment 114"
+   },
+   "designation": "114",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.6PD.Aufkl6",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第6装甲侦察营",
+    "en": "Panzer Reconnaissance Battalion 6",
+    "de": "Panzer-Aufklärungs-Abteilung 6"
+   },
+   "designation": "A",
+   "type": "recon",
+   "size": "battalion",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.6PD.PzJg41",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第41坦克歼击营",
+    "en": "Panzerjäger Battalion 41",
+    "de": "Panzerjäger-Abteilung 41"
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "MarderII",
+     "count": 5,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    },
+    {
+     "item": "MarderII",
+     "count": 1,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "只计自行反坦克炮（在编）；编制表另有牵引反坦克炮，但没有在编数"
+  },
+  {
+   "id": "DE.III.6PD.AR76",
+   "formation": "DE.III.6PD",
+   "names": {
+    "zh": "第76装甲炮兵团",
+    "en": "Panzer Artillery Regiment 76",
+    "de": "Panzer-Artillerie-Regiment 76"
+   },
+   "designation": "Art",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "Hummel",
+     "count": 6,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "6. Pz 11 II. - 1 Co(-) 2 - - 3 1 - On Hand 13 - 14 - 18 34 - 32 - 6 - 117 5 - - 1 - 6 - 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "只查到自行火炮在编数；牵引火炮只有编制（连数），没有在编数，炮火支援值偏低"
+  },
+  {
+   "id": "DE.III.7PD.PzRgt25",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第25装甲团",
+    "en": "Panzer Regiment 25",
+    "de": "Panzer-Regiment 25"
+   },
+   "designation": "25",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzII",
+     "count": 12,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "PzIII_75",
+     "count": 12,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "PzIII_long",
+     "count": 43,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "PzIV_short",
+     "count": 1,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "PzIV_long",
+     "count": 37,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 7,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "坦克为 7 月 1 日在编数（Niehorster 第 74 页，含维修中），没有找到 7 月 4 日可作战数；数值因此偏高"
+  },
+  {
+   "id": "DE.III.7PD.PzG6",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第6装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 6",
+    "de": "Panzergrenadier-Regiment 6"
+   },
+   "designation": "6",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.7PD.PzG7",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第7装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 7",
+    "de": "Panzergrenadier-Regiment 7"
+   },
+   "designation": "7",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.7PD.Aufkl7",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第7装甲侦察营",
+    "en": "Panzer Reconnaissance Battalion 7",
+    "de": "Panzer-Aufklärungs-Abteilung 7"
+   },
+   "designation": "A",
+   "type": "recon",
+   "size": "battalion",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.7PD.PzJg42",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第42坦克歼击营",
+    "en": "Panzerjäger Battalion 42",
+    "de": "Panzerjäger-Abteilung 42"
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "MarderII",
+     "count": 6,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "只计自行反坦克炮（在编）；编制表另有牵引反坦克炮，但没有在编数"
+  },
+  {
+   "id": "DE.III.7PD.AR78",
+   "formation": "DE.III.7PD",
+   "names": {
+    "zh": "第78装甲炮兵团",
+    "en": "Panzer Artillery Regiment 78",
+    "de": "Panzer-Artillerie-Regiment 78"
+   },
+   "designation": "Art",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "Wespe",
+     "count": 6,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    },
+    {
+     "item": "Hummel",
+     "count": 6,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "7. Pz 25 I., II. - 1 Co - yes - 4 2 - On Hand 12 - - - 12 43 1 37 - 7 - 112 - - - 6 - 6 6 6 -"
+    }
+   ],
+   "status": "unverified",
+   "note": "只查到自行火炮在编数；牵引火炮只有编制（连数），没有在编数，炮火支援值偏低"
+  },
+  {
+   "id": "DE.III.19PD.PzRgt27",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第27装甲团",
+    "en": "Panzer Regiment 27",
+    "de": "Panzer-Regiment 27"
+   },
+   "designation": "27",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzII",
+     "count": 2,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIII_short",
+     "count": 5,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIII_75",
+     "count": 11,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIII_long",
+     "count": 22,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIV_short",
+     "count": 2,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIV_long",
+     "count": 36,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 3,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    },
+    {
+     "item": "PzIII_obs",
+     "count": 4,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    }
+   ],
+   "status": "unverified",
+   "note": "坦克为 7 月 1 日在编数（Niehorster 第 74 页，含维修中），没有找到 7 月 4 日可作战数；数值因此偏高"
+  },
+  {
+   "id": "DE.III.19PD.PzG73",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第73装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 73",
+    "de": "Panzergrenadier-Regiment 73"
+   },
+   "designation": "73",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.19PD.PzG74",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第74装甲掷弹兵团",
+    "en": "Panzergrenadier Regiment 74",
+    "de": "Panzergrenadier-Regiment 74"
+   },
+   "designation": "74",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.19PD.Aufkl19",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第19装甲侦察营",
+    "en": "Panzer Reconnaissance Battalion 19",
+    "de": "Panzer-Aufklärungs-Abteilung 19"
+   },
+   "designation": "A",
+   "type": "recon",
+   "size": "battalion",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "DE.III.19PD.PzJg19",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第19坦克歼击营",
+    "en": "Panzerjäger Battalion 19",
+    "de": "Panzerjäger-Abteilung 19"
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "MarderIII",
+     "count": 14,
+     "basis": "on hand 1.07.1943",
+     "date": "1943-07-01",
+     "source": "SRC-0214",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh/v51.txt p.74 'DIVISIONAL AFV STRENGTHS ON 1.07.1943' (pdftotext line ~3420-3460)",
+     "quote": "19. Pz 27 I., II. - 1 Co - yes - 4 3 - On Hand 2 - - 5 11 22 2 36 - 3 4 85 - - - - 14 14 - - -"
+    }
+   ],
+   "status": "unverified",
+   "note": "只计自行反坦克炮（在编）；编制表另有牵引反坦克炮，但没有在编数"
+  },
+  {
+   "id": "DE.III.19PD.AR19",
+   "formation": "DE.III.19PD",
+   "names": {
+    "zh": "第19装甲炮兵团",
+    "en": "Panzer Artillery Regiment 19",
+    "de": "Panzer-Artillerie-Regiment 19"
+   },
+   "designation": "Art",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有火炮在编数（只有编制），数值为手填占位",
+   "ratings": {
+    "attack": 2,
+    "defense": 1,
+    "movement": 8
+   },
+   "steps": 2
+  },
+  {
+   "id": "DE.III.sPzAbt503",
+   "formation": "DE.III",
+   "names": {
+    "zh": "第503重装甲营",
+    "en": "Heavy Panzer Battalion 503",
+    "de": "schwere Panzer-Abteilung 503"
+   },
+   "designation": "503",
+   "type": "armor",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "Tiger",
+     "count": 45,
+     "basis": "on hand 30.06.1943",
+     "date": "1943-06-30",
+     "source": "SRC-0215",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh52/v52.txt p.64-65 'Tank strengths on 30.06.1943'",
+     "quote": "503 05.03.43 KStN 45 Pz-VI"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-06-30 在编 45 辆（Niehorster）；英文维基称战前 42 辆可战（D 级，无出处）。战役中按连分属三个装甲师"
+  },
+  {
+   "id": "DE.III.StuG228",
+   "formation": "DE.III",
+   "names": {
+    "zh": "第228突击炮营",
+    "en": "Assault Gun Battalion 228",
+    "de": "Sturmgeschütz-Abteilung 228"
+   },
+   "designation": "228",
+   "type": "assault-gun",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "StuGIII",
+     "count": 31,
+     "basis": "on hand 4.07.1943 incl. under repair",
+     "date": "1943-07-04",
+     "source": "SRC-0215",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/iii/nieh52/v52.txt Sturmgeschütz Units table (line ~3036)",
+     "quote": "228. - - 31 - 31 Armeeabteilung Kempf / Hgr. Süd"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.168ID.div",
+   "formation": "DE.168ID",
+   "names": {
+    "zh": "第168步兵师",
+    "en": "168th Infantry Division",
+    "de": "168. Infanterie-Division"
+   },
+   "designation": "168",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8077,
+     "basis": "KDB engagement strength 9 July",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "/tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/tdi/ob9.txt",
+     "quote": "168th ID 8,077 9,342 6 0 48 111"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 9 日 KDB 交战兵力（已经过 7 月 5–8 日战斗），没有 7 月 4 日数字"
   },
   {
    "id": "SU.18TK.110TBr",
