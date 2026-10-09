@@ -1,0 +1,263 @@
+{
+ "$comment": "南线战斗序列。现在只有演示用的少量单位，全部为占位（confidence = placeholder）：番号凭记忆录入未核对，数值是随手设定的游戏值。考据后逐条改为 sourced 并在 provenance 写出处（字段、史料 ID、页码、级别）。formations 的 color 是师属色条颜色（游戏设计选择，不是史料）。",
+ "formations": [
+  {
+   "id": "DE.IISS.LSSAH",
+   "side": "DE",
+   "branch": "waffen-ss",
+   "names": {
+    "zh": "党卫军第1装甲掷弹兵师“警卫旗队”",
+    "en": "1st SS Panzergrenadier Division LSSAH",
+    "de": "1. SS-Panzergrenadier-Division LSSAH"
+   },
+   "abbr": "LSSAH",
+   "color": "#d9a441",
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+  },
+  {
+   "id": "SU.29TK",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "坦克第29军",
+    "en": "29th Tank Corps",
+    "ru": "29-й танковый корпус"
+   },
+   "abbr": "29 TK",
+   "color": "#4f86c6",
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+  },
+  {
+   "id": "SU.9GVDD",
+   "side": "SU",
+   "branch": "rkka",
+   "guards": true,
+   "names": {
+    "zh": "近卫空降兵第9师",
+    "en": "9th Guards Airborne Division",
+    "ru": "9-я гвардейская воздушно-десантная дивизия"
+   },
+   "abbr": "9 VDD",
+   "color": "#7cb26a",
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+  }
+ ],
+ "units": [
+  {
+   "id": "DE.IISS.LSSAH.PzRgt1",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军第1装甲团",
+    "en": "SS Panzer Regiment 1",
+    "de": "SS-Panzer-Regiment 1"
+   },
+   "designation": "1",
+   "type": "armor",
+   "size": "regiment",
+   "steps": 4,
+   "ratings": {
+    "attack": 8,
+    "defense": 5,
+    "movement": 10
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "DE.IISS.LSSAH.PzGrenRgt1",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军第1装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment 1",
+    "de": "SS-Panzergrenadier-Regiment 1"
+   },
+   "designation": "1",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "steps": 4,
+   "ratings": {
+    "attack": 5,
+    "defense": 6,
+    "movement": 8
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "DE.IISS.LSSAH.PzGrenRgt2",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军第2装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment 2",
+    "de": "SS-Panzergrenadier-Regiment 2"
+   },
+   "designation": "2",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "steps": 4,
+   "ratings": {
+    "attack": 5,
+    "defense": 6,
+    "movement": 8
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "DE.IISS.LSSAH.AufklAbt1",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军第1装甲侦察营",
+    "en": "SS Panzer Reconnaissance Battalion 1",
+    "de": "SS-Panzer-Aufklärungs-Abteilung 1"
+   },
+   "designation": "1",
+   "type": "recon",
+   "size": "battalion",
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 2,
+    "movement": 12
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "DE.IISS.LSSAH.ArtRgt1",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军第1装甲炮兵团",
+    "en": "SS Panzer Artillery Regiment 1",
+    "de": "SS-Panzer-Artillerie-Regiment 1"
+   },
+   "designation": "1",
+   "type": "artillery",
+   "size": "regiment",
+   "steps": 3,
+   "ratings": {
+    "attack": 6,
+    "defense": 2,
+    "movement": 6
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "SU.29TK.25TBr",
+   "formation": "SU.29TK",
+   "names": {
+    "zh": "坦克第25旅",
+    "en": "25th Tank Brigade",
+    "ru": "25-я танковая бригада"
+   },
+   "designation": "25",
+   "type": "armor",
+   "size": "brigade",
+   "steps": 3,
+   "ratings": {
+    "attack": 4,
+    "defense": 3,
+    "movement": 10
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "SU.29TK.31TBr",
+   "formation": "SU.29TK",
+   "names": {
+    "zh": "坦克第31旅",
+    "en": "31st Tank Brigade",
+    "ru": "31-я танковая бригада"
+   },
+   "designation": "31",
+   "type": "armor",
+   "size": "brigade",
+   "steps": 3,
+   "ratings": {
+    "attack": 4,
+    "defense": 3,
+    "movement": 10
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "SU.29TK.32TBr",
+   "formation": "SU.29TK",
+   "names": {
+    "zh": "坦克第32旅",
+    "en": "32nd Tank Brigade",
+    "ru": "32-я танковая бригада"
+   },
+   "designation": "32",
+   "type": "armor",
+   "size": "brigade",
+   "steps": 3,
+   "ratings": {
+    "attack": 4,
+    "defense": 3,
+    "movement": 10
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "SU.29TK.53MSBr",
+   "formation": "SU.29TK",
+   "names": {
+    "zh": "摩托化步兵第53旅",
+    "en": "53rd Motorized Rifle Brigade",
+    "ru": "53-я мотострелковая бригада"
+   },
+   "designation": "53",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "steps": 3,
+   "ratings": {
+    "attack": 3,
+    "defense": 4,
+    "movement": 8
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  },
+  {
+   "id": "SU.9GVDD.div",
+   "formation": "SU.9GVDD",
+   "names": {
+    "zh": "近卫空降兵第9师",
+    "en": "9th Guards Airborne Division",
+    "ru": "9-я гвардейская воздушно-десантная дивизия"
+   },
+   "designation": "9",
+   "type": "airborne",
+   "size": "division",
+   "steps": 4,
+   "ratings": {
+    "attack": 4,
+    "defense": 7,
+    "movement": 5
+   },
+   "confidence": "placeholder",
+   "provenance": [],
+   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+  }
+ ]
+}

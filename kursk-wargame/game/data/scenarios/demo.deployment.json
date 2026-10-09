@@ -1,0 +1,55 @@
+{
+ "$comment": "演示摆放：用来检查算子、堆叠和信息面板，不是历史部署。同格多个单位按列表顺序堆叠，后列出的在上面；steps 不写表示满编。",
+ "id": "demo-prokhorovka",
+ "names": {
+  "zh": "演示摆放（普罗霍罗夫卡附近）",
+  "en": "Demo placement near Prokhorovka"
+ },
+ "confidence": "placeholder",
+ "provenance": [],
+ "note": "演示用，非历史部署",
+ "placements": [
+  {
+   "unit": "DE.IISS.LSSAH.PzGrenRgt1",
+   "hex": "2218"
+  },
+  {
+   "unit": "DE.IISS.LSSAH.PzRgt1",
+   "hex": "2218"
+  },
+  {
+   "unit": "DE.IISS.LSSAH.PzGrenRgt2",
+   "hex": "2117",
+   "steps": 3
+  },
+  {
+   "unit": "DE.IISS.LSSAH.AufklAbt1",
+   "hex": "2219"
+  },
+  {
+   "unit": "DE.IISS.LSSAH.ArtRgt1",
+   "hex": "2119"
+  },
+  {
+   "unit": "SU.29TK.53MSBr",
+   "hex": "2316"
+  },
+  {
+   "unit": "SU.29TK.32TBr",
+   "hex": "2316"
+  },
+  {
+   "unit": "SU.29TK.31TBr",
+   "hex": "2316",
+   "steps": 2
+  },
+  {
+   "unit": "SU.29TK.25TBr",
+   "hex": "2417"
+  },
+  {
+   "unit": "SU.9GVDD.div",
+   "hex": "2515"
+  }
+ ]
+}

@@ -44,6 +44,20 @@
       #info dt { color: #b9b096; }
       #info dd { margin: 0; }
       .muted { color: var(--muted); }
+      .ph { color: #9a9a92; font-style: italic; }
+      #info { max-height: calc(100vh - 80px); overflow-y: auto; width: min(360px, calc(100vw - 48px)); box-sizing: border-box; }
+      #info .units { border-top: 1px solid #4a473c; margin-top: 8px; padding-top: 6px; }
+      #info .units-head { color: #b9b096; margin-bottom: 4px; }
+      #info button.unit-row {
+        display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 13px; line-height: 1.3;
+        padding: 3px 4px; border-radius: 6px; border: 1px solid transparent;
+      }
+      #info button.unit-row.on { border-color: var(--accent); background: rgba(179, 38, 30, 0.15); }
+      #info button.unit-row svg { flex: none; }
+      #info small { color: #b9b096; font-size: 12px; }
+      #info .unit-detail { display: flex; gap: 10px; align-items: flex-start; margin-top: 8px; }
+      #info .unit-detail .unit-big { flex: none; }
+      @media (max-width: 520px) { #info .unit-detail { flex-direction: column; } }
       .st-auto { color: var(--auto); } .st-verified { color: #7fc78a; } .st-crosschecked { color: #8fb8ea; }
       #loading {
         position: fixed; inset: 0; display: grid; place-items: center; background: #2b2e30; color: #efe6c8;
@@ -121,6 +135,7 @@
       <label><input type="checkbox" id="ly-grid" checked /> 六角格网</label>
       <label><input type="checkbox" id="ly-num" checked /> 格号（放大后显示）</label>
       <label><input type="checkbox" id="ly-labels" checked /> 地名</label>
+      <label><input type="checkbox" id="ly-units" checked /> 部队算子（演示摆放）</label>
       <label><input type="checkbox" id="ly-status" /> <span class="swatch-auto"></span> 未核对标记（橙色菱形）</label>
       <div class="hint">橙色菱形 = 程序自动提取、尚未人工核对的格子。<br />样板区（普罗霍罗夫卡—捷捷列维诺）的村庄、河流、道路、铁路为 AI 转录草稿，均未核对。</div>
     </div>

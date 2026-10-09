@@ -14,6 +14,7 @@
     "apply-edits": "node ../tools/editor/apply-map-edits.mjs"
   },
   "dependencies": {
+    "milsymbol": "^3.0.3",
     "pixi.js": "^8.22.0",
     "zod": "^4.6.5"
   },

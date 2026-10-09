@@ -57,3 +57,23 @@ export const FONT_SERIF = '"Noto Serif SC", "Source Han Serif SC", "Songti SC", 
 /** 拉丁转写：IM Fell English 斜体（仿 17 世纪铅字，自托管子集，见 tools/fonts/fetch-map-fonts.mjs） */
 export const MAP_FONTS = [{ family: 'Map Latin', file: 'fonts/map-latin.woff2', style: 'italic' }] as const;
 export const FONT_LATIN = '"Map Latin", Georgia, serif';
+
+/**
+ * 算子样式。底色按军种：德国陆军原野灰、武装党卫军深灰、红军赭色；符号框用同色系浅色。
+ * 占位（未考据）的数值用灰色斜体。
+ */
+export const COUNTER_STYLE = {
+  /** 算子边长（公里，格子对边距 3 公里） */
+  sizeKm: 1.75,
+  /** 堆叠时每层错开的距离（公里） */
+  stackOffsetKm: 0.13,
+  /** 生成纹理的像素边长（最大放大倍数 × 屏幕像素密度下仍清晰） */
+  texturePx: 256,
+  font: '"DejaVu Sans", "Helvetica Neue", Arial, sans-serif',
+  edge: '#1f1d1a',
+  branch: {
+    heer: { base: '#a8ad96', symbol: '#e2e4d6', ink: '#1f1d1a', placeholder: '#5f625a' },
+    'waffen-ss': { base: '#4d4f4b', symbol: '#c9cbc1', ink: '#f1f0e8', placeholder: '#a3a59c' },
+    rkka: { base: '#c48a55', symbol: '#f1dcc1', ink: '#1f1d1a', placeholder: '#6e5643' },
+  },
+} as const;
