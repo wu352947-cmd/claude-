@@ -23,6 +23,8 @@ export const RatingsParams = z.object({
   steps: z.record(z.string(), z.tuple([z.number().int(), z.number().int()])),
   mobility: z.record(z.string(), z.enum(['foot', 'motorized', 'tracked'])),
   movement: z.record(z.string(), z.number()),
+  /** 只有上级（师）数字时，按单位类型分到本单位的份额（设计参数） */
+  shares: z.record(z.string(), z.union([z.string(), z.object({ name: z.string(), fraction: z.number().positive().max(1) })])).default({}),
 }).superRefine((p, ctx) => {
   for (const [k, it] of Object.entries(p.items)) {
     if (!p.classes[it.class]) ctx.addIssue({ code: 'custom', message: `装备 ${k} 的类别 ${it.class} 不存在` });
@@ -31,7 +33,12 @@ export const RatingsParams = z.object({
 export type RatingsParams = z.infer<typeof RatingsParams>;
 
 /** 进公式的一条输入（只需这几个字段） */
-export interface StrengthInput { item: string; count: number }
+export interface StrengthInput {
+  item: string;
+  count: number;
+  /** 数字属于上级（如全师），按 params.shares 里的份额分到本单位 */
+  share?: string | undefined;
+}
 
 export interface BreakdownLine {
   label: string;
@@ -72,11 +79,15 @@ export function deriveRatings(
     const it = p.items[s.item];
     if (!it) throw new Error(`未知装备：${s.item}`);
     const c = p.classes[it.class]!;
-    const k = s.count / c.per;
+    const shRaw = s.share === undefined ? undefined : p.shares[s.share];
+    if (s.share !== undefined && (!shRaw || typeof shRaw === 'string')) throw new Error(`未知份额：${s.share}`);
+    const sh = typeof shRaw === 'string' ? undefined : shRaw;
+    const k = (s.count * (sh?.fraction ?? 1)) / c.per;
     const ratio = c.combatRatio ?? 1;
     if (it.class.startsWith('personnel')) hasPersonnel = true;
     lines.push({
-      label: it.name + (c.combatRatio ? `（按战斗兵力约 ${Math.round(ratio * 100)}% 推算）` : ''),
+      label: it.name + (sh ? `（全师数字 × ${sh.name}份额 ${Math.round(sh.fraction * 100)}%）` : '')
+        + (c.combatRatio ? `（按战斗兵力约 ${Math.round(ratio * 100)}% 推算）` : ''),
       count: s.count,
       attack: r1(k * ratio * (c.attack ?? 0)),
       defense: r1(k * ratio * (c.defense ?? 0)),

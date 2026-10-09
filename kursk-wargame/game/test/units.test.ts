@@ -43,11 +43,12 @@ describe('战斗序列数据', () => {
     }
   });
 
-  it('考据程度自动判定：没有数字 = 占位；只有 D 级或推算 = 推定；A/B 级 = 有出处', () => {
+  it('考据程度自动判定：没有数字 = 占位；只有 D 级、推算比例或按份额分摊 = 推定；A/B 级 = 有出处', () => {
     const u = (id: string) => oob.units.get(id)!;
-    expect(u('DE.IISS.LSSAH.PzGrenRgt1').confidence).toBe('placeholder');
-    expect(u('SU.18TK.110TBr').confidence).toBe('estimated');
+    expect(u('SU.6GA.51GvSD').confidence).toBe('placeholder');
+    expect(u('DE.IISS.LSSAH.PzGrenRgt1').confidence).toBe('estimated');
     expect(u('SU.5GA.95GvSD').confidence).toBe('estimated');
+    expect(u('SU.18TK.110TBr').confidence).toBe('sourced');
     expect(u('SU.29TK.32TBr').confidence).toBe('sourced');
     expect(u('DE.IISS.T.PzRgt3').confidence).toBe('sourced');
   });
@@ -163,6 +164,15 @@ describe('数值换算公式', () => {
     expect(d.lines[0]!.label).toMatch(/推算/);
     expect(d.lines[0]!.defense).toBe(12);
     expect(d.usedDefault).toBe(false);
+  });
+
+  it('只有全师数字时按份额分摊到团，并在明细里注明；未知份额报错', () => {
+    const d = deriveRatings(params, 'panzergrenadier', 'regiment', [{ item: 'personnel_combat', count: 10000, share: 'ssPzGrenRgt' }]);
+    const f = (params.shares.ssPzGrenRgt as { fraction: number }).fraction;
+    expect(d.lines[0]!.label).toMatch(/全师数字 × .*份额/);
+    expect(d.lines[0]!.defense).toBeCloseTo(10 * f * 3, 5);
+    expect(d.usedDefault).toBe(false);
+    expect(() => deriveRatings(params, 'panzergrenadier', 'regiment', [{ item: 'personnel_combat', count: 1, share: 'nope' }])).toThrow(/未知份额/);
   });
 
   it('没有兵力数字的步兵单位用类型占位分', () => {

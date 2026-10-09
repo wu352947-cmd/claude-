@@ -96,6 +96,8 @@ export const StrengthItem = z.object({
   where: z.string().optional(),
   quote: z.string().optional(),
   note: z.string().optional(),
+  /** count 是上级（全师）数字时，分到本单位的份额键（data/rules/ratings.json 的 shares） */
+  share: z.string().optional(),
 });
 export type StrengthItem = z.infer<typeof StrengthItem>;
 
@@ -172,11 +174,11 @@ export interface PlacedUnit {
   steps: number;
 }
 
-/** 数值考据程度：没输入 = 占位；用了占位分、C/D 级来源或推算比例 = 推定；否则有出处 */
+/** 数值考据程度：没输入 = 占位；用了占位分、C/D 级来源、推算比例或按份额分摊 = 推定；否则有出处 */
 function judge(u: UnitData, d: Derived): Confidence {
   const placeholderOnly = d.lines.every((l) => l.placeholder);
   if (placeholderOnly) return 'placeholder';
-  const weak = d.usedDefault || u.strength.some((s) => s.grade === 'C' || s.grade === 'D' || s.item === 'personnel_total' || s.item === 'personnel_in_line');
+  const weak = d.usedDefault || u.strength.some((s) => s.grade === 'C' || s.grade === 'D' || s.item === 'personnel_total' || s.item === 'personnel_in_line' || s.share !== undefined);
   return weak ? 'estimated' : 'sourced';
 }
 

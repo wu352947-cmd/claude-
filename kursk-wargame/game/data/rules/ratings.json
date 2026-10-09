@@ -39,6 +39,9 @@
   "gun_76mm": { "name": "76 mm 炮", "class": "atMedium" },
   "gun_85mm": { "name": "85 mm 炮", "class": "atLong" },
   "guns_div": { "name": "火炮（各口径合计）", "class": "divGuns" },
+  "gun_122mm": { "name": "122 mm 榴弹炮", "class": "divGuns" },
+  "gun_76mm_div": { "name": "76 mm 师属加农炮", "class": "divGuns" },
+  "gun_76mm_reg": { "name": "76 mm 团属炮", "class": "divGuns" },
   "mortars": { "name": "迫击炮（合计）", "class": "mortars" },
   "personnel_total": { "name": "总兵力（人）", "class": "personnelTotal" },
   "personnel_in_line": { "name": "在列兵力（人）", "class": "personnelTotal" },
@@ -80,5 +83,11 @@
   "armor": "tracked", "panzergrenadier": "motorized", "motorized-infantry": "motorized", "infantry": "foot", "airborne": "foot",
   "recon": "motorized", "artillery": "motorized", "sp-artillery": "tracked", "antitank": "motorized", "tank-destroyer": "tracked", "assault-gun": "tracked"
  },
- "movement": { "foot": 4, "motorized": 8, "tracked": 8 }
+ "movement": { "foot": 4, "motorized": 8, "tracked": 8 },
+ "shares": {
+  "$comment": "只有全师战斗兵力时，分给团、营的份额（设计参数，不是史料数字）。依据见 docs/08 §3.1",
+  "ssPzGrenRgt": { "name": "党卫军装甲掷弹兵团（3 个营）", "fraction": 0.2 },
+  "heerPzGrenRgt": { "name": "陆军装甲掷弹兵团（2 个营）", "fraction": 0.15 },
+  "reconBn": { "name": "侦察营", "fraction": 0.06 }
+ }
 }

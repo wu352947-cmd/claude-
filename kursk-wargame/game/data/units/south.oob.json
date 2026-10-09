@@ -506,9 +506,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 12893,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ЛАГ»» column «1.7.43»: 12893",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.LSSAH.PzGrenRgt2",
@@ -522,9 +535,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 12893,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ЛАГ»» column «1.7.43»: 12893",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.LSSAH.AufklAbt",
@@ -539,6 +565,18 @@
    "size": "battalion",
    "guards": false,
    "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 12893,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ЛАГ»» column «1.7.43»: 12893",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    },
     {
      "item": "armoredCar",
      "count": 32,
@@ -795,9 +833,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10441,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ДР»» column «1.7.43»: 10441",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.DR.DF",
@@ -811,9 +862,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10441,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ДР»» column «1.7.43»: 10441",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.DR.AufklAbt",
@@ -827,9 +891,22 @@
    "type": "recon",
    "size": "battalion",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10441,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «ДР»» column «1.7.43»: 10441",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.DR.StuGAbt",
@@ -1021,9 +1098,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10214,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «МГ»» column «1.7.43»: 10214",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.T.PzGrenRgt3",
@@ -1037,9 +1127,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10214,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «МГ»» column «1.7.43»: 10214",
+     "share": "ssPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分。另有资料称团名为\"Eicke\"，番号未确认。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+   "note": "另有资料称团名为\"Eicke\"，番号未确认。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.T.AufklAbt",
@@ -1054,6 +1157,18 @@
    "size": "battalion",
    "guards": false,
    "strength": [
+    {
+     "item": "personnel_combat",
+     "count": 10214,
+     "basis": "\"Боевой состав\" = Gefechtsstärke 1.7.43（Лопуховский 表 4，据 NARA T354）",
+     "date": "1943-07-01",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=13 (Table 4 = image i_014.jpg; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/lopuh/img13/i_014.jpg)",
+     "quote": "row «тд «МГ»» column «1.7.43»: 10214",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    },
     {
      "item": "armoredCar",
      "count": 36,
@@ -1249,9 +1364,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 22792,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "6th PzD 22,792 16,241 158 54 143 151 [columns: German Strength, Soviet Strength, German Armor, Soviet Armor, German Artillery, Soviet Artillery]",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.6PD.PzG114",
@@ -1265,9 +1393,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 22792,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "6th PzD 22,792 16,241 158 54 143 151 [columns: German Strength, Soviet Strength, German Armor, Soviet Armor, German Artillery, Soviet Artillery]",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.6PD.Aufkl6",
@@ -1281,9 +1422,21 @@
    "type": "recon",
    "size": "battalion",
    "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 22792,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "6th PzD 22,792 16,241 158 54 143 151 [columns: German Strength, Soviet Strength, German Armor, Soviet Armor, German Artillery, Soviet Artillery]",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "DE.III.6PD.PzJg41",
@@ -1438,9 +1591,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19355,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "7th PzD 19,355 19,658 52 28 127 171",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.7PD.PzG7",
@@ -1454,9 +1620,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19355,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "7th PzD 19,355 19,658 52 28 127 171",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.7PD.Aufkl7",
@@ -1470,9 +1649,21 @@
    "type": "recon",
    "size": "battalion",
    "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19355,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "7th PzD 19,355 19,658 52 28 127 171",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "DE.III.7PD.PzJg42",
@@ -1647,9 +1838,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19347,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "19th PzD 19,347 10,179 13 0 161 107",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.19PD.PzG74",
@@ -1663,9 +1867,22 @@
    "type": "panzergrenadier",
    "size": "regiment",
    "guards": false,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19347,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "19th PzD 19,347 10,179 13 0 161 107",
+     "share": "heerPzGrenRgt",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "两个营的团（Niehorster 4.07.1943）"
   },
   {
    "id": "DE.III.19PD.Aufkl19",
@@ -1679,9 +1896,21 @@
    "type": "recon",
    "size": "battalion",
    "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 19347,
+     "basis": "KDB 7 月 9 日交战表 German Strength（总兵力，已经过 5–8 日战斗，可能含配属部队）",
+     "date": "1943-07-09",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/10/03/obscure-major-tank-battle-on-9-july-1943/",
+     "quote": "19th PzD 19,347 10,179 13 0 161 107",
+     "share": "reconBn",
+     "note": "没有团营级兵力，用全师战斗兵力按份额分摊（推定，份额见 data/rules/ratings.json 的 shares）"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "DE.III.19PD.PzJg19",
@@ -1827,27 +2056,27 @@
    "strength": [
     {
      "item": "T34",
-     "count": 24,
-     "basis": "11 July (uncited table)",
+     "count": 22,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "110 тбр ... 24 ... 21"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 110 тбр 22 - 2 21 … 45 (ЦАМО ф.3415 оп.1 д.26 л.8)"
     },
     {
      "item": "T70",
      "count": 21,
-     "basis": "same",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "110 тбр ... 24 ... 21"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 110 тбр 22 - 2 21 … 45 (ЦАМО ф.3415 оп.1 д.26 л.8)"
     }
    ],
    "status": "unverified",
-   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+   "note": "7 月 11 日 16:00 军报告（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；另有 T-34 2 辆在修；俄文维基的数字（D 级）与此相同或差 2 辆"
   },
   {
    "id": "SU.18TK.170TBr",
@@ -1865,26 +2094,26 @@
     {
      "item": "T34",
      "count": 22,
-     "basis": "11 July (uncited table)",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "170 тбр ... 22 ... 17"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 170 тбр 22 17 … 39"
     },
     {
      "item": "T70",
      "count": 17,
-     "basis": "same",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "170 тбр ... 22 ... 17"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 170 тбр 22 17 … 39"
     }
    ],
    "status": "unverified",
-   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+   "note": "7 月 11 日 16:00 军报告（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；俄文维基的数字（D 级）与此相同或差 2 辆"
   },
   {
    "id": "SU.18TK.181TBr",
@@ -1902,26 +2131,26 @@
     {
      "item": "T34",
      "count": 24,
-     "basis": "'боеготовых и временно в ремонте', 11 July (uncited table)",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "181 тбр ... 24 ... 20"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 181 тбр 24 20 … 44"
     },
     {
      "item": "T70",
      "count": 20,
-     "basis": "same",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "181 тбр ... 24 ... 20"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 181 тбр 24 20 … 44"
     }
    ],
    "status": "unverified",
-   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+   "note": "7 月 11 日 16:00 军报告（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；俄文维基的数字（D 级）与此相同或差 2 辆"
   },
   {
    "id": "SU.18TK.32MSBr",
@@ -1954,17 +2183,17 @@
    "strength": [
     {
      "item": "Churchill",
-     "count": 19,
-     "basis": "supporting 170 тбр, 12 July",
-     "date": "1943-07-12",
-     "source": "SRC-0207",
+     "count": 18,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=76",
-     "quote": "36-й гв. оттп (19 танков «Черчилль»)"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 36 гв. отпп … 18 2"
     }
    ],
    "status": "unverified",
-   "note": "俄文维基记 7 月 11 日 20 辆（D 级），采用 Лопуховский 7 月 12 日 19 辆（B 级）"
+   "note": "7 月 11 日可开动 18 辆、在途 2 辆（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；Лопуховский 记 7 月 12 日 19 辆，俄文维基记 20 辆"
   },
   {
    "id": "SU.29TK.25TBr",
@@ -2194,27 +2423,27 @@
    "strength": [
     {
      "item": "T34",
-     "count": 29,
-     "basis": "11 July uncited table",
-     "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "10 гв.мбр ... 29 ... 12"
+     "count": 30,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-12",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 10 гв. мехбр (к 2.00 12 июля 1943 г.) 30 14 … 44"
     },
     {
      "item": "T70",
-     "count": 12,
-     "basis": "11 July uncited table",
-     "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "10 гв.мбр ... 29 ... 12"
+     "count": 14,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-12",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 10 гв. мехбр (к 2.00 12 июля 1943 г.) 30 14 … 44"
     }
    ],
    "status": "unverified",
-   "note": "坦克数只见于俄文维基（D 级）；没有兵力数字，步兵部分用类型占位分"
+   "note": "坦克为 7 月 12 日 02:00 数（含配属的近卫坦克第 51 团，Замулин 附录表 5（据 ЦАМО 各军、旅报告））；没有兵力数字，步兵部分用类型占位分"
   },
   {
    "id": "SU.5GMK.11GvMBr",
@@ -2231,27 +2460,47 @@
    "strength": [
     {
      "item": "T34",
-     "count": 42,
-     "basis": "11 July uncited table",
+     "count": 16,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "11 гв.мбр ... 42 ... 22"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 11 гв. мехбр 16 15 … 31 9 8 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 10а)"
     },
     {
      "item": "T70",
-     "count": 22,
-     "basis": "11 July uncited table",
+     "count": 15,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "11 гв.мбр ... 42 ... 22"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 11 гв. мехбр 16 15 … 31 9 8 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 10а)"
+    },
+    {
+     "item": "armoredCar",
+     "count": 9,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 11 гв. мехбр 16 15 … 31 9 8 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 10а)"
+    },
+    {
+     "item": "armoredCar",
+     "count": 8,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 11 гв. мехбр 16 15 … 31 9 8 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 10а)"
     }
    ],
    "status": "unverified",
-   "note": "采用俄文维基 7 月 11 日 42/22（D 级）；Лопуховский 记 7 月 12 日到达勒扎韦茨时 16/15（B 级，已分兵并行军后），见争议登记"
+   "note": "7 月 11 日（Замулин 附录表 5（据 ЦАМО 各军、旅报告），ЦАМО ф.5 гв.ТА оп.4948 д.75 л.10а）；装甲车为 M3A1 9 辆、БА-64 8 辆。俄文维基的 42/22 没有出处，不用；没有兵力数字，步兵部分用类型占位分"
   },
   {
    "id": "SU.5GMK.12GvMBr",
@@ -2269,26 +2518,26 @@
     {
      "item": "T34",
      "count": 20,
-     "basis": "on arrival at Rzhavets 09.55 12 July",
-     "date": "1943-07-12",
-     "source": "SRC-0207",
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
-     "quote": "12-й гв. мбр (20 танков Т-34, 15 Т-70)"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 12 гв. мехбр 20 15 … 35"
     },
     {
      "item": "T70",
      "count": 15,
-     "basis": "on arrival at Rzhavets 09.55 12 July",
-     "date": "1943-07-12",
-     "source": "SRC-0207",
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
-     "quote": "12-й гв. мбр (20 танков Т-34, 15 Т-70)"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 12 гв. мехбр 20 15 … 35"
     }
    ],
    "status": "unverified",
-   "note": "7 月 12 日到达勒扎韦茨时的数字；没有兵力数字，步兵部分用类型占位分"
+   "note": "7 月 11 日（Замулин 附录表 5（据 ЦАМО 各军、旅报告）），与 Лопуховский 记 7 月 12 日到达勒扎韦茨时相同；没有兵力数字，步兵部分用类型占位分"
   },
   {
    "id": "SU.5GMK.24GvTBr",
@@ -2305,17 +2554,17 @@
    "strength": [
     {
      "item": "T34",
-     "count": 51,
-     "basis": "11 July uncited table",
+     "count": 48,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "24 гв. тбр ... 51 ... 0"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 24 гв. тбр 48 13 … 61"
     }
    ],
    "status": "unverified",
-   "note": "只见于俄文维基（D 级）"
+   "note": "7 月 11 日可开动 48 辆、在途 13 辆（Замулин 附录表 5（据 ЦАМО 各军、旅报告））"
   },
   {
    "id": "SU.5GMK.1447SAP",
@@ -2331,28 +2580,28 @@
    "guards": false,
    "strength": [
     {
-     "item": "SU122",
-     "count": 12,
-     "basis": "11 July uncited table (labelled '1147 сап')",
+     "item": "SU76",
+     "count": 4,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "1147 сап ... 12 ... 8"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1447 сап … (4) (7) (21) (10 СУ в пути, в ремонте)"
     },
     {
-     "item": "SU76",
-     "count": 8,
-     "basis": "11 July uncited table (labelled '1147 сап')",
+     "item": "SU122",
+     "count": 7,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "1147 сап ... 12 ... 8"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1447 сап … (4) (7) (21) (10 СУ в пути, в ремонте)"
     }
    ],
    "status": "unverified",
-   "note": "采用俄文维基 7 月 11 日（D 级，表中标为\"1147\"）；Лопуховский 记 7 月 12 日派往勒扎韦茨 7 辆 SU-122、4 辆 SU-76"
+   "note": "7 月 11 日可开动 11 辆，另 10 辆在途或在修（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；俄文维基记 12/8（D 级）"
   },
   {
    "id": "SU.2GTK.4GvTBr",
@@ -2370,26 +2619,26 @@
     {
      "item": "T34",
      "count": 28,
-     "basis": "11 July uncited table",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "4 гв.тбр ... 28 ... 19"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 4 гв. тбр 28 19 … 47 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 29 обр.)"
     },
     {
      "item": "T70",
      "count": 19,
-     "basis": "11 July uncited table",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "4 гв.тбр ... 28 ... 19"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 4 гв. тбр 28 19 … 47 (ЦАМО ф. 5 гв. ТА, оп. 4948, д. 75, л. 29 обр.)"
     }
    ],
    "status": "unverified",
-   "note": "只见于俄文维基（D 级；两旅数字完全相同，可疑）"
+   "note": "7 月 11 日（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；两旅数字相同，在原表中如此"
   },
   {
    "id": "SU.2GTK.25GvTBr",
@@ -2407,26 +2656,26 @@
     {
      "item": "T34",
      "count": 28,
-     "basis": "11 July uncited table",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "25 гв.тбр ... 28 ... 19"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 25 гв. тбр 28 19 … 47"
     },
     {
      "item": "T70",
      "count": 19,
-     "basis": "11 July uncited table",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "25 гв.тбр ... 28 ... 19"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 25 гв. тбр 28 19 … 47"
     }
    ],
    "status": "unverified",
-   "note": "只见于俄文维基（D 级；两旅数字完全相同，可疑）"
+   "note": "7 月 11 日（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；两旅数字相同，在原表中如此"
   },
   {
    "id": "SU.2GTK.26GvTBr",
@@ -2444,26 +2693,26 @@
     {
      "item": "T34",
      "count": 30,
-     "basis": "at Shakhovo 09.30 12 July",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-12",
-     "source": "SRC-0207",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
-     "quote": "26-я гв. тбр 2-го гв. тк (30 Т-34 и 14 Т-70)"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 26 гв. тбр (к 6.00 12 июля 1943 г.) 30 14 … 44"
     },
     {
      "item": "T70",
      "count": 14,
-     "basis": "at Shakhovo 09.30 12 July",
+     "basis": "на ходу（可开动）",
      "date": "1943-07-12",
-     "source": "SRC-0207",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
-     "quote": "26-я гв. тбр 2-го гв. тк (30 Т-34 и 14 Т-70)"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 26 гв. тбр (к 6.00 12 июля 1943 г.) 30 14 … 44"
     }
    ],
    "status": "unverified",
-   "note": "7 月 12 日 09:30 在沙霍沃（B 级）；俄文维基记 7 月 11 日 28/14"
+   "note": "7 月 12 日 06:00（Замулин 附录表 5（据 ЦАМО 各军、旅报告）），与 Лопуховский 记 09:30 在沙霍沃时相同"
   },
   {
    "id": "SU.2GTK.4GvMSBr",
@@ -2496,17 +2745,17 @@
    "strength": [
     {
      "item": "Churchill",
-     "count": 21,
-     "basis": "11 July uncited table",
+     "count": 3,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "47 гв.отпп ... 21"
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 47 гв. ттпп … 3 … 3"
     }
    ],
    "status": "unverified",
-   "note": "采用俄文维基 7 月 11 日 21 辆（D 级）；Lawrence 转录 7 月 12 日 07:00 报告称只有 2 辆可战（B 级），差距很大，见争议登记"
+   "note": "7 月 11 日可开动 3 辆（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；7 月 5 日在编 21 辆，经 7 月 6–10 日战斗减员；Lawrence 转录 12 日 07:00 报告为 2 辆"
   },
   {
    "id": "SU.2TK.26TBr",
@@ -2650,18 +2899,17 @@
    "strength": [
     {
      "item": "Churchill",
-     "count": 11,
-     "basis": "в боевом составе on arrival 8 July (ЦАМО Ф.8 гв.тк)",
-     "date": "1943-07-08",
-     "source": "SRC-0207",
+     "count": 3,
+     "basis": "на ходу（共 10 辆）",
+     "date": "1943-07-12",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
-     "quote": "имея в боевом составе 155 танков (87 – Т-34, 57 – Т-70, 11 – МК-4 «Черчилль»)",
-     "note": "全军 7 月 8 日有丘吉尔 11 辆；该团是军内唯一的丘吉尔部队，故推定全部属本团"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 15 гв. отпп (12 июля 1943 г.) … 3 … 10"
     }
    ],
    "status": "unverified",
-   "note": "7 月 1 日编成表未列入坦克第 2 军，8 月 1 日列入；坦克数为推定"
+   "note": "7 月 12 日可开动 3 辆、共 10 辆（Замулин 附录表 5（据 ЦАМО 各军、旅报告））；7 月 1 日编成表未列入坦克第 2 军，8 月 1 日列入"
   },
   {
    "id": "SU.5GTA.53GvOTP",
@@ -2678,28 +2926,27 @@
    "strength": [
     {
      "item": "T34",
-     "count": 36,
-     "basis": "Lopukhovsky Table 8 (reproduces ЦАМО Ф.332 Оп.4948 Д.67 Л.12), section 'В строю', 17.00 11 July",
+     "count": 39,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0207",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=69 (table images i_059.jpg 'В строю', i_060.jpg 'На пути/В ремонте')",
-     "quote": "Таблица 8 Донесение о состоянии материальной части и обеспечении 5-й гв. ТА на 17.00 11 июля 1943 г. Источник: ЦАМО РФ. Ф. 332. Оп. 4948. Д. 67. Л. 12. [value read from table image]",
-     "note": "Лопуховский 表 8：集团军直属部队合计，未分到近卫独立坦克第 53 团与近卫摩托车第 1 团，暂全部计入本团（推定）"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 53 гв. отп (к 15.00 11 июля 1943 г.) 39 3 - 1 … 43"
     },
     {
      "item": "T70",
-     "count": 8,
-     "basis": "Lopukhovsky Table 8 (reproduces ЦАМО Ф.332 Оп.4948 Д.67 Л.12), section 'В строю', 17.00 11 July",
+     "count": 1,
+     "basis": "на ходу（可开动）",
      "date": "1943-07-11",
-     "source": "SRC-0207",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://loveread.ec/read_book.php?id=52899&p=69 (table images i_059.jpg 'В строю', i_060.jpg 'На пути/В ремонте')",
-     "quote": "Таблица 8 Донесение о состоянии материальной части и обеспечении 5-й гв. ТА на 17.00 11 июля 1943 г. Источник: ЦАМО РФ. Ф. 332. Оп. 4948. Д. 67. Л. 12. [value read from table image]",
-     "note": "Лопуховский 表 8：集团军直属部队合计，未分到近卫独立坦克第 53 团与近卫摩托车第 1 团，暂全部计入本团（推定）"
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 53 гв. отп (к 15.00 11 июля 1943 г.) 39 3 - 1 … 43"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "note": "7 月 11 日 15:00 可开动，另 T-34 3 辆在途（Замулин 附录表 5（据 ЦАМО 各军、旅报告））"
   },
   {
    "id": "SU.5GTA.1GvMCP",
@@ -2713,9 +2960,40 @@
    "type": "recon",
    "size": "regiment",
    "guards": true,
-   "strength": [],
+   "strength": [
+    {
+     "item": "T34",
+     "count": 6,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1 гв. омцп (к 15.00 11 июля 1943 г.) 6 2 2 … 10 12/1 2 5"
+    },
+    {
+     "item": "armoredCar",
+     "count": 12,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1 гв. омцп (к 15.00 11 июля 1943 г.) 6 2 2 … 10 12/1 2 5"
+    },
+    {
+     "item": "armoredCar",
+     "count": 2,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-11",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1 гв. омцп (к 15.00 11 июля 1943 г.) 6 2 2 … 10 12/1 2 5"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "7 月 11 日 15:00 可开动（Замулин 附录表 5（据 ЦАМО 各军、旅报告））：T-34 6 辆（另 4 辆在途或在修）、M3A1 12 辆、БА-64 2 辆；没有兵力数字，步兵部分用类型占位分"
   },
   {
    "id": "SU.5GTA.1529SAP",
@@ -2733,38 +3011,26 @@
     {
      "item": "SU152",
      "count": 11,
-     "basis": "arrived only evening 12 July, one ammo load; not in 12 July battle (wiki citing Zamulin 2006 p.361)",
-     "date": "1943-07-12",
-     "source": "SRC-0211",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
-     "quote": "Полк в количестве 11 машин СУ-152 из 12 прибыл на место только к вечеру 12 июля c одним боекомплектом и без тылов"
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1529 сап (к 18.00 10 июля 1943 г.) … 1 … (11) (12) (1 СУ в ремонте) [fn17: ЦАМО РФ, ф. 333 гв. тсап, оп. 27736, д. 3]"
+    },
+    {
+     "item": "KV1",
+     "count": 1,
+     "basis": "на ходу（可开动）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4382 (Табл.5, img 370815_27_i_009/010.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/27_i_009.png)",
+     "quote": "Таблица 5 НАЛИЧИЕ БРОНЕТАНКОВОЙ ТЕХНИКИ В ЧАСТЯХ И СОЕДИНЕНИЯХ 5-Й ГВАРДЕЙСКОЙ ТАНКОВОЙ АРМИИ НА 11 ИЮЛЯ 1943 Г. | row: 1529 сап (к 18.00 10 июля 1943 г.) … 1 … (11) (12) (1 СУ в ремонте) [fn17: ЦАМО РФ, ф. 333 гв. тсап, оп. 27736, д. 3]"
     }
    ],
    "status": "unverified",
-   "note": "7 月 1 日属近卫第 7 集团军，7 月 11 日第 03 号命令配属；数字只见于俄文维基转引 Замулин（D 级），7 月 12 日晚才到达"
-  },
-  {
-   "id": "SU.5GTA.1549SAP",
-   "formation": "SU.5GTA",
-   "names": {
-    "zh": "自行火炮第1549团",
-    "en": "1549th SU Regiment",
-    "ru": "1549 сап"
-   },
-   "designation": "1549",
-   "type": "assault-gun",
-   "size": "regiment",
-   "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有任何兵力数字，数值为手填占位",
-   "ratings": {
-    "attack": 2,
-    "defense": 2,
-    "movement": 8
-   },
-   "steps": 2
+   "note": "7 月 10 日 18:00（Замулин 附录表 5（据 ЦАМО 各军、旅报告），ЦАМО ф.333 гв.тсап оп.27736 д.3）；7 月 1 日属近卫第 7 集团军，7 月 11 日第 03 号命令配属，7 月 12 日晚才到达"
   },
   {
    "id": "SU.69A.96TBr",
@@ -2852,9 +3118,40 @@
    "type": "infantry",
    "size": "division",
    "guards": true,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8567,
+     "basis": "списочная численность（Всего）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 13 гв. сд: Младший комсостав 926, Начальствующий состав 2545, Рядовой состав 5096, Всего 8567; Орудий всех калибров 92; Минометов всех калибров 163"
+    },
+    {
+     "item": "guns_div",
+     "count": 92,
+     "basis": "орудий всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 13 гв. сд: Младший комсостав 926, Начальствующий состав 2545, Рядовой состав 5096, Всего 8567; Орудий всех калибров 92; Минометов всех калибров 163"
+    },
+    {
+     "item": "mortars",
+     "count": 163,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 13 гв. сд: Младший комсостав 926, Начальствующий состав 2545, Рядовой состав 5096, Всего 8567; Орудий всех калибров 92; Минометов всех калибров 163"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））；同书表 4 记 5096 人，等于本表\"列兵\"一行，疑为抄错，见争议登记"
   },
   {
    "id": "SU.5GA.66GvSD",
@@ -2868,9 +3165,181 @@
    "type": "infantry",
    "size": "division",
    "guards": true,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8837,
+     "basis": "списочная численность（Всего）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 66 гв. сд: Младший комсостав 863, Начальствующий состав 2348, Рядовой состав 5626, Всего 8837; Орудий всех калибров 96; Минометов всех калибров 163"
+    },
+    {
+     "item": "guns_div",
+     "count": 96,
+     "basis": "орудий всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 66 гв. сд: Младший комсостав 863, Начальствующий состав 2348, Рядовой состав 5626, Всего 8837; Орудий всех калибров 96; Минометов всех калибров 163"
+    },
+    {
+     "item": "mortars",
+     "count": 163,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 66 гв. сд: Младший комсостав 863, Начальствующий состав 2348, Рядовой состав 5626, Всего 8837; Орудий всех калибров 96; Минометов всех калибров 163"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））；同书表 4 记 5626 人，等于本表\"列兵\"一行，疑为抄错，见争议登记"
+  },
+  {
+   "id": "SU.5GA.95GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第95师",
+    "en": "95th Guards Rifle Division",
+    "ru": "95-я гв. сд"
+   },
+   "designation": "95",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8771,
+     "basis": "списочная численность（Всего）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 95 гв. сд: Младший комсостав 862, Начальствующий состав 2433, Рядовой состав 5476, Всего 8771; Орудий всех калибров 96; Минометов всех калибров 170"
+    },
+    {
+     "item": "guns_div",
+     "count": 96,
+     "basis": "орудий всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 95 гв. сд: Младший комсостав 862, Начальствующий состав 2433, Рядовой состав 5476, Всего 8771; Орудий всех калибров 96; Минометов всех калибров 170"
+    },
+    {
+     "item": "mortars",
+     "count": 170,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 95 гв. сд: Младший комсостав 862, Начальствующий состав 2433, Рядовой состав 5476, Всего 8771; Орудий всех калибров 96; Минометов всех калибров 170"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））；同书正文记在列 8781 人（无脚注），Олейников 记 7 月 11 日晚 8200–8300 人"
+  },
+  {
+   "id": "SU.5GA.97GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第97师",
+    "en": "97th Guards Rifle Division",
+    "ru": "97-я гв. сд"
+   },
+   "designation": "97",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8637,
+     "basis": "списочная численность（Всего）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 97 гв. сд: Младший комсостав 885, Начальствующий состав 1911, Рядовой состав 6041, Всего 8637; Орудий всех калибров 96; Минометов всех калибров 140"
+    },
+    {
+     "item": "guns_div",
+     "count": 96,
+     "basis": "орудий всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 97 гв. сд: Младший комсостав 885, Начальствующий состав 1911, Рядовой состав 6041, Всего 8637; Орудий всех калибров 96; Минометов всех калибров 140"
+    },
+    {
+     "item": "mortars",
+     "count": 140,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 97 гв. сд: Младший комсостав 885, Начальствующий состав 1911, Рядовой состав 6041, Всего 8637; Орудий всех калибров 96; Минометов всех калибров 140"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））；表中三类人员相加为 8837，与合计 8637 不符（读图或印刷错误）"
+  },
+  {
+   "id": "SU.5GA.42GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第42师",
+    "en": "42nd Guards Rifle Division",
+    "ru": "42-я гв. сд"
+   },
+   "designation": "42",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8046,
+     "basis": "списочная численность（Всего）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 42 гв. сд: Младший комсостав 889, Начальствующий состав 2167, Рядовой состав 4990, Всего 8046; Орудий всех калибров 94; Минометов всех калибров 137"
+    },
+    {
+     "item": "guns_div",
+     "count": 94,
+     "basis": "орудий всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 42 гв. сд: Младший комсостав 889, Начальствующий состав 2167, Рядовой состав 4990, Всего 8046; Орудий всех калибров 94; Минометов всех калибров 137"
+    },
+    {
+     "item": "mortars",
+     "count": 137,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 42 гв. сд: Младший комсостав 889, Начальствующий состав 2167, Рядовой состав 4990, Всего 8046; Орудий всех калибров 94; Минометов всех калибров 137"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））"
   },
   {
    "id": "SU.5GA.6GvVDD",
@@ -2888,12 +3357,22 @@
     {
      "item": "personnel_total",
      "count": 8894,
-     "basis": "'в ее составе находилось'; reserve division, not yet in combat; no footnote",
+     "basis": "списочная численность（Всего）",
      "date": "1943-07-10",
-     "source": "SRC-0208",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://history.wikireading.ru/49234",
-     "quote": "На 10 июля в ее составе находилось 8894 человека, 94 орудия всех калибров и 157 минометов."
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 6 гв. вдд: Младший комсостав 866, Начальствующий состав 2561, Рядовой состав 5467, Всего 8894; Орудий всех калибров 9476 (sic; misprint); Минометов всех калибров 157"
+    },
+    {
+     "item": "mortars",
+     "count": 157,
+     "basis": "минометов всех калибров",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 6 гв. вдд: Младший комсостав 866, Начальствующий состав 2561, Рядовой состав 5467, Всего 8894; Орудий всех калибров 9476 (sic; misprint); Минометов всех калибров 157"
     },
     {
      "item": "guns_div",
@@ -2904,83 +3383,10 @@
      "grade": "B",
      "where": "https://history.wikireading.ru/49234",
      "quote": "94 орудия всех калибров"
-    },
-    {
-     "item": "mortars",
-     "count": 157,
-     "basis": "same",
-     "date": "1943-07-10",
-     "source": "SRC-0208",
-     "grade": "B",
-     "where": "https://history.wikireading.ru/49234",
-     "quote": "157 минометов"
     }
    ],
    "status": "unverified",
-   "note": "Замулин 书中这组数字没有脚注（无档案号）"
-  },
-  {
-   "id": "SU.5GA.95GvSD",
-   "formation": "SU.5GA",
-   "names": {
-    "zh": "近卫步兵第95师",
-    "en": "95th Guards Rifle Division",
-    "ru": "95-я гв. сд"
-   },
-   "designation": "95",
-   "type": "infantry",
-   "size": "division",
-   "guards": true,
-   "strength": [
-    {
-     "item": "personnel_in_line",
-     "count": 8781,
-     "basis": "'имела в строю'; no footnote",
-     "date": "1943-07-10",
-     "source": "SRC-0208",
-     "grade": "B",
-     "where": "https://history.wikireading.ru/49234",
-     "quote": "По состоянию на 10 июля дивизия имела в строю 8781 человек, 96 орудий и 170 минометов."
-    },
-    {
-     "item": "guns_div",
-     "count": 96,
-     "basis": "same",
-     "date": "1943-07-10",
-     "source": "SRC-0208",
-     "grade": "B",
-     "where": "https://history.wikireading.ru/49234",
-     "quote": "96 орудий"
-    },
-    {
-     "item": "mortars",
-     "count": 170,
-     "basis": "same",
-     "date": "1943-07-10",
-     "source": "SRC-0208",
-     "grade": "B",
-     "where": "https://history.wikireading.ru/49234",
-     "quote": "170 минометов"
-    }
-   ],
-   "status": "unverified",
-   "note": "Замулин 书中这组数字没有脚注（无档案号）；Олейников 记 7 月 11 日晚 8200–8300 人"
-  },
-  {
-   "id": "SU.5GA.97GvSD",
-   "formation": "SU.5GA",
-   "names": {
-    "zh": "近卫步兵第97师",
-    "en": "97th Guards Rifle Division",
-    "ru": "97-я гв. сд"
-   },
-   "designation": "97",
-   "type": "infantry",
-   "size": "division",
-   "guards": true,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））；火炮数表 6 印作 9476（印刷错误），改用同一作者另一本书正文的 94 门（无脚注）"
   },
   {
    "id": "SU.5GA.9GvVDD",
@@ -2998,52 +3404,36 @@
     {
      "item": "personnel_total",
      "count": 9018,
-     "basis": "'наибольшее число личного состава' among 5 GA divisions; on arrival at Prokhorovka position (date not stated, context night 10/11 July); no footnote in text",
+     "basis": "списочная численность（Всего）",
      "date": "1943-07-10",
-     "source": "SRC-0208",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://history.wikireading.ru/49228",
-     "quote": "Дивизия была хорошо укомплектована, относительно других соединений армии, она имела наибольшее число личного состава — 9018 человек и минометов — 170. В то же время она располагала лишь 76 орудиями"
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 9 гв. вдд: Младший комсостав 856, Начальствующий состав 2586, Рядовой состав 5576, Всего 9018; Орудий всех калибров 76; Минометов всех калибров 170"
     },
     {
      "item": "guns_div",
      "count": 76,
-     "basis": "same; 'в то время как соседи имели около сотни стволов'",
+     "basis": "орудий всех калибров",
      "date": "1943-07-10",
-     "source": "SRC-0208",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://history.wikireading.ru/49228",
-     "quote": "она располагала лишь 76 орудиями"
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 9 гв. вдд: Младший комсостав 856, Начальствующий состав 2586, Рядовой состав 5576, Всего 9018; Орудий всех калибров 76; Минометов всех калибров 170"
     },
     {
      "item": "mortars",
      "count": 170,
-     "basis": "same",
+     "basis": "минометов всех калибров",
      "date": "1943-07-10",
-     "source": "SRC-0208",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://history.wikireading.ru/49228",
-     "quote": "минометов — 170"
+     "where": "https://military.wikireading.ru/4383 (Табл.6, img 370815_28_i_011.png)",
+     "quote": "Таблица 6 СВЕДЕНИЯ О ЧИСЛЕННОМ И БОЕВОМ СОСТАВЕ СОЕДИНЕНИЙ 5-Й ГВ. АРМИИ ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 г. … ЦАМО РФ ф. 5 гв. А, оп. 4852, д. 38, л. 53. | row: 9 гв. вдд: Младший комсостав 856, Начальствующий состав 2586, Рядовой состав 5576, Всего 9018; Орудий всех калибров 76; Минометов всех калибров 170"
     }
    ],
    "status": "unverified",
-   "note": "Замулин 书中这组数字没有脚注（无档案号）"
-  },
-  {
-   "id": "SU.5GA.42GvSD",
-   "formation": "SU.5GA",
-   "names": {
-    "zh": "近卫步兵第42师",
-    "en": "42nd Guards Rifle Division",
-    "ru": "42-я гв. сд"
-   },
-   "designation": "42",
-   "type": "infantry",
-   "size": "division",
-   "guards": true,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 6（ЦАМО ф.5 гв.А оп.4852 д.38 л.53））"
   },
   {
    "id": "SU.6GA.51GvSD",
@@ -3100,9 +3490,83 @@
    "type": "infantry",
    "size": "division",
    "guards": true,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8479,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 12,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 36,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 41,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)"
+    },
+    {
+     "item": "mortars",
+     "count": 24,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 87,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 1,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 81 гв. сд: Нач состав 846, Мл. нач состав 2046, Рядовой 5587, Итого 8479; минометов 120/82/50 мм (24, 87, 1); орудий 122/76ДА/76ПА/45 (12, 36, 0, 41)",
+     "note": "50 mm"
+    }
+   ],
    "status": "unverified",
-   "note": "7 月 11 日夜只剩一个合成步兵团、6 门炮（Замулин）；没有可用的兵力数字，用类型占位分，开局应减员"
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；7 月 11 日夜只剩一个合成步兵团、6 门炮（Замулин 正文），开局应减员"
   },
   {
    "id": "SU.69A.89GvSD",
@@ -3116,9 +3580,693 @@
    "type": "infantry",
    "size": "division",
    "guards": true,
-   "strength": [],
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7979,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 2,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 19,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 12,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 32,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)"
+    },
+    {
+     "item": "mortars",
+     "count": 24,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 86,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 64,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 89 гв. сд: Нач состав 889, Мл. нач состав 1857, Рядовой 5238, Итого 7979; минометов 120/82/50 мм (24, 86, 64); орудий 122/76ДА/76ПА/45 (2, 19, 12, 32)",
+     "note": "50 mm"
+    }
+   ],
    "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；表中三类人员相加为 7984，与合计 7979 不符（读图或印刷错误）"
+  },
+  {
+   "id": "SU.69A.93GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第93师",
+    "en": "93rd Guards Rifle Division",
+    "ru": "93-я гв. сд"
+   },
+   "designation": "93",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 9269,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 12,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 2,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 3,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 46,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)"
+    },
+    {
+     "item": "mortars",
+     "count": 24,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 84,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 69,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 93 гв. сд: Нач состав 890, Мл. нач состав 2778, Рядовой 5601, Итого 9269; минометов 120/82/50 мм (24, 84, 69); орудий 122/76ДА/76ПА/45 (12, 2, 3, 46)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））"
+  },
+  {
+   "id": "SU.69A.94GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第94师",
+    "en": "94th Guards Rifle Division",
+    "ru": "94-я гв. сд"
+   },
+   "designation": "94",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8106,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 12,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 13,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 9,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 43,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)"
+    },
+    {
+     "item": "mortars",
+     "count": 24,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 82,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 54,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 94 гв. сд: Нач состав 867, Мл. нач состав 2534, Рядовой 4705, Итого 8106; минометов 120/82/50 мм (24, 82, 54); орудий 122/76ДА/76ПА/45 (12, 13, 9, 43)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））"
+  },
+  {
+   "id": "SU.69A.183SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第183师",
+    "en": "183rd Rifle Division",
+    "ru": "183-я сд"
+   },
+   "designation": "183",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7778,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 8,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 15,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 16,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 40,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)"
+    },
+    {
+     "item": "mortars",
+     "count": 21,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 73,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 50,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 183 сд: Нач состав 786, Мл. нач состав 1492, Рядовой 5500, Итого 7778; минометов 120/82/50 мм (21, 73, 50); орудий 122/76ДА/76ПА/45 (8, 15, 16, 40)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；俄文维基记 7981 人（D 级，无脚注）"
+  },
+  {
+   "id": "SU.69A.305SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第305师",
+    "en": "305th Rifle Division",
+    "ru": "305-я сд"
+   },
+   "designation": "305",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7778,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 8,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 20,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 15,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 37,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)"
+    },
+    {
+     "item": "mortars",
+     "count": 19,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 82,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 56,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 305 сд: Нач состав 777, Мл. нач состав 1909, Рядовой 5092, Итого 7778; минометов 120/82/50 мм (19, 82, 56); орудий 122/76ДА/76ПА/45 (8, 20, 15, 37)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））"
+  },
+  {
+   "id": "SU.69A.375SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第375师",
+    "en": "375th Rifle Division",
+    "ru": "375-я сд"
+   },
+   "designation": "375",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7401,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 11,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 13,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 10,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 27,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)"
+    },
+    {
+     "item": "mortars",
+     "count": 12,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 55,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 38,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 375 сд: Нач состав 714, Мл. нач состав 1829, Рядовой 4858, Итого 7401; минометов 120/82/50 мм (12, 55, 38); орудий 122/76ДА/76ПА/45 (11, 13, 10, 27)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；Замулин 另一本书记 7 月 12 日晨 7211 人（ЦАМО ф.375 сд оп.1 д.143 л.9）"
+  },
+  {
+   "id": "SU.69A.107SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第107师",
+    "en": "107th Rifle Division",
+    "ru": "107-я сд"
+   },
+   "designation": "107",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8003,
+     "basis": "Итого（личный состав）",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)"
+    },
+    {
+     "item": "gun_122mm",
+     "count": 8,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)"
+    },
+    {
+     "item": "gun_76mm_div",
+     "count": 13,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)"
+    },
+    {
+     "item": "gun_76mm_reg",
+     "count": 20,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 39,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)"
+    },
+    {
+     "item": "mortars",
+     "count": 21,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)",
+     "note": "120 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 80,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 65,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 107 сд: Нач состав 755, Мл. нач состав 1992, Рядовой 5261, Итого 8003; минометов 120/82/50 мм (21, 80, 65); орудий 122/76ДА/76ПА/45 (8, 13, 20, 39)",
+     "note": "50 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；表中三类人员相加为 8008，与合计 8003 不符（读图或印刷错误）"
   },
   {
    "id": "SU.69A.92GvSD",
@@ -3145,145 +4293,54 @@
     }
    ],
    "status": "unverified",
-   "note": "7 月 9 日晚，ЦАМО ф.92 гв.сд оп.1 д.13 л.108（转引自 Замулин 脚注）"
+   "note": "7 月 9 日晚，ЦАМО ф.92 гв.сд оп.1 д.13 л.108（转引自 Замулин 脚注）；同作者表 1 记 7 月 10 日 5249 人，差距大，见争议登记"
   },
   {
-   "id": "SU.69A.93GvSD",
+   "id": "SU.69A.10IPTABr",
    "formation": "SU.69A",
    "names": {
-    "zh": "近卫步兵第93师",
-    "en": "93rd Guards Rifle Division",
-    "ru": "93-я гв. сд"
+    "zh": "反坦克歼击炮兵第10旅",
+    "en": "10th Anti-Tank Artillery Brigade",
+    "ru": "10 иптабр"
    },
-   "designation": "93",
-   "type": "infantry",
-   "size": "division",
-   "guards": true,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
-  },
-  {
-   "id": "SU.69A.94GvSD",
-   "formation": "SU.69A",
-   "names": {
-    "zh": "近卫步兵第94师",
-    "en": "94th Guards Rifle Division",
-    "ru": "94-я гв. сд"
-   },
-   "designation": "94",
-   "type": "infantry",
-   "size": "division",
-   "guards": true,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
-  },
-  {
-   "id": "SU.69A.183SD",
-   "formation": "SU.69A",
-   "names": {
-    "zh": "步兵第183师",
-    "en": "183rd Rifle Division",
-    "ru": "183-я сд"
-   },
-   "designation": "183",
-   "type": "infantry",
-   "size": "division",
+   "designation": "10",
+   "type": "antitank",
+   "size": "brigade",
    "guards": false,
    "strength": [
     {
      "item": "personnel_total",
-     "count": 7981,
-     "basis": "'насчитывала в своём составе'; Wikipedia, no citation",
+     "count": 1253,
+     "basis": "личный состав（合计）",
      "date": "1943-07-10",
-     "source": "SRC-0212",
-     "grade": "D",
-     "where": "https://ru.wikipedia.org/wiki/183-я_стрелковая_дивизия (section on Kursk)",
-     "quote": "На 10 июля 1943 года ... насчитывала в своём составе 7981 человек при 4908 винтовках, 71 пулемёте, 75 орудиях, 1579 пистолетах-пулемётах, 205 противотанковых ружьях, 146 миномётах."
-    },
-    {
-     "item": "guns_div",
-     "count": 75,
-     "basis": "same (D)",
-     "date": "1943-07-10",
-     "source": "SRC-0212",
-     "grade": "D",
-     "where": "ru.wikipedia",
-     "quote": "75 орудиях"
-    },
-    {
-     "item": "mortars",
-     "count": 146,
-     "basis": "same (D)",
-     "date": "1943-07-10",
-     "source": "SRC-0212",
-     "grade": "D",
-     "where": "ru.wikipedia",
-     "quote": "146 миномётах"
-    }
-   ],
-   "status": "unverified",
-   "note": "只见于俄文维基（D 级，无脚注）"
-  },
-  {
-   "id": "SU.69A.305SD",
-   "formation": "SU.69A",
-   "names": {
-    "zh": "步兵第305师",
-    "en": "305th Rifle Division",
-    "ru": "305-я сд"
-   },
-   "designation": "305",
-   "type": "infantry",
-   "size": "division",
-   "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
-  },
-  {
-   "id": "SU.69A.375SD",
-   "formation": "SU.69A",
-   "names": {
-    "zh": "步兵第375师",
-    "en": "375th Rifle Division",
-    "ru": "375-я сд"
-   },
-   "designation": "375",
-   "type": "infantry",
-   "size": "division",
-   "guards": false,
-   "strength": [
-    {
-     "item": "personnel_total",
-     "count": 7211,
-     "basis": "per division political department report",
-     "date": "1943-07-12",
-     "source": "SRC-0208",
+     "source": "SRC-0216",
      "grade": "B",
-     "where": "https://history.wikireading.ru/49244 note [765] = ЦАМО РФ, ф. 375 сд, оп. 1, д. 143, л. 9",
-     "quote": "Согласно донесению политотдела дивизии, на утро 12 июля 1943 г. она насчитывала всего 7211 человек[765]."
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 10 иптабр: 154 329 770 1253 … 76 мм ПА 40, 45 мм 20, ПТР 20, автомашин 84"
+    },
+    {
+     "item": "gun_76mm",
+     "count": 40,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 10 иптабр: 154 329 770 1253 … 76 мм ПА 40, 45 мм 20, ПТР 20, автомашин 84"
+    },
+    {
+     "item": "gun_45mm",
+     "count": 20,
+     "basis": "в наличии",
+     "date": "1943-07-10",
+     "source": "SRC-0216",
+     "grade": "B",
+     "where": "https://military.wikireading.ru/4377 (Табл.1, img 370815_22_i_003/004.png; local /tmp/claude-0/-home-user-claude-/61981dc9-ff80-5be9-be8a-20ea410baf88/scratchpad/src/wr-pob/img/22_i_003.png)",
+     "quote": "Таблица 1 БОЕВОЙ И ЧИСЛЕННЫЙ СОСТАВ ВОЙСК 69-Й АРМИИ, ПО СОСТОЯНИЮ НА 10 ИЮЛЯ 1943 Г. … ЦАМО РФ, ф. 203, оп. 2843, д. 426, л. 165. | row: 10 иптабр: 154 329 770 1253 … 76 мм ПА 40, 45 мм 20, ПТР 20, автомашин 84"
     }
    ],
    "status": "unverified",
-   "note": "7 月 12 日晨，ЦАМО ф.375 сд оп.1 д.143 л.9（转引自 Замулин 脚注）"
-  },
-  {
-   "id": "SU.69A.107SD",
-   "formation": "SU.69A",
-   "names": {
-    "zh": "步兵第107师",
-    "en": "107th Rifle Division",
-    "ru": "107-я сд"
-   },
-   "designation": "107",
-   "type": "infantry",
-   "size": "division",
-   "guards": false,
-   "strength": [],
-   "status": "unverified",
-   "note": "没有兵力数字，步兵部分用类型占位分"
+   "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；Замулин 正文称该旅留在第 69 集团军。反坦克歼击炮兵第 14、31 旅没有数字，暂不做算子"
   }
  ]
 }
