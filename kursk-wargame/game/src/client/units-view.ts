@@ -29,38 +29,52 @@ function counterTexture(p: PlacedUnit): Promise<Texture> {
 
 export interface UnitsView {
   root: Container;
+  /** 按新的堆叠重画（对局状态变化后调用） */
+  render(stackMap: Map<string, PlacedUnit[]>): Promise<void>;
   /** 高亮信息面板里选中的单位 */
   highlight(unitId: string | null): void;
 }
 
-export async function createUnitsView(map: GameMap, stackMap: Map<string, PlacedUnit[]>): Promise<UnitsView> {
+export function createUnitsView(map: GameMap): UnitsView {
   const root = new Container();
+  const layer = new Container();
   const size = COUNTER_STYLE.sizeKm * K;
   const off = COUNTER_STYLE.stackOffsetKm * K;
   const sprites = new Map<string, Sprite>();
   const ring = new Graphics();
-  for (const [id, stack] of stackMap) {
-    const c = hexCenter(map.grid, parseHexId(id));
-    // 整个堆叠居中：最底层在右下，最顶层在左上
-    const shift = ((stack.length - 1) * off) / 2;
-    for (const [i, p] of stack.entries()) {
-      const x = c.x * K - size / 2 + shift - i * off;
-      const y = c.y * K - size / 2 + shift - i * off;
-      const shadow = new Graphics().roundRect(x + 1.2, y + 1.6, size, size, size * 0.06).fill({ color: 0x000000, alpha: 0.35 });
-      const s = new Sprite(await counterTexture(p));
-      s.position.set(x, y);
-      s.setSize(size, size);
-      sprites.set(p.unit.id, s);
-      root.addChild(shadow, s);
-    }
-  }
   // 选中的单位即使压在堆叠下面，也临时在上面显示一份
   const lifted = new Sprite();
   lifted.visible = false;
-  root.addChild(lifted, ring);
-  return {
+  root.addChild(layer, lifted, ring);
+  let current: string | null = null;
+  let version = 0;
+  const view: UnitsView = {
     root,
+    async render(stackMap) {
+      const v = ++version;
+      const items: [Graphics, Sprite, string][] = [];
+      for (const [id, stack] of stackMap) {
+        const c = hexCenter(map.grid, parseHexId(id));
+        // 整个堆叠居中：最底层在右下，最顶层在左上
+        const shift = ((stack.length - 1) * off) / 2;
+        for (const [i, p] of stack.entries()) {
+          const x = c.x * K - size / 2 + shift - i * off;
+          const y = c.y * K - size / 2 + shift - i * off;
+          const shadow = new Graphics().roundRect(x + 1.2, y + 1.6, size, size, size * 0.06).fill({ color: 0x000000, alpha: 0.35 });
+          const s = new Sprite(await counterTexture(p));
+          s.position.set(x, y);
+          s.setSize(size, size);
+          items.push([shadow, s, p.unit.id]);
+        }
+      }
+      if (v !== version) return; // 期间又有新的状态，丢弃这次结果
+      for (const ch of layer.removeChildren()) ch.destroy();
+      sprites.clear();
+      for (const [shadow, s, id] of items) { layer.addChild(shadow, s); sprites.set(id, s); }
+      view.highlight(current);
+    },
     highlight(unitId) {
+      current = unitId;
       ring.clear();
       lifted.visible = false;
       const s = unitId ? sprites.get(unitId) : undefined;
@@ -72,4 +86,5 @@ export async function createUnitsView(map: GameMap, stackMap: Map<string, Placed
       ring.roundRect(s.x - 1.5, s.y - 1.5, size + 3, size + 3, size * 0.08).stroke({ width: 2.5, color: PALETTE.select });
     },
   };
+  return view;
 }

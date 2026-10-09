@@ -1,0 +1,18 @@
+{
+ "$comment": "回合顺序（docs/02 §1）。actor：谁在本阶段行动——both 双方、first 主动方、second 被动方。主动方由想定规定。各阶段的具体规则在后续冲刺实现，现在只是骨架。",
+ "phases": [
+  { "id": "strategic", "name": "战略阶段", "actor": "both" },
+  { "id": "air", "name": "空中阶段", "actor": "both" },
+  { "id": "first.command", "name": "主动方指挥阶段", "actor": "first" },
+  { "id": "first.movement", "name": "主动方移动阶段", "actor": "first" },
+  { "id": "first.reaction", "name": "被动方反应阶段", "actor": "second" },
+  { "id": "first.combat", "name": "主动方战斗阶段", "actor": "first" },
+  { "id": "first.exploitation", "name": "主动方发展阶段", "actor": "first" },
+  { "id": "second.command", "name": "被动方指挥阶段", "actor": "second" },
+  { "id": "second.movement", "name": "被动方移动阶段", "actor": "second" },
+  { "id": "second.reaction", "name": "主动方反应阶段", "actor": "first" },
+  { "id": "second.combat", "name": "被动方战斗阶段", "actor": "second" },
+  { "id": "second.exploitation", "name": "被动方发展阶段", "actor": "second" },
+  { "id": "end", "name": "回合末", "actor": "both" }
+ ]
+}

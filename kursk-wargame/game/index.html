@@ -106,6 +106,27 @@
         padding: 6px 14px; border-radius: 16px; font-size: 13px; z-index: 4; pointer-events: none; opacity: 0; transition: opacity .2s;
       }
       #toast.show { opacity: 1; }
+      #game {
+        position: fixed; right: 10px; bottom: 26px; background: var(--panel); color: var(--panel-ink); border-radius: 8px;
+        padding: 8px 10px; font-size: 13px; z-index: 2; width: min(300px, calc(100vw - 20px)); box-sizing: border-box;
+      }
+      #game .g-ph { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+      #game .g-ph small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+      #game .row { display: flex; gap: 6px; flex-wrap: wrap; }
+      #game button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px; padding: 4px 9px; font-size: 13px; cursor: pointer;
+      }
+      #game button:disabled { opacity: .35; cursor: default; }
+      #game button.primary { background: var(--accent); border-color: var(--accent); }
+      #game .more { display: none; margin-top: 8px; }
+      #game.open .more { display: block; }
+      #game ol { list-style: none; margin: 8px 0 0; padding: 0; max-height: 30vh; overflow-y: auto; border-top: 1px solid #4a4738; }
+      #game li { padding: 3px 0; border-bottom: 1px solid #34332b; }
+      #game li.new { color: #fff; }
+      #game .meta { color: var(--muted); font-size: 11px; margin-top: 6px; word-break: break-all; }
+      @media (max-width: 600px) { body:has(#info:not([hidden])) #game { display: none; } }
+      #info .move-btn { margin-top: 6px; font-size: 13px; border: 1px solid #6b6650; border-radius: 6px; padding: 4px 10px; color: var(--panel-ink); background: transparent; cursor: pointer; }
+      #info .move-btn.on { background: var(--accent); border-color: var(--accent); }
       #info textarea { width: 100%; box-sizing: border-box; min-height: 52px; font-size: 13px; margin-top: 4px; border-radius: 6px; padding: 4px; }
       #info .note-save { margin-top: 4px; font-size: 13px; border: 1px solid #6b6650; border-radius: 6px; padding: 4px 10px; }
       #export {
@@ -184,6 +205,26 @@
           <button id="ex-clear">清空全部修改</button>
           <button id="ex-close">关闭</button>
         </div>
+      </div>
+    </div>
+    <div id="game">
+      <div class="g-ph" id="g-phase"></div>
+      <div class="row">
+        <button class="primary" id="g-end">结束阶段</button>
+        <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>
+        <button id="g-redo" title="重做（Ctrl+Y）">↷ 重做</button>
+        <button id="g-more">记录 / 存档</button>
+      </div>
+      <div class="more">
+        <div class="row">
+          <button id="g-roll">掷测试骰</button>
+          <button id="g-save">存档（下载）</button>
+          <button id="g-load">读档</button>
+          <button id="g-new">新对局</button>
+          <input type="file" id="g-file" accept=".json,application/json" hidden />
+        </div>
+        <ol id="g-log"></ol>
+        <div class="meta" id="g-meta"></div>
       </div>
     </div>
     <div id="toast"></div>

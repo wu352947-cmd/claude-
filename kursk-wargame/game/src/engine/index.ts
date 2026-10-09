@@ -13,3 +13,5 @@ export * from './map';
 export * from './map-edit';
 export * from './ratings';
 export * from './units';
+export * from './game';
+export * from './session';

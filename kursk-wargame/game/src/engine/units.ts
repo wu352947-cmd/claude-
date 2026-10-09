@@ -157,6 +157,8 @@ export const DeploymentFile = z.object({
   confidence: Confidence,
   provenance: z.array(Provenance).default([]),
   note: z.string().optional(),
+  /** 主动方（docs/02 §1）：本部署开局时先行动的一方 */
+  first: Side.default('DE'),
   placements: z.array(Placement),
 });
 export type Deployment = z.infer<typeof DeploymentFile>;

@@ -1,8 +1,8 @@
 import { Application } from 'pixi.js';
 import {
   ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  RatingsParams, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, linksBetween, loadDeployment, loadMap, loadOob, neighbor,
-  sideFeatures, stacks, toLatLon,
+  type GameContext, RatingsParams, Sequence, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
 import def from '../../data/maps/south.json';
@@ -13,8 +13,10 @@ import lines from '../../data/maps/south.lines.json';
 import oobData from '../../data/units/south.oob.json';
 import ratingsParams from '../../data/rules/ratings.json';
 import demoDeployment from '../../data/scenarios/demo.deployment.json';
+import sequence from '../../data/rules/sequence.json';
 import { attachCamera } from './camera';
 import { createEditor } from './editor';
+import { type GameUi, createGameUi } from './game-ui';
 import { createMapView } from './map-view';
 import { MAP_FONTS, PX_PER_KM } from './style';
 import { unitSectionHtml } from './unit-panel';
@@ -24,12 +26,29 @@ const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
 /** 当前显示的地图 = 数据文件 + 编辑器里的修改 */
 let map = baseMap;
-const { placed } = loadDeployment(loadOob(oobData, RatingsParams.parse(ratingsParams)), baseMap.grid, demoDeployment);
-const stackMap = stacks(placed);
+const oob = loadOob(oobData, RatingsParams.parse(ratingsParams));
+const { deployment } = loadDeployment(oob, baseMap.grid, demoDeployment);
+const ctx: GameContext = { grid: baseMap.grid, oob, sequence: Sequence.parse(sequence) };
+/** 想定 + 种子 → 初始状态（目前只有演示摆放） */
+const initialFor = (scenario: string, seed: number) => {
+  if (scenario !== deployment.id) throw new Error(`没有想定 ${scenario}`);
+  return withFullSteps(ctx, initialState(scenario, deployment.first, seed, deployment));
+};
+/** 当前对局各格的堆叠（由对局状态算出） */
+let stackMap = new Map<string, ReturnType<typeof placedUnits>>();
 /** 信息面板里选中的单位 */
 let selectedUnit: string | null = null;
+/** 正在等玩家点目标格的单位（临时移动） */
+let moving: string | null = null;
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const DIR_NAMES = ['北', '东北', '东南', '南', '西南', '西北'];
+let toastTimer = 0;
+const toast = (msg: string): void => {
+  const t = $('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = window.setTimeout(() => t.classList.remove('show'), 2600);
+};
 const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
 function showInfo(h: Offset | null): void {
@@ -59,21 +78,24 @@ function showInfo(h: Offset | null): void {
       <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
       ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
-    ${editor.active ? '' : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit)}
+    ${editor.active ? '' : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moving !== null && moving === selectedUnit)}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
   box.hidden = false;
   const save = document.getElementById('info-note-save');
   if (save) save.onclick = () => { editor.note(h, $<HTMLTextAreaElement>('info-note').value); showInfo(h); };
   for (const b of box.querySelectorAll<HTMLButtonElement>('.unit-row')) {
-    b.onclick = () => { selectedUnit = b.dataset.unit ?? null; units.highlight(selectedUnit); showInfo(h); };
+    b.onclick = () => { selectedUnit = b.dataset.unit ?? null; moving = null; units.highlight(selectedUnit); showInfo(h); };
   }
-  $('info-close').onclick = () => { view.select(null); units.highlight(null); showInfo(null); };
+  const mv = document.getElementById('move-btn');
+  if (mv) mv.onclick = () => { moving = moving ? null : selectedUnit; showInfo(h); };
+  $('info-close').onclick = () => { moving = null; view.select(null); units.highlight(null); showInfo(null); };
 }
 
 let view: Awaited<ReturnType<typeof createMapView>>;
 let editor: ReturnType<typeof createEditor>;
-let units: Awaited<ReturnType<typeof createUnitsView>>;
+let units: ReturnType<typeof createUnitsView>;
+let game: GameUi;
 
 async function start(): Promise<void> {
   $('title').textContent = meta.title.zh;
@@ -94,7 +116,7 @@ async function start(): Promise<void> {
     map.def.relief ? `${import.meta.env.BASE_URL}${map.def.relief.image}` : undefined);
   app.stage.addChild(view.root);
   // 算子在地名之上、选中框之下
-  units = await createUnitsView(map, stackMap);
+  units = createUnitsView(map);
   view.root.addChildAt(units.root, view.root.children.length - 1);
 
   let selected: ReturnType<typeof hexAt> | null = null;
@@ -112,12 +134,20 @@ async function start(): Promise<void> {
       // 编辑地图时隐藏算子，免得挡住地形
       units.root.visible = !on && $<HTMLInputElement>('ly-units').checked;
       units.highlight(null);
+      $('game').hidden = on;
+      moving = null;
       view.select(null); showInfo(null);
     },
     highlightSide: (h, dir) => view.selectSide(h, dir),
   });
   map = editor.map();
   if (map !== baseMap) view.update(map);
+
+  game = createGameUi(ctx, initialFor, deployment.id, ENGINE_VERSION, (s) => {
+    stackMap = stacks(placedUnits(ctx, s));
+    void units.render(stackMap);
+    if (selected && !$('info').hidden) showInfo(selected);
+  }, toast);
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
     const local = view.root.toLocal({ x: sx, y: sy });
@@ -127,6 +157,14 @@ async function start(): Promise<void> {
     if (editor.tap(world, h)) {
       if (editor.tool !== 'side') view.select(h);
       showInfo(null);
+      return;
+    }
+    if (moving && !editor.active) {
+      const u = moving;
+      moving = null;
+      if (game.dispatch({ type: 'Relocate', unit: u, to: hexId(h) })) {
+        selected = h; selectedUnit = u; units.highlight(u); view.select(h); showInfo(h);
+      }
       return;
     }
     selected = h;
