@@ -1,5 +1,5 @@
 {
- "$comment": "地名位置由 AI 从 AMS 图幅上读取，status = unverified，需人工核对。",
+ "$comment": "地名位置由 AI 从 AMS 图幅上读取；status 与 note 记录核对情况。",
  "labels": [
   {
    "id": "belgorod",
@@ -12,10 +12,11 @@
    "kind": "city",
    "lat": 50.5973,
    "lon": 36.5845,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在城区内，拼写与图上一致"
   },
   {
    "id": "oboyan",
@@ -28,10 +29,11 @@
    "kind": "town",
    "lat": 51.2126,
    "lon": 36.2765,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在城区内，拼写与图上一致"
   },
   {
    "id": "prokhorovka-st",
@@ -44,10 +46,11 @@
    "kind": "town",
    "lat": 51.0358,
    "lon": 36.7358,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置正确；图上印作 \"Stantsiya Prokhorovka\"（车站），大居民点注记为 Aleksandrovskiy，英文名沿用通行写法 Prokhorovka"
   },
   {
    "id": "oktyabrsky",
@@ -60,10 +63,11 @@
    "kind": "village",
    "lat": 51.0259,
    "lon": 36.6571,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "pravorot",
@@ -76,10 +80,11 @@
    "kind": "village",
    "lat": 50.9809,
    "lon": 36.7307,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "pokrovka",
@@ -92,10 +97,11 @@
    "kind": "village",
    "lat": 50.8894,
    "lon": 36.4412,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "yakovlevo",
@@ -108,10 +114,11 @@
    "kind": "village",
    "lat": 50.8624,
    "lon": 36.4485,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "luchki",
@@ -124,10 +131,11 @@
    "kind": "village",
    "lat": 50.8774,
    "lon": 36.5432,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "teterevino",
@@ -140,10 +148,11 @@
    "kind": "village",
    "lat": 50.8761,
    "lon": 36.6095,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "belenikhino",
@@ -156,10 +165,11 @@
    "kind": "village",
    "lat": 50.9319,
    "lon": 36.6429,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "gostishchevo",
@@ -172,10 +182,11 @@
    "kind": "village",
    "lat": 50.7831,
    "lon": 36.6573,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2314",
@@ -184,12 +195,13 @@
     "en": "Petrovka"
    },
    "kind": "village",
-   "lat": 51.05737,
-   "lon": 36.63919,
-   "status": "unverified",
+   "lat": 51.05212,
+   "lon": 36.64731,
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2116",
@@ -200,10 +212,11 @@
    "kind": "village",
    "lat": 51.01822,
    "lon": 36.59993,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2015",
@@ -217,7 +230,8 @@
    "status": "unverified",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09 待定：Kozlovka 注记附近的房屋可能属于 Gresnoye，无法确定，位置暂不改"
   },
   {
    "id": "ams-2115",
@@ -226,12 +240,13 @@
     "en": "Mikhaylovka"
    },
    "kind": "village",
-   "lat": 51.03395,
-   "lon": 36.59632,
-   "status": "unverified",
+   "lat": 51.02886,
+   "lon": 36.60801,
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2114",
@@ -240,12 +255,13 @@
     "en": "Polezhayev"
    },
    "kind": "village",
-   "lat": 51.05508,
-   "lon": 36.58554,
-   "status": "unverified",
+   "lat": 51.05061,
+   "lon": 36.62227,
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2014",
@@ -256,10 +272,11 @@
    "kind": "village",
    "lat": 51.03929,
    "lon": 36.54267,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-1915",
@@ -273,7 +290,8 @@
    "status": "unverified",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09 待定：图上找不到能确定属于 Krasnyy Oktyabr' 的房屋符号（附近两组房屋都可能），位置暂不改"
   },
   {
    "id": "ams-2013",
@@ -284,10 +302,11 @@
    "kind": "village",
    "lat": 51.06628,
    "lon": 36.54974,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2012",
@@ -298,10 +317,11 @@
    "kind": "village",
    "lat": 51.091,
    "lon": 36.54608,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2412",
@@ -312,10 +332,11 @@
    "kind": "village",
    "lat": 51.09785,
    "lon": 36.68568,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2413",
@@ -326,10 +347,11 @@
    "kind": "village",
    "lat": 51.07537,
    "lon": 36.69642,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2614",
@@ -340,10 +362,11 @@
    "kind": "village",
    "lat": 51.04387,
    "lon": 36.76437,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2615",
@@ -357,7 +380,8 @@
    "status": "unverified",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09 待定：Khlamov 注记附近房屋很少、看不清，无法确定属于哪一格，暂不改"
   },
   {
    "id": "ams-2415",
@@ -366,12 +390,13 @@
     "en": "Yamki"
    },
    "kind": "village",
-   "lat": 51.01466,
-   "lon": 36.71072,
-   "status": "unverified",
+   "lat": 51.01166,
+   "lon": 36.695,
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2512",
@@ -380,12 +405,13 @@
     "en": "Malaya Psinka"
    },
    "kind": "village",
-   "lat": 51.11582,
-   "lon": 36.7573,
-   "status": "unverified",
+   "lat": 51.11657,
+   "lon": 36.7468,
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2713",
@@ -396,10 +422,11 @@
    "kind": "village",
    "lat": 51.08654,
    "lon": 36.82885,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2814",
@@ -410,10 +437,11 @@
    "kind": "village",
    "lat": 51.0528,
    "lon": 36.84307,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2915",
@@ -424,10 +452,11 @@
    "kind": "village",
    "lat": 51.03927,
    "lon": 36.86805,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0102"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-1917",
@@ -436,12 +465,13 @@
     "en": "Malyye Mayachki"
    },
    "kind": "village",
-   "lat": 50.98303,
-   "lon": 36.51072,
-   "status": "unverified",
+   "lat": 50.96278,
+   "lon": 36.50105,
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-1819",
@@ -452,10 +482,11 @@
    "kind": "village",
    "lat": 50.91549,
    "lon": 36.46107,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-1919",
@@ -466,10 +497,11 @@
    "kind": "village",
    "lat": 50.93355,
    "lon": 36.50022,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2119",
@@ -480,10 +512,11 @@
    "kind": "village",
    "lat": 50.92556,
    "lon": 36.56803,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2118",
@@ -492,12 +525,13 @@
     "en": "Khutor Teterevino"
    },
    "kind": "village",
-   "lat": 50.95841,
-   "lon": 36.60006,
-   "status": "unverified",
+   "lat": 50.95764,
+   "lon": 36.57603,
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
   },
   {
    "id": "ams-2320",
@@ -508,10 +542,11 @@
    "kind": "village",
    "lat": 50.91123,
    "lon": 36.64865,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2518",
@@ -522,10 +557,11 @@
    "kind": "village",
    "lat": 50.94406,
    "lon": 36.72712,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2618",
@@ -536,10 +572,11 @@
    "kind": "village",
    "lat": 50.94268,
    "lon": 36.7892,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2619",
@@ -550,10 +587,11 @@
    "kind": "village",
    "lat": 50.92247,
    "lon": 36.7642,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2521",
@@ -564,10 +602,11 @@
    "kind": "village",
    "lat": 50.87526,
    "lon": 36.72993,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2321",
@@ -578,10 +617,11 @@
    "kind": "village",
    "lat": 50.86178,
    "lon": 36.6715,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2721",
@@ -592,10 +632,11 @@
    "kind": "village",
    "lat": 50.86847,
    "lon": 36.80688,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2820",
@@ -606,10 +647,11 @@
    "kind": "village",
    "lat": 50.87743,
    "lon": 36.84253,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2918",
@@ -620,10 +662,11 @@
    "kind": "village",
    "lat": 50.9516,
    "lon": 36.8606,
-   "status": "unverified",
+   "status": "crosschecked",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
   },
   {
    "id": "ams-2717",
@@ -637,7 +680,8 @@
    "status": "unverified",
    "sources": [
     "SRC-0101"
-   ]
+   ],
+   "note": "AI 复查 2026-10-09 待定：上下两幅 AMS 图在接缝处错开约 1 km：下幅只有小圆圈符号（现位置），上幅房屋在 2716，暂不改"
   }
  ]
 }

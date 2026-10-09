@@ -108,7 +108,15 @@
   "1917": {
    "terrain": "village",
    "status": "crosschecked",
-   "note": "AI 复查 2026-10-08：AMS 图上格内有居民点",
+   "note": "AI 复查 2026-10-09：格内黄色居民区属于 Greznoye（Gresnoye），保留村庄；Malyye Mayachki 在南邻 1918",
+   "sources": [
+    "SRC-0101"
+   ]
+  },
+  "1918": {
+   "terrain": "village",
+   "status": "crosschecked",
+   "note": "AI 复查 2026-10-09：Malyye Mayachki 的黄色居民区大部分在本格（此前只录了北邻 1917）",
    "sources": [
     "SRC-0101"
    ]
@@ -194,9 +202,9 @@
    ]
   },
   "2114": {
-   "terrain": "village",
+   "terrain": "clear",
    "status": "crosschecked",
-   "note": "AI 复查 2026-10-08：AMS 图上格内有居民点",
+   "note": "AI 复查 2026-10-09：放大原图，格内没有房屋符号；此前按 \"Polezhayev\" 注记文字位置录入，房屋实际在 2214",
    "sources": [
     "SRC-0102"
    ]
@@ -231,6 +239,14 @@
    "note": "AI 复查 2026-10-08：AMS 图上格内有居民点",
    "sources": [
     "SRC-0101"
+   ]
+  },
+  "2214": {
+   "terrain": "village",
+   "status": "crosschecked",
+   "note": "AI 复查 2026-10-09：放大原图，格内有沿路的房屋符号（Polezhayev，此前误录在 2114）",
+   "sources": [
+    "SRC-0102"
    ]
   },
   "2220": {
