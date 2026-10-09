@@ -50,6 +50,10 @@ export const PALETTE = {
   /** 可到达范围；敌控制区（到此停止） */
   reach: 0x2f7fd0,
   reachZoc: 0xe08a1e,
+  // 胜利目标（按现在归属着色）
+  objectiveDE: 0x6f7560,
+  objectiveSU: 0xb3261e,
+  objectiveRing: 0xfff6d8,
   auto: 0xd9822b,
   verified: 0x3f8f4a,
   crosschecked: 0x3a78c2,

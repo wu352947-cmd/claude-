@@ -12,6 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
+import { type Scenario, claim, startTurn } from './scenario';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
 
@@ -34,6 +35,8 @@ export interface GameContext {
   movement: MovementRules;
   combat: CombatRules;
   turns: TurnRules;
+  /** 当前想定（回合数、增援、胜利目标）；测试可以不给 */
+  scenario?: Scenario;
 }
 
 /** 单位在对局中的可变部分；数组顺序 = 同格堆叠从下到上 */
@@ -69,8 +72,14 @@ export interface GameState {
   repair: { unit: string; steps: number; left: number }[];
   /** 装甲完全损失（胜利点只计这些，02 §4.4） */
   destroyed: { unit: string; formation: string; steps: number; turn: number }[];
+  /** 非装甲单位的步数损失（直接就是完全损失） */
+  casualties: { unit: string; steps: number; turn: number }[];
   /** 被消灭的单位 */
   eliminated: string[];
+  /** 胜利目标格现在归谁（开局取想定，之后最后进入的一方） */
+  owners: Record<string, Side>;
+  /** 想定的最后一个回合已经结束 */
+  over: boolean;
 }
 
 export const Command = z.discriminatedUnion('type', [
@@ -99,16 +108,20 @@ export type GameEvent =
   | { type: 'Advanced'; units: string[]; to: string }
   | { type: 'TurnEnded'; turn: number }
   | { type: 'DamagedSorted'; unit: string; hex: string; control: 'own' | 'contested' | 'enemy'; need: number; rolls: number[]; repaired: number; destroyed: number }
-  | { type: 'Repaired'; unit: string; steps: number };
+  | { type: 'Repaired'; unit: string; steps: number }
+  | { type: 'Reinforced'; unit: string; hex: string }
+  | { type: 'GameOver'; turn: number };
 
 /** 非法指令（例如单位不存在）：界面应提示玩家，不会改变状态 */
 export class CommandError extends Error {}
 
-export function initialState(scenario: string, first: Side, seed: number, deployment: Deployment): GameState {
+export function initialState(scenario: string, first: Side, seed: number, deployment: Deployment | Scenario): GameState {
+  const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
     moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null,
-    damaged: [], repair: [], destroyed: [], eliminated: [],
+    damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
+    owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
   };
 }
@@ -132,10 +145,21 @@ function advancePhase(ctx: GameContext, s: GameState, leave = true): { state: Ga
   for (;;) {
     if (first) {
       const last = cur.phase + 1 >= P.length;
+      if (last && ctx.scenario?.turns && cur.turn >= ctx.scenario.turns) {
+        // 想定的最后一个回合结束：停在回合末
+        cur = { ...cur, over: true };
+        events.push({ type: 'GameOver', turn: cur.turn });
+        break;
+      }
       cur = last
         ? { ...cur, turn: cur.turn + 1, phase: 0, movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [] }
         : { ...cur, phase: cur.phase + 1 };
-      if (last) events.push({ type: 'TurnStarted', turn: cur.turn });
+      if (last) {
+        events.push({ type: 'TurnStarted', turn: cur.turn });
+        const r = startTurn(ctx, cur);
+        cur = r.state;
+        events.push(...r.events);
+      }
     }
     first = true;
     const ph = P[cur.phase]!;
@@ -152,6 +176,7 @@ function advancePhase(ctx: GameContext, s: GameState, leave = true): { state: Ga
 }
 
 export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: GameState; events: GameEvent[] } {
+  if (s.over) throw new CommandError('想定已经结束');
   // 推进的机会只保留到下一条指令
   if (cmd.type !== 'Advance' && s.advance) s = { ...s, advance: null };
   switch (cmd.type) {
@@ -165,7 +190,7 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
       // 到达后放在目的格堆叠的最上面
       const units = [...s.units.slice(0, i), ...s.units.slice(i + 1), { ...u, hex: cmd.path.at(-1)! }];
       return {
-        state: { ...s, units, moved: [...s.moved, u.id], movedThisTurn: [...s.movedThisTurn, u.id] },
+        state: claim(ctx, { ...s, units, moved: [...s.moved, u.id], movedThisTurn: [...s.movedThisTurn, u.id] }, u.id, cmd.path),
         events: [{ type: 'UnitMoved', unit: u.id, from: u.hex, path: cmd.path, cost: r.cost }],
       };
     }

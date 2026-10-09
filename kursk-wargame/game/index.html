@@ -126,6 +126,8 @@
       #game .meta { color: var(--muted); font-size: 11px; margin-top: 6px; word-break: break-all; }
       @media (max-width: 600px) { body:has(#info:not([hidden])) #game { display: none; } }
       #game .night { background: #2c3e66; color: #dfe6ff; border-radius: 3px; padding: 0 4px; margin-left: 4px; font-size: 12px; }
+      #game .g-score { font-size: 12px; margin: -2px 0 6px; }
+      #game .g-score small { color: var(--muted); margin-left: 6px; }
       #game label.hs { display: block; margin-top: 8px; font-size: 12px; }
       #handoff { position: fixed; inset: 0; z-index: 50; background: #1d1f20; display: flex; align-items: center; justify-content: center; padding: 16px; }
       #handoff[hidden] { display: none; }
@@ -228,6 +230,7 @@
     </div>
     <div id="game">
       <div class="g-ph" id="g-phase"></div>
+      <div class="g-score" id="g-score" hidden></div>
       <div class="row">
         <button class="primary" id="g-end">结束阶段</button>
         <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>
@@ -242,6 +245,7 @@
           <button id="g-new">新对局</button>
           <input type="file" id="g-file" accept=".json,application/json" hidden />
         </div>
+        <label class="hs">想定 <select id="g-scn"></select></label>
         <label class="hs"><input type="checkbox" id="g-hotseat" /> 热座：换人时遮屏，隐藏未侦察的敌军</label>
         <ol id="g-log"></ol>
         <div class="meta" id="g-meta"></div>

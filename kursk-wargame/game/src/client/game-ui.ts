@@ -6,7 +6,7 @@
  */
 import {
   CONTROL_NAMES, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
-  canRedo, canUndo, emptyHistory, loadSave, makeSave, push, redo, replay, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
+  canRedo, canUndo, emptyHistory, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
 
@@ -60,6 +60,8 @@ export function createGameUi(
       case 'DamagedSorted': return enemy(e.unit) ? null
         : `${unitName(e.unit)} 受损 ${e.rolls.length} 步（${e.hex} ${CONTROL_NAMES[e.control]}，掷 ${e.rolls.join('、')}，≤${e.need} 送修）：送修 ${e.repaired}，完全损失 ${e.destroyed}`;
       case 'Repaired': return enemy(e.unit) ? null : `${unitName(e.unit)} 修复 ${e.steps} 步归队`;
+      case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
+      case 'GameOver': return `—— 想定结束（第 ${e.turn} 回合）——`;
     }
   };
 
@@ -70,7 +72,15 @@ export function createGameUi(
     const ph = ctx.sequence.phases[s.phase]!;
     const side = actingSide(ctx, s);
     const t = turnInfo(ctx, s);
-    $('g-phase').innerHTML = `第 ${s.turn} 回合 · ${esc(turnLabel(t))}${t.night ? '<span class="night">夜</span>' : ''} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
+    const total = ctx.scenario?.turns;
+    $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))}${t.night ? '<span class="night">夜</span>' : ''} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
+    $<HTMLButtonElement>('g-end').disabled = s.over;
+    const sc = score(ctx, s);
+    $('g-score').hidden = !sc;
+    if (sc) {
+      $('g-score').innerHTML = `德军得分 <b>${sc.total}</b>（目标 ${sc.objectiveVp}，损失交换 ${sc.lossVp > 0 ? '+' : ''}${sc.lossVp}）`
+        + (sc.delta === null ? '<small>历史基准待校准</small>' : `<small>历史基准 ${sc.total - sc.delta} · 现在：${esc(sc.band!)}</small>`);
+    }
     $<HTMLButtonElement>('g-undo').disabled = !canUndo(history);
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);
     const lines = cur.events.flatMap((evs, i) => evs.map(describe).filter((d) => d !== null)

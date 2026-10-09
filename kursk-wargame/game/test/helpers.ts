@@ -37,6 +37,6 @@ export function world(opts: { hexes?: Record<string, string>; sides?: Record<str
 export const at = (units: Record<string, string>, ph = 'first.movement', steps: Record<string, number> = {}): GameState => ({
   scenario: 't', first: 'DE', turn: 1, phase: phase(ph), rng: createRng(1), start: { date: '1943-07-11', slot: 0 },
   moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null,
-  damaged: [], repair: [], destroyed: [], eliminated: [],
+  damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], owners: {}, over: false,
   units: Object.entries(units).map(([id, hex]) => ({ id, hex, steps: steps[id] ?? oob.units.get(id)!.steps })),
 });

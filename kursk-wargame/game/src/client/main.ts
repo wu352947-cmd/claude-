@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
-  ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  CombatRules, TurnRules, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  ENGINE_VERSION, GameMeta, SIDE_NAMES, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
+  CombatRules, TurnRules, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -27,15 +27,23 @@ import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
 import { type Fog, createHotseat } from './hotseat';
+import { createObjectivesView } from './objectives-view';
 
 const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
 /** 当前显示的地图 = 数据文件 + 编辑器里的修改 */
 let map = baseMap;
 const oob = loadOob(oobData, RatingsParams.parse(ratingsParams));
-const { deployment } = loadDeployment(oob, baseMap.grid, demoDeployment);
+/** 可选的想定（新对局时选；记在本机浏览器里） */
+const SCENARIOS = [demoDeployment].map((raw) => { loadDeployment(oob, baseMap.grid, raw); return loadScenario(oob, baseMap.grid, raw); });
+const SCN_KEY = 'kursk-1943-scenario';
+const deployment = (() => {
+  let want: string | null = null;
+  try { want = localStorage.getItem(SCN_KEY); } catch { /* 隐私模式 */ }
+  return SCENARIOS.find((x) => x.id === want) ?? SCENARIOS.at(-1)!;
+})();
 // 规则用数据文件里的地图（编辑器里未合并的修改不影响对局，保证存档可回放）
-const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules), combat: CombatRules.parse(combatRules), turns: TurnRules.parse(turnRules) };
+const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules), combat: CombatRules.parse(combatRules), turns: TurnRules.parse(turnRules), scenario: deployment };
 /** 想定 + 种子 → 初始状态（目前只有演示摆放） */
 const initialFor = (scenario: string, seed: number) => {
   if (scenario !== deployment.id) throw new Error(`没有想定 ${scenario}`);
@@ -91,6 +99,7 @@ function showInfo(h: Offset | null): void {
       <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
       ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
+    ${editor.active || !game ? '' : objectiveHtml(hexId(h))}
     ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
     ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
       : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote())}
@@ -117,6 +126,14 @@ function showInfo(h: Offset | null): void {
     const units = [...box.querySelectorAll<HTMLInputElement>('.adv-pick')].filter((x) => x.checked).map((x) => x.dataset.unit!);
     if (game.dispatch({ type: 'Advance', units })) { selectUnit(units.at(-1) ?? null); showInfo(h); }
   };
+}
+
+/** 胜利目标说明 */
+function objectiveHtml(hex: string): string {
+  const o = deployment.objectives.find((x) => x.hex === hex);
+  if (!o) return '';
+  const owner = game.state().owners[hex] ?? o.owner;
+  return `<div class="combat"><div class="units-head">胜利目标</div>${esc(o.name)}：${o.vp} 点，现归${SIDE_NAMES[owner]}${o.note ? `<div class="muted small">${esc(o.note)}</div>` : ''}</div>`;
 }
 
 /** 选中单位：高亮，并算出可到达范围 */
@@ -167,6 +184,8 @@ async function start(): Promise<void> {
   // 可到达范围画在算子下面
   reachView = createReachView(map);
   view.root.addChildAt(reachView.root, view.root.getChildIndex(units.root));
+  const objView = createObjectivesView(map);
+  view.root.addChildAt(objView.root, view.root.getChildIndex(units.root) + 1);
 
   let selected: ReturnType<typeof hexAt> | null = null;
   editor = createEditor(baseMap, {
@@ -192,10 +211,18 @@ async function start(): Promise<void> {
   if (map !== baseMap) view.update(map);
 
   const hotseat = createHotseat(ctx);
+  const pick = $<HTMLSelectElement>('g-scn');
+  pick.innerHTML = SCENARIOS.map((x) => `<option value="${esc(x.id)}"${x.id === deployment.id ? ' selected' : ''}>${esc(x.names.zh)}</option>`).join('');
+  pick.onchange = () => {
+    if (!confirm('换想定会开始新对局（当前对局可先存档）。继续？')) { pick.value = deployment.id; return; }
+    try { localStorage.setItem(SCN_KEY, pick.value); localStorage.removeItem('kursk-1943-autosave'); } catch { /* 隐私模式 */ }
+    location.reload();
+  };
   game = createGameUi(ctx, initialFor, deployment.id, ENGINE_VERSION, (s) => {
     stackMap = stacks(placedUnits(ctx, s));
     fog = hotseat.fog(s);
     void units.render(stackMap, fog?.hidden);
+    objView.show(deployment.objectives.map((o) => ({ hex: o.hex, vp: o.vp, owner: s.owners[o.hex] ?? o.owner })));
     selectUnit(selectedUnit && s.units.some((u) => u.id === selectedUnit) ? selectedUnit : null);
     if (selected && !$('info').hidden) showInfo(selected);
   }, toast, hotseat);

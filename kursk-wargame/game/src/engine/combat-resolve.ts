@@ -2,6 +2,7 @@
 import { rollDie } from './rng';
 import { parseResult, previewCombat, retreatPath } from './combat';
 import { sideOfUnit } from './movement';
+import { claim } from './scenario';
 import { CommandError, type GameContext, type GameEvent, type GameState, type UnitState } from './game';
 
 const unitOf = (ctx: GameContext, id: string) => ctx.oob.units.get(id)!;
@@ -22,11 +23,13 @@ function takeLosses(ctx: GameContext, s: GameState, order: string[], n: number, 
   }
   if (!lost.size) return s;
   const damaged = [...s.damaged];
+  const casualties = [...s.casualties];
   for (const [id, steps] of lost) {
     const unit = unitOf(ctx, id);
     // 装甲单位损失的步数先进入受损池（02 §4.4），回合末再按战场控制分流（冲刺 6）
     const armored = ctx.combat.armor.armorTypes.includes(unit.type);
     if (armored) damaged.push({ unit: id, formation: unit.formation, steps, hex: s.units.find((u) => u.id === id)!.hex, turn: s.turn });
+    else casualties.push({ unit: id, steps, turn: s.turn });
     events.push({ type: 'StepsLost', unit: id, steps, damagedPool: armored });
   }
   const units: UnitState[] = [];
@@ -37,7 +40,7 @@ function takeLosses(ctx: GameContext, s: GameState, order: string[], n: number, 
     if (steps > 0) units.push({ ...u, steps });
     else { eliminated.push(u.id); events.push({ type: 'UnitEliminated', unit: u.id }); }
   }
-  return { ...s, units, eliminated, damaged };
+  return { ...s, units, eliminated, damaged, casualties };
 }
 
 export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string[], hex: string): { state: GameState; events: GameEvent[] } {
@@ -71,6 +74,7 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
       // 撤退的单位移到目的格堆叠最上面，保持原来的上下顺序
       s = { ...s, units: [...s.units.filter((u) => u.hex !== hex), ...s.units.filter((u) => u.hex === hex).map((u) => ({ ...u, hex: to }))] };
       events.push({ type: 'Retreated', units: survivors, path });
+      s = claim(ctx, s, survivors[0]!, path);
     }
     if (extraLoss) {
       events.push({ type: 'RetreatLoss', units: survivors, steps: extraLoss, reason: path.length < res.r ? '无路可退' : '退入敌控制区' });
@@ -95,7 +99,7 @@ export function resolveAdvance(ctx: GameContext, s: GameState, units: string[]):
   for (const id of units) if (!adv.units.includes(id)) throw new CommandError(`${unitOf(ctx, id)?.names.zh ?? id} 没有参加这次进攻，不能推进`);
   const moving = s.units.filter((u) => units.includes(u.id)).map((u) => ({ ...u, hex: adv.hex }));
   return {
-    state: { ...s, units: [...s.units.filter((u) => !units.includes(u.id)), ...moving], advance: null },
+    state: claim(ctx, { ...s, units: [...s.units.filter((u) => !units.includes(u.id)), ...moving], advance: null }, units[0]!, [adv.hex]),
     events: [{ type: 'Advanced', units, to: adv.hex }],
   };
 }
