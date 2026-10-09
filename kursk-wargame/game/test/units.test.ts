@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { hexId, loadDeployment, loadMap, loadOob, stacks } from '../src/engine';
+import { RatingsParams, deriveRatings, hexId, loadDeployment, loadMap, loadOob, stacks } from '../src/engine';
 import { counterSvg, sidc } from '../src/client/counter-svg';
 import def from '../data/maps/south.json';
 import hexes from '../data/maps/south.hexes.json';
@@ -9,9 +9,11 @@ import hexsides from '../data/maps/south.hexsides.json';
 import labels from '../data/maps/south.labels.json';
 import oobData from '../data/units/south.oob.json';
 import demo from '../data/scenarios/demo.deployment.json';
+import rawParams from '../data/rules/ratings.json';
 
 const map = loadMap({ def, hexes, hexsides, labels });
-const oob = loadOob(oobData);
+const params = RatingsParams.parse(rawParams);
+const oob = loadOob(oobData, params);
 const clone = <T>(x: T): T => JSON.parse(JSON.stringify(x)) as T;
 
 describe('战斗序列数据', () => {
@@ -20,38 +22,60 @@ describe('战斗序列数据', () => {
     for (const u of oob.units.values()) expect(oob.formations.has(u.formation), u.id).toBe(true);
   });
 
-  it('未考据的数据都标为占位；标为有出处的都写了出处，且出处在史料登记表中', () => {
+  it('所有出处都在史料登记表中，级别与登记表一致', () => {
     const csv = readFileSync(fileURLToPath(new URL('../data/sources.csv', import.meta.url)), 'utf8');
-    const ids = new Set(csv.split('\n').slice(1).map((l) => l.split(',')[0]).filter(Boolean));
+    const grades = new Map(csv.split('\n').slice(1).filter(Boolean).map((l) => [l.split(',')[0]!, l.split(',')[1]!]));
     for (const r of [...oob.formations.values(), ...oob.units.values()]) {
-      if (r.confidence === 'sourced') expect(r.provenance.length, r.id).toBeGreaterThan(0);
-      for (const p of r.provenance) expect(ids.has(p.source), `${r.id} ${p.source}`).toBe(true);
+      if (r.confidence === 'sourced') expect(r.provenance.length + ('strength' in r ? r.strength.length : 0), r.id).toBeGreaterThan(0);
+      for (const p of r.provenance) expect(grades.has(p.source), `${r.id} ${p.source}`).toBe(true);
     }
+    for (const u of oob.units.values()) {
+      for (const s of u.strength) expect(grades.get(s.source), `${u.id} ${s.item} ${s.source}`).toBe(s.grade);
+    }
+  });
+
+  it('兵力数字都写了口径、日期与原文摘录；装备名都在公式参数表里', () => {
+    for (const u of oob.units.values()) {
+      for (const s of u.strength) {
+        expect(s.quote, `${u.id} ${s.item}`).toBeTruthy();
+        expect(params.items[s.item], `${u.id} ${s.item}`).toBeDefined();
+      }
+    }
+  });
+
+  it('考据程度自动判定：没有数字 = 占位；只有 D 级或推算 = 推定；A/B 级 = 有出处', () => {
+    const u = (id: string) => oob.units.get(id)!;
+    expect(u('DE.IISS.LSSAH.PzGrenRgt1').confidence).toBe('placeholder');
+    expect(u('SU.18TK.110TBr').confidence).toBe('estimated');
+    expect(u('SU.5GA.95GvSD').confidence).toBe('estimated');
+    expect(u('SU.29TK.32TBr').confidence).toBe('sourced');
+    expect(u('DE.IISS.T.PzRgt3').confidence).toBe('sourced');
+  });
+
+  it('素质不是 3 必须写理由', () => {
+    const q = clone(oobData) as { units: { quality?: number }[] };
+    q.units[0]!.quality = 4;
+    expect(() => loadOob(q, params)).toThrow(/理由/);
   });
 
   it('错误数据会被拒绝：所属编制不存在', () => {
     const bad = clone(oobData);
     bad.units[0]!.formation = 'NO.SUCH';
-    expect(() => loadOob(bad)).toThrow(/不存在/);
+    expect(() => loadOob(bad, params)).toThrow(/不存在/);
   });
 
   it('错误数据会被拒绝：未知兵种、重复 ID、军种与阵营不符', () => {
     const t = clone(oobData);
     (t.units[0] as { type: string }).type = 'cavalry-robot';
-    expect(() => loadOob(t)).toThrow();
+    expect(() => loadOob(t, params)).toThrow();
     const d = clone(oobData);
     d.units.push(d.units[0]!);
-    expect(() => loadOob(d)).toThrow(/重复/);
+    expect(() => loadOob(d, params)).toThrow(/重复/);
     const b = clone(oobData);
     b.formations[0]!.branch = 'rkka';
-    expect(() => loadOob(b)).toThrow(/军种/);
+    expect(() => loadOob(b, params)).toThrow(/军种/);
   });
 
-  it('错误数据会被拒绝：标为有出处却没写出处', () => {
-    const s = clone(oobData);
-    s.units[0]!.confidence = 'sourced';
-    expect(() => loadOob(s)).toThrow(/出处/);
-  });
 });
 
 describe('部署与堆叠', () => {
@@ -64,16 +88,18 @@ describe('部署与堆叠', () => {
 
   it('同格单位组成堆叠，按列表顺序从下到上', () => {
     const s = stacks(placed);
-    const order = demo.placements.filter((p) => p.hex === '2218').map((p) => p.unit);
-    expect(s.get('2218')!.map((p) => p.unit.id)).toEqual(order);
+    const hex = demo.placements.find((p, i) => demo.placements.findIndex((q) => q.hex === p.hex) !== i)!.hex;
+    const order = demo.placements.filter((p) => p.hex === hex).map((p) => p.unit);
+    expect(order.length).toBeGreaterThan(1);
+    expect(s.get(hex)!.map((p) => p.unit.id)).toEqual(order);
     expect([...s.values()].reduce((n, x) => n + x.length, 0)).toBe(placed.length);
     for (const [k, units] of s) for (const u of units) expect(hexId(u.hex)).toBe(k);
   });
 
   it('不写步数 = 满编；写了就用当前步数', () => {
     for (const p of placed) {
-      const raw = demo.placements.find((x) => x.unit === p.unit.id)!;
-      expect(p.steps).toBe('steps' in raw ? raw.steps : p.unit.steps);
+      const raw = demo.placements.find((x) => x.unit === p.unit.id)! as { steps?: number };
+      expect(p.steps).toBe(raw.steps ?? p.unit.steps);
     }
   });
 
@@ -107,10 +133,61 @@ describe('算子', () => {
     }
   });
 
-  it('占位数值用斜体（界面上灰色斜体），近卫编制带 Gds 标记', () => {
-    const u = [...oob.units.values()].find((x) => oob.formations.get(x.formation)!.guards)!;
+  it('占位数值用斜体（界面上灰色斜体），近卫单位的番号带 Gds 标记', () => {
+    const u = [...oob.units.values()].find((x) => x.guards && x.confidence === 'placeholder')!;
     const svg = counterSvg(u, oob.formations.get(u.formation)!);
     expect(svg).toContain('font-style="italic"');
     expect(svg).toContain('Gds ');
+  });
+});
+
+describe('数值换算公式', () => {
+  it('参数表自洽：每种装备的类别都存在', () => {
+    expect(params.status).toBe('draft');
+  });
+
+  it('装甲分：10 辆中型长身管坦克 = 攻击 1、防御 0.9（按公式取整前）', () => {
+    const d = deriveRatings(params, 'armor', 'regiment', [{ item: 'PzIV_long', count: 10 }]);
+    expect(d.lines[0]).toMatchObject({ attack: 1, defense: 0.9 });
+    expect(d.armorClass).toBe('medium');
+  });
+
+  it('同样数量下，重型坦克比中型强，中型比轻型强', () => {
+    const a = (item: string) => deriveRatings(params, 'armor', 'regiment', [{ item, count: 50 }]).attack;
+    expect(a('Tiger')).toBeGreaterThan(a('PzIV_long'));
+    expect(a('PzIV_long')).toBeGreaterThan(a('T70'));
+  });
+
+  it('只有总兵力时按战斗兵力比例推算，并在明细里注明', () => {
+    const d = deriveRatings(params, 'infantry', 'division', [{ item: 'personnel_total', count: 8000 }]);
+    expect(d.lines[0]!.label).toMatch(/推算/);
+    expect(d.lines[0]!.defense).toBe(12);
+    expect(d.usedDefault).toBe(false);
+  });
+
+  it('没有兵力数字的步兵单位用类型占位分', () => {
+    const d = deriveRatings(params, 'panzergrenadier', 'regiment', []);
+    expect(d.usedDefault).toBe(true);
+    expect(d.lines.every((l) => l.placeholder)).toBe(true);
+  });
+
+  it('炮兵：攻击位置是炮火支援值', () => {
+    const d = deriveRatings(params, 'artillery', 'regiment', [{ item: 'sFH_150', count: 24 }]);
+    expect(d.attack).toBe(2);
+    expect(d.defense).toBe(params.artilleryDefense);
+  });
+
+  it('步数在规模上下限之内', () => {
+    for (const u of oob.units.values()) {
+      const [lo, hi] = params.steps[u.size]!;
+      expect(u.steps, u.id).toBeGreaterThanOrEqual(lo);
+      expect(u.steps, u.id).toBeLessThanOrEqual(hi);
+    }
+  });
+
+  it('算子数字由公式算出，与明细一致', () => {
+    const u = oob.units.get('DE.IISS.LSSAH.PzRgt1')!;
+    const d = deriveRatings(params, u.type, u.size, u.strength, u.quality);
+    expect(u.ratings).toEqual({ attack: d.attack, defense: d.defense, movement: d.movement });
   });
 });

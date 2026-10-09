@@ -1,5 +1,5 @@
 {
- "$comment": "演示摆放：用来检查算子、堆叠和信息面板，不是历史部署。同格多个单位按列表顺序堆叠，后列出的在上面；steps 不写表示满编。",
+ "$comment": "演示摆放：只用来检查算子、堆叠和信息面板，不是历史部署（S1 的历史开局位置在冲刺 7 考据）。同格多个单位按列表顺序堆叠，后列出的在上面；steps 不写表示满编。",
  "id": "demo-prokhorovka",
  "names": {
   "zh": "演示摆放（普罗霍罗夫卡附近）",
@@ -10,46 +10,284 @@
  "note": "演示用，非历史部署",
  "placements": [
   {
-   "unit": "DE.IISS.LSSAH.PzGrenRgt1",
-   "hex": "2218"
+   "unit": "DE.IISS.LSSAH.PzRgt1",
+   "hex": "2117"
   },
   {
-   "unit": "DE.IISS.LSSAH.PzRgt1",
-   "hex": "2218"
+   "unit": "DE.IISS.LSSAH.PzGrenRgt1",
+   "hex": "2117"
   },
   {
    "unit": "DE.IISS.LSSAH.PzGrenRgt2",
-   "hex": "2117",
-   "steps": 3
+   "hex": "2116"
   },
   {
-   "unit": "DE.IISS.LSSAH.AufklAbt1",
-   "hex": "2219"
+   "unit": "DE.IISS.LSSAH.AufklAbt",
+   "hex": "2116"
   },
   {
-   "unit": "DE.IISS.LSSAH.ArtRgt1",
+   "unit": "DE.IISS.LSSAH.StuGAbt",
+   "hex": "2216"
+  },
+  {
+   "unit": "DE.IISS.LSSAH.PzJgAbt",
+   "hex": "2216"
+  },
+  {
+   "unit": "DE.IISS.LSSAH.ArtRgt",
+   "hex": "2217"
+  },
+  {
+   "unit": "DE.IISS.DR.PzRgt2",
+   "hex": "2120"
+  },
+  {
+   "unit": "DE.IISS.DR.D",
+   "hex": "2120"
+  },
+  {
+   "unit": "DE.IISS.DR.DF",
    "hex": "2119"
   },
   {
-   "unit": "SU.29TK.53MSBr",
-   "hex": "2316"
+   "unit": "DE.IISS.DR.AufklAbt",
+   "hex": "2119"
+  },
+  {
+   "unit": "DE.IISS.DR.StuGAbt",
+   "hex": "2219"
+  },
+  {
+   "unit": "DE.IISS.DR.PzJgAbt",
+   "hex": "2219"
+  },
+  {
+   "unit": "DE.IISS.DR.ArtRgt",
+   "hex": "2220"
+  },
+  {
+   "unit": "DE.IISS.T.PzRgt3",
+   "hex": "1914"
+  },
+  {
+   "unit": "DE.IISS.T.PzGrenRgt1",
+   "hex": "1914"
+  },
+  {
+   "unit": "DE.IISS.T.PzGrenRgt3",
+   "hex": "1913"
+  },
+  {
+   "unit": "DE.IISS.T.AufklAbt",
+   "hex": "1913"
+  },
+  {
+   "unit": "DE.IISS.T.StuGAbt",
+   "hex": "2013"
+  },
+  {
+   "unit": "DE.IISS.T.PzJgAbt",
+   "hex": "2013"
+  },
+  {
+   "unit": "DE.IISS.T.ArtRgt",
+   "hex": "2014"
+  },
+  {
+   "unit": "SU.18TK.110TBr",
+   "hex": "2415"
+  },
+  {
+   "unit": "SU.18TK.170TBr",
+   "hex": "2415"
+  },
+  {
+   "unit": "SU.18TK.181TBr",
+   "hex": "2414"
+  },
+  {
+   "unit": "SU.18TK.32MSBr",
+   "hex": "2414"
+  },
+  {
+   "unit": "SU.18TK.36GvTP",
+   "hex": "2515"
+  },
+  {
+   "unit": "SU.29TK.25TBr",
+   "hex": "2317"
+  },
+  {
+   "unit": "SU.29TK.31TBr",
+   "hex": "2317"
   },
   {
    "unit": "SU.29TK.32TBr",
    "hex": "2316"
   },
   {
-   "unit": "SU.29TK.31TBr",
-   "hex": "2316",
-   "steps": 2
+   "unit": "SU.29TK.53MSBr",
+   "hex": "2316"
   },
   {
-   "unit": "SU.29TK.25TBr",
+   "unit": "SU.29TK.1446SAP",
+   "hex": "2416"
+  },
+  {
+   "unit": "SU.5GMK.10GvMBr",
+   "hex": "2715"
+  },
+  {
+   "unit": "SU.5GMK.11GvMBr",
+   "hex": "2715"
+  },
+  {
+   "unit": "SU.5GMK.12GvMBr",
+   "hex": "2714"
+  },
+  {
+   "unit": "SU.5GMK.24GvTBr",
+   "hex": "2714"
+  },
+  {
+   "unit": "SU.5GMK.1447SAP",
+   "hex": "2814"
+  },
+  {
+   "unit": "SU.2GTK.4GvTBr",
+   "hex": "2420"
+  },
+  {
+   "unit": "SU.2GTK.25GvTBr",
+   "hex": "2420"
+  },
+  {
+   "unit": "SU.2GTK.26GvTBr",
+   "hex": "2419"
+  },
+  {
+   "unit": "SU.2GTK.4GvMSBr",
+   "hex": "2419"
+  },
+  {
+   "unit": "SU.2GTK.47GvTP",
+   "hex": "2520"
+  },
+  {
+   "unit": "SU.2TK.26TBr",
+   "hex": "2418"
+  },
+  {
+   "unit": "SU.2TK.99TBr",
+   "hex": "2418"
+  },
+  {
+   "unit": "SU.2TK.169TBr",
    "hex": "2417"
   },
   {
-   "unit": "SU.9GVDD.div",
-   "hex": "2515"
+   "unit": "SU.2TK.58MSBr",
+   "hex": "2417"
+  },
+  {
+   "unit": "SU.2TK.15GvTP",
+   "hex": "2518"
+  },
+  {
+   "unit": "SU.5GTA.53GvOTP",
+   "hex": "2616"
+  },
+  {
+   "unit": "SU.5GTA.1GvMCP",
+   "hex": "2616"
+  },
+  {
+   "unit": "SU.5GTA.1529SAP",
+   "hex": "2615"
+  },
+  {
+   "unit": "SU.5GTA.1549SAP",
+   "hex": "2615"
+  },
+  {
+   "unit": "SU.5GA.13GvSD",
+   "hex": "2112"
+  },
+  {
+   "unit": "SU.5GA.66GvSD",
+   "hex": "2112"
+  },
+  {
+   "unit": "SU.5GA.6GvVDD",
+   "hex": "2111"
+  },
+  {
+   "unit": "SU.5GA.95GvSD",
+   "hex": "2111"
+  },
+  {
+   "unit": "SU.5GA.97GvSD",
+   "hex": "2211"
+  },
+  {
+   "unit": "SU.5GA.9GvVDD",
+   "hex": "2211"
+  },
+  {
+   "unit": "SU.5GA.42GvSD",
+   "hex": "2212"
+  },
+  {
+   "unit": "SU.6GA.51GvSD",
+   "hex": "1713"
+  },
+  {
+   "unit": "SU.6GA.52GvSD",
+   "hex": "1713"
+  },
+  {
+   "unit": "SU.69A.96TBr",
+   "hex": "2721"
+  },
+  {
+   "unit": "SU.69A.148OTP",
+   "hex": "2721"
+  },
+  {
+   "unit": "SU.69A.81GvSD",
+   "hex": "2720"
+  },
+  {
+   "unit": "SU.69A.89GvSD",
+   "hex": "2720"
+  },
+  {
+   "unit": "SU.69A.92GvSD",
+   "hex": "2820"
+  },
+  {
+   "unit": "SU.69A.93GvSD",
+   "hex": "2820"
+  },
+  {
+   "unit": "SU.69A.94GvSD",
+   "hex": "2821"
+  },
+  {
+   "unit": "SU.69A.183SD",
+   "hex": "2821"
+  },
+  {
+   "unit": "SU.69A.305SD",
+   "hex": "2722"
+  },
+  {
+   "unit": "SU.69A.375SD",
+   "hex": "2722"
+  },
+  {
+   "unit": "SU.69A.107SD",
+   "hex": "2621"
   }
  ]
 }

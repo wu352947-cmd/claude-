@@ -1,20 +1,102 @@
 {
- "$comment": "南线战斗序列。现在只有演示用的少量单位，全部为占位（confidence = placeholder）：番号凭记忆录入未核对，数值是随手设定的游戏值。考据后逐条改为 sourced 并在 provenance 写出处（字段、史料 ID、页码、级别）。formations 的 color 是师属色条颜色（游戏设计选择，不是史料）。",
+ "$comment": "S1 普罗霍罗夫卡想定的战斗序列（AI 考据，2026-10-09，所有者未核对）。strength 里每个数字都抄自史料原文，带口径、日期、出处与原文摘录；攻击/防御/移动/步数由 data/rules/ratings.json 的公式自动算出（公式为草案）。德军取 1943-07-04；苏军没有 7 月 4 日数字，取 7 月 12 日晨开战前最近的数字，日期照实记录。没有数字的单位用类型占位分并显示为占位。德军第 3 装甲军另行补充。详见 docs/reviews/2026-10-09-S1战斗序列AI考据.md",
  "formations": [
   {
    "id": "DE.IISS.LSSAH",
    "side": "DE",
    "branch": "waffen-ss",
    "names": {
-    "zh": "党卫军第1装甲掷弹兵师“警卫旗队”",
-    "en": "1st SS Panzergrenadier Division LSSAH",
-    "de": "1. SS-Panzergrenadier-Division LSSAH"
+    "zh": "党卫军\"警卫旗队\"装甲掷弹兵师",
+    "en": "SS-Panzergrenadier-Division Leibstandarte SS Adolf Hitler",
+    "de": "SS-Panzergrenadier-Division \"Leibstandarte SS Adolf Hitler\""
    },
    "abbr": "LSSAH",
    "color": "#d9a441",
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0202",
+     "page": "Table 1",
+     "grade": "B",
+     "note": "师番号与隶属"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.IISS.DR",
+   "side": "DE",
+   "branch": "waffen-ss",
+   "names": {
+    "zh": "党卫军\"帝国\"装甲掷弹兵师",
+    "en": "SS-Panzergrenadier-Division Das Reich",
+    "de": "SS-Panzergrenadier-Division \"Das Reich\""
+   },
+   "abbr": "DR",
+   "color": "#c46a4a",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0202",
+     "page": "Table 1",
+     "grade": "B",
+     "note": "师番号与隶属"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "DE.IISS.T",
+   "side": "DE",
+   "branch": "waffen-ss",
+   "names": {
+    "zh": "党卫军\"骷髅\"装甲掷弹兵师",
+    "en": "SS-Panzergrenadier-Division Totenkopf",
+    "de": "SS-Panzergrenadier-Division \"Totenkopf\""
+   },
+   "abbr": "T",
+   "color": "#8d8f9a",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0202",
+     "page": "Table 1",
+     "grade": "B",
+     "note": "师番号与隶属"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.18TK",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "坦克第18军",
+    "en": "18th Tank Corps",
+    "ru": "18-й танковый корпус"
+   },
+   "abbr": "18 TK",
+   "color": "#4f86c6",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Ставка",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日为大本营预备队，7 月 5 日编入近卫坦克第 5 集团军（Лопуховский）"
   },
   {
    "id": "SU.29TK",
@@ -26,26 +108,190 @@
     "ru": "29-й танковый корпус"
    },
    "abbr": "29 TK",
-   "color": "#4f86c6",
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+   "color": "#2f6db0",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Степной ВО",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified"
   },
   {
-   "id": "SU.9GVDD",
+   "id": "SU.5GMK",
    "side": "SU",
    "branch": "rkka",
-   "guards": true,
    "names": {
-    "zh": "近卫空降兵第9师",
-    "en": "9th Guards Airborne Division",
-    "ru": "9-я гвардейская воздушно-десантная дивизия"
+    "zh": "近卫机械化第5军",
+    "en": "5th Guards Mechanized Corps",
+    "ru": "5-й гвардейский механизированный корпус"
    },
-   "abbr": "9 VDD",
-   "color": "#7cb26a",
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号与隶属凭 AI 记忆录入，未经史料核对；待所有者按《苏军战斗编成》/Tessin 等考据后改为 sourced"
+   "abbr": "5 MK",
+   "color": "#7a5bb5",
+   "guards": true,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Степной ВО",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.2GTK",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "近卫坦克第2军（塔钦斯卡亚）",
+    "en": "2nd Guards Tatsinskaya Tank Corps",
+    "ru": "2-й гвардейский Тацинский танковый корпус"
+   },
+   "abbr": "2 TK",
+   "color": "#c9a227",
+   "guards": true,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Воронежский фронт",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）"
+  },
+  {
+   "id": "SU.2TK",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "坦克第2军",
+    "en": "2nd Tank Corps",
+    "ru": "2-й танковый корпус"
+   },
+   "abbr": "2 TK",
+   "color": "#3f9a8c",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Юго-Западный фронт",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日属西南方面军；7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）"
+  },
+  {
+   "id": "SU.5GTA",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "近卫坦克第5集团军直属部队",
+    "en": "5th Guards Tank Army troops",
+    "ru": "5-я гвардейская танковая армия (армейские части)"
+   },
+   "abbr": "5 TA",
+   "color": "#b8453a",
+   "guards": true,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Степной ВО",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.5GA",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "近卫第5集团军",
+    "en": "5th Guards Army",
+    "ru": "5-я гвардейская армия"
+   },
+   "abbr": "5 A",
+   "color": "#6f9e4a",
+   "guards": true,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Степной ВО",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.6GA",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "近卫第6集团军",
+    "en": "6th Guards Army",
+    "ru": "6-я гвардейская армия"
+   },
+   "abbr": "6 A",
+   "color": "#9a7b4f",
+   "guards": true,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Воронежский фронт",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.69A",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "第69集团军",
+    "en": "69th Army",
+    "ru": "69-я армия"
+   },
+   "abbr": "69 A",
+   "color": "#5c6b7a",
+   "guards": false,
+   "confidence": "sourced",
+   "provenance": [
+    {
+     "field": "id",
+     "source": "SRC-0201",
+     "page": "1 июля 1943, Воронежский фронт",
+     "grade": "B",
+     "note": "编制与隶属（1943-07-01）"
+    }
+   ],
+   "status": "unverified",
+   "note": "81、89、92、93、94 гв. сд 与 375 сд 7 月 1 日分属其他集团军，7 月 11–13 日在第 69 集团军地段作战（Замулин）；96 тбр、148 отп 7 月 11 日配属该集团军"
   }
  ],
  "units": [
@@ -60,15 +306,72 @@
    "designation": "1",
    "type": "armor",
    "size": "regiment",
-   "steps": 4,
-   "ratings": {
-    "attack": 8,
-    "defense": 5,
-    "movement": 10
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzIV_long",
+     "count": 79,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/09/10/a-single-four-company-tank-battalion-in-lssah/",
+     "quote": "The LSSAH had on 4 July: 79 Pz IVs, 9 Pz III Command, 9 Pz III long, 2 Pz III short, 4 Pz IIs and 3 Pz Is."
+    },
+    {
+     "item": "PzIII_long",
+     "count": 9,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/09/10/a-single-four-company-tank-battalion-in-lssah/",
+     "quote": "The LSSAH had on 4 July: 79 Pz IVs, 9 Pz III Command, 9 Pz III long, 2 Pz III short, 4 Pz IIs and 3 Pz Is."
+    },
+    {
+     "item": "PzIII_short",
+     "count": 2,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/09/10/a-single-four-company-tank-battalion-in-lssah/",
+     "quote": "The LSSAH had on 4 July: 79 Pz IVs, 9 Pz III Command, 9 Pz III long, 2 Pz III short, 4 Pz IIs and 3 Pz Is."
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 9,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/09/10/a-single-four-company-tank-battalion-in-lssah/",
+     "quote": "The LSSAH had on 4 July: 79 Pz IVs, 9 Pz III Command, 9 Pz III long, 2 Pz III short, 4 Pz IIs and 3 Pz Is."
+    },
+    {
+     "item": "PzII",
+     "count": 4,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/09/10/a-single-four-company-tank-battalion-in-lssah/",
+     "quote": "The LSSAH had on 4 July: 79 Pz IVs, 9 Pz III Command, 9 Pz III long, 2 Pz III short, 4 Pz IIs and 3 Pz Is."
+    },
+    {
+     "item": "Tiger",
+     "count": 12,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/19/panzer-battalions-in-lssah-in-july-1943/",
+     "quote": "The division had 3 Pz I (one of them a command tank), 4 Pz IIs, 90 Pz IIIs and Pz IVs (79 of them Panzer IV longs), 12 Pz VI and nine Panzer III Command tanks.",
+     "note": "第 13（重）连"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月该团的营连编成有争议（Lawrence 博客多篇），本表按全团合计。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.LSSAH.PzGrenRgt1",
@@ -81,15 +384,10 @@
    "designation": "1",
    "type": "panzergrenadier",
    "size": "regiment",
-   "steps": 4,
-   "ratings": {
-    "attack": 5,
-    "defense": 6,
-    "movement": 8
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
    "id": "DE.IISS.LSSAH.PzGrenRgt2",
@@ -102,57 +400,798 @@
    "designation": "2",
    "type": "panzergrenadier",
    "size": "regiment",
-   "steps": 4,
-   "ratings": {
-    "attack": 5,
-    "defense": 6,
-    "movement": 8
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
-   "id": "DE.IISS.LSSAH.AufklAbt1",
+   "id": "DE.IISS.LSSAH.AufklAbt",
    "formation": "DE.IISS.LSSAH",
    "names": {
-    "zh": "党卫军第1装甲侦察营",
-    "en": "SS Panzer Reconnaissance Battalion 1",
-    "de": "SS-Panzer-Aufklärungs-Abteilung 1"
+    "zh": "党卫军\"警卫旗队\"侦察营",
+    "en": "LSSAH Reconnaissance Battalion",
+    "de": "SS-Aufklärungs-Abteilung LSSAH"
    },
-   "designation": "1",
+   "designation": "A",
    "type": "recon",
    "size": "battalion",
-   "steps": 2,
-   "ratings": {
-    "attack": 3,
-    "defense": 2,
-    "movement": 12
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "armoredCar",
+     "count": 32,
+     "basis": "KDB inventory evening 11 July（没有 7 月 4 日数字）",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32",
+     "note": "全师装甲车合计，暂全部计入侦察营"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
   },
   {
-   "id": "DE.IISS.LSSAH.ArtRgt1",
+   "id": "DE.IISS.LSSAH.StuGAbt",
    "formation": "DE.IISS.LSSAH",
    "names": {
-    "zh": "党卫军第1装甲炮兵团",
-    "en": "SS Panzer Artillery Regiment 1",
-    "de": "SS-Panzer-Artillerie-Regiment 1"
+    "zh": "党卫军\"警卫旗队\"突击炮营",
+    "en": "LSSAH Assault Gun Battalion",
+    "de": "SS-Sturmgeschütz-Abteilung LSSAH"
    },
-   "designation": "1",
+   "designation": "StuG",
+   "type": "assault-gun",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "StuGIII",
+     "count": 34,
+     "basis": "operational (einsatzbereit)",
+     "date": "1943-07-04",
+     "source": "SRC-0203",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf · Table 2",
+     "quote": "LSSAH Operational DR 4.7.43 11 79 - 12 9 111 34 20 165"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.LSSAH.PzJgAbt",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军\"警卫旗队\"坦克歼击营",
+    "en": "LSSAH Panzerjäger Battalion",
+    "de": "SS-Panzerjäger-Abteilung LSSAH"
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PakSf",
+     "count": 20,
+     "basis": "operational (einsatzbereit)",
+     "date": "1943-07-04",
+     "source": "SRC-0203",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf · Table 2",
+     "quote": "LSSAH Operational DR 4.7.43 11 79 - 12 9 111 34 20 165"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.LSSAH.ArtRgt",
+   "formation": "DE.IISS.LSSAH",
+   "names": {
+    "zh": "党卫军\"警卫旗队\"炮兵团",
+    "en": "LSSAH Artillery Regiment",
+    "de": "SS-Artillerie-Regiment LSSAH"
+   },
+   "designation": "Art",
    "type": "artillery",
    "size": "regiment",
-   "steps": 3,
-   "ratings": {
-    "attack": 6,
-    "defense": 2,
-    "movement": 6
+   "guards": false,
+   "strength": [
+    {
+     "item": "Wespe",
+     "count": 12,
+     "basis": "possessed for the launch of Citadel",
+     "date": "1943-07-04",
+     "source": "SRC-0202",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf",
+     "quote": "each of the three divisions of the II SS Panzer Korps possessed 12 Wespe self-propelled light field howitzers and 6 Hummel self-propelled heavy field howitzers"
+    },
+    {
+     "item": "Hummel",
+     "count": 6,
+     "basis": "possessed for the launch of Citadel",
+     "date": "1943-07-04",
+     "source": "SRC-0202",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf",
+     "quote": "each of the three divisions of the II SS Panzer Korps possessed 12 Wespe self-propelled light field howitzers and 6 Hummel self-propelled heavy field howitzers"
+    },
+    {
+     "item": "leFH_105",
+     "count": 15,
+     "basis": "KDB inventory evening 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32"
+    },
+    {
+     "item": "sFH_150",
+     "count": 12,
+     "basis": "KDB inventory evening 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32"
+    },
+    {
+     "item": "K_105",
+     "count": 4,
+     "basis": "KDB inventory evening 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32"
+    },
+    {
+     "item": "NbW_150",
+     "count": 6,
+     "basis": "KDB inventory evening 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32",
+     "note": "火箭炮营番号未查到，暂计入炮兵团"
+    },
+    {
+     "item": "NbW_210",
+     "count": 6,
+     "basis": "KDB inventory evening 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2019/07/26/but-it-really-wasnt-just-a-tank-battle/",
+     "quote": "LSSAH inventory evening of 11 July: 105mm Howitzer: 15 / 150mm Howitzer: 12 / 105mm Gun: 4 / 150mm Launcher: 6 / 210mm Launcher: 6 / Hummel: 5 / Wespe: 12 / Grille: 12 / AC 4w MG (221): 4 / AC 4w 20mm (222): 7 / AC 4w MG (223): 5 / AC 8w 20mm (231): 1 / AC 8w 20mm (232): 4 / AC 8w radio (261): 10 / AC 247: 1 — total armored cars 32"
+    }
+   ],
+   "status": "unverified",
+   "note": "自行火炮为 7 月 4 日数，牵引火炮与火箭炮只有 7 月 11 日晚数（KDB 记 Hummel 5 门，与 Wheatley 的 6 门不同，见争议登记）。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.PzRgt2",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军第2装甲团",
+    "en": "SS Panzer Regiment 2",
+    "de": "SS-Panzer-Regiment 2"
    },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "designation": "2",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzI_cmd",
+     "count": 1,
+     "basis": "KDB evening 4 July (in repair not counted)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 9,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair) [Pz III short ("
+    },
+    {
+     "item": "PzIII_short",
+     "count": 1,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "PzIII_long",
+     "count": 52,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "PzIV_long",
+     "count": 30,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "Tiger",
+     "count": 12,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "T34_captured",
+     "count": 18,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.D",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"德意志\"装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment Deutschland",
+    "de": "SS-Panzergrenadier-Regiment \"Deutschland\""
+   },
+   "designation": "D",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.DF",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"元首\"装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment Der Führer",
+    "de": "SS-Panzergrenadier-Regiment \"Der Führer\""
+   },
+   "designation": "DF",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.AufklAbt",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"帝国\"侦察营",
+    "en": "Das Reich Reconnaissance Battalion",
+    "de": "SS-Aufklärungs-Abteilung \"Das Reich\""
+   },
+   "designation": "A",
+   "type": "recon",
+   "size": "battalion",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.StuGAbt",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"帝国\"突击炮营",
+    "en": "Das Reich Assault Gun Battalion",
+    "de": "SS-Sturmgeschütz-Abteilung \"Das Reich\""
+   },
+   "designation": "StuG",
+   "type": "assault-gun",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "StuGIII",
+     "count": 33,
+     "basis": "operational (einsatzbereit)",
+     "date": "1943-07-04",
+     "source": "SRC-0203",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf · Table 2",
+     "quote": "DR Operational 4.7.43 47 30 18 12 8 115 33 11 159"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.PzJgAbt",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"帝国\"坦克歼击营",
+    "en": "Das Reich Panzerjäger Battalion",
+    "de": "SS-Panzerjäger-Abteilung \"Das Reich\""
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "MarderII",
+     "count": 2,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    },
+    {
+     "item": "MarderIII",
+     "count": 8,
+     "basis": "KDB evening 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/09/05/das-reich-tank-losses-on-6-july/",
+     "quote": "Pz I Command: 1 / Pz II: 0 (and 1 in repair) / Pz III short (Command): 8 / Pz III short: 1 / Pz III long: 52 (and 11 in repair) / Pz III Observation: 9 (not counted) / Pz III Command: 1 / Pz IV long: 30 (and 2 in repair) / Pz VI: 12 (and 2 in repair) / StuG III: 33 / Marder II: 2 (and one in repair) / Marder III 76.2mm: 8 / T-34: 18 (and 9 in repair) / Total: 166 (and 26 in repair)"
+    }
+   ],
+   "status": "unverified",
+   "note": "Wheatley 表 2 的可作战自行反坦克炮为 11 门，KDB 为 10 门（见争议登记）。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.DR.ArtRgt",
+   "formation": "DE.IISS.DR",
+   "names": {
+    "zh": "党卫军\"帝国\"炮兵团",
+    "en": "Das Reich Artillery Regiment",
+    "de": "SS-Artillerie-Regiment \"Das Reich\""
+   },
+   "designation": "Art",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "Wespe",
+     "count": 12,
+     "basis": "possessed for the launch of Citadel",
+     "date": "1943-07-04",
+     "source": "SRC-0202",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf",
+     "quote": "each of the three divisions of the II SS Panzer Korps possessed 12 Wespe self-propelled light field howitzers and 6 Hummel self-propelled heavy field howitzers"
+    },
+    {
+     "item": "Hummel",
+     "count": 6,
+     "basis": "possessed for the launch of Citadel",
+     "date": "1943-07-04",
+     "source": "SRC-0202",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf",
+     "quote": "each of the three divisions of the II SS Panzer Korps possessed 12 Wespe self-propelled light field howitzers and 6 Hummel self-propelled heavy field howitzers"
+    }
+   ],
+   "status": "unverified",
+   "note": "只查到自行火炮；牵引火炮数量缺失，炮火支援值偏低。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.PzRgt3",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军第3装甲团",
+    "en": "SS Panzer Regiment 3",
+    "de": "SS-Panzer-Regiment 3"
+   },
+   "designation": "3",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "PzIII_long",
+     "count": 59,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "PzIII_cmd",
+     "count": 8,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "PzIV_short",
+     "count": 7,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "PzIV_long",
+     "count": 40,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "Tiger",
+     "count": 11,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "Tiger_cmd",
+     "count": 1,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.PzGrenRgt1",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"第1装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment 1 Totenkopf",
+    "de": "SS-Panzergrenadier-Regiment 1 \"Totenkopf\""
+   },
+   "designation": "1",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.PzGrenRgt3",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"第3装甲掷弹兵团",
+    "en": "SS Panzergrenadier Regiment 3 Totenkopf",
+    "de": "SS-Panzergrenadier-Regiment 3 \"Totenkopf\""
+   },
+   "designation": "3",
+   "type": "panzergrenadier",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分。另有资料称团名为\"Eicke\"，番号未确认。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.AufklAbt",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"侦察营",
+    "en": "Totenkopf Reconnaissance Battalion",
+    "de": "SS-Aufklärungs-Abteilung \"Totenkopf\""
+   },
+   "designation": "A",
+   "type": "recon",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "armoredCar",
+     "count": 36,
+     "basis": "KDB 4 July, AFVs not included in tank count",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars",
+     "note": "全师装甲车合计，暂全部计入侦察营"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.StuGAbt",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"突击炮营",
+    "en": "Totenkopf Assault Gun Battalion",
+    "de": "SS-Sturmgeschütz-Abteilung \"Totenkopf\""
+   },
+   "designation": "StuG",
+   "type": "assault-gun",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "StuGIII",
+     "count": 28,
+     "basis": "operational (einsatzbereit)",
+     "date": "1943-07-04",
+     "source": "SRC-0203",
+     "grade": "B",
+     "where": "https://ueaeprints.uea.ac.uk/id/eprint/81739/1/Published_Version.pdf · Table 2",
+     "quote": "SS-T Operational 4.7.43 59 47 - 11 8 125 28 11 164"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.PzJgAbt",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"坦克歼击营",
+    "en": "Totenkopf Panzerjäger Battalion",
+    "de": "SS-Panzerjäger-Abteilung \"Totenkopf\""
+   },
+   "designation": "PzJg",
+   "type": "tank-destroyer",
+   "size": "battalion",
+   "guards": false,
+   "strength": [
+    {
+     "item": "MarderII",
+     "count": 11,
+     "basis": "KDB 4 July (ready for action)",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    }
+   ],
+   "status": "unverified",
+   "note": "团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "DE.IISS.T.ArtRgt",
+   "formation": "DE.IISS.T",
+   "names": {
+    "zh": "党卫军\"骷髅\"炮兵团",
+    "en": "Totenkopf Artillery Regiment",
+    "de": "SS-Artillerie-Regiment \"Totenkopf\""
+   },
+   "designation": "Art",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "Wespe",
+     "count": 12,
+     "basis": "KDB 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    },
+    {
+     "item": "Hummel",
+     "count": 5,
+     "basis": "KDB 4 July",
+     "date": "1943-07-04",
+     "source": "SRC-0205",
+     "grade": "B",
+     "where": "https://dupuyinstitute.org/2018/07/30/the-tank-repair-and-replacement-efforts-of-ii-guards-tank-corps-compared-to-totenkopf-ss-division/",
+     "quote": "On 4 July this tank strength consisted of 59 Pz III long, 8 Pz III Command, 7 Pz IV short, 40 Pz IV long, 11 Pz VI, 1 Pz VI Command, 28 SuG III and 11 Marder IIs. AFVs not included in this count are 5 Pz III Observation, 5 Hummel, 12 Wespe, 36 armored cars"
+    }
+   ],
+   "status": "unverified",
+   "note": "KDB 记 Hummel 5 门，Wheatley 记 6 门（见争议登记）；牵引火炮缺失。团级番号据 Lexikon der Wehrmacht（D 级，编制表为 1942 年 11 月或未注日期），待核对"
+  },
+  {
+   "id": "SU.18TK.110TBr",
+   "formation": "SU.18TK",
+   "names": {
+    "zh": "坦克第110旅",
+    "en": "110th Tank Brigade",
+    "ru": "110 танковая бригада"
+   },
+   "designation": "110",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 24,
+     "basis": "11 July (uncited table)",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "110 тбр ... 24 ... 21"
+    },
+    {
+     "item": "T70",
+     "count": 21,
+     "basis": "same",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "110 тбр ... 24 ... 21"
+    }
+   ],
+   "status": "unverified",
+   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+  },
+  {
+   "id": "SU.18TK.170TBr",
+   "formation": "SU.18TK",
+   "names": {
+    "zh": "坦克第170旅",
+    "en": "170th Tank Brigade",
+    "ru": "170 танковая бригада"
+   },
+   "designation": "170",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 22,
+     "basis": "11 July (uncited table)",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "170 тбр ... 22 ... 17"
+    },
+    {
+     "item": "T70",
+     "count": 17,
+     "basis": "same",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "170 тбр ... 22 ... 17"
+    }
+   ],
+   "status": "unverified",
+   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+  },
+  {
+   "id": "SU.18TK.181TBr",
+   "formation": "SU.18TK",
+   "names": {
+    "zh": "坦克第181旅",
+    "en": "181th Tank Brigade",
+    "ru": "181 танковая бригада"
+   },
+   "designation": "181",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 24,
+     "basis": "'боеготовых и временно в ремонте', 11 July (uncited table)",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "181 тбр ... 24 ... 20"
+    },
+    {
+     "item": "T70",
+     "count": 20,
+     "basis": "same",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "181 тбр ... 24 ... 20"
+    }
+   ],
+   "status": "unverified",
+   "note": "分车型数字只见于俄文维基（D 级，无出处）；Лопуховский 记 7 月 12 日该旅坦克总数，见备注"
+  },
+  {
+   "id": "SU.18TK.32MSBr",
+   "formation": "SU.18TK",
+   "names": {
+    "zh": "摩托化步兵第32旅",
+    "en": "32nd Motor Rifle Brigade",
+    "ru": "32 мсбр"
+   },
+   "designation": "32",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.18TK.36GvTP",
+   "formation": "SU.18TK",
+   "names": {
+    "zh": "近卫独立坦克第36团",
+    "en": "36th Guards Tank Regiment",
+    "ru": "36 гв. отп"
+   },
+   "designation": "36",
+   "type": "armor",
+   "size": "regiment",
+   "guards": true,
+   "strength": [
+    {
+     "item": "Churchill",
+     "count": 19,
+     "basis": "supporting 170 тбр, 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=76",
+     "quote": "36-й гв. оттп (19 танков «Черчилль»)"
+    }
+   ],
+   "status": "unverified",
+   "note": "俄文维基记 7 月 11 日 20 辆（D 级），采用 Лопуховский 7 月 12 日 19 辆（B 级）"
   },
   {
    "id": "SU.29TK.25TBr",
@@ -160,20 +1199,45 @@
    "names": {
     "zh": "坦克第25旅",
     "en": "25th Tank Brigade",
-    "ru": "25-я танковая бригада"
+    "ru": "25 тбр"
    },
    "designation": "25",
    "type": "armor",
    "size": "brigade",
-   "steps": 3,
-   "ratings": {
-    "attack": 4,
-    "defense": 3,
-    "movement": 10
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 31,
+     "basis": "1600 11 July; +1 in repair",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "Combat Report #73, 1600, July 11, 1943, HQ: 29th TC T-34…31 ... T-34 (in repair)…1"
+    },
+    {
+     "item": "T70",
+     "count": 36,
+     "basis": "1600 11 July; +3 in repair",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "T-70………36 ... T-70 (in repair)…3"
+    },
+    {
+     "item": "KV1",
+     "count": 1,
+     "basis": "1600 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "KV……………………………1"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "SU.29TK.31TBr",
@@ -181,20 +1245,35 @@
    "names": {
     "zh": "坦克第31旅",
     "en": "31st Tank Brigade",
-    "ru": "31-я танковая бригада"
+    "ru": "31 тбр"
    },
    "designation": "31",
    "type": "armor",
    "size": "brigade",
-   "steps": 3,
-   "ratings": {
-    "attack": 4,
-    "defense": 3,
-    "movement": 10
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 29,
+     "basis": "1600 11 July; +3 in repair",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "Combat Report #73, 1600, July 11, 1943, HQ: 29th TC T-34 ... 29 ... (in repair) 3"
+    },
+    {
+     "item": "T70",
+     "count": 38,
+     "basis": "1600 11 July; +1 in repair",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "T-70 ... 38 ... (in repair) 1"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "SU.29TK.32TBr",
@@ -202,62 +1281,1236 @@
    "names": {
     "zh": "坦克第32旅",
     "en": "32nd Tank Brigade",
-    "ru": "32-я танковая бригада"
+    "ru": "32 тбр"
    },
    "designation": "32",
    "type": "armor",
    "size": "brigade",
-   "steps": 3,
-   "ratings": {
-    "attack": 4,
-    "defense": 3,
-    "movement": 10
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 60,
+     "basis": "1600 11 July; +4 in repair",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "Combat Report #73, 1600, July 11, 1943, HQ: 29th TC T-34 ... 60 ... (in repair) 4"
+    }
+   ],
+   "status": "unverified"
   },
   {
    "id": "SU.29TK.53MSBr",
    "formation": "SU.29TK",
    "names": {
     "zh": "摩托化步兵第53旅",
-    "en": "53rd Motorized Rifle Brigade",
-    "ru": "53-я мотострелковая бригада"
+    "en": "53rd Motor Rifle Brigade",
+    "ru": "53 мсбр"
    },
    "designation": "53",
    "type": "motorized-infantry",
    "size": "brigade",
-   "steps": 3,
-   "ratings": {
-    "attack": 3,
-    "defense": 4,
-    "movement": 8
-   },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "guards": false,
+   "strength": [
+    {
+     "item": "armoredCar",
+     "count": 17,
+     "basis": "0800 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "53rd MotRBde: 293 cars, 17 BA-64 armored cars, 12 76mm guns, 12 45mm guns, 30 82mm mortars and 6 120mm mortars."
+    },
+    {
+     "item": "gun_76mm",
+     "count": 12,
+     "basis": "0800 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "53rd MotRBde: 293 cars, 17 BA-64 armored cars, 12 76mm guns, 12 45mm guns, 30 82mm mortars and 6 120mm mortars."
+    },
+    {
+     "item": "gun_45mm",
+     "count": 12,
+     "basis": "0800 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "53rd MotRBde: 293 cars, 17 BA-64 armored cars, 12 76mm guns, 12 45mm guns, 30 82mm mortars and 6 120mm mortars."
+    },
+    {
+     "item": "mortars",
+     "count": 30,
+     "basis": "0800 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "53rd MotRBde: 293 cars, 17 BA-64 armored cars, 12 76mm guns, 12 45mm guns, 30 82mm mortars and 6 120mm mortars.",
+     "note": "82 mm"
+    },
+    {
+     "item": "mortars",
+     "count": 6,
+     "basis": "0800 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "53rd MotRBde: 293 cars, 17 BA-64 armored cars, 12 76mm guns, 12 45mm guns, 30 82mm mortars and 6 120mm mortars.",
+     "note": "120 mm"
+    }
+   ],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分；装备为 7 月 11 日 08:00 报告"
   },
   {
-   "id": "SU.9GVDD.div",
-   "formation": "SU.9GVDD",
+   "id": "SU.29TK.1446SAP",
+   "formation": "SU.29TK",
+   "names": {
+    "zh": "自行火炮第1446团",
+    "en": "1446th SU Regiment",
+    "ru": "1446 сап"
+   },
+   "designation": "1446",
+   "type": "assault-gun",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "SU122",
+     "count": 11,
+     "basis": "1600 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "122mm SAU ... 11 / 76mm SAU ... 8"
+    },
+    {
+     "item": "SU76",
+     "count": 8,
+     "basis": "1600 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0206",
+     "grade": "A",
+     "where": "https://dupuyinstitute.org/2019/09/17/losses-of-the-32nd-and-31st-tank-brigades-at-prokhorovka/",
+     "quote": "122mm SAU ... 11 / 76mm SAU ... 8"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.5GMK.10GvMBr",
+   "formation": "SU.5GMK",
+   "names": {
+    "zh": "近卫机械化第10旅",
+    "en": "10th Guards Mechanized Brigade",
+    "ru": "10 гв. мбр"
+   },
+   "designation": "10",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 29,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "10 гв.мбр ... 29 ... 12"
+    },
+    {
+     "item": "T70",
+     "count": 12,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "10 гв.мбр ... 29 ... 12"
+    }
+   ],
+   "status": "unverified",
+   "note": "坦克数只见于俄文维基（D 级）；没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GMK.11GvMBr",
+   "formation": "SU.5GMK",
+   "names": {
+    "zh": "近卫机械化第11旅",
+    "en": "11th Guards Mechanized Brigade",
+    "ru": "11 гв. мбр"
+   },
+   "designation": "11",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 42,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "11 гв.мбр ... 42 ... 22"
+    },
+    {
+     "item": "T70",
+     "count": 22,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "11 гв.мбр ... 42 ... 22"
+    }
+   ],
+   "status": "unverified",
+   "note": "采用俄文维基 7 月 11 日 42/22（D 级）；Лопуховский 记 7 月 12 日到达勒扎韦茨时 16/15（B 级，已分兵并行军后），见争议登记"
+  },
+  {
+   "id": "SU.5GMK.12GvMBr",
+   "formation": "SU.5GMK",
+   "names": {
+    "zh": "近卫机械化第12旅",
+    "en": "12th Guards Mechanized Brigade",
+    "ru": "12 гв. мбр"
+   },
+   "designation": "12",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 20,
+     "basis": "on arrival at Rzhavets 09.55 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
+     "quote": "12-й гв. мбр (20 танков Т-34, 15 Т-70)"
+    },
+    {
+     "item": "T70",
+     "count": 15,
+     "basis": "on arrival at Rzhavets 09.55 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
+     "quote": "12-й гв. мбр (20 танков Т-34, 15 Т-70)"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 12 日到达勒扎韦茨时的数字；没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GMK.24GvTBr",
+   "formation": "SU.5GMK",
+   "names": {
+    "zh": "近卫坦克第24旅",
+    "en": "24th Guards Tank Brigade",
+    "ru": "24 гв. тбр"
+   },
+   "designation": "24",
+   "type": "armor",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 51,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "24 гв. тбр ... 51 ... 0"
+    }
+   ],
+   "status": "unverified",
+   "note": "只见于俄文维基（D 级）"
+  },
+  {
+   "id": "SU.5GMK.1447SAP",
+   "formation": "SU.5GMK",
+   "names": {
+    "zh": "自行火炮第1447团",
+    "en": "1447th SU Regiment",
+    "ru": "1447 сап"
+   },
+   "designation": "1447",
+   "type": "assault-gun",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "SU122",
+     "count": 12,
+     "basis": "11 July uncited table (labelled '1147 сап')",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "1147 сап ... 12 ... 8"
+    },
+    {
+     "item": "SU76",
+     "count": 8,
+     "basis": "11 July uncited table (labelled '1147 сап')",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "1147 сап ... 12 ... 8"
+    }
+   ],
+   "status": "unverified",
+   "note": "采用俄文维基 7 月 11 日（D 级，表中标为\"1147\"）；Лопуховский 记 7 月 12 日派往勒扎韦茨 7 辆 SU-122、4 辆 SU-76"
+  },
+  {
+   "id": "SU.2GTK.4GvTBr",
+   "formation": "SU.2GTK",
+   "names": {
+    "zh": "近卫坦克第4旅",
+    "en": "4th Guards Tank Brigade",
+    "ru": "4 гв. тбр"
+   },
+   "designation": "4",
+   "type": "armor",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 28,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "4 гв.тбр ... 28 ... 19"
+    },
+    {
+     "item": "T70",
+     "count": 19,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "4 гв.тбр ... 28 ... 19"
+    }
+   ],
+   "status": "unverified",
+   "note": "只见于俄文维基（D 级；两旅数字完全相同，可疑）"
+  },
+  {
+   "id": "SU.2GTK.25GvTBr",
+   "formation": "SU.2GTK",
+   "names": {
+    "zh": "近卫坦克第25旅",
+    "en": "25th Guards Tank Brigade",
+    "ru": "25 гв. тбр"
+   },
+   "designation": "25",
+   "type": "armor",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 28,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "25 гв.тбр ... 28 ... 19"
+    },
+    {
+     "item": "T70",
+     "count": 19,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "25 гв.тбр ... 28 ... 19"
+    }
+   ],
+   "status": "unverified",
+   "note": "只见于俄文维基（D 级；两旅数字完全相同，可疑）"
+  },
+  {
+   "id": "SU.2GTK.26GvTBr",
+   "formation": "SU.2GTK",
+   "names": {
+    "zh": "近卫坦克第26旅",
+    "en": "26th Guards Tank Brigade",
+    "ru": "26 гв. тбр"
+   },
+   "designation": "26",
+   "type": "armor",
+   "size": "brigade",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 30,
+     "basis": "at Shakhovo 09.30 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
+     "quote": "26-я гв. тбр 2-го гв. тк (30 Т-34 и 14 Т-70)"
+    },
+    {
+     "item": "T70",
+     "count": 14,
+     "basis": "at Shakhovo 09.30 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=91",
+     "quote": "26-я гв. тбр 2-го гв. тк (30 Т-34 и 14 Т-70)"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 12 日 09:30 在沙霍沃（B 级）；俄文维基记 7 月 11 日 28/14"
+  },
+  {
+   "id": "SU.2GTK.4GvMSBr",
+   "formation": "SU.2GTK",
+   "names": {
+    "zh": "近卫摩托化步兵第4旅",
+    "en": "4th Guards Motor Rifle Brigade",
+    "ru": "4 гв. мсбр"
+   },
+   "designation": "4",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.2GTK.47GvTP",
+   "formation": "SU.2GTK",
+   "names": {
+    "zh": "近卫独立坦克第47团",
+    "en": "47th Guards Tank Regiment",
+    "ru": "47 гв. отп"
+   },
+   "designation": "47",
+   "type": "armor",
+   "size": "regiment",
+   "guards": true,
+   "strength": [
+    {
+     "item": "Churchill",
+     "count": 21,
+     "basis": "11 July uncited table",
+     "date": "1943-07-11",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "47 гв.отпп ... 21"
+    }
+   ],
+   "status": "unverified",
+   "note": "采用俄文维基 7 月 11 日 21 辆（D 级）；Lawrence 转录 7 月 12 日 07:00 报告称只有 2 辆可战（B 级），差距很大，见争议登记"
+  },
+  {
+   "id": "SU.2TK.26TBr",
+   "formation": "SU.2TK",
+   "names": {
+    "zh": "坦克第26旅",
+    "en": "26th Tank Brigade",
+    "ru": "26 тбр"
+   },
+   "designation": "26",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 34,
+     "basis": "at attack 8 July",
+     "date": "1943-07-08",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
+     "quote": "26-я тбр (34 Т-34, 19 Т-70)"
+    },
+    {
+     "item": "T70",
+     "count": 19,
+     "basis": "at attack 8 July",
+     "date": "1943-07-08",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
+     "quote": "26-я тбр (34 Т-34, 19 Т-70)"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 8 日投入进攻时的数字"
+  },
+  {
+   "id": "SU.2TK.99TBr",
+   "formation": "SU.2TK",
+   "names": {
+    "zh": "坦克第99旅",
+    "en": "99th Tank Brigade",
+    "ru": "99 тбр"
+   },
+   "designation": "99",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 10,
+     "basis": "2 TC opsvodka 07.00 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=87",
+     "quote": "99 тбр имеет: 80 активных штыков, танков на ходу Т-34 = 10, технически неисправных = 4, Т-70 на ходу = 10."
+    },
+    {
+     "item": "T70",
+     "count": 10,
+     "basis": "2 TC opsvodka 07.00 12 July",
+     "date": "1943-07-12",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=87",
+     "quote": "99 тбр имеет: 80 активных штыков, танков на ходу Т-34 = 10, технически неисправных = 4, Т-70 на ходу = 10."
+    }
+   ],
+   "status": "unverified",
+   "note": "只有 7 月 12 日 07:00 能开动的数字（另有 4 辆 T-34 技术故障）"
+  },
+  {
+   "id": "SU.2TK.169TBr",
+   "formation": "SU.2TK",
+   "names": {
+    "zh": "坦克第169旅",
+    "en": "169th Tank Brigade",
+    "ru": "169 тбр"
+   },
+   "designation": "169",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 30,
+     "basis": "8 July",
+     "date": "1943-07-08",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
+     "quote": "169-я тбр, имея в своем составе 30 танков Т-34 и 18 Т-70"
+    },
+    {
+     "item": "T70",
+     "count": 18,
+     "basis": "8 July",
+     "date": "1943-07-08",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
+     "quote": "169-я тбр, имея в своем составе 30 танков Т-34 и 18 Т-70"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 8 日的数字"
+  },
+  {
+   "id": "SU.2TK.58MSBr",
+   "formation": "SU.2TK",
+   "names": {
+    "zh": "摩托化步兵第58旅",
+    "en": "58th Motor Rifle Brigade",
+    "ru": "58 мсбр"
+   },
+   "designation": "58",
+   "type": "motorized-infantry",
+   "size": "brigade",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.2TK.15GvTP",
+   "formation": "SU.2TK",
+   "names": {
+    "zh": "近卫独立坦克第15团",
+    "en": "15th Guards Tank Regiment",
+    "ru": "15 гв. тп"
+   },
+   "designation": "15",
+   "type": "armor",
+   "size": "regiment",
+   "guards": true,
+   "strength": [
+    {
+     "item": "Churchill",
+     "count": 11,
+     "basis": "в боевом составе on arrival 8 July (ЦАМО Ф.8 гв.тк)",
+     "date": "1943-07-08",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=34",
+     "quote": "имея в боевом составе 155 танков (87 – Т-34, 57 – Т-70, 11 – МК-4 «Черчилль»)",
+     "note": "全军 7 月 8 日有丘吉尔 11 辆；该团是军内唯一的丘吉尔部队，故推定全部属本团"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日编成表未列入坦克第 2 军，8 月 1 日列入；坦克数为推定"
+  },
+  {
+   "id": "SU.5GTA.53GvOTP",
+   "formation": "SU.5GTA",
+   "names": {
+    "zh": "近卫独立坦克第53团",
+    "en": "53rd Guards Separate Tank Regiment",
+    "ru": "53 гв. отп"
+   },
+   "designation": "53",
+   "type": "armor",
+   "size": "regiment",
+   "guards": true,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 36,
+     "basis": "Lopukhovsky Table 8 (reproduces ЦАМО Ф.332 Оп.4948 Д.67 Л.12), section 'В строю', 17.00 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=69 (table images i_059.jpg 'В строю', i_060.jpg 'На пути/В ремонте')",
+     "quote": "Таблица 8 Донесение о состоянии материальной части и обеспечении 5-й гв. ТА на 17.00 11 июля 1943 г. Источник: ЦАМО РФ. Ф. 332. Оп. 4948. Д. 67. Л. 12. [value read from table image]",
+     "note": "Лопуховский 表 8：集团军直属部队合计，未分到近卫独立坦克第 53 团与近卫摩托车第 1 团，暂全部计入本团（推定）"
+    },
+    {
+     "item": "T70",
+     "count": 8,
+     "basis": "Lopukhovsky Table 8 (reproduces ЦАМО Ф.332 Оп.4948 Д.67 Л.12), section 'В строю', 17.00 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=69 (table images i_059.jpg 'В строю', i_060.jpg 'На пути/В ремонте')",
+     "quote": "Таблица 8 Донесение о состоянии материальной части и обеспечении 5-й гв. ТА на 17.00 11 июля 1943 г. Источник: ЦАМО РФ. Ф. 332. Оп. 4948. Д. 67. Л. 12. [value read from table image]",
+     "note": "Лопуховский 表 8：集团军直属部队合计，未分到近卫独立坦克第 53 团与近卫摩托车第 1 团，暂全部计入本团（推定）"
+    }
+   ],
+   "status": "unverified"
+  },
+  {
+   "id": "SU.5GTA.1GvMCP",
+   "formation": "SU.5GTA",
+   "names": {
+    "zh": "近卫摩托车第1团",
+    "en": "1st Guards Motorcycle Regiment",
+    "ru": "1 гв. мцп"
+   },
+   "designation": "1",
+   "type": "recon",
+   "size": "regiment",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GTA.1529SAP",
+   "formation": "SU.5GTA",
+   "names": {
+    "zh": "重型自行火炮第1529团",
+    "en": "1529th Heavy SU Regiment",
+    "ru": "1529 тсап"
+   },
+   "designation": "1529",
+   "type": "assault-gun",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "SU152",
+     "count": 11,
+     "basis": "arrived only evening 12 July, one ammo load; not in 12 July battle (wiki citing Zamulin 2006 p.361)",
+     "date": "1943-07-12",
+     "source": "SRC-0211",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/Сражение_под_Прохоровкой (action=raw, section 'Силы сторон')",
+     "quote": "Полк в количестве 11 машин СУ-152 из 12 прибыл на место только к вечеру 12 июля c одним боекомплектом и без тылов"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日属近卫第 7 集团军，7 月 11 日第 03 号命令配属；数字只见于俄文维基转引 Замулин（D 级），7 月 12 日晚才到达"
+  },
+  {
+   "id": "SU.5GTA.1549SAP",
+   "formation": "SU.5GTA",
+   "names": {
+    "zh": "自行火炮第1549团",
+    "en": "1549th SU Regiment",
+    "ru": "1549 сап"
+   },
+   "designation": "1549",
+   "type": "assault-gun",
+   "size": "regiment",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有任何兵力数字，数值为手填占位",
+   "ratings": {
+    "attack": 2,
+    "defense": 2,
+    "movement": 8
+   },
+   "steps": 2
+  },
+  {
+   "id": "SU.69A.96TBr",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "坦克第96旅",
+    "en": "96th Tank Brigade",
+    "ru": "96 тбр"
+   },
+   "designation": "96",
+   "type": "armor",
+   "size": "brigade",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 24,
+     "basis": "Front HQ telegraph exchange 12.40 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=60",
+     "quote": "в 148-м отп осталось не 4 танка «Черчилль», а 13 Т-34 и 2 Т-70, а в 96-й тбр соответственно 24 и 5."
+    },
+    {
+     "item": "T70",
+     "count": 5,
+     "basis": "Front HQ telegraph exchange 12.40 11 July",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=60",
+     "quote": "в 148-м отп осталось не 4 танка «Черчилль», а 13 Т-34 и 2 Т-70, а в 96-й тбр соответственно 24 и 5."
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日属近卫第 6 集团军，7 月 11 日在第 69 集团军地段"
+  },
+  {
+   "id": "SU.69A.148OTP",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "独立坦克第148团",
+    "en": "148th Separate Tank Regiment",
+    "ru": "148 отп"
+   },
+   "designation": "148",
+   "type": "armor",
+   "size": "regiment",
+   "guards": false,
+   "strength": [
+    {
+     "item": "T34",
+     "count": 13,
+     "basis": "12.40 11 July exchange",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=60",
+     "quote": "в 148-м отп осталось не 4 танка «Черчилль», а 13 Т-34 и 2 Т-70"
+    },
+    {
+     "item": "T70",
+     "count": 2,
+     "basis": "12.40 11 July exchange",
+     "date": "1943-07-11",
+     "source": "SRC-0207",
+     "grade": "B",
+     "where": "https://loveread.ec/read_book.php?id=52899&p=60",
+     "quote": "в 148-м отп осталось не 4 танка «Черчилль», а 13 Т-34 и 2 Т-70"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 1 日属近卫第 7 集团军，7 月 11 日配属第 69 集团军"
+  },
+  {
+   "id": "SU.5GA.13GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第13师",
+    "en": "13th Guards Rifle Division",
+    "ru": "13-я гв. сд"
+   },
+   "designation": "13",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GA.66GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第66师",
+    "en": "66th Guards Rifle Division",
+    "ru": "66-я гв. сд"
+   },
+   "designation": "66",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GA.6GvVDD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫空降兵第6师",
+    "en": "6th Guards Airborne Division",
+    "ru": "6-я гв. вдд"
+   },
+   "designation": "6",
+   "type": "airborne",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 8894,
+     "basis": "'в ее составе находилось'; reserve division, not yet in combat; no footnote",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "На 10 июля в ее составе находилось 8894 человека, 94 орудия всех калибров и 157 минометов."
+    },
+    {
+     "item": "guns_div",
+     "count": 94,
+     "basis": "same",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "94 орудия всех калибров"
+    },
+    {
+     "item": "mortars",
+     "count": 157,
+     "basis": "same",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "157 минометов"
+    }
+   ],
+   "status": "unverified",
+   "note": "Замулин 书中这组数字没有脚注（无档案号）"
+  },
+  {
+   "id": "SU.5GA.95GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第95师",
+    "en": "95th Guards Rifle Division",
+    "ru": "95-я гв. сд"
+   },
+   "designation": "95",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_in_line",
+     "count": 8781,
+     "basis": "'имела в строю'; no footnote",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "По состоянию на 10 июля дивизия имела в строю 8781 человек, 96 орудий и 170 минометов."
+    },
+    {
+     "item": "guns_div",
+     "count": 96,
+     "basis": "same",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "96 орудий"
+    },
+    {
+     "item": "mortars",
+     "count": 170,
+     "basis": "same",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "170 минометов"
+    }
+   ],
+   "status": "unverified",
+   "note": "Замулин 书中这组数字没有脚注（无档案号）；Олейников 记 7 月 11 日晚 8200–8300 人"
+  },
+  {
+   "id": "SU.5GA.97GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第97师",
+    "en": "97th Guards Rifle Division",
+    "ru": "97-я гв. сд"
+   },
+   "designation": "97",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.5GA.9GvVDD",
+   "formation": "SU.5GA",
    "names": {
     "zh": "近卫空降兵第9师",
     "en": "9th Guards Airborne Division",
-    "ru": "9-я гвардейская воздушно-десантная дивизия"
+    "ru": "9-я гв. вдд"
    },
    "designation": "9",
    "type": "airborne",
    "size": "division",
-   "steps": 4,
-   "ratings": {
-    "attack": 4,
-    "defense": 7,
-    "movement": 5
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 9018,
+     "basis": "'наибольшее число личного состава' among 5 GA divisions; on arrival at Prokhorovka position (date not stated, context night 10/11 July); no footnote in text",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49228",
+     "quote": "Дивизия была хорошо укомплектована, относительно других соединений армии, она имела наибольшее число личного состава — 9018 человек и минометов — 170. В то же время она располагала лишь 76 орудиями"
+    },
+    {
+     "item": "guns_div",
+     "count": 76,
+     "basis": "same; 'в то время как соседи имели около сотни стволов'",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49228",
+     "quote": "она располагала лишь 76 орудиями"
+    },
+    {
+     "item": "mortars",
+     "count": 170,
+     "basis": "same",
+     "date": "1943-07-10",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49228",
+     "quote": "минометов — 170"
+    }
+   ],
+   "status": "unverified",
+   "note": "Замулин 书中这组数字没有脚注（无档案号）"
+  },
+  {
+   "id": "SU.5GA.42GvSD",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫步兵第42师",
+    "en": "42nd Guards Rifle Division",
+    "ru": "42-я гв. сд"
    },
-   "confidence": "placeholder",
-   "provenance": [],
-   "note": "演示占位：番号凭 AI 记忆录入；步数、攻击/防御/移动为随手设定的游戏占位值，不代表任何史料数字"
+   "designation": "42",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.6GA.51GvSD",
+   "formation": "SU.6GA",
+   "names": {
+    "zh": "近卫步兵第51师",
+    "en": "51st Guards Rifle Division",
+    "ru": "51-я гв. сд"
+   },
+   "designation": "51",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.6GA.52GvSD",
+   "formation": "SU.6GA",
+   "names": {
+    "zh": "近卫步兵第52师",
+    "en": "52nd Guards Rifle Division",
+    "ru": "52-я гв. сд"
+   },
+   "designation": "52",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 3380,
+     "basis": "'числилось' per division staff reports; no footnote",
+     "date": "1943-07-11",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49234",
+     "quote": "Согласно донесениям её штаба, к исходу 11 июля в ней числилось всего 3380 человек."
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 11 日日终（已在 7 月 5–11 日战斗中大量减员）；Замулин 书中这组数字没有脚注（无档案号）"
+  },
+  {
+   "id": "SU.69A.81GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第81师",
+    "en": "81st Guards Rifle Division",
+    "ru": "81-я гв. сд"
+   },
+   "designation": "81",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "7 月 11 日夜只剩一个合成步兵团、6 门炮（Замулин）；没有可用的兵力数字，用类型占位分，开局应减员"
+  },
+  {
+   "id": "SU.69A.89GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第89师",
+    "en": "89th Guards Rifle Division",
+    "ru": "89-я гв. сд"
+   },
+   "designation": "89",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.69A.92GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第92师",
+    "en": "92nd Guards Rifle Division",
+    "ru": "92-я гв. сд"
+   },
+   "designation": "92",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [
+    {
+     "item": "personnel_in_line",
+     "count": 8438,
+     "basis": "'имела в строю'",
+     "date": "1943-07-09",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49240 note [593] = ЦАМО РФ, ф. 92 гв. сд, оп. 1, д. 13, л. 108",
+     "quote": "На вечер 9 июля дивизия имела в строю всего 8438 человек[593]"
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 9 日晚，ЦАМО ф.92 гв.сд оп.1 д.13 л.108（转引自 Замулин 脚注）"
+  },
+  {
+   "id": "SU.69A.93GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第93师",
+    "en": "93rd Guards Rifle Division",
+    "ru": "93-я гв. сд"
+   },
+   "designation": "93",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.69A.94GvSD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "近卫步兵第94师",
+    "en": "94th Guards Rifle Division",
+    "ru": "94-я гв. сд"
+   },
+   "designation": "94",
+   "type": "infantry",
+   "size": "division",
+   "guards": true,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.69A.183SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第183师",
+    "en": "183rd Rifle Division",
+    "ru": "183-я сд"
+   },
+   "designation": "183",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7981,
+     "basis": "'насчитывала в своём составе'; Wikipedia, no citation",
+     "date": "1943-07-10",
+     "source": "SRC-0212",
+     "grade": "D",
+     "where": "https://ru.wikipedia.org/wiki/183-я_стрелковая_дивизия (section on Kursk)",
+     "quote": "На 10 июля 1943 года ... насчитывала в своём составе 7981 человек при 4908 винтовках, 71 пулемёте, 75 орудиях, 1579 пистолетах-пулемётах, 205 противотанковых ружьях, 146 миномётах."
+    },
+    {
+     "item": "guns_div",
+     "count": 75,
+     "basis": "same (D)",
+     "date": "1943-07-10",
+     "source": "SRC-0212",
+     "grade": "D",
+     "where": "ru.wikipedia",
+     "quote": "75 орудиях"
+    },
+    {
+     "item": "mortars",
+     "count": 146,
+     "basis": "same (D)",
+     "date": "1943-07-10",
+     "source": "SRC-0212",
+     "grade": "D",
+     "where": "ru.wikipedia",
+     "quote": "146 миномётах"
+    }
+   ],
+   "status": "unverified",
+   "note": "只见于俄文维基（D 级，无脚注）"
+  },
+  {
+   "id": "SU.69A.305SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第305师",
+    "en": "305th Rifle Division",
+    "ru": "305-я сд"
+   },
+   "designation": "305",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
+  },
+  {
+   "id": "SU.69A.375SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第375师",
+    "en": "375th Rifle Division",
+    "ru": "375-я сд"
+   },
+   "designation": "375",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [
+    {
+     "item": "personnel_total",
+     "count": 7211,
+     "basis": "per division political department report",
+     "date": "1943-07-12",
+     "source": "SRC-0208",
+     "grade": "B",
+     "where": "https://history.wikireading.ru/49244 note [765] = ЦАМО РФ, ф. 375 сд, оп. 1, д. 143, л. 9",
+     "quote": "Согласно донесению политотдела дивизии, на утро 12 июля 1943 г. она насчитывала всего 7211 человек[765]."
+    }
+   ],
+   "status": "unverified",
+   "note": "7 月 12 日晨，ЦАМО ф.375 сд оп.1 д.143 л.9（转引自 Замулин 脚注）"
+  },
+  {
+   "id": "SU.69A.107SD",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "步兵第107师",
+    "en": "107th Rifle Division",
+    "ru": "107-я сд"
+   },
+   "designation": "107",
+   "type": "infantry",
+   "size": "division",
+   "guards": false,
+   "strength": [],
+   "status": "unverified",
+   "note": "没有兵力数字，步兵部分用类型占位分"
   }
  ]
 }

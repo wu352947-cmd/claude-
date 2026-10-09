@@ -12,6 +12,7 @@ import { COUNTER_STYLE } from './style';
 const FUNCTION_ID: Record<UnitType, string> = {
   armor: 'UCA---', panzergrenadier: 'UCIZ--', 'motorized-infantry': 'UCIM--', infantry: 'UCI---', airborne: 'UCIA--',
   recon: 'UCR---', artillery: 'UCF---', 'sp-artillery': 'UCFHE-', antitank: 'UCAA--', 'tank-destroyer': 'UCAAA-',
+  'assault-gun': 'UCAT--',
 };
 /** 规模 → 规模标记代码（第 12 位） */
 const ECHELON: Record<UnitSize, string> = { battalion: 'F', regiment: 'G', brigade: 'H', division: 'I' };
@@ -44,11 +45,12 @@ export function counterSvg(unit: Unit, formation: Formation, opts: CounterOption
   parts.push(`<rect x="0.75" y="0.75" width="98.5" height="98.5" rx="6" fill="${c.base}" stroke="${S.edge}" stroke-width="1.5"/>`);
   // 师属色条
   const barInk = inkOn(formation.color);
-  const idStyle = formation.confidence === 'placeholder' ? ' font-style="italic"' : '';
+  const idStyle = formation.confidence !== 'sourced' ? ' font-style="italic"' : '';
   parts.push(`<path d="M1.5 21 V7 Q1.5 1.5 7 1.5 H93 Q98.5 1.5 98.5 7 V21 Z" fill="${formation.color}"/>`);
-  const abbr = `${formation.guards ? 'Gds ' : ''}${formation.abbr}`;
+  // 近卫只标在单位番号上（编制是否近卫在信息面板里看）
+  const abbr = formation.abbr;
   parts.push(`<text x="6" y="15.5" font-size="12" font-weight="700" fill="${barInk}"${idStyle}>${esc(abbr)}</text>`);
-  parts.push(`<text x="94" y="16" font-size="14" font-weight="700" fill="${barInk}" text-anchor="end"${idStyle}>${esc(unit.designation)}</text>`);
+  parts.push(`<text x="94" y="16" font-size="14" font-weight="700" fill="${barInk}" text-anchor="end"${idStyle}>${unit.guards ? '<tspan font-size="9">Gds </tspan>' : ''}${esc(unit.designation)}</text>`);
   // 兵种符号（含规模标记），放进 x 8–84、y 23–71 的区域
   const sym = new ms.Symbol(sidc(unit.type, unit.size), {
     size: 30, fill: true, fillColor: c.symbol, frame: true, infoFields: false, outlineWidth: 0, strokeWidth: 4,
@@ -62,13 +64,15 @@ export function counterSvg(unit: Unit, formation: Formation, opts: CounterOption
   parts.push(svg);
   // 步数格
   for (let i = 0; i < unit.steps; i++) {
-    const y = 26 + i * 9;
+    const y = 25 + i * Math.min(9, 44 / unit.steps);
     const on = i < steps;
-    parts.push(`<rect x="88" y="${y}" width="7" height="7" rx="1" fill="${on ? c.ink : 'none'}" stroke="${c.ink}" stroke-width="1.2"/>`);
+    parts.push(`<rect x="88" y="${y.toFixed(1)}" width="7" height="${unit.steps > 4 ? 5.5 : 7}" rx="1" fill="${on ? c.ink : 'none'}" stroke="${c.ink}" stroke-width="1.2"/>`);
   }
   // 攻击-防御-移动
   const r = unit.ratings;
+  // 占位：灰色斜体；推定：斜体
   const ph = unit.confidence === 'placeholder';
-  parts.push(`<text x="50" y="93" font-size="21" font-weight="700" text-anchor="middle" fill="${ph ? c.placeholder : c.ink}"${ph ? ' font-style="italic"' : ''} letter-spacing="0.5">${r.attack}-${r.defense}-${r.movement}</text>`);
+  const it = unit.confidence !== 'sourced';
+  parts.push(`<text x="50" y="93" font-size="21" font-weight="700" text-anchor="middle" fill="${ph ? c.placeholder : c.ink}"${it ? ' font-style="italic"' : ''} letter-spacing="0.5">${r.attack}-${r.defense}-${r.movement}</text>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" font-family='${S.font}'>${parts.join('')}</svg>`;
 }

@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
   ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, linksBetween, loadDeployment, loadMap, loadOob, neighbor,
+  RatingsParams, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, linksBetween, loadDeployment, loadMap, loadOob, neighbor,
   sideFeatures, stacks, toLatLon,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -11,6 +11,7 @@ import hexsides from '../../data/maps/south.hexsides.json';
 import labels from '../../data/maps/south.labels.json';
 import lines from '../../data/maps/south.lines.json';
 import oobData from '../../data/units/south.oob.json';
+import ratingsParams from '../../data/rules/ratings.json';
 import demoDeployment from '../../data/scenarios/demo.deployment.json';
 import { attachCamera } from './camera';
 import { createEditor } from './editor';
@@ -23,7 +24,7 @@ const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
 /** 当前显示的地图 = 数据文件 + 编辑器里的修改 */
 let map = baseMap;
-const { placed } = loadDeployment(loadOob(oobData), baseMap.grid, demoDeployment);
+const { placed } = loadDeployment(loadOob(oobData, RatingsParams.parse(ratingsParams)), baseMap.grid, demoDeployment);
 const stackMap = stacks(placed);
 /** 信息面板里选中的单位 */
 let selectedUnit: string | null = null;

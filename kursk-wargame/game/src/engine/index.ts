@@ -11,4 +11,5 @@ export * from './hex';
 export * from './projection';
 export * from './map';
 export * from './map-edit';
+export * from './ratings';
 export * from './units';

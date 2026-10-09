@@ -7,6 +7,8 @@
  */
 import { z } from 'zod';
 import { type HexGrid, type Offset, hexId, inBounds, parseHexId } from './hex';
+import { Status } from './map';
+import { type Derived, type RatingsParams, deriveRatings } from './ratings';
 
 export const Side = z.enum(['DE', 'SU']);
 export type Side = z.infer<typeof Side>;
@@ -19,13 +21,13 @@ export type Branch = z.infer<typeof Branch>;
 /** 兵种：决定北约兵种符号 */
 export const UNIT_TYPES = [
   'armor', 'panzergrenadier', 'motorized-infantry', 'infantry', 'airborne', 'recon',
-  'artillery', 'sp-artillery', 'antitank', 'tank-destroyer',
+  'artillery', 'sp-artillery', 'antitank', 'tank-destroyer', 'assault-gun',
 ] as const;
 export const UnitType = z.enum(UNIT_TYPES);
 export type UnitType = z.infer<typeof UnitType>;
 export const UNIT_TYPE_NAMES: Record<UnitType, string> = {
   armor: '装甲/坦克', panzergrenadier: '装甲掷弹兵/机械化步兵', 'motorized-infantry': '摩托化步兵', infantry: '步兵',
-  airborne: '空降兵', recon: '侦察', artillery: '炮兵', 'sp-artillery': '自行火炮', antitank: '反坦克', 'tank-destroyer': '坦克歼击车',
+  airborne: '空降兵', recon: '侦察', artillery: '炮兵', 'sp-artillery': '自行火炮', antitank: '反坦克', 'tank-destroyer': '坦克歼击车', 'assault-gun': '突击炮/自行火炮',
 };
 
 /** 规模：决定符号上方的规模标记（|| 营、||| 团、X 旅、XX 师） */
@@ -33,16 +35,19 @@ export const UnitSize = z.enum(['battalion', 'regiment', 'brigade', 'division'])
 export type UnitSize = z.infer<typeof UnitSize>;
 export const UNIT_SIZE_NAMES: Record<UnitSize, string> = { battalion: '营', regiment: '团', brigade: '旅', division: '师' };
 
-export const Confidence = z.enum(['placeholder', 'sourced']);
+/** 考据程度：占位（没有史料）→ 推定（只有 C/D 级来源，或经比例推算）→ 有出处（A/B 级来源） */
+export const Confidence = z.enum(['placeholder', 'estimated', 'sourced']);
 export type Confidence = z.infer<typeof Confidence>;
-export const CONFIDENCE_NAMES: Record<Confidence, string> = { placeholder: '占位（未考据）', sourced: '有出处' };
+export const CONFIDENCE_NAMES: Record<Confidence, string> = { placeholder: '占位（未考据）', estimated: '推定（来源较弱或经推算）', sourced: '有出处' };
+const CONF_RANK: Record<Confidence, number> = { placeholder: 0, estimated: 1, sourced: 2 };
+const Grade = z.enum(['A', 'B', 'C', 'D']);
 
 /** 一条出处：哪个字段、哪个史料（sources.csv 的 ID）、页码、级别 */
 export const Provenance = z.object({
   field: z.string().min(1),
   source: z.string().regex(/^SRC-\d{4}$/, '史料 ID 形如 SRC-0001'),
   page: z.string().optional(),
-  grade: z.enum(['A', 'B', 'C', 'D']).optional(),
+  grade: Grade.optional(),
   note: z.string().optional(),
 });
 export type Provenance = z.infer<typeof Provenance>;
@@ -76,6 +81,24 @@ export const Ratings = z.object({
 });
 export type Ratings = z.infer<typeof Ratings>;
 
+/**
+ * 一条兵力/装备数字：直接抄自史料，带口径、日期、出处。
+ * item 是 data/rules/ratings.json 里的装备键（如 PzIV_long、T34、personnel_total）。
+ */
+export const StrengthItem = z.object({
+  item: z.string().min(1),
+  count: z.number().nonnegative(),
+  /** 口径，照史料原话（可作战 / 在编 / в строю …） */
+  basis: z.string().min(1),
+  date: z.string().regex(/^1943-\d{2}-\d{2}/, '日期形如 1943-07-04'),
+  source: z.string().regex(/^SRC-\d{4}$/),
+  grade: Grade,
+  where: z.string().optional(),
+  quote: z.string().optional(),
+  note: z.string().optional(),
+});
+export type StrengthItem = z.infer<typeof StrengthItem>;
+
 export const Unit = z.object({
   id: z.string().min(1),
   formation: z.string().min(1),
@@ -84,15 +107,31 @@ export const Unit = z.object({
   designation: z.string().min(1).max(8),
   type: UnitType,
   size: UnitSize,
-  /** 满编步数（每损失一步，战斗力下降） */
-  steps: z.number().int().min(1).max(6),
-  ratings: Ratings,
-  /** 数值（步数、攻防移动）的考据状态 */
-  confidence: Confidence,
+  /** 近卫（苏军单位本身的称号，与所属编制无关） */
+  guards: z.boolean().default(false),
+  /** 兵力与装备（史料数字）；有它就按公式算数值 */
+  strength: z.array(StrengthItem).default([]),
+  /** 素质 1–5（3 = 普通），不是 3 时必须写理由 */
+  quality: z.number().int().min(1).max(5).default(3),
+  qualityNote: z.string().optional(),
+  /** 没有兵力数字时手填的占位数值 */
+  steps: z.number().int().min(1).max(6).optional(),
+  ratings: Ratings.optional(),
+  status: Status.default('unverified'),
   provenance: z.array(Provenance).default([]),
   note: z.string().optional(),
 });
-export type Unit = z.infer<typeof Unit>;
+type UnitData = z.infer<typeof Unit>;
+
+/** 加载后的单位：数值已按公式算好（或取手填占位） */
+export interface Unit extends UnitData {
+  steps: number;
+  ratings: Ratings;
+  /** 数值的考据程度（由输入自动判定） */
+  confidence: Confidence;
+  /** 公式明细（手填占位的单位没有） */
+  derived?: Derived;
+}
 
 export const OobFile = z.object({
   $comment: z.string().optional(),
@@ -133,7 +172,17 @@ export interface PlacedUnit {
   steps: number;
 }
 
-export function loadOob(raw: unknown): Oob {
+/** 数值考据程度：没输入 = 占位；用了占位分、C/D 级来源或推算比例 = 推定；否则有出处 */
+function judge(u: UnitData, d: Derived): Confidence {
+  const placeholderOnly = d.lines.every((l) => l.placeholder);
+  if (placeholderOnly) return 'placeholder';
+  const weak = d.usedDefault || u.strength.some((s) => s.grade === 'C' || s.grade === 'D' || s.item === 'personnel_total' || s.item === 'personnel_in_line');
+  return weak ? 'estimated' : 'sourced';
+}
+
+export const minConfidence = (a: Confidence, b: Confidence): Confidence => (CONF_RANK[a] <= CONF_RANK[b] ? a : b);
+
+export function loadOob(raw: unknown, params: RatingsParams): Oob {
   const data = OobFile.parse(raw);
   const formations = new Map<string, Formation>();
   for (const f of data.formations) {
@@ -146,8 +195,19 @@ export function loadOob(raw: unknown): Oob {
   for (const u of data.units) {
     if (units.has(u.id) || formations.has(u.id)) throw new Error(`单位 ID 重复：${u.id}`);
     if (!formations.has(u.formation)) throw new Error(`单位 ${u.id} 所属编制 ${u.formation} 不存在`);
-    if (u.confidence === 'sourced' && u.provenance.length === 0) throw new Error(`单位 ${u.id} 标为有出处，但没有写出处`);
-    units.set(u.id, u);
+    if (u.quality !== 3 && !u.qualityNote) throw new Error(`单位 ${u.id} 素质不是 3，但没有写理由`);
+    if (u.ratings && u.steps && !u.strength.length) {
+      // 手填的占位数值
+      units.set(u.id, { ...u, steps: u.steps, ratings: u.ratings, confidence: 'placeholder' });
+    } else {
+      // 按公式算；没有兵力数字时公式用类型占位分（没有占位分的兵种会报错）
+      const d = deriveRatings(params, u.type, u.size, u.strength, u.quality);
+      if (!d.lines.length) throw new Error(`单位 ${u.id} 没有兵力数字，兵种 ${u.type} 也没有占位分，请手填占位数值`);
+      units.set(u.id, {
+        ...u, steps: d.steps, derived: d, confidence: judge(u, d),
+        ratings: { attack: d.attack, defense: d.defense, movement: d.movement },
+      });
+    }
   }
   return { formations, units };
 }
