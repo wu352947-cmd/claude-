@@ -3,13 +3,15 @@
  * - 消耗：进入格的地形 + 穿越格边的特征；沿道路/小路走时改用道路消耗，不计地形与格边。
  * - 控制区：每个单位（豁免兵种除外）控制相邻 6 格，大河格边挡住控制区。
  *   进入敌控制区必须停止；从敌控制区出发，第一步另加离开消耗。不能进入有敌军的格子。
- * - 只能在本方的移动阶段（或发展阶段，限机动单位）移动，每个单位每阶段一次。
+ * - 只能在本方的移动阶段（或发展阶段，限本回合没进攻或进攻得手的机动单位）移动，每个单位每阶段一次。
+ * - 夜间回合移动力减半（calendar.ts）。
  * 参数全部在 data/rules/movement.json。
  */
 import { z } from 'zod';
 import { DIRECTIONS, type Direction, type Offset, hexId, inBounds, neighbor, parseHexId } from './hex';
 import { TERRAIN, SideFeature, hexRecord, linksBetween, sideFeatures } from './map';
 import { Mobility } from './ratings';
+import { movementAllowance, whyNotExploit } from './calendar';
 import type { GameContext, GameState } from './game';
 import type { Side } from './units';
 
@@ -105,7 +107,8 @@ export function whyCannotMove(ctx: GameContext, s: GameState, unitId: string, ac
   if (!ctx.movement.movePhases.includes(phase.id)) return `${phase.name}不能移动`;
   const side = sideOfUnit(ctx, unitId);
   if (acting !== side) return `现在是${acting === 'DE' ? '德军' : '苏军'}的阶段`;
-  if (phase.id.endsWith('exploitation') && !ctx.movement.exploitationMobility.includes(unit.mobility)) return '发展阶段只有机动单位能移动';
+  const ex = whyNotExploit(ctx, s, unitId);
+  if (ex) return ex;
   if (s.moved.includes(unitId)) return '本阶段已经移动过';
   return null;
 }
@@ -123,7 +126,7 @@ export interface Reach {
 export function reachable(ctx: GameContext, s: GameState, unitId: string): Map<string, Reach> {
   const unit = ctx.oob.units.get(unitId)!;
   const mob = unit.mobility;
-  const mp = unit.ratings.movement;
+  const mp = movementAllowance(ctx, s, unitId);
   const side = sideOfUnit(ctx, unitId);
   const enemyZoc = zocOf(ctx, s, enemyOf(side));
   const enemyHere = occupiedBy(ctx, s, enemyOf(side));
@@ -181,6 +184,7 @@ export function checkPath(ctx: GameContext, s: GameState, unitId: string, path: 
     if (enemyZoc.has(id) && i < path.length - 1) return { error: `${id} 在敌控制区内，必须停止` };
     at = id;
   }
-  if (cost > unit.ratings.movement) return { error: `需要移动力 ${cost}，只有 ${unit.ratings.movement}` };
+  const mp = movementAllowance(ctx, s, unitId);
+  if (cost > mp) return { error: `需要移动力 ${cost}，只有 ${mp}` };
   return { cost };
 }

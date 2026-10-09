@@ -76,3 +76,14 @@ export function counterSvg(unit: Unit, formation: Formation, opts: CounterOption
   parts.push(`<text x="50" y="93" font-size="21" font-weight="700" text-anchor="middle" fill="${ph ? c.placeholder : c.ink}"${it ? ' font-style="italic"' : ''} letter-spacing="0.5">${r.attack}-${r.defense}-${r.movement}</text>`);
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" font-family='${S.font}'>${parts.join('')}</svg>`;
 }
+
+/** 未侦察的敌军堆叠（热座迷雾）：只看得出是哪一方，不显示番号、兵种、实力与堆叠层数；德军一律用陆军底色，不暴露是否党卫军 */
+export function hiddenCounterSvg(side: 'DE' | 'SU'): string {
+  const S = COUNTER_STYLE;
+  const c = S.branch[side === 'DE' ? 'heer' : 'rkka'];
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" font-family='${S.font}'>`
+    + `<rect x="0.75" y="0.75" width="98.5" height="98.5" rx="6" fill="${c.base}" stroke="${S.edge}" stroke-width="1.5"/>`
+    + `<rect x="14" y="20" width="72" height="50" rx="3" fill="${c.symbol}" stroke="${c.ink}" stroke-width="3"/>`
+    + `<text x="50" y="60" font-size="40" font-weight="700" text-anchor="middle" fill="${c.ink}">?</text>`
+    + `<text x="50" y="91" font-size="15" text-anchor="middle" fill="${c.ink}">未侦察</text></svg>`;
+}

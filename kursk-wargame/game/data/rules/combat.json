@@ -67,5 +67,5 @@
   "blockedLoss": 1
  },
  "advanceMax": 3,
- "combatPhases": ["first.combat", "second.combat"]
+ "combatPhases": ["first.combat", "first.exploitation", "second.combat", "second.exploitation"]
 }

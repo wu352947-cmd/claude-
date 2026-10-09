@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type Command, CommandError, type GameContext, type GameState, CombatRules, MovementRules, RatingsParams, Sequence, actingSide, apply, canRedo, canUndo,
+  type Command, CommandError, type GameContext, type GameState, CombatRules, MovementRules, RatingsParams, Sequence, TurnRules, actingSide, apply, canRedo, canUndo,
   emptyHistory, initialState, loadDeployment, loadMap, loadOob, loadSave, makeSave, placedUnits, push, redo, replay, stateHash,
   undo, withFullSteps,
 } from '../src/engine';
@@ -14,20 +14,23 @@ import rawParams from '../data/rules/ratings.json';
 import rawSeq from '../data/rules/sequence.json';
 import rawMove from '../data/rules/movement.json';
 import rawCombat from '../data/rules/combat.json';
+import rawTurns from '../data/rules/turns.json';
 
 const map = loadMap({ def, hexes, hexsides, labels });
 const oob = loadOob(oobData, RatingsParams.parse(rawParams));
 const { deployment } = loadDeployment(oob, map.grid, demo);
-const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement: MovementRules.parse(rawMove), combat: CombatRules.parse(rawCombat) };
+const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement: MovementRules.parse(rawMove), combat: CombatRules.parse(rawCombat), turns: TurnRules.parse(rawTurns) };
 const start = (seed = 42): GameState => withFullSteps(ctx, initialState('demo', deployment.first, seed, deployment));
 const s0 = start();
 const U = s0.units[0]!.id;
 const N = ctx.sequence.phases.length;
+const ix = (id: string): number => ctx.sequence.phases.findIndex((p) => p.id === id);
 
 describe('指令与状态', () => {
-  it('初始状态：第 1 回合第 1 阶段，所有单位满编、位置与部署一致', () => {
+  it('初始状态：第 1 回合第一个要玩家操作的阶段（主动方移动），所有单位满编、位置与部署一致', () => {
     expect(s0.turn).toBe(1);
-    expect(s0.phase).toBe(0);
+    expect(s0.phase).toBe(ix('first.movement'));
+    expect(s0.start).toEqual({ date: '1943-07-11', slot: 0 });
     expect(s0.units.length).toBe(deployment.placements.length);
     for (const u of s0.units) expect(u.steps).toBe(oob.units.get(u.id)!.steps);
     expect(placedUnits(ctx, s0).map((p) => p.unit.id)).toEqual(s0.units.map((u) => u.id));
@@ -36,7 +39,7 @@ describe('指令与状态', () => {
   it('非法指令被拒绝且不改变状态：单位不存在、非移动阶段移动', () => {
     const before = JSON.stringify(s0);
     expect(() => apply(ctx, s0, { type: 'Move', unit: 'nope', path: ['1010'] })).toThrow(CommandError);
-    expect(() => apply(ctx, s0, { type: 'Move', unit: U, path: ['1010'] })).toThrow(/不能移动/);
+    expect(() => apply(ctx, { ...s0, phase: ix('first.combat') }, { type: 'Move', unit: U, path: ['1010'] })).toThrow(/不能移动/);
     expect(JSON.stringify(s0)).toBe(before);
   });
 
@@ -55,16 +58,20 @@ describe('指令与状态', () => {
     expect(roll(start(7), 200).every((v) => v >= 1 && v <= 6)).toBe(true);
   });
 
-  it('回合顺序：13 个阶段（docs/02 §1），最后一个阶段结束进入下一回合', () => {
+  it('回合顺序：13 个阶段（docs/02 §1）；规则未做的阶段自动经过，回合末结算后进入下一回合', () => {
     expect(N).toBe(13);
     expect(ctx.sequence.phases[0]!.id).toBe('strategic');
     expect(ctx.sequence.phases.at(-1)!.id).toBe('end');
+    const seen: string[] = [];
     let s = s0;
-    for (let i = 0; i < N - 1; i++) s = apply(ctx, s, { type: 'EndPhase' }).state;
-    expect([s.turn, s.phase]).toEqual([1, N - 1]);
+    for (let i = 0; i < 5; i++) {
+      s = apply(ctx, s, { type: 'EndPhase' }).state;
+      seen.push(ctx.sequence.phases[s.phase]!.id);
+    }
+    expect(seen).toEqual(['first.combat', 'first.exploitation', 'second.movement', 'second.combat', 'second.exploitation']);
     const r = apply(ctx, s, { type: 'EndPhase' });
-    expect([r.state.turn, r.state.phase]).toEqual([2, 0]);
-    expect(r.events[0]).toEqual({ type: 'TurnStarted', turn: 2 });
+    expect([r.state.turn, r.state.phase]).toEqual([2, ix('first.movement')]);
+    expect(r.events.map((e) => e.type)).toEqual(['TurnEnded', 'TurnStarted', 'PhaseChanged']);
   });
 
   it('行动方：主动方阶段归主动方，反应阶段归另一方，战略阶段双方', () => {
@@ -90,7 +97,7 @@ describe('撤销、重做与存档', () => {
     let h = build(cmds);
     const full = replay(ctx, s0, h).state;
     h = undo(h);
-    expect(replay(ctx, s0, h).state.phase).toBe(1);
+    expect(replay(ctx, s0, h).state.phase).toBe(ix('first.combat'));
     expect(canRedo(h)).toBe(true);
     h = redo(h);
     expect(replay(ctx, s0, h).state).toEqual(full);

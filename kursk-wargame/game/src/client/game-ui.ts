@@ -2,11 +2,13 @@
  * 对局面板：回合与阶段、结束阶段、撤销/重做、测试骰、存档/读档、事件记录。
  * 所有改变都通过引擎的指令完成；界面只保存指令历史，状态随时由回放得到。
  * 当前对局自动存在本机浏览器里（只是方便，丢了也能从存档文件恢复）。
+ * 热座时，记录里看不清的敌军单位不写番号，敌军的受损池与修理也不显示。
  */
 import {
-  type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, actingSide, canRedo, canUndo,
-  emptyHistory, loadSave, makeSave, push, redo, replay, stateHash, undo,
+  CONTROL_NAMES, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
+  canRedo, canUndo, emptyHistory, loadSave, makeSave, push, redo, replay, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
+import type { Fog, Hotseat } from './hotseat';
 
 const AUTOSAVE_KEY = 'kursk-1943-autosave';
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -23,7 +25,7 @@ const newSeed = (): number => crypto.getRandomValues(new Uint32Array(1))[0]!;
 
 export function createGameUi(
   ctx: GameContext, initialFor: (scenario: string, seed: number) => GameState, scenario: string,
-  engineVersion: string, onChange: (s: GameState) => void, toast: (msg: string) => void,
+  engineVersion: string, onChange: (s: GameState) => void, toast: (msg: string) => void, hotseat: Hotseat,
 ): GameUi {
   let seed = newSeed();
   let initial = initialFor(scenario, seed);
@@ -38,10 +40,13 @@ export function createGameUi(
     console.warn('自动存档无法恢复，开始新对局', e);
   }
 
-  const unitName = (id: string): string => ctx.oob.units.get(id)?.names.zh ?? id;
-  const describe = (e: GameEvent): string => {
+  let fog: Fog | null = null;
+  const enemy = (id: string): boolean => !!fog && sideOfUnit(ctx, id) !== fog.viewer;
+  const unitName = (id: string): string => (fog?.hidden.has(id) ? '敌军单位（未侦察）' : ctx.oob.units.get(id)?.names.zh ?? id);
+  /** 返回 null = 热座时不给这一方看 */
+  const describe = (e: GameEvent): string | null => {
     switch (e.type) {
-      case 'UnitMoved': return `${unitName(e.unit)}：${e.from} → ${e.path.at(-1)}（${e.path.length} 格，移动力 ${e.cost}）`;
+      case 'UnitMoved': return fog?.hidden.has(e.unit) ? `敌军单位移动到 ${e.path.at(-1)}` : `${unitName(e.unit)}：${e.from} → ${e.path.at(-1)}（${e.path.length} 格，移动力 ${e.cost}）`;
       case 'DieRolled': return `${e.purpose}骰 d${e.sides} = ${e.value}`;
       case 'PhaseChanged': return `进入${ctx.sequence.phases[e.phase]!.name}`;
       case 'TurnStarted': return `—— 第 ${e.turn} 回合 ——`;
@@ -51,23 +56,33 @@ export function createGameUi(
       case 'Retreated': return `${e.units.map(unitName).join('、')} 撤退到 ${e.path.at(-1)}`;
       case 'RetreatLoss': return `${e.reason}：每个单位再损失 ${e.steps} 步`;
       case 'Advanced': return `${e.units.map(unitName).join('、')} 推进到 ${e.to}`;
+      case 'TurnEnded': return `回合末：受损池分流、修理`;
+      case 'DamagedSorted': return enemy(e.unit) ? null
+        : `${unitName(e.unit)} 受损 ${e.rolls.length} 步（${e.hex} ${CONTROL_NAMES[e.control]}，掷 ${e.rolls.join('、')}，≤${e.need} 送修）：送修 ${e.repaired}，完全损失 ${e.destroyed}`;
+      case 'Repaired': return enemy(e.unit) ? null : `${unitName(e.unit)} 修复 ${e.steps} 步归队`;
     }
   };
 
   function render(): void {
     cur = replay(ctx, initial, history);
     const s = cur.state;
+    fog = hotseat.fog(s);
     const ph = ctx.sequence.phases[s.phase]!;
     const side = actingSide(ctx, s);
-    $('g-phase').innerHTML = `第 ${s.turn} 回合 · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
+    const t = turnInfo(ctx, s);
+    $('g-phase').innerHTML = `第 ${s.turn} 回合 · ${esc(turnLabel(t))}${t.night ? '<span class="night">夜</span>' : ''} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
     $<HTMLButtonElement>('g-undo').disabled = !canUndo(history);
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);
-    const lines = cur.events.flatMap((evs, i) => evs.map((e) => `<li${i === cur.events.length - 1 ? ' class="new"' : ''}>${esc(describe(e))}</li>`));
+    const lines = cur.events.flatMap((evs, i) => evs.map(describe).filter((d) => d !== null)
+      .map((d) => `<li${i === cur.events.length - 1 ? ' class="new"' : ''}>${esc(d)}</li>`));
     $('g-log').innerHTML = lines.length ? lines.slice(-60).reverse().join('') : '<li class="muted">还没有行动</li>';
-    const pool = (side: 'DE' | 'SU'): number => s.damaged.filter((d) => ctx.oob.formations.get(d.formation)?.side === side).reduce((n, d) => n + d.steps, 0);
-    $('g-meta').textContent = `受损池（装甲步数，回合末分流以后做）：德 ${pool('DE')} · 苏 ${pool('SU')} · 已消灭 ${s.eliminated.length} 个单位 · 种子 ${seed} · 指令 ${history.cursor} 条 · 指纹 ${stateHash(s)}`;
+    const sum = (xs: { unit: string; steps: number }[], side: Side): number => xs.filter((d) => sideOfUnit(ctx, d.unit) === side).reduce((n, d) => n + d.steps, 0);
+    const armor = (side: Side): string => (fog && fog.viewer !== side ? `${SIDE_NAMES[side]}：完全损失 ${sum(s.destroyed, side)}`
+      : `${SIDE_NAMES[side]}：受损池 ${sum(s.damaged, side)} · 修理中 ${sum(s.repair, side)} · 完全损失 ${sum(s.destroyed, side)}`);
+    $('g-meta').textContent = `装甲步数——${armor('DE')}；${armor('SU')} · 已消灭 ${s.eliminated.length} 个单位 · 种子 ${seed} · 指令 ${history.cursor} 条 · 指纹 ${stateHash(s)}`;
     try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(makeSave(ctx, initial, history, seed, engineVersion))); } catch { /* 隐私模式等 */ }
     onChange(s);
+    hotseat.update(s);
   }
 
   function dispatch(cmd: Command): boolean {
@@ -82,7 +97,12 @@ export function createGameUi(
   }
 
   $('g-end').onclick = () => dispatch({ type: 'EndPhase' });
-  $('g-undo').onclick = () => { history = undo(history); render(); };
+  const tryUndo = (): void => {
+    const h = undo(history);
+    if (hotseat.blocksUndo(cur.state, replay(ctx, initial, h).state)) { toast('热座：不能撤销到对方的阶段'); return; }
+    history = h; render();
+  };
+  $('g-undo').onclick = tryUndo;
   $('g-redo').onclick = () => { history = redo(history); render(); };
   $('g-roll').onclick = () => dispatch({ type: 'RollDie', sides: 6, purpose: '测试' });
   $('g-more').onclick = () => $('game').classList.toggle('open');
@@ -116,10 +136,11 @@ export function createGameUi(
   addEventListener('keydown', (e) => {
     if (!(e.ctrlKey || e.metaKey) || $('game').hidden || (e.target as HTMLElement).tagName === 'TEXTAREA') return;
     const k = e.key.toLowerCase();
-    if (k === 'z' && !e.shiftKey) { history = undo(history); render(); e.preventDefault(); }
+    if (k === 'z' && !e.shiftKey) { tryUndo(); e.preventDefault(); }
     if (k === 'y' || (k === 'z' && e.shiftKey)) { history = redo(history); render(); e.preventDefault(); }
   });
 
+  hotseat.onToggle(render);
   render();
   return { state: () => cur.state, dispatch };
 }

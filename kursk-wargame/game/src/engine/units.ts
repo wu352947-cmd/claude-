@@ -161,6 +161,9 @@ export const DeploymentFile = z.object({
   note: z.string().optional(),
   /** 主动方（docs/02 §1）：本部署开局时先行动的一方 */
   first: Side.default('DE'),
+  /** 第 1 回合的日期（不写则界面只显示时段）与时段（turns.json slots 的下标） */
+  start: z.object({ date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable().default(null), slot: z.number().int().nonnegative().default(0) })
+    .default({ date: null, slot: 0 }),
   placements: z.array(Placement),
 });
 export type Deployment = z.infer<typeof DeploymentFile>;

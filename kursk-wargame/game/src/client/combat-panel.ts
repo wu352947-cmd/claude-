@@ -25,7 +25,7 @@ export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, c
   const name = (id: string): string => esc(ctx.oob.units.get(id)!.names.zh);
   const eligible = eligibleAttackers(ctx, s, hex, side);
   const head = '<div class="units-head">进攻这一格</div>';
-  if (!eligible.length) return `<div class="combat">${head}<div class="muted">没有能进攻这一格的${side === 'DE' ? '德' : '苏'}军单位（要相邻、不是炮兵/反坦克旅、本阶段没进攻过）</div></div>`;
+  if (!eligible.length) return `<div class="combat">${head}<div class="muted">没有能进攻这一格的${side === 'DE' ? '德' : '苏'}军单位（要相邻、不是炮兵/反坦克旅、本阶段没进攻过；夜间机动单位不能进攻；发展阶段只限本回合没进攻或进攻得手的机动单位）</div></div>`;
   const picked = eligible.filter((id) => !chosen || chosen.has(id));
   const boxes = eligible.map((id) => `<label class="atk-row"><input type="checkbox" class="atk-pick" data-unit="${esc(id)}"${picked.includes(id) ? ' checked' : ''}> ${name(id)}</label>`).join('');
   const why = whyCannotAttack(ctx, s, picked, hex, side);

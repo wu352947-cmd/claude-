@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
   ENGINE_VERSION, GameMeta, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  CombatRules, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  CombatRules, TurnRules, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -16,6 +16,7 @@ import demoDeployment from '../../data/scenarios/demo.deployment.json';
 import sequence from '../../data/rules/sequence.json';
 import movementRules from '../../data/rules/movement.json';
 import combatRules from '../../data/rules/combat.json';
+import turnRules from '../../data/rules/turns.json';
 import { attachCamera } from './camera';
 import { createEditor } from './editor';
 import { type GameUi, createGameUi } from './game-ui';
@@ -25,6 +26,7 @@ import { unitSectionHtml } from './unit-panel';
 import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
+import { type Fog, createHotseat } from './hotseat';
 
 const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
@@ -33,7 +35,7 @@ let map = baseMap;
 const oob = loadOob(oobData, RatingsParams.parse(ratingsParams));
 const { deployment } = loadDeployment(oob, baseMap.grid, demoDeployment);
 // 规则用数据文件里的地图（编辑器里未合并的修改不影响对局，保证存档可回放）
-const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules), combat: CombatRules.parse(combatRules) };
+const ctx: GameContext = { map: baseMap, oob, sequence: Sequence.parse(sequence), movement: MovementRules.parse(movementRules), combat: CombatRules.parse(combatRules), turns: TurnRules.parse(turnRules) };
 /** 想定 + 种子 → 初始状态（目前只有演示摆放） */
 const initialFor = (scenario: string, seed: number) => {
   if (scenario !== deployment.id) throw new Error(`没有想定 ${scenario}`);
@@ -47,6 +49,10 @@ let selectedUnit: string | null = null;
 let attackPick: { hex: string; units: Set<string> } | null = null;
 /** 选中单位现在能到达的格子（不能移动时为 null） */
 let reach: Map<string, Reach> | null = null;
+/** 热座迷雾（关掉热座时为 null） */
+let fog: Fog | null = null;
+/** 这一格全是看不清的敌军 */
+const veiled = (hex: string): boolean => (stackMap.get(hex) ?? []).some((p) => fog?.hidden.has(p.unit.id));
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const DIR_NAMES = ['北', '东北', '东南', '南', '西南', '西北'];
 let toastTimer = 0;
@@ -86,7 +92,8 @@ function showInfo(h: Offset | null): void {
       ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
     ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
-    ${editor.active ? '' : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote())}
+    ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
+      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote())}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
   box.hidden = false;
@@ -126,7 +133,8 @@ function moveNote(): string {
   const why = whyCannotMove(ctx, s, selectedUnit, actingSide(ctx, s));
   if (why) return `<span class="muted">不能移动：${esc(why)}</span>`;
   const u = oob.units.get(selectedUnit)!;
-  return `可以移动（移动力 ${u.ratings.movement}）：点地图上<b class="c-reach">蓝色</b>格子移动；<b class="c-zoc">橙色</b>是敌控制区，到此停止。`;
+  const mp = movementAllowance(ctx, s, selectedUnit);
+  return `可以移动（移动力 ${mp}${mp !== u.ratings.movement ? '，夜间减半' : ''}）：点地图上<b class="c-reach">蓝色</b>格子移动；<b class="c-zoc">橙色</b>是敌控制区，到此停止。`;
 }
 
 let view: Awaited<ReturnType<typeof createMapView>>;
@@ -183,12 +191,14 @@ async function start(): Promise<void> {
   map = editor.map();
   if (map !== baseMap) view.update(map);
 
+  const hotseat = createHotseat(ctx);
   game = createGameUi(ctx, initialFor, deployment.id, ENGINE_VERSION, (s) => {
     stackMap = stacks(placedUnits(ctx, s));
-    void units.render(stackMap);
+    fog = hotseat.fog(s);
+    void units.render(stackMap, fog?.hidden);
     selectUnit(selectedUnit && s.units.some((u) => u.id === selectedUnit) ? selectedUnit : null);
     if (selected && !$('info').hidden) showInfo(selected);
-  }, toast);
+  }, toast, hotseat);
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
     const local = view.root.toLocal({ x: sx, y: sy });
@@ -210,7 +220,7 @@ async function start(): Promise<void> {
     selected = h;
     // 点到有部队的格子，默认选中最上面的单位
     const stack = stackMap.get(hexId(h)) ?? [];
-    selectUnit(editor.active ? null : stack.at(-1)?.unit.id ?? null);
+    selectUnit(editor.active || veiled(hexId(h)) ? null : stack.at(-1)?.unit.id ?? null);
     view.select(h); showInfo(h);
   });
   cam.onChange(() => view.onZoom(cam.zoom()));

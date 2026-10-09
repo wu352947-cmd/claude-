@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { type Direction, distance, hexId, inBounds, neighbor, parseHexId } from './hex';
 import { Terrain, SideFeature, hexRecord, sideFeatures } from './map';
 import { directionTo, sideOfUnit, stepCost, zocOf } from './movement';
+import { nightBarred, whyNotExploit } from './calendar';
 import type { GameContext, GameState, UnitState } from './game';
 import type { Side } from './units';
 
@@ -69,11 +70,12 @@ export const currentValue = (ctx: GameContext, u: UnitState, kind: 'attack' | 'd
 const r2 = (x: number): number => Math.round(x * 100) / 100;
 const RULE = 'data/rules/combat.json';
 
-/** 能进攻这一格的本方单位（相邻、能进攻、本阶段还没进攻过） */
+/** 能进攻这一格的本方单位（相邻、能进攻、本阶段还没进攻过；夜间不含机动单位；发展阶段只限可发展的单位） */
 export function eligibleAttackers(ctx: GameContext, s: GameState, hex: string, side: Side): string[] {
   const h = parseHexId(hex);
   return s.units.filter((u) => sideOfUnit(ctx, u.id) === side && distance(parseHexId(u.hex), h) === 1
-    && !ctx.combat.defenseOnlyTypes.includes(unitOf(ctx, u.id).type) && !s.attacked.includes(u.id)).map((u) => u.id);
+    && !ctx.combat.defenseOnlyTypes.includes(unitOf(ctx, u.id).type) && !s.attacked.includes(u.id)
+    && !nightBarred(ctx, s, u.id) && !whyNotExploit(ctx, s, u.id)).map((u) => u.id);
 }
 
 /** 射程内能支援的炮兵 */
@@ -94,6 +96,8 @@ export function whyCannotAttack(ctx: GameContext, s: GameState, attackers: reado
   if (defenders.some((u) => sideOfUnit(ctx, u.id) === side)) return `${hex} 是本方部队`;
   if (s.attackedHexes.includes(hex)) return '这一格本阶段已经被进攻过';
   if (!attackers.length) return '没有选择进攻单位';
+  for (const a of attackers) if (nightBarred(ctx, s, a)) return `夜间回合机动单位不能发起进攻（${unitOf(ctx, a)?.names.zh ?? a}）`;
+  for (const a of attackers) { const ex = whyNotExploit(ctx, s, a); if (ex) return `${unitOf(ctx, a)?.names.zh ?? a}：${ex}`; }
   const ok = new Set(eligibleAttackers(ctx, s, hex, side));
   for (const a of attackers) if (!ok.has(a)) return `${unitOf(ctx, a)?.names.zh ?? a} 不能参加这次进攻（不相邻、不能进攻或已进攻过）`;
   if (new Set(attackers).size !== attackers.length) return '进攻单位重复';

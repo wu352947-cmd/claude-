@@ -1,6 +1,6 @@
 /** 测试用：小地图与手搭的对局状态（movement、combat 测试共用） */
 import {
-  type GameContext, type GameState, CombatRules, MovementRules, RatingsParams, Sequence, createRng, linkKey, loadMap, loadOob, parseHexId,
+  type GameContext, type GameState, CombatRules, TurnRules, MovementRules, RatingsParams, Sequence, createRng, linkKey, loadMap, loadOob, parseHexId,
 } from '../src/engine';
 import def from '../data/maps/south.json';
 import oobData from '../data/units/south.oob.json';
@@ -8,6 +8,7 @@ import rawParams from '../data/rules/ratings.json';
 import rawSeq from '../data/rules/sequence.json';
 import rawMove from '../data/rules/movement.json';
 import rawCombat from '../data/rules/combat.json';
+import rawTurns from '../data/rules/turns.json';
 
 /**
  * 小测试地图（12×12，默认全是开阔地）。第 5 列从北往南：0502、0503 …… 南北相邻。
@@ -19,6 +20,7 @@ export const oob = loadOob(oobData, RatingsParams.parse(rawParams));
 export const sequence = Sequence.parse(rawSeq);
 export const movement = MovementRules.parse(rawMove);
 export const combat = CombatRules.parse(rawCombat);
+export const turns = TurnRules.parse(rawTurns);
 export const phase = (id: string): number => sequence.phases.findIndex((p) => p.id === id);
 
 export function world(opts: { hexes?: Record<string, string>; sides?: Record<string, string[]>; roads?: [string, string, string][] } = {}): GameContext {
@@ -29,11 +31,12 @@ export function world(opts: { hexes?: Record<string, string>; sides?: Record<str
     labels: { labels: [] },
   });
   for (const [a, b, kind] of opts.roads ?? []) map.links.set(linkKey(parseHexId(a), parseHexId(b)), [kind as 'road']);
-  return { map, oob, sequence, movement, combat };
+  return { map, oob, sequence, movement, combat, turns };
 }
 /** 手搭状态：units = 单位 → 格号；步数默认满编，可用 steps 覆盖 */
 export const at = (units: Record<string, string>, ph = 'first.movement', steps: Record<string, number> = {}): GameState => ({
-  scenario: 't', first: 'DE', turn: 1, phase: phase(ph), rng: createRng(1),
-  moved: [], movedThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null, damaged: [], eliminated: [],
+  scenario: 't', first: 'DE', turn: 1, phase: phase(ph), rng: createRng(1), start: { date: '1943-07-11', slot: 0 },
+  moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null,
+  damaged: [], repair: [], destroyed: [], eliminated: [],
   units: Object.entries(units).map(([id, hex]) => ({ id, hex, steps: steps[id] ?? oob.units.get(id)!.steps })),
 });

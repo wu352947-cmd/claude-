@@ -79,7 +79,11 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
   }
   const empty = !s.units.some((u) => u.hex === hex);
   const canAdvance = attackers.filter((id) => s.units.some((u) => u.id === id));
-  s = { ...s, advance: empty && canAdvance.length ? { hex, units: canAdvance } : null };
+  s = {
+    ...s, advance: empty && canAdvance.length ? { hex, units: canAdvance } : null,
+    foughtThisTurn: [...s.foughtThisTurn, ...attackers],
+    wonThisTurn: empty ? [...s.wonThisTurn, ...canAdvance] : s.wonThisTurn,
+  };
   return { state: s, events };
 }
 
