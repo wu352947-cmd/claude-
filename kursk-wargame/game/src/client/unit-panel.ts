@@ -18,6 +18,7 @@ function sources(list: Provenance[]): string {
   return list.map((p) => esc(`${p.field}：${p.source}${p.page ? (/^\d[\d–-]*$/.test(p.page) ? ` 第 ${p.page} 页` : ` · ${p.page}`) : ''}${p.grade ? `（${p.grade} 级）` : ''}${p.note ? ` ${p.note}` : ''}`)).join('<br>');
 }
 
+const ARMOR_NAMES = { none: '无', light: '轻', medium: '中', heavy: '重' } as const;
 const fmt = (n: number): string => (Math.round(n * 10) / 10).toString();
 
 /** 公式明细：每条输入（史料数字）→ 攻/防/支援分，并列出出处与原文 */
@@ -37,7 +38,7 @@ function derivation(p: PlacedUnit): string {
   }).join('');
   return `<details class="deriv"><summary>数值怎么算出来的（公式草案）</summary>
     <table><thead><tr><th>输入（史料数字）</th><th>${art ? '支援' : '攻'}</th><th>${art ? '' : '防'}</th></tr></thead><tbody>${rows}</tbody></table>
-    <div class="muted">合计 × 素质系数 ${d.quality} 后取整 → ${u.ratings.attack}-${u.ratings.defense}；步数 ${u.steps}；装甲等级 ${d.armorClass}。
+    <div class="muted">合计后取整（素质不进数值，战斗时作修正） → ${u.ratings.attack}-${u.ratings.defense}；步数 ${u.steps}；装甲等级 ${ARMOR_NAMES[d.armorClass]}。
     公式与参数见 docs/08-单位数值换算公式.md</div></details>`;
 }
 

@@ -113,7 +113,7 @@ export const Unit = z.object({
   guards: z.boolean().default(false),
   /** 兵力与装备（史料数字）；有它就按公式算数值 */
   strength: z.array(StrengthItem).default([]),
-  /** 素质 1–5（3 = 普通），不是 3 时必须写理由 */
+  /** 素质 1–5（3 = 普通），不是 3 时必须写理由。不进数值公式，战斗中作骰子修正（docs/08 §3.5） */
   quality: z.number().int().min(1).max(5).default(3),
   qualityNote: z.string().optional(),
   /** 没有兵力数字时手填的占位数值 */
@@ -203,7 +203,7 @@ export function loadOob(raw: unknown, params: RatingsParams): Oob {
       units.set(u.id, { ...u, steps: u.steps, ratings: u.ratings, confidence: 'placeholder' });
     } else {
       // 按公式算；没有兵力数字时公式用类型占位分（没有占位分的兵种会报错）
-      const d = deriveRatings(params, u.type, u.size, u.strength, u.quality);
+      const d = deriveRatings(params, u.type, u.size, u.strength);
       if (!d.lines.length) throw new Error(`单位 ${u.id} 没有兵力数字，兵种 ${u.type} 也没有占位分，请手填占位数值`);
       units.set(u.id, {
         ...u, steps: d.steps, derived: d, confidence: judge(u, d),

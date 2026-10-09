@@ -18,7 +18,6 @@ export const RatingsParams = z.object({
   })),
   typeDefaults: z.record(z.string(), z.union([z.string(), z.object({ attack: z.number(), defense: z.number() })])),
   artilleryDefense: z.number(),
-  quality: z.array(z.number()).length(5),
   pointsPerStep: z.number().positive(),
   steps: z.record(z.string(), z.tuple([z.number().int(), z.number().int()])),
   mobility: z.record(z.string(), z.enum(['foot', 'motorized', 'tracked'])),
@@ -59,7 +58,6 @@ export interface Derived {
   /** 有没有用到占位分 */
   usedDefault: boolean;
   lines: BreakdownLine[];
-  quality: number;
 }
 
 const r1 = (x: number): number => Math.round(x * 100) / 100;
@@ -67,10 +65,9 @@ const r1 = (x: number): number => Math.round(x * 100) / 100;
 /**
  * @param type 兵种（决定机动类型、占位分、是否炮兵）
  * @param size 规模（决定步数上下限）
- * @param quality 素质 1–5
  */
 export function deriveRatings(
-  p: RatingsParams, type: string, size: string, strength: readonly StrengthInput[], quality = 3,
+  p: RatingsParams, type: string, size: string, strength: readonly StrengthInput[],
 ): Derived {
   const lines: BreakdownLine[] = [];
   const armorWeight = { light: 0, medium: 0, heavy: 0 };
@@ -101,19 +98,18 @@ export function deriveRatings(
     lines.push({ label: '步兵（无兵力数字，用类型占位分）', attack: def.attack, defense: def.defense, support: 0, placeholder: true });
     usedDefault = true;
   }
-  const q = p.quality[Math.min(5, Math.max(1, quality)) - 1]!;
   const sum = (f: 'attack' | 'defense' | 'support'): number => lines.reduce((a, l) => a + l[f], 0);
   const isArtillery = type === 'artillery';
   // 炮兵：算子"攻击"位置印炮火支援值，"防御"印自身近战防御
-  const attack = Math.max(1, Math.round(q * (isArtillery ? sum('support') : sum('attack'))));
-  const defense = Math.max(1, Math.round(q * (isArtillery ? p.artilleryDefense : sum('defense'))));
+  const attack = Math.max(1, Math.round(isArtillery ? sum('support') : sum('attack')));
+  const defense = Math.max(1, Math.round(isArtillery ? p.artilleryDefense : sum('defense')));
   const [lo, hi] = p.steps[size] ?? [1, 4];
-  const stepBase = isArtillery ? sum('support') * 2 : sum('defense') * q;
+  const stepBase = isArtillery ? sum('support') * 2 : sum('defense');
   const steps = Math.min(hi, Math.max(lo, Math.round(stepBase / p.pointsPerStep)));
   const mob = p.mobility[type] ?? 'foot';
   const top = (Object.entries(armorWeight) as [Derived['armorClass'], number][]).sort((a, b) => b[1] - a[1])[0]!;
   return {
-    attack, defense, steps, quality: q,
+    attack, defense, steps,
     movement: p.movement[mob] ?? 4,
     armorClass: top[1] > 0 ? top[0] : 'none',
     usedDefault,

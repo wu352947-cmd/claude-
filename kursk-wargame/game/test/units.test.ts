@@ -197,7 +197,7 @@ describe('数值换算公式', () => {
 
   it('算子数字由公式算出，与明细一致', () => {
     const u = oob.units.get('DE.IISS.LSSAH.PzRgt1')!;
-    const d = deriveRatings(params, u.type, u.size, u.strength, u.quality);
+    const d = deriveRatings(params, u.type, u.size, u.strength);
     expect(u.ratings).toEqual({ attack: d.attack, defense: d.defense, movement: d.movement });
   });
 });

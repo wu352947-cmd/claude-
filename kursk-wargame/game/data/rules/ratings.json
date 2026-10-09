@@ -76,14 +76,13 @@
   "recon": { "attack": 1, "defense": 1 }
  },
  "artilleryDefense": 1,
- "quality": [0.8, 0.9, 1.0, 1.1, 1.2],
  "pointsPerStep": 3,
- "steps": { "battalion": [1, 2], "regiment": [2, 4], "brigade": [2, 4], "division": [3, 6] },
+ "steps": { "battalion": [1, 2], "regiment": [2, 3], "brigade": [2, 3], "division": [2, 3] },
  "mobility": {
   "armor": "tracked", "panzergrenadier": "motorized", "motorized-infantry": "motorized", "infantry": "foot", "airborne": "foot",
   "recon": "motorized", "artillery": "motorized", "sp-artillery": "tracked", "antitank": "motorized", "tank-destroyer": "tracked", "assault-gun": "tracked"
  },
- "movement": { "foot": 4, "motorized": 8, "tracked": 8 },
+ "movement": { "foot": 4, "motorized": 8, "tracked": 7 },
  "shares": {
   "$comment": "只有全师战斗兵力时，分给团、营的份额（设计参数，不是史料数字）。依据见 docs/08 §3.1",
   "ssPzGrenRgt": { "name": "党卫军装甲掷弹兵团（3 个营）", "fraction": 0.2 },
