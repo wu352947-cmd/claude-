@@ -27,7 +27,7 @@ export function turnEndCheck(ctx: GameContext, s: GameState): { state: GameState
     events.push({ type: 'GameOver', turn: s.turn, reason: `${SIDE_ZH[winner]}连续 ${streak.turns} 个回合保持战争目标：${out!.label}` });
     return { state: { ...cur, over: true }, events };
   }
-  if (s.turn >= E.hardTurns) {
+  if (E.hardTurns && s.turn >= E.hardTurns) {
     events.push({ type: 'GameOver', turn: s.turn, reason: `已到回合上限（${E.hardTurns} 回合）` });
     return { state: { ...cur, over: true }, events };
   }

@@ -22,8 +22,8 @@ export const EndRules = z.object({
   holdTurns: z.number().int().positive(),
   /** 最早第几回合才允许自动提前结束（否则守方什么都不做、开局就"达成目标"） */
   minTurn: z.number().int().positive(),
-  /** 硬上限回合数（防止永远打不完） */
-  hardTurns: z.number().int().positive(),
+  /** 硬上限回合数（可选；不写 = 没有上限，靠收兵或提前分出胜负结束） */
+  hardTurns: z.number().int().positive().optional(),
 });
 export type EndRules = z.infer<typeof EndRules>;
 
