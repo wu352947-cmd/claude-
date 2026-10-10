@@ -7,8 +7,11 @@ import { CommandError, type GameContext, type GameEvent, type GameState, type Un
 
 const unitOf = (ctx: GameContext, id: string) => ctx.oob.units.get(id)!;
 
-/** 按顺序每个单位轮流损失 1 步，直到损失够 n 步或全部消灭 */
-function takeLosses(ctx: GameContext, s: GameState, order: string[], n: number, events: GameEvent[]): GameState {
+/**
+ * 按顺序每个单位轮流损失 1 步，直到损失够 n 步或全部消灭。
+ * battleHex = 战斗发生的格子（守方所在格）：装甲损失记在战场上，回合末按"这块战场现在归谁"分流（02 §4.4）。
+ */
+function takeLosses(ctx: GameContext, s: GameState, order: string[], n: number, events: GameEvent[], battleHex: string): GameState {
   const left = new Map(order.map((id) => [id, s.units.find((u) => u.id === id)!.steps]));
   const lost = new Map<string, number>();
   let need = n;
@@ -28,7 +31,7 @@ function takeLosses(ctx: GameContext, s: GameState, order: string[], n: number, 
     const unit = unitOf(ctx, id);
     // 装甲单位损失的步数先进入受损池（02 §4.4），回合末再按战场控制分流（冲刺 6）
     const armored = ctx.combat.armor.armorTypes.includes(unit.type);
-    if (armored) damaged.push({ unit: id, formation: unit.formation, steps, hex: s.units.find((u) => u.id === id)!.hex, turn: s.turn });
+    if (armored) damaged.push({ unit: id, formation: unit.formation, steps, hex: battleHex, turn: s.turn });
     else casualties.push({ unit: id, steps, turn: s.turn });
     events.push({ type: 'StepsLost', unit: id, steps, damagedPool: armored });
   }
@@ -64,8 +67,8 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
   };
   // 守方从堆叠最上面开始轮流损失；攻方按进攻单位的先后
   const defenders = s.units.filter((u) => u.hex === hex).map((u) => u.id).reverse();
-  s = takeLosses(ctx, s, defenders, res.d, events);
-  s = takeLosses(ctx, s, attackers, res.a, events);
+  s = takeLosses(ctx, s, defenders, res.d, events, hex);
+  s = takeLosses(ctx, s, attackers, res.a, events, hex);
   const survivors = s.units.filter((u) => u.hex === hex).map((u) => u.id);
   if (res.r && survivors.length) {
     const { path, extraLoss } = retreatPath(ctx, s, hex, res.r, side, attackers);
@@ -78,7 +81,7 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
     }
     if (extraLoss) {
       events.push({ type: 'RetreatLoss', units: survivors, steps: extraLoss, reason: path.length < res.r ? '无路可退' : '退入敌控制区' });
-      for (let i = 0; i < extraLoss; i++) s = takeLosses(ctx, s, survivors.filter((id) => s.units.some((u) => u.id === id)), survivors.length, events);
+      for (let i = 0; i < extraLoss; i++) s = takeLosses(ctx, s, survivors.filter((id) => s.units.some((u) => u.id === id)), survivors.length, events, hex);
     }
   }
   const empty = !s.units.some((u) => u.hex === hex);

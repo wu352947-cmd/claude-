@@ -164,3 +164,16 @@ describe('结算', () => {
     expect([next.attacked, next.attackedHexes, next.fired, next.advance]).toEqual([[], [], [], null]);
   });
 });
+
+describe('受损池记在战场上', () => {
+  const ctx = world();
+  it('攻方装甲的损失记在守方所在的格子（战场），不是自己出发的格子；守方损失也记在这一格', () => {
+    let seen = 0;
+    for (let seed = 1; seed <= 200 && seen < 5; seed++) {
+      const s = { ...at({ [TANK]: '0505', [DRPZ]: otherNeighbor, [CHURCHILL]: '0506' }, 'first.combat'), rng: createRng(seed) };
+      const r = apply(ctx, s, { type: 'Attack', attackers: [TANK, DRPZ], hex: '0506' }).state;
+      for (const d of r.damaged) { expect(d.hex).toBe('0506'); seen++; }
+    }
+    expect(seen).toBeGreaterThan(0);
+  });
+});

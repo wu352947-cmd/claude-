@@ -66,7 +66,7 @@ export interface GameState {
   fired: string[];
   /** 战斗后可以推进（只在紧接着的下一条指令有效） */
   advance: { hex: string; units: string[] } | null;
-  /** 受损池：装甲单位本回合损失的步数（02 §4.4），回合末分流 */
+  /** 受损池：装甲单位本回合损失的步数（02 §4.4），回合末分流；hex = 战斗发生的格子（守方所在格） */
   damaged: { unit: string; formation: string; steps: number; hex: string; turn: number }[];
   /** 修理队列：left = 还要几个回合末 */
   repair: { unit: string; steps: number; left: number }[];
