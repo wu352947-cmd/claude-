@@ -12,6 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
+import { planGroupMove } from './group-move';
 import { parentOf, whyCannotAssign } from './command-chain';
 import { type Scenario, claim, startTurn } from './scenario';
 import { type RngState, createRng, rollDie } from './rng';
@@ -98,6 +99,8 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
   /** 战斗后推进 */
   z.object({ type: z.literal('Advance'), units: z.array(z.string().min(1)).min(1) }),
+  /** 整体移动：一批单位各自尽量靠近 hex（group-move.ts） */
+  z.object({ type: z.literal('MoveGroup'), units: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
   /** 调整隶属：把编制 formation 配属给 parent（null = 直属，不隶属任何上级） */
   z.object({ type: z.literal('Assign'), formation: z.string().min(1), parent: z.string().min(1).nullable() }),
   z.object({ type: z.literal('EndPhase') }),
@@ -214,6 +217,11 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
     case 'RollDie': {
       const [value, rng] = rollDie(s.rng, cmd.sides);
       return { state: { ...s, rng }, events: [{ type: 'DieRolled', sides: cmd.sides, value, purpose: cmd.purpose }] };
+    }
+    case 'MoveGroup': {
+      const plan = planGroupMove(ctx, s, cmd.units, cmd.hex);
+      if (!plan.moves.length) throw new CommandError(`没有单位能更靠近 ${cmd.hex}${plan.skipped[0] ? `（${plan.skipped[0].why}）` : ''}`);
+      return { state: plan.state, events: plan.events };
     }
     case 'Assign': {
       const why = whyCannotAssign(ctx, s, cmd.formation, cmd.parent, actingSide(ctx, s));

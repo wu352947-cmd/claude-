@@ -9,16 +9,31 @@ import {
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
 const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
-export interface OrgPanel { refresh(s: GameState): void }
+export interface OrgPanel { refresh(s: GameState): void; cancelMove(): void }
 
 export function setupOrg(
   ctx: GameContext, view: () => Side | null, assign: (formation: string, parent: string | null) => boolean, show: (unitIds: string[]) => void,
+  /** 整体移动：给出这个编制的全部单位，等玩家点地图；null = 取消 */
+  moveMode: (unitIds: string[] | null, name: string) => void,
 ): OrgPanel {
   const box = $('org');
   let last: GameState | null = null;
   let side: Side = 'DE';
   let open = false;
   let marked: string | null = null;
+  let moving: string | null = null;
+
+  /** 编制（含全部下级）现在在地图上的单位 */
+  function members(f: string): string[] {
+    const s = last!;
+    const out = new Set<string>();
+    const walk = (g: string): void => {
+      for (const u of ctx.oob.units.values()) if (u.formation === g && s.units.some((x) => x.id === u.id)) out.add(u.id);
+      for (const c of childrenOf(ctx, s, g)) walk(c);
+    };
+    walk(f);
+    return [...out];
+  }
 
   function render(): void {
     box.hidden = !open;
@@ -45,6 +60,7 @@ export function setupOrg(
         <span class="org-name">${form.echelon ? `<small>${ECHELON_NAMES[form.echelon]}</small> ` : ''}${esc(form.names.zh)}</span>
         <small>${total(f)} 个单位${own && own !== total(f) ? `（直属 ${own}）` : ''}${fresh ? ' · <b class="c-zoc">本回合刚调整</b>' : ''}</small>
         <span class="org-act">${total(f) ? `<button data-show="${esc(f)}">看位置</button>` : ''}
+        ${total(f) && acting === side ? `<button data-move="${esc(f)}"${moving === f ? ' class="on"' : ''}>${moving === f ? '点地图选目的地…（再点取消）' : '整体移动'}</button>` : ''}
         ${can ? `<select data-assign="${esc(f)}"><option value="">配属到…</option>${options}${canDetach ? '<option value="-">直属（不隶属）</option>' : ''}</select>` : ''}</span>
       </div>${childrenOf(ctx, s, f).filter((c) => ctx.oob.formations.get(c)!.side === side).map((c) => row(c, depth + 1)).join('')}`;
     };
@@ -55,14 +71,16 @@ export function setupOrg(
     for (const b of box.querySelectorAll<HTMLButtonElement>('button[data-show]')) {
       b.onclick = () => {
         const f = b.dataset.show!;
-        const members = new Set<string>();
-        const walk = (g: string): void => {
-          for (const u of ctx.oob.units.values()) if (u.formation === g && s.units.some((x) => x.id === u.id)) members.add(u.id);
-          for (const c of childrenOf(ctx, s, g)) walk(c);
-        };
-        walk(f);
         marked = marked === f ? null : f;
-        show(marked ? [...members] : []);
+        show(marked ? members(f) : []);
+        render();
+      };
+    }
+    for (const b of box.querySelectorAll<HTMLButtonElement>('button[data-move]')) {
+      b.onclick = () => {
+        const f = b.dataset.move!;
+        moving = moving === f ? null : f;
+        moveMode(moving ? members(f) : null, ctx.oob.formations.get(f)!.names.zh);
         render();
       };
     }
@@ -72,5 +90,5 @@ export function setupOrg(
   }
 
   $('g-org').onclick = () => { open = !open; if (!open) show([]); render(); };
-  return { refresh(s) { last = s; render(); } };
+  return { refresh(s) { last = s; render(); }, cancelMove() { moving = null; render(); } };
 }

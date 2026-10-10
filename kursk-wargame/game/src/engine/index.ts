@@ -17,6 +17,7 @@ export * from './game';
 export * from './session';
 export * from './movement';
 export * from './command-chain';
+export * from './group-move';
 export * from './combat';
 export * from './combat-resolve';
 export * from './calendar';

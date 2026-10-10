@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
   CONFIDENCE_NAMES, ENGINE_VERSION, GameMeta, SIDE_NAMES, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  CombatRules, TurnRules, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  CombatRules, TurnRules, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, planGroupMove, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -187,6 +187,8 @@ let editor: ReturnType<typeof createEditor>;
 let units: ReturnType<typeof createUnitsView>;
 let game: GameUi;
 let org: OrgPanel;
+/** 整体移动：正在等玩家点目的地的单位 */
+let groupMove: string[] | null = null;
 
 async function start(): Promise<void> {
   $('title').textContent = meta.title.zh;
@@ -256,7 +258,9 @@ async function start(): Promise<void> {
     if (selected && !$('info').hidden) showInfo(selected);
     org?.refresh(s);
   }, toast, hotseat);
-  org = setupOrg(ctx, () => hotseat.fog(game.state())?.viewer ?? null, (f, p) => game.dispatch({ type: 'Assign', formation: f, parent: p }), (ids) => units.highlightGroup(ids));
+  org = setupOrg(ctx, () => hotseat.fog(game.state())?.viewer ?? null, (f, p) => game.dispatch({ type: 'Assign', formation: f, parent: p }), (ids) => units.highlightGroup(ids),
+    (ids, name) => { groupMove = ids; if (ids) toast(`整体移动：${name}。点地图上的目的地（Esc 取消）`); });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape' && groupMove) { groupMove = null; org.cancelMove(); } });
   org.refresh(game.state());
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
@@ -264,6 +268,13 @@ async function start(): Promise<void> {
     const world = { x: local.x / PX_PER_KM, y: local.y / PX_PER_KM };
     const h = hexAt(map.grid, world);
     if (!inBounds(map.grid, h)) { selected = null; view.select(null); showInfo(null); return; }
+    if (groupMove) {
+      const ids = groupMove, to = hexId(h);
+      groupMove = null; org.cancelMove();
+      const plan = planGroupMove(ctx, game.state(), ids, to);
+      if (game.dispatch({ type: 'MoveGroup', units: ids, hex: to })) toast(`${plan.moves.length} 个单位向 ${to} 移动，${plan.skipped.length} 个没动`);
+      return;
+    }
     if (editor.tap(world, h)) {
       if (editor.tool !== 'side') view.select(h);
       showInfo(null);
