@@ -13,6 +13,7 @@ import type { HexGrid } from './hex';
 const Hex = z.string().regex(/^\d{4}$/, '格号必须是 4 位数字');
 /** 想定里的考据说明：引用 sources.csv 的 ID 与页码，原文摘录 */
 const Prov = z.object({ source: z.string(), page: z.string().optional(), quote: z.string().optional() });
+const Held = z.enum(['DE', 'SU', 'contested']);
 
 export const ScenarioFile = DeploymentFile.extend({
   /** 共几个回合（不写 = 不限） */
@@ -20,6 +21,8 @@ export const ScenarioFile = DeploymentFile.extend({
   /** 每回合的主动方（第 1 回合起；没写到的回合沿用 first） */
   initiative: z.array(Side).default([]),
   initiativeNote: z.string().optional(),
+  /** 没有查到开局位置、因此没有放进想定的单位（照实列出，不凭空放） */
+  omitted: z.array(z.string()).default([]),
   /** 增援：第 turn 回合开始时出现在 hex（被敌军占住时放到最近的空格） */
   reinforcements: z.array(z.object({
     unit: z.string().min(1), turn: z.number().int().min(2), hex: Hex, steps: z.number().int().min(1).optional(),
@@ -27,6 +30,14 @@ export const ScenarioFile = DeploymentFile.extend({
   })).default([]),
   /** 胜利目标：开局归 owner；之后哪一方的单位最后进入（经过）就归哪一方 */
   objectives: z.array(z.object({ hex: Hex, name: z.string().min(1), vp: z.number().int().positive(), owner: Side, note: z.string().optional() })).default([]),
+  /** 历史结局（战后报告用）：某个目标格在历史上最后归谁；contested = 史料互相矛盾或交替易手 */
+  history: z.object({
+    date: z.string(),
+    time: z.string(),
+    control: z.array(z.object({ hex: Hex, name: z.string().min(1), heldBy: Held, note: z.string().optional(), provenance: z.array(Prov).default([]) })),
+    losses: z.array(z.object({ label: z.string().min(1), text: z.string().min(1), provenance: z.array(Prov).default([]) })).default([]),
+    note: z.string().optional(),
+  }).optional(),
   victory: z.object({
     $comment: z.string().optional(),
     /** 每一步完全损失给对方的胜利点（德军得分 = 德占目标 + 苏军损失 × SU − 德军损失 × DE） */
@@ -52,6 +63,18 @@ export function loadScenario(oob: Oob, grid: HexGrid, raw: unknown): Scenario {
     if (!inBounds(grid, parseHexId(r.hex))) throw new Error(`增援 ${r.unit} 的格子 ${r.hex} 不在地图内`);
     if ((r.steps ?? 0) > u.steps) throw new Error(`增援 ${r.unit} 步数超过满编`);
     if (sc.turns && r.turn > sc.turns) throw new Error(`增援 ${r.unit} 在第 ${r.turn} 回合，想定只有 ${sc.turns} 回合`);
+  }
+  // 开局时敌对双方不能同格；目标格上有部队时，归属必须是那一方
+  const sideAt = new Map<string, Side>();
+  for (const p of sc.placements) {
+    const side = oob.formations.get(oob.units.get(p.unit)!.formation)!.side;
+    const prev = sideAt.get(p.hex);
+    if (prev && prev !== side) throw new Error(`格子 ${p.hex} 开局时德苏双方都有部队`);
+    sideAt.set(p.hex, side);
+  }
+  for (const o of sc.objectives) {
+    const at = sideAt.get(o.hex);
+    if (at && at !== o.owner) throw new Error(`目标 ${o.name}（${o.hex}）开局被${at}部队占着，归属却写成 ${o.owner}`);
   }
   const seen = new Set<string>();
   for (const o of sc.objectives) {
@@ -135,4 +158,32 @@ export function score(ctx: GameContext, s: GameState): Score | null {
   const delta = V.baseline === null ? null : total - V.baseline;
   const band = delta === null ? null : V.bands.find((b) => b.min === null || delta >= b.min)!.label;
   return { objectives, objectiveVp, lost, lossVp, total, delta, band };
+}
+
+export interface HistoryRow { hex: string; name: string; history: Side | 'contested'; game: Side; same: boolean; note?: string }
+export interface HistoryReport {
+  date: string;
+  time: string;
+  rows: HistoryRow[];
+  /** 与历史结局归属一致的目标格数 / 可比较的目标格数（历史上交替易手的不计） */
+  agree: number;
+  comparable: number;
+  /** 游戏里双方完全损失的步数（装甲回合末分流后 + 其他兵种全部损失） */
+  lost: Record<Side, number>;
+  losses: { label: string; text: string; provenance: { source: string; page?: string; quote?: string }[] }[];
+  note?: string;
+}
+
+/** 战后报告"与历史对比"：目标格最终归属对照历史结局，并列出各说法的历史损失（口径不同，不直接折算） */
+export function historyReport(ctx: GameContext, s: GameState): HistoryReport | null {
+  const H = ctx.scenario?.history;
+  if (!H) return null;
+  const rows = H.control.map((c) => {
+    const game = s.owners[c.hex] ?? ctx.scenario!.objectives.find((o) => o.hex === c.hex)?.owner ?? 'SU';
+    return { hex: c.hex, name: c.name, history: c.heldBy, game, same: c.heldBy === game, note: c.note };
+  });
+  const comparable = rows.filter((r) => r.history !== 'contested');
+  const lost: Record<Side, number> = { DE: 0, SU: 0 };
+  for (const x of [...s.destroyed, ...s.casualties]) lost[sideOfUnit(ctx, x.unit)] += x.steps;
+  return { date: H.date, time: H.time, rows, agree: comparable.filter((r) => r.same).length, comparable: comparable.length, lost, losses: H.losses, note: H.note };
 }

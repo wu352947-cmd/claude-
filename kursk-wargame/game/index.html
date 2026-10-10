@@ -126,6 +126,16 @@
       #game .meta { color: var(--muted); font-size: 11px; margin-top: 6px; word-break: break-all; }
       @media (max-width: 600px) { body:has(#info:not([hidden])) #game { display: none; } }
       #game .night { background: #2c3e66; color: #dfe6ff; border-radius: 3px; padding: 0 4px; margin-left: 4px; font-size: 12px; }
+      #game .g-report { font-size: 12px; margin: 0 0 8px; max-height: 40vh; overflow-y: auto; border: 1px solid #4a4738; padding: 6px; border-radius: 4px; }
+      #game .g-report small { display: block; color: var(--muted); }
+      #game .g-report table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+      #game .g-report td { padding: 1px 4px; border-bottom: 1px solid #34332b; }
+      #game .g-report tr.ok td:last-child { color: #8fc28f; }
+      #game .g-report tr.no td:last-child { color: #e08a7a; }
+      #game .g-report tr.ct td { color: var(--muted); font-style: italic; }
+      #game .g-report ul { margin: 4px 0 0; padding-left: 16px; }
+      #game .g-report li { border: 0; }
+      #info .start-note .est { font-style: italic; }
       #game .g-score { font-size: 12px; margin: -2px 0 6px; }
       #game .g-score small { color: var(--muted); margin-left: 6px; }
       #game label.hs { display: block; margin-top: 8px; font-size: 12px; }
@@ -231,6 +241,7 @@
     <div id="game">
       <div class="g-ph" id="g-phase"></div>
       <div class="g-score" id="g-score" hidden></div>
+      <div class="g-report" id="g-report" hidden></div>
       <div class="row">
         <button class="primary" id="g-end">结束阶段</button>
         <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>

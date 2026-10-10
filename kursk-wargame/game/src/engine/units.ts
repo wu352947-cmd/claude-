@@ -149,6 +149,12 @@ export const Placement = z.object({
   hex: z.string().regex(/^\d{4}$/, '格号必须是 4 位数字'),
   /** 当前剩余步数（不写 = 满编） */
   steps: z.number().int().min(1).optional(),
+  /** 开局位置的考据程度：有出处 = 史料写明了地点；推定 = 只知道大致地区，具体格号是设计选择 */
+  confidence: Confidence.optional(),
+  /** 位置依据（中文说明：哪个地名、怎么换算成这一格） */
+  basis: z.string().optional(),
+  /** 位置出处：史料 ID（sources.csv）、页码或行号、原文摘录 */
+  provenance: z.array(z.object({ source: z.string().regex(/^SRC-\d{4}$/), page: z.string().optional(), quote: z.string().min(1) })).default([]),
 });
 export type Placement = z.infer<typeof Placement>;
 
@@ -234,6 +240,7 @@ export function loadDeployment(oob: Oob, grid: HexGrid, raw: unknown): { deploym
     if (!inBounds(grid, hex)) throw new Error(`单位 ${p.unit} 的格子 ${p.hex} 不在地图内`);
     const steps = p.steps ?? unit.steps;
     if (steps > unit.steps) throw new Error(`单位 ${p.unit} 当前步数 ${steps} 超过满编 ${unit.steps}`);
+    if (p.confidence === 'sourced' && !p.provenance.length) throw new Error(`单位 ${p.unit} 的位置标为有出处，但没有写出处`);
     return { unit, formation: oob.formations.get(unit.formation)!, hex, steps };
   });
   return { deployment, placed };

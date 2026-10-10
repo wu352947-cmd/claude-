@@ -6,7 +6,7 @@
  */
 import {
   CONTROL_NAMES, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
-  canRedo, canUndo, emptyHistory, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
+  canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
 
@@ -73,8 +73,18 @@ export function createGameUi(
     const side = actingSide(ctx, s);
     const t = turnInfo(ctx, s);
     const total = ctx.scenario?.turns;
-    $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))}${t.night ? '<span class="night">夜</span>' : ''} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
+    $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
     $<HTMLButtonElement>('g-end').disabled = s.over;
+    const rep = s.over ? historyReport(ctx, s) : null;
+    $('g-report').hidden = !rep;
+    if (rep) {
+      const who = (x: Side | 'contested'): string => (x === 'contested' ? '史料矛盾/易手' : SIDE_NAMES[x]);
+      $('g-report').innerHTML = `<b>战后报告：与历史对比</b><small>历史结局：${esc(rep.date)} ${esc(rep.time)}</small>
+        <table>${rep.rows.map((r) => `<tr class="${r.history === 'contested' ? 'ct' : r.same ? 'ok' : 'no'}"><td>${esc(r.name)}</td><td>历史：${who(r.history)}</td><td>本局：${SIDE_NAMES[r.game]}</td></tr>`).join('')}</table>
+        <div>可比较的 ${rep.comparable} 处目标中，${rep.agree} 处与历史一致。</div>
+        <div class="muted">完全损失（步）：德 ${rep.lost.DE} · 苏 ${rep.lost.SU}（游戏的"步"与历史坦克数不能直接相比）</div>
+        <details><summary>历史上的损失，各说法（口径不同）</summary><ul>${rep.losses.map((l) => `<li><b>${esc(l.label)}</b>：${esc(l.text)}${l.provenance[0] ? `<small>${esc(l.provenance[0].source)}</small>` : ''}</li>`).join('')}</ul></details>`;
+    }
     const sc = score(ctx, s);
     $('g-score').hidden = !sc;
     if (sc) {

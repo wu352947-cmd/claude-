@@ -1,6 +1,6 @@
 import { Application } from 'pixi.js';
 import {
-  ENGINE_VERSION, GameMeta, SIDE_NAMES, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
+  CONFIDENCE_NAMES, ENGINE_VERSION, GameMeta, SIDE_NAMES, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
   CombatRules, TurnRules, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
@@ -13,6 +13,7 @@ import lines from '../../data/maps/south.lines.json';
 import oobData from '../../data/units/south.oob.json';
 import ratingsParams from '../../data/rules/ratings.json';
 import demoDeployment from '../../data/scenarios/demo.deployment.json';
+import s1Scenario from '../../data/scenarios/s1.scenario.json';
 import sequence from '../../data/rules/sequence.json';
 import movementRules from '../../data/rules/movement.json';
 import combatRules from '../../data/rules/combat.json';
@@ -35,7 +36,7 @@ const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
 let map = baseMap;
 const oob = loadOob(oobData, RatingsParams.parse(ratingsParams));
 /** 可选的想定（新对局时选；记在本机浏览器里） */
-const SCENARIOS = [demoDeployment].map((raw) => { loadDeployment(oob, baseMap.grid, raw); return loadScenario(oob, baseMap.grid, raw); });
+const SCENARIOS = [demoDeployment, s1Scenario].map((raw) => { loadDeployment(oob, baseMap.grid, raw); return loadScenario(oob, baseMap.grid, raw); });
 const SCN_KEY = 'kursk-1943-scenario';
 const deployment = (() => {
   let want: string | null = null;
@@ -102,7 +103,7 @@ function showInfo(h: Offset | null): void {
     ${editor.active || !game ? '' : objectiveHtml(hexId(h))}
     ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
     ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
-      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote())}
+      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + startNote(selectedUnit)}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
   box.hidden = false;
@@ -126,6 +127,20 @@ function showInfo(h: Offset | null): void {
     const units = [...box.querySelectorAll<HTMLInputElement>('.adv-pick')].filter((x) => x.checked).map((x) => x.dataset.unit!);
     if (game.dispatch({ type: 'Advance', units })) { selectUnit(units.at(-1) ?? null); showInfo(h); }
   };
+}
+
+/** 选中单位的开局位置依据（想定里写的考据说明；占位和推定用斜体） */
+function startNote(unitId: string | null): string {
+  if (!unitId) return '';
+  const p = deployment.placements.find((x) => x.unit === unitId);
+  const r = deployment.reinforcements.find((x) => x.unit === unitId);
+  const basis = p?.basis ?? r?.note;
+  if (!basis) return '';
+  const conf = p?.confidence ?? 'sourced';
+  const quote = (p?.provenance ?? r?.provenance ?? [])[0];
+  return `<div class="combat start-note"><div class="units-head">开局位置${r ? `（第 ${r.turn} 回合增援到 ${r.hex}）` : ''}</div>
+    <div${conf === 'sourced' ? '' : ' class="est"'}>${CONFIDENCE_NAMES[conf]}：${esc(basis)}</div>
+    ${quote ? `<div class="muted small">${esc(quote.source)}${quote.page ? `（${esc(quote.page)}）` : ''}：“${esc(quote.quote ?? '')}”</div>` : ''}</div>`;
 }
 
 /** 胜利目标说明 */
