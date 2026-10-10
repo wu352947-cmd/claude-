@@ -68,7 +68,7 @@ describe('想定', () => {
 
   it('胜负：按目标点数与关键目标判定，从上到下第一条满足的；装甲损失只作参考，不影响结果', () => {
     const sc0 = score(ctx, s0)!;
-    expect([sc0.objectiveVp, sc0.keyHeld, sc0.outcome]).toEqual([2, false, { label: '苏军胜利', winner: 'SU' }]);
+    expect([sc0.objectiveVp, sc0.keyHeld, sc0.outcome.label, sc0.outcome.winner]).toEqual([2, false, '苏军胜利', 'SU']);
     const took = { ...s0, owners: { '0507': 'DE', '0505': 'DE' } as const };
     const sc1 = score(ctx, { ...took, destroyed: [{ unit: T25, formation: 'x', steps: 2, turn: 1 }], casualties: [{ unit: INF, steps: 5, turn: 1 }] })!;
     expect([sc1.objectiveVp, sc1.keyHeld, sc1.lost, sc1.lostOther, sc1.outcome.label]).toEqual([5, true, { DE: 0, SU: 2 }, { DE: 0, SU: 5 }, '德军决定性胜利']);

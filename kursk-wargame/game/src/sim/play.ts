@@ -24,6 +24,8 @@ export interface GameResult {
   vp: number;
   /** 按想定胜负条件得出的结果 */
   outcome: string;
+  /** 打完时双方剩余战力（见 engine/attrition.ts） */
+  strength: Record<Side, { all: number; armor: number }>;
   /** 双方完全损失步数（装甲回合末分流后 + 其他兵种全部损失） */
   lostSteps: Record<Side, number>;
   /** 装甲完全损失折算成车辆数：[天][阵营]；党卫军军单独列 */
@@ -75,7 +77,7 @@ export function playGame(
   });
   return {
     seed, commands: n, turns: Math.min(s.turn, ctx.scenario?.turns ?? s.turn), deHeld: sco.objectives.filter((o) => o.owner === 'DE').map((o) => o.hex),
-    vp: sco.objectiveVp, outcome: sco.outcome.label, lostSteps: sco.lost, tankLoss, pool, attacks, codes, odds,
+    vp: sco.objectiveVp, outcome: sco.outcome.label, strength: sco.strength, lostSteps: sco.lost, tankLoss, pool, attacks, codes, odds,
   };
 }
 

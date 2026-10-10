@@ -112,6 +112,8 @@ export function createGameUi(
       const key = sc.objectives.find((o) => o.hex === ctx.scenario!.victory!.key)!;
       $('g-score').innerHTML = `德军占目标 <b>${sc.objectiveVp}</b> 分 · ${esc(key.name)}：${SIDE_NAMES[key.owner]}占着`
         + `<small>${s.over ? '结果' : '如果现在收兵'}：<b>${esc(sc.outcome.label)}</b></small>`
+        + (ctx.scenario!.victory!.attrition ? `<small>剩余战力（兵力 / 装甲）：${(['DE', 'SU'] as Side[]).map((x) => (fog && fog.viewer !== x ? `${SIDE_NAMES[x]} ？`
+          : `${SIDE_NAMES[x]} ${Math.round(sc.strength[x].all * 100)}% / ${Math.round(sc.strength[x].armor * 100)}%`)).join(' · ')}（低于 ${Math.round(ctx.scenario!.victory!.attrition!.collapse.all * 100)}% / ${Math.round(ctx.scenario!.victory!.attrition!.collapse.armor * 100)}% 就被打残）</small>` : '')
         + (!s.over && ctx.scenario?.end && s.streak.side ? `<small>${SIDE_NAMES[s.streak.side]}已连续 ${s.streak.turns} / ${ctx.scenario.end.holdTurns} 个回合末处于达成目标的状态，保持住就会提前结束</small>` : '')
         + (!s.over && s.limitReached ? '<small>已到想定的历史节点：可以继续打，随时可以“收兵”按现状判胜负</small>' : '');
     }

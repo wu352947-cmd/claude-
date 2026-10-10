@@ -7,6 +7,7 @@ import { distance, hexId, inBounds, parseHexId } from './hex';
 import { hexRecord } from './map';
 import { sideOfUnit } from './movement';
 import { ScenarioSupply } from './supply';
+import { type Strength, strengthOf } from './attrition';
 import type { GameContext, GameEvent, GameState } from './game';
 import { type Oob, DeploymentFile, Side } from './units';
 import type { HexGrid } from './hex';
@@ -63,6 +64,11 @@ export const ScenarioFile = DeploymentFile.extend({
     $comment: z.string().optional(),
     /** 关键目标格（必须是目标格之一） */
     key: Hex,
+    /** 兵力损耗（docs/18）：被打残 = 对方决定性胜利；代价过大 = 胜利降为惨胜。比例是对开局兵力说的（设计参数，不是史料） */
+    attrition: z.object({
+      collapse: z.object({ all: z.number().min(0).max(1), armor: z.number().min(0).max(1) }),
+      costly: z.object({ all: z.number().min(0).max(1), armor: z.number().min(0).max(1) }),
+    }).optional(),
     /** 从上到下判定，第一条满足的就是结果；最后一条没有条件，作为兜底 */
     results: z.array(z.object({
       label: z.string().min(1),
@@ -171,7 +177,8 @@ function entryHex(ctx: GameContext, s: GameState, hex: string, side: Side): stri
   return best;
 }
 
-export interface VictoryOutcome { label: string; winner: Side | null }
+/** collapsed = 被打残的一方（兵力损耗到崩溃线以下）；costly = 靠目标赢了但代价过大 */
+export interface VictoryOutcome { label: string; winner: Side | null; collapsed: Side[]; costly: boolean }
 export interface Score {
   objectives: { hex: string; name: string; vp: number; owner: Side }[];
   /** 德军占着的目标点数 */
@@ -182,6 +189,8 @@ export interface Score {
   lost: Record<Side, number>;
   /** 其他兵种的步数损失（参考） */
   lostOther: Record<Side, number>;
+  /** 双方现在还剩多少战力（对已出现单位的满编步数） */
+  strength: Record<Side, Strength>;
   /** 按现在的局面算出的结果（对局没结束时是"如果现在结束"） */
   outcome: VictoryOutcome;
 }
@@ -199,7 +208,20 @@ export function score(ctx: GameContext, s: GameState): Score | null {
   for (const x of s.casualties) lostOther[sideOfUnit(ctx, x.unit)] += x.steps;
   const hit = V.results.find((r) => (r.when.key === undefined || (r.when.key === 'DE') === keyHeld)
     && (r.when.deVpMin === undefined || objectiveVp >= r.when.deVpMin) && (r.when.deVpMax === undefined || objectiveVp <= r.when.deVpMax)) ?? V.results.at(-1)!;
-  return { objectives, objectiveVp, keyHeld, lost, lostOther, outcome: { label: hit.label, winner: hit.winner } };
+  const strength: Record<Side, Strength> = { DE: strengthOf(ctx, s, 'DE'), SU: strengthOf(ctx, s, 'SU') };
+  const AT = V.attrition;
+  const below = (side: Side, lim: { all: number; armor: number }): boolean => strength[side].all < lim.all || strength[side].armor < lim.armor;
+  const collapsed: Side[] = AT ? (['DE', 'SU'] as Side[]).filter((x) => below(x, AT.collapse)) : [];
+  const ZH: Record<Side, string> = { DE: '德军', SU: '苏军' };
+  let outcome: VictoryOutcome = { label: hit.label, winner: hit.winner, collapsed, costly: false };
+  if (collapsed.length === 2) outcome = { label: '两败俱伤（双方都被打残）', winner: null, collapsed, costly: false };
+  else if (collapsed.length === 1) {
+    const win: Side = collapsed[0] === 'DE' ? 'SU' : 'DE';
+    outcome = { label: `${ZH[collapsed[0]!]}被打残：${ZH[win]}决定性胜利`, winner: win, collapsed, costly: false };
+  } else if (AT && hit.winner && below(hit.winner, AT.costly)) {
+    outcome = { label: `${ZH[hit.winner]}惨胜（代价过大）`, winner: hit.winner, collapsed, costly: true };
+  }
+  return { objectives, objectiveVp, keyHeld, lost, lostOther, strength, outcome };
 }
 
 export interface HistoryRow { hex: string; name: string; history: Side | 'contested'; game: Side; same: boolean; note?: string }

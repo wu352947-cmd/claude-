@@ -23,6 +23,10 @@ export function turnEndCheck(ctx: GameContext, s: GameState): { state: GameState
   const winner = out?.winner ?? null;
   const streak: Streak = winner ? { side: winner, turns: s.streak.side === winner ? s.streak.turns + 1 : 1 } : { side: null, turns: 0 };
   let cur: GameState = { ...s, streak };
+  if (out && out.collapsed.length) {
+    events.push({ type: 'GameOver', turn: s.turn, reason: `兵力损耗到崩溃线：${out.label}` });
+    return { state: { ...cur, over: true }, events };
+  }
   if (winner && streak.turns >= E.holdTurns && s.turn >= E.minTurn) {
     events.push({ type: 'GameOver', turn: s.turn, reason: `${SIDE_ZH[winner]}连续 ${streak.turns} 个回合保持战争目标：${out!.label}` });
     return { state: { ...cur, over: true }, events };

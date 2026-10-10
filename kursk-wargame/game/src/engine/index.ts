@@ -28,3 +28,4 @@ export * from './calendar';
 export * from './turn-end';
 export * from './scenario';
 export * from './end-rules';
+export * from './attrition';
