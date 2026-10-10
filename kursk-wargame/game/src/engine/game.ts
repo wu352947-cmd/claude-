@@ -12,6 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
+import { type Axis, AxisKind, nextAxisId, whyCannotPlan } from './plan';
 import { planGroupMove } from './group-move';
 import { parentOf, whyCannotAssign } from './command-chain';
 import { type Scenario, claim, startTurn } from './scenario';
@@ -68,6 +69,8 @@ export interface GameState {
   entrench: Record<string, { hex: string; level: number }>;
   /** 玩家改过的隶属：编制 → 新上级（null = 直属）和调整的回合；没改过的用战斗序列里的默认上级 */
   attach: Record<string, { parent: string | null; turn: number }>;
+  /** 作战计划的轴线（双方都存；界面只给本方看） */
+  plans: Axis[];
   /** 本阶段已经进攻过的单位、被进攻过的格子、已经支援过的炮兵 */
   attacked: string[];
   attackedHexes: string[];
@@ -99,6 +102,9 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
   /** 战斗后推进 */
   z.object({ type: z.literal('Advance'), units: z.array(z.string().min(1)).min(1) }),
+  /** 制定/修改作战计划：不给 id = 新建一条；给 id = 改这一条 */
+  z.object({ type: z.literal('Plan'), id: z.string().min(1).optional(), kind: AxisKind, formation: z.string().min(1).nullable(), path: z.array(z.string().regex(/^\d{4}$/)).min(2).max(8) }),
+  z.object({ type: z.literal('Unplan'), id: z.string().min(1) }),
   /** 整体移动：一批单位各自尽量靠近 hex（group-move.ts） */
   z.object({ type: z.literal('MoveGroup'), units: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
   /** 调整隶属：把编制 formation 配属给 parent（null = 直属，不隶属任何上级） */
@@ -122,6 +128,8 @@ export type GameEvent =
   | { type: 'DamagedSorted'; unit: string; hex: string; control: 'own' | 'contested' | 'enemy'; need: number; rolls: number[]; repaired: number; destroyed: number }
   | { type: 'Repaired'; unit: string; steps: number }
   | { type: 'Reinforced'; unit: string; hex: string }
+  | { type: 'Planned'; side: Side; id: string; kind: AxisKind }
+  | { type: 'Unplanned'; side: Side; id: string }
   | { type: 'Assigned'; formation: string; from: string | null; to: string | null }
   | { type: 'GameOver'; turn: number };
 
@@ -132,7 +140,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
-    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attach: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
+    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attach: {}, plans: [], attacked: [], attackedHexes: [], fired: [], advance: null,
     damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
@@ -217,6 +225,21 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
     case 'RollDie': {
       const [value, rng] = rollDie(s.rng, cmd.sides);
       return { state: { ...s, rng }, events: [{ type: 'DieRolled', sides: cmd.sides, value, purpose: cmd.purpose }] };
+    }
+    case 'Plan': {
+      const side = actingSide(ctx, s);
+      const why = whyCannotPlan(ctx, s, side, cmd);
+      if (why) throw new CommandError(why);
+      const id = cmd.id ?? nextAxisId(s, side!);
+      const axis: Axis = { id, side: side!, kind: cmd.kind, formation: cmd.formation, path: cmd.path, turn: s.turn };
+      const plans = s.plans.some((p) => p.id === id) ? s.plans.map((p) => (p.id === id ? axis : p)) : [...s.plans, axis];
+      return { state: { ...s, plans }, events: [{ type: 'Planned', side: side!, id, kind: cmd.kind }] };
+    }
+    case 'Unplan': {
+      const side = actingSide(ctx, s);
+      const ax = s.plans.find((p) => p.id === cmd.id);
+      if (!ax || ax.side !== side) throw new CommandError('没有这条本方的轴线');
+      return { state: { ...s, plans: s.plans.filter((p) => p !== ax) }, events: [{ type: 'Unplanned', side: ax.side, id: ax.id }] };
     }
     case 'MoveGroup': {
       const plan = planGroupMove(ctx, s, cmd.units, cmd.hex);

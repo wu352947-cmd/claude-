@@ -26,6 +26,8 @@ import { MAP_FONTS, PX_PER_KM } from './style';
 import { unitSectionHtml } from './unit-panel';
 import { showSources } from './prefs';
 import { type OrgPanel, setupOrg } from './org-panel';
+import { type PlanPanel, setupPlan } from './plan-panel';
+import { createPlanView } from './plan-view';
 import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
@@ -187,6 +189,8 @@ let editor: ReturnType<typeof createEditor>;
 let units: ReturnType<typeof createUnitsView>;
 let game: GameUi;
 let org: OrgPanel;
+let planPanel: PlanPanel | undefined;
+let planView: ReturnType<typeof createPlanView>;
 /** 整体移动：正在等玩家点目的地的单位 */
 let groupMove: string[] | null = null;
 
@@ -214,6 +218,8 @@ async function start(): Promise<void> {
   // 可到达范围画在算子下面
   reachView = createReachView(map);
   view.root.addChildAt(reachView.root, view.root.getChildIndex(units.root));
+  planView = createPlanView(map);
+  view.root.addChildAt(planView.root, view.root.getChildIndex(units.root) + 1);
   const objView = createObjectivesView(map);
   view.root.addChildAt(objView.root, view.root.getChildIndex(units.root) + 1);
 
@@ -257,17 +263,24 @@ async function start(): Promise<void> {
     selectUnit(selectedUnit && s.units.some((u) => u.id === selectedUnit) ? selectedUnit : null);
     if (selected && !$('info').hidden) showInfo(selected);
     org?.refresh(s);
+    planPanel?.refresh(s);
   }, toast, hotseat);
   org = setupOrg(ctx, () => hotseat.fog(game.state())?.viewer ?? null, (f, p) => game.dispatch({ type: 'Assign', formation: f, parent: p }), (ids) => units.highlightGroup(ids),
     (ids, name) => { groupMove = ids; if (ids) toast(`整体移动：${name}。点地图上的目的地（Esc 取消）`); });
-  addEventListener('keydown', (e) => { if (e.key === 'Escape' && groupMove) { groupMove = null; org.cancelMove(); } });
+  addEventListener('keydown', (e) => { if (e.key === 'Escape') { if (groupMove) { groupMove = null; org.cancelMove(); } planPanel?.cancel(); } });
   org.refresh(game.state());
+  planPanel = setupPlan(ctx, () => hotseat.fog(game.state())?.viewer ?? null,
+    (kind, formation, path) => game.dispatch({ type: 'Plan', kind, formation, path }),
+    (id) => game.dispatch({ type: 'Unplan', id }),
+    () => planView.show(planPanel ? planPanel.axes(game.state()) : [], planPanel?.draft() ?? null));
+  planPanel.refresh(game.state());
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
     const local = view.root.toLocal({ x: sx, y: sy });
     const world = { x: local.x / PX_PER_KM, y: local.y / PX_PER_KM };
     const h = hexAt(map.grid, world);
     if (!inBounds(map.grid, h)) { selected = null; view.select(null); showInfo(null); return; }
+    if (planPanel?.drawing()) { planPanel.addPoint(hexId(h)); return; }
     if (groupMove) {
       const ids = groupMove, to = hexId(h);
       groupMove = null; org.cancelMove();

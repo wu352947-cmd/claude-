@@ -70,6 +70,12 @@
   "$comment": "工事（02 §5.1，简化版）：想定里标了工事的格子，守方每级工事使列向左移 shiftPerLevel 列，与地形偏移相加，总偏移受 maxShift 限制。雷场、反坦克支撑点、埋设坦克后续再做。游戏设计参数，⟨待校准⟩。",
   "shiftPerLevel": 1
  },
+ "plan": {
+  "$comment": "作战计划（docs/15 §7）：主攻轴线在前一回合或更早定下，指派的编制沿走廊进攻时赔率列右移。游戏设计参数，待试玩校准。",
+  "mainShift": 1,
+  "corridorRadius": 1,
+  "maxAxes": 5
+ },
  "coordination": {
   "$comment": "编制协同（docs/15）：进攻单位分属不同集团军（或本回合刚调整过隶属）时，赔率列偏移。游戏设计参数，待试玩校准。",
   "crossGroupShift": -1

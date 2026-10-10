@@ -5,7 +5,7 @@
  * 热座时，记录里看不清的敌军单位不写番号，敌军的受损池与修理也不显示。
  */
 import {
-  CONTROL_NAMES, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
+  AXIS_NAMES, CONTROL_NAMES, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
   canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
@@ -62,6 +62,8 @@ export function createGameUi(
         : `${unitName(e.unit)} 受损 ${e.rolls.length} 步（${e.hex} ${CONTROL_NAMES[e.control]}，掷 ${e.rolls.join('、')}，≤${e.need} 送修）：送修 ${e.repaired}，完全损失 ${e.destroyed}`;
       case 'Repaired': return enemy(e.unit) ? null : `${unitName(e.unit)} 修复 ${e.steps} 步归队`;
       case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
+      case 'Planned': return fog && fog.viewer !== e.side ? null : `作战计划：${AXIS_NAMES[e.kind]}轴线 ${e.id}`;
+      case 'Unplanned': return fog && fog.viewer !== e.side ? null : `撤销作战计划 ${e.id}`;
       case 'Assigned': {
         const nm = (f: string | null): string => (f ? ctx.oob.formations.get(f)?.names.zh ?? f : '直属');
         return `调整隶属：${nm(e.formation)} → ${nm(e.to)}`;

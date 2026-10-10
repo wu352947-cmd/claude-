@@ -9,6 +9,7 @@ import { directionTo, sideOfUnit, stepCost, zocOf } from './movement';
 import { nightBarred, whyNotExploit } from './calendar';
 import type { GameContext, GameState, UnitState } from './game';
 import { coordGroup } from './command-chain';
+import { PlanRules, planShift } from './plan';
 import type { Side } from './units';
 
 const Result = z.string().regex(/^(A\d)?(D\d)?(R\d)?$/);
@@ -29,6 +30,7 @@ export const CombatRules = z.object({
   qualityDrm: z.object({ perLevel: z.number().int(), max: z.number().int().nonnegative() }),
   retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
   fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
+  plan: PlanRules,
   coordination: z.object({ $comment: z.string().optional(), crossGroupShift: z.number().int() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
@@ -161,6 +163,8 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
     const names = groups.map((g) => ctx.oob.formations.get(g)!.names.zh).join('、');
     shifts.push({ value: C.coordination.crossGroupShift, label: `协同不良：${names}不属同一集团军${fresh ? '（含本回合刚调整隶属的）' : ''}`, source: `${RULE} coordination（docs/15）` });
   }
+  const ps = planShift(ctx, s, side, atk.map((u) => unitOf(ctx, u.id).formation), hex);
+  if (ps) shifts.push({ value: ps.value, label: ps.label, source: `${RULE} plan（docs/15 §7）` });
   const formations = new Set(atk.map((u) => unitOf(ctx, u.id).formation));
   for (const f of formations) {
     const mine = atk.filter((u) => unitOf(ctx, u.id).formation === f);
