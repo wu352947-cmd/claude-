@@ -4,7 +4,7 @@ import { loadSimContext } from '../src/sim/context';
 import { initialStateFor, playGame } from '../src/sim/play';
 import { makeReport } from '../src/sim/report';
 import { histogram, placement, quantile } from '../src/sim/stats';
-import { apply } from '../src/engine';
+import { apply, type GameState } from '../src/engine';
 import { aiStyleNames, defaultAiStyle, makeBot } from '../src/client/ai';
 
 const { ctx, rules, itemClass } = loadSimContext();
@@ -103,7 +103,7 @@ describe('人机对战的电脑（网页用）', () => {
 describe('电脑受迷雾限制', () => {
   it('只看得到贴近本方单位的敌军；不受限时看得到全部', () => {
     const s = initialStateFor(ctx, 1);
-    const all = new Bot(ctx, rules) as unknown as { enemyHexes(s: typeof s, side: 'SU'): string[] };
+    const all = new Bot(ctx, rules) as unknown as { enemyHexes(s: GameState, side: 'SU'): string[] };
     const fogged = new Bot(ctx, rules, true) as unknown as typeof all;
     const full = all.enemyHexes(s, 'SU'), seen = fogged.enemyHexes(s, 'SU');
     expect(seen.every((h) => full.includes(h))).toBe(true);
