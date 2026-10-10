@@ -8,6 +8,7 @@ import { Terrain, SideFeature, hexRecord, sideFeatures } from './map';
 import { directionTo, sideOfUnit, stepCost, zocOf } from './movement';
 import { nightBarred, whyNotExploit } from './calendar';
 import type { GameContext, GameState, UnitState } from './game';
+import { coordGroup } from './command-chain';
 import type { Side } from './units';
 
 const Result = z.string().regex(/^(A\d)?(D\d)?(R\d)?$/);
@@ -28,6 +29,7 @@ export const CombatRules = z.object({
   qualityDrm: z.object({ perLevel: z.number().int(), max: z.number().int().nonnegative() }),
   retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
   fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
+  coordination: z.object({ $comment: z.string().optional(), crossGroupShift: z.number().int() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
   combatPhases: z.array(z.string()),
@@ -153,6 +155,12 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
     shifts.push({ value: C.armor.bonus, label: '装甲效应：开阔地、守方没有反坦克力量', source: `${RULE} armor（02 §4.2）` });
   }
   if (armorAtk.some((u) => sidesOf(u).includes('balka'))) shifts.push({ value: C.armor.balkaPenalty, label: '装甲隔冲沟进攻', source: `${RULE} armor（02 §2）` });
+  const groups = [...new Set(atk.map((u) => coordGroup(ctx, s, unitOf(ctx, u.id).formation).id))];
+  if (groups.length > 1 && C.coordination.crossGroupShift) {
+    const fresh = atk.some((u) => coordGroup(ctx, s, unitOf(ctx, u.id).formation).fresh);
+    const names = groups.map((g) => ctx.oob.formations.get(g)!.names.zh).join('、');
+    shifts.push({ value: C.coordination.crossGroupShift, label: `协同不良：${names}不属同一集团军${fresh ? '（含本回合刚调整隶属的）' : ''}`, source: `${RULE} coordination（docs/15）` });
+  }
   const formations = new Set(atk.map((u) => unitOf(ctx, u.id).formation));
   for (const f of formations) {
     const mine = atk.filter((u) => unitOf(ctx, u.id).formation === f);

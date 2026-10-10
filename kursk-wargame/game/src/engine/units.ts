@@ -71,6 +71,9 @@ export const Formation = z.object({
   confidence: Confidence,
   provenance: z.array(Provenance).default([]),
   note: z.string().optional(),
+  /** 编制层级与上级（编制树，docs/15）；玩家可以在对局中改上级，见 command-chain.ts */
+  echelon: z.enum(['division', 'corps', 'army', 'army-group']).optional(),
+  parent: z.string().min(1).optional(),
 });
 export type Formation = z.infer<typeof Formation>;
 
@@ -205,6 +208,14 @@ export function loadOob(raw: unknown, params: RatingsParams): Oob {
     if ((f.branch === 'rkka') !== (f.side === 'SU')) throw new Error(`编制 ${f.id}：军种与阵营不符`);
     if (f.confidence === 'sourced' && f.provenance.length === 0) throw new Error(`编制 ${f.id} 标为有出处，但没有写出处`);
     formations.set(f.id, f);
+  }
+  const RANK = { division: 1, corps: 2, army: 3, 'army-group': 4 } as const;
+  for (const f of formations.values()) {
+    if (!f.parent) continue;
+    const up = formations.get(f.parent);
+    if (!up) throw new Error(`编制 ${f.id} 的上级 ${f.parent} 不存在`);
+    if (up.side !== f.side) throw new Error(`编制 ${f.id} 的上级 ${f.parent} 不是同一阵营`);
+    if (f.echelon && up.echelon && RANK[up.echelon] <= RANK[f.echelon]) throw new Error(`编制 ${f.id} 的上级 ${f.parent} 层级不高于它`);
   }
   const units = new Map<string, Unit>();
   for (const u of data.units) {

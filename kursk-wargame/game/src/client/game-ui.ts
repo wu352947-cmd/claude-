@@ -62,6 +62,10 @@ export function createGameUi(
         : `${unitName(e.unit)} 受损 ${e.rolls.length} 步（${e.hex} ${CONTROL_NAMES[e.control]}，掷 ${e.rolls.join('、')}，≤${e.need} 送修）：送修 ${e.repaired}，完全损失 ${e.destroyed}`;
       case 'Repaired': return enemy(e.unit) ? null : `${unitName(e.unit)} 修复 ${e.steps} 步归队`;
       case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
+      case 'Assigned': {
+        const nm = (f: string | null): string => (f ? ctx.oob.formations.get(f)?.names.zh ?? f : '直属');
+        return `调整隶属：${nm(e.formation)} → ${nm(e.to)}`;
+      }
       case 'GameOver': return `—— 想定结束（第 ${e.turn} 回合）——`;
     }
   };

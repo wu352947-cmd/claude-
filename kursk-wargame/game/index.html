@@ -247,6 +247,7 @@
         <button class="primary" id="g-end">结束阶段</button>
         <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>
         <button id="g-redo" title="重做（Ctrl+Y）">↷ 重做</button>
+        <button id="g-org">编制</button>
         <button id="g-howto">怎么玩</button>
         <button id="g-more">记录 / 存档</button>
       </div>
@@ -276,6 +277,19 @@
       #howto .muted { font-size: 12px; color: #b7ae90; }
       #howto .box > button { display: block; margin: 8px 0 0 auto; }
     </style>
+    <style>
+      #org { position: fixed; top: 48px; left: 10px; width: min(360px, calc(100vw - 20px)); max-height: 70vh; overflow: auto; z-index: 3; background: var(--panel); color: var(--panel-ink); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.5; }
+      #org[hidden] { display: none; }
+      #org .org-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+      #org .org-head button { background: transparent; border: 0; color: inherit; font-size: 18px; cursor: pointer; }
+      #org .org-row { border-top: 1px solid rgba(0,0,0,.12); padding: 4px 0; }
+      #org .org-row.on { background: rgba(200,60,40,.1); }
+      #org .org-row small { color: var(--muted); }
+      #org .org-act { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+      #org .org-act button, #org .org-act select { font-size: 12px; padding: 2px 6px; border-radius: 4px; border: 1px solid #6b6650; background: transparent; color: inherit; cursor: pointer; max-width: 170px; }
+      #org .small { font-size: 11px; margin-bottom: 4px; }
+    </style>
+    <div id="org" hidden></div>
     <div id="howto" hidden></div>
     <div id="handoff" hidden><div class="box"><div id="handoff-text"></div><button class="primary" id="handoff-go">继续</button>
       <div id="handoff-pbem" class="pbem" hidden><button class="primary" id="handoff-export">导出回合文件</button> <button id="handoff-import">读入对手的文件</button></div></div></div>

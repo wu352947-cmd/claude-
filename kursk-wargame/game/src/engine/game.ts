@@ -12,6 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
+import { parentOf, whyCannotAssign } from './command-chain';
 import { type Scenario, claim, startTurn } from './scenario';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
@@ -64,6 +65,8 @@ export interface GameState {
   fatigue: Record<string, number>;
   /** 掘壕：单位在同一格不动的回合数（等级），换格或移动就清零；hex 记下掘壕的格子 */
   entrench: Record<string, { hex: string; level: number }>;
+  /** 玩家改过的隶属：编制 → 新上级（null = 直属）和调整的回合；没改过的用战斗序列里的默认上级 */
+  attach: Record<string, { parent: string | null; turn: number }>;
   /** 本阶段已经进攻过的单位、被进攻过的格子、已经支援过的炮兵 */
   attacked: string[];
   attackedHexes: string[];
@@ -95,6 +98,8 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
   /** 战斗后推进 */
   z.object({ type: z.literal('Advance'), units: z.array(z.string().min(1)).min(1) }),
+  /** 调整隶属：把编制 formation 配属给 parent（null = 直属，不隶属任何上级） */
+  z.object({ type: z.literal('Assign'), formation: z.string().min(1), parent: z.string().min(1).nullable() }),
   z.object({ type: z.literal('EndPhase') }),
 ]);
 export type Command = z.infer<typeof Command>;
@@ -114,6 +119,7 @@ export type GameEvent =
   | { type: 'DamagedSorted'; unit: string; hex: string; control: 'own' | 'contested' | 'enemy'; need: number; rolls: number[]; repaired: number; destroyed: number }
   | { type: 'Repaired'; unit: string; steps: number }
   | { type: 'Reinforced'; unit: string; hex: string }
+  | { type: 'Assigned'; formation: string; from: string | null; to: string | null }
   | { type: 'GameOver'; turn: number };
 
 /** 非法指令（例如单位不存在）：界面应提示玩家，不会改变状态 */
@@ -123,7 +129,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
-    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
+    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attach: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
     damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
@@ -208,6 +214,15 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
     case 'RollDie': {
       const [value, rng] = rollDie(s.rng, cmd.sides);
       return { state: { ...s, rng }, events: [{ type: 'DieRolled', sides: cmd.sides, value, purpose: cmd.purpose }] };
+    }
+    case 'Assign': {
+      const why = whyCannotAssign(ctx, s, cmd.formation, cmd.parent, actingSide(ctx, s));
+      if (why) throw new CommandError(why);
+      const from = parentOf(ctx, s, cmd.formation);
+      return {
+        state: { ...s, attach: { ...s.attach, [cmd.formation]: { parent: cmd.parent, turn: s.turn } } },
+        events: [{ type: 'Assigned', formation: cmd.formation, from, to: cmd.parent }],
+      };
     }
     case 'EndPhase':
       return advancePhase(ctx, s);

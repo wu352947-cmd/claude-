@@ -23,7 +23,9 @@
      "note": "师番号与隶属"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.IISSPzK",
+   "echelon": "division"
   },
   {
    "id": "DE.IISS.DR",
@@ -47,7 +49,9 @@
      "note": "师番号与隶属"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.IISSPzK",
+   "echelon": "division"
   },
   {
    "id": "DE.IISS.T",
@@ -71,7 +75,9 @@
      "note": "师番号与隶属"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.IISSPzK",
+   "echelon": "division"
   },
   {
    "id": "DE.III.6PD",
@@ -95,7 +101,9 @@
      "note": "师与团营番号"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.III",
+   "echelon": "division"
   },
   {
    "id": "DE.III.7PD",
@@ -119,7 +127,9 @@
      "note": "师与团营番号"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.III",
+   "echelon": "division"
   },
   {
    "id": "DE.III.19PD",
@@ -143,7 +153,9 @@
      "note": "师与团营番号"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.III",
+   "echelon": "division"
   },
   {
    "id": "DE.III",
@@ -167,7 +179,9 @@
      "note": "军直属；s.Pz.Abt. 503、StuG-Abt. 228 的隶属见 SRC-0205 9 July 文章"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "DE.AAK",
+   "echelon": "corps"
   },
   {
    "id": "DE.168ID",
@@ -192,7 +206,9 @@
     }
    ],
    "status": "unverified",
-   "note": "团级番号只见于 Lexikon der Wehrmacht 的两份不同清单（417/442 或 417/429/442），按师级做一个算子"
+   "note": "团级番号只见于 Lexikon der Wehrmacht 的两份不同清单（417/442 或 417/429/442），按师级做一个算子",
+   "parent": "DE.III",
+   "echelon": "division"
   },
   {
    "id": "SU.18TK",
@@ -217,7 +233,9 @@
     }
    ],
    "status": "unverified",
-   "note": "7 月 1 日为大本营预备队，7 月 5 日编入近卫坦克第 5 集团军（Лопуховский）"
+   "note": "7 月 1 日为大本营预备队，7 月 5 日编入近卫坦克第 5 集团军（Лопуховский）",
+   "parent": "SU.5GTA",
+   "echelon": "corps"
   },
   {
    "id": "SU.29TK",
@@ -241,7 +259,9 @@
      "note": "编制与隶属（1943-07-01）"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "SU.5GTA",
+   "echelon": "corps"
   },
   {
    "id": "SU.5GMK",
@@ -265,7 +285,9 @@
      "note": "编制与隶属（1943-07-01）"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "SU.5GTA",
+   "echelon": "corps"
   },
   {
    "id": "SU.2GTK",
@@ -290,7 +312,9 @@
     }
    ],
    "status": "unverified",
-   "note": "7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）"
+   "note": "7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）",
+   "parent": "SU.5GTA",
+   "echelon": "corps"
   },
   {
    "id": "SU.2TK",
@@ -315,7 +339,9 @@
     }
    ],
    "status": "unverified",
-   "note": "7 月 1 日属西南方面军；7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）"
+   "note": "7 月 1 日属西南方面军；7 月 11 日 02:45 起归近卫坦克第 5 集团军指挥（Лопуховский）",
+   "parent": "SU.5GTA",
+   "echelon": "corps"
   },
   {
    "id": "SU.5GTA",
@@ -339,7 +365,9 @@
      "note": "编制与隶属（1943-07-01）"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "SU.VF",
+   "echelon": "army"
   },
   {
    "id": "SU.5GA",
@@ -363,7 +391,9 @@
      "note": "编制与隶属（1943-07-01）"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "SU.VF",
+   "echelon": "army"
   },
   {
    "id": "SU.6GA",
@@ -387,7 +417,9 @@
      "note": "编制与隶属（1943-07-01）"
     }
    ],
-   "status": "unverified"
+   "status": "unverified",
+   "parent": "SU.VF",
+   "echelon": "army"
   },
   {
    "id": "SU.69A",
@@ -412,7 +444,102 @@
     }
    ],
    "status": "unverified",
-   "note": "81、89、92、93、94 гв. сд 与 375 сд 7 月 1 日分属其他集团军，7 月 11–13 日在第 69 集团军地段作战（Замулин）；96 тбр、148 отп 7 月 11 日配属该集团军"
+   "note": "81、89、92、93、94 гв. сд 与 375 сд 7 月 1 日分属其他集团军，7 月 11–13 日在第 69 集团军地段作战（Замулин）；96 тбр、148 отп 7 月 11 日配属该集团军",
+   "parent": "SU.VF",
+   "echelon": "army"
+  },
+  {
+   "id": "DE.AGS",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "南方集团军群",
+    "en": "Army Group South",
+    "de": "Heeresgruppe Süd"
+   },
+   "abbr": "AGp Süd",
+   "color": "#8e8e84",
+   "echelon": "army-group",
+   "confidence": "estimated",
+   "provenance": [],
+   "guards": false,
+   "status": "unverified",
+   "note": "上下级关系是 AI 按常识补入的推定，不是史料数字，待所有者核对。"
+  },
+  {
+   "id": "DE.4PA",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "第4装甲集团军",
+    "en": "4th Panzer Army",
+    "de": "4. Panzerarmee"
+   },
+   "abbr": "4 PzA",
+   "color": "#9a9a8e",
+   "echelon": "army",
+   "parent": "DE.AGS",
+   "confidence": "estimated",
+   "provenance": [],
+   "guards": false,
+   "status": "unverified",
+   "note": "上下级关系是 AI 按常识补入的推定，不是史料数字，待所有者核对。"
+  },
+  {
+   "id": "DE.AAK",
+   "side": "DE",
+   "branch": "heer",
+   "names": {
+    "zh": "肯普夫集群",
+    "en": "Armee-Abteilung Kempf",
+    "de": "Armee-Abteilung Kempf"
+   },
+   "abbr": "AAK",
+   "color": "#9a9a8e",
+   "echelon": "army",
+   "parent": "DE.AGS",
+   "confidence": "estimated",
+   "provenance": [],
+   "guards": false,
+   "status": "unverified",
+   "note": "上下级关系是 AI 按常识补入的推定，不是史料数字，待所有者核对。"
+  },
+  {
+   "id": "DE.IISSPzK",
+   "side": "DE",
+   "branch": "waffen-ss",
+   "names": {
+    "zh": "党卫军第2装甲军",
+    "en": "II SS Panzer Corps",
+    "de": "II. SS-Panzerkorps"
+   },
+   "abbr": "II SSPzK",
+   "color": "#c46a4a",
+   "echelon": "corps",
+   "parent": "DE.4PA",
+   "confidence": "estimated",
+   "provenance": [],
+   "guards": false,
+   "status": "unverified",
+   "note": "上下级关系是 AI 按常识补入的推定，不是史料数字，待所有者核对。"
+  },
+  {
+   "id": "SU.VF",
+   "side": "SU",
+   "branch": "rkka",
+   "names": {
+    "zh": "沃罗涅日方面军",
+    "en": "Voronezh Front",
+    "ru": "Воронежский фронт"
+   },
+   "abbr": "ВФ",
+   "color": "#6f9e4a",
+   "echelon": "army-group",
+   "confidence": "estimated",
+   "provenance": [],
+   "guards": false,
+   "status": "unverified",
+   "note": "上下级关系是 AI 按常识补入的推定，不是史料数字，待所有者核对。 近卫第5集团军和近卫坦克第5集团军数据里记的是 7 月 1 日草原方面军，这里挂在沃罗涅日方面军下是按 7 月 11 日态势推定。"
   }
  ],
  "units": [

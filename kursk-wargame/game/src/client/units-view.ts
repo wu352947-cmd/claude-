@@ -35,6 +35,8 @@ export interface UnitsView {
   render(stackMap: Map<string, PlacedUnit[]>, hidden?: Set<string>): Promise<void>;
   /** 高亮信息面板里选中的单位 */
   highlight(unitId: string | null): void;
+  /** 编制面板：给一组单位画细框（不影响单个选中） */
+  highlightGroup(unitIds: readonly string[]): void;
 }
 
 export function createUnitsView(map: GameMap): UnitsView {
@@ -47,7 +49,9 @@ export function createUnitsView(map: GameMap): UnitsView {
   // 选中的单位即使压在堆叠下面，也临时在上面显示一份
   const lifted = new Sprite();
   lifted.visible = false;
-  root.addChild(layer, lifted, ring);
+  const groupRing = new Graphics();
+  let group: readonly string[] = [];
+  root.addChild(layer, groupRing, lifted, ring);
   let current: string | null = null;
   let version = 0;
   const view: UnitsView = {
@@ -76,6 +80,15 @@ export function createUnitsView(map: GameMap): UnitsView {
       sprites.clear();
       for (const [shadow, s, id] of items) { layer.addChild(shadow, s); sprites.set(id, s); }
       view.highlight(current);
+      view.highlightGroup(group);
+    },
+    highlightGroup(ids) {
+      group = ids;
+      groupRing.clear();
+      for (const id of ids) {
+        const s = sprites.get(id);
+        if (s) groupRing.roundRect(s.x - 1, s.y - 1, size + 2, size + 2, size * 0.08).stroke({ width: 2, color: PALETTE.select, alpha: 0.9 });
+      }
     },
     highlight(unitId) {
       current = unitId;

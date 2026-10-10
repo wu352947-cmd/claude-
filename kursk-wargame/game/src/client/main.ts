@@ -25,6 +25,7 @@ import { createMapView } from './map-view';
 import { MAP_FONTS, PX_PER_KM } from './style';
 import { unitSectionHtml } from './unit-panel';
 import { showSources } from './prefs';
+import { type OrgPanel, setupOrg } from './org-panel';
 import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
@@ -185,6 +186,7 @@ let reachView: ReturnType<typeof createReachView>;
 let editor: ReturnType<typeof createEditor>;
 let units: ReturnType<typeof createUnitsView>;
 let game: GameUi;
+let org: OrgPanel;
 
 async function start(): Promise<void> {
   $('title').textContent = meta.title.zh;
@@ -252,7 +254,10 @@ async function start(): Promise<void> {
     objView.show(deployment.objectives.map((o) => ({ hex: o.hex, vp: o.vp, owner: s.owners[o.hex] ?? o.owner })));
     selectUnit(selectedUnit && s.units.some((u) => u.id === selectedUnit) ? selectedUnit : null);
     if (selected && !$('info').hidden) showInfo(selected);
+    org?.refresh(s);
   }, toast, hotseat);
+  org = setupOrg(ctx, () => hotseat.fog(game.state())?.viewer ?? null, (f, p) => game.dispatch({ type: 'Assign', formation: f, parent: p }), (ids) => units.highlightGroup(ids));
+  org.refresh(game.state());
 
   const cam = attachCamera(app.canvas, view.root, (sx, sy) => {
     const local = view.root.toLocal({ x: sx, y: sy });
