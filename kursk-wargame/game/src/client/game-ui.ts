@@ -5,11 +5,12 @@
  * 热座时，记录里看不清的敌军单位不写番号，敌军的受损池与修理也不显示。
  */
 import {
-  AXIS_NAMES, CONTROL_NAMES, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
+  AXIS_NAMES, CONTROL_NAMES, apply, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
   canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
 import { setShowSources, showSources } from './prefs';
+import { makeBot } from './ai';
 
 const AUTOSAVE_KEY = 'kursk-1943-autosave';
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -110,6 +111,33 @@ export function createGameUi(
     try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(makeSave(ctx, initial, history, seed, engineVersion))); } catch { /* 隐私模式等 */ }
     onChange(s);
     hotseat.update(s);
+    scheduleAi();
+  }
+
+  /** 人机对战：轮到电脑时稍等一下，让它把本阶段一口气走完（一次性写入指令历史，只渲染一次） */
+  let aiTimer: ReturnType<typeof setTimeout> | undefined;
+  function scheduleAi(): void {
+    clearTimeout(aiTimer);
+    const bot = hotseat.aiSide();
+    if (!bot || cur.state.over || actingSide(ctx, cur.state) !== bot) return;
+    aiTimer = setTimeout(() => {
+      let st = cur.state;
+      if (actingSide(ctx, st) !== bot || st.over) return;
+      const ai = makeBot(ctx, bot, hotseat.aiStyle());
+      const cmds: Command[] = [];
+      try {
+        while (!st.over && actingSide(ctx, st) === bot && cmds.length < 3000) {
+          const c = ai.step(st);
+          st = apply(ctx, st, c).state;
+          cmds.push(c);
+        }
+      } catch (e) {
+        toast(`电脑出错：${(e as Error).message}`);
+        return;
+      }
+      history = { commands: [...history.commands.slice(0, history.cursor), ...cmds], cursor: history.cursor + cmds.length };
+      render();
+    }, 450);
   }
 
   function dispatch(cmd: Command): boolean {

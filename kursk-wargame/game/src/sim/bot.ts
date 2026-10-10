@@ -5,8 +5,8 @@
  */
 import { z } from 'zod';
 import {
-  type Command, type GameContext, type GameState, type Side, actingSide, distance, currentValue, eligibleAttackers, parseHexId, previewCombat, reachable, sideOfUnit,
-  whyCannotAttack, whyCannotMove, whyOverstacked,
+  type Command, type GameContext, type GameState, type Side, actingSide, childrenOf, coordGroup, distance, currentValue, eligibleAttackers, hexId, parseHexId, previewCombat,
+  reachable, sideOfUnit, whyCannotAttack, whyCannotMove, whyOverstacked, whyCannotPlan,
 } from '../engine';
 
 const Goal = z.enum(['objectives', 'enemy', 'hold']);
@@ -40,7 +40,12 @@ export class Bot {
       for (const id of s.advance.units) if (pick.length < ctx.combat.advanceMax && !whyOverstacked(ctx, s, s.advance.hex, [...pick, id])) pick.push(id);
       return pick.length ? { type: 'Advance', units: pick } : { type: 'EndPhase' };
     }
-    if (ctx.movement.movePhases.includes(phaseId)) return this.move(s, side, first ? profile.goalWhenFirst : profile.goal) ?? { type: 'EndPhase' };
+    if (ctx.movement.movePhases.includes(phaseId)) {
+      const goal = first ? profile.goalWhenFirst : profile.goal;
+      const plan = this.plan(s, side, goal);
+      if (plan) return plan;
+      return this.move(s, side, goal) ?? { type: 'EndPhase' };
+    }
     if (ctx.combat.combatPhases.includes(phaseId)) return this.attack(s, side, first ? profile.minRatioWhenFirst : profile.minRatio) ?? { type: 'EndPhase' };
     return { type: 'EndPhase' };
   }
@@ -61,6 +66,36 @@ export class Bot {
       if (d < bd || (d === bd && best !== null && c < best)) { best = c; bd = d; }
     }
     return best;
+  }
+
+  /**
+   * 作战计划：想进攻（goal 不是 hold）而本方没有主攻轴线、或主攻目标已经拿下时，从"进攻力最强的军/集团军"
+   * 的位置向最近的没占到的目标画一条主攻线。每个阶段最多给一条指令；画不出来就不画。
+   */
+  private plan(s: GameState, side: Side, goal: z.infer<typeof Goal>): Command | null {
+    const ctx = this.ctx;
+    if (goal === 'hold') return null;
+    const main = s.plans.find((p) => p.side === side && p.kind === 'main');
+    const owned = (hex: string): boolean => (s.owners[hex] ?? ctx.scenario?.objectives.find((o) => o.hex === hex)?.owner) === side;
+    if (main && !owned(main.path.at(-1)!)) return null;
+    if (main) return { type: 'Unplan', id: main.id };
+    const alive = new Set(s.units.map((u) => u.id));
+    const power = (f: string): number => [...ctx.oob.units.values()].filter((u) => u.formation === f && alive.has(u.id) && u.mobility !== 'foot')
+      .reduce((a, u) => a + u.ratings.attack, 0) + childrenOf(ctx, s, f).reduce((a, c) => a + power(c), 0);
+    const cands = [...ctx.oob.formations.values()].filter((f) => f.side === side && (f.echelon === 'corps' || f.echelon === 'army')).map((f) => ({ id: f.id, p: power(f.id) }))
+      .filter((x) => x.p > 0).sort((a, b) => b.p - a.p || (a.id < b.id ? -1 : 1));
+    const lead = cands[0];
+    if (!lead) return null;
+    const members: string[] = [];
+    const walk = (f: string): void => { for (const u of ctx.oob.units.values()) if (u.formation === f && alive.has(u.id)) members.push(u.id); for (const c of childrenOf(ctx, s, f)) walk(c); };
+    walk(lead.id);
+    const at = members.map((id) => parseHexId(s.units.find((u) => u.id === id)!.hex));
+    const start = at.sort((a, b) => a.col - b.col || a.row - b.row)[Math.floor(at.length / 2)]!;
+    const targets = (ctx.scenario?.objectives ?? []).filter((o) => !owned(o.hex)).sort((a, b) => distance(start, parseHexId(a.hex)) - distance(start, parseHexId(b.hex)) || (a.hex < b.hex ? -1 : 1));
+    const target = targets[0];
+    if (!target || hexId(start) === target.hex) return null;
+    const cmd = { type: 'Plan' as const, kind: 'main' as const, formation: lead.id, path: [hexId(start), target.hex] };
+    return whyCannotPlan(ctx, s, side, cmd) ? null : cmd;
   }
 
   private move(s: GameState, side: Side, goal: z.infer<typeof Goal>): Command | null {
@@ -107,18 +142,28 @@ export class Bot {
       for (const pool of fresh.length === all.length ? [all] : [fresh, all]) {
         if (!pool.length) continue;
         const order = [...pool].sort((a, b) => a.f - b.f || b.v - a.v || (a.id < b.id ? -1 : 1));
-        let pick = order.slice(0, cap).map((x) => x.id);
-        if (prof.economy) {
-          for (let n = 1; n <= Math.min(cap, order.length); n++) {
-            const ids = order.slice(0, n).map((x) => x.id);
-            if (!whyCannotAttack(ctx, s, ids, hex, side) && previewCombat(ctx, s, ids, hex).ratio >= minRatio) { pick = ids; break; }
+        // 先试"同一集团军"的兵力（没有协同代价），按这一组的进攻力从大到小；都不够再用全部
+        const groupOf = (id: string): string => coordGroup(ctx, s, ctx.oob.units.get(id)!.formation).id;
+        const groups = new Map<string, typeof order>();
+        for (const x of order) groups.set(groupOf(x.id), [...(groups.get(groupOf(x.id)) ?? []), x]);
+        const lists = groups.size > 1 ? [...groups.values()].sort((a, b) => b.reduce((n, x) => n + x.v, 0) - a.reduce((n, x) => n + x.v, 0)).concat([order]) : [order];
+        let found = false;
+        for (const list of lists) {
+          let pick = list.slice(0, cap).map((x) => x.id);
+          if (prof.economy) {
+            for (let n = 1; n <= Math.min(cap, list.length); n++) {
+              const ids = list.slice(0, n).map((x) => x.id);
+              if (!whyCannotAttack(ctx, s, ids, hex, side) && previewCombat(ctx, s, ids, hex).ratio >= minRatio) { pick = ids; break; }
+            }
           }
+          if (!pick.length || whyCannotAttack(ctx, s, pick, hex, side)) continue;
+          const p = previewCombat(ctx, s, pick, hex);
+          if (p.column < 0 || p.ratio < minRatio) continue;
+          if (!best || p.ratio > best.ratio || (p.ratio === best.ratio && hex < best.hex)) best = { hex, ratio: p.ratio, attackers: pick };
+          found = true;
+          break;
         }
-        if (!pick.length || whyCannotAttack(ctx, s, pick, hex, side)) continue;
-        const p = previewCombat(ctx, s, pick, hex);
-        if (p.column < 0 || p.ratio < minRatio) continue;
-        if (!best || p.ratio > best.ratio || (p.ratio === best.ratio && hex < best.hex)) best = { hex, ratio: p.ratio, attackers: pick };
-        break;
+        if (found) break;
       }
     }
     return best ? { type: 'Attack', attackers: best.attackers, hex: best.hex } : null;

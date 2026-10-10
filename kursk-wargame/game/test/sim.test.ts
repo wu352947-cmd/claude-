@@ -5,6 +5,7 @@ import { initialStateFor, playGame } from '../src/sim/play';
 import { makeReport } from '../src/sim/report';
 import { histogram, placement, quantile } from '../src/sim/stats';
 import { apply } from '../src/engine';
+import { aiStyleNames, defaultAiStyle, makeBot } from '../src/client/ai';
 
 const { ctx, rules, itemClass } = loadSimContext();
 const play = (seed: number) => playGame(ctx, (s) => initialStateFor(ctx, s), seed, rules, itemClass);
@@ -59,5 +60,42 @@ describe('无界面模拟', () => {
     for (const h of ['## 1. 对局概况', '## 2. 装甲完全损失', '## 3. 与历史对照', '## 4. 装甲受损池分流', '## 5. 战斗结果分布', '## 6. 分布图']) expect(md).toContain(h);
     expect(Object.keys(verdicts)).toContain('suDay2');
     expect(Object.keys(verdicts).filter((k) => k.startsWith('obj')).length).toBe(6);
+  });
+});
+
+describe('自动对手与作战计划', () => {
+  it('想进攻的一方第一个移动阶段就画主攻线（指派一个军/集团军，指向没占到的目标）；之后不重复画', () => {
+    const bot = new Bot(ctx, rules);
+    let s = initialStateFor(ctx, 1);
+    const cmds: string[] = [];
+    for (let i = 0; i < 400 && s.turn === 1 && s.phase <= 3; i++) {
+      const c = bot.step(s);
+      if (c.type === 'Plan') cmds.push(JSON.stringify(c));
+      s = apply(ctx, s, c).state;
+    }
+    expect(cmds).toHaveLength(1);
+    const ax = s.plans.find((p) => p.side === 'DE')!;
+    expect(ax.kind).toBe('main');
+    expect(ctx.oob.formations.get(ax.formation!)?.side).toBe('DE');
+    expect(ctx.scenario!.objectives.some((o) => o.hex === ax.path.at(-1))).toBe(true);
+    // 死守的一方（goal = hold）不画
+    expect(s.plans.filter((p) => p.side === 'SU')).toHaveLength(0);
+  });
+});
+
+describe('人机对战的电脑（网页用）', () => {
+  it('每方都有可选的打法，默认打法在其中；任何打法都能给出合法的第一条指令', () => {
+    for (const side of ['DE', 'SU'] as const) {
+      expect(aiStyleNames(side).length).toBeGreaterThanOrEqual(2);
+      expect(aiStyleNames(side)).toContain(defaultAiStyle(side));
+      for (const style of [...aiStyleNames(side), '不存在的打法']) {
+        const s0 = initialStateFor(ctx, 1);
+        // 让 side 行动：德军是主动方；苏军先让德军结束阶段直到轮到苏军
+        let s = s0;
+        while (side === 'SU' && s.phase < 5) s = apply(ctx, s, { type: 'EndPhase' }).state;
+        const c = makeBot(ctx, side, style).step(s);
+        expect(() => apply(ctx, s, c)).not.toThrow();
+      }
+    }
   });
 });
