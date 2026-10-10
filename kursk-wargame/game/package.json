@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "check": "tsc --noEmit && vitest run",
     "apply-edits": "node ../tools/editor/apply-map-edits.mjs",
-    "sim": "vite-node src/sim/run.ts"
+    "sim": "vite-node src/sim/run.ts",
+    "matrix": "vite-node src/sim/matrix.ts"
   },
   "dependencies": {
     "milsymbol": "^3.0.3",
