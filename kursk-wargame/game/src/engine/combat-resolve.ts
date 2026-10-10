@@ -78,7 +78,13 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
       s = { ...s, units: [...s.units.filter((u) => u.hex !== hex), ...s.units.filter((u) => u.hex === hex).map((u) => ({ ...u, hex: to }))] };
       events.push({ type: 'Retreated', units: survivors, path });
     }
-    if (extraLoss) {
+    if (!path.length && ctx.combat.retreat.annihilateAtR && res.r >= ctx.combat.retreat.annihilateAtR) {
+      // 被围死又要撤退很远：整格被歼灭（剩下的步数全部损失）
+      const alive = survivors.filter((id) => s.units.some((u) => u.id === id));
+      const all = alive.reduce((n, id) => n + s.units.find((u) => u.id === id)!.steps, 0);
+      events.push({ type: 'RetreatLoss', units: survivors, steps: all, reason: '被围歼：无路可退' });
+      s = takeLosses(ctx, s, alive, all, events, hex);
+    } else if (extraLoss) {
       events.push({ type: 'RetreatLoss', units: survivors, steps: extraLoss, reason: path.length < res.r ? '无路可退' : '退入敌控制区' });
       for (let i = 0; i < extraLoss; i++) s = takeLosses(ctx, s, survivors.filter((id) => s.units.some((u) => u.id === id)), survivors.length, events, hex);
     }

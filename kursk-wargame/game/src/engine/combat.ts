@@ -30,7 +30,7 @@ export const CombatRules = z.object({
   artillery: z.object({ types: z.array(z.string()), range: z.number().int().positive(), pointsPerShift: z.number().positive(), maxShifts: z.number().int().nonnegative() }),
   defenseOnlyTypes: z.array(z.string()),
   qualityDrm: z.object({ perLevel: z.number().int(), max: z.number().int().nonnegative() }),
-  retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
+  retreat: z.object({ $comment: z.string().optional(), zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative(), annihilateAtR: z.number().int().nonnegative() }),
   fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
   plan: PlanRules,
   disorganize: DisorganizeRules,
