@@ -86,7 +86,7 @@ export function zocOf(ctx: GameContext, s: GameState, side: Side): Set<string> {
   const out = new Set<string>();
   for (const u of s.units) {
     const unit = ctx.oob.units.get(u.id)!;
-    if (sideOfUnit(ctx, u.id) !== side || ctx.movement.zoc.exemptTypes.includes(unit.type)) continue;
+    if (sideOfUnit(ctx, u.id) !== side || ctx.movement.zoc.exemptTypes.includes(unit.type) || s.disorganized[u.id] !== undefined) continue;
     const h = parseHexId(u.hex);
     for (let d = 0; d < 6; d++) {
       const n = neighbor(h, d as Direction);
@@ -130,6 +130,7 @@ export function whyCannotMove(ctx: GameContext, s: GameState, unitId: string, ac
   const ex = whyNotExploit(ctx, s, unitId);
   if (ex) return ex;
   if (s.moved.includes(unitId)) return '本阶段已经移动过';
+  if (s.disorganized[unitId] !== undefined) return '混乱：不能移动，要等恢复';
   return null;
 }
 

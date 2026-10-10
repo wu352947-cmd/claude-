@@ -76,6 +76,14 @@
   "corridorRadius": 1,
   "maxAxes": 5
  },
+ "disorganize": {
+  "$comment": "混乱状态（docs/16）：被打垮的部队暂时失去战斗力。游戏设计参数，待试玩校准。",
+  "onRetreat": true,
+  "defenderLossAtLeast": 2,
+  "attackerLossAtLeast": 2,
+  "defenderShift": 1,
+  "recoverAfterTurns": 1
+ },
  "coordination": {
   "$comment": "编制协同（docs/15）：进攻单位分属不同集团军（或本回合刚调整过隶属）时，赔率列偏移。游戏设计参数，待试玩校准。",
   "crossGroupShift": -1

@@ -67,6 +67,8 @@ export interface GameState {
   fatigue: Record<string, number>;
   /** 掘壕：单位在同一格不动的回合数（等级），换格或移动就清零；hex 记下掘壕的格子 */
   entrench: Record<string, { hex: string; level: number }>;
+  /** 混乱的单位 → 变混乱的回合（没有记录 = 正常；docs/16） */
+  disorganized: Record<string, number>;
   /** 玩家改过的隶属：编制 → 新上级（null = 直属）和调整的回合；没改过的用战斗序列里的默认上级 */
   attach: Record<string, { parent: string | null; turn: number }>;
   /** 作战计划的轴线（双方都存；界面只给本方看） */
@@ -130,6 +132,8 @@ export type GameEvent =
   | { type: 'Reinforced'; unit: string; hex: string }
   | { type: 'Planned'; side: Side; id: string; kind: AxisKind }
   | { type: 'Unplanned'; side: Side; id: string }
+  | { type: 'Disorganized'; units: string[]; reason: string }
+  | { type: 'Recovered'; units: string[] }
   | { type: 'ObjectiveClaimed'; hex: string; side: Side }
   | { type: 'Assigned'; formation: string; from: string | null; to: string | null }
   | { type: 'GameOver'; turn: number };
@@ -141,7 +145,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
-    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attach: {}, plans: [], attacked: [], attackedHexes: [], fired: [], advance: null,
+    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, disorganized: {}, attach: {}, plans: [], attacked: [], attackedHexes: [], fired: [], advance: null,
     damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
@@ -274,7 +278,7 @@ export function placedUnits(ctx: GameContext, s: GameState): PlacedUnit[] {
   return s.units.map((u) => {
     const unit = ctx.oob.units.get(u.id);
     if (!unit) throw new Error(`状态里的单位 ${u.id} 不在战斗序列中`);
-    return { unit, formation: ctx.oob.formations.get(unit.formation)!, hex: parseHexId(u.hex), steps: u.steps };
+    return { unit, formation: ctx.oob.formations.get(unit.formation)!, hex: parseHexId(u.hex), steps: u.steps, disorganized: s.disorganized[u.id] !== undefined };
   });
 }
 

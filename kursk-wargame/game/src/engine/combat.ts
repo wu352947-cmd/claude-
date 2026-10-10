@@ -10,6 +10,7 @@ import { nightBarred, whyNotExploit } from './calendar';
 import type { GameContext, GameState, UnitState } from './game';
 import { coordGroup } from './command-chain';
 import { PlanRules, planShift } from './plan';
+import { DisorganizeRules } from './disorganize';
 import type { Side } from './units';
 
 const Result = z.string().regex(/^(A\d)?(D\d)?(R\d)?$/);
@@ -31,6 +32,7 @@ export const CombatRules = z.object({
   retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
   fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
   plan: PlanRules,
+  disorganize: DisorganizeRules,
   coordination: z.object({ $comment: z.string().optional(), crossGroupShift: z.number().int() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
@@ -82,7 +84,7 @@ export function eligibleAttackers(ctx: GameContext, s: GameState, hex: string, s
   const h = parseHexId(hex);
   return s.units.filter((u) => sideOfUnit(ctx, u.id) === side && distance(parseHexId(u.hex), h) === 1
     && !ctx.combat.defenseOnlyTypes.includes(unitOf(ctx, u.id).type) && !s.attacked.includes(u.id)
-    && !nightBarred(ctx, s, u.id) && !whyNotExploit(ctx, s, u.id)).map((u) => u.id);
+    && s.disorganized[u.id] === undefined && !nightBarred(ctx, s, u.id) && !whyNotExploit(ctx, s, u.id)).map((u) => u.id);
 }
 
 /** 射程内能支援的炮兵 */
@@ -90,7 +92,7 @@ export function supportingArtillery(ctx: GameContext, s: GameState, hex: string,
   const A = ctx.combat.artillery;
   const h = parseHexId(hex);
   return s.units.filter((u) => sideOfUnit(ctx, u.id) === side && A.types.includes(unitOf(ctx, u.id).type)
-    && distance(parseHexId(u.hex), h) <= A.range && !s.fired.includes(u.id) && !s.movedThisTurn.includes(u.id)).map((u) => u.id);
+    && distance(parseHexId(u.hex), h) <= A.range && s.disorganized[u.id] === undefined && !s.fired.includes(u.id) && !s.movedThisTurn.includes(u.id)).map((u) => u.id);
 }
 
 /** 不能进攻的原因；可以返回 null */
@@ -148,6 +150,9 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
   if (ctx.turns.entrench.shiftPerLevel) {
     const lvl = Math.max(0, ...def.map((u) => (s.entrench[u.id]?.hex === u.hex ? s.entrench[u.id]!.level : 0)));
     if (lvl > 0) shifts.push({ value: -lvl * ctx.turns.entrench.shiftPerLevel, label: `守方掘壕（${lvl} 级）：在原地守了 ${lvl} 个回合`, source: 'data/rules/turns.json entrench（02 §5.1）' });
+  }
+  if (C.disorganize.defenderShift && def.some((u) => s.disorganized[u.id] !== undefined)) {
+    shifts.push({ value: C.disorganize.defenderShift, label: '守方有混乱单位：防守失序', source: `${RULE} disorganize（docs/16）` });
   }
   const fort = ctx.scenario?.fortifications.find((f) => f.hex === hex && f.side === enemy);
   if (fort && C.fortification.shiftPerLevel) {

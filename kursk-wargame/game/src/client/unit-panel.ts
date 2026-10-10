@@ -7,7 +7,7 @@ import { showSources } from './prefs';
 
 const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const mini = (p: PlacedUnit, px: number): string =>
-  counterSvg(p.unit, p.formation, { steps: p.steps }).replace('width="100" height="100"', `width="${px}" height="${px}"`);
+  counterSvg(p.unit, p.formation, { steps: p.steps, disorganized: p.disorganized }).replace('width="100" height="100"', `width="${px}" height="${px}"`);
 
 /** 占位数据以灰色斜体显示 */
 const val = (text: string | number, c: Confidence): string =>

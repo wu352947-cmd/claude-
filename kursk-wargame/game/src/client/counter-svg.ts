@@ -34,6 +34,8 @@ function inkOn(hex: string): string {
 export interface CounterOptions {
   /** 当前步数（不写 = 满编） */
   steps?: number;
+  /** 混乱中：画橙色罩和"混乱"字条 */
+  disorganized?: boolean;
 }
 
 export function counterSvg(unit: Unit, formation: Formation, opts: CounterOptions = {}): string {
@@ -74,6 +76,11 @@ export function counterSvg(unit: Unit, formation: Formation, opts: CounterOption
   const ph = unit.confidence === 'placeholder';
   const it = unit.confidence !== 'sourced';
   parts.push(`<text x="50" y="93" font-size="21" font-weight="700" text-anchor="middle" fill="${ph ? c.placeholder : c.ink}"${it ? ' font-style="italic"' : ''} letter-spacing="0.5">${r.attack}-${r.defense}-${r.movement}</text>`);
+  if (opts.disorganized) {
+    // 混乱：整张算子罩一层橙色，斜贴"乱"字条
+    parts.push(`<rect x="0.75" y="0.75" width="98.5" height="98.5" rx="6" fill="#e8892b" fill-opacity="0.38"/>`);
+    parts.push(`<g transform="rotate(-12 50 50)"><rect x="14" y="38" width="72" height="22" rx="3" fill="#d9701a" stroke="#fff" stroke-width="1.5"/><text x="50" y="55" font-size="16" font-weight="700" text-anchor="middle" fill="#fff">混乱</text></g>`);
+  }
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100" font-family='${S.font}'>${parts.join('')}</svg>`;
 }
 

@@ -2,6 +2,7 @@
 import { rollDie } from './rng';
 import { parseResult, previewCombat, retreatPath } from './combat';
 import { sideOfUnit, whyOverstacked } from './movement';
+import { markDisorganized } from './disorganize';
 import { CommandError, type GameContext, type GameEvent, type GameState, type UnitState } from './game';
 
 const unitOf = (ctx: GameContext, id: string) => ctx.oob.units.get(id)!;
@@ -82,8 +83,14 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
       for (let i = 0; i < extraLoss; i++) s = takeLosses(ctx, s, survivors.filter((id) => s.units.some((u) => u.id === id)), survivors.length, events, hex);
     }
   }
+  // 混乱：被迫撤退（含无路可退）的守军、损失惨重的一方的幸存者
+  const D = ctx.combat.disorganize;
+  const lostOf = (ids: string[]): number => events.reduce((n, e) => (e.type === 'StepsLost' && ids.includes(e.unit) ? n + e.steps : n), 0);
+  if (D.onRetreat && res.r && survivors.length) s = markDisorganized(s, survivors, '被迫撤退', events);
+  else if (lostOf(defenders) >= D.defenderLossAtLeast) s = markDisorganized(s, defenders, '损失惨重', events);
+  if (lostOf(attackers) >= D.attackerLossAtLeast) s = markDisorganized(s, attackers, '进攻受挫', events);
   const empty = !s.units.some((u) => u.hex === hex);
-  const canAdvance = attackers.filter((id) => s.units.some((u) => u.id === id));
+  const canAdvance = attackers.filter((id) => s.units.some((u) => u.id === id) && s.disorganized[id] === undefined);
   s = {
     ...s, advance: empty && canAdvance.length ? { hex, units: canAdvance } : null,
     foughtThisTurn: [...s.foughtThisTurn, ...attackers],

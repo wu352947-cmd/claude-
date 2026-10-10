@@ -75,11 +75,19 @@ export function endOfTurn(ctx: GameContext, s0: GameState): { state: GameState; 
   const entrench: GameState['entrench'] = {};
   for (const u of units) {
     const prev = s0.entrench[u.id];
-    const stayed = !s0.movedThisTurn.includes(u.id) && (!prev || prev.hex === u.hex);
+    const stayed = !s0.movedThisTurn.includes(u.id) && s0.disorganized[u.id] === undefined && (!prev || prev.hex === u.hex);
     if (stayed) entrench[u.id] = { hex: u.hex, level: Math.min(E.max, (prev?.level ?? 0) + 1) };
   }
+  // 混乱：更早的回合就混乱、本回合没有再被打混乱的恢复
+  const disorganized: Record<string, number> = {};
+  const recovered: string[] = [];
+  for (const [id, t] of Object.entries(s0.disorganized)) {
+    if (!units.some((u) => u.id === id)) continue;
+    if (t <= s0.turn - ctx.combat.disorganize.recoverAfterTurns) recovered.push(id); else disorganized[id] = t;
+  }
+  if (recovered.length) events.push({ type: 'Recovered', units: recovered });
   // 5. 目标格：回合末停在上面（且只有一方）的才算占领
-  const held = claimHeld(ctx, { ...s0, rng, units, repair, destroyed, fatigue, entrench, damaged: [] });
+  const held = claimHeld(ctx, { ...s0, rng, units, repair, destroyed, fatigue, entrench, disorganized, damaged: [] });
   return { state: held.state, events: [...events, ...held.events] };
 }
 

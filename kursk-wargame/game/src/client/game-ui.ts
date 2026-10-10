@@ -65,6 +65,8 @@ export function createGameUi(
       case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
       case 'Planned': return fog && fog.viewer !== e.side ? null : `作战计划：${AXIS_NAMES[e.kind]}轴线 ${e.id}`;
       case 'Unplanned': return fog && fog.viewer !== e.side ? null : `撤销作战计划 ${e.id}`;
+      case 'Disorganized': return `${e.units.map(unitName).join('、')} 陷入混乱（${e.reason}）`;
+      case 'Recovered': return `${e.units.map(unitName).join('、')} 恢复正常`;
       case 'ObjectiveClaimed': return `回合末：${SIDE_NAMES[e.side]}占领了${ctx.scenario?.objectives.find((o) => o.hex === e.hex)?.name ?? e.hex}`;
       case 'Assigned': {
         const nm = (f: string | null): string => (f ? ctx.oob.formations.get(f)?.names.zh ?? f : '直属');

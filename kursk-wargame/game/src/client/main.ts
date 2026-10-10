@@ -136,6 +136,11 @@ function showInfo(h: Offset | null): void {
 
 /** 选中单位的疲劳（连续进攻会累积；进攻时使列左移） */
 function fatigueNote(unitId: string | null): string {
+  const dis = unitId && game ? game.state().disorganized[unitId] : undefined;
+  const disHtml = dis !== undefined ? `<div class="combat"><div class="units-head">混乱</div><div class="muted small">不能移动、不能进攻，没有控制区，炮兵不能支援，掘壕取消；被进攻时对方赔率列右移。在更早的回合就混乱、本回合没再被打垮的，回合末恢复。</div></div>` : '';
+  return disHtml + fatigueNoteRest(unitId);
+}
+function fatigueNoteRest(unitId: string | null): string {
   const dug = unitId && game ? game.state().entrench[unitId] : undefined;
   const dugHtml = dug && dug.level > 0 && game?.state().units.find((u) => u.id === unitId)?.hex === dug.hex
     ? `<div class="combat"><div class="units-head">掘壕 ${dug.level} 级</div><div class="muted small">在原地守了 ${dug.level} 个回合；被进攻时赔率列右移（对守方有利）。一移动就清零。</div></div>` : '';
