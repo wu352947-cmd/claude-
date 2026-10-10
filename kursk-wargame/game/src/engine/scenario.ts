@@ -135,8 +135,10 @@ export interface Score {
   /** 德军占领的目标 */
   objectives: { hex: string; name: string; vp: number; owner: Side }[];
   objectiveVp: number;
-  /** 双方完全损失的步数（装甲回合末分流后的完全损失 + 其他兵种的全部损失） */
+  /** 双方装甲完全损失的步数（回合末分流后报废的；胜利点只计这个，01 §7.2） */
   lost: Record<Side, number>;
+  /** 其他兵种的步数损失（不计胜利点，战后报告里单列） */
+  lostOther: Record<Side, number>;
   lossVp: number;
   total: number;
   /** 与历史基准之差；没有基准时为 null */
@@ -152,12 +154,14 @@ export function score(ctx: GameContext, s: GameState): Score | null {
   const objectives = sc.objectives.map((o) => ({ hex: o.hex, name: o.name, vp: o.vp, owner: s.owners[o.hex] ?? o.owner }));
   const objectiveVp = objectives.filter((o) => o.owner === 'DE').reduce((a, o) => a + o.vp, 0);
   const lost: Record<Side, number> = { DE: 0, SU: 0 };
-  for (const x of [...s.destroyed, ...s.casualties]) lost[sideOfUnit(ctx, x.unit)] += x.steps;
+  for (const x of s.destroyed) lost[sideOfUnit(ctx, x.unit)] += x.steps;
+  const lostOther: Record<Side, number> = { DE: 0, SU: 0 };
+  for (const x of s.casualties) lostOther[sideOfUnit(ctx, x.unit)] += x.steps;
   const lossVp = lost.SU * V.lossVp.SU - lost.DE * V.lossVp.DE;
   const total = objectiveVp + lossVp;
   const delta = V.baseline === null ? null : total - V.baseline;
   const band = delta === null ? null : V.bands.find((b) => b.min === null || delta >= b.min)!.label;
-  return { objectives, objectiveVp, lost, lossVp, total, delta, band };
+  return { objectives, objectiveVp, lost, lostOther, lossVp, total, delta, band };
 }
 
 export interface HistoryRow { hex: string; name: string; history: Side | 'contested'; game: Side; same: boolean; note?: string }
@@ -168,8 +172,10 @@ export interface HistoryReport {
   /** 与历史结局归属一致的目标格数 / 可比较的目标格数（历史上交替易手的不计） */
   agree: number;
   comparable: number;
-  /** 游戏里双方完全损失的步数（装甲回合末分流后 + 其他兵种全部损失） */
+  /** 游戏里双方装甲完全损失的步数 */
   lost: Record<Side, number>;
+  /** 其他兵种的步数损失 */
+  lostOther: Record<Side, number>;
   losses: { label: string; text: string; provenance: { source: string; page?: string; quote?: string }[] }[];
   note?: string;
 }
@@ -183,7 +189,7 @@ export function historyReport(ctx: GameContext, s: GameState): HistoryReport | n
     return { hex: c.hex, name: c.name, history: c.heldBy, game, same: c.heldBy === game, note: c.note };
   });
   const comparable = rows.filter((r) => r.history !== 'contested');
-  const lost: Record<Side, number> = { DE: 0, SU: 0 };
-  for (const x of [...s.destroyed, ...s.casualties]) lost[sideOfUnit(ctx, x.unit)] += x.steps;
-  return { date: H.date, time: H.time, rows, agree: comparable.filter((r) => r.same).length, comparable: comparable.length, lost, losses: H.losses, note: H.note };
+  const sc = score(ctx, s);
+  const zero: Record<Side, number> = { DE: 0, SU: 0 };
+  return { date: H.date, time: H.time, rows, agree: comparable.filter((r) => r.same).length, comparable: comparable.length, lost: sc?.lost ?? zero, lostOther: sc?.lostOther ?? zero, losses: H.losses, note: H.note };
 }

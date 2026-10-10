@@ -54,8 +54,8 @@ describe('想定', () => {
     expect(moved.owners['0507']).toBe('DE');
     const sc0 = score(ctx, s0)!;
     expect([sc0.objectiveVp, sc0.total, sc0.delta, sc0.band]).toEqual([2, 2, 0, '历史结果']);
-    const sc1 = score(ctx, { ...moved, casualties: [{ unit: INF, steps: 2, turn: 1 }] })!;
-    expect([sc1.objectiveVp, sc1.lost, sc1.total, sc1.band]).toEqual([5, { DE: 0, SU: 2 }, 6, '德军胜利']);
+    const sc1 = score(ctx, { ...moved, destroyed: [{ unit: T25, formation: 'x', steps: 2, turn: 1 }], casualties: [{ unit: INF, steps: 5, turn: 1 }] })!;
+    expect([sc1.objectiveVp, sc1.lost, sc1.lostOther, sc1.total, sc1.band]).toEqual([5, { DE: 0, SU: 2 }, { DE: 0, SU: 5 }, 6, '德军胜利']);
     const sc2 = score(ctx, { ...s0, destroyed: [{ unit: TANK, formation: 'x', steps: 3, turn: 1 }] })!;
     expect([sc2.total, sc2.band]).toEqual([-1, '苏军胜利']);
   });

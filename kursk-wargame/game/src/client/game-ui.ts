@@ -82,7 +82,7 @@ export function createGameUi(
       $('g-report').innerHTML = `<b>战后报告：与历史对比</b><small>历史结局：${esc(rep.date)} ${esc(rep.time)}</small>
         <table>${rep.rows.map((r) => `<tr class="${r.history === 'contested' ? 'ct' : r.same ? 'ok' : 'no'}"><td>${esc(r.name)}</td><td>历史：${who(r.history)}</td><td>本局：${SIDE_NAMES[r.game]}</td></tr>`).join('')}</table>
         <div>可比较的 ${rep.comparable} 处目标中，${rep.agree} 处与历史一致。</div>
-        <div class="muted">完全损失（步）：德 ${rep.lost.DE} · 苏 ${rep.lost.SU}（游戏的"步"与历史坦克数不能直接相比）</div>
+        <div class="muted">装甲完全损失（步）：德 ${rep.lost.DE} · 苏 ${rep.lost.SU}；其他兵种损失（步）：德 ${rep.lostOther.DE} · 苏 ${rep.lostOther.SU}（游戏的"步"与历史坦克数不能直接相比）</div>
         <details><summary>历史上的损失，各说法（口径不同）</summary><ul>${rep.losses.map((l) => `<li><b>${esc(l.label)}</b>：${esc(l.text)}${l.provenance[0] ? `<small>${esc(l.provenance[0].source)}</small>` : ''}</li>`).join('')}</ul></details>`;
     }
     const sc = score(ctx, s);
