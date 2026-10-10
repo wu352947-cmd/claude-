@@ -76,6 +76,12 @@
   "corridorRadius": 1,
   "maxAxes": 5
  },
+ "supply": {
+  "$comment": "补给线（docs/16）：断补的单位进攻降一列，被进攻时对方升一列；混乱的单位断补时不能恢复。游戏设计参数，待试玩校准。",
+  "attackShift": -1,
+  "defendShift": 1,
+  "recoverNeedsSupply": true
+ },
  "disorganize": {
   "$comment": "混乱状态（docs/16）：被打垮的部队暂时失去战斗力。游戏设计参数，待试玩校准。",
   "onRetreat": true,

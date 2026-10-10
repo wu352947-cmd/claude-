@@ -11,6 +11,7 @@ import type { GameContext, GameState, UnitState } from './game';
 import { coordGroup } from './command-chain';
 import { PlanRules, planShift } from './plan';
 import { DisorganizeRules } from './disorganize';
+import { SupplyRules, isSupplied } from './supply';
 import type { Side } from './units';
 
 const Result = z.string().regex(/^(A\d)?(D\d)?(R\d)?$/);
@@ -33,6 +34,7 @@ export const CombatRules = z.object({
   fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
   plan: PlanRules,
   disorganize: DisorganizeRules,
+  supply: SupplyRules,
   coordination: z.object({ $comment: z.string().optional(), crossGroupShift: z.number().int() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
@@ -153,6 +155,10 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
   }
   if (C.disorganize.defenderShift && def.some((u) => s.disorganized[u.id] !== undefined)) {
     shifts.push({ value: C.disorganize.defenderShift, label: '守方有混乱单位：防守失序', source: `${RULE} disorganize（docs/16）` });
+  }
+  if (ctx.scenario?.supply) {
+    if (C.supply.attackShift && atk.some((u) => !isSupplied(ctx, s, u.id))) shifts.push({ value: C.supply.attackShift, label: '攻方有断补单位：补给线被切断', source: `${RULE} supply（docs/16）` });
+    if (C.supply.defendShift && def.some((u) => !isSupplied(ctx, s, u.id))) shifts.push({ value: C.supply.defendShift, label: '守方有断补单位：补给线被切断', source: `${RULE} supply（docs/16）` });
   }
   const fort = ctx.scenario?.fortifications.find((f) => f.hex === hex && f.side === enemy);
   if (fort && C.fortification.shiftPerLevel) {

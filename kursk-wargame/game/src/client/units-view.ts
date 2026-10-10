@@ -10,12 +10,12 @@ const K = PX_PER_KM;
 const cache = new Map<string, Promise<Texture>>();
 /** hidden = 未侦察的敌军（热座迷雾） */
 function counterTexture(p: PlacedUnit, hidden: boolean): Promise<Texture> {
-  const key = hidden ? `?|${p.formation.side}` : `${p.unit.id}|${p.steps}|${p.disorganized ? 'd' : ''}`;
+  const key = hidden ? `?|${p.formation.side}` : `${p.unit.id}|${p.steps}|${p.disorganized ? 'd' : ''}${p.unsupplied ? 'u' : ''}`;
   let t = cache.get(key);
   if (!t) {
     t = (async () => {
       const img = new Image();
-      const svg = hidden ? hiddenCounterSvg(p.formation.side) : counterSvg(p.unit, p.formation, { steps: p.steps, disorganized: p.disorganized });
+      const svg = hidden ? hiddenCounterSvg(p.formation.side) : counterSvg(p.unit, p.formation, { steps: p.steps, disorganized: p.disorganized, unsupplied: p.unsupplied });
       img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
       await img.decode();
       const n = COUNTER_STYLE.texturePx;

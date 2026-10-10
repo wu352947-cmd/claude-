@@ -13,6 +13,7 @@ import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
 import { type Axis, AxisKind, nextAxisId, whyCannotPlan } from './plan';
+import { isSupplied } from './supply';
 import { planGroupMove } from './group-move';
 import { parentOf, whyCannotAssign } from './command-chain';
 import { type Scenario, startTurn } from './scenario';
@@ -278,7 +279,7 @@ export function placedUnits(ctx: GameContext, s: GameState): PlacedUnit[] {
   return s.units.map((u) => {
     const unit = ctx.oob.units.get(u.id);
     if (!unit) throw new Error(`状态里的单位 ${u.id} 不在战斗序列中`);
-    return { unit, formation: ctx.oob.formations.get(unit.formation)!, hex: parseHexId(u.hex), steps: u.steps, disorganized: s.disorganized[u.id] !== undefined };
+    return { unit, formation: ctx.oob.formations.get(unit.formation)!, hex: parseHexId(u.hex), steps: u.steps, disorganized: s.disorganized[u.id] !== undefined, unsupplied: !isSupplied(ctx, s, u.id) };
   });
 }
 

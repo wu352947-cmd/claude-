@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { distance, hexId, inBounds, parseHexId } from './hex';
 import { hexRecord } from './map';
 import { sideOfUnit } from './movement';
+import { ScenarioSupply } from './supply';
 import type { GameContext, GameEvent, GameState } from './game';
 import { type Oob, DeploymentFile, Side } from './units';
 import type { HexGrid } from './hex';
@@ -31,6 +32,8 @@ export const ScenarioFile = DeploymentFile.extend({
   /** 胜利目标：开局归 owner；之后哪一方的单位最后进入（经过）就归哪一方 */
   objectives: z.array(z.object({ hex: Hex, name: z.string().min(1), vp: z.number().int().positive(), owner: Side, note: z.string().optional() })).default([]),
   /** 工事：该格守方（side）获得每级一个列偏移（combat.json fortification）。位置与等级须有出处，没有出处的标 placeholder */
+  /** 各方的后方边缘（补给线连回这些地图边缘）；不写 = 不启用补给规则 */
+  supply: ScenarioSupply.optional(),
   fortifications: z.array(z.object({
     hex: Hex, side: Side, level: z.number().int().min(1).max(3), name: z.string().min(1),
     confidence: z.enum(['sourced', 'estimated', 'placeholder']), basis: z.string().min(1), provenance: z.array(Prov).default([]),

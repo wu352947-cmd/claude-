@@ -36,6 +36,8 @@ export interface CounterOptions {
   steps?: number;
   /** 混乱中：画橙色罩和"混乱"字条 */
   disorganized?: boolean;
+  /** 断补：左上角画红色"断"标 */
+  unsupplied?: boolean;
 }
 
 export function counterSvg(unit: Unit, formation: Formation, opts: CounterOptions = {}): string {
@@ -76,6 +78,9 @@ export function counterSvg(unit: Unit, formation: Formation, opts: CounterOption
   const ph = unit.confidence === 'placeholder';
   const it = unit.confidence !== 'sourced';
   parts.push(`<text x="50" y="93" font-size="21" font-weight="700" text-anchor="middle" fill="${ph ? c.placeholder : c.ink}"${it ? ' font-style="italic"' : ''} letter-spacing="0.5">${r.attack}-${r.defense}-${r.movement}</text>`);
+  if (opts.unsupplied) {
+    parts.push(`<rect x="3" y="50" width="20" height="20" rx="3" fill="#c62828" stroke="#fff" stroke-width="1.5"/><text x="13" y="65" font-size="14" font-weight="700" text-anchor="middle" fill="#fff">断</text>`);
+  }
   if (opts.disorganized) {
     // 混乱：整张算子罩一层橙色，斜贴"乱"字条
     parts.push(`<rect x="0.75" y="0.75" width="98.5" height="98.5" rx="6" fill="#e8892b" fill-opacity="0.38"/>`);

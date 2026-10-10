@@ -8,6 +8,7 @@ import { sideOfUnit, zocOf } from './movement';
 import { turnInfo } from './calendar';
 import type { GameContext, GameEvent, GameState } from './game';
 import { claimHeld } from './scenario';
+import { isSupplied } from './supply';
 import type { Side } from './units';
 
 export type Control = 'own' | 'contested' | 'enemy';
@@ -83,7 +84,8 @@ export function endOfTurn(ctx: GameContext, s0: GameState): { state: GameState; 
   const recovered: string[] = [];
   for (const [id, t] of Object.entries(s0.disorganized)) {
     if (!units.some((u) => u.id === id)) continue;
-    if (t <= s0.turn - ctx.combat.disorganize.recoverAfterTurns) recovered.push(id); else disorganized[id] = t;
+    const waited = t <= s0.turn - ctx.combat.disorganize.recoverAfterTurns;
+    if (waited && !(ctx.combat.supply.recoverNeedsSupply && !isSupplied(ctx, { ...s0, units }, id))) recovered.push(id); else disorganized[id] = t;
   }
   if (recovered.length) events.push({ type: 'Recovered', units: recovered });
   // 5. 目标格：回合末停在上面（且只有一方）的才算占领

@@ -1,7 +1,7 @@
 import { Application } from 'pixi.js';
 import {
   CONFIDENCE_NAMES, ENGINE_VERSION, GameMeta, SIDE_NAMES, SIDE_FEATURE_NAMES, STATUS_NAMES, TERRAIN_NAMES, type Direction, type Offset,
-  CombatRules, TurnRules, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, planGroupMove, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
+  CombatRules, TurnRules, isSupplied, loadScenario, type GameContext, MovementRules, type Reach, RatingsParams, Sequence, actingSide, movementAllowance, reachable, planGroupMove, whyCannotMove, formatDM, hexAt, hexCenter, hexId, hexRecord, inBounds, initialState, linksBetween,
   loadDeployment, loadMap, loadOob, neighbor, placedUnits, sideFeatures, stacks, toLatLon, withFullSteps,
 } from '../engine';
 import rawMeta from '../../data/game.json';
@@ -138,7 +138,9 @@ function showInfo(h: Offset | null): void {
 function fatigueNote(unitId: string | null): string {
   const dis = unitId && game ? game.state().disorganized[unitId] : undefined;
   const disHtml = dis !== undefined ? `<div class="combat"><div class="units-head">混乱</div><div class="muted small">不能移动、不能进攻，没有控制区，炮兵不能支援，掘壕取消；被进攻时对方赔率列右移。在更早的回合就混乱、本回合没再被打垮的，回合末恢复。</div></div>` : '';
-  return disHtml + fatigueNoteRest(unitId);
+  const cut = unitId && game && !isSupplied(ctx, game.state(), unitId)
+    ? `<div class="combat"><div class="units-head">断补</div><div class="muted small">补给线被切断（不能连回后方边缘：路上有敌军，或要穿过敌控制区）。进攻时赔率列左移，被进攻时对方赔率列右移；混乱后不能恢复。把敌人赶走或让己方单位占住路上的格子可以接通。</div></div>` : '';
+  return cut + disHtml + fatigueNoteRest(unitId);
 }
 function fatigueNoteRest(unitId: string | null): string {
   const dug = unitId && game ? game.state().entrench[unitId] : undefined;

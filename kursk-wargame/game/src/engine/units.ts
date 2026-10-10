@@ -190,6 +190,8 @@ export interface PlacedUnit {
   steps: number;
   /** 混乱中（界面画橙色标记） */
   disorganized?: boolean;
+  /** 断补（想定启用补给规则且补给线被切断；界面画"断补"标记） */
+  unsupplied?: boolean;
 }
 
 /** 数值考据程度：没输入 = 占位；用了占位分、C/D 级来源、推算比例或按份额分摊 = 推定；否则有出处 */
