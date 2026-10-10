@@ -145,7 +145,8 @@ export function createGameUi(
     const to = save.note?.to;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(save, null, 1)], { type: 'application/json' }));
-    a.download = hotseat.mode() === 'pbem' && to ? `kursk-回合文件-第${cur.state.turn}回合-轮到${SIDE_NAMES[to]}.json` : `kursk-存档-第${cur.state.turn}回合.json`;
+    // 文件名只用英文数字：有的浏览器会丢掉中文文件名
+    a.download = hotseat.mode() === 'pbem' && to ? `kursk-turn${cur.state.turn}-to-${to}.json` : `kursk-save-turn${cur.state.turn}.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
