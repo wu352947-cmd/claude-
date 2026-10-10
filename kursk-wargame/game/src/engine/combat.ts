@@ -63,6 +63,7 @@ export interface CombatPreview {
   support: { attacker: string[]; defender: string[] };
 }
 
+const C_F = (ctx: GameContext) => ctx.turns.fatigue;
 const unitOf = (ctx: GameContext, id: string) => ctx.oob.units.get(id)!;
 /** 按剩余步数折算的当前攻/防 */
 export const currentValue = (ctx: GameContext, u: UnitState, kind: 'attack' | 'defense'): number => {
@@ -135,6 +136,11 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
   }
   const typeOf = (u: UnitState): string => unitOf(ctx, u.id).type;
   const armorAtk = atk.filter((u) => C.armor.armorTypes.includes(typeOf(u)) && ['medium', 'heavy'].includes(unitOf(ctx, u.id).derived?.armorClass ?? ''));
+  if (C_F(ctx).shiftPerLevel) {
+    const w = attackersV.reduce((a, x) => a + x.value, 0) || 1;
+    const lvl = Math.floor(attackersV.reduce((a, x) => a + (s.fatigue[x.id] ?? 0) * x.value, 0) / w);
+    if (lvl > 0) shifts.push({ value: -lvl * C_F(ctx).shiftPerLevel, label: `攻方疲劳（${lvl} 级）：连续进攻的部队越打越乏`, source: 'data/rules/turns.json fatigue（02 §3）' });
+  }
   const fort = ctx.scenario?.fortifications.find((f) => f.hex === hex && f.side === enemy);
   if (fort && C.fortification.shiftPerLevel) {
     shifts.push({ value: -fort.level * C.fortification.shiftPerLevel, label: `守方工事：${fort.name}（${fort.level} 级）`, source: `${RULE} fortification（02 §5；位置：${fort.confidence === 'sourced' ? '有出处' : '推定'}）` });

@@ -20,6 +20,14 @@ export const TurnRules = z.object({
     repairTurns: z.number().int().positive(),
     nightRepair: z.number().int().positive(),
   }),
+  fatigue: z.object({
+    $comment: z.string().optional(),
+    max: z.number().int().positive(),
+    perFightTurn: z.number().int().positive(),
+    rest: z.number().int().nonnegative(),
+    nightRest: z.number().int().nonnegative(),
+    shiftPerLevel: z.number().int().nonnegative(),
+  }),
   fog: z.object({ $comment: z.string().optional(), revealRange: z.number().int().nonnegative() }),
 });
 export type TurnRules = z.infer<typeof TurnRules>;

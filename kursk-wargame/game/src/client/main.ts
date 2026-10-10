@@ -103,7 +103,7 @@ function showInfo(h: Offset | null): void {
     ${editor.active || !game ? '' : objectiveHtml(hexId(h))}
     ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
     ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
-      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + startNote(selectedUnit)}
+      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + startNote(selectedUnit) + fatigueNote(selectedUnit)}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
   box.hidden = false;
@@ -127,6 +127,12 @@ function showInfo(h: Offset | null): void {
     const units = [...box.querySelectorAll<HTMLInputElement>('.adv-pick')].filter((x) => x.checked).map((x) => x.dataset.unit!);
     if (game.dispatch({ type: 'Advance', units })) { selectUnit(units.at(-1) ?? null); showInfo(h); }
   };
+}
+
+/** 选中单位的疲劳（连续进攻会累积；进攻时使列左移） */
+function fatigueNote(unitId: string | null): string {
+  const lvl = unitId && game ? game.state().fatigue[unitId] ?? 0 : 0;
+  return lvl ? `<div class="combat"><div class="units-head">疲劳 ${lvl} 级</div><div class="muted small">连续进攻会累积；回合末不进攻则休整，夜间恢复更多。疲劳的部队进攻时赔率列左移。</div></div>` : '';
 }
 
 /** 选中单位的开局位置依据（想定里写的考据说明；占位和推定用斜体） */

@@ -36,7 +36,7 @@ export function world(opts: { hexes?: Record<string, string>; sides?: Record<str
 /** 手搭状态：units = 单位 → 格号；步数默认满编，可用 steps 覆盖 */
 export const at = (units: Record<string, string>, ph = 'first.movement', steps: Record<string, number> = {}): GameState => ({
   scenario: 't', first: 'DE', turn: 1, phase: phase(ph), rng: createRng(1), start: { date: '1943-07-11', slot: 0 },
-  moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], attacked: [], attackedHexes: [], fired: [], advance: null,
+  moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
   damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], owners: {}, over: false,
   units: Object.entries(units).map(([id, hex]) => ({ id, hex, steps: steps[id] ?? oob.units.get(id)!.steps })),
 });

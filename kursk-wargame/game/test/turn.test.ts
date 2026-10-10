@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
-  type GameState, apply, checkPath, controlOf, createRng, endOfTurn, movementAllowance, reachable, revealedEnemies, turnInfo, turnLabel,
+  type GameState, apply, checkPath, controlOf, previewCombat, createRng, endOfTurn, movementAllowance, reachable, revealedEnemies, turnInfo, turnLabel,
   whyCannotAttack, whyCannotMove,
 } from '../src/engine';
 import { DEINF, INF, MOT, TANK, at, phase, turns, world } from './helpers';
@@ -135,5 +135,31 @@ describe('热座迷雾', () => {
     const s = at({ [TANK]: '0505', [MOT]: '0506', [INF]: '0510' });
     expect([...revealedEnemies(ctx, s, 'DE')]).toEqual([MOT]);
     expect([...revealedEnemies(ctx, s, 'SU')]).toEqual([TANK]);
+  });
+});
+
+describe('疲劳', () => {
+  const F = turns.fatigue;
+  it(`进攻过的单位回合末疲劳 +${F.perFightTurn}（最高 ${F.max}）；没进攻的休整 −${F.rest}，夜间多 −${F.nightRest}`, () => {
+    let s: GameState = { ...at({ [TANK]: '0505', [MOT]: '0506' }, 'end'), foughtThisTurn: [TANK] };
+    s = endOfTurn(ctx, s).state;
+    expect(s.fatigue).toEqual({ [TANK]: F.perFightTurn });
+    for (let i = 0; i < 6; i++) s = endOfTurn(ctx, { ...s, foughtThisTurn: [TANK] }).state;
+    expect(s.fatigue[TANK]).toBe(F.max);
+    const rested = endOfTurn(ctx, { ...s, foughtThisTurn: [] }).state;
+    expect(rested.fatigue[TANK]).toBe(F.max - F.rest);
+    const night = endOfTurn(ctx, { ...s, foughtThisTurn: [], turn: 3 }).state;
+    expect(night.fatigue[TANK] ?? 0).toBe(Math.max(0, F.max - F.rest - F.nightRest));
+  });
+
+  it('疲劳的攻方列左移，按攻击力加权平均后向下取整，明细可读', () => {
+    const s = { ...at({ [TANK]: '0505', [DEINF]: '0507', [INF]: '0506' }, 'first.combat'), fatigue: { [TANK]: 2, [DEINF]: 2 } };
+    const tired = previewCombat(ctx, s, [TANK, DEINF], '0506');
+    const fresh = previewCombat(ctx, { ...s, fatigue: {} }, [TANK, DEINF], '0506');
+    expect(tired.shifts.find((m) => m.label.includes('疲劳'))?.value).toBe(-2 * F.shiftPerLevel);
+    expect(fresh.shifts.some((m) => m.label.includes('疲劳'))).toBe(false);
+    expect(tired.column).toBeLessThanOrEqual(fresh.column);
+    const mixed = previewCombat(ctx, { ...s, fatigue: { [TANK]: 1 } }, [TANK, DEINF], '0506');
+    expect(mixed.shifts.some((m) => m.label.includes('疲劳'))).toBe(false); // 平均不足 1 级
   });
 });

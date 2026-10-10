@@ -61,7 +61,15 @@ export function endOfTurn(ctx: GameContext, s0: GameState): { state: GameState; 
     if (lost) destroyed.push({ unit: d.unit, formation: d.formation, steps: lost, turn: s0.turn });
     events.push({ type: 'DamagedSorted', unit: d.unit, hex: d.hex, control, need, rolls, repaired, destroyed: lost });
   }
-  return { state: { ...s0, rng, units, repair, destroyed, damaged: [] }, events };
+  // 3. 疲劳：进攻过的 +，没进攻的休整 −（夜间多恢复一级）
+  const F = ctx.turns.fatigue;
+  const rest = F.rest + (turnInfo(ctx, s0).night ? F.nightRest : 0);
+  const fatigue: Record<string, number> = {};
+  for (const u of units) {
+    const v = s0.foughtThisTurn.includes(u.id) ? Math.min(F.max, (s0.fatigue[u.id] ?? 0) + F.perFightTurn) : Math.max(0, (s0.fatigue[u.id] ?? 0) - rest);
+    if (v > 0) fatigue[u.id] = v;
+  }
+  return { state: { ...s0, rng, units, repair, destroyed, fatigue, damaged: [] }, events };
 }
 
 /** 热座迷雾：viewer 能看清番号与实力的敌军单位（距本方任一单位不超过 revealRange） */
