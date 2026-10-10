@@ -54,8 +54,10 @@ describe('战斗序列数据', () => {
   });
 
   it('素质不是 3 必须写理由', () => {
-    const q = clone(oobData) as { units: { quality?: number }[] };
-    q.units[0]!.quality = 4;
+    const q = clone(oobData) as { units: { quality?: number; qualityNote?: string }[] };
+    const u = q.units.find((x) => x.quality === undefined)!;
+    u.quality = 4;
+    delete u.qualityNote;
     expect(() => loadOob(q, params)).toThrow(/理由/);
   });
 
