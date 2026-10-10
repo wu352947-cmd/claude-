@@ -3,6 +3,7 @@ import {
   CONFIDENCE_NAMES, type Confidence, type PlacedUnit, type Provenance, SIDE_NAMES, UNIT_SIZE_NAMES, UNIT_TYPE_NAMES,
 } from '../engine';
 import { counterSvg } from './counter-svg';
+import { showSources } from './prefs';
 
 const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 const mini = (p: PlacedUnit, px: number): string =>
@@ -55,26 +56,27 @@ export function unitSectionHtml(stack: readonly PlacedUnit[], selectedId: string
     const { unit: u, formation: f } = p;
     const ph = u.confidence;
     const fph = f.confidence;
+    const src = showSources();
     const other = [u.names.de, u.names.ru].filter(Boolean).map((n) => esc(n!)).join('<br>');
     detail = `
       <div class="unit-detail">
         <div class="unit-big">${mini(p, 72)}</div>
         <dl>
-          <dt>番号</dt><dd>${val(u.names.zh, fph)}<br><small>${esc(u.names.en)}${other ? `<br>${other}` : ''}</small></dd>
+          <dt>番号</dt><dd>${val(u.names.zh, fph)}${src ? `<br><small>${esc(u.names.en)}${other ? `<br>${other}` : ''}</small>` : ''}</dd>
           <dt>隶属</dt><dd>${val(f.names.zh, fph)}${f.guards ? '（近卫）' : ''} · ${SIDE_NAMES[f.side]}</dd>
           <dt>兵种</dt><dd>${UNIT_TYPE_NAMES[u.type]} · ${UNIT_SIZE_NAMES[u.size]}</dd>
           <dt>步数</dt><dd>${val(`${p.steps} / ${u.steps}`, ph)}</dd>
           <dt>攻击</dt><dd>${val(u.ratings.attack, ph)}</dd>
           <dt>防御</dt><dd>${val(u.ratings.defense, ph)}</dd>
           <dt>移动</dt><dd>${val(u.ratings.movement, ph)}</dd>
-          <dt>数值</dt><dd>${val(CONFIDENCE_NAMES[u.confidence], ph)}</dd>
+          ${src ? `<dt>数值</dt><dd>${val(CONFIDENCE_NAMES[u.confidence], ph)}</dd>
           <dt>番号考据</dt><dd>${val(CONFIDENCE_NAMES[f.confidence], fph)}</dd>
           <dt>编制出处</dt><dd>${sources([...f.provenance, ...u.provenance])}</dd>
-          ${u.note ? `<dt>备注</dt><dd><small>${esc(u.note)}</small></dd>` : ''}
+          ${u.note ? `<dt>备注</dt><dd><small>${esc(u.note)}</small></dd>` : ''}` : ''}
         </dl>
       </div>
       ${moveNote ? `<div class="move-note">${moveNote}</div>` : ''}
-      ${derivation(p)}`;
+      ${src ? derivation(p) : ''}`;
   }
   return `<div class="units"><div class="units-head">部队（${stack.length}）</div>${rows}${detail}</div>`;
 }

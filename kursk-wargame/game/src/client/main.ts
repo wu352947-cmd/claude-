@@ -24,6 +24,7 @@ import { type GameUi, createGameUi } from './game-ui';
 import { createMapView } from './map-view';
 import { MAP_FONTS, PX_PER_KM } from './style';
 import { unitSectionHtml } from './unit-panel';
+import { showSources } from './prefs';
 import { createUnitsView } from './units-view';
 import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
@@ -94,17 +95,17 @@ function showInfo(h: Offset | null): void {
     <div class="info-head"><span class="hexno">${hexId(h)}</span><button id="info-close" aria-label="关闭">×</button></div>
     <dl>
       <dt>地形</dt><dd>${TERRAIN_NAMES[rec.terrain]}${isDefault ? '<span class="muted">（未录入，默认）</span>' : ''}</dd>
-      ${isDefault ? '' : `<dt>状态</dt><dd class="st-${rec.status}">${STATUS_NAMES[rec.status]}</dd>`}
-      ${editor.active ? '' : rec.note ? `<dt>备注</dt><dd>${esc(rec.note)}</dd>` : ''}
+      ${isDefault || !(editor.active || showSources()) ? '' : `<dt>状态</dt><dd class="st-${rec.status}">${STATUS_NAMES[rec.status]}</dd>`}
+      ${!editor.active && showSources() && rec.note ? `<dt>备注</dt><dd>${esc(rec.note)}</dd>` : ''}
       <dt>格边</dt><dd>${sides.length ? sides.join('<br>') : '<span class="muted">无</span>'}</dd>
       <dt>道路</dt><dd>${links.length ? links.join('<br>') : '<span class="muted">无</span>'}</dd>
-      <dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>
-      ${rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
+      ${editor.active || showSources() ? `<dt>中心</dt><dd>${formatDM(ll.lat, 'N', 'S')} ${formatDM(ll.lon, 'E', 'W')}</dd>` : ''}
+      ${(editor.active || showSources()) && rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
     ${editor.active || !game ? '' : objectiveHtml(hexId(h))}
     ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
     ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
-      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + startNote(selectedUnit) + fatigueNote(selectedUnit)}
+      : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + (showSources() ? startNote(selectedUnit) : '') + fatigueNote(selectedUnit)}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
       <button class="note-save" id="info-note-save">保存备注</button>` : ''}`;
   box.hidden = false;
@@ -187,7 +188,7 @@ let game: GameUi;
 
 async function start(): Promise<void> {
   $('title').textContent = meta.title.zh;
-  $('subtitle').textContent = `${map.def.name.zh} · 引擎 v${ENGINE_VERSION}`;
+  $('subtitle').textContent = showSources() ? `${map.def.name.zh} · 引擎 v${ENGINE_VERSION}` : map.def.name.zh;
   const host = $('app');
   const app = new Application();
   await app.init({ resizeTo: host, background: '#2b2e30', antialias: true, autoDensity: true, resolution: Math.min(2, devicePixelRatio) });

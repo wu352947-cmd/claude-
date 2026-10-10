@@ -9,6 +9,7 @@ import {
   canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
+import { setShowSources, showSources } from './prefs';
 
 const AUTOSAVE_KEY = 'kursk-1943-autosave';
 const $ = <T extends HTMLElement>(id: string): T => document.getElementById(id) as T;
@@ -83,13 +84,13 @@ export function createGameUi(
         <table>${rep.rows.map((r) => `<tr class="${r.history === 'contested' ? 'ct' : r.same ? 'ok' : 'no'}"><td>${esc(r.name)}</td><td>历史：${who(r.history)}</td><td>本局：${SIDE_NAMES[r.game]}</td></tr>`).join('')}</table>
         <div>可比较的 ${rep.comparable} 处目标中，${rep.agree} 处与历史一致。</div>
         <div class="muted">装甲完全损失（步）：德 ${rep.lost.DE} · 苏 ${rep.lost.SU}；其他兵种损失（步）：德 ${rep.lostOther.DE} · 苏 ${rep.lostOther.SU}（游戏的"步"与历史坦克数不能直接相比）</div>
-        <details><summary>历史上的损失，各说法（口径不同）</summary><ul>${rep.losses.map((l) => `<li><b>${esc(l.label)}</b>：${esc(l.text)}${l.provenance[0] ? `<small>${esc(l.provenance[0].source)}</small>` : ''}</li>`).join('')}</ul></details>`;
+        ${showSources() ? `<details><summary>历史上的损失，各说法（口径不同）</summary><ul>${rep.losses.map((l) => `<li><b>${esc(l.label)}</b>：${esc(l.text)}${l.provenance[0] ? `<small>${esc(l.provenance[0].source)}</small>` : ''}</li>`).join('')}</ul></details>` : ''}`;
     }
     const sc = score(ctx, s);
     $('g-score').hidden = !sc;
     if (sc) {
       $('g-score').innerHTML = `德军得分 <b>${sc.total}</b>（目标 ${sc.objectiveVp}，损失交换 ${sc.lossVp > 0 ? '+' : ''}${sc.lossVp}）`
-        + (sc.delta === null ? '<small>历史基准待校准</small>' : `<small>历史基准 ${sc.total - sc.delta} · 现在：${esc(sc.band!)}</small>`);
+        + (sc.delta === null ? '<small>历史基准待校准</small>' : `<small>现在：${esc(sc.band!)}${showSources() ? `（历史基准 ${sc.total - sc.delta}）` : ''}</small>`);
     }
     $<HTMLButtonElement>('g-undo').disabled = !canUndo(history);
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);
@@ -134,6 +135,9 @@ export function createGameUi(
   };
   $('g-redo').onclick = tryRedo;
   $('g-roll').onclick = () => dispatch({ type: 'RollDie', sides: 6, purpose: '测试' });
+  const src = $<HTMLInputElement>('g-src');
+  src.checked = showSources();
+  src.onchange = () => { setShowSources(src.checked); render(); };
   $('g-more').onclick = () => $('game').classList.toggle('open');
   $('g-new').onclick = () => {
     if (!confirm('开始新对局？当前对局的指令会清空（可先存档）。')) return;
