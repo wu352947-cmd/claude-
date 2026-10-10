@@ -12,6 +12,10 @@ import {
 const Goal = z.enum(['objectives', 'enemy', 'hold']);
 const Profile = z.object({
   goal: Goal, goalWhenFirst: Goal, footAdvances: z.boolean(), minRatio: z.number().positive(), minRatioWhenFirst: z.number().positive(), artilleryStandoff: z.number().int().nonnegative(),
+  /** 疲劳达到这一级的单位不参加进攻（除非不用它就够不上赔率门槛）；不写 = 不看疲劳 */
+  maxFatigue: z.number().int().nonnegative().optional(),
+  /** 只投入够用的兵力：赔率刚到门槛就不再加人，保留生力军 */
+  economy: z.boolean().default(false),
 });
 export const BotRules = z.object({ $comment: z.string().optional(), status: z.enum(['draft', 'approved']), DE: Profile, SU: Profile });
 export type BotRules = z.infer<typeof BotRules>;
@@ -91,16 +95,31 @@ export class Bot {
 
   private attack(s: GameState, side: Side, minRatio: number): Command | null {
     const ctx = this.ctx;
+    const prof = this.rules[side];
+    const cap = ctx.combat.frontage.maxAttackers;
     let best: { hex: string; ratio: number; attackers: string[] } | null = null;
     for (const hex of this.enemyHexes(s, side)) {
       if (s.attackedHexes.includes(hex)) continue;
-      const attackers = eligibleAttackers(ctx, s, hex, side)
-        .map((id) => ({ id, v: currentValue(ctx, s.units.find((u) => u.id === id)!, 'attack') }))
-        .sort((a, b) => b.v - a.v || (a.id < b.id ? -1 : 1)).slice(0, ctx.combat.frontage.maxAttackers).map((x) => x.id);
-      if (!attackers.length || whyCannotAttack(ctx, s, attackers, hex, side)) continue;
-      const p = previewCombat(ctx, s, attackers, hex);
-      if (p.column < 0 || p.ratio < minRatio) continue;
-      if (!best || p.ratio > best.ratio || (p.ratio === best.ratio && hex < best.hex)) best = { hex, ratio: p.ratio, attackers };
+      const all = eligibleAttackers(ctx, s, hex, side)
+        .map((id) => ({ id, v: currentValue(ctx, s.units.find((u) => u.id === id)!, 'attack'), f: s.fatigue[id] ?? 0 }));
+      const fresh = prof.maxFatigue === undefined ? all : all.filter((x) => x.f < prof.maxFatigue!);
+      // 优先用不疲劳的、攻击力大的；先试只用生力军，不够再把疲劳的也算上
+      for (const pool of fresh.length === all.length ? [all] : [fresh, all]) {
+        if (!pool.length) continue;
+        const order = [...pool].sort((a, b) => a.f - b.f || b.v - a.v || (a.id < b.id ? -1 : 1));
+        let pick = order.slice(0, cap).map((x) => x.id);
+        if (prof.economy) {
+          for (let n = 1; n <= Math.min(cap, order.length); n++) {
+            const ids = order.slice(0, n).map((x) => x.id);
+            if (!whyCannotAttack(ctx, s, ids, hex, side) && previewCombat(ctx, s, ids, hex).ratio >= minRatio) { pick = ids; break; }
+          }
+        }
+        if (!pick.length || whyCannotAttack(ctx, s, pick, hex, side)) continue;
+        const p = previewCombat(ctx, s, pick, hex);
+        if (p.column < 0 || p.ratio < minRatio) continue;
+        if (!best || p.ratio > best.ratio || (p.ratio === best.ratio && hex < best.hex)) best = { hex, ratio: p.ratio, attackers: pick };
+        break;
+      }
     }
     return best ? { type: 'Attack', attackers: best.attackers, hex: best.hex } : null;
   }

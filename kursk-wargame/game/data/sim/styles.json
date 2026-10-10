@@ -1,13 +1,62 @@
 {
  "$comment": "自动对手的几种打法（docs/14 §11）。每种打法只覆盖 bots.json 里的部分参数，用来比较「不同打法会打出多大差别」。名称和参数都是 AI 拟定的模拟设定，不是史料，⟨待校准⟩。goal：objectives 向目标推进 / enemy 向敌军推进 / hold 原地；minRatio 赔率够才进攻。",
  "DE": {
-  "猛攻": { "goal": "objectives", "goalWhenFirst": "objectives", "footAdvances": true, "minRatio": 1, "minRatioWhenFirst": 1 },
-  "稳健": { "goal": "objectives", "goalWhenFirst": "objectives", "footAdvances": true, "minRatio": 1.5, "minRatioWhenFirst": 1.5 },
-  "谨慎": { "goal": "objectives", "goalWhenFirst": "objectives", "footAdvances": false, "minRatio": 3, "minRatioWhenFirst": 3 }
+  "猛攻": {
+   "goal": "objectives",
+   "goalWhenFirst": "objectives",
+   "footAdvances": true,
+   "minRatio": 1,
+   "minRatioWhenFirst": 1
+  },
+  "稳健": {
+   "goal": "objectives",
+   "goalWhenFirst": "objectives",
+   "footAdvances": true,
+   "minRatio": 1.5,
+   "minRatioWhenFirst": 1.5,
+   "maxFatigue": 2,
+   "economy": true
+  },
+  "谨慎": {
+   "goal": "objectives",
+   "goalWhenFirst": "objectives",
+   "footAdvances": false,
+   "minRatio": 3,
+   "minRatioWhenFirst": 3
+  },
+  "集中突破": {
+   "goal": "objectives",
+   "goalWhenFirst": "objectives",
+   "footAdvances": true,
+   "minRatio": 2,
+   "minRatioWhenFirst": 2,
+   "maxFatigue": 2,
+   "economy": true
+  }
  },
  "SU": {
-  "死守": { "goal": "hold", "goalWhenFirst": "hold", "footAdvances": false, "minRatio": 3, "minRatioWhenFirst": 3 },
-  "伺机反击": { "goal": "hold", "goalWhenFirst": "enemy", "footAdvances": false, "minRatio": 3, "minRatioWhenFirst": 1.5 },
-  "积极进攻": { "goal": "enemy", "goalWhenFirst": "enemy", "footAdvances": true, "minRatio": 1.5, "minRatioWhenFirst": 1.5 }
+  "死守": {
+   "goal": "hold",
+   "goalWhenFirst": "hold",
+   "footAdvances": false,
+   "minRatio": 3,
+   "minRatioWhenFirst": 3
+  },
+  "伺机反击": {
+   "goal": "hold",
+   "goalWhenFirst": "enemy",
+   "footAdvances": false,
+   "minRatio": 3,
+   "minRatioWhenFirst": 1.5,
+   "maxFatigue": 2,
+   "economy": true
+  },
+  "积极进攻": {
+   "goal": "enemy",
+   "goalWhenFirst": "enemy",
+   "footAdvances": true,
+   "minRatio": 1.5,
+   "minRatioWhenFirst": 1.5
+  }
  }
 }

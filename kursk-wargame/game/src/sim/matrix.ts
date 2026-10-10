@@ -29,7 +29,7 @@ for (const de of names('DE')) for (const su of names('SU')) {
   const sum = (f: (x: GameResult) => number): number => mean(res.map(f));
   const tl = (side: 'DE' | 'SU') => sum((x) => x.tankLoss.filter((t) => t.side === side).reduce((a, t) => a + t.tanks, 0));
   const bands = V.bands.map((b) => `${Math.round((100 * res.filter((x) => V.bands.find((bb) => bb.min === null || x.total - (V.baseline ?? 0) >= bb.min) === b).length) / n)}%`);
-  rows.push(`| ${de} | ${su} | ${fmt(sum((x) => x.deHeld.length))} | ${Math.round(100 * held('2515'))}% | ${fmt(tl('SU'))} | ${fmt(tl('DE'))} | ${fmt(quantile(delta, 0.1))} ~ ${fmt(quantile(delta, 0.9))} | ${bands.join(' / ')} |`);
+  rows.push(`| ${de} | ${su} | ${fmt(sum((x) => x.deHeld.length))} | ${Math.round(100 * held('2515'))}% | ${fmt(tl('SU'))} | ${fmt(tl('DE'))} | ${fmt(sum((x) => x.attacks))} | ${fmt(quantile(delta, 0.1))} ~ ${fmt(quantile(delta, 0.9))} | ${bands.join(' / ')} |`);
   console.error(`… ${de} × ${su}`);
 }
 const md = `# 打法矩阵（S1，每格 ${n} 局，种子 1–${n}）
@@ -37,8 +37,8 @@ const md = `# 打法矩阵（S1，每格 ${n} 局，种子 1–${n}）
 > 由 \`npm run matrix\` 自动生成。德军、苏军各几种打法两两对打。打法参数见 data/sim/styles.json（AI 拟定的模拟设定，不是史料）。
 > **读法**：不是找"最像历史"的组合，而是看——不同打法的结果差别有多大（有差别才有玩头），历史结局是否在合理打法的范围内。
 
-| 德军打法 | 苏军打法 | 德军占目标数（共 9 个） | 德军占普罗霍罗夫卡 | 苏军装甲完全损失（辆） | 德军装甲完全损失（辆） | 得分与历史基准之差（10%~90%） | 档位分布：${V.bands.map((b) => b.label).join(' / ')} |
-|---|---|---|---|---|---|---|---|
+| 德军打法 | 苏军打法 | 德军占目标数（共 9 个） | 德军占普罗霍罗夫卡 | 苏军装甲完全损失（辆） | 德军装甲完全损失（辆） | 每局战斗次数 | 得分与历史基准之差（10%~90%） | 档位分布：${V.bands.map((b) => b.label).join(' / ')} |
+|---|---|---|---|---|---|---|---|---|
 ${rows.join('\n')}
 `;
 if (out) { writeFileSync(out, md); console.error(`已写入 ${out}`); } else console.log(md);
