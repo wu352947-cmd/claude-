@@ -1,4 +1,4 @@
-/** 人机对战：电脑用 sim/bot.ts 的自动对手，打法取自 data/sim/styles.json（AI 拟定的模拟设定，不是史料）。 */
+/** 人机对战：电脑用 sim/bot.ts 的自动对手（和玩家一样受迷雾限制），打法取自 data/sim/styles.json（AI 拟定的模拟设定，不是史料）。 */
 import type { GameContext, Side } from '../engine';
 import { Bot, BotRules } from '../sim/bot';
 import rawBots from '../../data/sim/bots.json';
@@ -14,5 +14,5 @@ export const defaultAiStyle = (side: Side): string => (side === 'DE' ? '集中�
 export function makeBot(ctx: GameContext, side: Side, style: string): Bot {
   const base = rawBots as unknown as Record<Side, object>;
   const pick = (styles[side][style] ?? styles[side][defaultAiStyle(side)]) as object;
-  return new Bot(ctx, BotRules.parse({ ...rawBots, [side]: { ...base[side], ...pick } }));
+  return new Bot(ctx, BotRules.parse({ ...rawBots, [side]: { ...base[side], ...pick } }), true);
 }

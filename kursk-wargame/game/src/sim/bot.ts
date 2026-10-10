@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import {
   type Command, type GameContext, type GameState, type Side, actingSide, childrenOf, coordGroup, distance, currentValue, eligibleAttackers, hexId, parseHexId, previewCombat,
-  reachable, sideOfUnit, whyCannotAttack, whyCannotMove, whyOverstacked, whyCannotPlan,
+  reachable, revealedEnemies, sideOfUnit, whyCannotAttack, whyCannotMove, whyOverstacked, whyCannotPlan,
 } from '../engine';
 
 const Goal = z.enum(['objectives', 'enemy', 'hold']);
@@ -23,7 +23,8 @@ export type BotRules = z.infer<typeof BotRules>;
 export class Bot {
   private key = '';
   private done = new Set<string>();
-  constructor(private ctx: GameContext, private rules: BotRules) {}
+  /** fog = true：和人类玩家一样受迷雾限制，只看得到贴近本方单位的敌军（revealedEnemies）；false = 看得到全部（平衡测试默认） */
+  constructor(private ctx: GameContext, private rules: BotRules, private fog = false) {}
 
   step(s: GameState): Command {
     const ctx = this.ctx;
@@ -51,13 +52,16 @@ export class Bot {
   }
 
   private enemyHexes(s: GameState, side: Side): string[] {
-    return [...new Set(s.units.filter((u) => sideOfUnit(this.ctx, u.id) !== side).map((u) => u.hex))].sort();
+    const seen = this.fog ? revealedEnemies(this.ctx, s, side) : null;
+    return [...new Set(s.units.filter((u) => sideOfUnit(this.ctx, u.id) !== side && (!seen || seen.has(u.id))).map((u) => u.hex))].sort();
   }
 
   private goalHex(s: GameState, side: Side, from: string, goal: z.infer<typeof Goal>): string | null {
     if (goal === 'hold') return null;
-    const cands = goal === 'enemy'
-      ? this.enemyHexes(s, side)
+    const seen = goal === 'enemy' ? this.enemyHexes(s, side) : [];
+    // 受迷雾限制时看不到任何敌军 → 先向目标推进去找
+    const cands = goal === 'enemy' && seen.length
+      ? seen
       : (this.ctx.scenario?.objectives ?? []).filter((o) => (s.owners[o.hex] ?? o.owner) !== side).map((o) => o.hex);
     const h = parseHexId(from);
     let best: string | null = null, bd = Infinity;

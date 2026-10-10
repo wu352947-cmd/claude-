@@ -99,3 +99,23 @@ describe('人机对战的电脑（网页用）', () => {
     }
   });
 });
+
+describe('电脑受迷雾限制', () => {
+  it('只看得到贴近本方单位的敌军；不受限时看得到全部', () => {
+    const s = initialStateFor(ctx, 1);
+    const all = new Bot(ctx, rules) as unknown as { enemyHexes(s: typeof s, side: 'SU'): string[] };
+    const fogged = new Bot(ctx, rules, true) as unknown as typeof all;
+    const full = all.enemyHexes(s, 'SU'), seen = fogged.enemyHexes(s, 'SU');
+    expect(seen.every((h) => full.includes(h))).toBe(true);
+    // 把苏军挪到远处：什么都看不到
+    const far = { ...s, units: s.units.map((u) => (ctx.oob.units.get(u.id)!.formation.startsWith('SU') ? { ...u, hex: '0101' } : u)) };
+    expect(fogged.enemyHexes(far, 'SU')).toEqual([]);
+    expect(all.enemyHexes(far, 'SU').length).toBeGreaterThan(0);
+  });
+  it('受迷雾限制的电脑也能把整局打完，没有非法指令', () => {
+    const bot = new Bot(ctx, rules, true);
+    let st = initialStateFor(ctx, 3);
+    for (let i = 0; i < 4000 && !st.over; i++) st = apply(ctx, st, bot.step(st)).state;
+    expect(st.over).toBe(true);
+  });
+});
