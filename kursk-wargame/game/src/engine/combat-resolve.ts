@@ -2,7 +2,6 @@
 import { rollDie } from './rng';
 import { parseResult, previewCombat, retreatPath } from './combat';
 import { sideOfUnit, whyOverstacked } from './movement';
-import { claim } from './scenario';
 import { CommandError, type GameContext, type GameEvent, type GameState, type UnitState } from './game';
 
 const unitOf = (ctx: GameContext, id: string) => ctx.oob.units.get(id)!;
@@ -77,7 +76,6 @@ export function resolveAttack(ctx: GameContext, s0: GameState, attackers: string
       // 撤退的单位移到目的格堆叠最上面，保持原来的上下顺序
       s = { ...s, units: [...s.units.filter((u) => u.hex !== hex), ...s.units.filter((u) => u.hex === hex).map((u) => ({ ...u, hex: to }))] };
       events.push({ type: 'Retreated', units: survivors, path });
-      s = claim(ctx, s, survivors[0]!, path);
     }
     if (extraLoss) {
       events.push({ type: 'RetreatLoss', units: survivors, steps: extraLoss, reason: path.length < res.r ? '无路可退' : '退入敌控制区' });
@@ -104,7 +102,7 @@ export function resolveAdvance(ctx: GameContext, s: GameState, units: string[]):
   if (over) throw new CommandError(over);
   const moving = s.units.filter((u) => units.includes(u.id)).map((u) => ({ ...u, hex: adv.hex }));
   return {
-    state: claim(ctx, { ...s, units: [...s.units.filter((u) => !units.includes(u.id)), ...moving], advance: null }, units[0]!, [adv.hex]),
+    state: { ...s, units: [...s.units.filter((u) => !units.includes(u.id)), ...moving], advance: null },
     events: [{ type: 'Advanced', units, to: adv.hex }],
   };
 }

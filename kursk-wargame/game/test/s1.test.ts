@@ -62,9 +62,9 @@ describe('想定 S1 普罗霍罗夫卡', () => {
     expect(s.units.length).toBe(oob.units.size);
   });
 
-  it('没人动时：目标格都归苏军、得分 = 0，比历史基准低 16.8 → 苏军决定性胜利；战后报告把目标格对照历史（历史上交替易手的不计）', () => {
+  it('没人动时：目标格都归苏军、德军 0 分 → 苏军决定性胜利；战后报告把目标格对照历史（历史上交替易手的不计）', () => {
     const sco = score(ctx, s0)!;
-    expect([sco.objectiveVp, sco.total, sco.delta, sco.band]).toEqual([0, 0, -16.8, '苏军决定性胜利']);
+    expect([sco.objectiveVp, sco.keyHeld, sco.outcome.label, sco.outcome.winner]).toEqual([0, false, '苏军决定性胜利', 'SU']);
     const rep = historyReport(ctx, s0)!;
     expect(rep.rows.length).toBe(sc.history!.control.length);
     expect(rep.comparable).toBe(rep.rows.filter((r) => r.history !== 'contested').length);

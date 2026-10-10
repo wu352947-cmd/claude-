@@ -45,13 +45,20 @@ export const ScenarioFile = DeploymentFile.extend({
   }).optional(),
   victory: z.object({
     $comment: z.string().optional(),
-    /** 每一步完全损失给对方的胜利点（德军得分 = 德占目标 + 苏军损失 × SU − 德军损失 × DE） */
-    lossVp: z.object({ DE: z.number().nonnegative(), SU: z.number().nonnegative() }),
-    /** 历史结果按同一公式算出的德军得分；null = 还没校准 */
-    baseline: z.number().nullable(),
-    baselineNote: z.string(),
-    /** 德军得分 − 历史基准 ≥ min 就是这一档（从高到低排列，最后一档 min 为 null） */
-    bands: z.array(z.object({ min: z.number().nullable(), label: z.string().min(1) })).min(2),
+    /** 关键目标格（必须是目标格之一） */
+    key: Hex,
+    /** 从上到下判定，第一条满足的就是结果；最后一条没有条件，作为兜底 */
+    results: z.array(z.object({
+      label: z.string().min(1),
+      winner: Side.nullable(),
+      when: z.object({
+        /** 关键目标：DE = 德军占着，notDE = 德军没占着 */
+        key: z.enum(['DE', 'notDE']).optional(),
+        /** 德军占着的目标点数下限 / 上限（含） */
+        deVpMin: z.number().optional(),
+        deVpMax: z.number().optional(),
+      }).default({}),
+    })).min(2),
   }).optional(),
 });
 export type Scenario = z.infer<typeof ScenarioFile>;
@@ -94,20 +101,26 @@ export function loadScenario(oob: Oob, grid: HexGrid, raw: unknown): Scenario {
     seen.add(o.hex);
     if (!inBounds(grid, parseHexId(o.hex))) throw new Error(`目标 ${o.name} 的格子 ${o.hex} 不在地图内`);
   }
-  if (sc.victory && sc.victory.bands.at(-1)!.min !== null) throw new Error('胜负档位最后一档的 min 应为 null');
+  if (sc.victory) {
+    if (!sc.objectives.some((o) => o.hex === sc.victory!.key)) throw new Error(`关键目标 ${sc.victory.key} 不是目标格`);
+    if (Object.keys(sc.victory.results.at(-1)!.when).length) throw new Error('胜负判定的最后一条应该没有条件（兜底）');
+  }
   return sc;
 }
 
-/** 单位经过这些格子：其中的目标格归这一方 */
-export function claim(ctx: GameContext, s: GameState, unitId: string, hexes: readonly string[]): GameState {
-  const objs = ctx.scenario?.objectives ?? [];
-  if (!objs.length) return s;
-  const side = sideOfUnit(ctx, unitId);
+/**
+ * 回合末：目标格上只有一方的部队，这一格就归这一方（只是路过、没停在上面不算；格子空了归属不变）。
+ * 返回新状态和"占领"事件。
+ */
+export function claimHeld(ctx: GameContext, s: GameState): { state: GameState; events: GameEvent[] } {
   let owners = s.owners;
-  for (const h of hexes) {
-    if (owners[h] && owners[h] !== side && objs.some((o) => o.hex === h)) owners = { ...owners, [h]: side };
+  const events: GameEvent[] = [];
+  for (const o of ctx.scenario?.objectives ?? []) {
+    const sides = new Set(s.units.filter((u) => u.hex === o.hex).map((u) => sideOfUnit(ctx, u.id)));
+    const side = sides.size === 1 ? [...sides][0]! : null;
+    if (side && owners[o.hex] !== side) { owners = { ...owners, [o.hex]: side }; events.push({ type: 'ObjectiveClaimed', hex: o.hex, side }); }
   }
-  return owners === s.owners ? s : { ...s, owners };
+  return { state: owners === s.owners ? s : { ...s, owners }, events };
 }
 
 /** 新回合开始：换主动方、放增援 */
@@ -121,7 +134,6 @@ export function startTurn(ctx: GameContext, s0: GameState): { state: GameState; 
     const hex = entryHex(ctx, s, r.hex, side);
     if (!hex) continue;
     s = { ...s, units: [...s.units, { id: r.unit, hex, steps: r.steps ?? ctx.oob.units.get(r.unit)!.steps }] };
-    s = claim(ctx, s, r.unit, [hex]);
     events.push({ type: 'Reinforced', unit: r.unit, hex });
   }
   return { state: s, events };
@@ -143,20 +155,19 @@ function entryHex(ctx: GameContext, s: GameState, hex: string, side: Side): stri
   return best;
 }
 
+export interface VictoryOutcome { label: string; winner: Side | null }
 export interface Score {
-  /** 德军占领的目标 */
   objectives: { hex: string; name: string; vp: number; owner: Side }[];
+  /** 德军占着的目标点数 */
   objectiveVp: number;
-  /** 双方装甲完全损失的步数（回合末分流后报废的；胜利点只计这个，01 §7.2） */
+  /** 关键目标现在归德军吗 */
+  keyHeld: boolean;
+  /** 双方装甲完全损失的步数（回合末分流后报废的；只作参考，不决定胜负） */
   lost: Record<Side, number>;
-  /** 其他兵种的步数损失（不计胜利点，战后报告里单列） */
+  /** 其他兵种的步数损失（参考） */
   lostOther: Record<Side, number>;
-  lossVp: number;
-  total: number;
-  /** 与历史基准之差；没有基准时为 null */
-  delta: number | null;
-  /** 胜负档位；没有基准时为 null */
-  band: string | null;
+  /** 按现在的局面算出的结果（对局没结束时是"如果现在结束"） */
+  outcome: VictoryOutcome;
 }
 
 export function score(ctx: GameContext, s: GameState): Score | null {
@@ -165,15 +176,14 @@ export function score(ctx: GameContext, s: GameState): Score | null {
   const V = sc.victory;
   const objectives = sc.objectives.map((o) => ({ hex: o.hex, name: o.name, vp: o.vp, owner: s.owners[o.hex] ?? o.owner }));
   const objectiveVp = objectives.filter((o) => o.owner === 'DE').reduce((a, o) => a + o.vp, 0);
+  const keyHeld = objectives.find((o) => o.hex === V.key)?.owner === 'DE';
   const lost: Record<Side, number> = { DE: 0, SU: 0 };
   for (const x of s.destroyed) lost[sideOfUnit(ctx, x.unit)] += x.steps;
   const lostOther: Record<Side, number> = { DE: 0, SU: 0 };
   for (const x of s.casualties) lostOther[sideOfUnit(ctx, x.unit)] += x.steps;
-  const lossVp = lost.SU * V.lossVp.SU - lost.DE * V.lossVp.DE;
-  const total = objectiveVp + lossVp;
-  const delta = V.baseline === null ? null : total - V.baseline;
-  const band = delta === null ? null : V.bands.find((b) => b.min === null || delta >= b.min)!.label;
-  return { objectives, objectiveVp, lost, lostOther, lossVp, total, delta, band };
+  const hit = V.results.find((r) => (r.when.key === undefined || (r.when.key === 'DE') === keyHeld)
+    && (r.when.deVpMin === undefined || objectiveVp >= r.when.deVpMin) && (r.when.deVpMax === undefined || objectiveVp <= r.when.deVpMax)) ?? V.results.at(-1)!;
+  return { objectives, objectiveVp, keyHeld, lost, lostOther, outcome: { label: hit.label, winner: hit.winner } };
 }
 
 export interface HistoryRow { hex: string; name: string; history: Side | 'contested'; game: Side; same: boolean; note?: string }

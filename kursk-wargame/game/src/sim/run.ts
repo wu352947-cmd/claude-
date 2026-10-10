@@ -25,7 +25,6 @@ for (let seed = 1; seed <= n; seed++) {
   results.push(playGame(ctx, (sd) => initialStateFor(ctx, sd), seed, rules, itemClass));
   if (seed % 50 === 0) console.error(`… ${seed}/${n}（${Math.round((performance.now() - t0) / 1000)} 秒）`);
 }
-const { md, verdicts, baseline } = makeReport(ctx.scenario!, results, { first: 1, botNote: process.argv[4] ? `自动对手参数在 data/sim/bots.json 基础上覆盖：${process.argv[4]}。` : `自动对手参数见 data/sim/bots.json（德军向目标推进；苏军原地防守，有主动权的回合机动单位反突击）。` });
-console.error('建议历史基准', baseline);
+const { md, verdicts } = makeReport(ctx.scenario!, results, { first: 1, botNote: process.argv[4] ? `自动对手参数在 data/sim/bots.json 基础上覆盖：${process.argv[4]}。` : `自动对手参数见 data/sim/bots.json（德军向目标推进；苏军原地防守，有主动权的回合机动单位反突击）。` });
 if (out) { writeFileSync(out, md + '\n'); console.error(`已写入 ${out}`); } else console.log(md);
 console.error(JSON.stringify(verdicts, null, 1));

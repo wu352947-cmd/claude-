@@ -20,7 +20,10 @@ export interface GameResult {
   turns: number;
   /** 德军占着的目标格 */
   deHeld: string[];
-  total: number;
+  /** 德军占着的目标点数 */
+  vp: number;
+  /** 按想定胜负条件得出的结果 */
+  outcome: string;
   /** 双方完全损失步数（装甲回合末分流后 + 其他兵种全部损失） */
   lostSteps: Record<Side, number>;
   /** 装甲完全损失折算成车辆数：[天][阵营]；党卫军军单独列 */
@@ -71,7 +74,7 @@ export function playGame(
   });
   return {
     seed, commands: n, turns: s.turn, deHeld: sco.objectives.filter((o) => o.owner === 'DE').map((o) => o.hex),
-    total: sco.total, lostSteps: sco.lost, tankLoss, pool, attacks, codes, odds,
+    vp: sco.objectiveVp, outcome: sco.outcome.label, lostSteps: sco.lost, tankLoss, pool, attacks, codes, odds,
   };
 }
 

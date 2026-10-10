@@ -11,8 +11,13 @@ const sc = ScenarioFile.parse({
   reinforcements: [{ unit: MOT, turn: 2, hex: '0506' }, { unit: T25, turn: 2, hex: '0303' }],
   objectives: [{ hex: '0507', name: '目标甲', vp: 3, owner: 'SU' }, { hex: '0505', name: '目标乙', vp: 2, owner: 'DE' }],
   victory: {
-    lossVp: { DE: 1, SU: 0.5 }, baseline: 2, baselineNote: '测试',
-    bands: [{ min: 3, label: '德军胜利' }, { min: -2, label: '历史结果' }, { min: null, label: '苏军胜利' }],
+    key: '0507',
+    results: [
+      { label: '德军决定性胜利', winner: 'DE', when: { key: 'DE', deVpMin: 5 } },
+      { label: '德军胜利', winner: 'DE', when: { deVpMin: 3 } },
+      { label: '苏军胜利', winner: 'SU', when: { key: 'notDE', deVpMax: 2 } },
+      { label: '平局', winner: null, when: {} },
+    ],
   },
 });
 const ctx: GameContext = { ...world(), scenario: sc };
@@ -48,16 +53,31 @@ describe('想定', () => {
     expect(() => apply(ctx, r.state, { type: 'EndPhase' })).toThrow(/已经结束/);
   });
 
-  it('目标格：开局归想定规定的一方，单位进入或经过就归这一方；得分 = 德占目标 + 损失交换，再与历史基准比', () => {
+  it('目标格：开局归想定规定的一方；只是路过不算，回合末停在上面（且没有敌军）才算占领，并有占领事件', () => {
     expect(s0.owners).toEqual({ '0507': 'SU', '0505': 'DE' });
-    const moved = apply(ctx, s0, { type: 'Move', unit: TANK, path: ['0506', '0507', '0508'] }).state;
-    expect(moved.owners['0507']).toBe('DE');
+    const passed = ends(apply(ctx, s0, { type: 'Move', unit: TANK, path: ['0506', '0507', '0508'] }).state, 11);
+    expect(passed.owners['0507']).toBe('SU'); // 经过了，但停在 0508
+    const onIt = apply(ctx, s0, { type: 'Move', unit: TANK, path: ['0506', '0507'] }).state;
+    expect(onIt.owners['0507']).toBe('SU'); // 回合没结束，还不算
+    let s = onIt;
+    const claimed: string[] = [];
+    for (let i = 0; i < 11; i++) { const r = apply(ctx, s, { type: 'EndPhase' }); s = r.state; for (const e of r.events) if (e.type === 'ObjectiveClaimed') claimed.push(`${e.hex}${e.side}`); }
+    expect(s.owners['0507']).toBe('DE');
+    expect(claimed).toEqual(['0507DE']);
+  });
+
+  it('胜负：按目标点数与关键目标判定，从上到下第一条满足的；装甲损失只作参考，不影响结果', () => {
     const sc0 = score(ctx, s0)!;
-    expect([sc0.objectiveVp, sc0.total, sc0.delta, sc0.band]).toEqual([2, 2, 0, '历史结果']);
-    const sc1 = score(ctx, { ...moved, destroyed: [{ unit: T25, formation: 'x', steps: 2, turn: 1 }], casualties: [{ unit: INF, steps: 5, turn: 1 }] })!;
-    expect([sc1.objectiveVp, sc1.lost, sc1.lostOther, sc1.total, sc1.band]).toEqual([5, { DE: 0, SU: 2 }, { DE: 0, SU: 5 }, 6, '德军胜利']);
-    const sc2 = score(ctx, { ...s0, destroyed: [{ unit: TANK, formation: 'x', steps: 3, turn: 1 }] })!;
-    expect([sc2.total, sc2.band]).toEqual([-1, '苏军胜利']);
+    expect([sc0.objectiveVp, sc0.keyHeld, sc0.outcome]).toEqual([2, false, { label: '苏军胜利', winner: 'SU' }]);
+    const took = { ...s0, owners: { '0507': 'DE', '0505': 'DE' } as const };
+    const sc1 = score(ctx, { ...took, destroyed: [{ unit: T25, formation: 'x', steps: 2, turn: 1 }], casualties: [{ unit: INF, steps: 5, turn: 1 }] })!;
+    expect([sc1.objectiveVp, sc1.keyHeld, sc1.lost, sc1.lostOther, sc1.outcome.label]).toEqual([5, true, { DE: 0, SU: 2 }, { DE: 0, SU: 5 }, '德军决定性胜利']);
+    expect(score(ctx, { ...took, destroyed: [{ unit: TANK, formation: 'x', steps: 9, turn: 1 }] })!.outcome.label).toBe('德军决定性胜利');
+    expect(score(ctx, { ...s0, owners: { '0507': 'SU', '0505': 'DE' } })!.outcome.label).toBe('苏军胜利');
+    const none = { ...s0, owners: { '0507': 'SU', '0505': 'SU' } as const };
+    expect(score(ctx, none)!.outcome.label).toBe('苏军胜利');
+    expect(() => loadScenario(ctx.oob, ctx.map.grid, { ...sc, victory: { ...sc.victory!, key: '0101' } })).toThrow(/不是目标格/);
+    expect(() => loadScenario(ctx.oob, ctx.map.grid, { ...sc, victory: { ...sc.victory!, results: [sc.victory!.results[0]!, sc.victory!.results[1]!] } })).toThrow(/兜底/);
   });
 
   it('非装甲单位的步数损失直接记为完全损失', () => {

@@ -7,6 +7,7 @@ import { rollDie } from './rng';
 import { sideOfUnit, zocOf } from './movement';
 import { turnInfo } from './calendar';
 import type { GameContext, GameEvent, GameState } from './game';
+import { claimHeld } from './scenario';
 import type { Side } from './units';
 
 export type Control = 'own' | 'contested' | 'enemy';
@@ -77,7 +78,9 @@ export function endOfTurn(ctx: GameContext, s0: GameState): { state: GameState; 
     const stayed = !s0.movedThisTurn.includes(u.id) && (!prev || prev.hex === u.hex);
     if (stayed) entrench[u.id] = { hex: u.hex, level: Math.min(E.max, (prev?.level ?? 0) + 1) };
   }
-  return { state: { ...s0, rng, units, repair, destroyed, fatigue, entrench, damaged: [] }, events };
+  // 5. 目标格：回合末停在上面（且只有一方）的才算占领
+  const held = claimHeld(ctx, { ...s0, rng, units, repair, destroyed, fatigue, entrench, damaged: [] });
+  return { state: held.state, events: [...events, ...held.events] };
 }
 
 /** 热座迷雾：viewer 能看清番号与实力的敌军单位（距本方任一单位不超过 revealRange） */

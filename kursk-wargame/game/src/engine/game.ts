@@ -15,7 +15,7 @@ import { endOfTurn } from './turn-end';
 import { type Axis, AxisKind, nextAxisId, whyCannotPlan } from './plan';
 import { planGroupMove } from './group-move';
 import { parentOf, whyCannotAssign } from './command-chain';
-import { type Scenario, claim, startTurn } from './scenario';
+import { type Scenario, startTurn } from './scenario';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
 
@@ -130,6 +130,7 @@ export type GameEvent =
   | { type: 'Reinforced'; unit: string; hex: string }
   | { type: 'Planned'; side: Side; id: string; kind: AxisKind }
   | { type: 'Unplanned'; side: Side; id: string }
+  | { type: 'ObjectiveClaimed'; hex: string; side: Side }
   | { type: 'Assigned'; formation: string; from: string | null; to: string | null }
   | { type: 'GameOver'; turn: number };
 
@@ -211,7 +212,7 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
       // 到达后放在目的格堆叠的最上面
       const units = [...s.units.slice(0, i), ...s.units.slice(i + 1), { ...u, hex: cmd.path.at(-1)! }];
       return {
-        state: claim(ctx, { ...s, units, moved: [...s.moved, u.id], movedThisTurn: [...s.movedThisTurn, u.id] }, u.id, cmd.path),
+        state: { ...s, units, moved: [...s.moved, u.id], movedThisTurn: [...s.movedThisTurn, u.id] },
         events: [{ type: 'UnitMoved', unit: u.id, from: u.hex, path: cmd.path, cost: r.cost }],
       };
     }

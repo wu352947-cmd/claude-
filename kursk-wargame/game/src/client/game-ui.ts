@@ -65,6 +65,7 @@ export function createGameUi(
       case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
       case 'Planned': return fog && fog.viewer !== e.side ? null : `作战计划：${AXIS_NAMES[e.kind]}轴线 ${e.id}`;
       case 'Unplanned': return fog && fog.viewer !== e.side ? null : `撤销作战计划 ${e.id}`;
+      case 'ObjectiveClaimed': return `回合末：${SIDE_NAMES[e.side]}占领了${ctx.scenario?.objectives.find((o) => o.hex === e.hex)?.name ?? e.hex}`;
       case 'Assigned': {
         const nm = (f: string | null): string => (f ? ctx.oob.formations.get(f)?.names.zh ?? f : '直属');
         return `调整隶属：${nm(e.formation)} → ${nm(e.to)}`;
@@ -87,7 +88,8 @@ export function createGameUi(
     $('g-report').hidden = !rep;
     if (rep) {
       const who = (x: Side | 'contested'): string => (x === 'contested' ? '史料矛盾/易手' : SIDE_NAMES[x]);
-      $('g-report').innerHTML = `<b>战后报告：与历史对比</b><small>历史结局：${esc(rep.date)} ${esc(rep.time)}</small>
+      const oc = score(ctx, s)?.outcome;
+      $('g-report').innerHTML = `${oc ? `<div class="g-result"><b>${esc(oc.label)}</b></div>` : ''}<b>战后报告：与历史对比（仅供参考，不决定胜负）</b><small>历史结局：${esc(rep.date)} ${esc(rep.time)}</small>
         <table>${rep.rows.map((r) => `<tr class="${r.history === 'contested' ? 'ct' : r.same ? 'ok' : 'no'}"><td>${esc(r.name)}</td><td>历史：${who(r.history)}</td><td>本局：${SIDE_NAMES[r.game]}</td></tr>`).join('')}</table>
         <div>可比较的 ${rep.comparable} 处目标中，${rep.agree} 处与历史一致。</div>
         <div class="muted">装甲完全损失（步）：德 ${rep.lost.DE} · 苏 ${rep.lost.SU}；其他兵种损失（步）：德 ${rep.lostOther.DE} · 苏 ${rep.lostOther.SU}（游戏的"步"与历史坦克数不能直接相比）</div>
@@ -96,8 +98,9 @@ export function createGameUi(
     const sc = score(ctx, s);
     $('g-score').hidden = !sc;
     if (sc) {
-      $('g-score').innerHTML = `德军得分 <b>${sc.total}</b>（目标 ${sc.objectiveVp}，损失交换 ${sc.lossVp > 0 ? '+' : ''}${sc.lossVp}）`
-        + (sc.delta === null ? '<small>历史基准待校准</small>' : `<small>现在：${esc(sc.band!)}${showSources() ? `（历史基准 ${sc.total - sc.delta}）` : ''}</small>`);
+      const key = sc.objectives.find((o) => o.hex === ctx.scenario!.victory!.key)!;
+      $('g-score').innerHTML = `德军占目标 <b>${sc.objectiveVp}</b> 分 · ${esc(key.name)}：${SIDE_NAMES[key.owner]}占着`
+        + `<small>${s.over ? '结果' : '如果现在结束'}：<b>${esc(sc.outcome.label)}</b></small>`;
     }
     $<HTMLButtonElement>('g-undo').disabled = !canUndo(history);
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);

@@ -31,7 +31,7 @@ describe('无界面模拟', () => {
     const r = play(1);
     expect(r.turns).toBe(9);
     expect(r.attacks).toBeGreaterThan(0);
-    expect(Number.isFinite(r.total)).toBe(true);
+    expect(Number.isFinite(r.vp)).toBe(true);
     expect(r.commands).toBeLessThan(4000);
   });
 

@@ -15,7 +15,7 @@ const row = (name: string, xs: number[]): string =>
   `| ${name} | ${fmt(mean(xs))} | ${[0.1, 0.25, 0.5, 0.75, 0.9].map((q) => fmt(quantile(xs, q))).join(' | ')} |`;
 const VERDICT = { central: '**通过**（历史值落在 25%–75% 分位内）', wide: '可接受（落在 10%–90% 之间，需书面解释）', outside: '**不通过**（落在 10%–90% 之外）' };
 
-export function makeReport(sc: Scenario, results: GameResult[], opts: { first: number; botNote: string }): { md: string; verdicts: Record<string, string>; baseline: number } {
+export function makeReport(sc: Scenario, results: GameResult[], opts: { first: number; botNote: string }): { md: string; verdicts: Record<string, string> } {
   const n = results.length;
   const verdicts: Record<string, string> = {};
   const L: string[] = [];
@@ -37,7 +37,7 @@ export function makeReport(sc: Scenario, results: GameResult[], opts: { first: n
 
   L.push('## 1. 对局概况', '', '| 指标 | 平均 | 10% | 25% | 50% | 75% | 90% |', '|---|---|---|---|---|---|---|',
     row('每局指令数', results.map((r) => r.commands)), row('每局战斗次数', results.map((r) => r.attacks)),
-    row('德军占着的目标点数', objVp), row('德军得分（目标 + 装甲损失交换）', results.map((r) => r.total)), '');
+    row('德军占着的目标点数', objVp), row('德军占着的目标点数（共 20 分）', results.map((r) => r.vp)), '');
 
   L.push('## 2. 装甲完全损失（折算成车辆数）', '',
     '游戏里装甲单位每损失 1 步，按该单位战斗序列里的车辆总数 ÷ 满编步数折算成车辆数。这是粗略折算，只用来跟历史数字比数量级。', '',
@@ -72,24 +72,6 @@ export function makeReport(sc: Scenario, results: GameResult[], opts: { first: n
     }),
     '', '历史参照：苏军 7 月 12 日被击中的 340 辆里约 192 辆完全损失（约 56%）；德军"失去战斗力"154 辆里完全损失只有 5–10 辆（约 3%–6%）。这个比例由战场控制决定（德军守住战场，所以回收得多），不是一个固定参数。', '');
 
-  // 历史基准（同一个得分公式）：历史上德军占着的目标点数 + 历史装甲损失折成步数后的交换
-  const tps = (side: 'DE' | 'SU'): number => {
-    const all = results.flatMap((r) => r.tankLoss.filter((x) => x.side === side));
-    return sum(all.map((x) => x.tanks)) / Math.max(1, sum(all.map((x) => x.steps)));
-  };
-  const histObj = ctl.filter((c) => c.heldBy === 'DE').reduce((a, c) => a + (objs.find((o) => o.hex === c.hex)?.vp ?? 0), 0);
-  const suMid = (HISTORY.suArmorDay2.a + HISTORY.suArmorDay2.b) / 2, deMid = (HISTORY.deSsArmor.a + HISTORY.deSsArmor.b) / 2;
-  const suSteps = suMid / tps('SU'), deSteps = deMid / tps('DE');
-  const V = sc.victory!;
-  const baseline = Math.round((histObj + suSteps * V.lossVp.SU - deSteps * V.lossVp.DE) * 10) / 10;
-  L.push('## 7. 历史基准建议', '',
-    '得分公式（01 §7.2）：德军得分 = 德军占着的目标点数 + 苏军装甲完全损失步数 × 每步分 − 德军装甲完全损失步数 × 每步分。把历史结果代进同一个公式：', '',
-    '| 项 | 数值 | 依据 |', '|---|---|---|',
-    `| 历史上德军占着的目标点数 | ${histObj} | ${ctl.filter((c) => c.heldBy === 'DE').map((c) => c.name).join('、')}（13 日终，史料矛盾的格子不计） |`,
-    `| 苏军装甲完全损失（步） | ${fmt(suSteps)} | 取历史区间中值 ${fmt(suMid)} 辆 ÷ 模拟中苏军每步平均折合 ${fmt(tps('SU'))} 辆。**只含 12 日**，11、13 日的数字没有查到，所以偏低 |`,
-    `| 德军装甲完全损失（步） | ${fmt(deSteps)} | 取历史区间中值 ${fmt(deMid)} 辆 ÷ 模拟中德军每步平均折合 ${fmt(tps('DE'))} 辆。只含党卫军军 |`,
-    `| **历史基准（建议）** | **${baseline}** | 目标 ${histObj} + ${fmt(suSteps)} × ${V.lossVp.SU} − ${fmt(deSteps)} × ${V.lossVp.DE} |`, '');
-
   const attacks = sum(results.map((r) => r.attacks));
   const odds: Record<string, number> = {}, codes: Record<string, number> = {};
   for (const r of results) { for (const [k, v] of Object.entries(r.odds)) odds[k] = (odds[k] ?? 0) + v; for (const [k, v] of Object.entries(r.codes)) codes[k] = (codes[k] ?? 0) + v; }
@@ -102,5 +84,5 @@ export function makeReport(sc: Scenario, results: GameResult[], opts: { first: n
   L.push('## 6. 分布图', '', '**苏军 7 月 12 日装甲完全损失（辆）**', '', '```', histogram(suD2), '```', '',
     '**党卫军军装甲完全损失 11–13 日（辆）**', '', '```', histogram(deSS), '```', '',
     '**德军占着的目标点数**', '', '```', histogram(objVp, 8), '```', '');
-  return { md: L.join('\n'), verdicts, baseline };
+  return { md: L.join('\n'), verdicts };
 }
