@@ -27,6 +27,7 @@ export const CombatRules = z.object({
   defenseOnlyTypes: z.array(z.string()),
   qualityDrm: z.object({ perLevel: z.number().int(), max: z.number().int().nonnegative() }),
   retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
+  fortification: z.object({ $comment: z.string().optional(), shiftPerLevel: z.number().int().nonnegative() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
   combatPhases: z.array(z.string()),
@@ -134,6 +135,10 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
   }
   const typeOf = (u: UnitState): string => unitOf(ctx, u.id).type;
   const armorAtk = atk.filter((u) => C.armor.armorTypes.includes(typeOf(u)) && ['medium', 'heavy'].includes(unitOf(ctx, u.id).derived?.armorClass ?? ''));
+  const fort = ctx.scenario?.fortifications.find((f) => f.hex === hex && f.side === enemy);
+  if (fort && C.fortification.shiftPerLevel) {
+    shifts.push({ value: -fort.level * C.fortification.shiftPerLevel, label: `守方工事：${fort.name}（${fort.level} 级）`, source: `${RULE} fortification（02 §5；位置：${fort.confidence === 'sourced' ? '有出处' : '推定'}）` });
+  }
   if (armorAtk.length && C.armor.openTerrain.includes(terrain) && !def.some((u) => C.armor.antiTankTypes.includes(typeOf(u)))) {
     shifts.push({ value: C.armor.bonus, label: '装甲效应：开阔地、守方没有反坦克力量', source: `${RULE} armor（02 §4.2）` });
   }

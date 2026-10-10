@@ -30,6 +30,11 @@ export const ScenarioFile = DeploymentFile.extend({
   })).default([]),
   /** 胜利目标：开局归 owner；之后哪一方的单位最后进入（经过）就归哪一方 */
   objectives: z.array(z.object({ hex: Hex, name: z.string().min(1), vp: z.number().int().positive(), owner: Side, note: z.string().optional() })).default([]),
+  /** 工事：该格守方（side）获得每级一个列偏移（combat.json fortification）。位置与等级须有出处，没有出处的标 placeholder */
+  fortifications: z.array(z.object({
+    hex: Hex, side: Side, level: z.number().int().min(1).max(3), name: z.string().min(1),
+    confidence: z.enum(['sourced', 'estimated', 'placeholder']), basis: z.string().min(1), provenance: z.array(Prov).default([]),
+  })).default([]),
   /** 历史结局（战后报告用）：某个目标格在历史上最后归谁；contested = 史料互相矛盾或交替易手 */
   history: z.object({
     date: z.string(),
@@ -75,6 +80,13 @@ export function loadScenario(oob: Oob, grid: HexGrid, raw: unknown): Scenario {
   for (const o of sc.objectives) {
     const at = sideAt.get(o.hex);
     if (at && at !== o.owner) throw new Error(`目标 ${o.name}（${o.hex}）开局被${at}部队占着，归属却写成 ${o.owner}`);
+  }
+  const fseen = new Set<string>();
+  for (const f of sc.fortifications) {
+    if (!inBounds(grid, parseHexId(f.hex))) throw new Error(`工事 ${f.name} 的格子 ${f.hex} 不在地图内`);
+    if (fseen.has(`${f.hex}${f.side}`)) throw new Error(`工事格 ${f.hex} 重复`);
+    fseen.add(`${f.hex}${f.side}`);
+    if (f.confidence === 'sourced' && !f.provenance.length) throw new Error(`工事 ${f.name} 标为有出处却没有 provenance`);
   }
   const seen = new Set<string>();
   for (const o of sc.objectives) {
