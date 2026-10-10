@@ -27,8 +27,8 @@ describe('想定 S1 普罗霍罗夫卡', () => {
     const used = new Set([...sc.placements.map((p) => p.unit), ...sc.reinforcements.map((r) => r.unit)]);
     expect(used.size).toBe(sc.placements.length + sc.reinforcements.length);
     const omitted = [...oob.units.keys()].filter((id) => !used.has(id));
-    expect(omitted.length).toBe(3);
-    expect(sc.omitted.length).toBe(3);
+    expect(omitted.length).toBe(0);
+    expect(sc.omitted.length).toBe(0); // 全部单位都已放入（位置资料缺的按设计取值推定）
     expect(omitted.filter((id) => id.startsWith('DE.III.7PD')).length).toBe(0); // 第 7 装甲师已按设计取值放入（推定）
   });
 
@@ -59,7 +59,7 @@ describe('想定 S1 普罗霍罗夫卡', () => {
     expect(s.over).toBe(true);
     expect(s.turn).toBe(9);
     expect(arrived).toEqual([3, 5]);
-    expect(s.units.length).toBe(oob.units.size - 3);
+    expect(s.units.length).toBe(oob.units.size);
   });
 
   it('没人动时：目标格都归苏军、得分 = 0，比历史基准低 16.8 → 苏军决定性胜利；战后报告把目标格对照历史（历史上交替易手的不计）', () => {
