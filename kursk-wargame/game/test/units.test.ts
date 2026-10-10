@@ -203,3 +203,17 @@ describe('数值换算公式', () => {
     expect(u.ratings).toEqual({ attack: d.attack, defense: d.defense, movement: d.movement });
   });
 });
+
+describe('兵力密度', () => {
+  const strength = [{ item: 'personnel_total', count: 9000, basis: '测试', date: '1943-07-10', source: 'SRC-0216', grade: 'B' as const }];
+  it('徒步师的攻防乘 density.division，步数仍按未打折的兵力算；非徒步或非师不受影响', () => {
+    const k = (params.density.division as number);
+    expect(k).toBeLessThan(1);
+    const full = deriveRatings({ ...params, density: {} }, 'infantry', 'division', strength);
+    const dense = deriveRatings(params, 'infantry', 'division', strength);
+    expect(dense.attack).toBe(Math.max(1, Math.round(full.lines.reduce((a, l) => a + l.attack, 0) * k)));
+    expect(dense.defense).toBe(Math.max(1, Math.round(full.lines.reduce((a, l) => a + l.defense, 0) * k)));
+    expect(dense.steps).toBe(full.steps);
+    expect(deriveRatings(params, 'infantry', 'regiment', strength).attack).toBe(deriveRatings({ ...params, density: {} }, 'infantry', 'regiment', strength).attack);
+  });
+});

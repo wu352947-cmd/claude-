@@ -27,6 +27,8 @@ export const RatingsParams = z.object({
   mobility: z.record(z.string(), Mobility),
   movement: z.record(z.string(), z.number()),
   /** 只有上级（师）数字时，按单位类型分到本单位的份额（设计参数） */
+  /** 兵力密度（设计参数）：徒步单位的攻防按规模打折。一个师要守 3–4 个格子，把全师数字堆在一格会让这一格过硬 */
+  density: z.record(z.string(), z.union([z.string(), z.number().positive().max(1)])).default({}),
   shares: z.record(z.string(), z.union([z.string(), z.object({ name: z.string(), fraction: z.number().positive().max(1) })])).default({}),
 }).superRefine((p, ctx) => {
   for (const [k, it] of Object.entries(p.items)) {
@@ -105,12 +107,13 @@ export function deriveRatings(
   const sum = (f: 'attack' | 'defense' | 'support'): number => lines.reduce((a, l) => a + l[f], 0);
   const isArtillery = type === 'artillery';
   // 炮兵：算子"攻击"位置印炮火支援值，"防御"印自身近战防御
-  const attack = Math.max(1, Math.round(isArtillery ? sum('support') : sum('attack')));
-  const defense = Math.max(1, Math.round(isArtillery ? p.artilleryDefense : sum('defense')));
+  const mob = p.mobility[type] ?? 'foot';
+  const dens = mob === 'foot' && !isArtillery ? (typeof p.density[size] === 'number' ? p.density[size] : 1) : 1;
+  const attack = Math.max(1, Math.round(isArtillery ? sum('support') : sum('attack') * dens));
+  const defense = Math.max(1, Math.round(isArtillery ? p.artilleryDefense : sum('defense') * dens));
   const [lo, hi] = p.steps[size] ?? [1, 4];
   const stepBase = isArtillery ? sum('support') * 2 : sum('defense');
   const steps = Math.min(hi, Math.max(lo, Math.round(stepBase / p.pointsPerStep)));
-  const mob = p.mobility[type] ?? 'foot';
   const top = (Object.entries(armorWeight) as [Derived['armorClass'], number][]).sort((a, b) => b[1] - a[1])[0]!;
   return {
     attack, defense, steps,
