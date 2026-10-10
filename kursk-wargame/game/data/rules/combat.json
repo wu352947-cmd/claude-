@@ -77,6 +77,11 @@
   "corridorRadius": 1,
   "maxAxes": 5
  },
+ "pin": {
+  "$comment": "牵制义务（docs/16 第 4 轮）：进攻单位旁边的敌军格，必须在同一份作战分配里也被进攻。scope flank = 只管同时贴着进攻单位和目标格的两个侧翼格；all = 进攻单位旁边所有敌军格（在营团级尺度上太严，电脑德军几乎打不动）。enabled = false 时关闭。",
+  "enabled": true,
+  "scope": "flank"
+ },
  "supply": {
   "$comment": "补给线（docs/16）：断补的单位进攻降一列，被进攻时对方升一列；混乱的单位断补时不能恢复。游戏设计参数，待试玩校准。",
   "attackShift": -1,

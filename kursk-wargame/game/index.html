@@ -156,6 +156,13 @@
       #info .combat .final { margin: 6px 0 2px; }
       #info .combat .bad { color: #ff8a80; }
       #info .combat .small { font-size: 11px; margin-top: 6px; }
+      #game .g-assault { margin: 6px 0; padding: 6px 8px; border: 1px solid #6b6650; border-radius: 6px; font-size: 12.5px; line-height: 1.5; }
+      #game .g-assault .as-row { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding: 2px 0; }
+      #game .g-assault .as-row small { color: var(--muted); display: block; }
+      #game .g-assault button { font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #6b6650; background: transparent; color: inherit; cursor: pointer; }
+      #game .g-assault button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      #game .g-assault button:disabled { opacity: .45; cursor: default; }
+      #game .g-assault .bad { color: #ff8a80; }
       #info .combat button.primary { margin-top: 6px; background: var(--accent); border: 1px solid var(--accent); color: #fff; border-radius: 6px; padding: 5px 14px; font-size: 14px; cursor: pointer; }
       #info .move-note { margin-top: 6px; font-size: 12.5px; line-height: 1.5; }
       .c-reach { color: #6fb0f0; } .c-zoc { color: #f0a040; }
@@ -243,6 +250,7 @@
       <div class="g-ph" id="g-phase"></div>
       <div class="g-score" id="g-score" hidden></div>
       <div class="g-report" id="g-report" hidden></div>
+      <div class="g-assault" id="g-assault" hidden></div>
       <div class="row">
         <button class="primary" id="g-end">结束阶段</button>
         <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>

@@ -1,6 +1,6 @@
 /** 信息面板里的"进攻这一格"与"推进"：选进攻单位 → 赔率与每条修正的出处 → 各结果概率 → 开战。 */
 import {
-  type GameContext, type GameState, actingSide, eligibleAttackers, parseResult, previewCombat, sideOfUnit, whyCannotAttack,
+  type GameContext, type GameState, ODDS_LOW, actingSide, eligibleAttackers, parseResult, pinRequired, previewCombat, sideOfUnit, whyCannotAttack,
 } from '../engine';
 
 const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
@@ -17,11 +17,12 @@ export function resultText(code: string): string {
  * @param chosen 玩家勾选的进攻单位（null = 默认全选）
  * 返回 HTML；按钮 id：atk-go（开战）、复选框 class atk-pick（data-unit）
  */
-export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, chosen: Set<string> | null): string {
+export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, chosen: Set<string> | null, inDraft: string[] | null = null): string {
   const side = actingSide(ctx, s);
   const defenders = s.units.filter((u) => u.hex === hex);
   if (!side || !defenders.length || sideOfUnit(ctx, defenders[0]!.id) === side) return '';
   if (!ctx.combat.combatPhases.includes(ctx.sequence.phases[s.phase]!.id)) return '';
+  if (s.pending.length) return `<div class="combat"><div class="units-head">进攻这一格</div><div class="muted">已经宣布了作战分配：${s.pending.some((p) => p.hex === hex) ? '这一格的进攻在左下角面板里结算' : '只能结算分配里的进攻'}。</div></div>`;
   const name = (id: string): string => esc(ctx.oob.units.get(id)!.names.zh);
   const eligible = eligibleAttackers(ctx, s, hex, side);
   const head = '<div class="units-head">进攻这一格</div>';
@@ -29,8 +30,9 @@ export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, c
   const picked = eligible.filter((id) => !chosen || chosen.has(id));
   const boxes = eligible.map((id) => `<label class="atk-row"><input type="checkbox" class="atk-pick" data-unit="${esc(id)}"${picked.includes(id) ? ' checked' : ''}> ${name(id)}</label>`).join('');
   const why = whyCannotAttack(ctx, s, picked, hex, side);
-  if (why) return `<div class="combat">${head}${boxes}<div class="muted">${esc(why)}</div></div>`;
+  if (why && !why.startsWith(ODDS_LOW)) return `<div class="combat">${head}${boxes}<div class="muted">${esc(why)}</div></div>`;
   const p = previewCombat(ctx, s, picked, hex);
+  const pin = pinRequired(ctx, s, picked, hex);
   const C = ctx.combat;
   const vals = (xs: { id: string; value: number }[]): string => xs.map((x) => `${name(x.id)} ${x.value}`).join('、');
   const mods = (ms: typeof p.shifts): string => ms.map((m) => `<li><b>${sign(m.value)}</b> ${esc(m.label)}<small>${esc(m.source)}</small></li>`).join('');
@@ -47,7 +49,9 @@ export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, c
     ${p.drms.length ? `<div class="sub">骰子修正</div><ul class="mods">${mods(p.drms)}</ul>` : ''}
     ${below ? '' : `<div class="final">最终：<b>${C.columns[p.column]!.name}</b> 列，掷 2d6${p.drm ? `（${sign(p.drm)}）` : ''}</div>
     <ul class="mods outcomes">${outcomes}</ul>
-    <button class="primary" id="atk-go">开战（掷骰）</button>`}
+    ${pin.length ? `<div class="bad small">牵制义务：这些单位还贴着 ${pin.map(esc).join('、')} 的敌军，这些格子也必须被进攻——点那些格子，选好单位，都“加入分配”后一起宣布。</div>` : ''}
+    ${inDraft ? '<div class="muted small">已在分配草稿里（再点“加入分配”会更新）</div>' : ''}
+    <button class="primary" id="atk-go"${pin.length ? ' disabled' : ''}>开战（掷骰）</button> <button id="atk-add">加入分配</button>`}
     <div class="muted small">规则与参数：docs/10-战斗.md、data/rules/combat.json（草案）</div></div>`;
 }
 

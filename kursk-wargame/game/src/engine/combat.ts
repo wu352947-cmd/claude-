@@ -17,6 +17,17 @@ import type { Side } from './units';
 const Result = z.string().regex(/^(A\d)?(D\d)?(R\d)?$/);
 const withComment = <T extends z.ZodTypeAny>(v: T) => z.record(z.string(), z.union([z.string(), v]));
 
+/** whyCannotAttack 里"赔率太低"这条原因的开头（界面据此仍然显示赔率明细） */
+export const ODDS_LOW = '赔率';
+
+export const PinRules = z.object({
+  $comment: z.string().optional(),
+  enabled: z.boolean(),
+  /** flank = 只要求同时贴着进攻单位和目标格的敌军格（侧翼）也被进攻；all = 进攻单位旁边所有敌军格 */
+  scope: z.enum(['flank', 'all']),
+});
+export type PinRules = z.infer<typeof PinRules>;
+
 export const CombatRules = z.object({
   status: z.enum(['draft', 'approved']),
   dice: z.literal('2d6'),
@@ -35,6 +46,7 @@ export const CombatRules = z.object({
   plan: PlanRules,
   disorganize: DisorganizeRules,
   supply: SupplyRules,
+  pin: PinRules,
   coordination: z.object({ $comment: z.string().optional(), crossGroupShift: z.number().int() }),
   frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
@@ -113,6 +125,9 @@ export function whyCannotAttack(ctx: GameContext, s: GameState, attackers: reado
   for (const a of attackers) if (!ok.has(a)) return `${unitOf(ctx, a)?.names.zh ?? a} 不能参加这次进攻（不相邻、不能进攻或已进攻过）`;
   if (new Set(attackers).size !== attackers.length) return '进攻单位重复';
   if (attackers.length > ctx.combat.frontage.maxAttackers) return `正面限制：一次进攻最多 ${ctx.combat.frontage.maxAttackers} 个单位，现在选了 ${attackers.length} 个`;
+  // 赔率低于最左一列不能进攻（作战分配里已宣布的进攻，战场变化后也可能掉到这条线以下）
+  const p = previewCombat(ctx, s, attackers, hex);
+  if (p.column < 0) return `${ODDS_LOW} ${p.attack}:${p.defense} 低于 ${ctx.combat.columns[0]!.name}，不能进攻`;
   return null;
 }
 

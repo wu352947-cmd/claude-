@@ -6,7 +6,7 @@
 import { z } from 'zod';
 import {
   type Command, type GameContext, type GameState, type Side, actingSide, childrenOf, coordGroup, distance, currentValue, eligibleAttackers, hexId, parseHexId, previewCombat,
-  reachable, revealedEnemies, sideOfUnit, whyCannotAttack, whyCannotMove, whyOverstacked, whyCannotPlan,
+  reachable, revealedEnemies, sideOfUnit, whyCannotAttack, whyCannotMove, whyOverstacked, whyCannotPlan, assaultMissing, pinRequired, whyCannotAssault,
 } from '../engine';
 
 const Goal = z.enum(['objectives', 'enemy', 'hold']);
@@ -39,7 +39,7 @@ export class Bot {
     if (s.advance) {
       const pick: string[] = [];
       for (const id of s.advance.units) if (pick.length < ctx.combat.advanceMax && !whyOverstacked(ctx, s, s.advance.hex, [...pick, id])) pick.push(id);
-      return pick.length ? { type: 'Advance', units: pick } : { type: 'EndPhase' };
+      if (pick.length) return { type: 'Advance', units: pick };
     }
     if (ctx.movement.movePhases.includes(phaseId)) {
       const goal = first ? profile.goalWhenFirst : profile.goal;
@@ -132,44 +132,77 @@ export class Bot {
     return null;
   }
 
-  private attack(s: GameState, side: Side, minRatio: number): Command | null {
+  /**
+   * 一格敌军：用哪些单位、什么赔率进攻（达不到 minRatio 返回 null）。used = 本份分配里已经用掉的单位；
+   * avoidPin = 只用旁边没有别的敌军格的单位（不引来牵制义务）。
+   */
+  private evalHex(s: GameState, side: Side, hex: string, minRatio: number, used: ReadonlySet<string>, avoidPin: boolean): { hex: string; ratio: number; attackers: string[] } | null {
     const ctx = this.ctx;
     const prof = this.rules[side];
     const cap = ctx.combat.frontage.maxAttackers;
-    let best: { hex: string; ratio: number; attackers: string[] } | null = null;
-    for (const hex of this.enemyHexes(s, side)) {
-      if (s.attackedHexes.includes(hex)) continue;
-      const all = eligibleAttackers(ctx, s, hex, side)
-        .map((id) => ({ id, v: currentValue(ctx, s.units.find((u) => u.id === id)!, 'attack'), f: s.fatigue[id] ?? 0 }));
-      const fresh = prof.maxFatigue === undefined ? all : all.filter((x) => x.f < prof.maxFatigue!);
-      // 优先用不疲劳的、攻击力大的；先试只用生力军，不够再把疲劳的也算上
-      for (const pool of fresh.length === all.length ? [all] : [fresh, all]) {
-        if (!pool.length) continue;
-        const order = [...pool].sort((a, b) => a.f - b.f || b.v - a.v || (a.id < b.id ? -1 : 1));
-        // 先试"同一集团军"的兵力（没有协同代价），按这一组的进攻力从大到小；都不够再用全部
-        const groupOf = (id: string): string => coordGroup(ctx, s, ctx.oob.units.get(id)!.formation).id;
-        const groups = new Map<string, typeof order>();
-        for (const x of order) groups.set(groupOf(x.id), [...(groups.get(groupOf(x.id)) ?? []), x]);
-        const lists = groups.size > 1 ? [...groups.values()].sort((a, b) => b.reduce((n, x) => n + x.v, 0) - a.reduce((n, x) => n + x.v, 0)).concat([order]) : [order];
-        let found = false;
-        for (const list of lists) {
-          let pick = list.slice(0, cap).map((x) => x.id);
-          if (prof.economy) {
-            for (let n = 1; n <= Math.min(cap, list.length); n++) {
-              const ids = list.slice(0, n).map((x) => x.id);
-              if (!whyCannotAttack(ctx, s, ids, hex, side) && previewCombat(ctx, s, ids, hex).ratio >= minRatio) { pick = ids; break; }
-            }
+    if (s.attackedHexes.includes(hex)) return null;
+    const all = eligibleAttackers(ctx, s, hex, side).filter((id) => !used.has(id) && (!avoidPin || !pinRequired(ctx, s, [id], hex).length))
+      .map((id) => ({ id, v: currentValue(ctx, s.units.find((u) => u.id === id)!, 'attack'), f: s.fatigue[id] ?? 0 }));
+    const fresh = prof.maxFatigue === undefined ? all : all.filter((x) => x.f < prof.maxFatigue!);
+    // 优先用不疲劳的、攻击力大的；先试只用生力军，不够再把疲劳的也算上
+    for (const pool of fresh.length === all.length ? [all] : [fresh, all]) {
+      if (!pool.length) continue;
+      const order = [...pool].sort((a, b) => a.f - b.f || b.v - a.v || (a.id < b.id ? -1 : 1));
+      // 先试"同一集团军"的兵力（没有协同代价），按这一组的进攻力从大到小；都不够再用全部
+      const groupOf = (id: string): string => coordGroup(ctx, s, ctx.oob.units.get(id)!.formation).id;
+      const groups = new Map<string, typeof order>();
+      for (const x of order) groups.set(groupOf(x.id), [...(groups.get(groupOf(x.id)) ?? []), x]);
+      const lists = groups.size > 1 ? [...groups.values()].sort((a, b) => b.reduce((n, x) => n + x.v, 0) - a.reduce((n, x) => n + x.v, 0)).concat([order]) : [order];
+      for (const list of lists) {
+        let pick = list.slice(0, cap).map((x) => x.id);
+        if (prof.economy) {
+          for (let n = 1; n <= Math.min(cap, list.length); n++) {
+            const ids = list.slice(0, n).map((x) => x.id);
+            if (!whyCannotAttack(ctx, s, ids, hex, side) && previewCombat(ctx, s, ids, hex).ratio >= minRatio) { pick = ids; break; }
           }
-          if (!pick.length || whyCannotAttack(ctx, s, pick, hex, side)) continue;
-          const p = previewCombat(ctx, s, pick, hex);
-          if (p.column < 0 || p.ratio < minRatio) continue;
-          if (!best || p.ratio > best.ratio || (p.ratio === best.ratio && hex < best.hex)) best = { hex, ratio: p.ratio, attackers: pick };
-          found = true;
-          break;
         }
-        if (found) break;
+        if (!pick.length || whyCannotAttack(ctx, s, pick, hex, side)) continue;
+        const p = previewCombat(ctx, s, pick, hex);
+        if (p.column < 0 || p.ratio < minRatio) continue;
+        return { hex, ratio: p.ratio, attackers: pick };
       }
     }
-    return best ? { type: 'Attack', attackers: best.attackers, hex: best.hex } : null;
+    return null;
+  }
+
+  /** 作战分配：已宣布的先结算（已不能进行的取消）；没有就挑最好的一格，满足不了牵制义务的换下一个 */
+  private attack(s: GameState, side: Side, minRatio: number): Command | null {
+    const ctx = this.ctx;
+    for (const p of s.pending) if (!whyCannotAttack(ctx, s, p.attackers, p.hex, side)) return { type: 'Attack', attackers: p.attackers, hex: p.hex };
+    if (s.pending.length) return { type: 'CancelAttack', hex: s.pending[0]!.hex };
+    const none: ReadonlySet<string> = new Set();
+    type Cand = { hex: string; ratio: number; attackers: string[] };
+    const cands: Cand[] = [];
+    for (const hex of this.enemyHexes(s, side)) {
+      const clean = this.evalHex(s, side, hex, minRatio, none, true);
+      if (clean) cands.push(clean);
+      const any = this.evalHex(s, side, hex, minRatio, none, false);
+      if (any && (!clean || any.attackers.join() !== clean.attackers.join())) cands.push(any);
+    }
+    cands.sort((a, b) => b.ratio - a.ratio || (a.hex < b.hex ? -1 : a.hex > b.hex ? 1 : 0));
+    const floor = Math.max(ctx.combat.columns[0]!.min, minRatio * 0.5);
+    for (const seed of cands) {
+      const attacks: Cand[] = [seed];
+      const used = new Set(seed.attackers);
+      let ok = true;
+      for (let guard = 0; guard < 40; guard++) {
+        const miss = assaultMissing(ctx, s, attacks);
+        if (!miss.length) break;
+        const ev = this.evalHex(s, side, miss[0]!.hex, floor, used, false);
+        if (!ev) { ok = false; break; }
+        attacks.push(ev);
+        for (const u of ev.attackers) used.add(u);
+      }
+      if (!ok || assaultMissing(ctx, s, attacks).length) continue;
+      if (whyCannotAssault(ctx, s, attacks, side)) continue;
+      return attacks.length === 1 ? { type: 'Attack', attackers: seed.attackers, hex: seed.hex }
+        : { type: 'Assault', attacks: attacks.map((a) => ({ attackers: a.attackers, hex: a.hex })) };
+    }
+    return null;
   }
 }

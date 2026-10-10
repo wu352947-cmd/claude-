@@ -5,7 +5,7 @@
  * 热座时，记录里看不清的敌军单位不写番号，敌军的受损池与修理也不显示。
  */
 import {
-  AXIS_NAMES, CONTROL_NAMES, apply, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
+  AXIS_NAMES, CONTROL_NAMES, apply, assaultMissing, previewCombat, whyCannotAssault, whyCannotAttack, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
   canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
@@ -18,6 +18,10 @@ const esc = (t: string): string => t.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', 
 
 export interface GameUi {
   state(): GameState;
+  /** 把某格的进攻加入"作战分配"草稿（再点"宣布分配"才生效）；返回草稿里这一格现在的进攻单位 */
+  addToAssault(hex: string, attackers: string[]): void;
+  /** 草稿里这一格的进攻单位（没有 = null） */
+  draftOf(hex: string): string[] | null;
   /** 下达指令；非法时提示并返回 false */
   dispatch(cmd: Command): boolean;
 }
@@ -65,6 +69,8 @@ export function createGameUi(
       case 'Reinforced': return `增援：${unitName(e.unit)} 到达 ${e.hex}`;
       case 'Planned': return fog && fog.viewer !== e.side ? null : `作战计划：${AXIS_NAMES[e.kind]}轴线 ${e.id}`;
       case 'Unplanned': return fog && fog.viewer !== e.side ? null : `撤销作战计划 ${e.id}`;
+      case 'AssaultDeclared': return `宣布作战分配：${e.attacks.map((a) => `${a.hex}（${a.attackers.length} 个单位）`).join('、')}`;
+      case 'AttackCancelled': return `取消对 ${e.hex} 的进攻（已不能进行）`;
       case 'Disorganized': return `${e.units.map(unitName).join('、')} 陷入混乱（${e.reason}）`;
       case 'Recovered': return `${e.units.map(unitName).join('、')} 恢复正常`;
       case 'ObjectiveClaimed': return `回合末：${SIDE_NAMES[e.side]}占领了${ctx.scenario?.objectives.find((o) => o.hex === e.hex)?.name ?? e.hex}`;
@@ -114,9 +120,53 @@ export function createGameUi(
       : `${SIDE_NAMES[side]}：受损池 ${sum(s.damaged, side)} · 修理中 ${sum(s.repair, side)} · 完全损失 ${sum(s.destroyed, side)}`);
     $('g-meta').textContent = `装甲步数——${armor('DE')}；${armor('SU')} · 已消灭 ${s.eliminated.length} 个单位 · 种子 ${seed} · 指令 ${history.cursor} 条 · 指纹 ${stateHash(s)}`;
     try { localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(makeSave(ctx, initial, history, seed, engineVersion))); } catch { /* 隐私模式等 */ }
+    renderAssault();
     onChange(s);
     hotseat.update(s);
     scheduleAi();
+  }
+
+  /** 作战分配：草稿（还没宣布）与已宣布、等待结算的进攻 */
+  let draft: { hex: string; attackers: string[] }[] = [];
+  let draftKey = '';
+  function renderAssault(): void {
+    const s = cur.state;
+    const key = `${s.turn}.${s.phase}`;
+    if (key !== draftKey) { draft = []; draftKey = key; }
+    const box = $('g-assault');
+    const side = actingSide(ctx, s);
+    const names = (ids: string[]): string => ids.map(unitName).map(esc).join('、');
+    const mine = !s.over && !hotseat.whyCannotAct(s);
+    let html = '';
+    if (s.advance && mine) html += `<div>战斗后可以推进占领 <b>${esc(s.advance.hex)}</b>：点这一格，选单位推进（不想推进就直接做别的）。</div>`;
+    if (s.pending.length) {
+      html += `<b>已宣布的进攻</b><small>顺序由你定：逐个点"结算"。已不能进行的可以取消。</small>`;
+      for (const e of s.pending) {
+        const why = whyCannotAttack(ctx, s, e.attackers, e.hex, side);
+        const odds = !why ? (() => { const p = previewCombat(ctx, s, e.attackers, e.hex); return `${p.ratio}:1 → ${ctx.combat.columns[p.column]!.name} 列`; })() : '';
+        html += `<div class="as-row"><span>${esc(e.hex)} ← ${names(e.attackers)}<small>${why ? `<span class="bad">${esc(why)}</span>` : odds}</small></span>`
+          + (mine ? (why ? `<button data-cancel="${esc(e.hex)}">取消</button>` : `<button class="primary" data-res="${esc(e.hex)}">结算</button>`) : '') + '</div>';
+      }
+    } else if (draft.length) {
+      const miss = assaultMissing(ctx, s, draft);
+      const why = whyCannotAssault(ctx, s, draft, side);
+      html += `<b>作战分配草稿</b><small>先把要打的格子都加进来，满足牵制义务后一起宣布。</small>`;
+      for (const d of draft) html += `<div class="as-row"><span>${esc(d.hex)} ← ${names(d.attackers)}</span><button data-drop="${esc(d.hex)}">移除</button></div>`;
+      if (miss.length) html += `<div class="bad">牵制义务：还缺 ${miss.map((m) => `${esc(m.hex)}（因为进攻 ${esc(m.because)} 的单位贴着它）`).join('、')}</div>`;
+      else if (why) html += `<div class="bad">${esc(why)}</div>`;
+      html += `<div class="as-row"><button class="primary" id="as-go"${why || !mine ? ' disabled' : ''}>宣布分配</button><button id="as-clear">清空草稿</button></div>`;
+    }
+    box.hidden = !html;
+    box.innerHTML = html;
+    for (const b of box.querySelectorAll<HTMLButtonElement>('button[data-res]')) {
+      b.onclick = () => { const e = s.pending.find((x) => x.hex === b.dataset.res); if (e) dispatch({ type: 'Attack', attackers: e.attackers, hex: e.hex }); };
+    }
+    for (const b of box.querySelectorAll<HTMLButtonElement>('button[data-cancel]')) b.onclick = () => { dispatch({ type: 'CancelAttack', hex: b.dataset.cancel! }); };
+    for (const b of box.querySelectorAll<HTMLButtonElement>('button[data-drop]')) b.onclick = () => { draft = draft.filter((d) => d.hex !== b.dataset.drop); renderAssault(); onChange(cur.state); };
+    const go = document.getElementById('as-go');
+    if (go) go.onclick = () => { const attacks = draft; if (dispatch({ type: 'Assault', attacks })) draft = []; };
+    const clear = document.getElementById('as-clear');
+    if (clear) clear.onclick = () => { draft = []; renderAssault(); onChange(cur.state); };
   }
 
   /** 人机对战：轮到电脑时稍等一下，让它把本阶段一口气走完（一次性写入指令历史，只渲染一次） */
@@ -226,5 +276,13 @@ export function createGameUi(
 
   hotseat.onToggle(render);
   render();
-  return { state: () => cur.state, dispatch };
+  return {
+    state: () => cur.state, dispatch,
+    addToAssault(hex, attackers) {
+      draft = [...draft.filter((d) => d.hex !== hex), { hex, attackers: [...attackers] }];
+      renderAssault();
+      onChange(cur.state);
+    },
+    draftOf: (hex) => draft.find((d) => d.hex === hex)?.attackers ?? null,
+  };
 }

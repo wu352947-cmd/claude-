@@ -106,7 +106,7 @@ function showInfo(h: Offset | null): void {
       ${(editor.active || showSources()) && rec.sources.length ? `<dt>出处</dt><dd>${rec.sources.join('、')}</dd>` : ''}
     </dl>
     ${editor.active || !game ? '' : objectiveHtml(hexId(h))}
-    ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null)}
+    ${editor.active || !game ? '' : advanceSectionHtml(ctx, game.state(), hexId(h)) + combatSectionHtml(ctx, game.state(), hexId(h), attackPick?.hex === hexId(h) ? attackPick.units : null, game.draftOf(hexId(h)))}
     ${editor.active ? '' : veiled(hexId(h)) ? '<div class="units-head">部队</div><div class="muted">敌军部队（未侦察：本方单位贴近后才能看到番号与实力）</div>'
       : unitSectionHtml(stackMap.get(hexId(h)) ?? [], selectedUnit, moveNote()) + (showSources() ? startNote(selectedUnit) : '') + fatigueNote(selectedUnit)}
     ${editor.active ? `<textarea id="info-note" placeholder="备注（例如：对照图上此处有冲沟）">${esc(rec.note ?? '')}</textarea>
@@ -127,6 +127,8 @@ function showInfo(h: Offset | null): void {
   if (go) go.onclick = () => {
     if (game.dispatch({ type: 'Attack', attackers: picks.filter((x) => x.checked).map((x) => x.dataset.unit!), hex: id })) { attackPick = null; showInfo(h); }
   };
+  const add = document.getElementById('atk-add');
+  if (add) add.onclick = () => { game.addToAssault(id, picks.filter((x) => x.checked).map((x) => x.dataset.unit!)); showInfo(h); };
   const adv = document.getElementById('adv-go');
   if (adv) adv.onclick = () => {
     const units = [...box.querySelectorAll<HTMLInputElement>('.adv-pick')].filter((x) => x.checked).map((x) => x.dataset.unit!);

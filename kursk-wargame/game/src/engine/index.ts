@@ -19,6 +19,7 @@ export * from './movement';
 export * from './command-chain';
 export * from './group-move';
 export * from './plan';
+export * from './assault';
 export * from './supply';
 export * from './disorganize';
 export * from './combat';

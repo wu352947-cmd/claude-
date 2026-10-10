@@ -12,6 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
+import { pinRequired, sameUnits, whyCannotAssault } from './assault';
 import { type Axis, AxisKind, nextAxisId, whyCannotPlan } from './plan';
 import { isSupplied } from './supply';
 import { planGroupMove } from './group-move';
@@ -72,6 +73,8 @@ export interface GameState {
   disorganized: Record<string, number>;
   /** 玩家改过的隶属：编制 → 新上级（null = 直属）和调整的回合；没改过的用战斗序列里的默认上级 */
   attach: Record<string, { parent: string | null; turn: number }>;
+  /** 已宣布、还没结算的进攻（作战分配）；阶段结束时清空 */
+  pending: { attackers: string[]; hex: string }[];
   /** 作战计划的轴线（双方都存；界面只给本方看） */
   plans: Axis[];
   /** 本阶段已经进攻过的单位、被进攻过的格子、已经支援过的炮兵 */
@@ -103,6 +106,10 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('RollDie'), sides: z.number().int().min(2).max(100), purpose: z.string().default('测试') }),
   /** 进攻：attackers 进攻 hex 里的全部敌军 */
   z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
+  /** 作战分配：一次宣布本阶段的全部进攻（要满足牵制义务），之后逐个用 Attack 结算 */
+  z.object({ type: z.literal('Assault'), attacks: z.array(z.object({ attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) })).min(1).max(20) }),
+  /** 取消一场已宣布、但已经不能进行的进攻 */
+  z.object({ type: z.literal('CancelAttack'), hex: z.string().regex(/^\d{4}$/) }),
   /** 战斗后推进 */
   z.object({ type: z.literal('Advance'), units: z.array(z.string().min(1)).min(1) }),
   /** 制定/修改作战计划：不给 id = 新建一条；给 id = 改这一条 */
@@ -131,6 +138,8 @@ export type GameEvent =
   | { type: 'DamagedSorted'; unit: string; hex: string; control: 'own' | 'contested' | 'enemy'; need: number; rolls: number[]; repaired: number; destroyed: number }
   | { type: 'Repaired'; unit: string; steps: number }
   | { type: 'Reinforced'; unit: string; hex: string }
+  | { type: 'AssaultDeclared'; attacks: { attackers: string[]; hex: string }[] }
+  | { type: 'AttackCancelled'; hex: string }
   | { type: 'Planned'; side: Side; id: string; kind: AxisKind }
   | { type: 'Unplanned'; side: Side; id: string }
   | { type: 'Disorganized'; units: string[]; reason: string }
@@ -146,7 +155,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
-    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, disorganized: {}, attach: {}, plans: [], attacked: [], attackedHexes: [], fired: [], advance: null,
+    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, disorganized: {}, attach: {}, plans: [], pending: [], attacked: [], attackedHexes: [], fired: [], advance: null,
     damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
@@ -166,7 +175,7 @@ export function withFullSteps(ctx: GameContext, s: GameState): GameState {
 function advancePhase(ctx: GameContext, s: GameState, leave = true): { state: GameState; events: GameEvent[] } {
   const P = ctx.sequence.phases;
   const events: GameEvent[] = [];
-  const reset = { moved: [], attacked: [], attackedHexes: [], fired: [], advance: null };
+  const reset = { moved: [], attacked: [], attackedHexes: [], fired: [], advance: null, pending: [] };
   let cur: GameState = { ...s, ...reset };
   let first = leave;
   for (;;) {
@@ -224,7 +233,26 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
     case 'Attack': {
       const why = whyCannotAttack(ctx, s, cmd.attackers, cmd.hex, actingSide(ctx, s));
       if (why) throw new CommandError(why);
+      if (s.pending.length) {
+        const entry = s.pending.find((p) => p.hex === cmd.hex && sameUnits(p.attackers, cmd.attackers));
+        if (!entry) throw new CommandError('已经宣布了作战分配：只能结算分配里的进攻（进攻单位要和宣布时一致）');
+        const r = resolveAttack(ctx, s, cmd.attackers, cmd.hex);
+        return { state: { ...r.state, pending: r.state.pending.filter((p) => p !== entry) }, events: r.events };
+      }
+      const pin = pinRequired(ctx, s, cmd.attackers, cmd.hex);
+      if (pin.length) throw new CommandError(`牵制义务：进攻单位还贴着 ${pin.join('、')} 的敌军，必须同时进攻（请用作战分配一次宣布）`);
       return resolveAttack(ctx, s, cmd.attackers, cmd.hex);
+    }
+    case 'Assault': {
+      const why = whyCannotAssault(ctx, s, cmd.attacks, actingSide(ctx, s));
+      if (why) throw new CommandError(why);
+      return { state: { ...s, pending: cmd.attacks.map((a) => ({ attackers: [...a.attackers], hex: a.hex })) }, events: [{ type: 'AssaultDeclared', attacks: cmd.attacks }] };
+    }
+    case 'CancelAttack': {
+      const entry = s.pending.find((p) => p.hex === cmd.hex);
+      if (!entry) throw new CommandError(`没有已宣布的进攻 ${cmd.hex}`);
+      if (!whyCannotAttack(ctx, s, entry.attackers, entry.hex, actingSide(ctx, s))) throw new CommandError('这场进攻还能打，必须结算（只有已经不能进行的进攻可以取消）');
+      return { state: { ...s, pending: s.pending.filter((p) => p !== entry) }, events: [{ type: 'AttackCancelled', hex: cmd.hex }] };
     }
     case 'Advance':
       return resolveAdvance(ctx, s, cmd.units);
@@ -261,8 +289,11 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
         events: [{ type: 'Assigned', formation: cmd.formation, from, to: cmd.parent }],
       };
     }
-    case 'EndPhase':
+    case 'EndPhase': {
+      const live = s.pending.filter((p) => !whyCannotAttack(ctx, s, p.attackers, p.hex, actingSide(ctx, s)));
+      if (live.length) throw new CommandError(`还有已宣布的进攻没结算：${live.map((p) => p.hex).join('、')}（先结算，或取消已不能进行的）`);
       return advancePhase(ctx, s);
+    }
   }
 }
 
