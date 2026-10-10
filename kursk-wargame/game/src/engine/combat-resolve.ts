@@ -1,7 +1,7 @@
 /** 战斗结算：掷骰、查表、分配步数损失、撤退、推进（规则见 combat.ts 与 docs/10）。 */
 import { rollDie } from './rng';
 import { parseResult, previewCombat, retreatPath } from './combat';
-import { sideOfUnit } from './movement';
+import { sideOfUnit, whyOverstacked } from './movement';
 import { claim } from './scenario';
 import { CommandError, type GameContext, type GameEvent, type GameState, type UnitState } from './game';
 
@@ -100,6 +100,8 @@ export function resolveAdvance(ctx: GameContext, s: GameState, units: string[]):
   if (!adv) throw new CommandError('现在不能推进（只能紧接在把守方逐出格子的战斗之后）');
   if (!units.length || units.length > ctx.combat.advanceMax) throw new CommandError(`推进单位数应为 1–${ctx.combat.advanceMax} 个`);
   for (const id of units) if (!adv.units.includes(id)) throw new CommandError(`${unitOf(ctx, id)?.names.zh ?? id} 没有参加这次进攻，不能推进`);
+  const over = whyOverstacked(ctx, s, adv.hex, units);
+  if (over) throw new CommandError(over);
   const moving = s.units.filter((u) => units.includes(u.id)).map((u) => ({ ...u, hex: adv.hex }));
   return {
     state: claim(ctx, { ...s, units: [...s.units.filter((u) => !units.includes(u.id)), ...moving], advance: null }, units[0]!, [adv.hex]),

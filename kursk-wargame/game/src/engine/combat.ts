@@ -27,6 +27,7 @@ export const CombatRules = z.object({
   defenseOnlyTypes: z.array(z.string()),
   qualityDrm: z.object({ perLevel: z.number().int(), max: z.number().int().nonnegative() }),
   retreat: z.object({ zocLoss: z.number().int().nonnegative(), blockedLoss: z.number().int().nonnegative() }),
+  frontage: z.object({ $comment: z.string().optional(), maxAttackers: z.number().int().positive() }),
   advanceMax: z.number().int().positive(),
   combatPhases: z.array(z.string()),
 }).superRefine((r, ctx) => {
@@ -101,6 +102,7 @@ export function whyCannotAttack(ctx: GameContext, s: GameState, attackers: reado
   const ok = new Set(eligibleAttackers(ctx, s, hex, side));
   for (const a of attackers) if (!ok.has(a)) return `${unitOf(ctx, a)?.names.zh ?? a} 不能参加这次进攻（不相邻、不能进攻或已进攻过）`;
   if (new Set(attackers).size !== attackers.length) return '进攻单位重复';
+  if (attackers.length > ctx.combat.frontage.maxAttackers) return `正面限制：一次进攻最多 ${ctx.combat.frontage.maxAttackers} 个单位，现在选了 ${attackers.length} 个`;
   return null;
 }
 

@@ -31,6 +31,11 @@ export const MovementRules = z.object({
     blockedBySides: z.array(SideFeature),
     leaveCost: z.object({ foot: z.number().nonnegative(), motorized: z.number().nonnegative(), tracked: z.number().nonnegative() }),
   }),
+  stacking: z.object({
+    $comment: z.string().optional(),
+    limit: z.number().int().positive(),
+    points: z.object({ battalion: z.number().int().positive(), regiment: z.number().int().positive(), brigade: z.number().int().positive(), division: z.number().int().positive() }),
+  }),
   movePhases: z.array(z.string()),
   exploitationMobility: z.array(Mobility),
 }).superRefine((r, ctx) => {
@@ -99,6 +104,21 @@ function occupiedBy(ctx: GameContext, s: GameState, side: Side): Set<string> {
   return new Set(s.units.filter((u) => sideOfUnit(ctx, u.id) === side).map((u) => u.hex));
 }
 
+/** 单位占的堆叠点数 */
+export const stackPoints = (ctx: GameContext, unitId: string): number => ctx.movement.stacking.points[ctx.oob.units.get(unitId)!.size];
+
+/** 某格里本方单位已占的堆叠点数（不含 except 指定的单位） */
+export function stackUsed(ctx: GameContext, s: GameState, hex: string, except: readonly string[] = []): number {
+  return s.units.filter((u) => u.hex === hex && !except.includes(u.id)).reduce((a, u) => a + stackPoints(ctx, u.id), 0);
+}
+
+/** 这些单位放进 hex 会不会超过堆叠限制；超过返回原因 */
+export function whyOverstacked(ctx: GameContext, s: GameState, hex: string, units: readonly string[]): string | null {
+  const used = stackUsed(ctx, s, hex, units), add = units.reduce((a, id) => a + stackPoints(ctx, id), 0);
+  const limit = ctx.movement.stacking.limit;
+  return used + add > limit ? `${hex} 堆叠超限：已有 ${used} 点，再加 ${add} 点，上限 ${limit} 点` : null;
+}
+
 /** 单位现在不能移动的原因；能移动返回 null */
 export function whyCannotMove(ctx: GameContext, s: GameState, unitId: string, acting: Side | null): string | null {
   const unit = ctx.oob.units.get(unitId);
@@ -160,6 +180,7 @@ export function reachable(ctx: GameContext, s: GameState, unitId: string): Map<s
     }
   }
   best.delete(start);
+  for (const hex of [...best.keys()]) if (whyOverstacked(ctx, s, hex, [unitId])) best.delete(hex); // 路过不限，终点才查
   return best;
 }
 
@@ -186,5 +207,7 @@ export function checkPath(ctx: GameContext, s: GameState, unitId: string, path: 
   }
   const mp = movementAllowance(ctx, s, unitId);
   if (cost > mp) return { error: `需要移动力 ${cost}，只有 ${mp}` };
+  const over = whyOverstacked(ctx, s, path.at(-1)!, [unitId]);
+  if (over) return { error: over };
   return { cost };
 }

@@ -66,6 +66,10 @@
   "zocLoss": 1,
   "blockedLoss": 1
  },
+ "frontage": {
+  "$comment": "正面限制（02 §4）：一次进攻最多几个单位参加（炮兵支援不算）。一格最多 6 个邻格，战场上展不开更多的兵力。游戏设计参数，⟨待校准⟩。",
+  "maxAttackers": 6
+ },
  "advanceMax": 3,
  "combatPhases": ["first.combat", "first.exploitation", "second.combat", "second.exploitation"]
 }

@@ -5,8 +5,8 @@
  */
 import { z } from 'zod';
 import {
-  type Command, type GameContext, type GameState, type Side, actingSide, distance, eligibleAttackers, parseHexId, previewCombat, reachable, sideOfUnit,
-  whyCannotAttack, whyCannotMove,
+  type Command, type GameContext, type GameState, type Side, actingSide, distance, currentValue, eligibleAttackers, parseHexId, previewCombat, reachable, sideOfUnit,
+  whyCannotAttack, whyCannotMove, whyOverstacked,
 } from '../engine';
 
 const Goal = z.enum(['objectives', 'enemy', 'hold']);
@@ -31,7 +31,11 @@ export class Bot {
     const first = s.first === side;
     const phaseId = ctx.sequence.phases[s.phase]!.id;
 
-    if (s.advance) return { type: 'Advance', units: s.advance.units.slice(0, ctx.combat.advanceMax) };
+    if (s.advance) {
+      const pick: string[] = [];
+      for (const id of s.advance.units) if (pick.length < ctx.combat.advanceMax && !whyOverstacked(ctx, s, s.advance.hex, [...pick, id])) pick.push(id);
+      return pick.length ? { type: 'Advance', units: pick } : { type: 'EndPhase' };
+    }
     if (ctx.movement.movePhases.includes(phaseId)) return this.move(s, side, first ? profile.goalWhenFirst : profile.goal) ?? { type: 'EndPhase' };
     if (ctx.combat.combatPhases.includes(phaseId)) return this.attack(s, side, first ? profile.minRatioWhenFirst : profile.minRatio) ?? { type: 'EndPhase' };
     return { type: 'EndPhase' };
@@ -90,7 +94,9 @@ export class Bot {
     let best: { hex: string; ratio: number; attackers: string[] } | null = null;
     for (const hex of this.enemyHexes(s, side)) {
       if (s.attackedHexes.includes(hex)) continue;
-      const attackers = eligibleAttackers(ctx, s, hex, side);
+      const attackers = eligibleAttackers(ctx, s, hex, side)
+        .map((id) => ({ id, v: currentValue(ctx, s.units.find((u) => u.id === id)!, 'attack') }))
+        .sort((a, b) => b.v - a.v || (a.id < b.id ? -1 : 1)).slice(0, ctx.combat.frontage.maxAttackers).map((x) => x.id);
       if (!attackers.length || whyCannotAttack(ctx, s, attackers, hex, side)) continue;
       const p = previewCombat(ctx, s, attackers, hex);
       if (p.column < 0 || p.ratio < minRatio) continue;
