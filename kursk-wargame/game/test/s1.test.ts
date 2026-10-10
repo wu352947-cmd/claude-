@@ -23,7 +23,7 @@ const ctx: GameContext = { map, oob, sequence: Sequence.parse(rawSeq), movement:
 const s0 = withFullSteps(ctx, initialState(sc.id, sc.first, 1, sc));
 
 describe('想定 S1 普罗霍罗夫卡', () => {
-  it('每个单位要么放进想定（开局或增援），要么照实列在"没放"里；加起来正好是全部 91 个', () => {
+  it('每个单位要么放进想定（开局或增援），要么照实列在"没放"里；加起来正好是全部单位（含 8 个苏军炮兵占位）', () => {
     const used = new Set([...sc.placements.map((p) => p.unit), ...sc.reinforcements.map((r) => r.unit)]);
     expect(used.size).toBe(sc.placements.length + sc.reinforcements.length);
     const omitted = [...oob.units.keys()].filter((id) => !used.has(id));
@@ -59,7 +59,7 @@ describe('想定 S1 普罗霍罗夫卡', () => {
     expect(s.over).toBe(true);
     expect(s.turn).toBe(9);
     expect(arrived).toEqual([3, 5]);
-    expect(s.units.length).toBe(91 - 9);
+    expect(s.units.length).toBe(oob.units.size - 9);
   });
 
   it('没人动时：目标格都归苏军、得分 = 0，比历史基准低 16.8 → 苏军决定性胜利；战后报告把目标格对照历史（历史上交替易手的不计）', () => {

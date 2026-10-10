@@ -1422,6 +1422,62 @@
      "quote": "Подтверждаю: 10-ю иптабр оставить Короча, в моем резерве."
     }
    ]
+  },
+  {
+   "unit": "SU.5GA.ArtGrp1",
+   "hex": "1710",
+   "confidence": "estimated",
+   "basis": "设计取值：近卫第5集团军炮兵群放在挂靠的步兵师（1812 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.5GA.ArtGrp2",
+   "hex": "1911",
+   "confidence": "estimated",
+   "basis": "设计取值：近卫第5集团军炮兵群放在挂靠的步兵师（2013 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.5GA.ArtGrp3",
+   "hex": "2612",
+   "confidence": "estimated",
+   "basis": "设计取值：近卫第5集团军炮兵群放在挂靠的步兵师（2413 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.6GA.ArtGrp4",
+   "hex": "1007",
+   "confidence": "estimated",
+   "basis": "设计取值：近卫第6集团军炮兵群放在挂靠的步兵师（1208 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.69A.ArtGrp5",
+   "hex": "2423",
+   "confidence": "estimated",
+   "basis": "设计取值：第69集团军炮兵群放在挂靠的步兵师（2321 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.69A.ArtGrp6",
+   "hex": "2127",
+   "confidence": "estimated",
+   "basis": "设计取值：第69集团军炮兵群放在挂靠的步兵师（2328 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.69A.ArtGrp7",
+   "hex": "2324",
+   "confidence": "estimated",
+   "basis": "设计取值：第69集团军炮兵群放在挂靠的步兵师（2525 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
+  },
+  {
+   "unit": "SU.5GTA.ArtGrp8",
+   "hex": "2716",
+   "confidence": "estimated",
+   "basis": "设计取值：近卫坦克第5集团军炮兵群放在挂靠的步兵师（2517 格）附近、远离德军的一侧；数量与位置不是史料数字。",
+   "provenance": []
   }
  ],
  "reinforcements": [

@@ -4445,6 +4445,166 @@
    "note": "1943-07-10（Замулин 附录表 1（ЦАМО ф.203 оп.2843 д.426 л.165））；Замулин 正文称该旅留在第 69 集团军。反坦克歼击炮兵第 14、31 旅没有数字，暂不做算子",
    "quality": 2,
    "qualityNote": "设计取值（所有者决定，优先游戏平衡）：苏军非近卫装甲、机械化部队，协同与指挥艺术低于德军陆军和苏军近卫部队；不是史料统计数字。"
+  },
+  {
+   "id": "SU.5GA.ArtGrp1",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫第5集团军炮兵群1（占位）",
+    "en": "5GA artillery group 1 (placeholder)"
+   },
+   "designation": "炮1",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": true,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.5GA.ArtGrp2",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫第5集团军炮兵群2（占位）",
+    "en": "5GA artillery group 2 (placeholder)"
+   },
+   "designation": "炮2",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": true,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.5GA.ArtGrp3",
+   "formation": "SU.5GA",
+   "names": {
+    "zh": "近卫第5集团军炮兵群3（占位）",
+    "en": "5GA artillery group 3 (placeholder)"
+   },
+   "designation": "炮3",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": true,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.6GA.ArtGrp4",
+   "formation": "SU.6GA",
+   "names": {
+    "zh": "近卫第6集团军炮兵群4（占位）",
+    "en": "6GA artillery group 4 (placeholder)"
+   },
+   "designation": "炮4",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": true,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.69A.ArtGrp5",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "第69集团军炮兵群5（占位）",
+    "en": "69A artillery group 5 (placeholder)"
+   },
+   "designation": "炮5",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.69A.ArtGrp6",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "第69集团军炮兵群6（占位）",
+    "en": "69A artillery group 6 (placeholder)"
+   },
+   "designation": "炮6",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.69A.ArtGrp7",
+   "formation": "SU.69A",
+   "names": {
+    "zh": "第69集团军炮兵群7（占位）",
+    "en": "69A artillery group 7 (placeholder)"
+   },
+   "designation": "炮7",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": false,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
+  },
+  {
+   "id": "SU.5GTA.ArtGrp8",
+   "formation": "SU.5GTA",
+   "names": {
+    "zh": "近卫坦克第5集团军炮兵群8（占位）",
+    "en": "5GTA artillery group 8 (placeholder)"
+   },
+   "designation": "炮8",
+   "type": "artillery",
+   "size": "regiment",
+   "guards": true,
+   "steps": 2,
+   "ratings": {
+    "attack": 3,
+    "defense": 1,
+    "movement": 8
+   },
+   "status": "unverified",
+   "note": "占位：苏军炮兵没有逐团的史料数字。此单位代表该集团军配属炮兵的支援能力，数量与位置是设计取值（所有者决定：防线与兵力资料难以齐全，差不多即可，优先游戏平衡），不是史料数字，⟨待校准⟩。"
   }
  ]
 }
