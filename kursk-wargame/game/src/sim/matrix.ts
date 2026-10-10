@@ -1,0 +1,88 @@
+/**
+ * 打法矩阵：npm run matrix -- [每格局数] [输出文件]
+ * 德军 × 苏军各几种打法两两对打，比较结果的差别（docs/14 §11）。
+ */
+import { spawn } from 'node:child_process';
+import { writeFileSync } from 'node:fs';
+import { cpus } from 'node:os';
+import { z } from 'zod';
+import { BotRules } from './bot';
+import { loadSimContext } from './context';
+import { type GameResult, initialStateFor, playGame } from './play';
+import { fmt, mean, quantile, sorted } from './stats';
+import rawStyles from '../../data/sim/styles.json';
+
+const Style = z.record(z.string(), z.union([z.string(), z.record(z.string(), z.unknown())]));
+export const Styles = z.object({ $comment: z.string().optional(), DE: Style, SU: Style });
+
+const n = Number(process.argv[2] ?? 100);
+const out = process.argv[3];
+const { ctx, rules, itemClass } = loadSimContext();
+const styles = Styles.parse(rawStyles);
+/** 结果分组（含兵力损耗产生的"被打残""惨胜"，见 docs/18） */
+const BANDS: { name: string; is: (l: string) => boolean }[] = [
+  { name: '德军决定性胜利（含苏军被打残）', is: (l) => l === '德军决定性胜利' || l.startsWith('苏军被打残') },
+  { name: '德军胜利', is: (l) => l === '德军胜利' },
+  { name: '德军惨胜', is: (l) => l.startsWith('德军惨胜') },
+  { name: '苏军决定性胜利（含德军被打残）', is: (l) => l === '苏军决定性胜利' || l.startsWith('德军被打残') },
+  { name: '苏军胜利', is: (l) => l === '苏军胜利' },
+  { name: '苏军惨胜', is: (l) => l.startsWith('苏军惨胜') },
+  { name: '平局/两败俱伤', is: (l) => l.startsWith('平局') || l.startsWith('两败俱伤') },
+];
+const names = (side: 'DE' | 'SU'): string[] => Object.keys(styles[side]).filter((k) => k !== '$comment');
+/** 跑一格（德军打法 × 苏军打法），返回表格的一行 */
+function runCell(de: string, su: string): string {
+  const r = BotRules.parse({ ...rules, DE: { ...rules.DE, ...(styles.DE[de] as object) }, SU: { ...rules.SU, ...(styles.SU[su] as object) } });
+  const res: GameResult[] = [];
+  for (let seed = 1; seed <= n; seed++) res.push(playGame(ctx, (sd) => initialStateFor(ctx, sd), seed, r, itemClass));
+  const held = (hex: string): number => res.filter((x) => x.deHeld.includes(hex)).length / n;
+  const sum = (f: (x: GameResult) => number): number => mean(res.map(f));
+  const tl = (side: 'DE' | 'SU'): number => sum((x) => x.tankLoss.filter((t) => t.side === side).reduce((a, t) => a + t.tanks, 0));
+  const vp = sorted(res.map((x) => x.vp));
+  const bands = BANDS.map((b) => `${Math.round((100 * res.filter((x) => b.is(x.outcome)).length) / n)}%`);
+  return `| ${de} | ${su} | ${fmt(sum((x) => x.deHeld.length))} | ${Math.round(100 * held('2515'))}% | ${fmt(tl('SU'))} | ${fmt(tl('DE'))} | ${fmt(sum((x) => x.attacks))} | ${fmt(quantile(vp, 0.1))} ~ ${fmt(quantile(vp, 0.9))} | ${bands.join(' / ')} |`;
+}
+
+// 子进程模式：只跑一格，把结果行打印到标准输出（父进程并行启动多个子进程，每个用一个 CPU 核心）
+const cellEnv = process.env.MATRIX_CELL;
+if (cellEnv) {
+  const [de, su] = cellEnv.split('|') as [string, string];
+  console.log(runCell(de, su));
+  process.exit(0);
+}
+
+const cells = names('DE').flatMap((de) => names('SU').map((su) => [de, su] as const));
+const workers = Math.max(1, Math.min(cells.length, Number(process.env.MATRIX_JOBS ?? cpus().length)));
+const rows: string[] = new Array(cells.length);
+let next = 0;
+await new Promise<void>((resolve, reject) => {
+  let running = 0, finished = 0;
+  const launch = (): void => {
+    while (running < workers && next < cells.length) {
+      const i = next++;
+      const [de, su] = cells[i]!;
+      running++;
+      const child = spawn('npx', ['vite-node', 'src/sim/matrix.ts', String(n)], { env: { ...process.env, MATRIX_CELL: `${de}|${su}` }, stdio: ['ignore', 'pipe', 'inherit'] });
+      let buf = '';
+      child.stdout.on('data', (d: Buffer) => { buf += d.toString(); });
+      child.on('close', (code) => {
+        running--; finished++;
+        if (code !== 0 || !buf.trim()) { reject(new Error(`${de} × ${su} 失败（退出码 ${code}）`)); return; }
+        rows[i] = buf.trim();
+        console.error(`… ${de} × ${su}（${finished}/${cells.length}）`);
+        if (finished === cells.length) resolve(); else launch();
+      });
+    }
+  };
+  launch();
+});
+const md = `# 打法矩阵（S1，每格 ${n} 局，种子 1–${n}）
+
+> 由 \`npm run matrix\` 自动生成。德军、苏军各几种打法两两对打。打法参数见 data/sim/styles.json（AI 拟定的模拟设定，不是史料）。
+> **读法**：不是找"最像历史"的组合，而是看——不同打法的结果差别有多大（有差别才有玩头），两方的胜率是否都不是 0 或 100%（双方都有赢的机会）。
+
+| 德军打法 | 苏军打法 | 德军占目标数（共 9 个） | 德军占普罗霍罗夫卡 | 苏军装甲完全损失（辆） | 德军装甲完全损失（辆） | 每局战斗次数 | 德军占目标点数（10%~90%，共 20 分） | 结果分布：${BANDS.map((b) => b.name).join(' / ')} |
+|---|---|---|---|---|---|---|---|---|
+${rows.join('\n')}
+`;
+if (out) { writeFileSync(out, md); console.error(`已写入 ${out}`); } else console.log(md);

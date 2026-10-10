@@ -4,3 +4,8 @@ data/
 /*.png
 _fonttest/
 /dist-demo/
+
+# 库尔斯克兵棋的数据目录需要入库（上面的 data/ 规则针对拾光手帐的运行时数据）
+!kursk-wargame/game/data/
+kursk-wargame/game/dist/
+__pycache__/

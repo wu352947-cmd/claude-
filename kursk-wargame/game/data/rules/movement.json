@@ -1,0 +1,111 @@
+{
+ "$comment": "移动与控制区参数（docs/02 §3、docs/09）。全部是游戏设计参数，不是史料数字，⟨待校准⟩。null = 禁止进入/穿越。机动类型来自 ratings.json 的 mobility。 发展阶段只有 exploitationMobility 里的机动类型能移动（02 §1：发展阶段仅限机动单位）。",
+ "status": "draft",
+ "terrain": {
+  "clear": {
+   "foot": 1,
+   "motorized": 1,
+   "tracked": 1
+  },
+  "woods": {
+   "foot": 2,
+   "motorized": 3,
+   "tracked": 2
+  },
+  "village": {
+   "foot": 1,
+   "motorized": 1,
+   "tracked": 1
+  },
+  "town": {
+   "foot": 1,
+   "motorized": 1,
+   "tracked": 1
+  },
+  "city": {
+   "foot": 1,
+   "motorized": 1,
+   "tracked": 1
+  },
+  "marsh": {
+   "foot": 3,
+   "motorized": null,
+   "tracked": 4
+  },
+  "water": {
+   "foot": null,
+   "motorized": null,
+   "tracked": null
+  }
+ },
+ "sides": {
+  "$comment": "穿越格边的额外消耗（在进入格的地形消耗之外另加）",
+  "stream": {
+   "foot": 0,
+   "motorized": 1,
+   "tracked": 1
+  },
+  "minorRiver": {
+   "foot": 1,
+   "motorized": 3,
+   "tracked": 2
+  },
+  "majorRiver": {
+   "foot": null,
+   "motorized": null,
+   "tracked": null
+  },
+  "balka": {
+   "foot": 0,
+   "motorized": 2,
+   "tracked": 1
+  },
+  "railEmbankment": {
+   "foot": 0,
+   "motorized": 1,
+   "tracked": 1
+  }
+ },
+ "links": {
+  "$comment": "沿道路从一格到相邻格：消耗固定为此值，不计地形与格边（有桥/渡口）。railway 只用于战略移动（以后做），这里不给好处",
+  "road": {
+   "foot": 0.5,
+   "motorized": 0.5,
+   "tracked": 0.5
+  },
+  "track": {
+   "foot": 1,
+   "motorized": 1,
+   "tracked": 1
+  }
+ },
+ "zoc": {
+  "$comment": "每个单位对相邻 6 格施加控制区。进入敌控制区必须停止；从敌控制区出发，第一步另加 leaveCost",
+  "exemptTypes": [
+   "artillery"
+  ],
+  "blockedBySides": [
+   "majorRiver"
+  ],
+  "leaveCost": {
+   "foot": 2,
+   "motorized": 2,
+   "tracked": 1
+  }
+ },
+ "stacking": {
+  "$comment": "堆叠限制（02 §3）：同一格内本方单位的点数合计不得超过 limit；营 1 点、团 2 点、旅 2 点、师 4 点。只在移动终点、推进终点检查，路过己方满格不受限。游戏设计参数，不是史料数字，⟨待校准⟩。开局最多的一格（1812）为 10 点，所以 limit 不低于 10。",
+  "limit": 10,
+  "points": { "battalion": 1, "regiment": 2, "brigade": 2, "division": 4 }
+ },
+ "movePhases": [
+  "first.movement",
+  "first.exploitation",
+  "second.movement",
+  "second.exploitation"
+ ],
+ "exploitationMobility": [
+  "motorized",
+  "tracked"
+ ]
+}
