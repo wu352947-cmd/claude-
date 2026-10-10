@@ -12,8 +12,12 @@ import { makeReport } from './report';
 const n = Number(process.argv[2] ?? 200);
 const out = process.argv[3];
 const loaded = loadSimContext();
-const { ctx, itemClass } = loaded;
 const over = process.argv[4] ? (JSON.parse(process.argv[4]) as Record<string, Record<string, unknown>>) : {};
+const { itemClass } = loaded;
+// 可以覆盖受损池送修门槛：{"recover":{"own":6,"contested":3,"enemy":1}}
+const ctx = over.recover
+  ? { ...loaded.ctx, turns: { ...loaded.ctx.turns, damaged: { ...loaded.ctx.turns.damaged, recover: { ...loaded.ctx.turns.damaged.recover, ...over.recover } } } }
+  : loaded.ctx;
 const rules = BotRules.parse({ ...loaded.rules, DE: { ...loaded.rules.DE, ...over.DE }, SU: { ...loaded.rules.SU, ...over.SU } });
 const results = [];
 const t0 = performance.now();
