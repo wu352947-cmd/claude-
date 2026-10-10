@@ -37,7 +37,7 @@ describe('异地对战：回合文件', () => {
     expect(makeSave(ctx, init, h3, 7, 't').note).toMatchObject({ turn: 1, to: 'SU' });
     let h = h0;
     for (let i = 0; i < 200; i++) { try { h = push(ctx, init, h, end); } catch { break; } }
-    expect(makeSave(ctx, init, h, 7, 't').note).toMatchObject({ turn: 9, to: null, over: true });
+    expect(makeSave(ctx, init, h, 7, 't').note).toMatchObject({ turn: 6, to: null, over: true });
   });
 
   it('两个人轮流：A 走完交文件，B 读入、接着走、再交回，A 读入后与 B 的状态一致', () => {

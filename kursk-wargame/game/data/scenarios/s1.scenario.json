@@ -15,6 +15,12 @@
   "slot": 0
  },
  "turns": 9,
+ "end": {
+  "$comment": "结束规则（docs/17，设计参数，待试玩校准）：turns = 9 只是软时限（到点提示，可继续）；一方连续 holdTurns 个回合末处于达成战争目标的结果、且已到第 minTurn 回合，就提前结束（守方开局就占着全部目标，所以不设 minTurn 会在第 2 回合就判守方胜）；任何时候行动方可以收兵；hardTurns 是防挂机的硬上限。",
+  "holdTurns": 2,
+  "minTurn": 6,
+  "hardTurns": 27
+ },
  "initiative": [
   "DE",
   "DE",

@@ -44,14 +44,15 @@ export function playGame(
   let s = initialFor(seed);
   const events: GameEvent[] = [];
   let n = 0;
-  while (!s.over && n < maxCommands) {
+  // 提前分出胜负，或到软时限（想定写的回合数）就算打完：这样各组打法的结果口径和以前一致
+  while (!s.over && !s.limitReached && n < maxCommands) {
     const cmd = bot.step(s);
     const r = apply(ctx, s, cmd);
     s = r.state;
     events.push(...r.events);
     n++;
   }
-  if (!s.over) throw new Error(`种子 ${seed}：${maxCommands} 条指令内没有打完`);
+  if (!s.over && !s.limitReached) throw new Error(`种子 ${seed}：${maxCommands} 条指令内没有打完`);
   const sco = score(ctx, s)!;
   const pool: GameResult['pool'] = { DE: { damaged: 0, repaired: 0, destroyed: 0 }, SU: { damaged: 0, repaired: 0, destroyed: 0 } };
   const codes: Record<string, number> = {}, odds: Record<string, number> = {};
@@ -73,7 +74,7 @@ export function playGame(
     return { day, side: sideOfUnit(ctx, d.unit), ss: unit.formation.startsWith('DE.IISS'), tanks: d.steps * tanksPerStep(unit, itemClass), steps: d.steps };
   });
   return {
-    seed, commands: n, turns: s.turn, deHeld: sco.objectives.filter((o) => o.owner === 'DE').map((o) => o.hex),
+    seed, commands: n, turns: Math.min(s.turn, ctx.scenario?.turns ?? s.turn), deHeld: sco.objectives.filter((o) => o.owner === 'DE').map((o) => o.hex),
     vp: sco.objectiveVp, outcome: sco.outcome.label, lostSteps: sco.lost, tankLoss, pool, attacks, codes, odds,
   };
 }

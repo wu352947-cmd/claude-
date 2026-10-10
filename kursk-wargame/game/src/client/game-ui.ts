@@ -79,7 +79,8 @@ export function createGameUi(
         const nm = (f: string | null): string => (f ? ctx.oob.formations.get(f)?.names.zh ?? f : '直属');
         return `调整隶属：${nm(e.formation)} → ${nm(e.to)}`;
       }
-      case 'GameOver': return `—— 想定结束（第 ${e.turn} 回合）——`;
+      case 'TimeLimit': return `—— 已到想定的历史节点（第 ${e.turn} 回合）：可以继续打，也可以收兵 ——`;
+      case 'GameOver': return `—— 对局结束（第 ${e.turn} 回合）${e.reason ? `：${e.reason}` : ''} ——`;
     }
   };
 
@@ -91,8 +92,9 @@ export function createGameUi(
     const side = actingSide(ctx, s);
     const t = turnInfo(ctx, s);
     const total = ctx.scenario?.turns;
-    $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
+    $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total && s.turn <= total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
     $<HTMLButtonElement>('g-end').disabled = s.over || !!hotseat.whyCannotAct(s);
+    $<HTMLButtonElement>('g-conclude').disabled = s.over || !!hotseat.whyCannotAct(s);
     const rep = s.over ? historyReport(ctx, s) : null;
     $('g-report').hidden = !rep;
     if (rep) {
@@ -109,7 +111,9 @@ export function createGameUi(
     if (sc) {
       const key = sc.objectives.find((o) => o.hex === ctx.scenario!.victory!.key)!;
       $('g-score').innerHTML = `德军占目标 <b>${sc.objectiveVp}</b> 分 · ${esc(key.name)}：${SIDE_NAMES[key.owner]}占着`
-        + `<small>${s.over ? '结果' : '如果现在结束'}：<b>${esc(sc.outcome.label)}</b></small>`;
+        + `<small>${s.over ? '结果' : '如果现在收兵'}：<b>${esc(sc.outcome.label)}</b></small>`
+        + (!s.over && ctx.scenario?.end && s.streak.side ? `<small>${SIDE_NAMES[s.streak.side]}已连续 ${s.streak.turns} / ${ctx.scenario.end.holdTurns} 个回合末处于达成目标的状态，保持住就会提前结束</small>` : '')
+        + (!s.over && s.limitReached ? '<small>已到想定的历史节点：可以继续打，随时可以“收兵”按现状判胜负</small>' : '');
     }
     $<HTMLButtonElement>('g-undo').disabled = !canUndo(history);
     $<HTMLButtonElement>('g-redo').disabled = !canRedo(history);
@@ -210,6 +214,7 @@ export function createGameUi(
   }
 
   $('g-end').onclick = () => dispatch({ type: 'EndPhase' });
+  $('g-conclude').onclick = () => { if (confirm('收兵：现在结束对局，按现状判定胜负。确定吗？')) dispatch({ type: 'Conclude' }); };
   const tryUndo = (): void => {
     const no = hotseat.whyCannotAct(cur.state);
     if (no) { toast(no); return; }

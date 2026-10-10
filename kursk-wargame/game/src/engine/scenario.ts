@@ -16,9 +16,22 @@ const Hex = z.string().regex(/^\d{4}$/, '格号必须是 4 位数字');
 const Prov = z.object({ source: z.string(), page: z.string().optional(), quote: z.string().optional() });
 const Held = z.enum(['DE', 'SU', 'contested']);
 
+export const EndRules = z.object({
+  $comment: z.string().optional(),
+  /** 一方连续多少个回合末达成战争目标就提前结束 */
+  holdTurns: z.number().int().positive(),
+  /** 最早第几回合才允许自动提前结束（否则守方什么都不做、开局就"达成目标"） */
+  minTurn: z.number().int().positive(),
+  /** 硬上限回合数（防止永远打不完） */
+  hardTurns: z.number().int().positive(),
+});
+export type EndRules = z.infer<typeof EndRules>;
+
 export const ScenarioFile = DeploymentFile.extend({
   /** 共几个回合（不写 = 不限） */
   turns: z.number().int().positive().optional(),
+  /** 结束规则（docs/17）：不写 = 打满 turns 回合就结束；写了 = turns 只是软时限 */
+  end: EndRules.optional(),
   /** 每回合的主动方（第 1 回合起；没写到的回合沿用 first） */
   initiative: z.array(Side).default([]),
   initiativeNote: z.string().optional(),

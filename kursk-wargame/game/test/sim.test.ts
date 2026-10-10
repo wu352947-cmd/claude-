@@ -51,7 +51,7 @@ describe('无界面模拟', () => {
   it('苏军只守不攻（goal=hold、minRatio 很高）时，第一回合德军占不到任何苏军目标之外的格子也不会崩', () => {
     const calm = { ...rules, SU: { ...rules.SU, goalWhenFirst: 'hold' as const, minRatio: 99, minRatioWhenFirst: 99 } };
     const r = playGame(ctx, (s) => initialStateFor(ctx, s), 2, calm, itemClass);
-    expect(r.turns).toBe(9);
+    expect(r.turns).toBeLessThanOrEqual(9);
   });
 
   it('报告：三批结果生成的 Markdown 包含各节、判定文字', () => {

@@ -27,3 +27,4 @@ export * from './combat-resolve';
 export * from './calendar';
 export * from './turn-end';
 export * from './scenario';
+export * from './end-rules';

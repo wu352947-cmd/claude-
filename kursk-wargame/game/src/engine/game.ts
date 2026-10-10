@@ -18,6 +18,7 @@ import { isSupplied } from './supply';
 import { planGroupMove } from './group-move';
 import { parentOf, whyCannotAssign } from './command-chain';
 import { type Scenario, startTurn } from './scenario';
+import { conclude, turnEndCheck, type Streak } from './end-rules';
 import { type RngState, createRng, rollDie } from './rng';
 import type { Deployment, Oob, PlacedUnit, Side } from './units';
 
@@ -95,8 +96,12 @@ export interface GameState {
   eliminated: string[];
   /** 胜利目标格现在归谁（开局取想定，之后最后进入的一方） */
   owners: Record<string, Side>;
-  /** 想定的最后一个回合已经结束 */
+  /** 对局已结束（提前分出胜负 / 收兵 / 回合上限；没有 end 规则的想定打满 turns 回合） */
   over: boolean;
+  /** 已到想定的软时限回合（只是提示，可以继续） */
+  limitReached: boolean;
+  /** 某一方连续几个回合末处于"达成战争目标" */
+  streak: Streak;
 }
 
 export const Command = z.discriminatedUnion('type', [
@@ -120,6 +125,8 @@ export const Command = z.discriminatedUnion('type', [
   /** 调整隶属：把编制 formation 配属给 parent（null = 直属，不隶属任何上级） */
   z.object({ type: z.literal('Assign'), formation: z.string().min(1), parent: z.string().min(1).nullable() }),
   z.object({ type: z.literal('EndPhase') }),
+  /** 行动方收兵：当场结束对局，按现状判胜负 */
+  z.object({ type: z.literal('Conclude') }),
 ]);
 export type Command = z.infer<typeof Command>;
 
@@ -146,7 +153,8 @@ export type GameEvent =
   | { type: 'Recovered'; units: string[] }
   | { type: 'ObjectiveClaimed'; hex: string; side: Side }
   | { type: 'Assigned'; formation: string; from: string | null; to: string | null }
-  | { type: 'GameOver'; turn: number };
+  | { type: 'TimeLimit'; turn: number }
+  | { type: 'GameOver'; turn: number; reason?: string };
 
 /** 非法指令（例如单位不存在）：界面应提示玩家，不会改变状态 */
 export class CommandError extends Error {}
@@ -156,7 +164,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
     moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, disorganized: {}, attach: {}, plans: [], pending: [], attacked: [], attackedHexes: [], fired: [], advance: null,
-    damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
+    damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false, limitReached: false, streak: { side: null, turns: 0 },
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),
   };
@@ -181,7 +189,12 @@ function advancePhase(ctx: GameContext, s: GameState, leave = true): { state: Ga
   for (;;) {
     if (first) {
       const last = cur.phase + 1 >= P.length;
-      if (last && ctx.scenario?.turns && cur.turn >= ctx.scenario.turns) {
+      if (last && ctx.scenario?.end) {
+        const r = turnEndCheck(ctx, cur);
+        cur = r.state;
+        events.push(...r.events);
+        if (cur.over) break;
+      } else if (last && ctx.scenario?.turns && cur.turn >= ctx.scenario.turns) {
         // 想定的最后一个回合结束：停在回合末
         cur = { ...cur, over: true };
         events.push({ type: 'GameOver', turn: cur.turn });
@@ -286,6 +299,10 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
         state: { ...s, attach: { ...s.attach, [cmd.formation]: { parent: cmd.parent, turn: s.turn } } },
         events: [{ type: 'Assigned', formation: cmd.formation, from, to: cmd.parent }],
       };
+    }
+    case 'Conclude': {
+      if (!actingSide(ctx, s)) throw new CommandError('现在没有行动方，不能收兵');
+      return conclude(s);
     }
     case 'EndPhase': {
       const live = s.pending.filter((p) => !whyCannotAttack(ctx, s, p.attackers, p.hex, actingSide(ctx, s)));

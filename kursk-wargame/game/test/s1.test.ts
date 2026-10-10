@@ -48,7 +48,7 @@ describe('想定 S1 普罗霍罗夫卡', () => {
     expect(sc.turns).toBe(9);
   });
 
-  it('不做任何操作，一路结束阶段，9 回合后对局结束；增援在规定回合到达', () => {
+  it('不做任何操作，一路结束阶段：苏军守着全部目标，到第 6 回合（minTurn）连续 2 回合达成目标就提前结束；增援在规定回合到达', () => {
     let s = s0;
     const arrived: number[] = [];
     for (let i = 0; i < 200 && !s.over; i++) {
@@ -57,7 +57,7 @@ describe('想定 S1 普罗霍罗夫卡', () => {
       s = r.state;
     }
     expect(s.over).toBe(true);
-    expect(s.turn).toBe(9);
+    expect(s.turn).toBe(6);
     expect(arrived).toEqual([3, 5]);
     expect(s.units.length).toBe(oob.units.size);
   });
