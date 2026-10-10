@@ -170,7 +170,7 @@ export class Bot {
     return null;
   }
 
-  /** 作战分配：已宣布的先结算（已不能进行的取消）；没有就挑最好的一格，满足不了牵制义务的换下一个 */
+  /** 作战分配：已宣布的先结算（已不能进行的取消）；没有就挑最好的一格，补不上牵制的认罚降列 */
   private attack(s: GameState, side: Side, minRatio: number): Command | null {
     const ctx = this.ctx;
     for (const p of s.pending) if (!whyCannotAttack(ctx, s, p.attackers, p.hex, side)) return { type: 'Attack', attackers: p.attackers, hex: p.hex };
@@ -191,18 +191,16 @@ export class Bot {
     for (const seed of cands.slice(0, 14)) {
       const attacks: Cand[] = [seed];
       const used = new Set(seed.attackers);
-      let ok = true;
       for (let guard = 0; guard < 40; guard++) {
         const miss = assaultMissing(ctx, s, attacks);
         if (!miss.length) break;
         const ev = this.evalHex(s, side, miss[0]!.hex, floor, used, false);
-        if (!ev) { ok = false; break; }
+        if (!ev) break; // 补不上牵制就认罚（降一列），不再放弃这份分配
         attacks.push(ev);
         for (const u of ev.attackers) used.add(u);
       }
-      if (!ok || assaultMissing(ctx, s, attacks).length) continue;
       if (whyCannotAssault(ctx, s, attacks, side)) continue;
-      const score = Math.min(...attacks.map((a) => a.ratio)) + 0.15 * attacks.reduce((n, a) => n + a.ratio, 0);
+      const score = -assaultMissing(ctx, s, attacks).length * 0.5 + Math.min(...attacks.map((a) => a.ratio)) + 0.15 * attacks.reduce((n, a) => n + a.ratio, 0);
       if (best && score <= best.score) continue;
       best = { score, cmd: attacks.length === 1 ? { type: 'Attack', attackers: seed.attackers, hex: seed.hex }
         : { type: 'Assault', attacks: attacks.map((a) => ({ attackers: a.attackers, hex: a.hex })) } };

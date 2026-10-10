@@ -49,9 +49,9 @@ export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, c
     ${p.drms.length ? `<div class="sub">骰子修正</div><ul class="mods">${mods(p.drms)}</ul>` : ''}
     ${below ? '' : `<div class="final">最终：<b>${C.columns[p.column]!.name}</b> 列，掷 2d6${p.drm ? `（${sign(p.drm)}）` : ''}</div>
     <ul class="mods outcomes">${outcomes}</ul>
-    ${pin.length ? `<div class="bad small">牵制义务：这些单位还贴着 ${pin.map(esc).join('、')} 的敌军，这些格子也必须被进攻——点那些格子，选好单位，都“加入分配”后一起宣布。</div>` : ''}
+    ${pin.length ? `<div class="bad small">侧翼牵制：这些单位还贴着 ${pin.map(esc).join('、')} 的敌军。不一起进攻（哪怕低赔率佯攻）就要降一列；想牵制就点那些格子、选好单位，都“加入分配”后一起宣布。</div>` : ''}
     ${inDraft ? '<div class="muted small">已在分配草稿里（再点“加入分配”会更新）</div>' : ''}
-    <button class="primary" id="atk-go"${pin.length ? ' disabled' : ''}>开战（掷骰）</button> <button id="atk-add">加入分配</button>`}
+    <button class="primary" id="atk-go">开战（掷骰）</button> <button id="atk-add">加入分配</button>`}
     <div class="muted small">规则与参数：docs/10-战斗.md、data/rules/combat.json（草案）</div></div>`;
 }
 

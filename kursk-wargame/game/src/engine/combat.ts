@@ -10,6 +10,7 @@ import { nightBarred, whyNotExploit } from './calendar';
 import type { GameContext, GameState, UnitState } from './game';
 import { coordGroup } from './command-chain';
 import { PlanRules, planShift } from './plan';
+import { pinRequired } from './assault';
 import { DisorganizeRules } from './disorganize';
 import { SupplyRules, isSupplied } from './supply';
 import type { Side } from './units';
@@ -25,6 +26,8 @@ export const PinRules = z.object({
   enabled: z.boolean(),
   /** flank = 只要求同时贴着进攻单位和目标格的敌军格（侧翼）也被进攻；all = 进攻单位旁边所有敌军格 */
   scope: z.enum(['flank', 'all']),
+  /** 侧翼敌军格没被同时进攻（牵制）时，进攻的列偏移（负数 = 不利）；0 = 无惩罚 */
+  shift: z.number().int(),
 });
 export type PinRules = z.infer<typeof PinRules>;
 
@@ -189,6 +192,8 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
     const names = groups.map((g) => ctx.oob.formations.get(g)!.names.zh).join('、');
     shifts.push({ value: C.coordination.crossGroupShift, label: `协同不良：${names}不属同一集团军${fresh ? '（含本回合刚调整隶属的）' : ''}`, source: `${RULE} coordination（docs/15）` });
   }
+  const loose = C.pin.shift ? pinRequired(ctx, s, attackers, hex) : [];
+  if (loose.length) shifts.push({ value: C.pin.shift, label: `侧翼没有牵制：${loose.join('、')} 的敌军没被同时进攻，会来侧击`, source: `${RULE} pin（docs/16）` });
   const ps = planShift(ctx, s, side, atk.map((u) => unitOf(ctx, u.id).formation), hex);
   if (ps) shifts.push({ value: ps.value, label: ps.label, source: `${RULE} plan（docs/15 §7）` });
   const formations = new Set(atk.map((u) => unitOf(ctx, u.id).formation));

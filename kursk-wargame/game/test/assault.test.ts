@@ -18,25 +18,31 @@ describe('牵制义务', () => {
     expect(pinRequired(ctx, s, [TANK], nA)).toEqual([nB]);
     expect(pinRequired(ctx, s, [DEINF], nB)).toEqual([]);
     expect(pinRequired(ctx, { ...s, attackedHexes: [nB] }, [TANK], nA)).toEqual([]);
-    expect(pinRequired({ ...ctx, combat: { ...ctx.combat, pin: { enabled: false, scope: 'all' as const } } }, s, [TANK], nA)).toEqual([]);
+    expect(pinRequired({ ...ctx, combat: { ...ctx.combat, pin: { enabled: false, scope: 'all' as const, shift: -1 } } }, s, [TANK], nA)).toEqual([]);
   });
   it('scope = all 时进攻单位旁边所有敌军格都算；flank 只算同时贴着目标格的两个侧翼', () => {
-    const all = { ...ctx, combat: { ...ctx.combat, pin: { enabled: true, scope: 'all' as const } } };
+    const all = { ...ctx, combat: { ...ctx.combat, pin: { enabled: true, scope: 'all' as const, shift: -1 } } };
     // 另放一个只贴着 TANK、不贴目标 nA 的敌军
     const far = ring('0606').find((h) => h !== nA && h !== nB && !ring(nA).includes(h))!;
     const s = at({ [TANK]: '0606', [INF]: nA, [MOT]: far }, 'first.combat');
     expect(pinRequired(ctx, s, [TANK], nA)).toEqual([]);
     expect(pinRequired(all, s, [TANK], nA)).toEqual([far]);
   });
-  it('单独 Attack 违反牵制义务会被拒绝，并提示用作战分配', () => {
-    expect(() => apply(ctx, base(), { type: 'Attack', attackers: [TANK], hex: nA })).toThrow(/牵制义务/);
-    // 没有额外相邻敌军的进攻照常
-    expect(apply(ctx, base(), { type: 'Attack', attackers: [DEINF], hex: nB }).events.length).toBeGreaterThan(0);
+  it('不牵制侧翼不再被禁止，但进攻降一列；把侧翼格一起宣布（或已宣布）就不降', async () => {
+    const { previewCombat } = await import('../src/engine');
+    const s = base();
+    const loose = previewCombat(ctx, s, [TANK], nA);
+    expect(loose.shifts.some((m) => m.label.startsWith('侧翼没有牵制'))).toBe(true);
+    expect(() => apply(ctx, s, { type: 'Attack', attackers: [TANK], hex: nA })).not.toThrow();
+    const covered = apply(ctx, s, { type: 'Assault', attacks: [{ attackers: [TANK], hex: nA }, { attackers: [DEINF], hex: nB }] }).state;
+    expect(previewCombat(ctx, covered, [TANK], nA).shifts.some((m) => m.label.startsWith('侧翼没有牵制'))).toBe(false);
+    const off = { ...ctx, combat: { ...ctx.combat, pin: { ...ctx.combat.pin, shift: 0 } } };
+    expect(previewCombat(off, s, [TANK], nA).shifts.some((m) => m.label.startsWith('侧翼没有牵制'))).toBe(false);
   });
-  it('一份分配里覆盖了所有义务才合法；缺的会写明', () => {
+  it('一份分配没覆盖侧翼也合法（只是降列）；assaultMissing 仍会指出缺哪格', () => {
     const s = base();
     expect(assaultMissing(ctx, s, [{ attackers: [TANK], hex: nA }])).toEqual([{ hex: nB, because: nA }]);
-    expect(whyCannotAssault(ctx, s, [{ attackers: [TANK], hex: nA }], 'DE')).toMatch(/牵制义务/);
+    expect(whyCannotAssault(ctx, s, [{ attackers: [TANK], hex: nA }], 'DE')).toBeNull();
     expect(whyCannotAssault(ctx, s, [{ attackers: [TANK], hex: nA }, { attackers: [DEINF], hex: nB }], 'DE')).toBeNull();
   });
   it('分配的其他检查：目标重复、单位重复、对方回合、空分配', () => {

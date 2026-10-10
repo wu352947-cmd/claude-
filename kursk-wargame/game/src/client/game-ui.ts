@@ -150,10 +150,10 @@ export function createGameUi(
     } else if (draft.length) {
       const miss = assaultMissing(ctx, s, draft);
       const why = whyCannotAssault(ctx, s, draft, side);
-      html += `<b>作战分配草稿</b><small>先把要打的格子都加进来，满足牵制义务后一起宣布。</small>`;
+      html += `<b>作战分配草稿</b><small>把要打的格子都加进来一起宣布；侧翼敌军也加进来就不会被降列（牵制）。</small>`;
       for (const d of draft) html += `<div class="as-row"><span>${esc(d.hex)} ← ${names(d.attackers)}</span><button data-drop="${esc(d.hex)}">移除</button></div>`;
-      if (miss.length) html += `<div class="bad">牵制义务：还缺 ${miss.map((m) => `${esc(m.hex)}（因为进攻 ${esc(m.because)} 的单位贴着它）`).join('、')}</div>`;
-      else if (why) html += `<div class="bad">${esc(why)}</div>`;
+      if (miss.length) html += `<div class="bad">牵制：${miss.map((m) => `${esc(m.hex)}（进攻 ${esc(m.because)} 的单位贴着它）`).join('、')} 没被进攻，相关进攻会降一列</div>`;
+      if (why) html += `<div class="bad">${esc(why)}</div>`;
       html += `<div class="as-row"><button class="primary" id="as-go"${why || !mine ? ' disabled' : ''}>宣布分配</button><button id="as-clear">清空草稿</button></div>`;
     }
     box.hidden = !html;

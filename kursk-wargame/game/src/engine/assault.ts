@@ -1,7 +1,7 @@
 /**
  * 作战分配（docs/16 第 4 轮）：先宣布本阶段的全部进攻，再由进攻方决定顺序逐个结算。
- * 牵制义务：一个单位进攻时，它旁边其他有敌军的格子也必须在同一份分配里被进攻（由它或别的单位），
- * 否则这份分配不合法。这让接触线上的每个选择都互相牵连。参数在 combat.json 的 pin；enabled = false 时不要求。
+ * 牵制（软规定）：一个单位进攻时，它侧翼还贴着别的敌军格；这些格没被同时进攻（由它或别的单位），
+ * 进攻就降一列（combat.ts）。不再禁止宣布：玩家可以自己权衡。参数在 combat.json 的 pin。
  */
 import { distance, hexId, neighbors, parseHexId } from './hex';
 import { sideOfUnit } from './movement';
@@ -11,7 +11,7 @@ import type { Side } from './units';
 
 export interface Attack { attackers: string[]; hex: string }
 
-/** 牵制义务：进攻单位旁边、除目标格外还有敌军的格子（scope = flank 时只算同时贴着目标格的侧翼；本阶段已被进攻过的不算）必须也被进攻 */
+/** 牵制：进攻单位旁边、除目标格外还有敌军的格子（scope = flank 时只算同时贴着目标格的侧翼；本阶段已被进攻过或已宣布的不算）应该也被进攻，否则降列 */
 export function pinRequired(ctx: GameContext, s: GameState, attackers: readonly string[], hex: string): string[] {
   if (!ctx.combat.pin.enabled || !attackers.length) return [];
   const side = sideOfUnit(ctx, attackers[0]!);
@@ -22,14 +22,14 @@ export function pinRequired(ctx: GameContext, s: GameState, attackers: readonly 
     if (!u) continue;
     for (const n of neighbors(parseHexId(u.hex))) {
       const h = hexId(n);
-      if (h === hex || !enemyAt.has(h) || s.attackedHexes.includes(h)) continue;
+      if (h === hex || !enemyAt.has(h) || s.attackedHexes.includes(h) || s.pending.some((p) => p.hex === h)) continue;
       if (ctx.combat.pin.scope === 'all' || distance(n, parseHexId(hex)) === 1) out.add(h);
     }
   }
   return [...out].sort();
 }
 
-/** 一份分配里还没被覆盖的牵制义务：[被要求进攻的格, 因为哪个格的进攻] */
+/** 一份分配里还没被覆盖的牵制：[被要求进攻的格, 因为哪个格的进攻] */
 export function assaultMissing(ctx: GameContext, s: GameState, attacks: readonly Attack[]): { hex: string; because: string }[] {
   const covered = new Set(attacks.map((a) => a.hex));
   const out = new Map<string, string>();
@@ -54,8 +54,6 @@ export function whyCannotAssault(ctx: GameContext, s: GameState, attacks: readon
     const why = whyCannotAttack(ctx, s, a.attackers, a.hex, side);
     if (why) return `进攻 ${a.hex}：${why}`;
   }
-  const miss = assaultMissing(ctx, s, attacks);
-  if (miss.length) return `牵制义务：${miss.map((m) => `进攻 ${m.because} 的单位还贴着 ${m.hex} 的敌军，${m.hex} 也必须被进攻`).join('；')}`;
   return null;
 }
 

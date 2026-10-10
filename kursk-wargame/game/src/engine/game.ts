@@ -12,7 +12,7 @@ import { type CombatRules, whyCannotAttack } from './combat';
 import { resolveAdvance, resolveAttack } from './combat-resolve';
 import { type TurnRules, type TurnStart } from './calendar';
 import { endOfTurn } from './turn-end';
-import { pinRequired, sameUnits, whyCannotAssault } from './assault';
+import { sameUnits, whyCannotAssault } from './assault';
 import { type Axis, AxisKind, nextAxisId, whyCannotPlan } from './plan';
 import { isSupplied } from './supply';
 import { planGroupMove } from './group-move';
@@ -106,7 +106,7 @@ export const Command = z.discriminatedUnion('type', [
   z.object({ type: z.literal('RollDie'), sides: z.number().int().min(2).max(100), purpose: z.string().default('测试') }),
   /** 进攻：attackers 进攻 hex 里的全部敌军 */
   z.object({ type: z.literal('Attack'), attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) }),
-  /** 作战分配：一次宣布本阶段的全部进攻（要满足牵制义务），之后逐个用 Attack 结算 */
+  /** 作战分配：一次宣布本阶段的全部进攻（侧翼敌军一起打可免降列），之后逐个用 Attack 结算 */
   z.object({ type: z.literal('Assault'), attacks: z.array(z.object({ attackers: z.array(z.string().min(1)).min(1), hex: z.string().regex(/^\d{4}$/) })).min(1).max(20) }),
   /** 取消一场已宣布、但已经不能进行的进攻 */
   z.object({ type: z.literal('CancelAttack'), hex: z.string().regex(/^\d{4}$/) }),
@@ -239,8 +239,6 @@ export function apply(ctx: GameContext, s: GameState, cmd: Command): { state: Ga
         const r = resolveAttack(ctx, s, cmd.attackers, cmd.hex);
         return { state: { ...r.state, pending: r.state.pending.filter((p) => p !== entry) }, events: r.events };
       }
-      const pin = pinRequired(ctx, s, cmd.attackers, cmd.hex);
-      if (pin.length) throw new CommandError(`牵制义务：进攻单位还贴着 ${pin.join('、')} 的敌军，必须同时进攻（请用作战分配一次宣布）`);
       return resolveAttack(ctx, s, cmd.attackers, cmd.hex);
     }
     case 'Assault': {
