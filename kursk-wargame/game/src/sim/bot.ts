@@ -186,7 +186,9 @@ export class Bot {
     }
     cands.sort((a, b) => b.ratio - a.ratio || (a.hex < b.hex ? -1 : a.hex > b.hex ? 1 : 0));
     const floor = Math.max(ctx.combat.columns[0]!.min, minRatio * 0.5);
-    for (const seed of cands) {
+    // 每个起点各自凑出一份可行的分配，挑"最弱一环最强"的（被迫牵制的烂赔率攻击会拖垮整份）
+    let best: { score: number; cmd: Command } | null = null;
+    for (const seed of cands.slice(0, 14)) {
       const attacks: Cand[] = [seed];
       const used = new Set(seed.attackers);
       let ok = true;
@@ -200,9 +202,12 @@ export class Bot {
       }
       if (!ok || assaultMissing(ctx, s, attacks).length) continue;
       if (whyCannotAssault(ctx, s, attacks, side)) continue;
-      return attacks.length === 1 ? { type: 'Attack', attackers: seed.attackers, hex: seed.hex }
-        : { type: 'Assault', attacks: attacks.map((a) => ({ attackers: a.attackers, hex: a.hex })) };
+      const score = Math.min(...attacks.map((a) => a.ratio)) + 0.15 * attacks.reduce((n, a) => n + a.ratio, 0);
+      if (best && score <= best.score) continue;
+      best = { score, cmd: attacks.length === 1 ? { type: 'Attack', attackers: seed.attackers, hex: seed.hex }
+        : { type: 'Assault', attacks: attacks.map((a) => ({ attackers: a.attackers, hex: a.hex })) } };
     }
+    if (best) return best.cmd;
     return null;
   }
 }
