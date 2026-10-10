@@ -22,6 +22,7 @@ export interface GameUi {
   addToAssault(hex: string, attackers: string[]): void;
   /** 草稿里这一格的进攻单位（没有 = null） */
   draftOf(hex: string): string[] | null;
+  draftHexes(): string[];
   /** 下达指令；非法时提示并返回 false */
   dispatch(cmd: Command): boolean;
 }
@@ -283,6 +284,7 @@ export function createGameUi(
       renderAssault();
       onChange(cur.state);
     },
+    draftHexes: () => draft.map((d) => d.hex),
     draftOf: (hex) => draft.find((d) => d.hex === hex)?.attackers ?? null,
   };
 }

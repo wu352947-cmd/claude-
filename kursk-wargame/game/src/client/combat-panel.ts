@@ -17,7 +17,7 @@ export function resultText(code: string): string {
  * @param chosen 玩家勾选的进攻单位（null = 默认全选）
  * 返回 HTML；按钮 id：atk-go（开战）、复选框 class atk-pick（data-unit）
  */
-export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, chosen: Set<string> | null, inDraft: string[] | null = null): string {
+export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, chosen: Set<string> | null, inDraft: string[] | null = null, draftHexes: readonly string[] = []): string {
   const side = actingSide(ctx, s);
   const defenders = s.units.filter((u) => u.hex === hex);
   if (!side || !defenders.length || sideOfUnit(ctx, defenders[0]!.id) === side) return '';
@@ -31,8 +31,10 @@ export function combatSectionHtml(ctx: GameContext, s: GameState, hex: string, c
   const boxes = eligible.map((id) => `<label class="atk-row"><input type="checkbox" class="atk-pick" data-unit="${esc(id)}"${picked.includes(id) ? ' checked' : ''}> ${name(id)}</label>`).join('');
   const why = whyCannotAttack(ctx, s, picked, hex, side);
   if (why && !why.startsWith(ODDS_LOW)) return `<div class="combat">${head}${boxes}<div class="muted">${esc(why)}</div></div>`;
-  const p = previewCombat(ctx, s, picked, hex);
-  const pin = pinRequired(ctx, s, picked, hex);
+  // 草稿里已经加进分配的格子算一起进攻：预览不再为它们扣牵制降列
+  const sv: GameState = draftHexes.length ? { ...s, pending: draftHexes.filter((h) => h !== hex).map((h) => ({ attackers: [], hex: h })) } : s;
+  const p = previewCombat(ctx, sv, picked, hex);
+  const pin = pinRequired(ctx, sv, picked, hex);
   const C = ctx.combat;
   const vals = (xs: { id: string; value: number }[]): string => xs.map((x) => `${name(x.id)} ${x.value}`).join('、');
   const mods = (ms: typeof p.shifts): string => ms.map((m) => `<li><b>${sign(m.value)}</b> ${esc(m.label)}<small>${esc(m.source)}</small></li>`).join('');
