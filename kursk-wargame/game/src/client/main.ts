@@ -29,6 +29,7 @@ import { createReachView } from './reach-view';
 import { advanceSectionHtml, combatSectionHtml } from './combat-panel';
 import { type Fog, createHotseat } from './hotseat';
 import { createObjectivesView } from './objectives-view';
+import { setupHowto } from './howto';
 
 const meta = GameMeta.parse(rawMeta);
 const baseMap = loadMap({ def, hexes, hexsides, labels, lines });
@@ -131,8 +132,11 @@ function showInfo(h: Offset | null): void {
 
 /** 选中单位的疲劳（连续进攻会累积；进攻时使列左移） */
 function fatigueNote(unitId: string | null): string {
+  const dug = unitId && game ? game.state().entrench[unitId] : undefined;
+  const dugHtml = dug && dug.level > 0 && game?.state().units.find((u) => u.id === unitId)?.hex === dug.hex
+    ? `<div class="combat"><div class="units-head">掘壕 ${dug.level} 级</div><div class="muted small">在原地守了 ${dug.level} 个回合；被进攻时赔率列右移（对守方有利）。一移动就清零。</div></div>` : '';
   const lvl = unitId && game ? game.state().fatigue[unitId] ?? 0 : 0;
-  return lvl ? `<div class="combat"><div class="units-head">疲劳 ${lvl} 级</div><div class="muted small">连续进攻会累积；回合末不进攻则休整，夜间恢复更多。疲劳的部队进攻时赔率列左移。</div></div>` : '';
+  return dugHtml + (lvl ? `<div class="combat"><div class="units-head">疲劳 ${lvl} 级</div><div class="muted small">连续进攻会累积；回合末不进攻则休整，夜间恢复更多。疲劳的部队进攻时赔率列左移。</div></div>` : '');
 }
 
 /** 选中单位的开局位置依据（想定里写的考据说明；占位和推定用斜体） */
@@ -239,6 +243,7 @@ async function start(): Promise<void> {
     try { localStorage.setItem(SCN_KEY, pick.value); localStorage.removeItem('kursk-1943-autosave'); } catch { /* 隐私模式 */ }
     location.reload();
   };
+  setupHowto();
   game = createGameUi(ctx, initialFor, deployment.id, ENGINE_VERSION, (s) => {
     stackMap = stacks(placedUnits(ctx, s));
     fog = hotseat.fog(s);

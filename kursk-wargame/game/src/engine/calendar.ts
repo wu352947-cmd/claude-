@@ -28,6 +28,7 @@ export const TurnRules = z.object({
     nightRest: z.number().int().nonnegative(),
     shiftPerLevel: z.number().int().nonnegative(),
   }),
+  entrench: z.object({ $comment: z.string().optional(), max: z.number().int().positive(), shiftPerLevel: z.number().int().nonnegative() }),
   fog: z.object({ $comment: z.string().optional(), revealRange: z.number().int().nonnegative() }),
 });
 export type TurnRules = z.infer<typeof TurnRules>;

@@ -62,6 +62,8 @@ export interface GameState {
   wonThisTurn: string[];
   /** 疲劳等级（只记大于 0 的单位；回合末按本回合是否进攻更新，见 turn-end.ts） */
   fatigue: Record<string, number>;
+  /** 掘壕：单位在同一格不动的回合数（等级），换格或移动就清零；hex 记下掘壕的格子 */
+  entrench: Record<string, { hex: string; level: number }>;
   /** 本阶段已经进攻过的单位、被进攻过的格子、已经支援过的炮兵 */
   attacked: string[];
   attackedHexes: string[];
@@ -121,7 +123,7 @@ export function initialState(scenario: string, first: Side, seed: number, deploy
   const objectives = 'objectives' in deployment ? deployment.objectives : [];
   return {
     scenario, first, turn: 1, phase: 0, rng: createRng(seed), start: deployment.start,
-    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
+    moved: [], movedThisTurn: [], foughtThisTurn: [], wonThisTurn: [], fatigue: {}, entrench: {}, attacked: [], attackedHexes: [], fired: [], advance: null,
     damaged: [], repair: [], destroyed: [], casualties: [], eliminated: [], over: false,
     owners: Object.fromEntries(objectives.map((o) => [o.hex, o.owner])),
     units: deployment.placements.map((p) => ({ id: p.unit, hex: p.hex, steps: p.steps ?? -1 })),

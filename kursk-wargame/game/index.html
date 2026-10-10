@@ -247,6 +247,7 @@
         <button class="primary" id="g-end">结束阶段</button>
         <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>
         <button id="g-redo" title="重做（Ctrl+Y）">↷ 重做</button>
+        <button id="g-howto">怎么玩</button>
         <button id="g-more">记录 / 存档</button>
       </div>
       <div class="more">
@@ -264,6 +265,17 @@
         <div class="meta" id="g-meta"></div>
       </div>
     </div>
+    <style>
+      #howto { position: fixed; inset: 0; z-index: 60; background: rgba(20,22,23,.82); display: flex; align-items: center; justify-content: center; padding: 16px; }
+      #howto[hidden] { display: none; }
+      #howto .box { background: var(--panel); color: var(--panel-ink); max-width: 520px; max-height: 90vh; overflow: auto; padding: 16px 20px; border-radius: 6px; font-size: 14px; line-height: 1.6; }
+      #howto h2 { margin: 0 0 8px; font-size: 17px; }
+      #howto ol { margin: 0 0 8px; padding-left: 20px; }
+      #howto li { margin-bottom: 4px; }
+      #howto .muted { font-size: 12px; color: #b7ae90; }
+      #howto .box > button { display: block; margin: 8px 0 0 auto; }
+    </style>
+    <div id="howto" hidden></div>
     <div id="handoff" hidden><div class="box"><div id="handoff-text"></div><button class="primary" id="handoff-go">继续</button>
       <div id="handoff-pbem" class="pbem" hidden><button class="primary" id="handoff-export">导出回合文件</button> <button id="handoff-import">读入对手的文件</button></div></div></div>
     <div id="toast"></div>

@@ -69,7 +69,15 @@ export function endOfTurn(ctx: GameContext, s0: GameState): { state: GameState; 
     const v = s0.foughtThisTurn.includes(u.id) ? Math.min(F.max, (s0.fatigue[u.id] ?? 0) + F.perFightTurn) : Math.max(0, (s0.fatigue[u.id] ?? 0) - rest);
     if (v > 0) fatigue[u.id] = v;
   }
-  return { state: { ...s0, rng, units, repair, destroyed, fatigue, damaged: [] }, events };
+  // 4. 掘壕：同一格不动 +1，否则清零
+  const E = ctx.turns.entrench;
+  const entrench: GameState['entrench'] = {};
+  for (const u of units) {
+    const prev = s0.entrench[u.id];
+    const stayed = !s0.movedThisTurn.includes(u.id) && (!prev || prev.hex === u.hex);
+    if (stayed) entrench[u.id] = { hex: u.hex, level: Math.min(E.max, (prev?.level ?? 0) + 1) };
+  }
+  return { state: { ...s0, rng, units, repair, destroyed, fatigue, entrench, damaged: [] }, events };
 }
 
 /** 热座迷雾：viewer 能看清番号与实力的敌军单位（距本方任一单位不超过 revealRange） */

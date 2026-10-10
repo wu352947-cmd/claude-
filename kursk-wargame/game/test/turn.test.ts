@@ -163,3 +163,28 @@ describe('疲劳', () => {
     expect(mixed.shifts.some((m) => m.label.includes('疲劳'))).toBe(false); // 平均不足 1 级
   });
 });
+
+describe('掘壕', () => {
+  const E = turns.entrench;
+  it('同一格不动过完一个回合 +1（最高 max）；移动过或换格归零', () => {
+    let s: GameState = at({ [TANK]: '0505', [MOT]: '0508' }, 'end');
+    s = endOfTurn(ctx, s).state;
+    expect(s.entrench[TANK]).toEqual({ hex: '0505', level: 1 });
+    for (let i = 0; i < 4; i++) s = endOfTurn(ctx, s).state;
+    expect(s.entrench[TANK]?.level).toBe(E.max);
+    const moved = endOfTurn(ctx, { ...s, movedThisTurn: [TANK] }).state;
+    expect(moved.entrench[TANK]).toBeUndefined();
+    const shifted = endOfTurn(ctx, { ...s, units: s.units.map((u) => (u.id === TANK ? { ...u, hex: '0504' } : u)) }).state;
+    expect(shifted.entrench[TANK]).toBeUndefined();
+  });
+
+  it('守方掘壕使攻方赔率列左移，按守方格内最高等级；已换格的旧记录无效', () => {
+    const s = { ...at({ [MOT]: '0505', [DEINF]: '0506' }, 'second.combat'), entrench: { [DEINF]: { hex: '0506', level: 2 } } };
+    const dug = previewCombat(ctx, s, [MOT], '0506');
+    const plain = previewCombat(ctx, { ...s, entrench: {} }, [MOT], '0506');
+    expect(dug.shifts.find((m) => m.label.includes('掘壕'))?.value).toBe(-2 * E.shiftPerLevel);
+    expect(dug.column).toBeLessThanOrEqual(plain.column);
+    const stale = previewCombat(ctx, { ...s, entrench: { [DEINF]: { hex: '0507', level: 2 } } }, [MOT], '0506');
+    expect(stale.shifts.some((m) => m.label.includes('掘壕'))).toBe(false);
+  });
+});

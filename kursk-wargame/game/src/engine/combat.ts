@@ -141,6 +141,10 @@ export function previewCombat(ctx: GameContext, s: GameState, attackers: readonl
     const lvl = Math.floor(attackersV.reduce((a, x) => a + (s.fatigue[x.id] ?? 0) * x.value, 0) / w);
     if (lvl > 0) shifts.push({ value: -lvl * C_F(ctx).shiftPerLevel, label: `攻方疲劳（${lvl} 级）：连续进攻的部队越打越乏`, source: 'data/rules/turns.json fatigue（02 §3）' });
   }
+  if (ctx.turns.entrench.shiftPerLevel) {
+    const lvl = Math.max(0, ...def.map((u) => (s.entrench[u.id]?.hex === u.hex ? s.entrench[u.id]!.level : 0)));
+    if (lvl > 0) shifts.push({ value: -lvl * ctx.turns.entrench.shiftPerLevel, label: `守方掘壕（${lvl} 级）：在原地守了 ${lvl} 个回合`, source: 'data/rules/turns.json entrench（02 §5.1）' });
+  }
   const fort = ctx.scenario?.fortifications.find((f) => f.hex === hex && f.side === enemy);
   if (fort && C.fortification.shiftPerLevel) {
     shifts.push({ value: -fort.level * C.fortification.shiftPerLevel, label: `守方工事：${fort.name}（${fort.level} 级）`, source: `${RULE} fortification（02 §5；位置：${fort.confidence === 'sourced' ? '有出处' : '推定'}）` });

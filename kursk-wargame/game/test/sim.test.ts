@@ -36,7 +36,7 @@ describe('无界面模拟', () => {
 
   it('同一种子结果完全相同；不同种子（骰子不同）结果不全相同', () => {
     expect(play(7)).toEqual(play(7));
-    const sig = (seed: number) => JSON.stringify([play(seed).lostSteps, play(seed).deHeld]);
+    const sig = (seed: number) => { const r = play(seed); return JSON.stringify([r.lostSteps, r.deHeld]); };
     expect(new Set([1, 2, 3, 4].map(sig)).size).toBeGreaterThan(1);
   });
 
