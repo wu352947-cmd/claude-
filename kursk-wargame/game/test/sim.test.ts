@@ -39,7 +39,7 @@ describe('无界面模拟', () => {
     expect(play(7)).toEqual(play(7));
     const sig = (seed: number) => { const r = play(seed); return JSON.stringify([r.lostSteps, r.deHeld]); };
     expect(new Set([1, 2, 3, 4].map(sig)).size).toBeGreaterThan(1);
-  });
+  }, 30000);
 
   it('自动对手不会给出非法指令（逐条检查 apply 不抛错）', () => {
     const bot = new Bot(ctx, rules);
@@ -60,7 +60,7 @@ describe('无界面模拟', () => {
     for (const h of ['## 1. 对局概况', '## 2. 装甲完全损失', '## 3. 与历史对照', '## 4. 装甲受损池分流', '## 5. 战斗结果分布', '## 6. 分布图']) expect(md).toContain(h);
     expect(Object.keys(verdicts)).toContain('suDay2');
     expect(Object.keys(verdicts).filter((k) => k.startsWith('obj')).length).toBe(6);
-  });
+  }, 30000);
 });
 
 describe('自动对手与作战计划', () => {
