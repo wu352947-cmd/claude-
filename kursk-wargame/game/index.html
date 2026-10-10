@@ -144,6 +144,7 @@
       #handoff .box { text-align: center; color: #eee; max-width: 420px; }
       #handoff-text { font-size: 22px; margin-bottom: 20px; line-height: 1.5; }
       #handoff-text small { display: block; font-size: 14px; color: var(--muted); }
+      #handoff .pbem { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
       #handoff button { font: inherit; font-size: 16px; padding: 10px 22px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
       #info .combat { border-top: 1px solid #4a4738; margin-top: 8px; padding-top: 6px; font-size: 13px; }
       #info .combat .atk-row { display: block; margin: 2px 0; }
@@ -257,12 +258,14 @@
           <input type="file" id="g-file" accept=".json,application/json" hidden />
         </div>
         <label class="hs">想定 <select id="g-scn"></select></label>
-        <label class="hs"><input type="checkbox" id="g-hotseat" /> 热座：换人时遮屏，隐藏未侦察的敌军</label>
+        <label class="hs">对战方式 <select id="g-mode"><option value="hotseat">热座（一台设备轮流）</option><option value="pbem">异地对战（交换回合文件）</option><option value="off">上帝视角（一个人测试）</option></select>
+          <select id="g-side" hidden><option value="DE">我是德军</option><option value="SU">我是苏军</option></select></label>
         <ol id="g-log"></ol>
         <div class="meta" id="g-meta"></div>
       </div>
     </div>
-    <div id="handoff" hidden><div class="box"><div id="handoff-text"></div><button class="primary" id="handoff-go">继续</button></div></div>
+    <div id="handoff" hidden><div class="box"><div id="handoff-text"></div><button class="primary" id="handoff-go">继续</button>
+      <div id="handoff-pbem" class="pbem" hidden><button class="primary" id="handoff-export">导出回合文件</button> <button id="handoff-import">读入对手的文件</button></div></div></div>
     <div id="toast"></div>
     <div id="loading">正在绘制地图…</div>
     <div class="credit">底图：U.S. Army Map Service N501；红军总参谋部 1:100,000（Indiana University Libraries）（均为公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>

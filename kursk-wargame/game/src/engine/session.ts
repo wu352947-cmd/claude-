@@ -5,7 +5,8 @@
  * - 存档：只存指令列表和最终状态的指纹，读档时回放并核对指纹，证明结果完全一致。
  */
 import { z } from 'zod';
-import { Command, type GameContext, type GameEvent, type GameState, apply } from './game';
+import { Command, type GameContext, type GameEvent, type GameState, actingSide, apply } from './game';
+import { Side } from './units';
 
 export interface History {
   /** 已下达的全部指令（含被撤销、可重做的） */
@@ -70,13 +71,24 @@ export const SaveFile = z.object({
   commands: z.array(Command),
   /** 回放后最终状态的指纹 */
   hash: z.string().regex(/^[0-9a-f]{8}$/),
+  /** 异地对战（docs/13）：这份文件存的是哪个回合、哪个阶段，现在轮到谁（null = 对局已结束或双方都可） */
+  note: z.object({ turn: z.number().int().positive(), phase: z.number().int().nonnegative(), to: Side.nullable(), over: z.boolean().default(false) }).optional(),
 });
 export type SaveFile = z.infer<typeof SaveFile>;
 
 export function makeSave(ctx: GameContext, initial: GameState, h: History, seed: number, engine: string): SaveFile {
   const commands = h.commands.slice(0, h.cursor);
   const { state } = replay(ctx, initial, { commands, cursor: commands.length });
-  return { format: SAVE_FORMAT, version: 1, engine, scenario: initial.scenario, seed, commands, hash: stateHash(state) };
+  const to = state.over ? null : actingSide(ctx, state);
+  return {
+    format: SAVE_FORMAT, version: 1, engine, scenario: initial.scenario, seed, commands, hash: stateHash(state),
+    note: { turn: state.turn, phase: state.phase, to, over: state.over },
+  };
+}
+
+/** 新文件的指令是否以旧指令为开头（异地对战读入对手文件时检查：防止读入旧文件把进度倒退，或读入另一局的文件） */
+export function extendsHistory(oldCommands: readonly Command[], newCommands: readonly Command[]): boolean {
+  return newCommands.length >= oldCommands.length && oldCommands.every((c, i) => JSON.stringify(c) === JSON.stringify(newCommands[i]));
 }
 
 /**

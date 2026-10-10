@@ -5,7 +5,7 @@
  * 热座时，记录里看不清的敌军单位不写番号，敌军的受损池与修理也不显示。
  */
 import {
-  CONTROL_NAMES, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
+  CONTROL_NAMES, extendsHistory, type Command, CommandError, type GameContext, type GameEvent, type GameState, type History, SIDE_NAMES, type Side, actingSide,
   canRedo, canUndo, emptyHistory, historyReport, loadSave, makeSave, push, redo, replay, score, sideOfUnit, stateHash, turnInfo, turnLabel, undo,
 } from '../engine';
 import type { Fog, Hotseat } from './hotseat';
@@ -74,7 +74,7 @@ export function createGameUi(
     const t = turnInfo(ctx, s);
     const total = ctx.scenario?.turns;
     $('g-phase').innerHTML = `${s.over ? '<span class="night">已结束</span> ' : ''}第 ${s.turn}${total ? ` / ${total}` : ''} 回合 · ${esc(turnLabel(t))} · ${esc(ph.name)}<small>${side ? `${SIDE_NAMES[side]}行动` : '双方'}</small>`;
-    $<HTMLButtonElement>('g-end').disabled = s.over;
+    $<HTMLButtonElement>('g-end').disabled = s.over || !!hotseat.whyCannotAct(s);
     const rep = s.over ? historyReport(ctx, s) : null;
     $('g-report').hidden = !rep;
     if (rep) {
@@ -106,6 +106,8 @@ export function createGameUi(
   }
 
   function dispatch(cmd: Command): boolean {
+    const no = hotseat.whyCannotAct(cur.state);
+    if (no) { toast(no); return false; }
     try {
       history = push(ctx, initial, history, cmd);
     } catch (e) {
@@ -118,36 +120,54 @@ export function createGameUi(
 
   $('g-end').onclick = () => dispatch({ type: 'EndPhase' });
   const tryUndo = (): void => {
+    const no = hotseat.whyCannotAct(cur.state);
+    if (no) { toast(no); return; }
     const h = undo(history);
     if (hotseat.blocksUndo(cur.state, replay(ctx, initial, h).state)) { toast('热座：不能撤销到对方的阶段'); return; }
     history = h; render();
   };
   $('g-undo').onclick = tryUndo;
-  $('g-redo').onclick = () => { history = redo(history); render(); };
+  const tryRedo = (): void => {
+    const no = hotseat.whyCannotAct(cur.state);
+    if (no) { toast(no); return; }
+    history = redo(history); render();
+  };
+  $('g-redo').onclick = tryRedo;
   $('g-roll').onclick = () => dispatch({ type: 'RollDie', sides: 6, purpose: '测试' });
   $('g-more').onclick = () => $('game').classList.toggle('open');
   $('g-new').onclick = () => {
     if (!confirm('开始新对局？当前对局的指令会清空（可先存档）。')) return;
     seed = newSeed(); initial = initialFor(scenario, seed); history = emptyHistory(); render();
   };
-  $('g-save').onclick = () => {
+  /** 下载存档；异地对战时文件名写明回合与"轮到谁"，就是发给对手的回合文件 */
+  const exportFile = (): void => {
     const save = makeSave(ctx, initial, history, seed, engineVersion);
+    const to = save.note?.to;
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([JSON.stringify(save, null, 1)], { type: 'application/json' }));
-    a.download = `kursk-存档-第${cur.state.turn}回合.json`;
+    a.download = hotseat.mode() === 'pbem' && to ? `kursk-回合文件-第${cur.state.turn}回合-轮到${SIDE_NAMES[to]}.json` : `kursk-存档-第${cur.state.turn}回合.json`;
     a.click();
     URL.revokeObjectURL(a.href);
   };
+  $('g-save').onclick = exportFile;
   const file = $<HTMLInputElement>('g-file');
   $('g-load').onclick = () => file.click();
+  hotseat.setActions({ exportFile, importFile: () => file.click() });
   file.onchange = async () => {
     const f = file.files?.[0];
     file.value = '';
     if (!f) return;
     try {
-      ({ initial, history, seed } = loadSave(ctx, JSON.parse(await f.text()), initialFor));
+      const loaded = loadSave(ctx, JSON.parse(await f.text()), initialFor);
+      // 异地对战：只接受接在我现有进度之后的文件（防止读入旧文件让进度倒退，或另一局的文件）
+      if (hotseat.mode() === 'pbem' && history.cursor > 0 && !(loaded.seed === seed && extendsHistory(history.commands.slice(0, history.cursor), loaded.history.commands))) {
+        toast('这份文件不是接在你现有进度之后的（可能是旧文件，或另一局的文件），没有读入');
+        return;
+      }
+      ({ initial, history, seed } = loaded);
       render();
-      toast(`已读档：回放 ${history.cursor} 条指令，结果与存档一致（指纹 ${stateHash(cur.state)}）`);
+      const to = cur.state.over ? null : actingSide(ctx, cur.state);
+      toast(`已读入：回放 ${history.cursor} 条指令，结果与文件一致（指纹 ${stateHash(cur.state)}）${to ? `；现在轮到${SIDE_NAMES[to]}` : ''}`);
     } catch (e) {
       toast(`读档失败：${(e as Error).message}`);
     }
@@ -157,7 +177,7 @@ export function createGameUi(
     if (!(e.ctrlKey || e.metaKey) || $('game').hidden || (e.target as HTMLElement).tagName === 'TEXTAREA') return;
     const k = e.key.toLowerCase();
     if (k === 'z' && !e.shiftKey) { tryUndo(); e.preventDefault(); }
-    if (k === 'y' || (k === 'z' && e.shiftKey)) { history = redo(history); render(); e.preventDefault(); }
+    if (k === 'y' || (k === 'z' && e.shiftKey)) { tryRedo(); e.preventDefault(); }
   });
 
   hotseat.onToggle(render);
