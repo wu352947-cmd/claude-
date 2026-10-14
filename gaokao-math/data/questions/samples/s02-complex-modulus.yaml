@@ -1,0 +1,19 @@
+type: single
+source: 示例题（原创）
+kps: {complex.arith: 2, complex.modulus: 1}
+difficulty_label: 基础
+est_seconds: 90
+stem: |
+  若复数 $z$ 满足 $z(1+\mathrm{i})=2\mathrm{i}$，则 $|z|=$
+options:
+  A: '$1$'
+  B: '$\sqrt{2}$'
+  C: '$2$'
+  D: '$2\sqrt{2}$'
+answer: B
+hints:
+  - 不必求出 $z$：两边取模，$|z|\cdot|1+\mathrm{i}|=|2\mathrm{i}|$。
+solution: |
+  两边取模：$|z|\cdot|1+\mathrm{i}|=|2\mathrm{i}|$，即 $\sqrt{2}\,|z|=2$，所以 $|z|=\sqrt{2}$，选 B。
+
+  （也可以直接算：$z=\dfrac{2\mathrm{i}}{1+\mathrm{i}}=\dfrac{2\mathrm{i}(1-\mathrm{i})}{2}=1+\mathrm{i}$。）

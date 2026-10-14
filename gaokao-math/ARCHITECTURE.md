@@ -34,7 +34,7 @@
 
 1. **分值权重不均**：系统推荐时必须乘上「这个知识点在卷面上值多少分」。
 2. **多选题有策略空间**：需要一个「多选题保守 / 激进策略」的期望分计算器。
-3. **填空题的判分要做数学等价**：`\frac{\sqrt{3}}{2}`、`√3/2`、`0.866…` 应判为同一个答案。
+3. **填空题的判分要做数学等价**：`\frac{\sqrt{3}}{2}`、`√3/2`、`\dfrac12\sqrt3` 应判为同一个答案；但 `0.866` 这种近似值要判错，高考填空要的是准确值。
 4. **解答题按步给分**：错题记录要精确到「第几问 / 哪一步」。
 5. **时间是一等公民**：120 分钟 150 分，每道题都要记录用时。
 
@@ -247,15 +247,19 @@ CREATE TABLE session (
 题目也支持用 YAML 文件批量维护（方便用 Git 管理、在电脑上批量录入）：
 
 ```yaml
-# data/questions/2025-xkb1-q14.yaml
+# data/questions/2025-xkb1-q14.yaml（文件名就是题目 id）
 type: fill
 source: 2025 新课标I卷 第14题
-kps: [conic.ellipse.eccentricity, conic.focal_triangle]
+kps: [conic.eccentricity, conic.ellipse]   # 也可以写权重：{conic.eccentricity: 2, conic.ellipse: 1}
 difficulty_label: 中档        # 基础 / 中档 / 较难 / 压轴
 est_seconds: 300
 stem: |
   已知椭圆 $C:\frac{x^2}{a^2}+\frac{y^2}{b^2}=1\ (a>b>0)$ ……
-answer: {latex: "\\frac{\\sqrt{3}}{3}", kind: expr}
+answer: '\frac{\sqrt{3}}{3}'   # 单引号里的反斜杠不用转义
+answer_kind: expr             # expr 一个值 / set 多个值 / interval 区间 / equation 方程
+hints:
+  - 第一级提示
+  - 第二级提示
 solution: |
   ……
 ```
@@ -291,10 +295,13 @@ def performance(attempt, q) -> float:
         r *= 0.85 ** attempt.hints_used           # 用了提示就打折
         if attempt.seconds > 1.5 * q.est_seconds:
             r *= 0.8                              # 做对但超时：考场上等于丢分
-    if attempt.error_type == "guess":
-        r = min(r, 0.3)                           # 自己承认蒙的
+        r = min(r, {"sure": 1.0, "unsure": 0.7, "guess": 0.3}[attempt.confidence])
+    if attempt.revealed:
+        r = min(r, 0.3)                           # 没做出来、先看了答案
     return r
 ```
+
+提交前选「有把握 / 不踏实 / 蒙的」：蒙对的题不该让掌握度大涨，「不踏实」的题即使做对也会进错题本。
 
 ### 5.3 掌握度更新（Elo / IRT）
 
@@ -589,8 +596,8 @@ gaokao-math/
 
 | 阶段 | 时间 | 交付 | 开发时长上限 |
 |---|---|---|---|
-| **M0 最小可用** | 10 月下旬两个周末 | YAML 题库 + 知识点标签；做题页（KaTeX、计时、选择/填空判分）；错题本 + FSRS 复习；导入 50–100 道你最近做错的题 | 12 小时 |
-| **M1 定制化** | 11 月 | 掌握度模型、每日推荐（带理由）、掌握度雷达图、错因统计 | 每周 2 小时 |
+| **M0 最小可用** ✅ 已实现 | 10 月下旬两个周末 | YAML 题库 + 知识点标签；做题页（KaTeX、计时、选择/填空判分）；错题本 + FSRS 复习；导入 50–100 道你最近做错的题 | 12 小时 |
+| **M1 定制化** | 11 月 | 掌握度模型 ✅、每日推荐（带理由）✅、错因统计 ✅；还差：掌握度雷达图 | 每周 2 小时 |
 | **M2 省力录入** | 寒假 | 拍照 OCR + 校对编辑器；AI 分级提示；离线 PWA | 寒假集中 2–3 天 |
 | **M3 冲刺** | 3–4 月 | 模考组卷 + 成绩报告、预测分、多选策略分析、变式题生成 | 每周 ≤ 1 小时，只修 bug 和小功能 |
 | **冻结** | 5 月起 | 停止开发，只用不改 | 0 |
@@ -622,8 +629,8 @@ M0 只需要做到一件事：**你每天打开它，它告诉你今天该复习
 
 ## 12. 下一步
 
-1. 确认你所在省份的试卷类型，填好 `exam_blueprint.yaml`。
-2. 把最近一个月的错题挑 30 道，按 §4 的 YAML 格式录进去，并打上知识点标签——这一步本身就是一次复盘。
-3. 搭 M0：FastAPI + SQLite + 一个 React 做题页 + FSRS。
+M0 和 M1 的大部分已经实现，怎么运行见 [README.md](README.md)。
 
-需要的话，可以在这个目录下按本文档直接搭出 M0 的代码骨架。
+1. 确认你所在省份的试卷类型，改好 `data/exam_blueprint.yaml`。
+2. 把最近一个月的错题挑 30 道录进去（网页「录题」或直接写 YAML），并打上知识点标签——这一步本身就是一次复盘。
+3. 用两周，再看要不要做 M2。

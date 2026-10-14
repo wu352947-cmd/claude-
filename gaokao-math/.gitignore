@@ -1,0 +1,9 @@
+# 根目录 .gitignore 会忽略所有 data/ 目录；题库是这个项目的源数据，要放行
+!/data/
+
+/var/
+server/.venv/
+server/**/__pycache__/
+server/.pytest_cache/
+web/node_modules/
+web/dist/

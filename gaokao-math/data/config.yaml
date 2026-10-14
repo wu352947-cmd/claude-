@@ -1,0 +1,22 @@
+# 数·途 配置。改完后重启服务生效。
+
+daily:
+  review: 5   # 每天最多推几道到期错题
+  new: 6      # 每天推几道新题
+
+# 当前复习阶段的重点模块（名字要和 knowledge_graph.yaml 里的 module 一致），推荐时优先级 × 1.5
+# 例如一轮复习正在学校复习导数：
+# focus_modules: [导数及其应用]
+focus_modules: []
+
+# 推荐新题时，希望预测做对概率落在这个区间（「跳一跳够得着」）
+target_band: [0.6, 0.85]
+
+fsrs:
+  desired_retention: 0.9   # 希望复习时还记得的概率；调高 → 复习更频繁
+
+mastery:
+  k0: 0.4          # 掌握度更新步长
+  tau_days: 45     # 遗忘衰减时间常数（天）
+
+timezone: Asia/Shanghai

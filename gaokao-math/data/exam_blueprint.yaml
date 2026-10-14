@@ -1,0 +1,28 @@
+# 试卷结构。默认是 2024 年起的新课标卷（19 题，150 分，120 分钟）。
+# 先确认你所在省份用的是哪套卷，不一样就改这里。
+# points / est_seconds 是录题时的默认分值和建议用时；解答题分值以每道题 parts 里写的为准。
+
+name: 新课标卷
+total_points: 150
+minutes: 120
+sections:
+  - type: single
+    label: 单选题
+    numbers: [1, 2, 3, 4, 5, 6, 7, 8]
+    points: 5
+    est_seconds: 150
+  - type: multi
+    label: 多选题
+    numbers: [9, 10, 11]
+    points: 6        # 全对 6 分；部分选对按「每对一个 = 6 / 正确选项数」；有错选 0 分
+    est_seconds: 240
+  - type: fill
+    label: 填空题
+    numbers: [12, 13, 14]
+    points: 5
+    est_seconds: 240
+  - type: solve
+    label: 解答题
+    numbers: [15, 16, 17, 18, 19]
+    points: 15       # 实际为 13 / 15 / 15 / 17 / 17
+    est_seconds: 900

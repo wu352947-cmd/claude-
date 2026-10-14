@@ -1,0 +1,17 @@
+type: single
+source: 示例题（原创）
+kps: [prob.classical, count.perm_comb]
+difficulty_label: 基础
+stem: |
+  从 $1,2,3,4,5$ 中任取两个不同的数，则取到的两个数之和为偶数的概率为
+options:
+  A: '$\dfrac{1}{5}$'
+  B: '$\dfrac{2}{5}$'
+  C: '$\dfrac{1}{2}$'
+  D: '$\dfrac{3}{5}$'
+answer: B
+hints:
+  - 两数之和为偶数 ⟺ 两个都是奇数，或两个都是偶数。
+solution: |
+  基本事件共 $\mathrm{C}_5^2=10$ 个。和为偶数：两奇 $\mathrm{C}_3^2=3$ 个，两偶 $\mathrm{C}_2^2=1$ 个，共 $4$ 个。
+  所求概率 $P=\dfrac{4}{10}=\dfrac{2}{5}$，选 B。

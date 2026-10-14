@@ -1,0 +1,39 @@
+type: solve
+source: 示例题（原创）
+kps: {seq.recurrence: 1, seq.sum_dislocation: 1}
+difficulty_label: 中档
+est_seconds: 720
+stem: |
+  已知数列 $\{a_n\}$ 满足 $a_1=1$，$a_{n+1}=2a_n+1$。
+
+  (1) 证明：数列 $\{a_n+1\}$ 是等比数列，并求 $\{a_n\}$ 的通项公式；
+
+  (2) 求数列 $\{n(a_n+1)\}$ 的前 $n$ 项和 $T_n$。
+parts:
+  - label: (1)
+    points: 6
+    answer: '$a_n=2^n-1$'
+    rubric:
+      - 由 $a_{n+1}+1=2(a_n+1)$ 且 $a_1+1=2\neq 0$ 证明等比（4 分）
+      - 求出 $a_n=2^n-1$（2 分）
+  - label: (2)
+    points: 9
+    answer: '$T_n=(n-1)\cdot 2^{n+1}+2$'
+    rubric:
+      - 写出 $T_n$ 与 $2T_n$（3 分）
+      - 错位相减并正确求等比数列的和（4 分）
+      - 化简得到结果（2 分）
+hints:
+  - 第 (1) 问：两边同时加 1。
+  - 第 (2) 问：$n\cdot 2^n$ 是「等差 × 等比」，用错位相减。
+solution: |
+  (1) 由 $a_{n+1}=2a_n+1$ 得 $a_{n+1}+1=2(a_n+1)$。又 $a_1+1=2\neq 0$，
+  所以 $\{a_n+1\}$ 是首项为 $2$、公比为 $2$ 的等比数列，$a_n+1=2^n$，即 $a_n=2^n-1$。
+
+  (2) $n(a_n+1)=n\cdot 2^n$。
+  $T_n=1\cdot 2+2\cdot 2^2+\cdots+n\cdot 2^n$，
+  $2T_n=1\cdot 2^2+\cdots+(n-1)\cdot 2^n+n\cdot 2^{n+1}$。
+  两式相减：$-T_n=2+2^2+\cdots+2^n-n\cdot 2^{n+1}=2^{n+1}-2-n\cdot 2^{n+1}$，
+  所以 $T_n=(n-1)\cdot 2^{n+1}+2$。
+
+  检验：$T_1=2$，$T_2=2+8=10$，与公式一致。

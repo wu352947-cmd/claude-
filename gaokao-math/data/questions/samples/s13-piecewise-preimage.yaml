@@ -1,0 +1,14 @@
+type: fill
+source: 示例题（原创）
+kps: {func.piecewise: 2, expo.ops: 1}
+difficulty_label: 中档
+stem: |
+  已知函数 $f(x)=\begin{cases}2^x, & x\le 0,\\ \log_2 x, & x>0,\end{cases}$ 若 $f(a)=\dfrac{1}{2}$，则 $a=$ ______。
+answer: '-1, \sqrt{2}'
+answer_kind: set
+solution: |
+  若 $a\le 0$：$2^a=\dfrac{1}{2}$，$a=-1$，符合。
+  若 $a>0$：$\log_2 a=\dfrac{1}{2}$，$a=\sqrt{2}$，符合。
+  所以 $a=-1$ 或 $a=\sqrt{2}$。
+
+  易错：只算了一段，漏解。

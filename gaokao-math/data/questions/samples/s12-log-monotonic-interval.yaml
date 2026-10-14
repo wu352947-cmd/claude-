@@ -1,0 +1,16 @@
+type: fill
+source: 示例题（原创）
+kps: {func.monotonic: 1, expo.functions: 1, func.domain_range: 1}
+difficulty_label: 中档
+stem: |
+  函数 $f(x)=\ln(x^2-2x)$ 的单调递增区间为 ______。
+answer: '(2,+\infty)'
+answer_kind: interval
+hints:
+  - 先求定义域！
+  - 复合函数「同增异减」：外层 $\ln t$ 递增，只需找内层 $t=x^2-2x$ 在定义域内的递增部分。
+solution: |
+  定义域：$x^2-2x>0$，即 $x<0$ 或 $x>2$。
+  $t=x^2-2x$ 在 $(1,+\infty)$ 上递增，$y=\ln t$ 递增，取与定义域的交集，递增区间为 $(2,+\infty)$。
+
+  易错：忘记定义域，写成 $(1,+\infty)$。

@@ -1,0 +1,18 @@
+type: single
+source: 示例题（原创）
+kps: [set.operations, ineq.quadratic]
+difficulty_label: 基础
+stem: |
+  已知集合 $A=\{x \mid x^2-3x-4<0\}$，$B=\{x \mid x>1\}$，则 $A\cap B=$
+options:
+  A: '$(-1,1)$'
+  B: '$(1,4)$'
+  C: '$(-1,4)$'
+  D: '$(4,+\infty)$'
+answer: B
+hints:
+  - 先把集合 $A$ 化简：解一元二次不等式。
+  - $x^2-3x-4=(x-4)(x+1)<0$，所以 $A=(-1,4)$。
+solution: |
+  由 $x^2-3x-4<0$ 得 $(x-4)(x+1)<0$，即 $-1<x<4$，所以 $A=(-1,4)$。
+  又 $B=(1,+\infty)$，故 $A\cap B=(1,4)$，选 B。
