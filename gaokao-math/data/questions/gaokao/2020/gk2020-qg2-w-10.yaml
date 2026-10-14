@@ -1,0 +1,26 @@
+type: single
+source: 2020 全国II卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  func.parity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)=x^{3}-\frac{1}{x^{3}}$, 则 $f(x)(\quad)$
+options:
+  A: 是奇函数, 且在 $(0,+\infty)$ 单调递增
+  B: 是奇函数, 且在 $(0,+\infty)$ 单调递减
+  C: 是偶函数, 且在 $(0,+\infty)$ 单调递增
+  D: 是偶函数, 且在 $(0,+\infty)$ 单调递减
+answer: A
+solution: |-
+  【详解】 因为函数 $f(x)=x^{3}-\frac{1}{x^{3}}$ 定义域为 $\{x \mid x \neq 0\}$, 其关于原点对称, 而 $f(-x)=-f(x)$,
+
+  所以函数 $f(x)$ 为奇函数.
+
+  又因为函数 $y=x^{3}$ 在 $(0,+\not)$ 上单调递增, 在 $(-¥, 0)$ 上单调递增,
+
+  而 $y=\frac{1}{x^{3}}=x^{-3}$ 在 $(0,+\not)$ 上单调递减, 在 $(-¥, 0)$ 上单调递减,
+
+  所以函数 $f(x)=x^{3}-\frac{1}{x^{3}}$ 在 $(0,+¥)$ 上单调递增，在 $(-\neq, 0)$ 上单调递增.
+
+  故选: A.

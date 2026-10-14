@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{\pi}=(\lambda+1,1), \overrightarrow{\mathrm{n}}=(\lambda+2,2)$, 若 $(\vec{\pi}+\vec{n}) \perp(\vec{\pi}-\overrightarrow{\mathrm{n}})$, 则 $\lambda=(\qquad)$
+options:
+  A: '-4'
+  B: '-3'
+  C: '-2'
+  D: '-1'
+answer: B

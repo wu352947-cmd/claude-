@@ -1,0 +1,15 @@
+type: single
+source: 2017 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2017
+kps:
+  tri.range: 0.5
+  vec.dot: 0.5
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $\triangle A B C$ 是边长为 2 的等边三角形, $P$ 为平面 $A B C$ 内一点, 则 $\overrightarrow{P A}\cdot(\overrightarrow{\mathrm{PB}}+\overrightarrow{\mathrm{PC}})$ 的最小值是 ($\qquad$)
+options:
+  A: '-2'
+  B: $-\frac{3}{2}$
+  C: $-\frac{4}{3}$
+  D: '-1'
+answer: B

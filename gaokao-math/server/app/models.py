@@ -42,12 +42,23 @@ class Question(SQLModel, table=True):
     difficulty_label: str
     est_seconds: int
     source: str = ""
+    year: int | None = Field(default=None, index=True)  # 真题年份；自编题、变式题为空
     parent_id: str | None = Field(default=None, index=True)  # 变式题指向母题
     figure: str | None = None  # data/figures/ 下的配图文件名
     verified: bool = True
     active: bool = True  # YAML 文件删除后置为 False，保留作答历史
     file: str = ""
     updated_at: datetime = Field(default_factory=utcnow)
+
+
+class QuestionFlag(SQLModel, table=True):
+    """做题时点了「这题有问题」：不再推送，也不进模考，直到取消标记。改 YAML 修好后在题库里取消。"""
+
+    __tablename__ = "question_flag"
+
+    question_id: str = Field(primary_key=True, foreign_key="question.id")
+    reason: str = ""
+    created_at: datetime = Field(default_factory=utcnow)
 
 
 class QuestionKp(SQLModel, table=True):

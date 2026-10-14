@@ -1,0 +1,16 @@
+type: single
+source: 2016 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2016
+kps:
+  trig.graph: 0.41
+  func.zeros: 0.35
+  func.symmetry: 0.24
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数 $f(x)=\sin (\omega x+\phi)\left(\omega>0,|\phi| \leqslant \frac{\pi}{2}\right), x=-\frac{\pi}{4}$ 为 $f(x)$ 的零点, $x=\frac{\pi}{4}$ 为 $y=f(x)$ 图象的对称轴, 且 $f(x)$ 在 $\left(\frac{\pi}{18}, \frac{5 \pi}{36}\right)$ 上单调, 则 $\omega$ 的最大值为 ($\qquad$）
+options:
+  A: '11'
+  B: '9'
+  C: '7'
+  D: '5'
+answer: B

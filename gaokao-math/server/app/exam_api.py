@@ -10,6 +10,7 @@ from sqlmodel import Session, select
 
 from .api import SessionDep, current_prediction, now_of, public_question
 from .core.exam import build_report, compose
+from .core.today import flagged_ids
 from .models import Attempt, Exam, Question
 from .services import kp_map, links, record_attempt, reveal_payload
 
@@ -38,7 +39,9 @@ def create_exam(body: ExamIn, request: Request, session: Session = SessionDep):
     if not bp.slots:
         raise HTTPException(400, "试卷结构里没有题位（data/exam_blueprint.yaml 的 slots）")
     now = now_of(request)
-    questions = session.exec(select(Question).where(Question.active, Question.verified)).all()
+    flagged = flagged_ids(session)
+    questions = [q for q in session.exec(select(Question).where(Question.active, Question.verified))
+                 if q.id not in flagged]
     kps = kp_map(session)
     attempted = set(session.exec(select(Attempt.question_id).distinct()))
     n = len(session.exec(select(Exam.id)).all()) + 1

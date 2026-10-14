@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国I卷（文科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.ops: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $a \log _{3} 4=2$ ，则 $4^{-a}=(\quad)$
+options:
+  A: $\frac{1}{16}$
+  B: $\frac{1}{9}$
+  C: $\frac{1}{8}$
+  D: $\frac{1}{6}$
+answer: B
+solution: |-
+  【详解】由 $a \log _{3} 4=2$ 可得 $\log _{3} 4^{a}=2$ ，所以 $4^{a}=9$,
+
+  所以有 $4^{-a}=\frac{1}{9}$,
+
+  故选: B.

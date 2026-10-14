@@ -1,0 +1,18 @@
+type: single
+source: 2021 全国乙卷（文科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  trig.identities: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\cos ^{2} \frac{\pi}{12}-\cos ^{2} \frac{5 \pi}{12}=(\quad)$
+options:
+  A: $\frac{1}{2}$
+  B: $\frac{\sqrt{3}}{3}$
+  C: $\frac{\sqrt{2}}{2}$
+  D: $\frac{\sqrt{3}}{2}$
+answer: D
+solution: |-
+  解析:
+
+  $\cos ^{2} \frac{\pi}{12}-\cos ^{2} \frac{5 \pi}{12}=\cos ^{2} \frac{\pi}{12}-\cos ^{2}\left(\frac{\pi}{2}-\frac{\pi}{12}\right)=\cos ^{2} \frac{\pi}{12}-\sin ^{2} \frac{\pi}{12}=\cos \frac{\pi}{6}=\frac{\sqrt{3}}{2} \therefore$ 选 D.

@@ -1,0 +1,28 @@
+type: single
+source: 2020 全国I卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  count.binomial: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\left(x+\frac{y^{2}}{x}\right)(x+y)^{5}$ 的展开式中 $x^{3} y^{3}$ 的系数为 $(\quad)$
+options:
+  A: '5'
+  B: '10'
+  C: '15'
+  D: '20'
+answer: C
+solution: |-
+  【详解】 $(x+y)^{5}$ 展开式的通项公式为 $T_{r+1}=C_{5}^{r} x^{5-r} y^{r} \quad(r \in N$ 且 $r \leq 5)$
+
+  所以 $\left(x+\frac{y^{2}}{x}\right)$ 与 $(x+y)^{5}$ 展开式的乘积可表示为:
+
+  $x T_{r+1}=x C_{5}^{r} x^{5-r} y^{r}=C_{5}^{r} x^{6-r} y^{r}$ 或 $\frac{y^{2}}{x} T_{r+1}=\frac{y^{2}}{x} C_{5}^{r} x^{5-r} y^{r}=C_{5}^{r} x^{4-r} y^{r+2}$
+
+  在 $x T_{r+1}=C_{5}^{r} x^{6-r} y^{r}$ 中, 令 $r=3$, 可得: $x T_{4}=C_{5}^{3} x^{3} y^{3}$, 该项中 $x^{3} y^{3}$ 的系数为 10 ,
+
+  在 $\frac{y^{2}}{x} T_{r+1}=C_{5}^{r} x^{4-r} y^{r+2}$ 中, 令 $r=1$, 可得: $\frac{y^{2}}{x} T_{2}=C_{5}^{1} x^{3} y^{3}$, 该项中 $x^{3} y^{3}$ 的系数为 5
+
+  所以 $x^{3} y^{3}$ 的系数为 $10+5=15$
+
+  故选: C

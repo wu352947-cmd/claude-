@@ -1,0 +1,26 @@
+type: single
+source: 2012 全国新课标卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  expo.ops: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设点 $P$ 在曲线 $y=\frac{1}{2} e^{x}$ 上, 点 $Q$ 在曲线 $y=\ln (2 x)$ 上, 则 $|P Q|$ 最小 值为 $(\quad)$
+options:
+  A: $1-\ln 2$
+  B: $\sqrt{2}(1-\ln 2)$
+  C: $1+\ln 2$
+  D: $\sqrt{2}(1+\ln 2)$
+answer: B
+solution: |-
+  解: $\because$ 函数 $y=\frac{1}{2} e^{x}$ 与函数 $y=\ln (2 x)$ 互为反函数, 图象关于 $y=x$ 对称, 函数 $y=\frac{1}{2} e^{x}$ 上的点 $P\left(x, \frac{1}{2} e^{x}\right)$ 到直线 $y=x$ 的距离为 $\mathrm{d}=\frac{\left|\frac{1}{2} \mathrm{e}^{\mathrm{x}}-\mathrm{x}\right|}{\sqrt{2}}$, 设 $g(x)=\frac{1}{2} e^{x}-x(x>0)$ ，则 $g^{\prime}(x)=\frac{1}{2} e^{x}-1$, 由 $g^{\prime}(x)=\frac{1}{2} e^{x}-1 \geqslant 0$ 可得 $x \geqslant \ln 2$, 由 $g^{\prime}(x)=\frac{1}{2} e^{x}-1<0$ 可得 $0<x<\ln 2$,
+
+  $\therefore$ 函数 $\mathrm{g}(\mathrm{x})$ 在 $(0, \ln 2)$ 单调递减, 在 $[\ln 2,+\infty)$ 单调递增,
+
+  $\therefore$ 当 $\mathrm{x}=\ln 2$ 时, 函数 $\mathrm{g}(\mathrm{x})_{\min }=1-\ln 2$,
+
+  $\mathrm{d}_{\min }=\frac{1-\ln 2}{\sqrt{2}}$,
+
+  由图象关于 $y=x$ 对称得: $|P Q|$ 最小值为 $2 d_{\min }=\sqrt{2}(1-\ln 2)$.
+
+  故选: B.

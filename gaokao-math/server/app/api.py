@@ -12,8 +12,8 @@ from sqlmodel import Session, func, select
 from . import bank, images
 from .core import stats
 from .core.predict import predict_score
-from .core.today import ERROR_LABELS, build_plan
-from .models import Attempt, KnowledgePoint, Mastery, Question, ReviewCard
+from .core.today import ERROR_LABELS, build_plan, flagged_ids
+from .models import Attempt, KnowledgePoint, Mastery, Question, QuestionFlag, ReviewCard
 from .services import kp_map, links, record_attempt, reveal_payload, review_target
 
 router = APIRouter(prefix="/api")
@@ -48,6 +48,7 @@ def summary(q: Question, weights: dict[str, float], kps: dict[str, KnowledgePoin
         "id": q.id,
         "type": q.type,
         "source": q.source,
+        "year": q.year,
         "difficulty_label": q.difficulty_label,
         "points": q.points,
         "preview": _preview(q.stem),
@@ -117,6 +118,7 @@ def list_questions(module: str | None = None, type: str | None = None, kp: str |
     all_links = links(session)
     counts = dict(session.exec(select(Attempt.question_id, func.count()).group_by(Attempt.question_id)).all())
     cards = {c.question_id: c for c in session.exec(select(ReviewCard))}
+    flagged = flagged_ids(session)
     variant_counts: dict[str, int] = {}
     for item in questions:
         if item.parent_id:
@@ -138,6 +140,7 @@ def list_questions(module: str | None = None, type: str | None = None, kp: str |
             "attempts": counts.get(item.id, 0),
             "in_review": bool(card and not card.suspended),
             "variants": variant_counts.get(item.id, 0),
+            "flagged": item.id in flagged,
         })
     return out
 
@@ -152,7 +155,32 @@ def get_question(qid: str, session: Session = SessionDep):
                         "seconds": a.seconds, "error_type": a.error_type, "note": a.note} for a in history]
     data["card"] = None if card is None else {
         "due": card.due, "reps": card.reps, "lapses": card.lapses, "graduated": card.suspended}
+    data["file"] = q.file
+    flag = session.get(QuestionFlag, qid)
+    data["flag"] = None if flag is None else {"reason": flag.reason, "created_at": flag.created_at}
     return data
+
+
+class FlagIn(BaseModel):
+    reason: str = Field(default="", max_length=200)
+
+
+@router.post("/questions/{qid}/flag")
+def flag_question(qid: str, body: FlagIn, session: Session = SessionDep):
+    """题目有错（乱码、答案不对、缺图……）：不再推送、不进模考，等改好 YAML 再取消。"""
+    get_question_or_404(session, qid)
+    session.merge(QuestionFlag(question_id=qid, reason=body.reason.strip()))
+    session.commit()
+    return {"ok": True}
+
+
+@router.delete("/questions/{qid}/flag")
+def unflag_question(qid: str, session: Session = SessionDep):
+    flag = session.get(QuestionFlag, qid)
+    if flag is not None:
+        session.delete(flag)
+        session.commit()
+    return {"ok": True}
 
 
 @router.get("/questions/{qid}/hints/{n}")

@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\left(\frac{3-i}{1+i}\right)^{2}=$ ($\qquad$)
+options:
+  A: $-3-4 \mathrm{i}$
+  B: $-3+4 i$
+  C: $3-4 i$
+  D: $3+4 i$
+answer: A

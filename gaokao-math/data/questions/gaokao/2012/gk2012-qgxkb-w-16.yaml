@@ -1,0 +1,21 @@
+type: fill
+source: 2012 全国新课标卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  trig.graph: 0.52
+  deriv.extremum: 0.48
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)=\frac{(x+1)^{2}+\sin x}{x^{2}+1}$ 的最大值为 $M$, 最小值为 $m$, 则 $M+m=$ ______
+answer: '2'
+answer_kind: expr
+solution: |-
+  解: 函数可化为 $f(x)=\frac{(x+1)^{2}+\sin x}{x^{2}+1}=1+\frac{2 x+\sin x}{x^{2}+1}$,
+
+  令 $g(x)=\frac{2 x+\sin x}{x^{2}+1}$, 则 $g(x)=\frac{2 x+\sin x}{x^{2}+1}$ 为奇函数,
+
+  $\therefore \mathrm{g}(\mathrm{x})=\frac{2 x+\sin x}{x^{2}+1}$ 的最大值与最小值的和为 0 .
+
+  $\therefore$ 函数 $f(x)=\frac{(x+1)^{2}+\sin x}{x^{2}+1}$ 的最大值与最小值的和为 $1+1+0=2$. 即 $M+m=2$.
+
+  故答案为: 2 .

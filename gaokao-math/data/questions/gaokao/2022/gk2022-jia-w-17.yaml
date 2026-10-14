@@ -1,0 +1,56 @@
+type: solve
+source: 2022 全国甲卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  stat.regression: 1.0
+difficulty_label: 中档
+stem: |-
+  甲、乙两城之间的长途客车均由 $A$ 和 $B$ 两家公司运营, 为了解这两家公司长途客车的运 行情况，随机调查了甲、乙两城之间的 500 个班次，得到下面列联表:
+
+  $$\begin{array}{|c|c|c|}\hline  & \text{准点班次数} & 20 \\ \hline A & 240 & \text{末准点班次数} \\ \hline B & 210 & 30 \\ \hline \end{array}$$
+
+  （1）根据上表, 分别估计这两家公司甲、乙两城之间的长途客车准点的概率;
+
+  （2）能否有 $90 \%$ 的把握认为甲、乙两城之间的长途客车是否准点与客车所属公司有关?
+
+  附: $K^{2}=\frac{n(a d-b c)^{2}}{(a+b)(c+d)(a+c)(b+d)}$,
+
+  $\begin{array}{cccc}P\left(\begin{array}{ll}K^{2} & k\end{array}\right) & 0.100 & 0.050 & 0.010 \\ & 2.706 & 3.841 & 6.635\end{array}$
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  根据表中数据, $A$ 共有班次 260 次, 准点班次有 240 次,
+
+  设 $A$ 家公司长途客车准点事件为 $M$,
+
+  则 $P(M)=\frac{240}{260}=\frac{12}{13}$ ；
+
+  $B$ 共有班次 240 次, 准点班次有 210 次,
+
+  设 $B$ 家公司长途客车准点事件为 $N$,
+
+  则 $P(N)=\frac{210}{240}=\frac{7}{8}$.
+
+  $A$ 家公司长途客车准点的概率为 $\frac{12}{13}$; $B$ 家公司长途客车准点的概率为 $\frac{7}{8}$.
+
+  【小问 2 详解】}
+
+  列联表
+
+  $$\begin{array}{|c|c|c|c|}\hline  & \text{准点班次数} & \text{末准点班次数} & \text{合计} \\ \hline A & 240 & 20 & 260 \\ \hline B & 210 & 30 & 240 \\ \hline \text{合计} & 450 & 50 & 500 \\ \hline \end{array}$$
+
+  $$
+  \begin{aligned}
+  & K^{2}=\frac{n(a d-b c)^{2}}{(a+b)(c+d)(a+c)(b+d)} \\
+  & =\frac{500 \times(240 \times 30-210 \times 20)^{2}}{260 \times 240 \times 450 \times 50} \approx 3.205>2.706,
+  \end{aligned}
+  $$
+
+  根据临界值表可知, 有 $90 \%$ 的把握认为甲、乙两城之间的长途客车是否准点与客车所属公 司有关.

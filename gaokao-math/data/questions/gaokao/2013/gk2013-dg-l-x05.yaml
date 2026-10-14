@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  expo.ops: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $\mathrm{f}(\mathrm{x})=\log _{2}\left(1+\frac{1}{\mathrm{x}}\right)(x>0)$ 的反函数 $\mathrm{f}^{-1}(\mathrm{x})=(\qquad)$
+options:
+  A: $\frac{1}{2^{x}-1}(x>0)$
+  B: $\frac{1}{2^{x}-1}(x \neq 0)$
+  C: $2^{x}-1(x \in R)$
+  D: $2^{x}-1(x>0)$
+answer: A

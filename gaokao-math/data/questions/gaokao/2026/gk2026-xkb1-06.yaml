@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 6 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数$f(x)=\dfrac{x+2}{e^x+a}$的最大值为$1$，则$a=$（ ）
+options:
+  A: $\dfrac{1}{2}$
+  B: $1$
+  C: $\dfrac{3}{2}$
+  D: $2$
+answer: B

@@ -1,0 +1,16 @@
+type: fill
+source: 2018 全国II卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  solid.vector: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知圆锥的顶点为 $S$, 母线 $S A, S B$ 互相垂直, $S A$ 与圆锥底面所成 角为 $30^{\circ}$. 若 $\triangle S A B$ 的面积为 8 , 则该圆锥的体积为 ______
+answer: 8 \pi
+answer_kind: expr
+solution: |-
+  解: 圆锥的顶点为 $S$, 母线 $S A, S B$ 互相垂直, $\triangle S A B$ 的面积为 8 , 可得 $: \frac{1}{2} S^{2}=8$, 解得 $\mathrm{SA}=4$,
+
+  $\mathrm{SA}$ 与圆锥底面所成角为 $30^{\circ}$. 可得圆锥的底面半径为: $2 \sqrt{3}$, 圆锥的高为: 2 , 则该圆锥的体积为: $V=\frac{1}{3} \times \pi \times(2 \sqrt{3})^{2} \times 2=8 \pi$.
+
+  故答案为: $8 \pi$.

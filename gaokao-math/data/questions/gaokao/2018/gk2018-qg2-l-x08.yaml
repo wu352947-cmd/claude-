@@ -1,0 +1,14 @@
+type: single
+source: 2018 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2018
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '已知 $F_{1}, F_{2}$ 是椭圆 C: $\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的左、右焦点, $A$ 是 $C$ 的左顶点, 点 $P$ 在过 $A$ 且斜率为 $\frac{\sqrt{3}}{6}$ 的直线上, $\triangle P F_{1} F_{2}$ 为等腰三角形, $\angle F_{1} F_{2} P=120^{\circ}$, 则 $C$ 的离心率为 ($\qquad$)'
+options:
+  A: $\frac{2}{3}$
+  B: $\frac{1}{2}$
+  C: $\frac{1}{3}$
+  D: $\frac{1}{4}$
+answer: D

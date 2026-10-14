@@ -1,0 +1,26 @@
+type: single
+source: 2015 全国II卷（文科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  seq.geom: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知等比数列 $\left\{a_{n}\right\}$ 满足 $\left.a_{1}=\frac{1}{4}, a_{3} a_{5}=4 （ a_{4}-1\right)$, 则 $a_{2}=(\quad)$
+options:
+  A: '2'
+  B: '1'
+  C: $\frac{1}{2}$
+  D: $\frac{1}{8}$
+answer: C
+solution: |-
+  解: 设等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$,
+
+  $\because a_{1}=\frac{1}{4}, a_{3} a_{5}=4\left(a_{4}-1\right)$,
+
+  $\therefore\left(\frac{1}{4}\right)^{2} \times q^{6}=4\left(\frac{1}{4} q^{3}-1\right)$,
+
+  化为 $q^{3}=8$, 解得 $q=2$
+
+  则 $a_{2}=\frac{1}{4} \times 2=\frac{1}{2}$.
+
+  故选: C.

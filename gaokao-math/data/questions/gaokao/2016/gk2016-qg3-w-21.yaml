@@ -1,0 +1,64 @@
+type: solve
+source: 2016 全国III卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  deriv.monotonic: 1.0
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=\ln x-x+1$.
+
+  （1）讨论 $f(x)$ 的单调性;
+
+  （2） 证明当 $x \in(1,+\infty)$ 时, $1<\frac{x-1}{\ln x}<x$;
+
+  （3） 设 $c>1$, 证明当 $x \in(0,1)$ 时, $1+(c-1) x>c^{x}$.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  解: (1) 函数 $f(x)=\ln x-x+1$ 的导数为 $f^{\prime}(x)=\frac{1}{x}-1$,
+
+  由 $f^{\prime}(x)>0$, 可得 $0<x<1$; 由 $f^{\prime}(x)<0$, 可得 $x>1$.
+
+  即有 $f(x)$ 的增区间为 $(0,1)$ ； 减区间为 $(1,+\infty)$;
+
+  （2） 证明: 当 $x \in(1,+\infty)$ 时, $1<\frac{x-1}{\ln x}<x$, 即为 $\ln x<x-1<x \ln x$.
+
+  由 (1) 可得 $f(x)=\ln x-x+1$ 在 $(1,+\infty)$ 递减,
+
+  可得 $f(x)<f(1)=0$, 即有 $\ln x<x-1$;
+
+  设 $F(x)=x \ln x-x+1, x>1, F^{\prime}(x)=1+\ln x-1=\ln x$,
+
+  当 $x>1$ 时, $F^{\prime}(x)>0$, 可得 $F(x)$ 递增, 即有 $F(x)>F(1)=0$,
+
+  即有 $x \ln x>x-1$, 则原不等式成立;
+
+  (3) 证明: 设 $G(x)=1+(c-1) x-c^{x}$,
+
+  则需要证明: 当 $x \in(0,1)$ 时, $G(x)>0(c>1)$;
+
+  $G^{\prime}(x)=c-1-c^{x} \ln c, G^{\prime \prime}(x)=-(\operatorname{lnc})^{2} c^{x}<0$
+
+  $\therefore G^{\prime}(x)$ 在 $(0,1)$ 单调递减, 而 $G^{\prime}(0)=c-1$ - Inc, $G^{\prime}(1)=c-1$ - clnc,
+
+  由 (1) 中 $f(x)$ 的单调性, 可得 $G^{\prime}(0)=c-1-\ln c>0$, 由 (2) 可得 $G^{\prime}(1)$
+
+  $$
+  =c-1-c \operatorname{lnc}=c \quad(1-\operatorname{lnc})-1<0
+  $$
+
+  $\therefore \exists \mathrm{t} \in(0,1)$, 使得 $G^{\prime}(t)=0$, 即 $x \in(0, t)$ 时, $G^{\prime}(x)>0, x \in(t, 1)$ 时, $G^{\prime}(x)<0$;
+
+  即 $G(x)$ 在 $(0, t)$ 递增, 在 $(t, 1)$ 递减; 又因为: $G(0)=G(1)=0$,
+
+  $\therefore x \in(0,1)$ 时 $G(x)>0$ 成立, 不等式得证;
+
+  即 $c>1$, 当 $x \in(0,1)$ 时, $1+(c-1) x>c^{x}$.

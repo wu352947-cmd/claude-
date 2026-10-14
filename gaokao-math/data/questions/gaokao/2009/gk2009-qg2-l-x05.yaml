@@ -1,0 +1,14 @@
+type: single
+source: 2009 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2009
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(2,1), \vec{a} \cdot \vec{b}=10,|\vec{a}+\vec{b}|=5 \sqrt{2}$, 则 $|\vec{b}|=$（$\qquad$）
+options:
+  A: $\sqrt{5}$
+  B: $\sqrt{10}$
+  C: '5'
+  D: '25'
+answer: C

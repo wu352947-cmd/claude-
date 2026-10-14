@@ -1,0 +1,14 @@
+type: fill
+source: 2017 全国III卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{9}=1(a>0)$ 的一条渐近线方程为 $y=\frac{3}{5} x$, 则 $a=$ ______
+answer: '5'
+answer_kind: expr
+solution: |-
+  解: 双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{9}=1(a>0)$ 的一条渐近线方程为 $y=\frac{3}{5} x$, 可得 $\frac{3}{a}=\frac{3}{5}$, 解得 $a=5$.
+
+  故答案为: 5 .

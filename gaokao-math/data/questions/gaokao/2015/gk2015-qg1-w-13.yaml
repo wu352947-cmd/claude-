@@ -1,0 +1,28 @@
+type: fill
+source: 2015 全国I卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 在数列 $\left\{a_{n}\right\}$ 中, $a_{1}=2, a_{n+1}=2 a_{n}, S_{n}$ 为 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 若 $S_{n}=126$, 则 $n=$ ______
+answer: '6'
+answer_kind: expr
+solution: |-
+  解: $\because a_{n+1}=2 a_{n}$,
+
+  $\therefore \frac{a_{n+1}}{a_{n}}=2$
+
+  $\because a_{1}=2$
+
+  $\therefore$ 数列 $\left\{a_{n}\right\}$ 是 $a_{1}=2$ 为首项, 以 2 为公比的等比数列,
+
+  $\therefore S_{n}=\frac{a_{1}\left(1-q^{n}\right)}{1-q}=\frac{2\left(1-2^{n}\right)}{1-2}=2^{n+1}-2=126$,
+
+  $\therefore 2^{n+1}=128$
+
+  $\therefore \mathrm{n}+1=7$
+
+  $\therefore n=6$.
+
+  故答案为: 6

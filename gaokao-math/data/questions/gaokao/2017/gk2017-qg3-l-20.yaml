@@ -1,0 +1,73 @@
+type: solve
+source: 2017 全国III卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+stem: |-
+  已知抛物线 $C: y^{2}=2 x$, 过点 $(2,0)$ 的直线।交 $C$ 于 $A, B$ 两点, 圆 $M$ 是以线段 $A B$ 为直径的圆.
+
+  (1) 证明：坐标原点 $O$ 在圆 $M$ 上;
+
+  (2) 设圆 $M$ 过点 $P(4,-2)$, 求直线 $।$ 与圆 $M$ 的方程.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: 方法一: 证明: (1) 当直线 I的斜率不存在时, 则 $A(2,2), B$ $(2,-2)$,
+
+  则 $\overrightarrow{O A}=(2,2), \overrightarrow{O B}=(2,-2)$, 则 $\overrightarrow{O A} \cdot \overrightarrow{O B}=0$,
+
+  $\therefore \overrightarrow{\mathrm{OA}} \perp \overrightarrow{\mathrm{OB}}$
+
+  则坐标原点 $O$ 在圆 $M$ 上;
+
+  当直线 I 的斜率存在, 设直线 $\mid$ 的方程 $y=k(x-2), A\left(x_{1}, y_{1}\right), B\left(x_{2}, y_{2}\right)$, $\left\{\begin{array}{l}y=k(x-2) \\ y^{2}=2 x\end{array}\right.$, 整理得: $k^{2} x^{2}-\left(4 k^{2}+2\right) x+4 k^{2}=0$, 则 $x_{1} x_{2}=4,4 x_{1} x_{2}=y_{1}{ }^{2} y_{2}{ }^{2}=\left(y_{1} y_{2}\right)^{2}$, 由 $y_{1} y_{2}<0$,
+
+  则 $y_{1} y_{2}=-4$,
+
+  由 $\overrightarrow{\mathrm{OA}} \cdot \overrightarrow{\mathrm{OB}}=\mathrm{x}_{1} x_{2}+y_{1} y_{2}=0$,
+
+  则 $\overrightarrow{O A} \perp \overrightarrow{O B}$, 则坐标原点 $O$ 在圆 $M$ 上,
+
+  综上可知: 坐标原点 $O$ 在圆 $M$ 上;
+
+  方法二: 设直线 $\mathrm{I}$ 的方程 $\mathrm{x}=\mathrm{my+2}$, $\left\{\begin{array}{l}x=m y+2 \\ y^{2}=2 x\end{array}\right.$, 整理得: $y^{2}-2 m y-4=0, \quad A \quad\left(x_{1}, y_{1}\right), B \quad\left(x_{2}, y_{2}\right)$,
+
+  则 $y_{1} y_{2}=-4$
+
+  则 $\left(y_{1} y_{2}\right)^{2}=4 x_{1} x_{2}$, 则 $x_{1} x_{2}=4$, 则 $\overrightarrow{O A} \cdot \overrightarrow{O B}=x_{1} x_{2}+y_{1} y_{2}=0$,
+
+  则 $\overrightarrow{O A} \perp \overrightarrow{O B}$, 则坐标原点 $\mathrm{O}$ 在圆 $\mathrm{M}$ 上,
+
+  $\therefore$ 坐标原点 $\mathrm{O}$ 在圆 $\mathrm{M}$ 上;
+
+  (2) 由 (1) 可知: $x_{1} x_{2}=4, x_{1}+x_{2}=\frac{4 k^{2}+2}{k^{2}}, y_{1}+y_{2}=\frac{2}{k}, y_{1} y_{2}=-4$,
+
+  圆 $M$ 过点 $P(4,-2)$, 则 $\overrightarrow{\mathrm{AP}}=\left(4-x_{1},-2-y_{1}\right), \quad \overrightarrow{\mathrm{BP}}=\left(4-x_{2},-2-y_{2}\right)$,
+
+  由 $\overrightarrow{\mathrm{AP}} \cdot \overrightarrow{\mathrm{BP}}=0$, 则 $\left(4-\mathrm{x}_{1}\right)\left(4-\mathrm{x}_{2}\right)+\left(-2-\mathrm{y}_{1}\right)\left(-2-\mathrm{y}_{2}\right)=0$,
+
+  整理得: $k^{2}+k-2=0$, 解得: $k=-2, k=1$,
+
+  当 $\mathrm{k}=-2$ 时, 直线 $\mathrm{l}$ 的方程为 $\mathrm{y}=-2 x+4$,
+
+  则 $x_{1}+x_{2}=\frac{9}{2}, y_{1}+y_{2}=-1$,
+
+  则 $M\left(\frac{9}{4},-\frac{1}{2}\right)$, 半径为 $r=|M P|=\sqrt{\left(4-\frac{9}{4}\right)^{2}+\left(-2+\frac{1}{2}\right)^{2}}=\frac{\sqrt{85}}{4}$,
+
+  $\therefore$ 圆 $\mathrm{M}$ 的方程 $\left(x-\frac{9}{4}\right)^{2}+\left(y+\frac{1}{2}\right)^{2}=\frac{85}{16}$.
+
+  当直线斜率 $\mathrm{k}=1$ 时, 直线 $\mathrm{l}$ 的方程为 $\mathrm{y}=\mathrm{x}-2$,
+
+  同理求得 $M(3,1)$, 则半径为 $r=|M P|=\sqrt{10}$,
+
+  $\therefore$ 圆 $M$ 的方程为 $(x-3)^{2}+(y-1)^{2}=10$,
+
+  综上可知: 直线 $\mathrm{l}$ 的方程为 $y=-2 x+4$, 圆 $M$ 的方程 $\left(x-\frac{9}{4}\right)^{2}+\left(y+\frac{1}{2}\right)^{2}=\frac{85}{16}$,
+
+  或直线 $\mathrm{I}$ 的方程为 $y=x-2$, 圆 $M$ 的方程为 $(x-3)^{2}+(y-1)^{2}=10$.

@@ -1,0 +1,16 @@
+type: single
+source: 2019 全国I卷（理科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  vec.projection: 0.56
+  vec.dot: 0.44
+difficulty_label: 中档
+points: 5.0
+stem: 已知非零向量 $\boldsymbol{a}, \boldsymbol{b}$ 满足 $|a|=2|b|$, 且 $(\boldsymbol{a}-\boldsymbol{b}) \perp \boldsymbol{b}$, 则 $\boldsymbol{a}$ 与 $\boldsymbol{b}$ 的夹角为
+options:
+  A: $\frac{\pi}{6}$
+  B: $\frac{\pi}{3}$
+  C: $\frac{2 \pi}{3}$
+  D: $\frac{5 \pi}{6}$
+answer: B
+solution: 【详解】因为 $(a-b) \perp b$, 所以 $(a-b) \cdot b=a \cdot b-b^{2}=0$, 所以 $a \cdot b=b^{2}$, 所以 $\cos \theta=\frac{a \cdot b}{|a| \cdot|b|}=\frac{|b|^{2}}{2|b|^{2}}=\frac{1}{2}$, 所以 $a$ 与 $b$ 的夹角为 $\frac{\pi}{3}$, 故选 B.

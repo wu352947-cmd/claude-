@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国I卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  trig.identities: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $\tan \alpha>0$, 则 $(\quad)$
+options:
+  A: $\sin \alpha>0$
+  B: $\cos \alpha>0$
+  C: $\sin 2 \alpha>0$
+  D: $\cos 2 \alpha>0$
+answer: C
+solution: |-
+  解: $\because \tan \alpha>0$,
+
+  $\therefore \frac{\sin \alpha}{\cos \alpha}>0$,
+
+  则 $\sin 2 \alpha=2 \sin \alpha \cos \alpha>0$.
+
+  故选: C.

@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  count.binomial: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $(1-\sqrt{\mathrm{x}})^{6}(1+\sqrt{\mathrm{x}})^{4}$ 的展开式中 $\mathrm{x}$ 的系数是($\qquad$)
+options:
+  A: '-4'
+  B: '-3'
+  C: '3'
+  D: '4'
+answer: B

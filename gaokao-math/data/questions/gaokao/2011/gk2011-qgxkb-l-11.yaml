@@ -1,0 +1,23 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  trig.graph: 0.55
+  func.symmetry: 0.45
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)=\sin (\omega x+\phi)+\cos (\omega x+\phi)\left(\omega>0,|\phi|<\frac{\pi}{2}\right)$ 的最 小正周期为 $\pi$, 且 $f(-x)=f(x)$ ，则（ $)$
+options:
+  A: $f(x)$ 在 $\left(0, \frac{\pi}{2}\right)$ 单调递减
+  B: $f(x)$ 在 $\left(\frac{\pi}{4}, \frac{3 \pi}{4}\right)$ 单调递减
+  C: $f(x)$ 在 $\left(0, \frac{\pi}{2}\right)$ 单调递增
+  D: $f(x)$ 在 $\left(\frac{\pi}{4}, \frac{3 \pi}{4}\right)$ 单调递增
+answer: A
+solution: |-
+  解: 由于 $f(x)=\sin (\omega x+\varphi)+\cos (\omega x+\varphi)=\sqrt{2} \sin \left(\omega x+\phi+\frac{\pi}{4}\right)$, 由于该函数的最小正周期为 $\mathrm{T}=\frac{2 \pi}{\omega}$, 得出 $\omega=2$,
+
+  又根据 $f(-x)=f(x)$, 得 $\phi+\frac{\pi}{4}=\frac{\pi}{2}+k \pi(k \in Z)$, 以及 $|\phi|<\frac{\pi}{2}$, 得出 $\phi=\frac{\pi}{4}$. 因此, $f(x)=\sqrt{2} \sin \left(2 x+\frac{\pi}{2}\right)=\sqrt{2} \cos 2 x$, 若 $x \in\left(0, \frac{\pi}{2}\right)$, 则 $2 x \in(0, \pi)$, 从而 $f(x)$ 在 $\left(0, \frac{\pi}{2}\right)$ 单调递减, 若 $x \in\left(\frac{\pi}{4}, \frac{3 \pi}{4}\right)$, 则 $2 x \in\left(\frac{\pi}{2}, \frac{3 \pi}{2}\right)$,
+
+  该区间不为余弦函数的单调区间, 故 $B, C, D$ 都错, $A$ 正确.
+
+  故选: A.

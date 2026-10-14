@@ -1,0 +1,19 @@
+type: single
+source: 2021 全国乙卷 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  logic.quantifier: 0.6
+  trig.graph: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: '已知命题 $p: \exists x \in R, \sin x<1$; 命题 $q: \forall x \in R, e^{|x|} \geq 1$, 则下列命题中为真命题的是 ( )'
+options:
+  A: $p \wedge q$
+  B: $\neg p \wedge q$
+  C: $p \wedge \neg q$
+  D: $\neg(p \vee q)$
+answer: A
+solution: |-
+  解析:
+
+  根据正弦函数的值域 $\sin x \in[-1,1], \sin x<1$, 故 $\exists x \in R, p$ 为真命题, 而函数 $y=e^{|x|}$ 为 偶函数, 且 $x \geq 0$ 时, $y=e^{x} \geq 1$, 故 $\forall x \in R, y=e^{|x|} \geq 1$ 恒成立. 则 $q$ 也为真命题. 所以 $p \wedge q$ 为真, 选 $A$.

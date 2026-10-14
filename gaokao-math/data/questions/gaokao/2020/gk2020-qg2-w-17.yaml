@@ -1,0 +1,47 @@
+type: solve
+source: 2020 全国II卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $\cos ^{2}\left(\frac{\pi}{2}+A\right)+\cos A=\frac{5}{4}$.
+
+  (1) 求 $A$;
+
+  (2) 若 $b-c=\frac{\sqrt{3}}{3} a$, 证明: $\triangle A B C$ 是直角三角形.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【分析】
+
+  (1) 根据诱导公式和同角三角函数平方关系, $\cos ^{2}\left(\frac{\pi}{2}+A\right)+\cos A=\frac{5}{4}$ 可化为 $1-\cos ^{2} A+\cos A=\frac{5}{4}$ , 即可解出;
+
+  (2) 根据余弦定理可得 $b^{2}+c^{2}-a^{2}=b c$, 将 $b-c=\frac{\sqrt{3}}{3} a$ 代入可找到 $a, b, c$ 关系,
+
+  再根据勾股定理或正弦定理即可证出.
+
+  【详解】 (1) 因为 $\cos ^{2}\left(\frac{\pi}{2}+A\right)+\cos A=\frac{5}{4}$, 所以 $\sin ^{2} A+\cos A=\frac{5}{4}$,
+
+  即 $1-\cos ^{2} A+\cos A=\frac{5}{4}$ ， 解得 $\cos A=\frac{1}{2}$, 又 $0<A<\pi$,
+
+  所以 $A=\frac{\pi}{3}$;
+
+  (2) 因为 $A=\frac{\pi}{3}$, 所以 $\cos A=\frac{b^{2}+c^{2}-a^{2}}{2 b c}=\frac{1}{2}$,
+
+  即 $b^{2}+c^{2}-a^{2}=b c$ (1),
+
+  又 $b-c=\frac{\sqrt{3}}{3} a$ (2), 将(2)代入(1)得, $b^{2}+c^{2}-3(b-c)^{2}=b c$,
+
+  即 $2 b^{2}+2 c^{2}-5 b c=0$, 而 $b>c$, 解得 $b=2 c$,
+
+  所以 $a=\sqrt{3} c$,
+
+  故 $b^{2}=a^{2}+c^{2}$,
+
+  即 $\square A B C$ 是直角三角形.

@@ -1,0 +1,47 @@
+type: solve
+source: 2019 全国II卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  deriv.extremum: 0.38
+  deriv.zeros: 0.34
+  deriv.construct: 0.29
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=(x-1) \ln x-x-1$. 证明:
+
+  (1) $f(x)$ 存在唯一的极值点;
+
+  (2) $f(x)=0$ 有且仅有两个实根, 且两个实根互为倒数.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【详解】(1) 由题意可得, $f(x)$ 的定义域为 $(0,+\infty)$,
+
+  由 $f(x)=(x-1) \ln x-x-1$,
+
+  得 $f^{\prime}(x)=\ln x+\frac{x-1}{x}-1=\ln x-\frac{1}{x}$,
+
+  显然 $f^{\prime}(x)=\ln x-\frac{1}{x}$ 单调递增; 又 $f^{\prime}(1)=-1<0, f^{\prime}(2)=\ln 2-\frac{1}{2}=\frac{\ln 4-1}{2}>0$ ，
+
+  故存在唯一 $x_{0}$, 使得 $f^{\prime}\left(x_{0}\right)=0$ ；
+
+  又当 $x>x_{0}$ 时, $f^{\prime}\left(x_{0}\right)>0$, 函数 $f(x)$ 单调递增; 当 $0<x<x_{0}$ 时, $f^{\prime}\left(x_{0}\right)<0$, 函数 $f(x)$ 单调递减;
+
+  因此, $f(x)$ 存在唯一的极值点;
+
+  (2) 由 (1) 知, $f\left(x_{0}\right)<f(1)=-2$, 又 $f\left(e^{2}\right)=e^{2}-3>0$,
+
+  所以 $f(x)=0$ 在 $\left(\boldsymbol{x}_{\mathbf{0}},+\infty\right)$ 内存在唯一实根, 记作 $x=a$.
+
+  由 $1<x_{0}<a$ 得 $\frac{1}{a}<1<x_{0}$,
+
+  又 $f\left(\frac{1}{a}\right)=\left(\frac{1}{a}-1\right) \ln \frac{1}{a}-\frac{1}{a}-1=\frac{f(a)}{a}=0$,
+
+  故 $\frac{1}{a}$ 是方程 $f(x)=0$ 在 $\left(0, x_{0}\right)$ 内的唯一实根;
+
+  综上, $f(x)=0$ 有且仅有两个实根, 且两个实根互为倒数.

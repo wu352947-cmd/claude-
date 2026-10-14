@@ -1,0 +1,16 @@
+type: single
+source: 2015 全国I卷 第 8 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2015
+kps:
+  trig.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=\cos (\omega x+\phi)$ 的部分图象如图所示, 则 $f(x)$ 的单调递减区间为()
+figure: 7cc612d04b22f60a.png
+options:
+  A: $\left(k \pi-\frac{1}{4}, k \pi+\frac{3}{4}\right), k \in z$
+  B: $\left(2 k \pi-\frac{1}{4}, 2 k \pi+\frac{3}{4}\right), k \in z$
+  C: $\quad\left(k-\frac{1}{4}, k+\frac{3}{4}\right), k \in z$
+  D: $\left(2 k-\frac{1}{4}, 2 k+\frac{3}{4}\right), k \in z$
+answer: D
+solution: '解: 由函数 $f(x)=\cos (\omega x+\varphi)$ 的部分图象, 可得函数的周期为 $\frac{2 \pi}{\omega}=2$$$\left(\frac{5}{4}-\frac{1}{4}\right)=2, \therefore \omega=\pi, f(x)=\cos (\pi x+\varphi) .$$再根据函数的图象以及五点法作图, 可得 $\frac{\pi}{4}+\varphi=\frac{\pi}{2}, k \in z$, 即 $\varphi=\frac{\pi}{4}, f(x)=\cos$ $\left(\pi x+\frac{\pi}{4}\right)$.由 $2 k \pi \leqslant \pi x+\frac{\pi}{4} \leqslant 2 k \pi+\pi$, 求得 $2 k-\frac{1}{4} \leqslant x \leqslant 2 k+\frac{3}{4}$, 故 $f(x)$ 的单调递减区间为'

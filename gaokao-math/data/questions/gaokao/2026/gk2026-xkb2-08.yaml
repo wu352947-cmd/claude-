@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标II卷 第 8 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  func.parity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知$f(x)$为定义在$R$上的偶函数，且$f(x)+f(x-2)=0$，当$x\in\left[\dfrac{3}{2},3\right]$时，$f(x)=x^2+ax+b$，则$(\quad)$
+options:
+  A: $a=-2$,$b=-3$
+  B: $a=-2$,$b=3$
+  C: $a=-4$,$b=-3$
+  D: $a=-4$,$b=3$
+answer: D

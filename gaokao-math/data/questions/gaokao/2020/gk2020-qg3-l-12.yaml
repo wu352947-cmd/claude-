@@ -1,0 +1,18 @@
+type: single
+source: 2020 全国III卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.compare: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $5^{5}<8^{4}, 13^{4}<8^{5}$. 设 $a=\log _{5} 3, b=\log _{8} 5, c=\log _{13} 8$, 则 $(\quad)$
+options:
+  A: $a<b<c$
+  B: $b<a<c$
+  C: $b<c<a$
+  D: $c<a<b$
+answer: A
+solution: |-
+  【详 解 】 由 题 意 可 知 $a$ 、 $b$ 、 $c \in(0,1)$, $\frac{a}{b}=\frac{\log _{5} 3}{\log _{8} 5}=\frac{\lg 3}{\lg 5} \cdot \frac{\lg 8}{\lg 5}<\frac{1}{(\lg 5)^{2}} \cdot\left(\frac{\lg 3+\lg 8}{2}\right)^{2}=\left(\frac{\lg 3+\lg 8}{2 \lg 5}\right)^{2}=\left(\frac{\lg 24}{\lg 25}\right)^{2}<1, \quad \therefore a<b ;$ 由 $b=\log _{8} 5$, 得 $8^{b}=5$, 由 $5^{5}<8^{4}$, 得 $8^{5 b}<8^{4}, \therefore 5 b<4$, 可得 $b<\frac{4}{5}$; 由 $c=\log _{13} 8$, 得 $13^{c}=8$, 由 $13^{4}<8^{5}$, 得 $13^{4}<13^{5 c}, \therefore 5 c>4$, 可得 $c>\frac{4}{5}$. 综上所述, $a<b<c$.
+
+  故选: A.

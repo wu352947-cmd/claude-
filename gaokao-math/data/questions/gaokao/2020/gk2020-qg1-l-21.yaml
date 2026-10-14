@@ -1,0 +1,59 @@
+type: solve
+source: 2020 全国I卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  deriv.monotonic: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\mathrm{e}^{x}+a x^{2}-x$.
+
+  （1）当 $a=1$ 时, 讨论 $f(x)$ 的单调性;
+
+  (2) 当 $x \geq 0$ 时, $f(x) \geq \frac{1}{2} x^{3}+1$, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【分析】
+
+  (1)由题意首先对函数二次求导, 然后确定导函数的符号, 最后确定原函数的单调性即可.
+
+  (2)首先讨论 $x=0$ 的
+
+  情况, 然后分离参数, 构造新函数, 结合导函数研究构造所得的函数的最大值即可确定实数 $a$ 的取值范围.
+
+  【详解】(1)当 $a=1$ 时, $f(x)=e^{x}+x^{2}-x, f^{\prime}(x)=e^{x}+2 x-1$,
+
+  由于 $f^{\prime \prime}(x)=e^{x}+2>0$, 故 $f^{\prime}(x)$ 单调递增, 注意到 $f^{\prime}(0)=0$, 故:
+
+  当 $x \in(-\infty, 0)$ 时, $f^{\prime}(x)<0, f(x)$ 单调递减,
+
+  当 $x \in(0,+\infty)$ 时, $f^{\prime}(x)>0, f(x)$ 单调递增.
+
+  (2)由 $f(x) \geq \frac{1}{2} x^{3}+1$ 得, $e^{x}+a x^{2}-x \ldots \frac{1}{2} x^{3}+1$, 其中 $x \geq 0$,
+
+  (1). 当 $x=0$ 时, 不等式为: $1 \geq 1$, 显然成立, 符合题意; (2).当 $x>0$ 时, 分离参数 $a$ 得, $a \ldots-\frac{e^{x}-\frac{1}{2} x^{3}-x-1}{x^{2}}$,
+
+  记 $g(x)=-\frac{e^{x}-\frac{1}{2} x^{3}-x-1}{x^{2}}, g^{\prime}(x)=-\frac{(x-2)\left(e^{x}-\frac{1}{2} x^{2}-x-1\right)}{x^{3}}$,
+
+  令 $h(x)=e^{x}-\frac{1}{2} x^{2}-x-1(x \geq 0)$,
+
+  则 $h^{\prime}(x)=e^{x}-x-1, h^{\prime \prime}(x)=e^{x}-1 \geq 0$,
+
+  故 $h^{\prime}(x)$ 单调递增, $h^{\prime}(x) \geq h^{\prime}(0)=0$,
+
+  故函数 $h(x)$ 单调递增, $h(x) \geq h(0)=0$,
+
+  由 $h(x) \geq 0$ 可得: $e^{x}-\frac{1}{2} x^{2}-x-1 \ldots 0$ 恒成立,
+
+  故当 $x \in(0,2)$ 时, $g^{\prime}(x)>0, g(x)$ 单调递增;
+
+  当 $x \in(2,+\infty)$ 时, $g^{\prime}(x)<0, g(x)$ 单调递减;
+
+  因此, $[g(x)]_{\max }=g(2)=\frac{7-e^{2}}{4}$ ，
+
+  综上可得，实数 $a$ 的取值范围是 $\left[\frac{7-e^{2}}{4},+\infty\right)$.

@@ -1,0 +1,21 @@
+type: fill
+source: 2019 全国I卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 0.6
+  deriv.extremum: 0.4
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=\sin \left(2 x+\frac{3 \pi}{2}\right)-3 \cos x$ 的最小值为 ______
+answer: '-4'
+answer_kind: expr
+solution: |-
+  【详解】
+
+  $f(x)=\sin \left(2 x+\frac{3 \pi}{2}\right)-3 \cos x=-\cos 2 x-3 \cos x=-2 \cos ^{2} x-3 \cos x+1$
+
+  $=-2\left(\cos x+\frac{3}{4}\right)^{2}+\frac{17}{8}$
+
+  $\because-1 \leq \cos x \leq 1, \therefore$ 当 $\cos x=1$ 时, $f_{\text {min }}(x)=-4$,
+
+  故函数 $f(x)$ 的最小值为 -4 .

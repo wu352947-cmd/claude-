@@ -1,0 +1,76 @@
+type: solve
+source: 2022 全国甲卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  deriv.construct: 0.53
+  deriv.zeros: 0.47
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\frac{e^{x}}{x}-\ln x+x-a$.
+
+  (1) 若 $f(x) \geq 0$, 求 $a$ 的取值范围;
+
+  (2) 证明: 若 $f(x)$ 有两个零点 $x_{1}, x_{2}$, 则环 $x_{1} x_{2}<1$.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  $f(x)$ 的定义域为 $(0,+\infty)$,
+
+  $f^{\prime}(x)=\left(\frac{1}{x}-\frac{1}{x^{2}}\right) \mathrm{e}^{x}-\frac{1}{x}+1=\frac{1}{x}\left(1-\frac{1}{x}\right) \mathrm{e}^{x}+\left(1-\frac{1}{x}\right)=\frac{x-1}{x}\left(\frac{\mathrm{e}^{x}}{x}+1\right)$
+
+  令 $f(x)=0$, 得 $x=1$ 当 $x \in(0,1), f^{\prime}(x)<0, f(x)$ 单调递减
+
+  当 $x \in(1,+\infty), f^{\prime}(x)>0, f(x)$ 单调递增 $f(x) \geq f(1)=\mathrm{e}+1-a$,
+
+  若 $f(x) \geq 0$, 则 $\mathrm{e}+1-a \geq 0$, 即 $a \leq e+1$
+
+  所以 $a$ 的取值范围为 $(-\infty, e+1]$
+
+  【小问 2 详解】}
+
+  由题知, $f(x)$ 一个零点小于 1 ,一个零点大于 1
+
+  不妨设 $x_{1}<1<x_{2}$
+
+  要证 $x_{1} x_{2}<1$,即证 $x_{1}<\frac{1}{x_{2}}$
+
+  因为 $x_{1}, \frac{1}{x_{2}} \in(0,1)$, 即证 $f\left(x_{1}\right)>f\left(\frac{1}{x_{2}}\right)$
+
+  因为 $f\left(x_{1}\right)=f\left(x_{2}\right)$, 即证 $f\left(x_{2}\right)>f\left(\frac{1}{x_{2}}\right)$
+
+  即证 $\frac{\mathrm{e}^{x}}{x}-\ln x+x-x \mathrm{e}^{\frac{1}{x}}-\ln x-\frac{1}{x}>0, x \in(1,+\infty)$
+
+  即证 $\frac{\mathrm{e}^{x}}{x}-x \mathrm{e}^{\frac{1}{x}}-2\left[\ln x-\frac{1}{2}\left(x-\frac{1}{x}\right)\right]>0$
+
+  下面证明 $x>1$ 时, $\frac{\mathrm{e}^{x}}{x}-x \mathrm{e}^{\frac{1}{x}}>0, \ln x-\frac{1}{2}\left(x-\frac{1}{x}\right)<0$
+
+  设 $g(x)=\frac{\mathrm{e}^{x}}{x}-x \mathrm{e}^{\frac{1}{x}}, x>1$ ，
+
+  则 $g^{\prime}(x)=\left(\frac{1}{x}-\frac{1}{x^{2}}\right) \mathrm{e}^{x}-\left(\mathrm{e}^{\frac{1}{x}}+x \mathrm{e}^{\frac{1}{x}} \cdot\left(-\frac{1}{x^{2}}\right)\right)=\frac{1}{x}\left(1-\frac{1}{x}\right) \mathrm{e}^{x}-\mathrm{e}^{\frac{1}{x}}\left(1-\frac{1}{x}\right)$
+
+  $=\left(1-\frac{1}{x}\right)\left(\frac{\mathrm{e}^{x}}{x}-\mathrm{e}^{\frac{1}{x}}\right)=\frac{x-1}{x}\left(\frac{\mathrm{e}^{x}}{x}-\mathrm{e}^{\frac{1}{x}}\right)$
+
+  设 $\varphi(x)=\frac{\mathrm{e}^{x}}{x}(x>1), \varphi^{\prime}(x)=\left(\frac{1}{x}-\frac{1}{x^{2}}\right) \mathrm{e}^{x}=\frac{x-1}{x^{2}} \mathrm{e}^{x}>0$ 所以 $\varphi(x)>\varphi(1)=\mathrm{e}$, 而 $\mathrm{e}^{\frac{1}{x}}<\mathrm{e}$
+
+  所以 $\frac{\mathrm{e}^{x}}{x}-\mathrm{e}^{\frac{1}{x}}>0$, 所以 $g^{\prime}(x)>0$
+
+  所以 $g(x)$ 在 $(1,+\infty)$ 单调递增
+
+  即 $g(x)>g(1)=0$,所以 $\frac{\mathrm{e}^{x}}{x}-x \mathrm{e}^{\frac{1}{x}}>0$
+
+  令 $h(x)=\ln x-\frac{1}{2}\left(x-\frac{1}{x}\right), x>1$
+
+  $h^{\prime}(x)=\frac{1}{x}-\frac{1}{2}\left(1+\frac{1}{x^{2}}\right)=\frac{2 x-x^{2}-1}{2 x^{2}}=\frac{-(x-1)^{2}}{2 x^{2}}<0$
+
+  所以 $h(x)$ 在 $(1,+\infty)$ 单调递减
+
+  即 $h(x)<h(1)=0$, 所以 $\ln x-\frac{1}{2}\left(x-\frac{1}{x}\right)<0$ ；
+
+  综上, $\frac{\mathrm{e}^{x}}{x}-x \mathrm{e}^{\frac{1}{x}}-2\left[\ln x-\frac{1}{2}\left(x-\frac{1}{x}\right)\right]>0$,所以 $x_{1} x_{2}<1$.

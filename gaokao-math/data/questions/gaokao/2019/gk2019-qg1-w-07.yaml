@@ -1,0 +1,18 @@
+type: single
+source: 2019 全国I卷（文科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.identities: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: tan $255^{\circ}=$
+options:
+  A: $-2-\sqrt{3}$
+  B: $-2+\sqrt{3}$
+  C: $2-\sqrt{3}$
+  D: $2+\sqrt{3}$
+answer: D
+solution: |-
+  【 详 解】
+  $\tan 255^{\circ}=\tan \left(180^{\circ}+75^{\circ}\right)=\tan 75^{\circ}=\tan \left(45^{\circ}+30^{\circ}\right)$
+  $\frac{\tan 45^{\circ}+\tan 30^{\circ}}{1-\tan 45^{\circ} \tan 30^{\circ}}=\frac{1+\frac{\sqrt{3}}{3}}{1-\frac{\sqrt{3}}{3}}=2+\sqrt{3}$. 解

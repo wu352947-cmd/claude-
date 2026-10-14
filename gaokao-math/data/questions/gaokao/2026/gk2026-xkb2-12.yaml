@@ -1,0 +1,10 @@
+type: fill
+source: 2026 新课标II卷 第 12 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知$S_n$为等差数列$\{a_n\}$前$n$项的和，若$a_1=-1$，$a_4=5$，则$S_6=\underline{\quad\quad}$.
+answer: '24'
+answer_kind: expr

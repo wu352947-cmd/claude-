@@ -1,0 +1,21 @@
+type: single
+source: 2013 全国I卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  complex.modulus: 0.59
+  complex.arith: 0.41
+difficulty_label: 基础
+points: 5.0
+stem: 若复数 $z$ 满足 $(3-4 i) z=|4+3 i|$, 则 $z$ 的虚部为（ ）
+options:
+  A: '-4'
+  B: $-\frac{4}{5}$
+  C: '4'
+  D: $\frac{4}{5}$
+answer: D
+solution: |-
+  解: $\because$ 复数 $z$ 满足 $(3-4 i) z=|4+3 i|, \therefore z=\frac{|4+3 i|}{3-4 i}=\frac{5}{3-4 i}=\frac{5(3+4 i)}{25}=\frac{3}{5}+$ $\frac{4}{5} i$
+
+  故 $z$ 的虚部等于 $\frac{4}{5}$,
+
+  故选: D.

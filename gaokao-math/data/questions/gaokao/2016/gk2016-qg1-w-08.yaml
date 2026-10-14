@@ -1,0 +1,29 @@
+type: single
+source: 2016 全国I卷（文科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  ineq.properties: 0.5
+  expo.functions: 0.5
+difficulty_label: 中档
+points: 5.0
+stem: 若 $a>b>0,0<c<1$, 则（ $)$
+options:
+  A: $\log _{a} c<\log _{b} c$
+  B: $\log _{c} a<\log _{c} b$
+  C: $a^{c}<b^{c}$
+  D: $c^{a}>c^{b}$
+answer: B
+solution: |-
+  解: $\because a>b>0,0<c<1$,
+
+  $\therefore \log _{c} a<\log _{c} b$, 故 B 正确;
+
+  $\therefore$ 当 $a>b>1$ 时,
+
+  $0>\log _{a} c>\log _{b} c$, 故 $A$ 错误;
+
+  $a^{c}>b^{c}$, 故 $C$ 错误;
+
+  $c^{a}<c^{b}$, 故 $D$ 错误;
+
+  故选: B.

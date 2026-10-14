@@ -1,0 +1,11 @@
+type: fill
+source: 2020 北京卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  trig.graph: 0.59
+  deriv.extremum: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: '若函数 $f(x)=\sin (x+\varphi)+\cos x$ 的最大值为 2 , 则常数 $\varphi$ 的一个取值为 ______ '
+answer: \frac{\pi}{2}
+answer_kind: expr

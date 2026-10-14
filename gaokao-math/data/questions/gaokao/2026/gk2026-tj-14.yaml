@@ -1,0 +1,17 @@
+type: solve
+source: 2026 天津卷 第 14 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  vec.dot: 1.0
+difficulty_label: 较难
+stem: 已知 $|\vec{a}| = \vec{a} \cdot \vec{b} = 1$，$|\vec{b}| > 1$，记 $\vec{c} = \lambda \vec{a} + \mu \vec{b}$。当 $\vec{a} + \vec{b} - \vec{c} = \vec{0}$ 时，$\lambda + \mu =$ ______；当 $|\vec{a} + \vec{b} - \vec{c}| = 1$ 时，$\lambda + \mu$ 的取值范围为 ______。
+parts:
+- label: 答案
+  points: 5.0
+  answer: 2；$[1, 3]$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 2；$[1, 3]$

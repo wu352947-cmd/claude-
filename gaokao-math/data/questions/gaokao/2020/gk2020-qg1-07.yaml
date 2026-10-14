@@ -1,0 +1,18 @@
+type: single
+source: 2020 全国I卷 第 7 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2020
+kps:
+  trig.graph: 0.45
+  func.graph: 0.3
+  func.symmetry: 0.26
+difficulty_label: 中档
+points: 5.0
+stem: 设函数 $f(x)=\cos \left(\omega x+\frac{\pi}{6}\right)$ 在 $[-\pi, \pi]$ 的图像大致如下图, 则 $f(x)$ 的最小正周期为（）
+figure: 065c6ffb859af7a1.png
+options:
+  A: $\frac{10 \pi}{9}$
+  B: $\frac{7 \pi}{6}$
+  C: $\frac{4 \pi}{3}$
+  D: $\frac{3 \pi}{2}$
+answer: C
+solution: '【详解】由图可得: 函数图象过点 $\left(-\frac{4 \pi}{9}, 0\right)$,将它代入函数 $f(x)$ 可得: $\cos \left(-\frac{4 \pi}{9} \cdot \omega+\frac{\pi}{6}\right)=0$又 $\left(-\frac{4 \pi}{9}, 0\right)$ 是函数 $f(x)$ 图象与 $x$ 轴负半轴的第一个交点,所以 $-\frac{4 \pi}{9} \cdot \omega+\frac{\pi}{6}=-\frac{\pi}{2}$, 解得: $\omega=\frac{3}{2}$所以函数 $f(x)$ 的最小正周期为 $T=\frac{2 \pi}{\omega}=\frac{2 \pi}{\frac{3}{2}}=\frac{4 \pi}{3}$故选: C'

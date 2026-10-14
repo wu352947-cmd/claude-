@@ -1,0 +1,46 @@
+type: solve
+source: 2022 全国甲卷 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  seq.arith: 0.5
+  seq.geom: 0.5
+difficulty_label: 中档
+stem: |-
+  记 $S_{n}$ 为数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 已知 $\frac{2 S_{n}}{n}+n=2 a_{n}+1$.
+
+  (1) 证明: $\left\{a_{n}\right\}$ 是等差数列;
+
+  (2) 若 $a_{4}, a_{7}, a_{9}$ 成等比数列, 求 $S_{n}$ 的最小值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  解: 因为 $\frac{2 S_{n}}{n}+n=2 a_{n}+1$, 即 $2 S_{n}+n^{2}=2 n a_{n}+n(1)$,
+
+  当 $n \geq 2$ 时, $2 S_{n-1}+(n-1)^{2}=2(n-1) a_{n-1}+(n-1)$ (2),
+
+  (1)-(2)得, $2 S_{n}+n^{2}-2 S_{n-1}-(n-1)^{2}=2 n a_{n}+n-2(n-1) a_{n-1}-(n-1)$,
+
+  即 $2 a_{n}+2 n-1=2 n a_{n}-2(n-1) a_{n-1}+1$,
+
+  即 $2(n-1) a_{n}-2(n-1) a_{n-1}=2(n-1)$, 所以 $a_{n}-a_{n-1}=1, n \geq 2$ 且 $n \in \mathrm{N}^{*}$,
+
+  所以 $\left\{a_{n}\right\}$ 是以 1 为公差的等差数列.
+
+  【小问 2 详解】
+
+  解：由（1）可得 $a_{4}=a_{1}+3, a_{7}=a_{1}+6, a_{9}=a_{1}+8$,
+
+  又 $a_{4}, a_{7}, a_{9}$ 成等比数列, 所以 $a_{7}^{2}=a_{4} \cdot a_{9}$,
+
+  即 $\left(a_{1}+6\right)^{2}=\left(a_{1}+3\right) \cdot\left(a_{1}+8\right)$ ， 解得 $a_{1}=-12$ ，
+
+  所以 $a_{n}=n-13$, 所以 $S_{n}=-12 n+\frac{n(n-1)}{2}=\frac{1}{2} n^{2}-\frac{25}{2} n=\frac{1}{2}\left(n-\frac{25}{2}\right)^{2}-\frac{625}{8}$,
+
+  所以, 当 $n=12$ 或 $n=13$ 时 $\left(S_{n}\right)_{\text {min }}=-78$.

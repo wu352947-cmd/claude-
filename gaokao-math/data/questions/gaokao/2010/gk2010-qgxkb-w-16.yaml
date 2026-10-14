@@ -1,0 +1,36 @@
+type: fill
+source: 2010 全国新课标卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $D$ 为 $B C$ 边上一点, $B C=3 B D, A D=\sqrt{2}, \angle A D B=135^{\circ}$. 若 $A C=\sqrt{2} A B$, 则 $B D=$ ______
+answer: 2+\sqrt{5}
+answer_kind: expr
+solution: |-
+  用余弦定理求得
+
+  $A B^{2}=B^{2}+A D^{2}-2 A D \cdot B D \cos 135^{\circ}$
+
+  $A C^{2}=C D^{2}+A D^{2}-2 A D \cdot C D \cos 45^{\circ}$
+
+  即 $A B^{2}=B D^{2}+2+2 B D$ (1) $A C^{2}=C D^{2}+2-2 C D$
+
+  又 $B C=3 B D$
+
+  所以 $C D=2 B D$
+
+  所以 由（2）得 $A C^{2}=4 B D^{2}+2-4 B D$ （3）
+
+  因为 $A C=\sqrt{2} A B$
+
+  所以 由 (3) 得 $2 A B^{2}=4 B D^{2}+2-4 B D \quad(4)$
+
+  $(4)-2(1)$
+
+  $B D^{2}-4 B D-1=0$
+
+  求得 $\mathrm{BD}=2+\sqrt{5}$
+
+  故答案为: $2+\sqrt{5}$

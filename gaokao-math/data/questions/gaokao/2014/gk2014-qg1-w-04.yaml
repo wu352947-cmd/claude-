@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国I卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{3}=1(a>0)$ 的离心率为 2 , 则实数 $a=(\quad)$
+options:
+  A: '2'
+  B: $\frac{\sqrt{6}}{2}$
+  C: $\frac{\sqrt{5}}{2}$
+  D: '1'
+answer: D
+solution: |-
+  解: 由题意,
+
+  $\mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\frac{\sqrt{\mathrm{a}^{2}+3}}{\mathrm{a}}=2$,
+
+  解得, $a=1$.
+
+  故选：D.

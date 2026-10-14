@@ -1,0 +1,10 @@
+type: fill
+source: 2020 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2020
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '将数列 $\{2 n-1\}$ 与 $\{3 n-2\}$ 的公共项从小到大排列得到数列 $\left\{a_{n}\right\}$, 则 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 ______ '
+answer: 3n^{2}-2n
+answer_kind: expr

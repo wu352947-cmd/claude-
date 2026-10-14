@@ -1,0 +1,42 @@
+type: solve
+source: 2015 全国I卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  deriv.tangent: 0.64
+  conic.chord: 0.36
+difficulty_label: 较难
+stem: |-
+  在直角坐标系 $x O y$ 中, 曲线 $C: y=\frac{x^{2}}{4}$ 与直线 $:: y=k x+a(a>0)$ 交 于 $M, N$ 两点.
+
+  (I) 当 $k=0$ 时, 分別求 $C$ 在点 $M$ 和 $N$ 处的切线方程.
+
+  ( II) $y$ 轴上是否存在点 $P$, 使得当 $k$ 变动时, 总有 $\angle O P M=\angle O P N$ ? （说明理由 )
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解：（1）联立 $\left\{\begin{array}{l}y=a \\ y=\frac{x^{2}}{4}\end{array}\right.$ 不妨取 $M(2 \sqrt{a}, a), N(-2 \sqrt{a}, a)$,
+
+  由曲线 $C: y=\frac{x^{2}}{4}$ 可得: $y^{\prime}=\frac{x}{2}$,
+
+  $\therefore$ 曲线 C 在 $M$ 点处的切线斜率为 $\frac{2 \sqrt{a}}{2}=\sqrt{a}$, 其切线方程为: $y^{-} a=\sqrt{a}(x-2 \sqrt{a})$, 化为 $\sqrt{a} x-y-a=0$.
+
+  同理可得曲线 $C$ 在点 $N$ 处的切线方程为: $\sqrt{a} x+y+a=0$.
+
+  (II) 存在符合条件的点 $(0,-a)$, 下面给出证明:
+
+  设 $P(0, b)$ 满足 $\angle O P M=\angle O P N . M\left(x_{1}, y_{1}\right), N\left(x_{2}, y_{2}\right)$, 直线 $P M, P N$ 的 斜率分别为: $k_{1}, k_{2}$.
+
+  联立 $\left\{\begin{array}{l}y=k x+a \\ y=\frac{x^{2}}{4}\end{array}\right.$, 化为 $x^{2}-4 k x-4 a=0$,
+
+  $\therefore x_{1}+x_{2}=4 k, x_{1} x_{2}=-4 a$.
+
+  $\therefore \mathrm{k}_{1}+\mathrm{k}_{2}=\frac{\mathrm{y}_{1}-\mathrm{b}}{\mathrm{x}_{1}}+\frac{\mathrm{y}_{2}-\mathrm{b}}{\mathrm{x}_{2}}=\frac{2 \mathrm{kx} \mathrm{x}_{1}+(\mathrm{a}-\mathrm{b})\left(\mathrm{x}_{1}+\mathrm{x}_{2}\right)}{\mathrm{x}_{1} \mathrm{x}_{2}}=\frac{\mathrm{k}(\mathrm{a}+\mathrm{b})}{\mathrm{a}}$.
+
+  当 $b=-a$ 时, $k_{1}+k_{2}=0$, 直线 PM, PN 的倾斜角互补, $\therefore \angle \mathrm{OPM}=\angle \mathrm{OPN}$
+
+  $\therefore$ 点 $P(0,-a)$ 符合条件.

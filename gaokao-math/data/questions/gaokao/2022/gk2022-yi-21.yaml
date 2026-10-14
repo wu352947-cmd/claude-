@@ -1,0 +1,59 @@
+type: solve
+source: 2022 全国乙卷 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知椭圆 $E$ 的中心为坐标原点, 对称轴为 $x$ 轴、 $y$ 轴, 且过 $A(0,-2), B\left(\frac{3}{2},-1\right)$ 两点.
+
+  (1) 求 $E$ 的方程;
+
+  (2) 设过点 $P(1,-2)$ 的直线交 $E$ 于 $M, N$ 两点, 过 $M$ 且平行于 $x$ 轴的直线与线段 $A B$ 交于
+
+  点 $T$, 点 $H$ 满足 $\overrightarrow{M T}=\overrightarrow{T H}$. 证明: 直线 $H N$ 过定点.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  解: 设椭圆 $E$ 的方程为 $m x^{2}+n y^{2}=1$, 过 $A(0,-2), B\left(\frac{3}{2},-1\right)$,
+
+  则 $\left\{\begin{array}{c}4 n=1 \\ \frac{9}{4} m+n=1\end{array}\right.$, 解得 $m=\frac{1}{3}, \quad n=\frac{1}{4}$,
+
+  所以椭圆 $E$ 的方程为: $\frac{y^{2}}{4}+\frac{x^{2}}{3}=1$.
+
+  【小问 2 详解】
+
+  $A(0,-2), B\left(\frac{3}{2},-1\right)$, 所以 $A B: y+2=\frac{2}{3} x$,
+
+  (1) 若过点 $P(1,-2)$ 的直线斜率不存在, 直线 $x=1$. 代人 $\frac{x^{2}}{3}+\frac{y^{2}}{4}=1$,
+
+  可得 $M\left(1, \frac{2 \sqrt{6}}{3}\right), N\left(1,-\frac{2 \sqrt{6}}{3}\right)$, 代人 $A B$ 方程 $y=\frac{2}{3} x-2$, 可得
+
+  $T\left(\sqrt{6}+3, \frac{2 \sqrt{6}}{3}\right)$, 由 $\overrightarrow{M T}=\overrightarrow{T H}$ 得到 $H\left(2 \sqrt{6}+5, \frac{2 \sqrt{6}}{3}\right)$. 求得 $H N$ 方程:
+
+  $y=\left(2-\frac{2 \sqrt{6}}{3}\right) x-2$, 过点 $(0,-2)$.
+
+  (2)若过点 $P(1,-2)$ 的直线斜率存在, 设 $k x-y-(k+2)=0, M\left(x_{1}, y_{1}\right), N\left(x_{2}, y_{2}\right)$.
+
+  联立 $\left\{\begin{array}{c}k x-y-(k+2)=0 \\ \frac{x^{2}}{3}+\frac{y^{2}}{4}=1\end{array}\right.$, 得 $\left(3 k^{2}+4\right) x^{2}-6 k(2+k) x+3 k(k+4)=0$ ，
+
+  可得 $\left\{\begin{array}{c}x_{1}+x_{2}=\frac{6 k(2+k)}{3 k^{2}+4} \\ x_{1} x_{2}=\frac{3 k(4+k)}{3 k^{2}+4}\end{array},\left\{\begin{array}{c}y_{1}+y_{2}=\frac{-8(2+k)}{3 k^{2}+4} \\ y_{2} y_{2}=\frac{4\left(4+4 k-2 k^{2}\right)}{3 k^{2}+4}\end{array}\right.\right.$, 且 $x_{1} y_{2}+x_{2} y_{1}=\frac{-24 k}{3 k^{2}+4}(*)$
+
+  联立 $\left\{\begin{array}{c}y=y_{1} \\ y=\frac{2}{3} x-2\end{array}\right.$, 可得 $T\left(\frac{3 y_{1}}{2}+3, y_{1}\right), H\left(3 y_{1}+6-x_{1}, y_{1}\right)$.
+
+  可求得此时 $H N: y-y_{2}=\frac{y_{1}-y_{2}}{3 y_{1}+6-x_{1}-x_{2}}\left(x-x_{2}\right)$,
+
+  将 $(0,-2)$, 代人整理得 $2\left(x_{1}+x_{2}\right)-6\left(y_{1}+y_{2}\right)+x_{1} y_{2}+x_{2} y_{1}-3 y_{1} y_{2}-12=0$,
+
+  将 $(*)$ 代人, 得 $24 k+12 k^{2}+96+48 k-24 k-48-48 k+24 k^{2}-36 k^{2}-48=0$,
+
+  显然成立,
+
+  综上, 可得直线 $H N$ 过定点 $(0,-2)$.

@@ -1,0 +1,20 @@
+type: single
+source: 2018 全国III卷 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{x \mid x-1 \geqslant 0\}, B=\{0,1,2\}$, 则 $A \cap B=(\quad)$
+options:
+  A: $\{0\}$
+  B: $\{1\}$
+  C: $\{1,2\}$
+  D: $\{0,1,2\}$
+answer: C
+solution: |-
+  解: $\because A=\{x \mid x-1 \geqslant 0\}=\{x \mid x \geqslant 1\}, B=\{0,1,2\}$,
+
+  $\therefore A \cap B=\{x \mid x \geqslant 1\} \cap\{0,1,2\}=\{1,2\}$.
+
+  故选: C.

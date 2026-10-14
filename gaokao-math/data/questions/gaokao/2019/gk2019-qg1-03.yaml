@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国I卷 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  expo.compare: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $a=\log _{2} 0.2, b=2^{0.2}, c=0.2^{0.3}$ ，则
+options:
+  A: $a<b<c$
+  B: $a<c<b$
+  C: $c<a<b$
+  D: $b<c<a$
+answer: B
+solution: 【详 解 】 $a=\log _{2} 0.2<\log _{2} 1=0, \quad b=2^{0.2}>2^{0}=1, \quad 0<0.2^{0.3}<0.2^{0}=1$, 则 $0<c<1, a<c<b$. 故选 B.

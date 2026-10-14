@@ -1,0 +1,10 @@
+type: fill
+source: 2026 上海卷 第 12 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 在 $\triangle ABC$ 中，$AB=3$，$AC=5$，$BC=\sqrt{14}$。已知点 $A$，$B$，$C$ 分别为椭圆的上、下、右顶点，以及两个焦点中的三点，求椭圆的离心率$\underline{\quad\quad}$.
+answer: \frac{2}{3}
+answer_kind: expr

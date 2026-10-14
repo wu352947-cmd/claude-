@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国I卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.geom: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $\left\{a_{n}\right\}$ 是等比数列, 且 $a_{1}+a_{2}+a_{3}=1, a_{2}+a_{3}+a_{4}=2$, 则 $a_{6}+a_{7}+a_{8}=(\quad)$
+options:
+  A: '12'
+  B: '24'
+  C: '30'
+  D: '32'
+answer: D
+solution: |-
+  【详解】设等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$, 则 $a_{1}+a_{2}+a_{3}=a_{1}\left(1+q+q^{2}\right)=1$,
+
+  $a_{2}+a_{3}+a_{4}=a_{1} q+a_{1} q^{2}+a_{1} q^{3}=a_{1} q\left(1+q+q^{2}\right)=q=2$ 因此, $a_{6}+a_{7}+a_{8}=a_{1} q^{5}+a_{1} q^{6}+a_{1} q^{7}=a_{1} q^{5}\left(1+q+q^{2}\right)=q^{5}=32$.
+
+  故选：D.

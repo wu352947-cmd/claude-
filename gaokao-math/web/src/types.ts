@@ -14,6 +14,7 @@ export interface QuestionSummary {
   is_variant?: boolean;
   type: QType;
   source: string;
+  year: number | null;
   difficulty_label: string;
   points: number;
   preview: string;
@@ -24,6 +25,7 @@ export interface BankItem extends QuestionSummary {
   attempts: number;
   in_review: boolean;
   variants: number;
+  flagged: boolean;
 }
 
 export interface QuestionDetail extends QuestionSummary {
@@ -37,6 +39,8 @@ export interface QuestionDetail extends QuestionSummary {
   parent_id: string | null;
   history: { created_at: string; score: number; max_score: number; seconds: number; error_type: ErrorType | null }[];
   card: { due: string; reps: number; lapses: number; graduated: boolean } | null;
+  file: string;
+  flag: { reason: string; created_at: string } | null;
 }
 
 export interface SolvePart {

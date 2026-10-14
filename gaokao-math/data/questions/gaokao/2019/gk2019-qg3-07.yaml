@@ -1,0 +1,16 @@
+type: single
+source: 2019 全国III卷 第 7 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2019
+kps:
+  func.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $y=\frac{2 x^3}{2^x+2^{-x}}$ 在 $[-6,6]$ 的图像大致为
+figure: 654332f6116c49cc.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: B
+solution: 【详解】设 $y=f(x)=\frac{2 x^3}{2^x+2^{-x}}$, 则 $f(-x)=\frac{2(-x)^3}{2^{-x}+2^x}=-\frac{2 x^3}{2^x+2^{-x}}=-f(x)$, 所以 $f(x)$ 是奇函数, 图象关于原点成中心对称, 排除选项 C. 又 $f(4)=\frac{2 \times 4^3}{2^4+2^{-4}}>0$, 排除选项 D; $f(6)=\frac{2 \times 6^3}{2^6+2^{-6}} \approx 7$, 排除选项 A, 故选 B.

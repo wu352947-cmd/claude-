@@ -1,0 +1,10 @@
+type: fill
+source: 2021 新课标II卷 填空题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}+\vec{b}+\vec{c}=\overrightarrow{0},|\vec{a}|=1,|\vec{b}|=|\vec{c}|=2, \vec{a} \cdot \vec{b}+\vec{b} \cdot \vec{c}+\vec{c} \cdot \vec{a}=\underline{\qquad}$
+answer: -\frac{9}{2}
+answer_kind: expr

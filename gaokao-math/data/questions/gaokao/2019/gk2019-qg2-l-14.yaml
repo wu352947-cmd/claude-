@@ -1,0 +1,16 @@
+type: fill
+source: 2019 全国II卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $f(x)$ 是奇函数, 且当 $x<0$ 时, $f(x)=-\mathrm{e}^{a x}$. 若 $f(\ln 2)=8$, 则 $a=$ ______
+answer: '-3'
+answer_kind: expr
+solution: |-
+  【详解】因为 $f(x)$ 是奇函数, 且当 $x<0$ 时, $f(x)=-e^{-a x}$.
+
+  又因为 $\ln 2 \in(0,1), f(\ln 2)=8$,
+
+  所以 $-e^{-a \ln 2}=-8$, 两边取以 $e$ 为底的对数得 $-a \ln 2=3 \ln 2$, 所以 $-a=3$, 即 $3 \pi$.

@@ -1,0 +1,38 @@
+type: single
+source: 2022 全国乙卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  prob.classical: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 某棋手与甲、乙、丙三位棋手各比赛一盘, 各盘比赛结果相互独立. 已知该棋手与甲、 乙、丙比赛获胜的概率分别为 $p_{1}, p_{2}, p_{3}$, 且 $p_{3}>p_{2}>p_{1}>0$. 记该棋手连胜两盘的概率为 $p$, 则 ()
+options:
+  A: $p$ 与该棋手和甲、乙、丙的比赛次序无关
+  B: 该棋手在第二盘与甲比赛， $p$ 最大
+  C: 该棋手在第二盘与乙比赛, $p$ 最大
+  D: 该棋手在第二盘与丙比赛, $p$ 最大
+answer: D
+solution: |-
+  【详解】该棋手连胜两盘, 则第二盘为必胜盘,
+
+  记该棋手在第二盘与甲比赛，且连胜两盘的概率为 $p_{\text {甲 }}$
+
+  则 $p_{\text {甲 }}=2\left(1-p_{2}\right) p_{1} p_{3}+2 p_{2} p_{1}\left(1-p_{3}\right)=2 p_{1}\left(p_{2}+p_{3}\right)-4 p_{1} p_{2} p_{3}$ 记该棋手在第二盘与乙比赛, 且连胜两盘的概率为 $p_{\text {乙 }}$
+
+  则 $p_{\text {乙 }}=2\left(1-p_{1}\right) p_{2} p_{3}+2 p_{1} p_{2}\left(1-p_{3}\right)=2 p_{2}\left(p_{1}+p_{3}\right)-4 p_{1} p_{2} p_{3}$
+
+  记该棋手在第二盘与丙比赛, 且连胜两盘的概率为 $p_{\text {丙 }}$
+
+  则 $p_{\text {丙 }}=2\left(1-p_{1}\right) p_{3} p_{2}+2 p_{1} p_{3}\left(1-p_{2}\right)=2 p_{3}\left(p_{1}+p_{2}\right)-4 p_{1} p_{2} p_{3}$
+
+  则 $p_{\text {甲 }}-p_{\text {乙 }}=2 p_{1}\left(p_{2}+p_{3}\right)-4 p_{1} p_{2} p_{3}-\left[2 p_{2}\left(p_{1}+p_{3}\right)-4 p_{1} p_{2} p_{3}\right]=2\left(p_{1}-p_{2}\right) p_{3}<0$
+
+  $p_{\text {乙 }}-p_{\text {丙 }}=2 p_{2}\left(p_{1}+p_{3}\right)-4 p_{1} p_{2} p_{3}-\left[2 p_{3}\left(p_{1}+p_{2}\right)-4 p_{1} p_{2} p_{3}\right]=2\left(p_{2}-p_{3}\right) p_{1}<0$
+
+  即 $p_{\text {甲 }}<p_{\text {乙 }}, p_{\text {乙 }}<p_{\text {丙 }}$,
+
+  则该棋手在第二盘与丙比赛, $p$ 最大.选项 D 判断正确; 选项 BC 判断错误;
+
+  $p$ 与该棋手与甲、乙、丙的比赛次序有关.选项 $\mathrm{A}$ 判断错误.
+
+  故选: D

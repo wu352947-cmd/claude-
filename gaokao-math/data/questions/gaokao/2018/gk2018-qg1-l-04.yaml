@@ -1,0 +1,24 @@
+type: single
+source: 2018 全国I卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 记 $S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $3 S_{3}=S_{2}+S_{4}, a_{1}=2$, 则 $a_{5}=(\quad)$
+options:
+  A: '-12'
+  B: '-10'
+  C: '10'
+  D: '12'
+answer: B
+solution: |-
+  解: $\because S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, $3 S_{3}=S_{2}+S_{4}, a_{1}=2$,
+
+  $\therefore 3 \times\left(3 \mathrm{a}_{1}+\frac{3 \times 2}{2} \mathrm{d}\right)=\mathrm{a}_{1}+\mathrm{a}_{1}+d+4 \mathrm{a}_{1}+\frac{4 \times 3}{2} \mathrm{d}$,
+
+  把 $a_{1}=2$, 代入得 $d=-3$
+
+  $\therefore a_{5}=2+4 \times(-3)=-10$.
+
+  故选: B.

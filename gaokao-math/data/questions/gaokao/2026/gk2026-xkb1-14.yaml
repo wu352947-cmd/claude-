@@ -1,0 +1,10 @@
+type: fill
+source: 2026 新课标I卷 第 14 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  seq.geom: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设实数$q$满足：存在数列$\{a_n\}$，使得对于任意$n\in N^*$，均有$a_1+a_2+\dots+a_{3n}=n^2+n$，且$a_n$中有某连续9项$a_k,a_{k+1},\dots,a_{k+8}$是公比为$q$的等比数列，则$q$的最大值为______。
+answer: \sqrt[3]{\dfrac{3}{2}}
+answer_kind: expr

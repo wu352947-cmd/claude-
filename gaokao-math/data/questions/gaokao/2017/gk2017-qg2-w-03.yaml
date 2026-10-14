@@ -1,0 +1,19 @@
+type: single
+source: 2017 全国II卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  trig.graph: 0.59
+  func.symmetry: 0.41
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\sin \left(2 x+\frac{\pi}{3}\right)$ 的最小正周期为（ $)$
+options:
+  A: $4 \pi$
+  B: $2 \pi$
+  C: $\pi$
+  D: $\frac{\pi}{2}$
+answer: C
+solution: |-
+  解：函数 $\mathrm{f}(\mathrm{x})=\sin \left(2 x+\frac{\pi}{3}\right)$ 的最小正周期为: $\frac{2 \pi}{2}=\pi$.
+
+  故选: C.

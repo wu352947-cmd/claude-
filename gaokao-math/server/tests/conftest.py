@@ -25,7 +25,8 @@ class Clock:
 @pytest.fixture
 def data_dir(tmp_path: Path) -> Path:
     target = tmp_path / "data"
-    shutil.copytree(DATA_DIR, target, ignore=shutil.ignore_patterns("inbox"))
+    # 只用示例题：导入的真题有几百道，测试里的推荐、组卷结果就不好预期了（真题另有专门的测试）
+    shutil.copytree(DATA_DIR, target, ignore=shutil.ignore_patterns("inbox", "gaokao*"))
     return target
 
 

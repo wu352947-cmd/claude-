@@ -1,0 +1,16 @@
+type: single
+source: 2012 全国新课标卷 第 10 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2012
+kps:
+  func.graph: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)=\frac{1}{\ln (x+1)-x}$, 则 $y=f(x)$ 的图象大致为 ( )
+figure: 744b3d9cdb90a90d.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: B
+solution: '解：设 $g(x)=\ln (1+x)-x$则 $g^{\prime}(x)=-\frac{x}{1+x}$$\therefore \mathrm{g}(\mathrm{x})$ 在 $(-1,0)$ 上为增函数, 在 $(0,+\infty)$ 上为减函数$$\begin{aligned}& \therefore g(x)<g(0)=0 \\& \therefore f(x)=\frac{1}{g(x)}<0\end{aligned}$$得: $\mathrm{x}>0$ 或 $-1<\mathrm{x}<0$ 均有 $\mathrm{f}(\mathrm{x})<0$ 排除 $\mathrm{A}, \mathrm{C}$,又 $f(x)=\frac{1}{\ln (x+1)-x}$ 中, $\left\{\begin{array}{l}x+1>0 \\ \ln (x+1)-x \neq 0\end{array}\right.$, 能排除 $D$.故选: B.'

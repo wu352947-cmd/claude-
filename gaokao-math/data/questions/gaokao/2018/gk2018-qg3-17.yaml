@@ -1,0 +1,41 @@
+type: solve
+source: 2018 全国III卷 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  seq.geom: 1.0
+difficulty_label: 中档
+stem: |-
+  等比数列 $\left\{a_{n}\right\}$ 中, $a_{1}=1, a_{5}=4 a_{3}$.
+
+  (1) 求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 记 $S_{n}$ 为 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $S_{m}=63$, 求 $m$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解：(1) $\because$ 等比数列 $\left\{a_{n}\right\}$ 中, $a_{1}=1, a_{5}=4 a_{3}$.
+
+  $\therefore 1 \times q^{4}=4 \times\left(1 \times q^{2}\right)$
+
+  解得 $q= \pm 2$,
+
+  当 $q=2$ 时, $a_{n}=2^{n-1}$,
+
+  当 $q=-2$ 时, $a_{n}=(-2)^{n-1}$,
+
+  $\therefore\left\{a_{n}\right\}$ 的通项公式为, $a_{n}=2^{n-1}$, 或 $a_{n}=(-2)^{n-1}$.
+
+  (2) 记 $S_{n}$ 为 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 当 $a_{1}=1, q=-2$ 时, $S_{n}=\frac{a_{1}\left(1-q^{n}\right)}{1-q}=\frac{1-(-2)^{n}}{1-(-2)}=\frac{1-(-2)^{n}}{3}$,
+
+  由 $S_{m}=63$, 得 $S_{m}=\frac{1-(-2)^{m}}{3}=63, \mathrm{m} \in \mathrm{N}$, 无解;
+
+  当 $a_{1}=1, q=2$ 时, $S_{n}=\frac{a_{1}\left(1-q^{n}\right)}{1-q}=\frac{1-2^{n}}{1-2}=2^{n}-1$,
+
+  由 $S_{m}=63$, 得 $S_{m}=2^{m}-1=63, m \in N$,
+
+  解得 $m=6$.

@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国III卷 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.ops: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 'Logistic 模型是常用数学模型之一, 可应用于流行病学领城. 有学者根据公布数据建立了某 地区新冠肺炎累计确诊病例数 $I(t)\left(t\right.$ 的单位: 天)的 Logistic 模型: $I(t)=\frac{K}{1+\mathrm{e}^{-0.23(t-53)}}$, 其中 $K$ 为最大确诊病例数. 当 $I\left(t^{*}\right)=0.95 K$ 时，标志着已初步遏制疫情, 则 $t^{*}$ 约为 $(\quad) \quad(\ln 19 \approx 3)$'
+options:
+  A: '60'
+  B: '63'
+  C: '66'
+  D: '69'
+answer: C
+solution: |-
+  【详解】 $\because I(t)=\frac{K}{1+e^{-0.23(t-53)}}$, 所以 $I\left(t^{\star}\right)=\frac{K}{1+e^{-0.23\left(t^{\star}-53\right)}}=0.95 K$, 则 $e^{0.23\left(t^{\star}-53\right)}=19$,
+
+  所以, $0.23\left(t^{*}-53\right)=\ln 19 \approx 3$, 解得 $t^{*} \approx \frac{3}{0.23}+53 \approx 66$.
+
+  故选: C.

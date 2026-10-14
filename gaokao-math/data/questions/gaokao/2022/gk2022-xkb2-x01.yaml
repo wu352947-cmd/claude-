@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{-1,1,2,4\}, B=\{x \mid |x-1| \leq 1\}$, 则 $A \cap B=(\quad)$
+options:
+  A: $\{-1,2\}$
+  B: $\{1,2\}$
+  C: $\{1,4\}$
+  D: $\{-1,4\}$
+answer: B

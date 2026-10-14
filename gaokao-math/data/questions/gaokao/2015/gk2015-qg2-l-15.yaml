@@ -1,0 +1,24 @@
+type: fill
+source: 2015 全国II卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  count.binomial: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $(a+x)(1+x)^{4}$ 的展开式中 $x$ 的奇数次幂项的系数之和为 32 , 则 $a=$ ______
+answer: '3'
+answer_kind: expr
+solution: |-
+  解：设 $f(x)=(a+x)(1+x)^{4}=a_{0}+a_{1} x+a_{2} x^{2}+\ldots+a_{5} x^{5}$,
+
+  令 $x=1$, 则 $a_{0}+a_{1}+a_{2}+\ldots+a_{5}=f(1 ）=16(a+1)$, (1)
+
+  令 $x=-1$, 则 $a_{0}-a_{1}+a_{2}-\ldots-a_{5}=f(-1)=0$. (2)
+
+  (1)- (2)得, 2 $\left(a_{1}+a_{3}+a_{5}\right)=16(a+1)$,
+
+  所以 $2 \times 32=16(a+1)$,
+
+  所以 $a=3$.
+
+  故答案为: 3 .

@@ -1,0 +1,35 @@
+type: solve
+source: 2013 全国I卷（理科） 第 19 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  prob.distribution: 1.0
+difficulty_label: 中档
+stem: |-
+  一批产品需要进行质量检验, 检验方案是: 先从这批产品中任取 4 件作检验, 这 4 件产品中优质品的件数记为 $\mathrm{n}$. 如果 $\mathrm{n}=3$, 再从这批产品中任 取 4 件作检验, 若都为优质品, 则这批产品通过检验 如果 $n=4$, 再从这批产 品中任取 1 件作检验, 若为优质品, 则这批产品通过检验; 其他情况下, 这 批产品都不能通过检验. 假设这批产品的优质品率为 $50 \%$, 即取出的产品是 优质品的概率都为 $\frac{1}{2}$, 且各件产品是否为优质品相互独立.
+
+  ( I ) 求这批产品通过检验的概率;
+
+  (II ) 已知每件产品检验费用为 100 元, 凡抽取的每件产品都需要检验, 对这批 产品作质量检验所需的费用记为 $X$ (单位：元）, 求 $X$ 的分布列及数学期望.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 设第一次取出的 4 件产品中恰有 3 件优质品为事件 $\mathrm{A}_{1}$, 第 一次取出的 4 件产品全是优质品为事件 $\mathrm{A}_{2}$,
+
+  第二次取出的 4 件产品全是优质品为事件 $\mathrm{B}_{1}$, 第二次取出的 1 件产品是优质品 为事件 $B_{2}$,
+
+  这批产品通过检验为事件 $A$, 依题意有 $A=\left(A_{1} B_{1}\right) \cup\left(A_{2} B_{2}\right)$, 且 $A_{1} B_{1}$ 与 $A_{2} B_{2}$ 互斥,
+
+  所以 $P(A)=P\left(A_{1} B_{1}\right)+P\left(A_{2} B_{2}\right)=P\left(A_{1}\right) P\left(B_{1} \mid A_{1}\right)+P\left(A_{2}\right) P\left(B_{2} \mid A_{2}\right)$ $=\frac{4}{16} \times \frac{1}{16}+\frac{1}{16} \times \frac{1}{2}=\frac{3}{64}$
+
+  (II ) $X$ 可能的取值为 $400,500,800$, 并且 $P(X=800)=\frac{1}{4}, P(X=500)=\frac{1}{16}$, $\mathrm{P}(\mathrm{X}=400)=1-\frac{1}{16}-\frac{1}{4}=\frac{11}{16}$, 故 $\mathrm{X}$ 的分布列如下：
+
+  $$\begin{array}{|c|c|c|c|}\hline X & 400 & 500 & 800 \\ \hline \end{array}$$
+
+  $$\begin{array}{|c|c|c|c|}\hline \mathrm{P} & \frac{11}{16} & \frac{1}{16} & \frac{1}{4} \\ \hline \end{array}$$
+
+  故 $\mathrm{EX}=400 \times \frac{11}{16}+500 \times \frac{1}{16}+800 \times \frac{1}{4}=506.25$

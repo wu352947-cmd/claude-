@@ -1,0 +1,24 @@
+type: single
+source: 2021 全国乙卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  trig.graph: 0.41
+  func.symmetry: 0.29
+  deriv.extremum: 0.29
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\sin \frac{x}{3}+\cos \frac{x}{3}$ 的最小正周期和最大值分别是 $(\quad)$
+options:
+  A: $3 \pi$ 和 $\sqrt{2}$
+  B: $3 \pi$ 和 2
+  C: $6 \pi$ 和 $\sqrt{2}$
+  D: $6 \pi$ 和 2
+answer: C
+solution: |-
+  解析:
+
+  $f(x)=\sqrt{2} \sin \left(\frac{x}{3}+\frac{\pi}{4}\right)$
+
+  $f(x)_{\max }=\sqrt{2}, \quad T=\frac{2 \pi}{\frac{1}{3}}=6 \pi$.
+
+  故选 C.

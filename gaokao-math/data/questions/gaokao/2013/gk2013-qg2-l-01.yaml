@@ -1,0 +1,22 @@
+type: single
+source: 2013 全国II卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $M=\left\{x \mid(x-1)^{2}<4, x \in R\right\}, N=\{-1,0,1,2,3\}$, 则 $M$ $\cap N=(\quad)$
+options:
+  A: $\{0,1,2\}$
+  B: $\{-1,0,1,2\}$
+  C: $\{-1,0,2,3\}$
+  D: $\{0,1,2,3\}$
+answer: A
+solution: |-
+  解: 由 $(x-1)^{2}<4$, 解得: $-1<x<3$, 即 $M=\{x \mid-1<x<3\}$,
+
+  $\because N=\{-1,0,1,2,3\}$,
+
+  $\therefore M \cap N=\{0,1,2\}$.
+
+  故选: A.

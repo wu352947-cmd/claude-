@@ -1,0 +1,14 @@
+type: single
+source: 2026 上海卷 第 15 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  logic.condition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $\omega$，$z$ 为复数，当 $\omega-z$ 为实数或 $\omega-z$ 的共轭复数为实数时，称 $\omega$ 和 $z$ 互相伴随。则当 $\omega$ 和 $z$ 互相伴随时，$\omega+i$ 和 $z+i$ 互相伴随的充要条件是$（\quad）$。
+options:
+  A: $\mathrm{Re}\,\omega+\mathrm{Re}\,z=0$
+  B: $\mathrm{Re}\,\omega-\mathrm{Re}\,z=0$
+  C: $\mathrm{Im}\,\omega+\mathrm{Im}\,z=0$
+  D: $\mathrm{Im}\,\omega-\mathrm{Im}\,z=0$
+answer: D

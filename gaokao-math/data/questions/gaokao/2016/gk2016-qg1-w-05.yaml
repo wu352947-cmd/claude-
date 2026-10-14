@@ -1,0 +1,29 @@
+type: single
+source: 2016 全国I卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  conic.eccentricity: 0.63
+  conic.ellipse: 0.37
+difficulty_label: 基础
+points: 5.0
+stem: 直线 I 经过椭圆的一个顶点和一个焦点, 若椭圆中心到 I 的距离为其 短轴长的 $\frac{1}{4}$, 则该椭圆的离心率为（）
+options:
+  A: $\frac{1}{3}$
+  B: $\frac{1}{2}$
+  C: $\frac{2}{3}$
+  D: $\frac{3}{4}$
+answer: B
+solution: |-
+  解: 设椭圆的方程为: $\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1$, 直线 I 经过椭圆的一个顶点和一个 焦点
+
+  则直线方程为: $\frac{x}{c}+\frac{y}{b}=1$, 椭圆中心到 1 的距离为其短轴长的 $\frac{1}{4}$,
+
+  可得: $\frac{1}{\sqrt{\frac{1}{c^{2}}+\frac{1}{b^{2}}}}=\frac{b}{2}$,
+
+  $4=b^{2}\left(\frac{1}{c^{2}}+\frac{1}{b^{2}}\right)$
+
+  $\therefore \frac{b^{2}}{c^{2}}=3$, $\frac{a^{2}-c^{2}}{c^{2}}=3$
+
+  $\therefore \mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\frac{1}{2}$
+
+  故选: B.

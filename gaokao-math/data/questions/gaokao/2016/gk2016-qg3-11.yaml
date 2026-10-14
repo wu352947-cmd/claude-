@@ -1,0 +1,28 @@
+type: single
+source: 2016 全国III卷 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  solid.sphere: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 在封闭的直三棱柱 $A B C-\mathrm{A}_{1} B_{1} C_{1}$ 内有一个体积为 $\mathrm{V}$ 的球, 若 $A B \perp$ $\mathrm{BC}, \mathrm{AB}=6, \mathrm{BC}=8, A A_{1}=3$, 则 $V$ 的最大值是 $(\quad)$
+options:
+  A: $4 \pi$
+  B: $\frac{9 \pi}{2}$
+  C: $6 \pi$
+  D: $\frac{32 \pi}{3}$
+answer: B
+solution: |-
+  解: $\because A B \perp B C, A B=6, B C=8$,
+
+  $\therefore \mathrm{AC}=10$.
+
+  故三角形 $A B C$ 的内切圆半径 $r=\frac{6+8-10}{2}=2$,
+
+  又由 $\mathrm{AA}_{1}=3$,
+
+  故直三棱柱 $A B C-A_{1} B_{1} C_{1}$ 的内切球半径为 $\frac{3}{2}$,
+
+  此时 $\vee$ 的最大值 $\frac{4}{3} \pi \cdot\left(\frac{3}{2}\right)^{3}=\frac{9 \pi}{2}$,
+
+  故选: B.

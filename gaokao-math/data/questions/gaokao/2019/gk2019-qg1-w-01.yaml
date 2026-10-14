@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国I卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $z=\frac{3-\mathrm{i}}{1+2 \mathrm{i}}$, 则 $|z|=$
+options:
+  A: '2'
+  B: $\sqrt{3}$
+  C: $\sqrt{2}$
+  D: '1'
+answer: C
+solution: 【详解 】因为 $z=\frac{3-i}{1+2 i}$, 所以 $z=\frac{(3-i)(1-2 i)}{(1+2 i)(1-2 i)}=\frac{1}{5}-\frac{7}{5} i$, 所以 $|z|=\sqrt{\left(\frac{1}{5}\right)^{2}+\left(-\frac{7}{5}\right)^{2}}=\sqrt{2}$, 故选 C.

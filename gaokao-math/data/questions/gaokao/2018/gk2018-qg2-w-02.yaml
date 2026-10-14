@@ -1,0 +1,20 @@
+type: single
+source: 2018 全国II卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{1,3,5,7\}, B=\{2,3,4,5\}$, 则 $A \cap B=(\quad)$
+options:
+  A: $\{3\}$
+  B: $\{5\}$
+  C: $\{3,5\}$
+  D: $\{1,2,3,4,5,7\}$
+answer: C
+solution: |-
+  解: $\because$ 集合 $\mathrm{A}=\{1,3,5,7\}, B=\{2,3,4,5\}$,
+
+  $\therefore A \cap B=\{3,5\}$.
+
+  故选: C.

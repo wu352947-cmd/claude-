@@ -1,0 +1,17 @@
+type: solve
+source: 2021 北京卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+stem: $\vec{a}=(2,1), \vec{b}=(2,-1), \vec{c}=(0,1)$, 则 $(\vec{a}+\vec{b}) \cdot \vec{c}=\underline{\qquad}$ ;$\vec{a} \cdot \vec{b}=\underline{\qquad}$
+parts:
+- label: 答案
+  points: 5.0
+  answer: 0；3
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 0；3

@@ -13,6 +13,7 @@ import {
   type QuestionDetail,
   type Reveal,
 } from "../types";
+import { FlagControl } from "./FlagControl";
 import { FillInput, Options } from "./Inputs";
 import { MathText } from "./MathText";
 
@@ -308,6 +309,7 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
         </section>
       )}
       {result && !result.queued && <ResultPanel result={result} q={q} ai={ai} onNext={onNext} />}
+      <FlagControl key={q.id} q={q} />
     </article>
   );
 }

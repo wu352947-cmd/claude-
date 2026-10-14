@@ -1,0 +1,30 @@
+type: fill
+source: 2015 全国II卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 较难
+points: 3.0
+stem: 已知曲线 $y=x+\ln x$ 在点 $\left(1,1 ）\right.$ 处的切线与曲线 $y=a x^{2}+(a+2) x+1$ 相切，则 $a=$ ______
+answer: '8'
+answer_kind: expr
+solution: |-
+  解: $y=x+\ln x$ 的导数为 $y^{\prime}=1+\frac{1}{x}$,
+
+  曲线 $y=x+\ln x$ 在 $x=1$ 处的切线斜率为 $k=2$,
+
+  则曲线 $y=x+\ln x$ 在 $x=1$ 处的切线方程为 $y-1=2 x-2$, 即 $y=2 x-1$.
+
+  由于切线与曲线 $y=a x^{2}+(a+2) x+1$ 相切,
+
+  故 $y=a x^{2}+(a+2) x+1$ 可联立 $y=2 x-1$,
+
+  得 $a x^{2}+a x+2=0$,
+
+  又 $a \neq 0$, 两线相切有一切点,
+
+  所以有 $\triangle=\mathrm{a}^{2}-8 a=0$,
+
+  解得 $a=8$.
+
+  故答案为: 8 .

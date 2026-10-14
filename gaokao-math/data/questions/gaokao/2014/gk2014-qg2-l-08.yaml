@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国II卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设曲线 $y=a x-\ln (x+1)$ 在点 $(0,0)$ 处的切线方程为 $y=2 x$, 则 $a=($
+options:
+  A: '0'
+  B: '1'
+  C: '2'
+  D: '3'
+answer: D
+solution: |-
+  解: $y^{\prime}=a \frac{1}{x+1}$,
+
+  $\therefore y^{\prime}(0)=a-1=2$
+
+  $\therefore a=3$.
+
+  故选: D.

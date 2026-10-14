@@ -1,0 +1,44 @@
+type: solve
+source: 2014 全国I卷（理科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  seq.recurrence: 0.51
+  seq.arith: 0.49
+difficulty_label: 中档
+stem: |-
+  已知数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 $S_{n}, a_{1}=1, a_{n} \neq 0, a_{n} a_{n+1}=\lambda S_{n}-1$, 其中 $\lambda$ 为常数.
+
+  ( I ) 证明: $a_{n+2}-a_{n}=\lambda$
+
+  (II ) 是否存在 $\lambda$, 使得 $\left\{a_{n}\right\}$ 为等差数列? 并说明理由.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  （I ） 证明: $\because a_{n} a_{n+1}=\lambda S_{n}-1, a_{n+1} a_{n+2}=\lambda S_{n+1}-1$,
+
+  $\therefore a_{n+1}\left(a_{n+2}-a_{n}\right)=\lambda a_{n+1}$
+
+  $\because a_{n+1} \neq 0$
+
+  $\therefore a_{n+2}-a_{n}=\lambda$
+
+  （II ) 解：假设存在 $\lambda$, 使得 $\left\{a_{n}\right\}$ 为等差数列, 设公差为 $d$.
+
+  则 $\lambda=a_{n+2}-a_{n}=\left(a_{n+2}-a_{n+1}\right)+\left(a_{n+1}-a_{n}\right)=2 d$,
+
+  $\therefore d=\frac{\lambda}{2}$
+
+  $\therefore a_{n}=1+\frac{\lambda(n-1)}{2}, a_{n+1}=1+\frac{\lambda_{n}}{2}$
+
+  $\therefore \lambda S_{n}=1+\left[1+\frac{\lambda(n-1)}{2}\right]\left[1+\frac{\lambda n}{2}\right]=\frac{\lambda^{2}}{4} n^{2}+\left(\lambda-\frac{\lambda^{2}}{4}\right) n+2-\frac{\lambda}{2}$,
+
+  根据 $\left\{a_{n}\right\}$ 为等差数列的充要条件是 $\left\{\begin{array}{l}\lambda \neq 0 \\ 2-\frac{\lambda}{2}=0\end{array}\right.$, 解得 $\lambda=4$.
+
+  此时可得 $S_{n}=n^{2}, a_{n}=2 n-1$.
+
+  因此存在 $\lambda=4$, 使得 $\left\{a_{n}\right\}$ 为等差数列.

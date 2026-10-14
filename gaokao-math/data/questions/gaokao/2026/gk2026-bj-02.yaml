@@ -1,0 +1,14 @@
+type: single
+source: 2026 北京卷 第 2 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $z_{1}=3-2 i$ , $z_{2}=-1+4 i$ ,则 $|z_{1}+z_{2}|=(\ )$
+options:
+  A: $2 \sqrt{2}$
+  B: $i$
+  C: $2$
+  D: $8$
+answer: A

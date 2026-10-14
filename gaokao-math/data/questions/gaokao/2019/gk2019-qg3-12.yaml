@@ -1,0 +1,21 @@
+type: single
+source: 2019 全国III卷 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  func.parity: 0.61
+  func.domain_range: 0.39
+difficulty_label: 较难
+points: 5.0
+stem: 设 $f(x)$ 是定义域为 $R$ 的偶函数, 且在 $(0,+\infty)$ 单调递减, 则 $(\quad)$
+options:
+  A: $f\left(\log _{5} \frac{1}{4}\right)>f\left(2^{-\frac{3}{2}}\right)>f\left(2^{-\frac{2}{3}}\right)$
+  B: $f\left(\log _{8} \frac{1}{4}\right)>f\left(2^{-\frac{2}{3}}\right)>f\left(2^{-\frac{3}{2}}\right)$
+  C: $f\left(2^{-\frac{3}{2}}\right)>f\left(2^{-\frac{2}{3}}\right)>f\left(\log _{5} \frac{1}{4}\right)$
+  D: $f\left(2^{-\frac{2}{3}}\right)>f\left(2^{-\frac{3}{2}}\right)>f\left(\log _{5} \frac{1}{4}\right)$
+answer: C
+solution: |-
+  【详解】 $\because f(x)$ 是 $\mathrm{R}$ 的偶函数, $\therefore f\left(\log _{3} \frac{1}{4}\right)=f\left(\log _{3} 4\right)$.
+
+  $\therefore \log _{3} 4>1=2^{0}>2^{-\frac{3}{2}}$, 又 $f(x)$ 在 $(0,+\infty)$ 单调递减, $f\left(\log _{3} 4\right)<f\left(2^{-\frac{2}{3}}\right)<f\left(2^{-\frac{3}{2}}\right)$,
+
+  $\therefore f\left(2^{-\frac{3}{2}}\right)>f\left(2^{-\frac{2}{3}}\right)>f\left(\log _{3} \frac{1}{4}\right)$, 故选 C.

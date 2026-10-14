@@ -1,0 +1,22 @@
+type: single
+source: 2021 全国甲卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  prob.classical: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 将 4 个 1 和 2 个 0 随机排成一行, 则 2 个 0 不相邻的概率为 $(\quad)$
+options:
+  A: $\frac{1}{3}$
+  B: $\frac{2}{5}$
+  C: $\frac{2}{3}$
+  D: $\frac{4}{5}$
+answer: C
+solution: |-
+  【详解】将 4 个 1 和 2 个 0 随机排成一行, 可利用揷空法, 4 个 1 产生 5 个空,
+
+  若 2 个 0 相邻, 则有 $C_{5}^{1}=5$ 种排法, 若 2 个 0 不相邻, 则有 $C_{5}^{2}=10$ 种排法,
+
+  所以 2 个 0 不相邻的概率为 $\frac{10}{5+10}=\frac{2}{3}$.
+
+  故选: C.

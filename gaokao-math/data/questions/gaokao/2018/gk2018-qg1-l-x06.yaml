@@ -1,0 +1,15 @@
+type: single
+source: 2018 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2018
+kps:
+  deriv.zeros: 0.59
+  func.zeros: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数  $\left\{\begin{array}{l}e^{x}, x \leqslant 0， \\ ln x, x>0 \end{array}, g(x)=f(x)+x+a \right.$.若 $g(x)$ 存在 $2$ 个零点, 则 $a$ 的取值范围是 ($\qquad$)
+options:
+  A: $[-1,0)$
+  B: $[0,+\infty)$
+  C: $[-1,+\infty)$
+  D: $[1,+\infty)$
+answer: C

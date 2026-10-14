@@ -1,0 +1,14 @@
+type: single
+source: 2026 天津卷 第 2 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  logic.condition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $x \in R$，则“$x > 0$”是“$x^2 + 3x > 0$”的（ ）
+options:
+  A: 充分而不必要条件
+  B: 必要而不充分条件
+  C: 充分必要条件
+  D: 既不充分也不必要条件
+answer: A

@@ -1,0 +1,48 @@
+type: solve
+source: 2011 全国新课标卷 第 19 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  prob.distribution: 0.63
+  count.perm_comb: 0.37
+difficulty_label: 中档
+stem: |-
+  某种产品的质量以其质量指标值衡量, 质量指标值越大表明质量 越好, 且质量指标值大于或等于 102 的产品为优质品, 现用两种新配方（分 别称为 $\mathrm{A}$ 配方和 $\mathrm{B}$ 配方) 做试验, 各生产了 100 件这种产品, 并测量了每件 产品的质量指标值, 得到下面试验结果:
+
+  A 配方的频数分布表
+
+  $$\begin{array}{|c|c|c|c|c|c|}\hline \text{指标值分组} & { [90,94) } & { [94,98) } & { [98,102) } & { [102,106) } & { [106,110] } \\ \hline \text{频数} & 8 & 20 & 42 & 22 & 8 \\ \hline \end{array}$$
+
+  $\mathrm{B}$ 配方的频数分布表
+
+  $$\begin{array}{|c|c|c|c|c|c|}\hline \text{指标值分组} & { [90,94) } & { [94,98) } & { [98,102) } & { [102,106) } & { [106,110] } \\ \hline \text{频数} & 4 & 12 & 42 & 32 & 10 \\ \hline \end{array}$$
+
+  ( I ) 分别估计用 $\mathrm{A}$ 配方, $\mathrm{B}$ 配方生产的产品的优质品率;
+
+  （II ) 已知用 B 配方生成的一件产品的利润 $\mathrm{y}$ （单位: 元）与其质量指标值 $\mathrm{t}$ 的 关系式为 $\mathrm{y}= \begin{cases}-2, & \mathrm{t}<94 \\ 2, & 94 \leqslant \mathrm{t}<102 \\ 4, & \mathrm{t} \geqslant 102\end{cases}$
+
+  从用 $B$ 配方生产的产品中任取一件, 其利润记为 $X$ （单位: 元）, 求 $X$ 的分布列 及数学期望. (以试验结果中质量指标值落入各组的频率作为一件产品的质 量指标值落入相应组的概率)
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 由试验结果知, 用 $A$ 配方生产的产品中优质的频率为 $\frac{22+8}{100}=0.3$ $\therefore$ 用 $\mathrm{A}$ 配方生产的产品的优质品率的估计值为 0.3 .
+
+  由试验结果知, 用 $B$ 配方生产的产品中优质品的频率为 $\frac{32+10}{100}=0.42$
+
+  $\therefore$ 用 B 配方生产的产品的优质品率的估计值为 0.42 ;
+
+  （II) 用 B 配方生产的 100 件产品中，其质量指标值落入区间
+
+  $[90,94),[94,102),[102,110]$ 的频率分别为 $0.04,0.54,0.42$,
+
+  $\therefore P(X=-2)=0.04, P(X=2)=0.54, P(X=4)=0.42$,
+
+  即 $\mathrm{X}$ 的分布列为
+
+  $$\begin{array}{|c|c|c|c|}\hline X & -2 & 2 & 4 \\ \hline P & 0.04 & 0.54 & 0.42 \\ \hline \end{array}$$
+
+  $\therefore X$ 的数学期望值 $E X=-2 \times 0.04+2 \times 0.54+4 \times 0.42=2.68$

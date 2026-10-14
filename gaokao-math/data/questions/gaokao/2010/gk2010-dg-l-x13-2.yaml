@@ -1,0 +1,10 @@
+type: fill
+source: 2010 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  trig.definition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\mathrm{a}$ 是第二象限的角, $\tan (\pi+2 \alpha)=-\frac{4}{3}$, 则 $\tan \alpha=\underline{\qquad}$.
+answer: -\frac{1}{2}
+answer_kind: expr

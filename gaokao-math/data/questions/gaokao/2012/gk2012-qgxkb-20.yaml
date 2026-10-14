@@ -1,0 +1,45 @@
+type: solve
+source: 2012 全国新课标卷 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+stem: |-
+  设抛物线 $C: x^{2}=2 p y(p>0)$ 的焦点为 $F$, 准线为 $\mid, A \in C$, 已知以 $F$ 为圆心, $F A$ 为半径的圆 $F$ 交 $I$ 于 $B, D$ 两点;
+
+  (1) 若 $\angle B F D=90^{\circ}, \triangle A B D$ 的面积为 $4 \sqrt{2}$, 求 $p$ 的值及圆 $F$ 的方程;
+
+  (2) 若 $A, B, F$ 三点在同一直线 $m$ 上, 直线 $\mathrm{n}$ 与 $\mathrm{m}$ 平行, 且 $\mathrm{n}$ 与 $C$ 只有一个 公共点, 求坐标原点到 $m, n$ 距离的比值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 由对称性知: $\triangle B F D$ 是等腰直角 $\triangle$, 斜边 $|B D|=2 p$ 点 $A$ 到准线 $\mid$ 的距离 $\mathrm{d}=|\mathrm{FA}|=|F B|=\sqrt{2} \mathrm{p}$, $\because \triangle A B D$ 的面积 $S_{\triangle A B D}=4 \sqrt{2}$,
+
+  $\therefore \frac{1}{2} \times \mathrm{BD} \times \mathrm{d}=\frac{1}{2} \times 2 \mathrm{p} \times \sqrt{2} \mathrm{p}=4 \sqrt{2}$,
+
+  解得 $p=2$, 所以 $F$ 坐标为 $(0,1)$,
+
+  $\therefore$ 圆 $F$ 的方程为 $x^{2}+(y-1)^{2}=8$.
+
+  （2）由题设 $\mathrm{A}\left(\mathrm{x}_{0}, \frac{\mathrm{x}_{0}^{2}}{2 \mathrm{p}}\right)\left(\mathrm{x}_{0}>0\right)$, 则 $\mathrm{F}\left(0, \frac{\mathrm{p}}{2}\right)$,
+
+  $\because A, B, F$ 三点在同一直线 $m$ 上，
+
+  又 $A B$ 为圆 $F$ 的直径, 故 $A, B$ 关于点 $F$ 对称.
+
+  由点 $A, B$ 关于点 $F$ 对称得: $B\left(-x_{0}, p-\frac{x_{0}^{2}}{2 p}\right) \Rightarrow p-\frac{x_{0}^{2}}{2 p}=-\frac{p}{2} \Leftrightarrow x_{0}^{2}=3 p^{2}$
+
+  得 : $A\left(\sqrt{3} p, \frac{3 p}{2}\right)$, 直 线 $m: y=\frac{\frac{3 p}{2}-\frac{p}{2}}{\sqrt{3} p} x+\frac{p}{2} \Leftrightarrow x-\sqrt{3} y+\frac{\sqrt{3} p}{2}=0$,
+
+  $$
+  x^{2}=2 p y \Leftrightarrow y=\frac{x^{2}}{2 p} \Rightarrow y^{\prime}=\frac{x}{p}=\frac{\sqrt{3}}{3} \Rightarrow x=\frac{\sqrt{3}}{3} p \Rightarrow \text { 切点 } P\left(\frac{\sqrt{3} p}{3}, \frac{p}{6}\right)
+  $$
+
+  直线 $n: y-\frac{p}{6}=\frac{\sqrt{3}}{3}\left(x-\frac{\sqrt{3} p}{3}\right) \Leftrightarrow x-\sqrt{3} y-\frac{\sqrt{3}}{6} \mathrm{p}=0$
+
+  坐标原点到 $m, n$ 距离的比值为 $\frac{\sqrt{3} p}{2}: \frac{\sqrt{3} p}{6}=3$.

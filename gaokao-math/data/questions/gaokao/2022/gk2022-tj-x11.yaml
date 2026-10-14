@@ -1,0 +1,10 @@
+type: fill
+source: 2022 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '$\left(\sqrt{x}+\frac{3}{x^{2}}\right)^{5}$ 的展开式中的常数项为 ______ '
+answer: '15'
+answer_kind: expr

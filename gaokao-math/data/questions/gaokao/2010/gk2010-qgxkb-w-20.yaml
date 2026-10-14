@@ -1,0 +1,39 @@
+type: solve
+source: 2010 全国新课标卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  conic.ellipse: 0.41
+  seq.arith: 0.32
+  conic.chord: 0.27
+difficulty_label: 较难
+stem: |-
+  设 $F_{1}, F_{2}$ 分别是椭圆 $E: x^{2}+\frac{y^{2}}{b^{2}}=1(0<b<1)$ 的左、右焦点, 过 $F_{1}$ 的直线 与 $E$ 相交于 $A 、 B$ 两点, 且 $\left|A_{2}\right|,|A B|,\left|B_{2}\right|$ 成等差数列.
+
+  ( I ) 求 $|A B|$;
+
+  (II) 若直线 $\mathrm{l}$ 的斜率为 1 , 求 $\mathrm{b}$ 的值.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  解：（1）由椭圆定义知 $\left|\mathrm{AF}_{2}\right|+|\mathrm{AB}|+\left|\mathrm{BF}_{2}\right|=4$
+
+  又 $2|\mathrm{AB}|=\left|\mathrm{AF}_{2}\right|+\left|\mathrm{BF}_{2}\right|$, 得 $|\mathrm{AB}|=\frac{4}{3}$
+
+  (2) $L$ 的方程式为 $y=x+c$, 其中 $c=\sqrt{1-b^{2}}$
+
+  设 $A\left(x_{1}, y_{1}\right), B\left(x_{2}, y_{2}\right)$, 则 $A, B$ 两点坐标满足方程组 $\left\{\begin{array}{l}y=x+c \\ x^{2}+\frac{y^{2}}{b^{2}}=1\end{array}\right.$, ,
+
+  化简得 $\left(1+b^{2}\right) x^{2}+2 c x+1-2 b^{2}=0$.
+
+  则 $x_{1}+x_{2}=\frac{-2 c}{1+b^{2}}, x_{1} x_{2}=\frac{1-2 b^{2}}{1+b^{2}}$.
+
+  因为直线 $A B$ 的斜率为 1 , 所以 $|A B|=\sqrt{2}\left|x_{2}-x_{1}\right|$ 即 $\frac{4}{3}=\sqrt{2}\left|x_{2}-x_{1}\right|$.
+
+  则 $\frac{8}{9}=\left(x_{1}+x_{2}\right)^{2}-4 x_{1} x_{2}=\frac{4\left(1-b^{2}\right)}{\left(1+b^{2}\right)^{2}}-\frac{4\left(1-2 b^{2}\right)}{1+b^{2}}=\frac{8 b^{4}}{\left(1+b^{2}\right)^{2}}$.
+
+  解得 $\mathrm{b}=\frac{\sqrt{2}}{2}$.

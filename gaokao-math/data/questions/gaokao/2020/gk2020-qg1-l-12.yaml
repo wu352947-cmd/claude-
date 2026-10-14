@@ -1,0 +1,30 @@
+type: single
+source: 2020 全国I卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.ops: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若 $2^{a}+\log _{2} a=4^{b}+2 \log _{4} b$ ，则（ $)$
+options:
+  A: $a>2 b$
+  B: $a<2 b$
+  C: $a>b^{2}$
+  D: $a<b^{2}$
+answer: B
+solution: |-
+  【详解】 设 $f(x)=2^{x}+\log _{2} x$, 则 $f(x)$ 为增函数, 因为 $2^{a}+\log _{2} a=4^{b}+2 \log _{4} b=2^{2 b}+\log _{2} b$
+
+  所以 $f(a)-f(2 b)=2^{a}+\log _{2} a-\left(2^{2 b}+\log _{2} 2 b\right)=2^{2 b}+\log _{2} b-\left(2^{2 b}+\log _{2} 2 b\right)=\log _{2} \frac{1}{2}=-1<0$,
+
+  所以 $f(a)<f(2 b)$, 所以 $a<2 b$.
+
+  $f(a)-f\left(b^{2}\right)=2^{a}+\log _{2} a-\left(2^{b^{2}}+\log _{2} b^{2}\right)=2^{2 b}+\log _{2} b-\left(2^{b^{2}}+\log _{2} b^{2}\right)=2^{2 b}-2^{b^{2}}-\log _{2} b$,
+
+  当 $b=1$ 时, $f(a)-f\left(b^{2}\right)=2>0$, 此时 $f(a)>f\left(b^{2}\right)$, 有 $a>b^{2}$
+
+  当 $b=2$ 时, $f(a)-f\left(b^{2}\right)=-1<0$, 此时 $f(a)<f\left(b^{2}\right)$, 有 $a<b^{2}$, 所以C、D错误.
+
+  故选: B.
+
+  【点晴】本题主要考查函数与方程的综合应用, 涉及到构造函数, 利用函数的单调性比较大小, 是一道中 档题.

@@ -1,0 +1,52 @@
+type: solve
+source: 2014 全国II卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  deriv.construct: 0.52
+  deriv.tangent: 0.48
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=x^{3}-3 x^{2}+a x+2$, 曲线 $y=f(x)$ 在点 $(0,2)$ 处的 切线与 $x$ 轴交点的横坐标为 -2 .
+
+  （I）求 a;
+
+  （II ）证明: 当 $k<1$ 时, 曲线 $y=f(x)$ 与直线 $y=k x-2$ 只有一个交点.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 函数的导数 $f^{\prime}(x)=3 x^{2}-6 x+a ; f^{\prime}(0)=a$;
+
+  则 $y=f(x)$ 在点 $(0,2)$ 处的切线方程为 $y=a x+2$,
+
+  $\because$ 切线与 $\mathrm{x}$ 轴交点的横坐标为 -2 ,
+
+  $\therefore f(-2)=-2 a+2=0$,
+
+  解得 $a=1$.
+
+  （II）当 $a=1$ 时, $f(x)=x^{3}-3 x^{2}+x+2$,
+
+  设 $g(x)=f(x)-k x+2=x^{3}-3 x^{2}+(1-k) x+4$,
+
+  由题设知 $1-\mathrm{k}>0$,
+
+  当 $x \leqslant 0$ 时, $g^{\prime}(x)=3 x^{2}-6 x+1-k>0, g(x)$ 单调递增, $g(-1)=k-1, g(0)$ $=4$,
+
+  当 $x>0$ 时, 令 $h(x)=x^{3}-3 x^{2}+4$, 则 $g(x)=h(x)+(1-k) x>h(x)$. 则 $h^{\prime}(x)=3 x^{2}-6 x=3 x(x-2)$ 在 $(0,2)$ 上单调递减, 在 $(2,+\infty)$ 单调递增,
+
+  $\therefore$ 在 $\mathrm{x}=2$ 时, $\mathrm{h}(\mathrm{x})$ 取得极小值 $\mathrm{h}(2)=0$,
+
+  $g(-1)=k-1, g(0)=4$
+
+  则 $g(x)=0$ 在 $(-\infty, 0]$ 有唯一实根.
+
+  $\because g(x)>h(x) \geqslant h(2)=0$,
+
+  $\therefore g(\mathrm{x})=0$ 在 $(0,+\infty)$ 上没有实根.
+
+  综上当 $k<1$ 时, 曲线 $y=f(x)$ 与直线 $y=k x-2$ 只有一个交点.

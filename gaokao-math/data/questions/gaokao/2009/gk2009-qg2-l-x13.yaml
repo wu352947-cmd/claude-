@@ -1,0 +1,10 @@
+type: fill
+source: 2009 全国II卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2009
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $(x \sqrt{y}-y \sqrt{x})^{4}$ 的展开式中 $x^{3} y^{3}$ 的系数为 ______ .
+answer: '6'
+answer_kind: expr

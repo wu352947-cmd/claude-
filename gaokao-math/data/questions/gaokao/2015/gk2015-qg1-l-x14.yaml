@@ -1,0 +1,10 @@
+type: fill
+source: 2015 全国I卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2015
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 一个圆经过椭圆 $\frac{x^{2}}{16}+\frac{y^{2}}{4}=1$ 的三个顶点. 且圆心在 $x$ 轴的正半轴 上. 则该圆标准方程为 ______ .
+answer: (x-\frac{3}{2})^{2}+y^{2}=\frac{25}{4}
+answer_kind: equation

@@ -1,0 +1,41 @@
+type: solve
+source: 2014 全国I卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+stem: |-
+  已知点 $A(0,-2)$, 椭圆 $\left.E: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1 （ a>b>0\right)$ 的离心率为 $\frac{\sqrt{3}}{2}$ , $F$ 是椭圆的右焦点, 直线 $A F$ 的斜率为 $\frac{2 \sqrt{3}}{3}, O$ 为坐标原点.
+
+  (I ) 求 $E$ 的方程;
+
+  （II ) 设过点 $A$ 的直线 $I$ 与 $E$ 相交于 $P, Q$ 两点, 当 $\triangle O P Q$ 的面积最大时, 求 $I$ 的方程.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 设 $\mathrm{F}(\mathrm{c}, 0)$, 由条件知 $\frac{2}{\mathrm{c}}=\frac{2 \sqrt{3}}{3}$, 得 $\mathrm{c}=\sqrt{3}$ 又 $\frac{\mathrm{c}}{\mathrm{a}}=\frac{\sqrt{3}}{2}$, 所以 $a=2$ 田, $b^{2}=a^{2}-c^{2}=1$, 故 $E$ 的方程 $\frac{x^{2}}{4}+y^{2}=1 . \cdots$. （5 分）
+
+  (II ) 依题意当 $I \perp x$ 轴不合题意, 故设直线 $l: y=k x-2$, 设 $P\left(x_{1}, y_{1}\right), Q\left(x_{2}\right.$ $\left.y_{2}\right)$
+
+  将 $y=k x-2$ 代入 $\frac{x^{2}}{4}+y^{2}=1$, 得 $\left(1+4 k^{2}\right) x^{2}-16 k x+12=0$,
+
+  当 $\triangle=16\left(4 k^{2}-3\right)>0$, 即 $k^{2}>\frac{3}{4}$ 时, $x_{1}, 2=\frac{8 k \pm 2 \sqrt{4 k^{2}-3}}{1+4 k^{2}}$
+
+  从而 $|P Q|=\sqrt{k^{2}+1}\left|x_{1}-x_{2}\right|=\frac{4 \sqrt{k^{2}+1} \cdot \sqrt{4 k^{2}-3}}{1+4 k^{2}}$ ?]?
+
+  又点 $O$ 到直线 $P Q$ 的距离 $d=\frac{2}{\sqrt{k^{2}+1}}$, 所以 $\triangle O P Q$ 的面积 $S_{\triangle O P Q}=\frac{1}{2} d|P Q|=$
+
+  $$
+  \frac{4 \sqrt{4 k^{2}-3}}{1+4 k^{2}}
+  $$
+
+  设 $\sqrt{4 k^{2}-3}=t$, 则 $t>0, S_{\triangle 0 P Q}=\frac{4 t}{t^{2}+4}=\frac{4}{t+\frac{4}{t}} \leqslant 1$,
+
+  当且仅当 $\mathrm{t}=2, k= \pm \frac{\sqrt{7}}{2}$ 等号成立, 且满足 $\triangle>0$,
+
+  所以当 $\triangle O P Q$ 的面积最大时, $\mathrm{l}$ 的方程为: $y=\frac{\sqrt{7}}{2} x-2$ 或 $y=-\frac{\sqrt{7}}{2} x-2 . \ldots$ （12 分

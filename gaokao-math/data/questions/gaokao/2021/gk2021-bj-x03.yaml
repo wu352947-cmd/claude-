@@ -1,0 +1,14 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  logic.condition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $f(x)$ 是定义在上 $[0,1]$ 的函数, 那么 “函数 $f(x)$ 在 $[0,1]$ 上单调递增” 是 “函数 $f(x)$ 在 $[0,1]$ 上的最大值为 $f(1) ”$ 的 ($\quad$)
+options:
+  A: 充分而不必要条件
+  B: 必要而不充分条件
+  C: 充分必要条件
+  D: 既不充分也不必要条件
+answer: A

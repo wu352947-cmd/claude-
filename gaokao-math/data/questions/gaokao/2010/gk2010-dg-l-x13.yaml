@@ -1,0 +1,10 @@
+type: fill
+source: 2010 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  ineq.quadratic: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: （5 分) 不等式 $\sqrt{2 x^{2}+1}-x \leqslant 1$ 的解集是 ______ .
+answer: '[0,2]'
+answer_kind: interval

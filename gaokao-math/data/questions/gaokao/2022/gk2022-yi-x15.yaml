@@ -1,0 +1,11 @@
+type: fill
+source: 2022 全国乙卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  deriv.extremum: 0.59
+  expo.functions: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: '已知 $x=x_{1}$ 和 $x=x_{2}$ 分别是函数 $f(x)=2 a^{x}-e x^{2}(a>0$ 且 $a \neq 1)$ 的极小值点和极 大值点. 若 $x_{1}<x_{2}$, 则 $a$ 的取值范围是 ______ '
+answer: (\frac{1}{e},1)
+answer_kind: interval

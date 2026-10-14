@@ -1,0 +1,26 @@
+type: single
+source: 2021 全国乙卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '设 $B$ 是椭圆 $C: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的上顶点, 若 $C$ 上的任意一点 $P$ 都满足, $|P B| \leq 2 b ， \quad$ 则 $C$ 的离心率的取值范围是 $(\quad)$'
+options:
+  A: $\left[\frac{\sqrt{2}}{2}, 1\right)$
+  B: $\left[\frac{1}{2}, 1\right)$
+  C: $\left(0, \frac{\sqrt{2}}{2}\right]$
+  D: $\left(0, \frac{1}{2}\right]$
+answer: C
+solution: |-
+  解析:
+
+  由题意, 点 $B(0, b)$, 设 $P\left(x_{0}, y_{0}\right)$, 则 $\frac{x_{0}^{2}}{a^{2}}+\frac{y_{0}^{2}}{b^{2}}=1 \Rightarrow x_{0}^{2}=a^{2}\left(1-\frac{y_{0}^{2}}{b^{2}}\right)$, 故
+
+  $|P B|^{2}=x_{0}^{2}+\left(y_{0}-b\right)^{2}=a^{2}\left(1-\frac{y_{0}^{2}}{b^{2}}\right)+y_{0}^{2}-2 b y_{0}+b^{2}=-\frac{c^{2}}{b^{2}} y_{0}^{2}-2 b y_{0}+a^{2}+b^{2}$
+
+  $y_{0} \in[-b, b]$
+
+  由题意, 当 $y_{0}=-b$ 时, $|P B|^{2}$ 最大, 则 $-\frac{b^{3}}{c^{2}} \leq-b, b^{2} \geq c^{2}, a^{2}-c^{2} \geq c^{2}, c=\frac{c}{a} \leq \frac{\sqrt{2}}{2}$,
+
+  $c \in\left(0, \frac{\sqrt{2}}{2}\right]$

@@ -1,0 +1,22 @@
+type: single
+source: 2015 全国I卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{x \mid x=3 n+2, n \in N\}, B=\{6,8,10,12,14\}$, 则集合 $A \cap$ $B$ 中元素的个数为 $(\quad)$
+options:
+  A: '5'
+  B: '4'
+  C: '3'
+  D: '2'
+answer: D
+solution: |-
+  解: $A=\{x \mid x=3 n+2, n \in N\}=\{2,5,8,11,14,17, \ldots\}$,
+
+  则 $A \cap B=\{8,14\}$,
+
+  故集合 $A \cap B$ 中元素的个数为 2 个,
+
+  故选: D.

@@ -1,0 +1,47 @@
+type: solve
+source: 2018 全国I卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  seq.geom: 0.52
+  seq.recurrence: 0.48
+difficulty_label: 中档
+stem: |-
+  已知数列 $\left\{a_{n}\right\}$ 满足 $a_{1}=1, n a_{n+1}=2(n+1) a_{n}$, 设 $b_{n}=\frac{a_{n}}{n}$.
+
+  (1) 求 $b_{1}, b_{2}, b_{3}$;
+
+  (2) 判断数列 $\left\{b_{n}\right\}$ 是否为等比数列, 并说明理由;
+
+  (3) 求 $\left\{a_{n}\right\}$ 的通项公式.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  解: (1) 数列 $\left\{a_{n}\right\}$ 满足 $a_{1}=1, n a_{n+1}=2(n+1) a_{n}$,
+
+  则: $\frac{\frac{a_{n+1}}{n+1}}{\frac{a_{n}}{n}}=2$ (常数)，
+
+  由于 $b_{n}=\frac{a_{n}}{n}$,
+
+  故: $\frac{b_{n+1}}{b_{n}}=2$,
+
+  数列 $\left\{b_{n}\right\}$ 是以 $b_{1}$ 为首项, 2 为公比的等比数列.
+
+  整理得： $b_{n}=b_{1} \cdot 2^{n-1}=2^{n-1}$,
+
+  所以: $b_{1}=1, b_{2}=2, b_{3}=4$.
+
+  （2）数列 $\left\{b_{n}\right\}$ 是为等比数列,
+
+  由于 $\frac{b_{n+1}}{b_{n}}=2$ （常数）；
+
+  （3）由（1）得: $b_{n}=2^{n-1}$, 根据 $\mathrm{b}_{\mathrm{n}}=\frac{\mathrm{a}_{\mathrm{n}}}{\mathrm{n}}$,
+
+  所以: $a_{n}=n \cdot 2^{\mathrm{rr}-1}$.

@@ -1,0 +1,14 @@
+type: single
+source: 2018 全国III卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2018
+kps:
+  solid.sphere: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $A, B, C, D$ 是同一个半径为 4 的球的球面上四点, $\triangle A B C$ 为等 边三角形且面积为 $9 \sqrt{3}$, 则三棱锥 $D-A B C$ 体积的最大值为（$\qquad$）
+options:
+  A: $12 \sqrt{3}$
+  B: $18 \sqrt{3}$
+  C: $24 \sqrt{3}$
+  D: $54 \sqrt{3}$
+answer: B

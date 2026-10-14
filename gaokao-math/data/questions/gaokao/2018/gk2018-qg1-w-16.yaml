@@ -1,0 +1,42 @@
+type: fill
+source: 2018 全国I卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$. 已知 $b \sin C+c \sin B=4 a \sin B \sin C, b^{2}+c^{2}-a^{2}=8$, 则 $\triangle A B C$ 的面积为 ______
+answer: \frac{2 \sqrt{3}}{3}
+answer_kind: expr
+solution: |-
+  解: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$.
+
+  $b \sin C+c \sin B=4 a \sin B \sin C$,
+
+  利用正弦定理可得 $\sin B \sin C+\sin C \sin B=4 \sin A \sin B \sin C$,
+
+  由于 $0<B<\pi, 0<C<\pi$ ，
+
+  所以 $\sin B \sin C \neq 0$,
+
+  所以 $\sin A=\frac{1}{2}$,
+
+  则 $A=\frac{\pi}{6}$ 或 $\frac{5 \pi}{6}$
+
+  由于 $b^{2}+c^{2}-a^{2}=8$,
+
+  则: $\cos \mathrm{a}=\frac{b^{2}+c^{2}-a^{2}}{2 b c}$,
+
+  (1)当 $A=\frac{\pi}{6}$ 时, $\frac{\sqrt{3}}{2}=\frac{8}{2 b c}$,
+
+  解得 $\mathrm{bc}=\frac{8 \sqrt{3}}{3}$,
+
+  所以 $S_{\triangle A B C}=\frac{1}{2} b \operatorname{csin} A=\frac{2 \sqrt{3}}{3}$.
+
+  (2)当 $\mathrm{A}=\frac{5 \pi}{6}$ 时, $-\frac{\sqrt{3}}{2}=\frac{8}{2 \mathrm{bc}}$,
+
+  解得 $b c=-\frac{8 \sqrt{3}}{3}$ (不合题意), 舍去.
+
+  故: $S_{\triangle A B C}=\frac{2 \sqrt{3}}{3}$.
+
+  故答案为: $\frac{2 \sqrt{3}}{3}$.

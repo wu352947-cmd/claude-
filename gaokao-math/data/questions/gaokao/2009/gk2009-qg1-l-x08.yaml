@@ -1,0 +1,14 @@
+type: single
+source: 2009 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2009
+kps:
+  func.parity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)$ 的定义域为 $R$, 若 $f(x+1)$ 与 $f(x-1)$ 都是奇函数, 则 （$\qquad$）
+options:
+  A: $f(x)$ 是偶函数
+  B: $f(x)$ 是奇函数
+  C: $f(x)=f(x+2)$
+  D: $f(x+3)$ 是奇函数
+answer: D

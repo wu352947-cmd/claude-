@@ -1,0 +1,18 @@
+type: single
+source: 2016 全国III卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $z=1+2 i$, 则 $\frac{4 i}{z \cdot \bar{z}-1}=(\quad)$
+options:
+  A: '1'
+  B: '-1'
+  C: i
+  D: $-\mathrm{i}$
+answer: C
+solution: |-
+  解: $z=1+2 i$, 则 $\frac{4 i}{z \bar{z}-1}=\frac{4 i}{(1+2 i)(1-2 i)-1}=\frac{4 i}{5-1}=i$.
+
+  故选: C.

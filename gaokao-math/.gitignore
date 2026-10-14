@@ -8,3 +8,5 @@ server/.pytest_cache/
 web/node_modules/
 web/dist/
 .env
+# 没有附许可的数据集转换出的真题：只留在本机，不提交（见 server/tools/import_open_data.py）
+/data/questions/gaokao-local/

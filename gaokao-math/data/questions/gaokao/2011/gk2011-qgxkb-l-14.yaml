@@ -1,0 +1,22 @@
+type: fill
+source: 2011 全国新课标卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 在平面直角坐标系 $x O y$, 椭圆 $C$ 的中心为原点, 焦点 $F_{1} F_{2}$ 在 $x$ 轴上, 离心率为 $\frac{\sqrt{2}}{2}$. 过 $F_{1}$ 的直线交于 $A, B$ 两点, 且 $\triangle A B F_{2}$ 的周长为 16 , 那么 $C$ 的 方程为 ______
+answer: \frac{x^{2}}{16}+\frac{y^{2}}{8}=1
+answer_kind: equation
+solution: |-
+  解: 根据题意, $\triangle A B F_{2}$ 的周长为 16 , 即 $\mathrm{BF}_{2}+A F_{2}+B_{1}+A F_{1}=16$;
+
+  根据椭圆的性质, 有 $4 a=16$, 即 $a=4$;
+
+  椭圆的离心率为 $\frac{\sqrt{2}}{2}$, 即 $\frac{c}{a}=\frac{\sqrt{2}}{2}$, 则 $a=\sqrt{2} c$,
+
+  将 $a=\sqrt{2} c$, 代入可得, $c=2 \sqrt{2}$, 则 $b^{2}=a^{2}-c^{2}=8$;
+
+  则椭圆的方程为 $\frac{x^{2}}{16}+\frac{y^{2}}{8}=1$;
+
+  故答案为: $\frac{x^{2}}{16}+\frac{y^{2}}{8}=1$.

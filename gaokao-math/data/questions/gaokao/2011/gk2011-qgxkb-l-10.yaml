@@ -1,0 +1,22 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  vec.dot: 0.46
+  logic.quantifier: 0.27
+  vec.projection: 0.27
+difficulty_label: 较难
+points: 5.0
+stem: '已知 $\vec{a}$ 与 $\vec{b}$ 均为单位向量, 其夹角为 $\theta$, 有下列四个命题 $P_{1}: \mid \vec{a}+\vec{b}$ $>1 \Leftrightarrow \theta \in\left[0, \frac{2 \pi}{3}\right) ; P_{2}:|\vec{a}+\vec{b}|>1 \Leftrightarrow \theta \in\left(\frac{2 \pi}{3}, \pi\right] ; P_{3}:|\vec{a}-\vec{b}|>1 \Leftrightarrow \theta \in[0$ ， $\left.\frac{\pi}{3}\right) ; P_{4}:|\vec{a}-\vec{b}|>1 \Leftrightarrow \theta \in\left(\frac{\pi}{3}, \pi\right]$ ；其中的真命题是（ $)$'
+options:
+  A: $P_{1}, P_{4}$
+  B: $P_{1}, P_{3}$
+  C: $P_{2}, P_{3}$
+  D: $P_{2}, P_{4}$
+answer: A
+solution: |-
+  解: 由 $|\vec{a}-\vec{b}|>1$, 得出 $2-2 \cos \theta>1$, 即 $\cos \theta<\frac{1}{2}$, 又 $\theta \in[0, \pi]$, 故 可以得出 $\theta \in\left(\frac{\pi}{3}, \pi\right]$, 故 $P_{3}$ 错误, $P_{4}$ 正确.
+
+  由 $|\vec{a}+\vec{b}|>1$, 得出 $2+2 \cos \theta>1$, 即 $\cos \theta>-\frac{1}{2}$, 又 $\theta \in[0, \pi]$, 故可以得出 $\theta \in[0$ ,$\left.\frac{2 \pi}{3}\right)$, 故 $P_{2}$ 错误, $P_{1}$ 正确.
+
+  故选: A.

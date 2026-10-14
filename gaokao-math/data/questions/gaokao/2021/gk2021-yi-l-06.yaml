@@ -1,0 +1,18 @@
+type: single
+source: 2021 全国乙卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 将 5 名北京冬奥会志愿者分配到花样滑冰，短道速滑、冰球和冰显 4 个项目进行培训, 每名 志愿者只分配到 1 个项目, 每个项目至少分配 1 名志愿者, 则不同的分配方案共有（）
+options:
+  A: 60 种
+  B: 120 种
+  C: 240 种
+  D: 480 种
+answer: C
+solution: |-
+  解析:
+
+  所求分配方案数为 $C_{5}^{2} A_{4}^{4}=240$.

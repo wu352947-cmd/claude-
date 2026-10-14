@@ -1,0 +1,11 @@
+type: fill
+source: 2022 北京卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  seq.geom: 0.51
+  seq.recurrence: 0.49
+difficulty_label: 较难
+points: 5.0
+stem: "已知数列 $\\left\\{a_{n}\\right\\}$ 各项均为正数, 其前 $n$ 项和 $S_{n}$ 满足 $a_{n} \\cdot S_{n}=9(n=1,2, \\cdots)$. 给出下列四个结论:\\\\\n$\\textcircled{1}$ $\\left\\{a_{n}\\right\\}$ 的第 2 项小于$3$;\\\\\n$\\textcircled{2}$ $\\left\\{a_{n}\\right\\}$ 为等比数列;\\\\\n$\\textcircled{3}$ $\\left\\{a_{n}\\right\\}$ 为递减数列;\\\\\n$\\textcircled{4}$ $\\left\\{a_{n}\\right\\}$ 中存在小于 $\\frac{1}{100}$ 的项.\\\\\n其中所有正确结论的序号是 ______ "
+answer: \textcircled{1}\textcircled{3}\textcircled{4}
+answer_kind: expr

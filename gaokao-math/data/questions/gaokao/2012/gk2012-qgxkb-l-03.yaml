@@ -1,0 +1,33 @@
+type: single
+source: 2012 全国新课标卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  complex.modulus: 0.43
+  logic.quantifier: 0.3
+  complex.arith: 0.27
+difficulty_label: 基础
+points: 5.0
+stem: |-
+  下面是关于复数 $z=\frac{2}{-1+i}$ 的四个命题：其中的真命题为 $(\quad)$, $p_{1}:|z|=2$,
+
+  $\mathrm{p}_{2}: \mathrm{z}^{2}=2 \mathrm{i}$,
+
+  $p_{3}: z$ 的共轭复数为 $1+i$,
+
+  $p_{4}: z$ 的虚部为 -1 .
+options:
+  A: $\mathrm{p}_{2}, \mathrm{p}_{3}$
+  B: $p_{1}, p_{2}$
+  C: $\mathrm{p}_{2}, \mathrm{p}_{4}$
+  D: $p_{3}, p_{4}$
+answer: C
+solution: |-
+  解: $\because z=\frac{2}{-1+i}=\frac{2(-1-i)}{(-1+i)(-1-i)}=-1-i$,
+
+  $\therefore p_{1}:|z|=\sqrt{2}$
+
+  $p_{2}: z^{2}=2 i$
+
+  $p_{3}: z$ 的共轭复数为 $-1+i$, $p_{4}: z$ 的虚部为 -1,
+
+  故选: C.

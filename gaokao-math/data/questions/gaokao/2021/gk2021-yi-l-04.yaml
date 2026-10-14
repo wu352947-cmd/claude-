@@ -1,0 +1,18 @@
+type: single
+source: 2021 全国乙卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设函数 $f(x)=\frac{1-x}{1+x}$, 则下列函数中为奇函数的是 $(\quad)$
+options:
+  A: $f(x-1)-1$
+  B: $f(x-1)+1$
+  C: $f(x+1)-1$
+  D: $f(x+1)+1$
+answer: B
+solution: |-
+  解析:
+
+  $f(x)=\frac{1-x}{1+x}=-1+\frac{2}{1+x}, f(x)$ 向右平移一个单位, 向上平移一个单位得到 $g(x)=\frac{2}{x}$ 为奇 函数.

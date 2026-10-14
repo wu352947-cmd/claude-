@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国I卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\left\{x \mid x^{2}-4 \leq 0\right\}, B=\{x \mid 2 x+a \leq 0\}$, 且 $A \cap B=\{x \mid-2 \leq x \leq 1\}$, 则 $a=(\quad)$
+options:
+  A: '-4'
+  B: '-2'
+  C: '2'
+  D: '4'
+answer: B
+solution: |-
+  【详解】求解二次不等式 $x^{2}-4 \leq 0$ 可得: $A=\{x \mid-2 \leq x \leq 2\}$,
+
+  求解一次不等式 $2 x+a \leq 0$ 可得: $B=\left\{x \mid x \leq-\frac{a}{2}\right\}$.
+
+  由于 $A \cap B=\{x \mid-2 \leq x \leq 1\}$, 故: $-\frac{a}{2}=1$, 解得: $a=-2$.
+
+  故选: B.

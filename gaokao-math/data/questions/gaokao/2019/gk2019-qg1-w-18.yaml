@@ -1,0 +1,39 @@
+type: solve
+source: 2019 全国I卷（文科） 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+stem: |-
+  记 $S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 已知 $S_{9}=-a_{5}$.
+
+  (1) 若 $a_{3}=4$, 求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 若 $a_{1}>0$, 求使得 $S_{n} \geq a_{n}$ 的 $n$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【详解】设等差数列 $\left\{a_{n}\right\}$ 的首项为 $a_{1}$, 公差为 $d$,
+
+  根据题意有 $\left\{\begin{array}{l}9 a_{1}+\frac{9 \times 8}{2} d=-\left(a_{1}+4 d\right) \\ a_{1}+2 d=4\end{array}\right.$,
+
+  解答 $\left\{\begin{array}{l}a_{1}=8 \\ d=-2\end{array}\right.$, 所以 $a_{n}=8+(n-1) \times(-2)=-2 n+10$,
+
+  所以等差数列 $\left\{a_{n}\right\}$ 的通项公式为 $a_{n}=-2 n+10$;
+
+  (2) 由条件 $S_{9}=-a_{5}$, 得 $9 a_{5}=-a_{5}$, 即 $a_{5}=0$,
+
+  因为 $a_{1}>0$, 所以 $d<0$, 并且有 $a_{5}=a_{1}+4 d=0$, 所以有 $a_{1}=-4 d$,
+
+  由 $S_{n} \geq a_{n}$ 得 $n a_{1}+\frac{n(n-1)}{2} d \geq a_{1}+(n-1) d$, 整理得 $\left(n^{2}-9 n\right) d \geq(2 n-10) d$,
+
+  因为 $d<0$, 所以有 $n^{2}-9 n \leq 2 n-10$, 即 $n^{2}-11 n+10 \leq 0$,
+
+  解得 $1 \leq n \leq 10$,
+
+  所以 $n$ 的取值范围是: $1 \leq n \leq 10\left(n \in N^{\star}\right)$

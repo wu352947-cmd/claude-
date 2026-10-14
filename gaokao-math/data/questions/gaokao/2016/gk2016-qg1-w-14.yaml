@@ -1,0 +1,24 @@
+type: fill
+source: 2016 全国I卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.identities: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\theta$ 是第四象限角, 且 $\sin \left(\theta+\frac{\pi}{4}\right)=\frac{3}{5}$, 则 $\tan \left(\theta-\frac{\pi}{4}\right)=$ ______
+answer: -\frac{4}{3}
+answer_kind: expr
+solution: |-
+  解: $\because \theta$ 是第四象限角,
+
+  $\therefore-\frac{\pi}{2}+2 k \pi<\theta<2 k \pi$, 则 $-\frac{\pi}{4}+2 k \pi<\theta+\frac{\pi}{4}<\frac{\pi}{4}+2 k \pi, k \in Z$,
+
+  又 $\sin \left(\theta+\frac{\pi}{4}\right)=\frac{3}{5}$,
+
+  $\therefore \cos \left(\theta+\frac{\pi}{4}\right)=\sqrt{1-\sin ^{2}\left(\theta+\frac{\pi}{4}\right)}=\sqrt{1-\left(\frac{3}{5}\right)^{2}}=\frac{4}{5}$.
+
+  $\therefore \cos \left(\frac{\pi}{4}-\theta\right)=\sin \left(\theta+\frac{\pi}{4}\right)=\frac{3}{5}, \sin \left(\frac{\pi}{4}-\theta\right)=\cos \left(\theta+\frac{\pi}{4}\right)=\frac{4}{5}$.
+
+  则 $\tan \left(\theta-\frac{\pi}{4}\right)=-\tan \left(\frac{\pi}{4}-\theta\right)=-\frac{\sin \left(\frac{\pi}{4}-\theta\right)}{\cos \left(\frac{\pi}{4}-\theta\right)}=-\frac{\frac{4}{5}}{\frac{3}{5}}=-\frac{4}{3}$.
+
+  故答案为: $-\frac{4}{3}$.

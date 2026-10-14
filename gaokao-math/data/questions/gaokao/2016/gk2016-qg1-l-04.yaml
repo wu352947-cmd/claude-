@@ -1,0 +1,22 @@
+type: single
+source: 2016 全国I卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '某公司的班车在 7: $00,8: 00,8: 30$ 发车, 小明在 7:50 至 8: 30 之间到达发车站乘坐班车, 且到达发车站的时刻是随机的, 则他等车时间不 超过 10 分钟的概率是（ $)$'
+options:
+  A: $\frac{1}{3}$
+  B: $\frac{1}{2}$
+  C: $\frac{2}{3}$
+  D: $\frac{3}{4}$
+answer: B
+solution: |-
+  解：设小明到达时间为 $y$, 当 $y$ 在 7: 50 至 8: 00 , 或 8: 20 至 8: 30 时,
+
+  小明等车时间不超过 10 分钟,
+
+  故 $P=\frac{20}{40}=\frac{1}{2}$,
+
+  故选: B.

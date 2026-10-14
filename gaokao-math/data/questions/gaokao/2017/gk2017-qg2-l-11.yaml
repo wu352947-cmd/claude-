@@ -1,0 +1,34 @@
+type: single
+source: 2017 全国II卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若 $x=-2$ 是函数 $f(x)=\left(x^{2}+a x-1\right) e^{x-1}$ 的极值点, 则 $f(x)$ 的极 小值为 $(\quad)$
+options:
+  A: '-1'
+  B: $-2 e^{-3}$
+  C: $5 \mathrm{e}^{-3}$
+  D: '1'
+answer: A
+solution: |-
+  解：函数 $f(x)=\left(x^{2}+a x-1\right) e^{x-1}$,
+
+  可得 $f^{\prime}(x)=(2 x+a) e^{x-1+}\left(x^{2}+a x-1\right) e^{x-1}$,
+
+  $x=-2$ 是函数 $f(x)=\left(x^{2}+a x-1\right) e^{x-1}$ 的极值点,
+
+  可得: $f^{\prime}(-2)=(-4+a) e^{-3}+(4-2 a-1) e^{-3}=0$, 即 $-4+a+(3-2 a)=0$.
+
+  解得 $a=-1$.
+
+  可得 $f^{\prime}(x)=(2 x-1) e^{x-1+}\left(x^{2}-x-1\right) e^{x-1}$,
+
+  $=\left(x^{2}+x-2\right) e^{x-1}$, 函数的极值点为: $x=-2, x=1$,
+
+  当 $x<-2$ 或 $x>1$ 时, $f^{\prime}(x)>0$ 函数是增函数, $x \in(-2,1 ）$ 时, 函数是减函 数,
+
+  $x=1$ 时, 函数取得极小值: $f(1)=\left(1^{2}-1-1\right) e^{1-1}=-1$.
+
+  故选: A.

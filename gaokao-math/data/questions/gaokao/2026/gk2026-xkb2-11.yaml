@@ -1,0 +1,17 @@
+type: multi
+source: 2026 新课标II卷 第 11 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+points: 6.0
+stem: 已知抛物线$E:y^2 = 8x$，斜率为$k(k > 0)$的直线$l$过点$(-1,0)$，$\triangle ABC$为等边三角形，$A$在抛物线$E$上，$B$，$C$在$l$上，则$(\quad)$
+options:
+  A: 抛物线准线方程为$x = -2$
+  B: $l$与抛物线$E$无交点时，$k > \sqrt{2}$
+  C: 若$l$与$E$相交于唯一点$B$，则抛物线焦点在直线$AB$上
+  D: $k = 2$时，$\triangle ABC$面积最小值为$\dfrac{\sqrt{3}}{15}$
+answer:
+- A
+- B
+- D

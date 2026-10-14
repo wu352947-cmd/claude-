@@ -1,0 +1,14 @@
+type: fill
+source: 2021 全国乙卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(2,5), \vec{b}=(\lambda, 4)$, 若 $\vec{a} / / \vec{b}$, 则 $\lambda=$ ______
+answer: \frac{8}{5}
+answer_kind: expr
+solution: |-
+  解析:
+
+  由已知 $\vec{a} / / \vec{b}$ 可得 $2 \times 4=5 \lambda \Rightarrow \lambda=\frac{8}{5}$.

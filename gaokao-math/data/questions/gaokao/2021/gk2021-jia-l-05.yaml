@@ -1,0 +1,24 @@
+type: single
+source: 2021 全国甲卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $F_{1}, F_{2}$ 是双曲线 $C$ 的两个焦点, $P$ 为 $C$ 上一点, 且 $\angle F_{1} P F_{2}=60^{\circ},\left|P F_{1}\right|=3\left|P F_{2}\right|$, 则 $C$ 的离心率为
+options:
+  A: $\frac{\sqrt{7}}{2}$
+  B: $\frac{\sqrt{13}}{2}$
+  C: $\sqrt{7}$
+  D: $\sqrt{13}$
+answer: A
+solution: |-
+  【详解】因为 $\left|P F_{1}\right|=3\left|P F_{2}\right|$, 由双曲线的定义可得 $\left|P F_{1}\right|-\left|P F_{2}\right|=2\left|P F_{2}\right|=2 a$,
+
+  所以 $\left|P F_{2}\right|=a,\left|P F_{1}\right|=3 a$;
+
+  因为 $\angle F_{1} P F_{2}=60^{\circ}$,由余弦定理可得 $4 c^{2}=9 a^{2}+a^{2}-2 \times 3 a \cdot a \cdot \cos 60^{\circ}$,
+
+  整理可得 $4 c^{2}=7 a^{2}$, 所以 $e^{2}=\frac{c^{2}}{a^{2}}=\frac{7}{4}$, 即 $e=\frac{\sqrt{7}}{2}$.
+
+  故选: A

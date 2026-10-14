@@ -1,0 +1,10 @@
+type: fill
+source: 2020 北京卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  func.domain_range: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '函数 $f(x)=\frac{1}{x+1}+\ln x$ 的定义域是 ______ '
+answer: (0,+\infty)
+answer_kind: interval

@@ -145,11 +145,18 @@ def normalize_question(raw: dict, qid: str, kp_ids: set[str], defaults: dict | N
         "difficulty_label": label,
         "est_seconds": int(raw.get("est_seconds") or defaults[qtype]["est_seconds"]),
         "source": str(raw.get("source") or ""),
+        "year": None,
         "parent_id": raw.get("parent"),
         "figure": raw.get("figure"),
         "verified": bool(raw.get("verified", True)),
         "kps": kps,
     }
+
+    if raw.get("year") is not None:
+        try:
+            out["year"] = int(raw["year"])
+        except (TypeError, ValueError):
+            fail("year 必须是年份数字，如 2024")
 
     if out["figure"] is not None:
         if not FIGURE_NAME.match(str(out["figure"])):
@@ -279,7 +286,7 @@ def _str_representer(dumper, value: str):
 
 _BlockDumper.add_representer(str, _str_representer)
 
-FIELD_ORDER = ("type", "source", "kps", "difficulty_label", "est_seconds", "points", "stem", "figure", "options",
+FIELD_ORDER = ("type", "source", "year", "kps", "difficulty_label", "est_seconds", "points", "stem", "figure", "options",
                "answer", "answer_kind", "loose_endpoints", "parts", "hints", "solution", "parent", "verified")
 
 

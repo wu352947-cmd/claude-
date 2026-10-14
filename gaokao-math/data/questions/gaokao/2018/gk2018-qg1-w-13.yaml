@@ -1,0 +1,16 @@
+type: fill
+source: 2018 全国I卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  expo.ops: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知函数 $f(x)=\log _{2}\left(x^{2}+a\right)$, 若 $f(3)=1$, 则 $a=$ ______
+answer: '-7'
+answer_kind: expr
+solution: |-
+  解: 函数 $\mathrm{f}(\mathrm{x})=\log _{2}\left(\mathrm{x}^{2}+\mathrm{a}\right)$, 若 $\mathrm{f}(3)=1$,
+
+  可得: $\log _{2}(9+a)=1$, 可得 $a=-7$.
+
+  故答案为: -7 .

@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国III卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 两位男同学和两位女同学随机排成一列, 则两位女同学相邻的概率是（）
+options:
+  A: $\frac{1}{6}$
+  B: $\frac{1}{4}$
+  C: $\frac{1}{3}$
+  D: $\frac{1}{2}$
+answer: D
+solution: 【详解】两位男同学和两位女同学排成一列, 因为男生和女生人数相等, 两位女生相邻与不 相邻的排法种数相同, 所以两位女生相邻与不相邻的概率均是 $\frac{1}{2}$. 故选 D.

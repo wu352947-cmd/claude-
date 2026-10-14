@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 等腰三角形两腰所在直线的方程分别为 $x+y-2=0$ 与 $x-7 y-4=0$, 原点在等腰三角形的底边上, 则底边所在直线的斜率为($\qquad$)
+options:
+  A: '3'
+  B: '2'
+  C: $-\frac{1}{3}$
+  D: $-\frac{1}{2}$
+answer: A

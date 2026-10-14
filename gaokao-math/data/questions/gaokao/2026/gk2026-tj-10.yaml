@@ -1,0 +1,10 @@
+type: fill
+source: 2026 天津卷 第 10 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 化简 $(3 + i)^2 =$ ______。
+answer: 8 + 6i
+answer_kind: expr

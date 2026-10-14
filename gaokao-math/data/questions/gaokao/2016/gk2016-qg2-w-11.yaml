@@ -1,0 +1,32 @@
+type: single
+source: 2016 全国II卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.graph: 0.36
+  trig.identities: 0.34
+  deriv.extremum: 0.31
+difficulty_label: 较难
+points: 5.0
+stem: 函数 $\mathrm{f}(\mathrm{x})=\cos 2 x+6 \cos \left(\frac{\pi}{2}-\mathrm{x}\right)$ 的最大值为 ( )
+options:
+  A: '4'
+  B: '5'
+  C: '6'
+  D: '7'
+answer: B
+solution: |-
+  解: 函数 $\mathrm{f}(\mathrm{x})=\cos 2 x+6 \cos \left(\frac{\pi}{2}-\mathrm{x}\right)$
+
+  $=1-2 \sin ^{2} x+6 \sin x$,
+
+  令 $t=\sin x(-1 \leqslant t \leqslant 1) ，$
+
+  可得函数 $y=-2 t^{2}+6 t+1$
+
+  $=-2\left(t-\frac{3}{2}\right)^{2}+\frac{11}{2}$
+
+  由 $\frac{3}{2} \notin[-1,1]$, 可得函数在 $[-1,1]$ 递增,
+
+  即有 $t=1$ 即 $x=2 k \pi+\frac{\pi}{2}, k \in Z$ 时, 函数取得最大值 5 .
+
+  故选: B.

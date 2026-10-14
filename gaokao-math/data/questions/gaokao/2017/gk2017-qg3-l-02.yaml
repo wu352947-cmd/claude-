@@ -1,0 +1,20 @@
+type: single
+source: 2017 全国III卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设复数 $z$ 满足 $(1+i) \quad z=2 i$, 则 $|z|=(\quad)$
+options:
+  A: $\frac{1}{2}$
+  B: $\frac{\sqrt{2}}{2}$
+  C: $\sqrt{2}$
+  D: '2'
+answer: C
+solution: |-
+  解: $\because(1+\mathrm{i}) \mathrm{z}=2 \mathrm{i}, \quad \therefore(1-\mathrm{i})(1+\mathrm{i}) \quad \mathrm{z}=2 \mathrm{i}(1-\mathrm{i}), \mathrm{z}=\mathrm{i}+1$.
+
+  则 $|z|=\sqrt{2}$.
+
+  故选: C.

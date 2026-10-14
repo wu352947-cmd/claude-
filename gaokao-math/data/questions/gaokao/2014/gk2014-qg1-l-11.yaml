@@ -1,0 +1,36 @@
+type: single
+source: 2014 全国I卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  func.zeros: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)=a x^{3}-3 x^{2}+1$, 若 $f(x)$ 存在唯一的零点 $x_{0}$, 且 $x_{0}>$ 0 , 则实数 a 的取值范围是（ $)$
+options:
+  A: $(1,+\infty)$
+  B: $(2,+\infty)$
+  C: $(-\infty,-1)$
+  D: $(-\infty,-2)$
+answer: D
+solution: |-
+  解: $\because f(x)=a x^{3}-3 x^{2}+1$,
+
+  $\therefore f^{\prime}(x)=3 a x^{2}-6 x=3 x(a x-2), f(0)=1$;
+
+  (1)当 $a=0$ 时, $f(x)=-3 x^{2}+1$ 有两个零点, 不成立; (2)当 $a>0$ 时, $f(x)=a x^{3}-3 x^{2}+1$ 在 $(-\infty, 0)$ 上有零点, 故不成立;
+
+  (3)当 $a<0$ 时, $f(x)=a x^{3}-3 x^{2}+1$ 在 $(0,+\infty)$ 上有且只有一个零点;
+
+  故 $f(x)=a x^{3}-3 x^{2}+1$ 在 $(-\infty, 0)$ 上没有零点;
+
+  而当 $x=\frac{2}{a}$ 时, $f(x)=a x^{3}-3 x^{2}+1$ 在 $(-\infty, 0)$ 上取得最小值;
+
+  故 $f\left(\frac{2}{a}\right)=\frac{8}{a^{2}}-3 \cdot \frac{4}{a^{2}}+1>0$;
+
+  故 $a<-2$;
+
+  综上所述，
+
+  实数 $\mathrm{a}$ 的取值范围是 $(-\infty,-2)$;
+
+  故选: D.

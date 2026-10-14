@@ -1,0 +1,54 @@
+type: solve
+source: 2017 全国III卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.monotonic: 0.54
+  deriv.construct: 0.46
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\ln x+a x^{2}+(2 a+1) x$.
+
+  (1) 讨论 $f(x)$ 的单调性;
+
+  （2）当 $a<0$ 时, 证明 $f(x) \leqslant-\frac{3}{4 a}-2$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  (1) 解: 因为 $f(x)=\ln x+a x^{2}+(2 a+1) x$,
+
+  求导 $f^{\prime}(x)=\frac{1}{x}+2 a x+(2 a+1)=\frac{2 a x^{2}+(2 a+1) x+1}{x}=\frac{(2 a x+1)(x+1)}{x}, \quad(x>0)$,
+
+  (1)当 $a=0$ 时, $f^{\prime}(x)=\frac{1}{x}+1>0$ 恒成立, 此时 $y=f(x)$ 在 $(0,+\infty)$ 上单调递增;
+
+  (2)当 $a>0$, 由于 $x>0$, 所以 $(2 a x+1)(x+1)>0$ 恒成立, 此时 $y=f(x)$ 在 $(0$, $+\infty)$ 上单调递增;
+
+  (3)当 $a<0$ 时, 今 $f^{\prime}(x)=0$, 解得: $x=-\frac{1}{2 a}$. 因为当 $x \in\left(0,-\frac{1}{2 a}\right) f^{\prime}(x)>0$ 、当 $x \in\left(-\frac{1}{2 a},+\infty\right) f^{\prime}(x)<0$, 所以 $y=f(x)$ 在 $\left(0,-\frac{1}{2 \mathrm{a}}\right)$ 上单调递增、在 $\left(-\frac{1}{2 \mathrm{a}},+\infty\right)$ 上单调递减.
+
+  综上可知: 当 $a \geqslant 0$ 时 $f(x)$ 在 $(0,+\infty)$ 上单调递增,
+
+  当 $a<0$ 时, $f(x)$ 在 $\left(0,-\frac{1}{2 a}\right)$ 上单调递增、在 $\left(-\frac{1}{2 a},+\infty\right)$ 上单调递减;
+
+  （2） 证明: 由 (1) 可知: 当 $a<0$ 时 $f(x)$ 在 $\left(0,-\frac{1}{2 \mathrm{a}}\right)$ 上单调递增、在 $(-$ $\left.\frac{1}{2 \mathrm{a}},+\infty\right)$ 上单调递减
+
+  所以当 $x=-\frac{1}{2 a}$ 时函数 $y=f(x)$ 取最大值 $f(x)$ max $=f\left(-\frac{1}{2 a}\right)=-1-\ln 2-\frac{1}{4 a}+\ln$ $\left(-\frac{1}{\mathrm{a}}\right)$.
+
+  从而要证 $f(x) \leqslant-\frac{3}{4 a}-2$, 即证 $f\left(-\frac{1}{2 a}\right) \leqslant-\frac{3}{4 a}-2$,
+
+  即证 $-1-\ln 2-\frac{1}{4 a}+\ln \left(-\frac{1}{a}\right) \leqslant-\frac{3}{4 a}-2$, 即证 $-\frac{1}{2}\left(-\frac{1}{a}\right)+\ln \left(-\frac{1}{a}\right) \leqslant-1+\ln 2$.
+
+  令 $t=-\frac{1}{a}$, 则 $t>0$, 问题转化为证明: $-\frac{1}{2} t+\ln t \leqslant-1+\ln 2$. $\cdots\left({ }^{*}\right)$
+
+  今 $g(t)=-\frac{1}{2} t+I n t$, 则 $g^{\prime}(t)=-\frac{1}{2}+\frac{1}{t}$,
+
+  令 $g^{\prime}(t)=0$ 可知 $t=2$, 则当 $0<t<2$ 时 $g^{\prime}(t)>0$, 当 $t>2$ 时 $g^{\prime}(t)<0$,
+
+  所以 $y=g(t)$ 在 $(0,2)$ 上单调递增、在 $(2,+\infty)$ 上单调递减,
+
+  即 $g(t) \leqslant g(2)=-\frac{1}{2} \times 2+\ln 2=-1+\ln 2$, 即 $\left({ }^{*}\right)$ 式成立,
+
+  所以当 $a<0$ 时, $f(x) \leqslant-\frac{3}{4 a}-2$ 成立.

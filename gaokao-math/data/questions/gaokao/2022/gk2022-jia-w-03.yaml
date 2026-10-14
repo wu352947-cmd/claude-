@@ -1,0 +1,20 @@
+type: single
+source: 2022 全国甲卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $z=1+\mathrm{i}$. 则 $|\mathrm{i} z+3 \bar{z}|=()$
+options:
+  A: $4 \sqrt{5}$
+  B: $4 \sqrt{2}$
+  C: $2 \sqrt{5}$
+  D: $2 \sqrt{2}$
+answer: D
+solution: |-
+  【详解】因为 $z=1+\mathrm{i}$, 所以 $\mathrm{i} z+3 \bar{z}=\mathrm{i}(1+\mathrm{i})+3(1-\mathrm{i})=2-2 \mathrm{i}$, 所以
+
+  $|i z+3 \bar{z}|=\sqrt{4+4}=2 \sqrt{2}$
+
+  故选: D.

@@ -1,0 +1,11 @@
+type: fill
+source: 2007 全国I卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2007
+kps:
+  seq.arith: 0.5
+  seq.geom: 0.5
+difficulty_label: 基础
+points: 5.0
+stem: 等比数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 $S_{n}$, 已知 $S_{1}, 2 S_{2}$, $3 S_{3}$ 成等差数列, 则 $\left\{a_{n}\right\}$ 的公比为 ______ .
+answer: \frac{1}{3}
+answer_kind: expr

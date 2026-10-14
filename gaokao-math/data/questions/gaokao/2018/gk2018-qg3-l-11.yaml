@@ -1,0 +1,32 @@
+type: single
+source: 2018 全国III卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '设 $F_{1}, F_{2}$ 是双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的左, 右焦点, $O$ 是坐标原点. 过 $F_{2}$ 作 $C$ 的一条渐近线的垂线, 垂足为 $P$, 若 $\left|P F_{1}\right|=\sqrt{6}|O P|$, 则 $C$ 的离心率为 $(\quad)$'
+options:
+  A: $\sqrt{5}$
+  B: '2'
+  C: $\sqrt{3}$
+  D: $\sqrt{2}$
+answer: C
+solution: |-
+  解：双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1 \quad(a>0 . b>0)$ 的一条渐近线方程为 $y=\frac{b}{a} x$, $\therefore$ 点 $\mathrm{F}_{2}$ 到渐近线的距离 $\mathrm{d}=\frac{\mathrm{bc}}{\sqrt{\mathrm{a}^{2}+\mathrm{b}^{2}}}=\mathrm{b}$, 即 $\left|P F_{2}\right|=b$,
+
+  $\therefore|\mathrm{OP}|=\sqrt{\left|O \mathrm{F}_{2}\right|^{2}-\left|\mathrm{PF}_{2}\right|^{2}}=\sqrt{c^{2}-\mathrm{b}^{2}}=\mathrm{a}, \quad \cos \angle \mathrm{PF} \mathrm{F}_{2} \mathrm{O}=\frac{\mathrm{b}}{\mathrm{c}}$,
+
+  $\because\left|\mathrm{PF}_{1}\right|=\sqrt{6}|\mathrm{OP}|$
+
+  $\therefore\left|P F_{1}\right|=\sqrt{6} a$ 在三角形 $F_{1} P F_{2}$ 中, 由余弦定理可得 $\left|P F_{1}\right|^{2}=\left|P F_{2}\right|^{2}+\left|F_{1} F_{2}\right|^{2}-2\left|P F_{2}\right| \cdot\left|F_{1} F_{2}\right| C O S \angle$ $\mathrm{PF}_{2} \mathrm{O}$
+
+  $\therefore 6 \mathrm{a}^{2}=\mathrm{b}^{2}+4 c^{2}-2 \times b \times 2 c \times \frac{b}{c}=4 c^{2}-3 b^{2}=4 c^{2}-3 \quad\left(c^{2}-a^{2}\right)$,
+
+  即 $3 a^{2}=c^{2}$,
+
+  即 $\sqrt{3} a=c$,
+
+  $\therefore \mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\sqrt{3}$,
+
+  故选: C.

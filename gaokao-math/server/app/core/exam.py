@@ -6,6 +6,7 @@ import random
 from collections import defaultdict
 
 from .predict import TYPE_LABELS
+from .today import recency_weight
 
 MATCH_LABELS = {"kp": "知识点吻合", "module": "同模块", "type": "仅题型相同", "none": "题库里没有这种题型"}
 
@@ -26,7 +27,9 @@ def compose(blueprint, questions, links: dict[str, dict[str, float]], kp_module:
             kp_match = sum(wk * slot.kps.get(k, 0.0) for k, wk in w.items())
             module_match = sum(wk for k, wk in w.items() if kp_module.get(k) in slot_modules)
             score = (10 * kp_match + 3 * module_match + (2 if q.id not in attempted else 0)
-                     - 0.5 * abs(q.difficulty - slot_b) + rng.random())
+                     - 0.5 * abs(q.difficulty - slot_b) + 2 * recency_weight(q.year) + rng.random())
+            if slot.type == "solve" and len(q.parts or []) < 2:
+                score -= 3  # 只有一问的（多是答案没法自动判分、改成自评的填空题）不像真正的大题
             if score > best_score:
                 best, best_score = q, score
                 best_match = "kp" if kp_match > 0 else "module" if module_match > 0 else "type"

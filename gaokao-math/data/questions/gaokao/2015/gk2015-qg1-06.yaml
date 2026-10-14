@@ -1,0 +1,16 @@
+type: single
+source: 2015 全国I卷 第 6 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2015
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '《九章算术》是我国古代内容极为丰富的数学名著, 书中有如下问题："今有委米依垣内角, 下周八尺, 高五尺. 问：积及为米几何？ “其意思为: "在屋内墙角处堆放米 (如图, 米堆为一个圆锥的四分之一), 米堆底部的弧长为 8 尺, 米堆的高为 5 尺, 问米堆的体积和堆放的米各为多少? “已知 1 斛米的体积约为 1.62 立方尺, 圆周率约为 3 , 估算出堆放的米约有 $($ )'
+figure: 81e1b787cf769cbe.png
+options:
+  A: 14 斛
+  B: 22 斛
+  C: 36 斛
+  D: 66 斛
+answer: B
+solution: 解：设圆锥的底面半径为 $r$, 则 $\frac{\pi}{2} r=8$,解得 $r=\frac{16}{\pi}$,故米堆的体积为 $\frac{1}{4} \times \frac{1}{3} \times \pi \times\left(\frac{16}{\pi}\right)^2 \times 5 \approx \frac{320}{9}$, $\because 1$ 斛米的体积约为 1.62 立方,$$\therefore \frac{320}{9} \div 1.62 \approx 22 \text {, }$$故选：B.

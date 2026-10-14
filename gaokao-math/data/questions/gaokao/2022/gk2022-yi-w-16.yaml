@@ -1,0 +1,17 @@
+type: fill
+source: 2022 全国乙卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  func.parity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  若 $f(x)=\ln \left|a+\frac{1}{1-x}\right|+b$ 是奇函数, 则 $a=$
+
+  $b=$ ______
+answer: (1). -\frac{1}{2} ; \quad (2). \ln 2
+answer_kind: expr
+solution: |-
+  【详解】因为函数 $f(x)=\ln \left|a+\frac{1}{1-x}\right|+b$ 为奇函数, 所以其定义域关于原点对称.
+
+  由 $a+\frac{1}{1-x} \neq 0$ 可得, $(1-x)(a+1-a x) \neq 0$, 所以 $x=\frac{a+1}{a}=-1$, 解得: $a=-\frac{1}{2}$, 即函 数的定义域为 $(-\infty,-1) \cup(-1,1) \cup(1,+\infty)$, 再由 $f(0)=0$ 可得, $b=\ln 2$. 即 $f(x)=\ln \left|-\frac{1}{2}+\frac{1}{1-x}\right|+\ln 2=\ln \left|\frac{1+x}{1-x}\right|$, 在定义域内满足 $f(-x)=-f(x)$, 符合题意. 故答案为: $-\frac{1}{2} ; \ln 2$.

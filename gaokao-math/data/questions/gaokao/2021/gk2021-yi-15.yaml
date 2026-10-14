@@ -1,0 +1,21 @@
+type: fill
+source: 2021 全国乙卷 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: |-
+  记 $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 面积为 $\sqrt{3}$,
+
+  $B=60^{\circ}, a^{2}+c^{2}=3 a c$, 则 $b=$ ______
+answer: 2 \sqrt{2}
+answer_kind: expr
+solution: |-
+  解析:
+
+  由面积公式 $S=\frac{1}{2} a c \sin B=\sqrt{3}$, 且 $B=60^{\circ}$, 解得 $a c=4$,
+
+  又由余弦定理 $b^{2}=a^{2}+c^{2}-2 a c \cos B, a^{2}+c^{2}=3 a c$, 且 $b>0$
+
+  解得 $b=2 \sqrt{2}$.

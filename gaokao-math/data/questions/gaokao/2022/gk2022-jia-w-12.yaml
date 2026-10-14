@@ -1,0 +1,26 @@
+type: single
+source: 2022 全国甲卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  ineq.properties: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $9^{m}=10, a=10^{m}-11, b=8^{m}-9$, 则 ()
+options:
+  A: $a>0>b$
+  B: $a>b>0$
+  C: $b>a>0$
+  D: $b>0>a$
+answer: A
+solution: |-
+  【详解】由 $9^{m}=10$ 可得 $m=\log _{9} 10=\frac{\lg 10}{\lg 9}>1$, 而
+
+  $\lg 9 \lg 11<\left(\frac{\lg 9+\lg 11}{2}\right)^{2}=\left(\frac{\lg 99}{2}\right)^{2}<1=(\lg 10)^{2}$, 所以 $\frac{\lg 10}{\lg 9}>\frac{\lg 11}{\lg 10}$, 即 $m>\lg 11$, 所
+
+  以 $a=10^{m}-11>10^{\lg 11}-11=0$.
+
+  又 $\lg 8 \lg 10<\left(\frac{\lg 8+\lg 10}{2}\right)^{2}=\left(\frac{\lg 80}{2}\right)^{2}<(\lg 9)^{2}$ ， 所以 $\frac{\lg 9}{\lg 8}>\frac{\lg 10}{\lg 9}$, 即 $\log _{8} 9>m$ ，
+
+  所以 $b=8^{m}-9<8^{\log _{8} 9}-9=0$. 综上, $a>0>b$.
+
+  故选: A.

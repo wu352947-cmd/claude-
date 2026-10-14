@@ -1,0 +1,50 @@
+type: solve
+source: 2022 全国甲卷（理科） 第 19 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  prob.distribution: 1.0
+difficulty_label: 中档
+stem: |-
+  甲、乙两个学校进行体育比赛, 比赛共设三个项目, 每个项目胜方得 10 分, 负方得 0 分, 没有平局. 三个项目比赛结束后, 总得分高的学校获得冠军. 已知甲学校在三个项目中 获胜的概率分别为 $0.5,0.4,0.8$, 各项目的比赛结果相互独立.
+
+  (1) 求甲学校获得冠军的概率;
+
+  (2) 用 $X$ 表示乙学校的总得分, 求 $X$ 的分布列与期望.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  设甲在三个项目中获胜的事件依次记为 $A, B, C$, 所以甲学校获得冠军的概率为
+
+  $$
+  \begin{aligned}
+  & P=P(A B C)+P(\bar{A} B C)+P(A \bar{B} C)+P(A B \bar{C}) \\
+  & =0.5 \times 0.4 \times 0.8+0.5 \times 0.4 \times 0.8+0.5 \times 0.6 \times 0.8+0.5 \times 0.4 \times 0.2 \\
+  & =0.16+0.16+0.24+0.04=0.6
+  \end{aligned}
+  $$
+
+  【小问 2 详解】
+
+  依题可知, $X$ 的可能取值为 $0,10,20,30$, 所以,
+
+  $$
+  \begin{aligned}
+  & P(X=0)=0.5 \times 0.4 \times 0.8=0.16, \\
+  & P(X=10)=0.5 \times 0.4 \times 0.8+0.5 \times 0.6 \times 0.8+0.5 \times 0.4 \times 0.2=0.44, \\
+  & P(X=20)=0.5 \times 0.6 \times 0.8+0.5 \times 0.4 \times 0.2+0.5 \times 0.6 \times 0.2=0.34, \\
+  & P(X=30)=0.5 \times 0.6 \times 0.2=0.06 .
+  \end{aligned}
+  $$
+
+  即 $X$ 的分布列为
+
+  $$\begin{array}{|c|c|c|c|c|}\hline X & 0 & 10 & 20 & 30 \\ \hline P & 0.16 & 0.44 & 0.34 & 0.06 \\ \hline \end{array}$$
+
+  期望 $E(X)=0 \times 0.16+10 \times 0.44+20 \times 0.34+30 \times 0.06=13$.

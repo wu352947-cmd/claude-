@@ -1,0 +1,21 @@
+type: single
+source: 2021 全国乙卷（理科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  trig.transform: 0.53
+  trig.graph: 0.47
+difficulty_label: 中档
+points: 5.0
+stem: 把函数 $y=f(x)$ 图像上所有点的横坐标缩短到原来的 $\frac{1}{2}$ 倍, 纵坐标不变, 再把所得曲线 向右平移 $\frac{\pi}{3}$ 个单位长度, 得到函数 $y=\sin \left(x-\frac{\pi}{4}\right)$ 的图像, 则 $f(x)=(\quad)$
+options:
+  A: $\sin \left(\frac{x}{2}-\frac{7 \pi}{12}\right)$
+  B: $\sin \left(\frac{x}{2}+\frac{\pi}{12}\right)$
+  C: $\sin \left(2 x-\frac{7 \pi}{12}\right)$
+  D: $\sin \left(2 x+\frac{\pi}{12}\right)$
+answer: B
+solution: |-
+  解析:
+
+  逆向: $y=\sin \left(x-\frac{\pi}{4}\right) \stackrel{\text { 左移 } \frac{\pi}{3}}{\longrightarrow} y=\sin \left(x+\frac{\pi}{12}\right) \stackrel{\text { 横坐标变为原来的2倍 }}{\longrightarrow} y=\sin \left(\frac{1}{2} x+\frac{\pi}{12}\right)$.
+
+  故选 B.

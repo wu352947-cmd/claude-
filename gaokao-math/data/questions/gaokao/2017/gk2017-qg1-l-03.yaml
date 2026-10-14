@@ -1,0 +1,33 @@
+type: single
+source: 2017 全国I卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: |-
+  设有下面四个命题
+
+  $p_{1}$ : 若复数 $z$ 满足 $\frac{1}{z} \in R$, 则 $z \in R$;
+
+  $p_{2}$ : 若复数 $z$ 满足 $z^{2} \in R$, 则 $z \in R$;
+
+  $p_{3}$ ：若复数 $z_{1}, z_{2}$ 满足 $z_{1} z_{2} \in R$, 则 $z_{1}=\overline{z_{2}}$;
+
+  $p_{4}$ : 若复数 $z \in R$, 则 $z \in R$.
+
+  其中的真命题为（ $)$
+options:
+  A: $\mathrm{p}_{1}, \mathrm{p}_{3}$
+  B: $\mathrm{p}_{1}, \mathrm{p}_{4}$
+  C: $p_{2}, p_{3}$
+  D: $p_{2}, p_{4}$
+answer: B
+solution: |-
+  解：若复数 $z$ 满足 $\frac{1}{z} \in R$, 则 $z \in R$, 故命题 $p_{1}$ 为真命题; $p_{2}$ : 复数 $z=i$ 满足 $z^{2}=-1 \in R$, 则 $z \notin R$, 故命题 $p_{2}$ 为假命题;
+
+  $p_{3}$ ：若复数 $z_{1}=i, z_{2}=2 i$ 满足 $z_{1} z_{2} \in R$, 但 $z_{1} \neq \overline{z_{2}}$, 故命题 $p_{3}$ 为假命题;
+
+  $p_{4}$ : 若复数 $z \in R$, 则 $z=z \in R$, 故命题 $p_{4}$ 为真命题.
+
+  故选: B.

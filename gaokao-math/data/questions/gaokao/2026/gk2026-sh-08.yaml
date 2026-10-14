@@ -1,0 +1,10 @@
+type: fill
+source: 2026 上海卷 第 8 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  prob.distribution: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知随机变量$X$的分布为$\begin{pmatrix} -1 & 0 & 1 \\ a & 0.3 & b \end{pmatrix}$，且$E(X)=0.5$，则$b=\underline{\quad\quad}$。
+answer: \frac{3}{5}
+answer_kind: expr

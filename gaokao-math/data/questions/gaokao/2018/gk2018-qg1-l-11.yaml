@@ -1,0 +1,22 @@
+type: single
+source: 2018 全国I卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '已知双曲线 $C: \frac{x^{2}}{3}-y^{2}=1, O$ 为坐标原点, $F$ 为 $C$ 的右焦点, 过 $F$ 的直线与 $C$ 的两条渐近线的交点分别为 $M, N$. 若 $\triangle O M N$ 为直角三角形, 则 $|\mathrm{MN}|=(\quad)$'
+options:
+  A: $\frac{3}{2}$
+  B: '3'
+  C: $2 \sqrt{3}$
+  D: '4'
+answer: B
+solution: |-
+  解: 双曲线 $c: \frac{x^{2}}{3}-y^{2}=1$ 的渐近线方程为: $y= \pm \frac{\sqrt{3}}{3} x$, 渐近线的夹角 为: $60^{\circ}$, 不妨设过 $F(2,0)$ 的直线为: $y=\sqrt{3}(x-2)$, 则: $\left\{\begin{array}{l}y=\frac{\sqrt{3}}{3} x \\ y=\sqrt{3}(x-2)\end{array}\right.$ 解得 $M\left(\frac{3}{2},-\frac{\sqrt{3}}{2}\right)$,
+
+  $\left\{\begin{array}{l}y=\frac{\sqrt{3}}{3} x \\ y=\sqrt{3}(x-2)\end{array}\right.$ 解得: $N(3, \sqrt{3})$,
+
+  则 $|M N|=\sqrt{\left(3-\frac{3}{2}\right)^{2}+\left(\sqrt{3}+\frac{\sqrt{3}}{2}\right)^{2}}=3$.
+
+  故选：B.

@@ -1,0 +1,26 @@
+type: single
+source: 2020 全国III卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\left\{(x, y) \mid x, y \in \mathbf{N}^{*}, y \geq x\right\}, B=\{(x, y) \mid x+y=8\}$, 则 $A \cap B$ 中元素的个数为 $(\quad)$
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '6'
+answer: C
+solution: |-
+  【详解】由题意, $A \cap B$ 中的元素满足 $\left\{\begin{array}{c}y \geq x \\ x+y=8\end{array}\right.$, 且 $x, y \in N^{*}$,
+
+  由 $x+y=8 \geq 2 x$, 得 $x \leq 4$,
+
+  所以满足 $x+y=8$ 的有 $(1,7),(2,6),(3,5),(4,4)$,
+
+  故 $A \cap B$ 中元素的个数为 4 .
+
+  故选: C.
+
+  【点晴】本题主要考查集合的交集运算, 考查学生对交集定义的理解, 是一道容易题.

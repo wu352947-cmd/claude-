@@ -1,0 +1,14 @@
+type: single
+source: 2026 天津卷 第 5 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.position: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 正方体 $ABCD - A_1B_1C_1D_1$ 中，错误的是（ ）
+options:
+  A: $AC // A_1C_1$
+  B: $CC_1 \perp$ 面 $ABC$
+  C: 面 $ACD_1 //$ 面 $A_1C_1B$
+  D: 面 $ADD_1 \perp$ 面 $ACD_1$
+answer: D

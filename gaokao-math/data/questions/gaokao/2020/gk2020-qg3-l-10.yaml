@@ -1,0 +1,28 @@
+type: single
+source: 2020 全国III卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  circle.line: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若直线 $l$ 与曲线 $y=\sqrt{x}$ 和 $x^{2}+y^{2}=\frac{1}{5}$ 都相切, 则 $l$ 的方程为 $(\quad)$
+options:
+  A: $y=2 x+1$
+  B: $y=2 x+\frac{1}{2}$
+  C: $y=\frac{1}{2} x+1$
+  D: $y=\frac{1}{2} x+\frac{1}{2}$
+answer: D
+solution: |-
+  【详解】设直线 $l$ 在曲线 $y=\sqrt{x}$ 上的切点为 $\left(x_{0}, \sqrt{x_{0}}\right)$, 则 $x_{0}>0$,
+
+  函数 $y=\sqrt{x}$ 的导数为 $y^{\prime}=\frac{1}{2 \sqrt{x}}$, 则直线 $l$ 的斜率 $k=\frac{1}{2 \sqrt{x_{0}}}$,
+
+  设直线 $l$ 的方程为 $y-\sqrt{x_{0}}=\frac{1}{2 \sqrt{x_{0}}}\left(x-x_{0}\right)$, 即 $x-2 \sqrt{x_{0}} y+x_{0}=0$,
+
+  由于直线 $l$ 与圆 $x^{2}+y^{2}=\frac{1}{5}$ 相切, 则 $\frac{x_{0}}{\sqrt{1+4 x_{0}}}=\frac{1}{\sqrt{5}}$,
+
+  两边平方并整理得 $5 x_{0}^{2}-4 x_{0}-1=0$, 解得 $x_{0}=1, x_{0}=-\frac{1}{5}$ (舍),
+
+  则直线 $l$ 的方程为 $x-2 y+1=0$, 即 $y=\frac{1}{2} x+\frac{1}{2}$.
+
+  故选: D.

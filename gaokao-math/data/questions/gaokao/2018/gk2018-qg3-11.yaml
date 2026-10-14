@@ -1,0 +1,24 @@
+type: single
+source: 2018 全国III卷 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, C$. 若 $\triangle A B C$ 的面积 为 $\frac{a^{2}+b^{2}-c^{2}}{4}$, 则 $C=(\quad)$
+options:
+  A: $\frac{\pi}{2}$
+  B: $\frac{\pi}{3}$
+  C: $\frac{\pi}{4}$
+  D: $\frac{\pi}{6}$
+answer: C
+solution: |-
+  解: $\because \triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$.
+
+  $\triangle A B C$ 的面积为 $\frac{a^{2}+b^{2}-c^{2}}{4}$, $\therefore S_{\triangle A B C}=\frac{1}{2} a b \sin C=\frac{a^{2}+b^{2}-c^{2}}{4}$
+
+  $\therefore \sin C=\frac{a^{2}+b^{2}-c^{2}}{2 a b}=\cos C$
+
+  $\because 0<\mathrm{C}<\pi, \quad \therefore \mathrm{C}=\frac{\pi}{4}$
+
+  故选: C.

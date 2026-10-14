@@ -1,0 +1,14 @@
+type: single
+source: 2022 全国乙卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  func.symmetry: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '嫦娥二号卫星在完成探月任务后, 继续进行深空探测, 成为我国第一颗环绕太阳飞行 人造行星, 为研究嫦娥二号绕日周期与地球绕日周期的比值, 用到数列 $\left\{b_{n}\right\}$ : $b_{1}=1+\frac{1}{\alpha_{1}}, \quad b_{2}=1+\frac{1}{\alpha_{1}+\frac{1}{\alpha_{2}}}, \quad b_{3}=1+\frac{1}{\alpha_{1}+\frac{1}{\alpha_{2}+\frac{1}{\alpha_{3}}}}, \ldots$, 依此类推, 其中 $\alpha_{k} \in \mathbf{N}^{*}(k=1,2, \cdots)$. 则 ($\quad$)'
+options:
+  A: $b_{1}<b_{5}$
+  B: $b_{3}<b_{8}$
+  C: $b_{6}<b_{2}$
+  D: $b_{4}<b_{7}$
+answer: D

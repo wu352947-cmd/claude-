@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国新课标卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  trig.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $\omega>0$, 函数 $f(x)=\sin \left(\omega x+\frac{\pi}{4}\right)$ 在区间 $\left[\frac{\pi}{2}, \pi\right]$ 上单调递减, 则实数 $\omega$ 的取值范围是 （$\qquad $）
+options:
+  A: $\left[\frac{1}{2}, \frac{5}{4}\right]$
+  B: $\left[\frac{1}{2}, \frac{3}{4}\right]$
+  C: $\left(0, \frac{1}{2}\right]$
+  D: $(0,2]$
+answer: A

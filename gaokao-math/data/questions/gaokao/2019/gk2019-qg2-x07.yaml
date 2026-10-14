@@ -1,0 +1,14 @@
+type: single
+source: 2019 全国II卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2019
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '设 $F$ 为双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的右焦点, $O$ 为坐标原点, 以 $O F$ 为直径的 圆与圆 $x^{2}+y^{2}=a^{2}$ 交于 $P$、 $Q$ 两点. 若 $|P Q|=|O F|$, 则 $C$ 的离心率为'
+options:
+  A: $\sqrt{2}$
+  B: $\sqrt{3}$
+  C: '2'
+  D: $\sqrt{5}$
+answer: A

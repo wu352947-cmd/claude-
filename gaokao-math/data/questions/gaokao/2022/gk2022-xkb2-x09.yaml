@@ -1,0 +1,18 @@
+type: multi
+source: 2022 新课标II卷 多选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  deriv.tangent: 0.38
+  func.symmetry: 0.31
+  trig.graph: 0.31
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=\sin (2 x+\varphi)(0<\varphi<\pi)$ 的图象以 $\left(\frac{2 \pi}{3}, 0\right)$ 中心对称, 则 ($\quad$)
+options:
+  A: $y=f(x)$ 在 $\left(0, \frac{5 \pi}{12}\right)$ 单调递减
+  B: $y=f(x)$ 在 $\left( -\frac{\pi}{12}, \frac{11 \pi}{12}\right)$ 有 $2$ 个极值点
+  C: 直线 $x= \frac{7 \pi}{6} $ 是一条对称轴
+  D: 直线 $y= \frac{\sqrt{3}}{2} - x $ 是一条切线
+answer:
+- A
+- D

@@ -1,0 +1,55 @@
+type: solve
+source: 2017 全国II卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.monotonic: 1.0
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=\left(1-x^{2}\right) e^{x}$.
+
+  （1）讨论 $f(x)$ 的单调性;
+
+  （2）当 $x \geqslant 0$ 时, $f(x) \leqslant a x+1$, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 因为 $f(x)=\left(1-x^{2}\right) e^{x}, x \in R$,
+
+  所以 $f^{\prime}(x)=\left(1-2 x-x^{2}\right) e^{x}$,
+
+  令 $f^{\prime}(x)=0$ 可知 $x=-1 \pm \sqrt{2}$,
+
+  当 $\mathrm{x}<-1-\sqrt{2}$ 或 $x>-1+\sqrt{2}$ 时 $\mathrm{f}^{\prime}(\mathrm{x})<0$, 当 $-1-\sqrt{2}<x<-1+\sqrt{2}$ 时 $\mathrm{f}^{\prime}(\mathrm{x})>$ 0
+
+  所以 $f(x)$ 在 $(-\infty,-1-\sqrt{2}),(-1+\sqrt{2},+\infty)$ 上单调递减, 在 $(-1-\sqrt{2}$ $,-1+\sqrt{2})$ 上单调递增;
+
+  (2) 由题可知 $f(x)=(1-x)(1+x) e^{x}$. 下面对 $a$ 的范围进行讨论:
+
+  (1)当 $a \geqslant 1$ 时, 设函数 $h(x)=(1-x) e^{x}$, 则 $h^{\prime}(x)=-x e^{x}<0(x>0)$,
+
+  因此h $(x)$ 在 $[0,+\infty)$ 上单调递减,
+
+  又因为 $h(0)=1$, 所以 $h(x) \leqslant 1$,
+
+  所以 $f(x)=(1+x) h(x) \leqslant x+1 \leqslant a x+1$;
+
+  (2)当 $0<a<1$ 时, 设函数 $g(x)=e^{x}-x-1$, 则 $g^{\prime}(x)=e^{x}-1>0(x>0)$, 所以 $g(x)$ 在 $[0,+\infty)$ 上单调递增,
+
+  又 $g(0)=1-0-1=0$,
+
+  所以 $e^{x} \geqslant x+1$.
+
+  因为当 $0<x<1$ 时 $f(x)>(1-x)(1+x)^{2}$,
+
+  所以 $(1-x)(1+x)^{2}-a x-1=x\left(1-a-x^{-} x^{2}\right)$, 取 $x_{0}=\frac{\sqrt{5-4 a}-1}{2} \in(0,1)$, 则 $\left(1-x_{0}\right) \quad\left(1+x_{0}\right)^{2}-a x_{0}-1=0$,
+
+  所以 $f\left(x_{0}\right)>a x_{0}+1$, 矛盾;
+
+  (3)当 $a \leqslant 0$ 时, 取 $x_{0}=\frac{\sqrt{5}-1}{2} \in(0,1)$, 则 $f\left(x_{0}\right)>\left(1-x_{0}\right) \quad\left(1+x_{0}\right)^{2}=1 \geqslant a x_{0}+1$ ，矛盾；
+
+  综上所述, $\mathrm{a}$ 的取值范围是 $[1,+\infty)$.

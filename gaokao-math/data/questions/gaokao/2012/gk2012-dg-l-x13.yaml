@@ -1,0 +1,11 @@
+type: fill
+source: 2012 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  trig.graph: 0.59
+  deriv.extremum: 0.41
+difficulty_label: 基础
+points: 5.0
+stem: 当函数 $y=\sin x-\sqrt{3} \cos x(0 \leqslant x<2 \pi)$ 取得最大值时, $x=\underline{\qquad}$.
+answer: \frac{5\pi}{6}
+answer_kind: expr

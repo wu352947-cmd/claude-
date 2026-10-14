@@ -1,0 +1,29 @@
+type: single
+source: 2013 全国I卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  tri.laws: 0.59
+  trig.identities: 0.41
+difficulty_label: 较难
+points: 5.0
+stem: 已知锐角 $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c, 23 \cos ^{2} A+\cos 2 A=0$ , $a=7, c=6$, 则 $b=(\quad)$
+options:
+  A: '10'
+  B: '9'
+  C: '8'
+  D: '5'
+answer: D
+solution: |-
+  解: $\because 23 \cos ^{2} \mathrm{A}+\cos 2 \mathrm{A}=23 \cos ^{2} \mathrm{A}+2 \cos ^{2} \mathrm{A}-1=0$, 即 $\cos ^{2} \mathrm{A}=\frac{1}{25}, \mathrm{A}$ 为锐角,
+
+  $\therefore \cos A=\frac{1}{5}$,
+
+  又 $a=7, c=6$,
+
+  根据余弦定理得: $a^{2}=b^{2}+c^{2}-2 b c \bullet \cos A$, 即 $49=b^{2}+36-\frac{12}{5} b$,
+
+  解得: $b=5$ 或 $b=-\frac{13}{5}$ (舍去),
+
+  则 $b=5$.
+
+  故选: D.

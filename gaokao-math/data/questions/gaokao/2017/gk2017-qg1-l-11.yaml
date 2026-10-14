@@ -1,0 +1,44 @@
+type: single
+source: 2017 全国I卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  expo.compare: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $x 、 y 、 z$ 为正数, 且 $2^{x}=3^{y}=5^{2}$, 则 ( )
+options:
+  A: $2 x<3 y<5 z$
+  B: $5 z<2 x<3 y$
+  C: $3 y<5 z<2 x$
+  D: $3 y<2 x<5 z$
+answer: D
+solution: |-
+  解: $x 、 y 、 z$ 为正数,
+
+  令 $2^{x}=3^{y}=5^{z}=k>1 . \quad \lg k>0$.
+
+  则 $x=\frac{\operatorname{lgk}}{\lg 2}, y=\frac{\operatorname{lgk}}{\lg 3}, z=\frac{\operatorname{lgk}}{\lg 5}$.
+
+  $\therefore 3 y=\frac{\operatorname{lgk}}{\lg \sqrt[3]{3}}, 2 x=\frac{\operatorname{lgk}}{\lg \sqrt{2}}, 5 \mathrm{z}=\frac{\operatorname{lgk}}{\lg \sqrt[5]{5}}$.
+
+  $\because \sqrt[3]{3}=\sqrt[6]{9}>\sqrt[6]{8}=\sqrt{2}, \sqrt{2}=\sqrt[10]{32}>\sqrt[10]{25}=\sqrt[5]{5}$
+
+  $\therefore \lg \sqrt[3]{3}>\lg \sqrt{2}>\lg \sqrt[5]{5}>0$
+
+  $\therefore 3 y<2 x<5 z$.
+
+  另解： $x 、 y 、 z$ 为正数,
+
+  令 $2^{x}=3^{y}=5^{2}=k>1 . \quad \lg k>0$.
+
+  则 $x=\frac{\operatorname{lgk}}{\lg 2}, y=\frac{\operatorname{lgk}}{\lg 3}, z=\frac{\operatorname{lgk}}{\lg 5}$.
+
+  $\therefore \frac{2 x}{3 y}=\frac{2}{3} \times \frac{\lg 3}{\lg 2}=\frac{\lg 9}{\lg 8}>1$, 可得 $2 x>3 y$,
+
+  $\frac{5 z}{2 x}=\frac{5}{2} \times \frac{\lg 2}{\lg 5}=\frac{\lg 2^{5}}{\lg 5^{2}}>1$. 可得 $5 z>2 x$.
+
+  综上可得: $5 z>2 x>3 y$.
+
+  解法三: 对 $\mathrm{k}$ 取特殊值, 也可以比较出大小关系.
+
+  故选：D.

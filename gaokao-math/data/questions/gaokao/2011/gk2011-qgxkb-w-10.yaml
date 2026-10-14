@@ -1,0 +1,31 @@
+type: single
+source: 2011 全国新课标卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  deriv.zeros: 0.59
+  func.zeros: 0.41
+difficulty_label: 较难
+points: 5.0
+stem: 在下列区间中, 函数 $f(x)=e^{x}+4 x-3$ 的零点所在的区间为 $(\quad)$
+options:
+  A: $\left(\frac{1}{4}, \frac{1}{2}\right)$
+  B: $\left(-\frac{1}{4}, 0\right)$
+  C: $\left(0, \frac{1}{4}\right)$
+  D: $\left(\frac{1}{2}, \frac{3}{4}\right)$
+answer: A
+solution: |-
+  解: $\because$ 函数 $f(x)=\mathrm{e}^{\mathrm{x}+4 \mathrm{x}-3}$
+
+  $\therefore f^{\prime}(x)=e^{x+4}$
+
+  当 $x>0$ 时, $f^{\prime}(x)=e^{x}+4>0$
+
+  $\therefore$ 函数 $f(x)=e^{x}+4 x-3$ 在 $(-\infty,+\infty)$ 上为 $f(0)=e^{0}-3=-2<0$
+
+  $f\left(\frac{1}{2}\right)=\sqrt{e^{-}} 1>0$
+
+  $f\left(\frac{1}{4}\right)=\sqrt[4]{e^{-}}-2=\sqrt[4]{\mathrm{e}}-\sqrt[4]{16}<0$
+
+  $\because f\left(\frac{1}{2}\right)$ of $\left(\frac{1}{4}\right)<0$, $\therefore$ 函数 $f(x)=\mathrm{e}^{\mathrm{x}+4 x-3}$ 的零点所在的区间为 $\left(\frac{1}{4}, \frac{1}{2}\right)$
+
+  故选: A.

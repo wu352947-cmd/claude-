@@ -1,0 +1,47 @@
+type: solve
+source: 2010 全国新课标卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  deriv.monotonic: 1.0
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=x\left(e^{x}-1\right)-a x^{2}$
+
+  (I) 若 $a=\frac{1}{2}$, 求 $f(x)$ 的单调区间;
+
+  (II) 若当 $x \geqslant 0$ 时 $f(x) \geqslant 0$, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( ( ) $a=\frac{1}{2}$ 时, $f(x)=x\left(e^{x}-1\right)-\frac{1}{2} x^{2}, f^{\prime}(x)=e^{x}-1+x e^{x}-x^{x}=($ $\left.\mathrm{e}^{\mathrm{x}-1}\right)(\mathrm{x}+1)$
+
+  令 $f^{\prime}(x)>0$, 可得 $x<-1$ 或 $x>0$; 令 $f^{\prime}(x)<0$, 可得 $-1<x<0$;
+
+  $\therefore$ 函数的单调增区间是 $(-\infty,-1),(0,+\infty)$ ；单调减区间为 $(-1,0)$;
+
+  (II) $f(x)=x\left(e^{x}-1-a x\right)$.
+
+  令 $g(x)=e^{x}-1-a x$, 则 $g^{\prime}(x)=e^{x}-a$.
+
+  若 $a \leqslant 1$, 则当 $x \in(0,+\infty)$ 时, $g^{\prime}(x)>0, g(x)$ 为增函数, 而 $g(0)=0$, 从而当 $x \geqslant 0$ 时 $g(x) \geqslant 0$, 即 $f(x) \geqslant 0$.
+
+  若 $a>1$, 则当 $x \in\left(0, \ln a ）\right.$ 时, $g^{\prime}(x)<0, g(x)$ 为减函数, 而 $g(0)=0$, 从而当 $x \in(0, \ln a ）$ 时, $g(x)<0$, 即 $f(x)<0$. 综合得 $\mathrm{a}$ 的取值范围为 $(-\infty, 1]$.
+
+  另解: 当 $x=0$ 时, $f(x)=0$ 成立;
+
+  当 $x>0$, 可得 $e^{x}-1-a x \geqslant 0$, 即有 $a \leqslant \frac{e^{x}-1}{x}$ 的最小值,
+
+  由 $y=e^{x}-x-1$ 的导数为 $y^{\prime}=e^{x}-1$,
+
+  当 $x>0$ 时, 函数 $y$ 递增; $x<0$ 时, 函数递减,
+
+  可得函数 $y$ 取得最小值 0 , 即 $e^{x}-x-1 \geqslant 0$,
+
+  $x>0$ 时， 可得 $\frac{e^{x}-1}{x} \geqslant 1$,
+
+  则 $a \leqslant 1$.

@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $a>1$, 则双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{(a+1)^{2}}=1$ 的离心率 $e$ 的取值范围是 ($\qquad$)
+options:
+  A: $(\sqrt{2}, 2)$
+  B: $(\sqrt{2}, \sqrt{5})$
+  C: $(2,5)$
+  D: $(2, \sqrt{5})$
+answer: B

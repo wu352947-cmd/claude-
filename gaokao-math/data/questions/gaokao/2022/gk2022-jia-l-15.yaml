@@ -1,0 +1,15 @@
+type: fill
+source: 2022 全国甲卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  prob.classical: 0.57
+  solid.position: 0.43
+difficulty_label: 中档
+points: 5.0
+stem: 从正方体的 8 个顶点中任选 4 个, 则这 4 个点在同一个平面的概率为 ______
+answer: \frac{6}{35}
+answer_kind: expr
+solution: |-
+  【详解】从正方体的 8 个顶点中任取 4 个, 有 $n=\mathrm{C}_{8}^{4}=70$ 个结果, 这 4 个点在同一个平面 的有 $m=6+6=12$ 个, 故所求概率 $P=\frac{m}{n}=\frac{12}{70}=\frac{6}{35}$.
+
+  故答案为: $\frac{6}{35}$.

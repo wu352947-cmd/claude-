@@ -1,0 +1,16 @@
+type: single
+source: 2010 全国新课标卷 第 4 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2010
+kps:
+  func.graph: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 如图, 质点 $P$ 在半径为 2 的圆周上逆时针运动, 其初始位置为 $P_0$ ( $\sqrt{2},-\sqrt{2})$, 角速度为 1 , 那么点 $\mathrm{P}$ 到 $\mathrm{x}$ 轴距离 $\mathrm{d}$ 关于时间 $\mathrm{t}$ 的函数图象大致为 $(\quad)$
+figure: 2e44dfb2119fce49.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: C
+solution: '解: 通过分析可知当 $\mathrm{t}=0$ 时, 点 $\mathrm{P}$ 到 $\mathrm{x}$ 轴距离 $\mathrm{d}$ 为 $\sqrt{2}$, 于是可以排除答案 $A, D$,再根据当 $t=\frac{\pi}{4}$ 时, 可知点 $P$ 在 $x$ 轴上此时点 $P$ 到 $x$ 轴距离 $d$ 为 0 , 排除答案 $B$,故选: C.'

@@ -1,0 +1,11 @@
+type: fill
+source: 2014 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2014
+kps:
+  trig.graph: 0.59
+  trig.identities: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 若函数 $f(x)=\cos 2 x+a \sin x$ 在区间 $\left(\frac{\pi}{6}, \frac{\pi}{2}\right.$ ) 是减函数, 则 $a$ 的取值范围是 ______ .
+answer: (-\infty,2]
+answer_kind: interval

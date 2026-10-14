@@ -1,0 +1,19 @@
+type: fill
+source: 2020 全国II卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  vec.dot: 0.53
+  vec.projection: 0.47
+difficulty_label: 基础
+points: 5.0
+stem: 已知单位向量 $a, b$ 的夹角为 $45^{\circ}, k a-b$ 与 $a$ 垂直, 则 $k=$ ______
+answer: \frac{\sqrt{2}}{2}
+answer_kind: expr
+solution: |-
+  【详解】由题意可得: $\vec{a} \cdot \vec{b}=1 \times 1 \times \cos 45^{\circ}=\frac{\sqrt{2}}{2}$,
+
+  由向量垂直的充分必要条件可得: $(k \vec{a}-\vec{b}) \cdot \vec{a}=0$,
+
+  即: $k \times \vec{a}^{2}-\vec{a} \cdot \vec{b}=k-\frac{\sqrt{2}}{2}=0$, 解得: $k=\frac{\sqrt{2}}{2}$.
+
+  故答案为: $\frac{\sqrt{2}}{2}$.

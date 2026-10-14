@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\{1,2,3\}, B=\{4,5\}, M=\{x \mid x=a+b, a \in A, b \in B\}$, 则 $M$ 中元素的个数为 （$\qquad$）
+options:
+  A: '3'
+  B: '4'
+  C: '5'
+  D: '6'
+answer: B

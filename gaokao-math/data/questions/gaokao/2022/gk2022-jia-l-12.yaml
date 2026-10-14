@@ -1,0 +1,26 @@
+type: single
+source: 2022 全国甲卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  expo.compare: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $a=\frac{31}{32}, b=\cos \frac{1}{4}, c=4 \sin \frac{1}{4}$, 则 ()
+options:
+  A: $c>b>a$
+  B: $b>a>c$
+  C: $a>b>c$
+  D: $a>c>b$
+answer: A
+solution: |-
+  【详解】因为 $\frac{c}{b}=4 \tan \frac{1}{4}$, 因为当 $x \in\left(0, \frac{\pi}{2}\right), \sin x<x<\tan x$
+
+  所以 $\tan \frac{1}{4}>\frac{1}{4}$, 即 $\frac{c}{b}>1$, 所以 $c>b$;
+
+  设 $f(x)=\cos x+\frac{1}{2} x^{2}-1, x \in(0,+\infty)$, $f^{\prime}(x)=-\sin x+x>0$, 所以 $f(x)$ 在 $(0,+\infty)$ 单调递增,
+
+  则 $f\left(\frac{1}{4}\right)>f(0)=0$, 所以 $\cos \frac{1}{4}-\frac{31}{32}>0$ ，
+
+  所以 $b>a$, 所以 $c>b>a$,
+
+  故选: A

@@ -1,0 +1,10 @@
+type: fill
+source: 2021 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '函数 $f(x)=|2 x-1|-2 \ln x$ 的最小值为 ______ '
+answer: '1'
+answer_kind: expr

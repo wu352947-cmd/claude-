@@ -1,0 +1,22 @@
+type: single
+source: 2019 全国III卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知曲线 $y=a \mathrm{e}^{x}+x \ln x$ 在点 $(1, a e)$ 处的切线方程为 $y=2 x+b$, 则 ( )
+options:
+  A: $a=e, b=-1$
+  B: $a=e, b=1$
+  C: $a=e^{-1}, b=1$
+  D: $a=e^{-1}, b=-1$
+answer: D
+solution: |-
+  【详解】详解: $y^{\prime}=a e^{x}+\ln x+1$,
+
+  $k=\left.y^{\prime}\right|_{x=1}=a e+1=2$
+
+  $\therefore a=e^{-1}$
+
+  将 $(1,1)$ 代人 $y=2 x+b$ 得 $2+b=1, b=-1$, 故选 D.

@@ -1,0 +1,69 @@
+type: solve
+source: 2020 全国III卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  deriv.construct: 0.44
+  deriv.tangent: 0.31
+  func.zeros: 0.25
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=x^{3}+b x+c$, 曲线 $y=f(x)$ 在点 $\left(\frac{1}{2}, f\left(\frac{1}{2}\right)\right)$ 处的切线与 $y$ 轴垂直.
+
+  (1) 求 $b$.
+
+  (2) 若 $f(x)$ 有一个绝对值不大于 1 的零点, 证明: $f(x)$ 所有零点的绝对值都不大于 1 .
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【分析】
+
+  （1）利用导数的几何意义得到 $f^{\prime}\left(\frac{1}{2}\right)=0$, 解方程即可;
+
+  (2) 由（1）可得 $f^{\prime}(x)=3 x^{2}-\frac{3}{4}=2\left(x+\frac{1}{2}\right)\left(x-\frac{1}{2}\right)$, 易知 $f(x)$ 在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 上单调递减, 在 $\left(-\infty,-\frac{1}{2}\right),\left(\frac{1}{2},+\infty\right)$ 上单调递增, 且 $f(-1)=c-\frac{1}{4}, f\left(-\frac{1}{2}\right)=c+\frac{1}{4}, f\left(\frac{1}{2}\right)=c-\frac{1}{4}, f(1)=c+\frac{1}{4}$, 采用反证法, 推出矛盾即可.
+
+  【详解】(1) 因为 $f^{\prime}(x)=3 x^{2}+b$,
+
+  由题意, $f^{\prime}\left(\frac{1}{2}\right)=0$, 即 $3 \times\left(\frac{1}{2}\right)^{2}+b=0$
+
+  则 $b=-\frac{3}{4}$;
+
+  (2) 由（1） 可得 $f(x)=x^{3}-\frac{3}{4} x+c$,
+
+  $f^{\prime}(x)=3 x^{2}-\frac{3}{4}=3\left(x+\frac{1}{2}\right)\left(x-\frac{1}{2}\right)$,
+
+  令 $f^{\prime}(x)>0$, 得 $x>\frac{1}{2}$ 或 $x<-\frac{1}{2}$; 令 $f^{\prime}(x)<0$, 得 $-\frac{1}{2}<x<\frac{1}{2}$,
+
+  所以 $f(x)$ 在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 上单调递减, 在 $\left(-\infty,-\frac{1}{2}\right),\left(\frac{1}{2},+\infty\right)$ 上单调递增,
+
+  且 $f(-1)=c-\frac{1}{4}, f\left(-\frac{1}{2}\right)=c+\frac{1}{4}, f\left(\frac{1}{2}\right)=c-\frac{1}{4}, f(1)=c+\frac{1}{4}$,
+
+  若 $f(x)$ 所有零点中存在一个绝对值大于 1 的零点 $x_{0}$, 则 $f(-1)>0$ 或 $f(1)<0$,
+
+  即 $c>\frac{1}{4}$ 或 $c<-\frac{1}{4}$.
+
+  当 $c>\frac{1}{4}$ 时, $f(-1)=c-\frac{1}{4}>0, f\left(-\frac{1}{2}\right)=c+\frac{1}{4}>0, f\left(\frac{1}{2}\right)=c-\frac{1}{4}>0, f(1)=c+\frac{1}{4}>0$,
+
+  又 $f(-4 c)=-64 c^{3}+3 c+c=4 c\left(1-16 c^{2}\right)<0$ ，
+
+  由零点存在性定理知 $f(x)$ 在 $(-4 c,-1)$ 上存在唯一一个零点 $x_{0}$,
+
+  即 $f(x)$ 在 $(-\infty,-1)$ 上存在唯一一个零点, 在 $(-1,+\infty)$ 上不存在零点,
+
+  此时 $f(x)$ 不存在绝对值不大于 1 的零点, 与题设矛盾;
+
+  当 $c<-\frac{1}{4}$ 时, $f(-1)=c-\frac{1}{4}<0, f\left(-\frac{1}{2}\right)=c+\frac{1}{4}<0, f\left(\frac{1}{2}\right)=c-\frac{1}{4}<0, f(1)=c+\frac{1}{4}<0$,
+
+  又 $f(-4 c)=64 c^{3}+3 c+c=4 c\left(1-16 c^{2}\right)>0$ ，
+
+  由零点存在性定理知 $f(x)$ 在 $(1,-4 c)$ 上存在唯一一个零点 $x_{0}^{\prime}$,
+
+  即 $f(x)$ 在 $(1,+\infty)$ 上存在唯一一个零点, 在 $(-\infty, 1)$ 上不存在零点,
+
+  此时 $f(x)$ 不存在绝对值不大于 1 的零点, 与题设矛盾;
+
+  综上, $f(x)$ 所有零点的绝对值都不大于 1 . 【点晴】本题主要考查利用导数研究函数的零点, 涉及到导数的几何意义, 反证法, 考查学 生逻辑推理能力, 是一道有一定难度的题.

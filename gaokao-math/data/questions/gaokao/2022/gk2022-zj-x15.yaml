@@ -1,0 +1,17 @@
+type: solve
+source: 2022 浙江卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  prob.distribution: 1.0
+difficulty_label: 中档
+stem: 现有 7 张卡片, 分别写上数字 $1,2,2,3,4,5,6$. 从这 7 张卡片中随机抽取 3 张, 记所抽取卡片上数字的最小值为 $\xi$, 则 $P(\xi=2)=\underline{\qquad}$ , $E(\xi)=\underline{\qquad}$
+parts:
+- label: 答案
+  points: 5.0
+  answer: $\frac{16}{35}$；$\frac{12}{7}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $\frac{16}{35}$；$\frac{12}{7}$

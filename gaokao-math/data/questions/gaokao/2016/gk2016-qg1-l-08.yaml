@@ -1,0 +1,26 @@
+type: single
+source: 2016 全国I卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  expo.functions: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $a>b>1,0<c<1$, 则（ $)$
+options:
+  A: $a^{c}<b^{c}$
+  B: $a b^{c}<b a^{c}$
+  C: $a \log _{b} c<b \log _{a} c$
+  D: $\log _{a} c<\log _{b} c$
+answer: C
+solution: |-
+  解: $\because a>b>1,0<c<1$,
+
+  $\therefore$ 函数 $f(x)=x^{c}$ 在 $(0,+\infty)$ 上为增函数, 故 $a^{c}>b^{c}$, 故 $\mathrm{A}$ 错误;
+
+  函数 $f(x)=x^{c-1}$ 在 $(0,+\infty)$ 上为减函数, 故 $a^{c-1}<b^{c-1}$, 故 $b a^{c}<a b^{c}$, 即 $a b^{c}>$ $b^{c}$; 故 B 错误;
+
+  $\log _{a} c<0$, 且 $\log _{b} c<0, \log _{a} b<1$, 即 $\frac{\log _{c} b}{\log _{c} a}=\frac{\log _{a} c}{\log _{b} c}<1$, 即 $\log _{a} c>\log _{b} c$. 故 $D$ 错误；
+
+  $0<-\log _{a} c<-\log _{b} c$, 故 $-b \log _{a} c<-a \log _{b} c$, 即 $b \log _{a} c>a \log _{b} c$, 即 $a \log _{b} c<b \log _{a} c$ ，故 C 正确;
+
+  故选: C.

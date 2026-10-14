@@ -1,0 +1,23 @@
+type: fill
+source: 2013 全国I卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  solid.sphere: 0.6
+  solid.section: 0.4
+difficulty_label: 中档
+points: 5.0
+stem: '已知 $H$ 是球 $O$ 的直径 $A B$ 上一点, $A H: H B=1: 2, A B \perp$ 平面 $\alpha, H$ 为垂足, $\alpha$ 截球 $O$ 所得截面的面积为 $\pi$, 则球 $O$ 的表面积为 ______'
+answer: \frac{9 \pi}{2}
+answer_kind: expr
+solution: |-
+  解：设球的半径为 $R, \because A H: H B=1: 2, \therefore$ 平面 $\alpha$ 与球心的距离为 $\frac{1}{3} R$,
+
+  $\because \alpha$ 截球 $O$ 所得截面的面积为 $\pi$,
+
+  $\therefore d=\frac{1}{3} R$ 时, $r=1$,
+
+  故由 $R^{2}=r^{2}+d^{2}$ 得 $R^{2}=1^{2}+\left(\frac{1}{3} R\right)^{2}, \therefore R^{2}=\frac{9}{8}$
+
+  $\therefore$ 球的表面积 $S=4 \pi R^{2}=\frac{9 \pi}{2}$.
+
+  故答案为: $\frac{9 \pi}{2}$.

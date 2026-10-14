@@ -1,0 +1,14 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  func.parity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=\cos x-\cos 2 x$, 试判断函数的奇偶性及最大值 ($\quad$)
+options:
+  A: 奇函数, 最大值为 2
+  B: 偶函数, 最大值为 2
+  C: 奇函数, 最大值为 $\frac{9}{8}$
+  D: 偶函数，最大值为 $\frac{9}{8}$
+answer: D

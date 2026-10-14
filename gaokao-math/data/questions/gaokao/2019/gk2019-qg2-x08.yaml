@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国II卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2019
+kps:
+  func.domain_range: 0.5
+  func.abstract: 0.5
+difficulty_label: 中档
+points: 5.0
+stem: 设函数 $f(x)$ 的定义域为 $\mathbf{R}$, 满足 $f(x+1)=2 f(x)$, 且当 $x \in(0,1]$ 时, $f(x)=x(x-1)$. 若对任意 $x \in(-\infty, m]$, 都有 $f(x) \geq-\frac{8}{9}$, 则 $m$ 的取值范围是
+options:
+  A: $\left(-\infty, \frac{9}{4}\right]$
+  B: $\left(-\infty, \frac{7}{3}\right]$
+  C: $\left(-\infty, \frac{5}{2}\right]$
+  D: $\left(-\infty, \frac{8}{3}\right]$
+answer: B

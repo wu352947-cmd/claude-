@@ -1,0 +1,25 @@
+type: solve
+source: 2026 天津卷 第 17 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+stem: |-
+  在长方体 $ABCD - A_1B_1C_1D_1$ 中，$AB = 2$，$AA_1 = 3$，$AD = 4$，$A_1E = 3ED_1$，$2C_1F = FC$。
+      (1) 求证：$BD \perp$ 面 $CEF$；
+      (2) 求面 $AEF$ 与面 $CEF$ 的夹角的余弦值；
+      (3) 求三棱锥 $A - CEF$ 的体积。
+parts:
+- label: (1)
+  points: 5.0
+  answer: 证明略
+- label: (2)
+  points: 5.0
+  answer: 余弦值为 $\frac{\sqrt{15}}{5}$
+- label: (3)
+  points: 5.0
+  answer: 体积为2
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 证明略；(2) 余弦值为 $\frac{\sqrt{15}}{5}$；(3) 体积为2

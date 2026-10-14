@@ -1,0 +1,26 @@
+type: single
+source: 2020 全国III卷（理科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $\cos C=\frac{2}{3}, A C=4, B C=3$, 则 $\cos B=(\quad)$
+options:
+  A: $\frac{1}{9}$
+  B: $\frac{1}{3}$
+  C: $\frac{1}{2}$
+  D: $\frac{2}{3}$
+answer: A
+solution: |-
+  【详解】 $\because$ 在 $\triangle A B C$ 中, $\cos C=\frac{2}{3}, A C=4, B C=3$
+
+  根据余弦定理: $A B^{2}=A C^{2}+B C^{2}-2 A C \cdot B C \cdot \cos C$ $A B^{2}=4^{2}+3^{2}-2 \times 4 \times 3 \times \frac{2}{3}$
+
+  可得 $A B^{2}=9$ ， 即 $A B=3$
+
+  由 $\because \cos B=\frac{A B^{2}+B C^{2}-A C^{2}}{2 A B \cdot B C}=\frac{9+9-16}{2 \times 3 \times 3}=\frac{1}{9}$
+
+  故 $\cos B=\frac{1}{9}$.
+
+  故选: A.

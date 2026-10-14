@@ -1,0 +1,15 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  prob.classical: 0.52
+  solid.sphere: 0.48
+difficulty_label: 较难
+points: 5.0
+stem: 有 6 个相同的球, 分别标有数字 $1,2,3,4,5,6$, 从中有放回的随机取两次, 每次取 1 个球, 甲表示 事件“第一次取出的球的数字是 1”，乙表示事件“第二次取出的球的数字是 2”，丙表示事件“两次取出的球的 数字之和是 8 ”, 丁表示事件“两次取出的球的数字之和是 7”, 则 ($\quad$)
+options:
+  A: 甲与丙相互独立
+  B: 甲与丁相互独立
+  C: 乙与丙相互独立
+  D: 丙与丁相互独立
+answer: B

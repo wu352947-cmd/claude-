@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国II卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  ineq.properties: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $a>b$, 则
+options:
+  A: $\ln (a-b)>0$
+  B: $3^{a}<3^{b}$
+  C: $a^{3}-b^{3}>0$
+  D: $|a|>|b|$
+answer: C
+solution: 【详解】取 $a=2, b=1$, 满足 $a>b, \ln (a-b)=0$, 知 $\mathrm{A}$ 错, 排除 $\mathrm{A}$; 因为 $9=3^{a}>3^{b}=3$, 知 B 错, 排除 B; 取 $a=1, b=-2$, 满足 $a>b, 1=|a|<|b|=2$, 知 $\mathrm{D}$ 错, 排除 $\mathrm{D}$, 因为 幂函数 $y=x^{3}$ 是增函数, $a>b$, 所以 $a^{3}>b^{3}$, 故选 C.

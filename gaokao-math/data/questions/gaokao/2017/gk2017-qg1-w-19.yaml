@@ -1,0 +1,53 @@
+type: solve
+source: 2017 全国I卷（文科） 第 19 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  stat.regression: 1.0
+difficulty_label: 中档
+stem: |-
+  为了监控某种零件的一条生产线的生产过程, 检验员每隔 30min 从该生产线上随机抽取一个零件, 并测量其尺寸（单位: $\mathrm{cm}$ ）. 下面是检验 员在一天内依次抽取的 16 个零件的尺寸:
+
+  $$\begin{array}{|c|c|c|c|c|c|c|c|c|}\hline \text{抽取次序} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 \\ \hline \text{零件尺寸} & 9.95 & 10.12 & 9.96 & 9.96 & 10.01 & 9.92 & 9.98 & 10.04 \\ \hline \text{抽取次序} & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 \\ \hline \text{零件尺寸} & 10.26 & 9.91 & 10.13 & 10.02 & 9.22 & 10.04 & 10.05 & 9.95 \\ \hline \end{array}$$
+
+  经计算得 $\bar{x}=\frac{1}{16} \sum_{i=1}^{16} x_{i}=9.97, s=\sqrt{\frac{1}{16} \sum_{i=1}^{16}\left(x_{i}-\bar{x}\right)^{2}}=\sqrt{\frac{1}{16}\left(\sum_{i=1}^{16} x_{i}{ }^{2}-16 \bar{x}^{2}\right)} \approx 0.212$,
+
+  $$
+  \sqrt{\sum_{i=1}^{16}(i-8.5)^{2}} \approx 18.439, \sum_{i=1}^{16}\left(x_{i}-\bar{x}\right) \quad(i-8.5)=-2.78 \text {, 其中 } x_{i} \text { 为抽取的第 }
+  $$
+
+  $\mathrm{i}$ 个零件的尺寸, $\mathrm{i}=1,2, \ldots, 16$.
+
+  (1) 求 $\left(x_{i}, i\right)(i=1,2, \ldots, 16 ）$ 的相关系数 $r$, 并回答是否可以认为这一天 生产的零件尺寸不随生产过程的进行而系统地变大或变小（若 $|r|<0.25$, 则 可以认为零件的尺寸不随生产过程的进行而系统地变大或变小）.
+
+  （2）一天内抽检零件中, 如果出现了尺寸在 $(\bar{x}-3 s, \bar{x}+3 s)$ 之外的零件, 就认 为这条生产线在这一天的生产过程可能出现了异常情况, 需对当天的生产过 程进行检查.
+
+  （i ）从这一天抽检的结果看, 是否需对当天的生产过程进行检查?
+
+  (ii ) 在 ( $\overline{\mathrm{x}}-3 \mathrm{s}, \overline{\mathrm{x}}+3 \mathrm{s})$ 之外的数据称为离群值, 试剔除离群值, 估计这条生 产线当天生产的零件尺寸的均值与标准差.（精确到 0.01 ）
+
+  附: 样本 $\left(x_{i}, y_{i}\right) \quad(i=1,2, \ldots, n)$ 的相关系数 $r=\frac{\sum_{i=1}^{n}\left(x_{i}-\bar{x}\right)\left(y_{i}-\bar{y}\right)}{\sqrt{\sum_{i=1}^{n}\left(x_{i}-\bar{x}\right)^{2} \sqrt{\sum_{i=1}^{n}\left(y_{i}-\bar{y}\right)^{2}}}}$ , $\sqrt{0.008} \approx 0.09$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) $r=\frac{\sum_{i=1}^{16}\left(x_{i}-\bar{x}\right)(i-8.5)}{\sqrt{\sum_{i=1}^{16}\left(x_{i}-\bar{x}\right)^{2}} \sqrt{\sum_{i=1}^{16}(i-8.5)^{2}}}=\frac{-2.78}{0.212 \times \sqrt{16} \times 18.439}=-0.18$
+
+  $\because|r|<0.25, \therefore$ 可以认为这一天生产的零件尺寸不随生产过程的进行而系统地 变大或变小.
+
+  （2）（i） $\bar{x}=9.97, s=0.212, \therefore$ 合格零件尺寸范围是 $(9.334,10.606 ）$,
+
+  显然第 13 号零件尺寸不在此范围之内，
+
+  $\therefore$ 需要对当天的生产过程进行检查.
+
+  （ii）剔除离群值后, 剩下的数据平均值为 $\frac{1}{15}(16 \times 9.97-9.22)=10.02$,
+
+  $\sum_{i=1}^{16} x_{i}^{2}=16 \times 0.212^{2}+16 \times 9.97^{2}=1591.134$
+
+  $\therefore$ 剔除离群值后样本方差为 $\frac{1}{15}\left(1591.134-9.22^{2}-15 \times 10.02^{2}\right)=0.008$,
+
+  $\therefore$ 剔除离群值后样本标准差为 $\sqrt{0.008} \approx 0.09$.

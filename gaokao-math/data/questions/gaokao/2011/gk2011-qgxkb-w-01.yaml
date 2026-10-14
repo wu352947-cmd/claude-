@@ -1,0 +1,22 @@
+type: single
+source: 2011 全国新课标卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $M=\{0,1 ， 2 ， 3 ， 4\}, N=\{1,3 ， 5\}, P=M \cap N$, 则 $P$ 的子 集共有 $(\quad)$
+options:
+  A: 2 个
+  B: 4 个
+  C: 6 个
+  D: 8 个
+answer: B
+solution: |-
+  解: $\because M=\{0,1,2,3,4\}, N=\{1,3,5\}$,
+
+  $\therefore P=M \cap N=\{1,3\}$
+
+  $\therefore P$ 的子集共有 $2^{2}=4$
+
+  故选：B.

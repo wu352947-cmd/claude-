@@ -1,0 +1,37 @@
+type: solve
+source: 2016 全国II卷（理科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+stem: |-
+  $S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 且 $a_{1}=1, S_{7}=28$, 记 $b_{n}=\left[\lg a_{n}\right]$, 其 中 $[\mathrm{x}]$ 表示不超过 $\mathrm{x}$ 的最大整数, 如 $[0.9]=0,[\lg 99]=1$.
+
+  (I) 求 $b_{1}, b_{11}, b_{101}$ ；
+
+  (II) 求数列 $\left\{b_{n}\right\}$ 的前 1000 项和.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) $s_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 且 $a_{1}=1, S_{7}=28,7 a_{4}=28$.
+
+  可得 $a_{4}=4$, 则公差 $d=1$.
+
+  $a_{n}=n$,
+
+  $b_{n}=[\operatorname{lgn}]$, 则 $b_{1}=[\lg 1]=0$,
+
+  $b_{11}=[\lg 11]=1$,
+
+  $\mathrm{b}_{101}=[\lg 101]=2$.
+
+  ( II ) 由 ( I ) 可知: $b_{1}=b_{2}=b_{3}=\ldots=b_{9}=0, b_{10}=b_{11}=b_{12}=\ldots=b_{99}=1$.
+
+  $b_{100}=b_{101}=b_{102}=b_{103}=\ldots=b_{999}=2, b_{10,00}=3$.
+
+  数列 $\left\{b_{n}\right\}$ 的前 1000 项和为: $9 \times 0+90 \times 1+900 \times 2+3=1893$.

@@ -1,0 +1,14 @@
+type: fill
+source: 2011 全国新课标卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\triangle A B C$ 中, $\angle B=120^{\circ}, A C=7, A B=5$, 则 $\triangle A B C$ 的面积为 ______
+answer: \frac{15 \sqrt{3}}{4}
+answer_kind: expr
+solution: |-
+  解: 由余弦定理可知 $\cos B=\frac{25+B C^{2}-49}{2 * B C * 5}=-\frac{1}{2}$, 求得 $B C=-8$ 或 3 (舍负)
+
+  $\therefore \triangle A B C$ 的面积为 $\frac{1}{2} \cdot A B \cdot B C \cdot \sin B=\frac{1}{2} \times 5 \times 3 \times \frac{\sqrt{3}}{2}=\frac{15 \sqrt{3}}{4}$ 故答案为: $\frac{15 \sqrt{3}}{4}$

@@ -1,0 +1,14 @@
+type: single
+source: 2009 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2009
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\{4,5,7,9\}, B=\{3,4,7,8,9\}$, 全集 $U=A \cup B$, 则集 合 $\complement_{U} (A \cap B)$ 中的元素共有 （$\qquad$）
+options:
+  A: 3 个
+  B: 4 个
+  C: 5 个
+  D: 6 个
+answer: A

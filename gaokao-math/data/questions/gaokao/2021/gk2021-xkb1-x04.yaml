@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '已知 $F_{1}, F_{2}$ 是椭圆 $C: \frac{x^{2}}{9}+\frac{y^{2}}{4}=1$ 的两个焦点, 点 $M$ 在 $C$ 上, 则 $\left|M F_{1}\right| \cdot\left|M F_{2}\right|$ 的最大值为 ($\quad$)'
+options:
+  A: '13'
+  B: '12'
+  C: '9'
+  D: '6'
+answer: C

@@ -1,0 +1,20 @@
+type: single
+source: 2013 全国I卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\left\{x \mid x^{2}-2 x>0\right\}, B=\{x \mid-\sqrt{5}<x<\sqrt{5}\}$, 则（）
+options:
+  A: $A \cap B=\emptyset$
+  B: $A \cup B=R$
+  C: $B \subseteq A$
+  D: $A \subseteq B$
+answer: B
+solution: |-
+  解: $\because$ 集合 $A=\left\{x \mid x^{2}-2 x>0\right\}=\{x \mid x>2$ 或 $x<0\}$,
+
+  $\therefore A \cap B=\{x \mid 2<x<\sqrt{5}$ 或 $-\sqrt{5}<x<0\}, A \cup B=R$,
+
+  故选: B.

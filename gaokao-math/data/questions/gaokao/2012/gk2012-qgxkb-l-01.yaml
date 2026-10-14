@@ -1,0 +1,26 @@
+type: single
+source: 2012 全国新课标卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{1,2,3,4,5\}, B=\{(x, y) \mid x \in A, y \in A, x-y \in A\}$, 则 $B$ 中所含元素的个数为（ $)$
+options:
+  A: '3'
+  B: '6'
+  C: '8'
+  D: '10'
+answer: D
+solution: |-
+  解: 由题意, $x=5$ 时, $y=1,2,3,4$,
+
+  $x=4$ 时 $, y=1,2,3$ ，
+
+  $x=3$ 时, $y=1,2$,
+
+  $x=2$ 时,$y=1$
+
+  综上知, $\mathrm{B}$ 中的元素个数为 10 个
+
+  故选: D.

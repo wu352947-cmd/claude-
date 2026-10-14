@@ -1,0 +1,23 @@
+type: solve
+source: 2026 北京卷 第 16 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  trig.graph: 1.0
+difficulty_label: 中档
+stem: |-
+  已知函数 $f(x) = 2\sin \omega x\cos \varphi +2\cos \omega x\sin \varphi$ ， $\omega >0$ ， $|\varphi |< \frac{\pi}{2}$ ， $f(x)$ 最小正周期为 $\pi$ ，且 $f(0) > 0$ ， $f(\frac{\pi}{4}) = 1$
+
+  (1) 求 $\omega$ 、 $\varphi$ 的值；
+
+  (2) 求 $f(x)$ 的单调递减区间。
+parts:
+- label: (1)
+  points: 5.0
+  answer: $\omega =2$
+- label: (2)
+  points: 5.0
+  answer: $\varphi =\frac{\pi}{3}$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $\omega =2$；(2) $\varphi =\frac{\pi}{3}$

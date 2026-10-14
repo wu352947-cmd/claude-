@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若曲线 $y=x^{-\frac{1}{2}}$ 在点  $\left( a, a^{-\frac{1}{2}}\right)$ 处的切线与两个坐标围成的三角形 的面积为 18 , 则 $a=$ ($\qquad$)
+options:
+  A: '64'
+  B: '32'
+  C: '16'
+  D: '8'
+answer: D

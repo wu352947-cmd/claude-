@@ -1,0 +1,28 @@
+type: single
+source: 2017 全国II卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '过抛物线 $C: y^{2}=4 x$ 的焦点 $F$, 且斜率为 $\sqrt{3}$ 的直线交 $C$ 于点 $M(M$ 在 $x$ 轴上方), 1 为 $C$ 的准线, 点 $N$ 在 $I$ 上, 且 $M N \perp 1$, 则 $M$ 到直线 $N F$ 的距 离为 $(\quad)$'
+options:
+  A: $\sqrt{5}$
+  B: $2 \sqrt{2}$
+  C: $2 \sqrt{3}$
+  D: $3 \sqrt{3}$
+answer: C
+solution: |-
+  解 抛物线 $C: y^{2}=4 x$ 的焦点 $F(1,0)$, 且斜率为 $\sqrt{3}$ 的直线 $y=\sqrt{3}(x-1$ )
+
+  过抛物线 $C: y^{2}=4 x$ 的焦点 $F$, 且斜率为 $\sqrt{3}$ 的直线交 $C$ 于点 $M(M$ 在 $x$ 轴上方),
+
+  I
+
+  可知: $\left\{\begin{array}{l}y^{2}=4 x \\ y=\sqrt{3}(x-1)\end{array}\right.$, 解得 $M(3,2 \sqrt{3})$.
+
+  可得 $N(-1,2 \sqrt{3}), N F$ 的方程为: $y=-\sqrt{3}(x-1)$, 即 $\sqrt{3} x+y-\sqrt{3}=0$,
+
+  则 $M$ 到直线 NF 的距离为: $\frac{|3 \sqrt{3}+2 \sqrt{3}-\sqrt{3}|}{\sqrt{3+1}}=2 \sqrt{3}$.
+
+  故选: C.

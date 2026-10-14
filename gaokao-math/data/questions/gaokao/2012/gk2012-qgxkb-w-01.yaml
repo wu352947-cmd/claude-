@@ -1,0 +1,24 @@
+type: single
+source: 2012 全国新课标卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\left\{x \mid x^{2}-x-2<0\right\}, B=\{x \mid-1<x<1\}$, 则（）
+options:
+  A: $A \subsetneq B$
+  B: $\mathrm{B} \subsetneq \mathrm{A}$
+  C: $A=B$
+  D: $A \cap B=\varnothing$
+answer: B
+solution: |-
+  解：由题意可得, $A=\{x \mid-1<x<2\}$,
+
+  $\because B=\{x \mid-1<x<1\}$
+
+  在集合 $B$ 中的元素都属于集合 $A$, 但是在集合 $A$ 中的元素不一定在集合 $B$ 中, 例 如 $x=\frac{3}{2}$
+
+  $\therefore B \subsetneq A$.
+
+  故选: B.

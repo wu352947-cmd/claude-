@@ -1,0 +1,16 @@
+type: single
+source: 2019 全国II卷 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.parabola: 0.59
+  conic.ellipse: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 若抛物线 $y^{2}=2 p x \quad(p>0)$ 的焦点是椭圆 $\frac{x^{2}}{3 p}+\frac{y^{2}}{p}=1$ 的一个焦点, 则 $p=$
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '8'
+answer: D
+solution: 【详解】因为抛物线 $y^{2}=2 p x(p>0)$ 的焦点 $\left(\frac{p}{2}, 0\right)$ 是椭圆 $\frac{x^{2}}{3 p}+\frac{y^{2}}{p}=1$ 的一个焦点, 所以 $3 p-p=\left(\frac{p}{2}\right)^{2}$, 解得 $p=8$, 故选 D.

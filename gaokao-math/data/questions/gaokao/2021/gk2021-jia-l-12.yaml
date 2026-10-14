@@ -1,0 +1,42 @@
+type: single
+source: 2021 全国甲卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  func.parity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)$ 的定义域为 $\mathbf{R}, f(x+1)$ 为奇函数, $f(x+2)$ 为偶函数, 当 $x \in[1,2]$ 时, $f(x)=a x^{2}+b$. 若 $f(0)+f(3)=6$, 则 $f\left(\frac{9}{2}\right)=(\quad)$
+options:
+  A: $-\frac{9}{4}$
+  B: $-\frac{3}{2}$
+  C: $\frac{7}{4}$
+  D: $\frac{5}{2}$
+answer: D
+solution: |-
+  【详解】因为 $f(x+1)$ 是奇函数, 所以 $f(-x+1)=-f(x+1)$ (1);
+
+  因为 $f(x+2)$ 是偶函数, 所以 $f(x+2)=f(-x+2)(2)$.
+
+  令 $x=1$, 由(1)得: $f(0)=-f(2)=-(4 a+b)$, 由(2)得： $f(3)=f(1)=a+b$,
+
+  因为 $f(0)+f(3)=6$, 所以 $-(4 a+b)+a+b=6 \Rightarrow a=-2$,
+
+  令 $x=0$, 由(1)得: $f(1)=-f(1) \Rightarrow f(1)=0 \Rightarrow b=2$, 所以 $f(x)=-2 x^{2}+2$.
+
+  思路一: 从定义人手.
+
+  $f\left(\frac{9}{2}\right)=f\left(\frac{5}{2}+2\right)=f\left(-\frac{5}{2}+2\right)=f\left(-\frac{1}{2}\right)$
+
+  $f\left(-\frac{1}{2}\right)=f\left(-\frac{3}{2}+1\right)=-f\left(\frac{3}{2}+1\right)=-f\left(\frac{5}{2}\right)$
+
+  $-f\left(\frac{5}{2}\right)=-f\left(\frac{1}{2}+2\right)=-f\left(-\frac{1}{2}+2\right)=-f\left(\frac{3}{2}\right)$
+
+  所以 $f\left(\frac{9}{2}\right)=-f\left(\frac{3}{2}\right)=\frac{5}{2}$.
+
+  思路二: 从周期性人手
+
+  由两个对称性可知, 函数 $f(x)$ 的周期 $T=4$.
+
+  所以 $f\left(\frac{9}{2}\right)=f\left(\frac{1}{2}\right)=-f\left(\frac{3}{2}\right)=\frac{5}{2}$.
+
+  故选: D.

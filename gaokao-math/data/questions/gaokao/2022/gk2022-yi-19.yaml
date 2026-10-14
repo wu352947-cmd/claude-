@@ -1,0 +1,59 @@
+type: solve
+source: 2022 全国乙卷 第 19 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  stat.regression: 1.0
+difficulty_label: 中档
+stem: |-
+  某地经过多年的环境治理, 已将荒山改造成了绿水青山. 为估计一林区某种树木的总材 积量, 随机选取了 10 棵这种树木, 测量每棵树的根部横截面积 (单位: $\mathrm{m}^{2}$ ) 和材积量 (单 位: $\left.m^{3}\right)$, 得到如下数据:
+
+  $$\begin{array}{|l|l|l|l|l|l|l|l|l|l|l|l|}\hline \text{样本号 i} & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & \text{总和} \\ \hline \text{根部横截面积} x_{\mathrm{i}} & 0.04 & 0.06 & 0.04 & 0.08 & 0.08 & 0.05 & 0.05 & 0.07 & 0.07 & 0.06 & 0.6 \\ \hline \text{材积量} y_{i} & 0.25 & 0.40 & 0.22 & 0.54 & 0.51 & 0.34 & 0.36 & 0.46 & 0.42 & 0.40 & 3.9 \\ \hline \end{array}$$
+
+  并计算得 $\sum_{\mathrm{i}=1}^{10} x_{\mathrm{i}}^{2}=0.038, \sum_{\mathrm{i}=1}^{10} y_{\mathrm{i}}^{2}=1.6158, \sum_{\mathrm{i}=1}^{10} x_{\mathrm{i}} y_{\mathrm{i}}=0.2474$.
+
+  （1）估计该林区这种树木平均一棵的根部横截面积与平均一棵的材积量;
+
+  (2) 求该林区这种树木的根部横截面积与材积量的样本相关系数 (精确到 0.01 );
+
+  (3) 现测量了该林区所有这种树木的根部横截面积, 并得到所有这种树木的根部横截面积 总和为 $186 \mathrm{m}^{2}$. 已知树木的材积量与其根部横截面积近似成正比. 利用以上数据给出该林 区这种树木的总材积量的估计值.
+
+  附: 相关系数 $r=\frac{\sum_{\mathrm{i}=1}^{n}\left(x_{\mathrm{i}}-\bar{x}\right)\left(y_{\mathrm{i}}-\bar{y}\right)}{\sqrt{\sum_{\mathrm{i}=1}^{n}\left(x_{\mathrm{i}}-\bar{x}\right)^{2} \sum_{\mathrm{i}=1}^{n}\left(y_{\mathrm{i}}-\bar{y}\right)^{2}}}, \sqrt{1.896} \approx 1.377$.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  样本中 10 棵这种树木的根部横截面积的平均值 $\bar{x}=\frac{0.6}{10}=0.06$
+
+  样本中 10 棵这种树木的材积量的平均值 $\bar{y}=\frac{3.9}{10}=0.39$
+
+  据此可估计该林区这种树木平均一棵的根部横截面积为 $0.06 \mathrm{m}^{2}$,
+
+  平均一棵的材积量为 $0.39 \mathrm{m}^{3}$
+
+  【小问 2 详解】
+
+  $$
+  \begin{gathered}
+  r=\frac{\sum_{\mathrm{i}=1}^{10}\left(x_{\mathrm{i}}-\bar{x}\right)\left(y_{\mathrm{i}}-\bar{y}\right)}{\sqrt{\sum_{\mathrm{i}=1}^{10}\left(x_{\mathrm{i}}-\bar{x}\right)^{2} \sum_{\mathrm{i}=1}^{10}\left(y_{\mathrm{i}}-\bar{y}\right)^{2}}}=\frac{\sum_{\mathrm{i}=1}^{10} x_{\mathrm{i}} y_{\mathrm{i}}-10 \overline{x y}}{\sqrt{\left(\sum_{\mathrm{i}=1}^{10} x_{\mathrm{i}}^{2}-10 \bar{x}^{2}\right)\left(\sum_{\mathrm{i}=1}^{10} y_{\mathrm{i}}^{2}-10 \bar{y}^{2}\right)}} \\
+  =\frac{0.2474-10 \times 0.06 \times 0.39}{\sqrt{\left(0.038-10 \times 0.06^{2}\right)\left(1.6158-10 \times 0.39^{2}\right)}}=\frac{0.0134}{\sqrt{0.0001896}} \approx \frac{0.0134}{0.01377} \approx 0.97
+  \end{gathered}
+  $$
+
+  则 $r \approx 0.97$
+
+  【小问 3 详解】
+
+  设该林区这种树木的总材积量的估计值为 $Y \mathrm{m}^{3}$, 又已知树木的材积量与其根部横截面积近似成正比,
+
+  可得 $\frac{0.06}{0.39}=\frac{186}{Y}$, 解之得 $Y=1209 \mathrm{m}^{3}$.
+
+  则该林区这种树木的总材积量估计为 $1209 \mathrm{m}^{3}$

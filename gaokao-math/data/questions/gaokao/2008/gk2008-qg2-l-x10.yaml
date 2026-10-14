@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  solid.vector: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知正四棱锥 $S-A B C D$ 的侧棱长与底面边长都相等, $E$ 是 $S B$ 的中 点, 则 $A E$、 $S D$ 所成的角的余弦值为($\qquad$)
+options:
+  A: $\frac{1}{3}$
+  B: $\frac{\sqrt{2}}{3}$
+  C: $\frac{\sqrt{3}}{3}$
+  D: $\frac{2}{3}$
+answer: C

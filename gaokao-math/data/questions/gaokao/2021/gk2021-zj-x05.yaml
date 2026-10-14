@@ -1,0 +1,16 @@
+type: single
+source: 2021 浙江卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  seq.geom: 0.33
+  conic.ellipse: 0.33
+  conic.hyperbola: 0.33
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $a, b \in \mathrm{R}, a b>0$, 函数 $f(x)=a x^{2}+b(x \in \mathrm{R})$. 若 $f(s-t), f(s), f(s+t)$ 成等比数列, 则平面上点 $(s, t)$ 的轨迹是 ($\quad$)
+options:
+  A: 直线和圆
+  B: 直线和椭圆
+  C: 直线和双曲线
+  D: 直线和抛物线
+answer: C

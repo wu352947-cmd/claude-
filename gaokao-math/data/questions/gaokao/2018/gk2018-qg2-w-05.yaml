@@ -1,0 +1,22 @@
+type: single
+source: 2018 全国II卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 从 2 名男同学和 3 名女同学中任选 2 人参加社区服务, 则选中的 2 人都是女同学的概率为 $(\quad)$
+options:
+  A: '0.6'
+  B: '0.5'
+  C: '0.4'
+  D: '0.3'
+answer: D
+solution: |-
+  解:（适合理科生）从 2 名男同学和 3 名女同学中任选 2 人参加社区服 务, 共有 $\mathrm{C}_{5}{ }^{2}=10$ 种, 其中全是女生的有 $\mathrm{C}_{3}{ }^{2}=3$ 种, 中的 2 人都是女同学的概率 $P=\frac{3}{10}=0.3$,
+
+  （适合文科生）, 设 2 名男生为 $a, b, 3$ 名女生为 $A, B, C$,
+
+  则任选 2 人的种数为 $a b, a A, a B, a C, b A, b B, B c, A B, A C, B C$ 共 10 种, 其 中全是女生为 $A B, A C, B C$ 共 3 种,
+
+  中的 2 人都是女同学的概率 $P=\frac{3}{10}=0.3$, 故选：D.

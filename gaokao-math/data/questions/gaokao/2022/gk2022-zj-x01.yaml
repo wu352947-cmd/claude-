@@ -1,0 +1,14 @@
+type: single
+source: 2022 浙江卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\{1,2\}, B=\{2,4,6\}$, 则 $A \cup B=(\qquad)$
+options:
+  A: $\{2\}$
+  B: $\{1,2\}$
+  C: $\{2,4,6\}$
+  D: $\{1,2,4,6\}$
+answer: B

@@ -1,0 +1,30 @@
+type: single
+source: 2020 全国I卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  circle.line: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '已知 $\odot M: x^{2}+y^{2}-2 x-2 y-2=0$, 直线 $l: 2 x+y+2=0, P$ 为 $l$ 上的动点, 过点 $P$ 作 $\odot M$ 的切 线 $P A, P B$, 切点为 $A, B$, 当 $|P M| \cdot|A B|$ 最小时, 直线 $A B$ 的方程为（ ()'
+options:
+  A: $2 x-y-1=0$
+  B: $2 x+y-1=0$
+  C: $2 x-y+1=0$
+  D: $2 x+y+1=0$
+answer: D
+solution: |-
+  【详解】圆的方程可化为 $(x-1)^{2}+(y-1)^{2}=4$, 点 $M$ 到直线 $l$ 的距离为 $d=\frac{|2 \times 1+1+2|}{\sqrt{2^{2}+1^{2}}}=\sqrt{5}>2$ , 所以直线 $l$ 与圆相离.
+
+  依圆的知识可知, 四点 $A, P, B, M$ 四点共圆, 且 $A B \perp M P$, 所以
+
+  $|P M| \cdot|A B|=2 S_{\triangle P A M}=2 \times \frac{1}{2} \times|P A| \times|A M|=2|P A|$, 而 $|P A|=\sqrt{|M P|^{2}-4}$ ，
+
+  当直线 $M P \perp l$ 时, $|M P|_{\min }=\sqrt{5},|P A|_{\min }=1$, 此时 $|P M| \cdot|A B|$ 最小.
+
+  $\therefore M P: y-1=\frac{1}{2}(x-1)$ 即 $y=\frac{1}{2} x+\frac{1}{2}$, 由 $\left\{\begin{array}{c}y=\frac{1}{2} x+\frac{1}{2} \\ 2 x+y+2=0\end{array}\right.$ 解得, $\left\{\begin{array}{l}x=-1 \\ y=0\end{array}\right.$.
+
+  所以以 $M P$ 为直径的圆的方程为 $(x-1)(x+1)+y(y-1)=0$, 即 $x^{2}+y^{2}-y-1=0$,
+
+  两圆的方程相减可得: $2 x+y+1=0$, 即为直线 $A B$ 的方程.
+
+  故选: D.

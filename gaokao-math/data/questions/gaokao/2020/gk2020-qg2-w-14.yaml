@@ -1,0 +1,30 @@
+type: fill
+source: 2020 全国II卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 记 $S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $a_{1}=-2, a_{2}+a_{6}=2$, 则 $S_{10}=$ ______
+answer: '25'
+answer_kind: expr
+solution: |-
+  【详解】 $\because\left\{a_{n}\right\}$ 是等差数列, 且 $a_{1}=-2, a_{2}+a_{6}=2$
+
+  设 $\left\{a_{n}\right\}$ 等差数列的公差 $d$
+
+  根据等差数列通项公式: $a_{n}=a_{1}+(n-1) d$
+
+  可得 $a_{1}+d+a_{1}+5 d=2$
+
+  即: $-2+d+(-2)+5 d=2$ 整理可得: $6 d=6$
+
+  解得: $d=1$
+
+  $\because$ 根据等差数列前 $n$ 项和公式: $S_{n}=n a_{1}+\frac{n(n-1)}{2} d, n \in N^{*}$
+
+  可得: $S_{10}=10(-2)+\frac{10 \times(10-1)}{2}=-20+45=25$
+
+  $\therefore S_{10}=25$.
+
+  故答案为: 25 .

@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  func.piecewise: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数 $f(x)=\left\{\begin{array}{l}-x^{2}+2 x, \quad x \leqslant 0 \\ \ln (x+1), \quad x>0, \text { 若 }|f(x)| \geqslant a x, \text { 则 } a \text { 的取值 }\end{array}\right.$ 范围是 （$\qquad$）
+options:
+  A: $(-\infty, 0]$
+  B: $(-\infty, 1]$
+  C: $[-2,1]$
+  D: $[-2,0]$
+answer: D

@@ -1,0 +1,16 @@
+type: single
+source: 2026 北京卷 第 5 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  func.parity: 0.4
+  func.domain_range: 0.33
+  trig.graph: 0.27
+difficulty_label: 中档
+points: 5.0
+stem: 下列函数 $f(x)$是奇函数且在定义域上单调递增的是( )
+options:
+  A: $f(x) = \frac{1}{x^{2} + 1}$
+  B: $f(x) = \sin x$
+  C: $f(x) = 2^{-x} - 2^{x}$
+  D: $f(x) = \ln {\frac{5 + x}{5 - x}}$
+answer: D

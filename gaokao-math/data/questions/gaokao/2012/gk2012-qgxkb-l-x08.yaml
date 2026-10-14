@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国新课标卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  solid.sphere: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知三棱锥 $S-A B C$ 的所有顶点都在球 $O$ 的表面上, $\triangle A B C$ 是边长 为 1 的正三角形, $S C$ 为球 $O$ 的直径, 且 $S C=2$, 则此三棱锥的体积为 （$\qquad $）
+options:
+  A: $\frac{1}{4}$
+  B: $\frac{\sqrt{2}}{4}$
+  C: $\frac{\sqrt{2}}{6}$
+  D: $\frac{\sqrt{2}}{12}$
+answer: C

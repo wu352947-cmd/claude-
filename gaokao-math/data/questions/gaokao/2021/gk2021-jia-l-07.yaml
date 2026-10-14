@@ -1,0 +1,22 @@
+type: single
+source: 2021 全国甲卷（理科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  logic.condition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$, 前 $n$ 项和为 $S_{n}$, 设甲: $q>0$, 乙: $\left\{S_{n}\right\}$ 是递增数列, 则 ( )'
+options:
+  A: 甲是乙的充分条件但不是必要条件
+  B: 甲是乙的必要条件但不是充分条件
+  C: 甲是乙的充要条件
+  D: 甲既不是乙的充分条件也不是乙的必要条件
+answer: B
+solution: |-
+  【详解】由题, 当数列为 $-2,-4,-8, \cdots$ 时, 满足 $q>0$,
+
+  但是 $\left\{S_{n}\right\}$ 不是递增数列, 所以甲不是乙的充分条件.
+
+  若 $\left\{S_{n}\right\}$ 是递增数列, 则必有 $a_{n}>0$ 成立, 若 $q>0$ 不成立, 则会出现一正一负的情况，是矛盾的, 则 $q>0$ 成立, 所以甲是乙的必要条件.
+
+  故选: B.

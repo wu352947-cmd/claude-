@@ -1,0 +1,16 @@
+type: single
+source: 2015 全国II卷 第 10 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2015
+kps:
+  func.graph: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 如图, 长方形 $A B C D$ 的边 $A B=2, B C=1, O$ 是 $A B$ 的中点, 点 $P$ 沿着边 $B C, C D$ 与 $D A$ 运动, 记 $\angle B O P=x$. 将动点 $P$ 到 $A, B$ 两点距离之和表示为 $x$的函数 $f(x)$, 则 $y=f(x)$ 的图象大致为 $(\quad)$
+figure: f1c7e195a27e135d.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: B
+solution: '解：当 $0 \leqslant x \leqslant \frac{\pi}{4}$ 时, $B P=\tan x, A P=\sqrt{A B^2+B P^2}=\sqrt{4+\tan ^2 x}$,此时 $f(x)=\sqrt{4+\tan ^2 x}+\tan x, 0 \leqslant x \leqslant \frac{\pi}{4}$, 此时单调递增,当 $P$ 在 $C D$ 边上运动时, $\frac{\pi}{4} \leqslant x \leqslant \frac{3 \pi}{4}$ 且 $x \neq \frac{\pi}{2}$ 时,如图所示, $\tan \angle P O B=\tan (\pi-\angle P O Q)=\tan x=-\tan \angle P O Q=-\frac{P Q}{O Q}=-\frac{1}{O Q}$, $\therefore O Q=-\frac{1}{\tan x}$,$\therefore P D=A O-O Q=1+\frac{1}{\tan x}, P C=B O+O Q=1-\frac{1}{\tan x}$,$\therefore P A+P B=\sqrt{\left(1-\frac{1}{\tan x}\right)^2+1}+\sqrt{\left(1+\frac{1}{\tan x}\right)^2+1}$,当 $x=\frac{\pi}{2}$ 时, $P A+P B=2 \sqrt{2}$,当 $P$ 在 $A D$ 边上运动时, $\frac{3 \pi}{4} \leqslant x \leqslant \pi, P A+P B=\sqrt{4+\tan ^2 x}-\tan x$,由对称性可知函数 $\mathrm{f}(\mathrm{x})$ 关于 $\mathrm{x}=\frac{\pi}{2}$ 对称,且 $f\left(\frac{\pi}{4}\right)>f\left(\frac{\pi}{2}\right)$, 且轨迹为非线型,排除 A, C, D,故选: B.'

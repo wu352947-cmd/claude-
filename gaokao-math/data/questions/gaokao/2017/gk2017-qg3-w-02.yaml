@@ -1,0 +1,18 @@
+type: single
+source: 2017 全国III卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  complex.geometry: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复平面内表示复数 $\mathrm{z}=\mathrm{i}(-2+\mathrm{i})$ 的点位于 $(\quad)$
+options:
+  A: 第一象限
+  B: 第二象限
+  C: 第三象限
+  D: 第四象限
+answer: C
+solution: |-
+  解: $z=i(-2+i)=-2 i-1$ 对应的点 $(-1,-2)$ 位于第三象限.
+
+  故选: C.

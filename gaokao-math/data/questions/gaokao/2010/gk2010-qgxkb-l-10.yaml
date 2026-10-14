@@ -1,0 +1,18 @@
+type: single
+source: 2010 全国新课标卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  solid.sphere: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设三棱柱的侧棱垂直于底面, 所有棱长都为 $a$, 顶点都在一个球面 上, 则该球的表面积为（）
+options:
+  A: $\pi a^{2}$
+  B: $\frac{7}{3} \pi a^{2}$
+  C: $\frac{11}{3} \pi a^{2}$
+  D: $5 \pi a^{2}$
+answer: B
+solution: |-
+  解：根据题意条件可知三棱柱是棱长都为 $\mathrm{a}$ 的正三棱柱, 上下底面中心 连 线的中点就是球心, 则其外接球的半径为 $R=\sqrt{\left(\frac{a}{2}\right)^{2}+\left(\frac{a}{2 \sin 60^{\circ}}\right)^{2}}=\sqrt{\frac{7}{12} a^{2}}$, 球的表面积为 $S=4 \pi \cdot \frac{7 a^{2}}{12}=\frac{7}{3} \pi a^{2}$,
+
+  故选: B.

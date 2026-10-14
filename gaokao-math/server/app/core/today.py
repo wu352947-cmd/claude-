@@ -7,6 +7,7 @@
    题目得分     = 优先级 × 难度贴合度（预测做对概率落在目标区间时为 1）
    同一知识点被选中后优先级减半，避免一天全是同一类题。
 3. 新题里留 settings.explore 道随机题，避免只刷推荐、视野变窄。
+4. 近几年的真题、新高考的卷子优先（见 recency_weight）；标记了「有问题」的题不推送。
 每道题都附一句推荐理由。
 """
 
@@ -19,7 +20,7 @@ from datetime import datetime
 
 from sqlmodel import Session, select
 
-from ..models import Attempt, KnowledgePoint, Mastery, Question, QuestionKp, ReviewCard
+from ..models import Attempt, KnowledgePoint, Mastery, Question, QuestionFlag, QuestionKp, ReviewCard
 from .mastery import effective_theta, predict, sigmoid
 
 ERROR_LABELS = {
@@ -32,6 +33,21 @@ FOCUS_FACTOR = 1.5
 REPEAT_PENALTY = 0.5
 
 
+def recency_weight(year: int | None) -> float:
+    """越新的真题越像今年的卷子：2021 年起的卷子不打折，越早的老高考题权重越低。自编题、变式题不打折。"""
+    if year is None or year >= 2021:
+        return 1.0
+    if year >= 2017:
+        return 0.85
+    if year >= 2013:
+        return 0.7
+    return 0.55
+
+
+def flagged_ids(session: Session) -> set[str]:
+    return set(session.exec(select(QuestionFlag.question_id)))
+
+
 def _days_since(dt: datetime | None, now: datetime) -> int | None:
     return None if dt is None else max(int((now - dt).total_seconds() // 86400), 0)
 
@@ -39,7 +55,9 @@ def _days_since(dt: datetime | None, now: datetime) -> int | None:
 def build_plan(session: Session, settings, now: datetime) -> dict:
     kps = {k.id: k for k in session.exec(select(KnowledgePoint).where(KnowledgePoint.active))}
     masteries = {m.kp_id: m for m in session.exec(select(Mastery))}
-    questions = {q.id: q for q in session.exec(select(Question).where(Question.active, Question.verified))}
+    flagged = flagged_ids(session)
+    questions = {q.id: q for q in session.exec(select(Question).where(Question.active, Question.verified))
+                 if q.id not in flagged}
     links: dict[str, dict[str, float]] = defaultdict(dict)
     for link in session.exec(select(QuestionKp)):
         links[link.question_id][link.kp_id] = link.weight
@@ -93,7 +111,7 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
         p = predict(weights, masteries, q.difficulty, now, settings.tau_days)
         fit = 1.0 if lo <= p <= hi else math.exp(-4 * (lo - p if p < lo else p - hi))
         main_kp = max(weights, key=lambda k: weights[k] * priority[k])
-        candidates.append({"q": q, "p": p, "fit": fit, "weights": weights, "main": main_kp})
+        candidates.append({"q": q, "p": p, "fit": fit * recency_weight(q.year), "weights": weights, "main": main_kp})
 
     picked = []
     used: dict[str, int] = defaultdict(int)

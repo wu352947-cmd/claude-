@@ -1,0 +1,15 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  trig.identities: 0.57
+  trig.definition: 0.43
+difficulty_label: 中档
+points: 5.0
+stem: 若 $\tan \theta=-2$, 则 $\frac{\sin \theta(1+\sin 2 \theta)}{\sin \theta+\cos \theta}=(\quad)$
+options:
+  A: $-\frac{6}{5}$
+  B: $-\frac{2}{5}$
+  C: $\frac{2}{5}$
+  D: $\frac{6}{5}$
+answer: C

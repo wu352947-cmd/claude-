@@ -1,0 +1,56 @@
+type: solve
+source: 2017 全国II卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.extremum: 0.56
+  deriv.construct: 0.44
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=a x^{2}-a x-x \ln x$, 且 $f(x) \geqslant 0$.
+
+  (1) 求 $a$;
+
+  (2) 证明: $f(x)$ 存在唯一的极大值点 $x_{0}$, 且 $e^{-2}<f\left(x_{0}\right)<2^{-2}$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  (1） 解: 因为 $f(x)=a x^{2}-a x-x \ln x=x(a x-a-\ln x)(x>0)$, 则 $f(x) \geqslant 0$ 等价于 $h(x)=a x-a-\ln x \geqslant 0$, 求导可知 $h^{\prime}(x)=a-\frac{1}{x}$. 则当 $a \leqslant 0$ 时 $h^{\prime}(x)<0$, 即 $y=h(x)$ 在 $(0,+\infty)$ 上单调递减, 所以当 $x_{0}>1$ 时, $h\left(x_{0}\right)<h(1)=0$, 矛盾, 故 $a>0$.
+
+  因为当 $0<x<\frac{1}{a}$ 时 $h^{\prime}(x)<0$ 、当 $x>\frac{1}{a}$ 时 $h^{\prime}(x)>0$, 所以 $h(x)_{\text {min }}=h\left(\frac{1}{a}\right)$,
+
+  又因为 $h(1)=a-a-\ln 1=0$,
+
+  所以 $\frac{1}{a}=1$, 解得 $a=1$;
+
+  另解: 因为 $f(1)=0$, 所以 $f(x) \geqslant 0$ 等价于 $f(x)$ 在 $x>0$ 时的最小值为 $f(1)$
+
+  所以等价于 $f(x)$ 在 $x=1$ 处是极小值, 所以解得 $a=1$;
+
+  （2）证明: 由（1）可知 $f(x)=x^{2}-x-x \ln x, f^{\prime}(x)=2 x-2-\ln x$,
+
+  令 $f^{\prime}(x)=0$, 可得 $2 x-2-\ln x=0$, 记 $t(x)=2 x-2-\ln x$, 则 $t^{\prime}(x)=2-\frac{1}{x}$, 令 $t^{\prime}(x)=0$, 解得: $x=\frac{1}{2}$,
+
+  所以 $\mathrm{t}(\mathrm{x})$ 在区间 $\left(0, \frac{1}{2}\right)$ 上单调递减, 在 $\left(\frac{1}{2},+\infty\right)$ 上单调递增,
+
+  所以 $\mathrm{t}(\mathrm{x})_{\min }=\mathrm{t}\left(\frac{1}{2}\right)=\ln 2-1<0$, 从而 $\mathrm{t}(\mathrm{x})=0$ 有解, 即 $\mathrm{f}^{\prime}(\mathrm{x})=0$ 存在两根 $\mathrm{x}_{0}$ $x_{2}$
+
+  且不妨设 $f^{\prime}(x)$ 在 $\left(0, x_{0}\right)$ 上为正、在 $\left(x_{0}, x_{2}\right)$ 上为负、在 $\left(x_{2},+\infty\right)$ 上为 正,
+
+  所以 $f(x)$ 必存在唯一极大值点 $x_{0}$, 且 $2 x_{0}-2-\ln x_{0}=0$,
+
+  所以 $f\left(x_{0}\right)=x_{0}^{2}-x_{0}-x_{0} \ln x_{0}=x_{0}^{2}-x_{0}+2 x_{0}-2 x_{0}^{2}=x_{0}-x_{0}^{2}$,
+
+  由 $x_{0}<\frac{1}{2}$ 可知 $f\left(x_{0}\right)<\left(x_{0}-x_{0}^{2}\right)_{\max }=-\frac{1}{2^{2}}+\frac{1}{2}=\frac{1}{4}$;
+
+  由 $\mathrm{f}^{\prime}\left(\frac{1}{\mathrm{e}}\right)<0$ 可知 $x_{0}<\frac{1}{\mathrm{e}}<\frac{1}{2}$,
+
+  所以 $f(x)$ 在 $\left(0, x_{0}\right)$ 上单调递增, 在 $\left(x_{0}, \frac{1}{e}\right)$ 上单调递减,
+
+  所以 $f\left(x_{0}\right)>f\left(\frac{1}{e}\right)=\frac{1}{e^{2}}$;
+
+  综上所述, $f(x)$ 存在唯一的极大值点 $x_{0}$, 且 $e^{-2}<f\left(x_{0}\right)<2^{-2}$.

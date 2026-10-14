@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  func.symmetry: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\frac{1}{x}-x$ 的图象关于($\qquad$)
+options:
+  A: $y$ 轴对称
+  B: 直线 $y=-x$ 对称
+  C: 坐标原点对称
+  D: 直线 $y=x$ 对称
+answer: C

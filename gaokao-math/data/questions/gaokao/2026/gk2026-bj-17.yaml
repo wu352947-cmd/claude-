@@ -1,0 +1,33 @@
+type: solve
+source: 2026 北京卷 第 17 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  expo.compare: 0.38
+  count.perm_comb: 0.36
+  prob.classical: 0.26
+difficulty_label: 中档
+stem: |-
+  现从全校学生中随机抽取200人统计数学成绩，成绩分组及对应人数如下：
+
+  $$\begin{array}{|c|c|c|c|c|c|}\hline \text{成绩分组} & [81,94) & [94,107) & [107,120) & [120,135) & [135,150] \\ \hline \text{人数} & 40 & 60 & 60 & 32 & 8 \\ \hline\end{array}$$
+  以频率估计概率，完成下列问题：
+
+  (1) 求数学成绩低于120分的概率；
+
+  (2) 从学校随机抽取4人，求2人不低于120且2人小于94的概率；
+
+  (3) 每组数据取左端、中间、右端，比较 $s_{\text{左}}^2$ 、 $s_{\text{中}}^2$ 、 $s_{\text{右}}^2$ 的大小关系。
+parts:
+- label: (1)
+  points: 4.0
+  answer: $ 0.8$
+- label: (2)
+  points: 4.0
+  answer: $\frac{6}{625}$
+- label: (3)
+  points: 4.0
+  answer: $s_{\text{左}}^2 < s_{\text{中}}^2 < s_{\text{右}}^2$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $ 0.8$；(2) $\frac{6}{625}$；(3) $s_{\text{左}}^2 < s_{\text{中}}^2 < s_{\text{右}}^2$

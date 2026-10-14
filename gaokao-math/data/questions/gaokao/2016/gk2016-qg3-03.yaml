@@ -1,0 +1,24 @@
+type: single
+source: 2016 全国III卷 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\overrightarrow{\mathrm{BA}}=\left(\frac{1}{2}, \frac{\sqrt{3}}{2}\right), \overrightarrow{\mathrm{BC}}=\left(\frac{\sqrt{3}}{2}, \frac{1}{2}\right)$, 则 $\angle \mathrm{ABC}=(\quad)$
+options:
+  A: $30^{\circ}$
+  B: $45^{\circ}$
+  C: $60^{\circ}$
+  D: $120^{\circ}$
+answer: A
+solution: |-
+  解: $\overrightarrow{\mathrm{BA}} \cdot \overrightarrow{\mathrm{BC}}=\frac{\sqrt{3}}{4}+\frac{\sqrt{3}}{4}=\frac{\sqrt{3}}{2},|\overrightarrow{\mathrm{BA}}|=|\overrightarrow{\mathrm{BC}}|=1$;
+
+  $\therefore \cos \angle \mathrm{ABC}=\frac{\overrightarrow{\mathrm{BA}} \cdot \overrightarrow{\mathrm{BC}}}{|\overrightarrow{\mathrm{BA}}||\overrightarrow{\mathrm{BC}}|}=\frac{\sqrt{3}}{2}$;
+
+  又 $0^{\circ} \leqslant \angle A B C \leqslant 180^{\circ}$;
+
+  $\therefore \angle \mathrm{ABC}=30^{\circ}$.
+
+  故选: A.

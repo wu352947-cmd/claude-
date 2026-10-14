@@ -1,0 +1,14 @@
+type: single
+source: 2022 浙江卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  expo.ops: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $2^{a}=5, \log _{8} 3=b$, 则 $4^{a-3 b}=(\qquad)$
+options:
+  A: '25'
+  B: '5'
+  C: $\frac{25}{9}$
+  D: $\frac{5}{3}$
+answer: C

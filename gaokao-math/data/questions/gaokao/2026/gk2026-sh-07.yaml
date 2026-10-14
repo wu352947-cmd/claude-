@@ -1,0 +1,10 @@
+type: fill
+source: 2026 上海卷 第 7 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  ineq.mean: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知$a^2+4b^2=1$，则$ab$的最大值为$\underline{\quad\quad}$。
+answer: \frac{1}{4}
+answer_kind: expr

@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国III卷 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  seq.geom: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知各项均为正数的等比数列 $\left\{a_{n}\right\}$ 的前 4 项和为 15 , 且 $a_{5}=3 a_{3}+4 a_{1}$, 则 $a_{3}=(\quad)$
+options:
+  A: '16'
+  B: '8'
+  C: '4'
+  D: '2'
+answer: C
+solution: 【详解】设正数的等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$, 则 $\left\{\begin{array}{l}a_{1}+a_{1} q+a_{1} q^{2}+a_{1} q^{3}=15 \text {, } \\ a_{1} q^{4}=3 a_{1} q^{2}+4 a_{1}\end{array}\right.$, 解得 $\left\{\begin{array}{l}a_{1}=1, \\ q=2\end{array}, \therefore a_{3}=a_{1} q^{2}=4\right.$, 故选 C.

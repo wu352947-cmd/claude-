@@ -1,0 +1,24 @@
+type: fill
+source: 2016 全国II卷 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 若 $\cos A=\frac{4}{5}, \cos C=\frac{5}{13}$ , $a=1$, 则 $b=$ ______
+answer: \frac{21}{13}
+answer_kind: expr
+solution: |-
+  解: 由 $\cos A=\frac{4}{5}, \cos C=\frac{5}{13}$, 可得
+
+  $\sin A=\sqrt{1-\cos ^{2} \mathrm{A}}=\sqrt{1-\frac{16}{25}}=\frac{3}{5}$,
+
+  $\sin \mathrm{C}=\sqrt{1-\cos ^{2} \mathrm{C}}=\sqrt{1-\frac{25}{169}}=\frac{12}{13}$,
+
+  $\sin B=\sin (A+C)=\sin A \cos C+\cos A \sin C=\frac{3}{5} \times \frac{5}{13}+\frac{4}{5} \times \frac{12}{13}=\frac{63}{65}$,
+
+  由正弦定理可得 $b=\frac{a \sin B}{\sin A}$
+
+  $=\frac{1 \times \frac{63}{65}}{\frac{3}{5}}=\frac{21}{13}$.
+
+  故答案为: $\frac{21}{13}$.

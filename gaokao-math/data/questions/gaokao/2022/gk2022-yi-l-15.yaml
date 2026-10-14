@@ -1,0 +1,24 @@
+type: fill
+source: 2022 全国乙卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  trig.graph: 0.41
+  func.zeros: 0.35
+  func.symmetry: 0.24
+difficulty_label: 中档
+points: 5.0
+stem: 记函数 $f(x)=\cos (\omega x+\varphi)(\omega>0,0<\varphi<\pi)$ 的最小正周期为 $T$, 若 $f(T)=\frac{\sqrt{3}}{2}$, $x=\frac{\pi}{9}$ 为 $f(x)$ 的零点, 则 $\omega$ 的最小值为 ______
+answer: '3'
+answer_kind: expr
+solution: |-
+  【详解】解：因为 $f(x)=\cos (\omega x+\varphi),(\omega>0,0<\varphi<\pi)$
+
+  所以最小正周期 $T=\frac{2 \pi}{\omega}$, 因为 $f(T)=\cos \left(\omega \cdot \frac{2 \pi}{\omega}+\varphi\right)=\cos (2 \pi+\varphi)=\cos \varphi=\frac{\sqrt{3}}{2}$,
+
+  又 $0<\varphi<\pi$, 所以 $\varphi=\frac{\pi}{6}$, 即 $f(x)=\cos \left(\omega x+\frac{\pi}{6}\right)$,
+
+  又 $x=\frac{\pi}{9}$ 为 $f(x)$ 的零点, 所以 $\frac{\pi}{9} \omega+\frac{\pi}{6}=\frac{\pi}{2}+k \pi, k \in Z$, 解得 $\omega=3+9 k, k \in Z$,
+
+  因为 $\omega>0$, 所以当 $k=0$ 时 $\omega_{\text {min }}=3$;
+
+  故答案为: 3

@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  solid.sphere: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知正四棱锥的侧棱长为 $l$, 其各顶点都在同一球面上. 若该球的体积为 $36 \pi$, 且 $3 \leq l \leq 3 \sqrt{3}$, 则该正四棱锥体积的取值范围是 ($\qquad$)
+options:
+  A: $\left[18, \frac{81}{4}\right]$
+  B: $\left[\frac{27}{4}, \frac{81}{4}\right]$
+  C: $\left[\frac{27}{4}, \frac{64}{3}\right]$
+  D: '[18, 27]'
+answer: C

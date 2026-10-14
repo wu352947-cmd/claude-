@@ -1,0 +1,43 @@
+type: solve
+source: 2017 全国III卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=x-1-a \ln x$. (1) 若 $f(x) \geqslant 0$, 求 $a$ 的值;
+
+  （2）设 $m$ 为整数，且对于任意正整数 $n,\left(1+\frac{1}{2}\right)\left(1+\frac{1}{2^{2}}\right) \cdots\left(1+\frac{1}{2^{n}}\right)<m$, 求 $m$ 的最小值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 因为函数 $f(x)=x-1-\operatorname{aln} x, x>0$,
+
+  所以 $f^{\prime}(x)=1-\frac{a}{x}=\frac{x-a}{x}$, 且 $f(1)=0$.
+
+  所以当 $a \leqslant 0$ 时 $f^{\prime}(x)>0$ 恒成立, 此时 $y=f(x)$ 在 $(0,+\infty)$ 上单调递增, 这 与 $f(x) \geqslant 0$ 矛盾;
+
+  当 $a>0$ 时令 $f^{\prime}(x)=0$, 解得 $x=a$,
+
+  所以 $y=f(x)$ 在 $(0, a)$ 上单调递减, 在 $(a,+\infty)$ 上单调递增, 即 $f(x) \min ^{=} f$ (a)
+
+  若 $a \neq 1$, 则 $f(a)<f(1)=0$, 从而与 $f(x) \geqslant 0$ 矛盾;
+
+  所以 $a=1$;
+
+  (2) 由 (1) 可知当 $a=1$ 时 $f(x)=x-1-\ln x \geqslant 0$, 即 $\ln x \leqslant x-1$, 所以 $\ln (x+1) \leqslant x$ 当且仅当 $x=0$ 时取等号,
+
+  所以 $\ln \left(1+\frac{1}{2^{\mathrm{k}}}\right)<\frac{1}{2^{\mathrm{k}}}, k \in N^{*}$.
+
+  $\ln \left(1+\frac{1}{2}\right)+\ln \left(1+\frac{1}{2^{2}}\right)+\ldots+\ln \left(1+\frac{1}{2^{n}}\right)<\frac{1}{2}+\frac{1}{2^{2}}+\ldots+\frac{1}{2^{n}}=1-\frac{1}{2^{n}}<1$,
+
+  即 $\left(1+\frac{1}{2}\right)\left(1+\frac{1}{2^{2}}\right) \cdots\left(1+\frac{1}{2^{n}}\right)<e$;
+
+  因为 $m$ 为整数, 且对于任意正整数 $n,\left(1+\frac{1}{2}\right)\left(1+\frac{1}{2^{2}}\right) \cdots\left(1+\frac{1}{2^{n}}\right)<m$ 成立, 当 $n=3$ 时, 不等式左边大于 2 ,
+
+  所以 $m$ 的最小值为 3 .

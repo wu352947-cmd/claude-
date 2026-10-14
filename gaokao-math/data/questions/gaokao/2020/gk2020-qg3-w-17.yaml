@@ -1,0 +1,37 @@
+type: solve
+source: 2020 全国III卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.geom: 1.0
+difficulty_label: 中档
+stem: |-
+  设等比数列 $\left\{a_{n}\right\}$ 满足 $a_{1}+a_{2}=4, a_{3}-a_{1}=8$.
+
+  (1) 求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 记 $S_{n}$ 为数列 $\left\{\log _{3} a_{n}\right\}$ 的前 $n$ 项和. 若 $S_{m}+S_{m+1}=S_{m+3}$, 求 $m$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【分析】
+
+  (1) 设等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$, 根据题意, 列出方程组, 求得首项和公比, 进而求得通项 公式;
+
+  (2) 由（1）求出 $\left\{\log _{3} a_{n}\right\}$ 的通项公式, 利用等差数列求和公式求得 $S_{n}$, 根据已知列出关于 $m$ 的等量关系式, 求得结果.
+
+  【详解】(1) 设等比数列 $\left\{a_{n}\right\}$ 的公比为 $q$,
+
+  根据题意, 有 $\left\{\begin{array}{l}a_{1}+a_{1} q=4 \\ a_{1} q^{2}-a_{1}=8\end{array}\right.$, 解得 $\left\{\begin{array}{l}a_{1}=1 \\ q=3\end{array}\right.$, 所以 $a_{n}=3^{n-1}$;
+
+  (2) 令 $b_{n}=\log _{3} a_{n}=\log _{3} 3^{n-1}=n-1$,
+
+  所以 $S_{n}=\frac{n(0+n-1)}{2}=\frac{n(n-1)}{2}$ ，
+
+  根据 $S_{m}+S_{m+1}=S_{m+3}$, 可得 $\frac{m(m-1)}{2}+\frac{m(m+1)}{2}=\frac{(m+2)(m+3)}{2}$ ，
+
+  整理得 $m^{2}-5 m-6=0$, 因为 $m>0$, 所以 $m=6$,

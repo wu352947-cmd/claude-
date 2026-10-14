@@ -1,0 +1,24 @@
+type: single
+source: 2013 全国II卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  tri.laws: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $b=2, B=\frac{\pi}{6}, C=$ $\frac{\pi}{4}$, 则 $\triangle A B C$ 的面积为 $(\quad)$
+options:
+  A: $2 \sqrt{3}+2$
+  B: $\sqrt{3}+1$
+  C: $2 \sqrt{3}-2$
+  D: $\sqrt{3}-1$
+answer: B
+solution: |-
+  解： $\because b=2, B=\frac{\pi}{6}, C=\frac{\pi}{4}$,
+
+  $\therefore$ 由正弦定理 $\frac{b}{\sin B}=\frac{c}{\sin C}$ 得: $c=\frac{b \sin C}{\sin B}=\frac{2 \times \frac{\sqrt{2}}{2}}{\frac{1}{2}}=2 \sqrt{2}, A=\frac{7 \pi}{12}$,
+
+  $\therefore \sin A=\sin \left(\frac{\pi}{2}+\frac{\pi}{12}\right)=\cos \frac{\pi}{12}=\frac{\sqrt{2}+\sqrt{6}}{4}$,
+
+  则 $S_{\triangle A B C}=\frac{1}{2} b c \sin A=\frac{1}{2} \times 2 \times 2 \sqrt{2} \times \frac{\sqrt{2}+\sqrt{6}}{4}=\sqrt{3}+1$.
+
+  故选: B.

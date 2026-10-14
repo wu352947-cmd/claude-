@@ -1,0 +1,26 @@
+type: single
+source: 2010 全国新课标卷 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  func.parity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设偶函数 $f(x)$ 满足 $f(x)=2^{x}-4(x \geqslant 0)$, 则 $\{x \mid f(x-2)>0\}=($ )
+options:
+  A: $\{x \mid x<-2$ 或 $x>4\}$
+  B: $\{x \mid x<0$ 或 $x>4\}$
+  C: $\{x \mid x<0$ 或 $x>6\}$
+  D: $\{x \mid x<-2$ 或 $x>2\}$
+answer: B
+solution: |-
+  解：由偶函数 $f(x)$ 满足 $f(x)=2^{x}-4(x \geqslant 0)$, 可得 $f(x)=f(|x|)$ $=2^{|x|}-4$,
+
+  则 $f(x-2)=f(|x-2|)=2^{|x-2|}-4$, 要使 $f(|x-2|)>0$, 只需 $2^{|x-2|}-4>0$,
+
+  $$
+  |x-2|>2
+  $$
+
+  解得 $x>4$, 或 $x<0$.
+
+  应选: B.

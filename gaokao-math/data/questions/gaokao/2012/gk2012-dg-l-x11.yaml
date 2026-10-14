@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 将字母 $a, a, b, b, c, c$ 排成三行两列, 要求每行的字母互不相 同, 每列的字母也互不相同, 则不同的排列方法共有 ($\qquad$)
+options:
+  A: 12 种
+  B: 18 种
+  C: 24 种
+  D: 36 种
+answer: A

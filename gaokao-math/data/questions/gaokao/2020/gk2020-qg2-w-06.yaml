@@ -1,0 +1,24 @@
+type: single
+source: 2020 全国II卷（文科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.geom: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 记 $S_{n}$ 为等比数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $a_{5}-a_{3}=12, a_{6}-a_{4}=24$, 则 $\frac{S_{n}}{a_{n}}=(\quad)$
+options:
+  A: $2^{n}-1$
+  B: $2-2^{1-n}$
+  C: $2-2^{n-1}$
+  D: $2^{1-n}-1$
+answer: B
+solution: |-
+  【详解】设等比数列的公比为 $q$,
+
+  由 $a_{5}-a_{3}=12, a_{6}-a_{4}=24$ 可得: $\left\{\begin{array}{l}a_{1} q^{4}-a_{1} q^{2}=12 \\ a_{1} q^{5}-a_{1} q^{3}=24\end{array} \Rightarrow\left\{\begin{array}{l}q=2 \\ a_{1}=1\end{array}\right.\right.$,
+
+  所以 $a_{n}=a_{1} q^{n-1}=2^{n-1}, S_{n}=\frac{a_{1}\left(1-q^{n}\right)}{1-q}=\frac{1-2^{n}}{1-2}=2^{n}-1$,
+
+  因此 $\frac{S_{n}}{a_{n}}=\frac{2^{n}-1}{2^{n-1}}=2-2^{1-n}$.
+
+  故选: B.

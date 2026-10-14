@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  expo.ops: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $y=\frac{1+\ln (x-1)}{2}(x>1)$ 的反函数是 ($\qquad$)
+options:
+  A: $y=e^{2 x-1}-1(x>0)$
+  B: $y=e^{2 x-1}+1 \quad(x>0)$
+  C: $y=e^{2 x-1}-1 \quad(x \in R)$
+  D: $y=e^{2 x-1}+1 \quad(x \in R)$
+answer: D

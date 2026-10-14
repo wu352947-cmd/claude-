@@ -1,0 +1,28 @@
+type: single
+source: 2012 全国新课标卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 数列 $\left\{a_{n}\right\}$ 满足 $a_{n+1}+(-1){ }^{n} a_{n}=2 n-1$, 则 $\left\{a_{n}\right\}$ 的前 60 项和为 ( )
+options:
+  A: '3690'
+  B: '3660'
+  C: '1845'
+  D: '1830'
+answer: D
+solution: |-
+  解: 由于数列 $\left\{a_{n}\right\}$ 满足 $a_{n+1}+(-1)^{n} a_{n}=2 n-1$, 故有 $a_{2}-a_{1}=1, a_{3}+a_{2}=3$ ,$a_{4}-a_{3}=5$,
+
+  $a_{5}+a_{4}=7, \quad a_{6}-a_{5}=9, \quad a_{7}+a_{6}=11, \quad \ldots a_{50}-a_{49}=97$
+
+  从而可得 $a_{3}+a_{1}=2, a_{4}+a_{2}=8, a_{7}+a_{5}=2, a_{8}+a_{6}=24, a_{11}+a_{9}=2, a_{12}+a_{10}=40, a_{15}+a_{13}=2$ $, \mathrm{a}_{16}+\mathrm{a}_{14}=56, \ldots$
+
+  从第一项开始, 依次取 2 个相邻奇数项的和都等于 2 ,
+
+  从第二项开始, 依次取 2 个相邻偶数项的和构成以 8 为首项, 以 16 为公差的等 差数列.
+
+  $\left\{a_{n}\right\}$ 的前 60 项和为 $15 \times 2+\left(15 \times 8+\frac{15 \times 14}{2} \times 16\right)=1830$,
+
+  故选: D.

@@ -1,0 +1,32 @@
+type: single
+source: 2012 全国新课标卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  seq.geom: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\left\{a_{n}\right\}$ 为等比数列, $a_{4}+a_{7}=2, a_{5} a_{6}=-8$, 则 $a_{1}+a_{10}=(\quad)$
+options:
+  A: '7'
+  B: '5'
+  C: '-5'
+  D: '-7'
+answer: D
+solution: |-
+  解: $\because a_{4}+a_{7}=2$, 由等比数列的性质可得, $a_{5} a_{6}=a_{4} a_{7}=-8$
+
+  $\therefore a_{4}=4, a_{7}=-2$ 或 $a_{4}=-2, a_{7}=4$
+
+  当 $a_{4}=4, a_{7}=-2$ 时, $q^{3}=-\frac{1}{2}$,
+
+  $\therefore a_{1}=-8, a_{10}=1$
+
+  $\therefore a_{1}+a_{10}=-7$
+
+  当 $a_{4}=-2, a_{7}=4$ 时, $q^{3}=-2$, 则 $a_{10}=-8, a_{1}=1$
+
+  $\therefore \mathrm{a}_{1}+\mathrm{a}_{10}=-7$
+
+  综上可得, $\mathrm{a}_{1}+\mathrm{a}_{10}=-7$
+
+  故选: D.

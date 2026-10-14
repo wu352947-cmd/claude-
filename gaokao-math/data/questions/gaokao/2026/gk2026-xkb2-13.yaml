@@ -1,0 +1,10 @@
+type: fill
+source: 2026 新课标II卷 第 13 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  func.zeros: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若函数$f(x)=2^x+2^{2-x}-m$有两个零点，则$m$的取值范围是$\underline{\quad\quad}$.
+answer: (4,+\infty)
+answer_kind: interval

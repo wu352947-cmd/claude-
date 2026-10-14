@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国II卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{x \mid x>-1\}, B=\{x \mid x<2\}$, 则 $A \cap B=$
+options:
+  A: $(-1,+\infty)$
+  B: $(-\infty, 2)$
+  C: $(-1,2)$
+  D: $\varnothing$
+answer: C
+solution: 【详解】由题知, $A \cap B=(-1,2)$, 故选 C.

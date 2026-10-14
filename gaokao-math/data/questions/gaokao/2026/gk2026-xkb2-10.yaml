@@ -1,0 +1,17 @@
+type: multi
+source: 2026 新课标II卷 第 10 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  seq.geom: 1.0
+difficulty_label: 较难
+points: 6.0
+stem: 等比数列$\{a_n\}$的公比$q\neq 1$，$a_1>0$，$2a_3=a_2+a_1$，记前$n$项和为$S_n$，则$(\quad)$
+options:
+  A: $q=-\dfrac{1}{2}$
+  B: $S_n>\dfrac{2a_1}{3}$
+  C: $2S_{n+2}=S_{n+1}+S_n$
+  D: $\sum_{k=1}^{n}S_k>\dfrac{2na_1}{3}$
+answer:
+- A
+- C
+- D

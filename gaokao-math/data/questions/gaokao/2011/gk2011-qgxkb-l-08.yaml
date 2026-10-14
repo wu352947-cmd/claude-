@@ -1,0 +1,34 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  count.binomial: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\left(x+\frac{a}{x}\right)\left(2 x-\frac{1}{x}\right)^{5}$ 的展开式中各项系数的和为 2 , 则该展开式中常数项 为 $(\quad)$
+options:
+  A: '-40'
+  B: '-20'
+  C: '20'
+  D: '40'
+answer: D
+solution: |-
+  解: 令二项式中的 $x$ 为 1 得到展开式的各项系数和为 $1+a$
+
+  $\therefore 1+a=2$
+
+  $\therefore a=1$
+
+  $\therefore\left(x+\frac{a}{x}\right)\left(2 x-\frac{1}{x}\right)^{5}=\left(x+\frac{1}{x}\right)\left(2 x-\frac{1}{x}\right)^{5}$
+
+  $=x\left(2 x-\frac{1}{x}\right)^{5}+\frac{1}{x}\left(2 x-\frac{1}{x}\right)^{5}$
+
+  $\therefore$ 展开式中常数项为 $\left(2 x-\frac{1}{x}\right)$ 的 $\frac{1}{x}$ 与 $x$ 的系数和
+
+  $\because\left(2 x-\frac{1}{x}\right)$ 展开式的通项为 $\mathrm{T}_{\mathrm{r}+1}=(-1){ }^{r} 2^{5-}{ }^{r} C_{5}{ }^{r} x^{5-2 r}$
+
+  令 5- $2 r=1$ 得 $r=2$; 令 $5-2 r=-1$ 得 $r=3$
+
+  展开式中常数项为 $8 C_{5}{ }^{2}-4 C_{5}{ }^{3}=40$
+
+  故选: D.

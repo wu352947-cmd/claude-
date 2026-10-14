@@ -1,0 +1,14 @@
+type: single
+source: 2021 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  ineq.mean: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $2^{a}=5^{b}=10$, 则 $\frac{1}{a}+\frac{1}{b}=(\quad)$
+options:
+  A: $-1$
+  B: $\lg 7$
+  C: '1'
+  D: $\log _{7} 10$
+answer: C

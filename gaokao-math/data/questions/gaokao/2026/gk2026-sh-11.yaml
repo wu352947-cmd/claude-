@@ -1,0 +1,10 @@
+type: fill
+source: 2026 上海卷 第 11 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  trig.graph: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知三角函数 $f(t)=A\sin(\omega t+\varphi)+B$（$A>0$，$B\in \mathbf{R}$，$\omega>0$，$0\le \varphi<2\pi$），若 $v=f(t)$，当 $v=0$ 或 $v=4$ 时其导数为 $0$，初始速度为 $0$，且速度第一次达到 $4$ 时用时为 $0.1$ 秒，则 $f(t)=\underline{\quad\quad}$.
+answer: 2\sin(10\pi t+\frac{3\pi}{2})+2
+answer_kind: expr

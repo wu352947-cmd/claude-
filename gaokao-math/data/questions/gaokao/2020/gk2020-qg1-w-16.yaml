@@ -1,0 +1,28 @@
+type: fill
+source: 2020 全国I卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 数列 $\left\{a_{n}\right\}$ 满足 $a_{n+2}+(-1)^{n} a_{n}=3 n-1$, 前 16 项和为 540 , 则 $a_{1}=$ ______
+answer: '7'
+answer_kind: expr
+solution: |-
+  【详解】 $a_{n+2}+(-1)^{n} a_{n}=3 n-1$,
+
+  当 $n$ 为奇数时, $a_{n+2}=a_{n}+3 n-1$; 当 $n$ 为偶数时, $a_{n+2}+a_{n}=3 n-1$.
+
+  设数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 $S_{n}$,
+
+  $S_{16}=a_{1}+a_{2}+a_{3}+a_{4}+\cdots+a_{16}$
+
+  $=a_{1}+a_{3}+a_{5} \cdots+a_{15}+\left(a_{2}+a_{4}\right)+\cdots\left(a_{14}+a_{16}\right)$
+
+  $=a_{1}+\left(a_{1}+2\right)+\left(a_{1}+10\right)+\left(a_{1}+24\right)+\left(a_{1}+44\right)+\left(a_{1}+70\right)$
+
+  $+\left(a_{1}+102\right)+\left(a_{1}+140\right)+(5+17+29+41)$ $=8 a_{1}+392+92=8 a_{1}+484=540$,
+
+  $\therefore a_{1}=7$.
+
+  故答案为: 7 .

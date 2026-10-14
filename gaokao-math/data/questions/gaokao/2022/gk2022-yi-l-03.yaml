@@ -1,0 +1,24 @@
+type: single
+source: 2022 全国乙卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}, \vec{b}$ 满足 $|\vec{a}|=1,|\vec{b}|=\sqrt{3},|\vec{a}-2 \vec{b}|=3$, 则 $\vec{a} \cdot \vec{b}=()$
+options:
+  A: '-2'
+  B: '-1'
+  C: '1'
+  D: '2'
+answer: C
+solution: |-
+  【详解】解: $\because|\vec{a}-2 \vec{b}|^{2}=|\vec{a}|^{2}-4 \vec{a} \cdot \vec{b}+4|\vec{b}|^{2}$,
+
+  又 $\because|\vec{a}|=1,|\vec{b}|=\sqrt{3},|\vec{a}-2 \vec{b}|=3$,
+
+  $\therefore 9=1-4 \vec{a} \cdot \vec{b}+4 \times 3=13-4 \vec{a} \cdot \vec{b}$
+
+  $\therefore \vec{a} \cdot \vec{b}=1$
+
+  故选: C.

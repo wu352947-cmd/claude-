@@ -1,0 +1,18 @@
+type: single
+source: 2022 全国甲卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 当 $x=1$ 时, 函数 $f(x)=a \ln x+\frac{b}{x}$ 取得最大值 -2 , 则 $f^{\prime}(2)=()$
+options:
+  A: '-1'
+  B: $-\frac{1}{2}$
+  C: $\frac{1}{2}$
+  D: '1'
+answer: B
+solution: |-
+  【详解】因为函数 $f(x)$ 定义域为 $(0,+\infty)$, 所以依题可知, $f(1)=-2, f^{\prime}(1)=0$, 而 $f^{\prime}(x)=\frac{a}{x}-\frac{b}{x^{2}}$, 所以 $b=-2, a-b=0$, 即 $a=-2, b=-2$, 所以 $f^{\prime}(x)=-\frac{2}{x}+\frac{2}{x^{2}}$, 因 此函数 $f(x)$ 在 $(0,1)$ 上递增, 在 $(1,+\infty)$ 上递减, $x=1$ 时取最大值, 满足题意, 即有 $f^{\prime}(2)=-1+\frac{1}{2}=-\frac{1}{2}$
+
+  故选: B.
