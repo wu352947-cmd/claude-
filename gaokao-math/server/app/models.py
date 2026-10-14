@@ -42,7 +42,8 @@ class Question(SQLModel, table=True):
     difficulty_label: str
     est_seconds: int
     source: str = ""
-    parent_id: str | None = None
+    parent_id: str | None = Field(default=None, index=True)  # 变式题指向母题
+    figure: str | None = None  # data/figures/ 下的配图文件名
     verified: bool = True
     active: bool = True  # YAML 文件删除后置为 False，保留作答历史
     file: str = ""
@@ -70,6 +71,7 @@ class Attempt(SQLModel, table=True):
     confidence: str = "sure"  # sure | unsure | guess
     error_type: str | None = None  # concept | method | calc | reading | time | guess
     note: str = ""
+    exam_id: int | None = Field(default=None, index=True)
     created_at: datetime = Field(default_factory=utcnow, index=True)
 
 
@@ -91,4 +93,34 @@ class ReviewCard(SQLModel, table=True):
     streak: int = 0  # 连续 Good/Easy 次数
     suspended: bool = False  # 已「毕业」
     last_error_type: str | None = None
+    created_at: datetime = Field(default_factory=utcnow)
+
+
+class Exam(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    title: str
+    status: str = "ongoing"  # ongoing | grading（客观题已交，等解答题自评）| done
+    # [{no, type, points, question_id, matched, parts}]
+    slots: list[dict] = Field(default_factory=list, sa_column=Column(JSON))
+    minutes: int = 120
+    predicted: float | None = None  # 组卷时的预测分
+    score: float | None = None
+    responses: dict = Field(default_factory=dict, sa_column=Column(JSON))  # 题号 → 作答与用时
+    report: dict = Field(default_factory=dict, sa_column=Column(JSON))
+    created_at: datetime = Field(default_factory=utcnow)
+    finished_at: datetime | None = None
+
+
+class AiUsage(SQLModel, table=True):
+    __tablename__ = "ai_usage"
+
+    day: str = Field(primary_key=True)  # 本地日期 YYYY-MM-DD
+    calls: int = 0
+
+
+class AiCache(SQLModel, table=True):
+    __tablename__ = "ai_cache"
+
+    key: str = Field(primary_key=True)  # 请求内容的 sha256
+    value: str
     created_at: datetime = Field(default_factory=utcnow)

@@ -69,7 +69,9 @@ def test_multi_partial_and_solve_self_grading(client):
 def test_today_plan_is_limited_and_explained(client):
     plan = client.get("/api/today").json()
     assert len(plan["items"]) == 6 and plan["unseen_total"] == 15
-    assert all(i["kind"] == "new" and "卷面约" in i["reason"] for i in plan["items"])
+    kinds = [i["kind"] for i in plan["items"]]
+    assert kinds == ["new"] * 5 + ["explore"]  # 默认留 1 道随机题
+    assert all("卷面约" in i["reason"] for i in plan["items"][:5]) and "随机题" in plan["items"][5]["reason"]
     main_kps = [i["question"]["kps"][0]["id"] for i in plan["items"]]
     assert len(set(main_kps)) >= 4  # 不会一天全是同一类题
 

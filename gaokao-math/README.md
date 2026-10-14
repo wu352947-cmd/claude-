@@ -1,20 +1,19 @@
 # 数·途
 
-定制化数学高考刷题应用。设计思路见 [ARCHITECTURE.md](ARCHITECTURE.md)。
+定制化数学高考刷题应用，按**新课标 I 卷**设计。设计思路见 [ARCHITECTURE.md](ARCHITECTURE.md)。
 
-现在能做的事：
-
-| 页面 | 内容 |
+| 页面 | 能做什么 |
 |---|---|
-| 今日 | 到期错题 + 按「卷面分值 × 薄弱程度」挑的新题，每道题附推荐理由；一键开始，逐题做 |
-| 做题 | 公式渲染、计时（超时变红）、分级提示、「有把握 / 不踏实 / 蒙的」；单选、多选（新高考部分得分）、填空（数学等价判分）、解答题（对照得分点自评） |
-| 结果 | 正确答案与解答、各知识点掌握度变化、下次复习时间；做错时选错因、写一句反思 |
-| 错题本 | 到期 / 全部 / 已毕业；FSRS 安排复习，连续 3 次做对且间隔超过 30 天就「毕业」 |
-| 题库 | 按模块、题型、关键词筛选 |
-| 录题 | 网页表单录入，实时预览公式，保存成 YAML 文件 |
-| 看板 | 各模块与知识点的把握（按卷面分值加权）、近 30 天失分按错因分布 |
+| 今日 | 到期错题 + 按「卷面分值 × 薄弱程度」挑的新题 + 1 道随机题，每道附推荐理由；错题第 2 次复习起交替出变式题，防止背答案。今天的题会预先缓存，路上没网也能做 |
+| 做题 | 公式渲染、配图、计时、分级提示（题库自带 + AI）、「有把握 / 不踏实 / 蒙的」；单选、多选（新高考部分得分）、填空（数学等价判分）、解答题（对照得分点自评）；断网时作答存在手机上，联网后自动判分 |
+| 结果 | 正确答案与解答、掌握度变化、下次复习时间、错因与反思；AI 讲解你的作答并建议错因；一键生成变式题 |
+| 错题本 | FSRS 安排复习，连续 3 次做对且间隔超过 30 天就「毕业」 |
+| 题库 | 按模块、题型、关键词筛选，显示变式题数量 |
+| 模考 | 按新课标 I 卷 19 个题位从题库组卷，限时 120 分钟，中途刷新不丢；交卷后客观题自动判分、解答题对照得分点自评；成绩报告含逐题得分与用时、丢分模块、多选漏选/错选分析，可一键重做丢分题 |
+| 录题 | 拍照 → 框选 → AI 识别成可编辑的题目 → 核对；框出图形设为配图；AI 推荐知识点；保存成 YAML 文件 |
+| 看板 | 预测分（按题型拆开）、「每多练 1 小时最能提分」的知识点、近 30 天得分率趋势、各模块把握、失分错因、多选题策略建议、历次模考与预测对比 |
 
-还没做的（见 ARCHITECTURE.md §10）：拍照录题、AI 讲解、变式题生成、模考组卷、预测分、离线 PWA。
+另外：数据库每天自动备份；可以「添加到主屏幕」当 App 用。
 
 ## 运行
 
@@ -26,37 +25,42 @@ cd web
 npm install
 npm run build
 
-# 2. 启动后端（同时提供网页）
+# 2. 启动（同时提供网页）
 cd ../server
 uv sync
 uv run uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000
 ```
 
-电脑上打开 <http://localhost:8000>。手机和电脑连同一个 Wi-Fi 时，手机打开 `http://电脑的局域网IP:8000`，再「添加到主屏幕」。
+电脑上打开 <http://localhost:8000>。手机和电脑连同一个 Wi-Fi 时，手机打开 `http://电脑的局域网IP:8000`，再用浏览器菜单里的「添加到主屏幕」。
 
-**不要把服务直接暴露到公网。** 如果需要在外面访问，启动时设置口令：
+### 配置文件 `.env`
 
-```bash
-APP_TOKEN=换成一串随机字符 uv run uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000
-```
+把 `.env.example` 复制成 `.env`（都在 `gaokao-math/` 目录下）再填写，重启生效。`.env` 不会提交到 Git。可以配置：
 
-第一次用 `http://地址:8000/?token=那串字符` 打开，浏览器会记住。
+- **访问口令 `APP_TOKEN`**：只在家里 Wi-Fi 用可以不设；**要在外网访问必须设置**。设置后第一次用 `http://地址:8000/?token=口令` 打开，浏览器会记住。
+- **大模型**：见下一节。
+- **备份目录 `BACKUP_DIR`**：可以指到网盘同步文件夹。
 
-### 开发
+## AI 功能（可选）
 
-```bash
-cd server && uv run uvicorn app.main:create_app --factory --reload   # 后端，端口 8000
-cd web && npm run dev                                                # 前端热更新，/api 自动转发到 8000
-cd server && uv run pytest                                           # 后端测试
-cd web && npm run typecheck                                          # 前端类型检查
-```
+不配置也能用，AI 按钮会自动隐藏。配置后可以用：AI 分级提示、AI 讲解与错因判断、知识点推荐、拍照识题、变式题生成。
+
+接口是 OpenAI 兼容格式，国内的 DeepSeek、通义千问（阿里云百炼）、Kimi、智谱等都支持，`.env.example` 里有填写示例。模型名称和地址以服务商文档为准。
+
+- **文字模型**（`LLM_*`）：提示、讲解、知识点推荐、变式题。
+- **视觉模型**（`VISION_*`）：拍照识题。需要能看图的模型（如通义千问 VL 系列），可以和文字模型不是同一家。
+- **费用**：`data/config.yaml` 里 `ai.daily_limit` 限制每天最多调用次数（默认 60），相同的请求走缓存不重复计费。
+- **注意**：题目和你的作答会发送给大模型服务商。AI 的内容都标了「AI 生成，仅供参考」——讲解以题库里的标准解答为依据，但仍可能出错；拍照识别的结果一定要逐字核对。
+
+**变式题怎么保证不出错**：AI 只写「参数化模板」，答案由程序用 SymPy 计算（模板里的表达式只在白名单内求值，不会当代码执行）；再让 AI 只看题干独立求解，两个答案一致才入库，否则丢弃。变式题保存在 `data/questions/variants/`，可以随时删。
 
 ## 录题
 
-两种方式，结果一样，都是 `data/questions/` 下一个题目一个 YAML 文件：
+`data/questions/` 下一个题目一个 YAML 文件，三种方式结果一样：
 
-- **网页「录题」**：适合手机上随手录错题，保存到 `data/questions/inbox/`。
-- **直接写 YAML**：适合在电脑上批量录。格式照着 `data/questions/samples/` 里的 15 道示例题写；改完后在「看板」点「重新加载题库」。
+- **拍照**：「录题」页拍照，框出题目 → 识别文字；再框出图形 → 设为配图。保存到 `data/questions/inbox/`。
+- **网页表单**：手动输入，适合手机上随手录。
+- **直接写 YAML**：适合在电脑上批量录，格式照着 `data/questions/samples/` 里的示例题写；改完在「看板」点「重新加载题库」。
 
 几个要点：
 
@@ -64,37 +68,61 @@ cd web && npm run typecheck                                          # 前端类
 - `kps` 必须是 `data/knowledge_graph.yaml` 里已有的 id，可以写列表或带权重的字典。
 - 填空题 `answer_kind`：`expr`（一个值）、`set`（多个值，如 `'-1, \sqrt{2}'`）、`interval`（区间，如 `'(2,+\infty)'`，单调区间可加 `loose_endpoints: true` 不区分开闭）、`equation`（方程，两边同乘常数算同一个）。
 - 解答题写 `parts`（每问分值、答案、得分点 `rubric`）和完整的 `solution`。
+- 配图放在 `data/figures/`，题目里写 `figure: 文件名`（网页上传会自动处理）。
 - 文件有错时这道题会被跳过，「今日」和「看板」会提示是哪个文件、错在哪。
 
 学生作答时，`√3/2`、`sqrt(3)/2`、`\frac{\sqrt3}{2}` 都能被识别为同一个答案；`0.866` 这样的近似值会判错。
 
-## 配置
+## 配置 `data/`
 
-- `data/config.yaml`：每天推几道题、当前复习重点模块（推荐时优先）、FSRS 记忆保持率、掌握度参数、时区。
-- `data/exam_blueprint.yaml`：试卷结构，决定各题型默认分值和建议用时。**先确认你所在省份用的是哪套卷。**
-- `data/knowledge_graph.yaml`：知识点、前置关系、每个知识点在卷面上大约值多少分（初始值是估计，建议用近三年真题校准）。
+- `exam_blueprint.yaml`：**新课标 I 卷**的 19 个题位——分值、每一问的难度、每个题位考哪些知识点的概率。预测分和模考组卷都用它。里面的分布是按 2024、2025 年 I 卷归纳的估计，**建议你把 2024–2026 年的 I 卷逐题统计后修改**。
+- `knowledge_graph.yaml`：64 个知识点、前置关系、每个知识点在卷面上大约值多少分。
+- `config.yaml`：每天推几道题（含随机题）、当前复习重点模块、FSRS 记忆保持率、掌握度参数、AI 每日上限、备份保留份数、时区。
 
-## 数据
+## 数据与备份
 
-- 题库：`data/`，用 Git 管理。
-- 作答记录、掌握度、错题本：`var/app.db`（SQLite，单个文件）。**定期把这个文件复制一份备份。**
+- 题库与配图：`data/`，用 Git 管理。
+- 作答记录、掌握度、错题本、模考：`var/app.db`（SQLite，单个文件）。
+- **每天第一次启动时自动备份**到 `var/backups/`（或 `BACKUP_DIR`），保留最近 14 份。手动备份：`cd server && uv run python -m app.backup`。
 - 全部作答数据也可以用 `GET /api/export` 导出成 JSON。
+- 升级代码后旧数据库会自动补上新增的字段，不用手动迁移。
+
+## 开发
+
+```bash
+cd server && uv run uvicorn app.main:create_app --factory --reload   # 后端，端口 8000
+cd web && npm run dev                                                # 前端热更新，/api 自动转发到 8000
+cd server && uv run pytest                                           # 后端测试（AI 部分用假模型，不需要密钥）
+cd web && npm run typecheck                                          # 前端类型检查
+```
+
+开发模式下不启用离线缓存；离线功能只在 `npm run build` 后、由后端提供网页时生效。
 
 ## 代码结构
 
 ```
-data/                  题库与配置（YAML，唯一数据源，启动时同步进数据库）
+data/                    题库、配图、知识点图谱、试卷结构、配置（YAML，唯一数据源）
 server/app/
-  core/grading.py      判分：多选部分得分、填空等价判定（SymPy）
-  core/performance.py  作答 → 0–1 表现分
-  core/mastery.py      知识点掌握度（Elo / IRT-1PL，含遗忘衰减）
-  core/review.py       错题复习调度（FSRS）
-  core/today.py        每日推荐
-  core/stats.py        看板数据
-  bank.py              YAML 校验、同步、写入
-  api.py · main.py     接口与启动
-server/tests/          判分、算法、题库校验、接口全流程测试
-web/src/               React 前端（KaTeX 渲染公式）
+  core/grading.py        判分：多选部分得分、填空等价判定（SymPy）
+  core/performance.py    作答 → 0–1 表现分
+  core/mastery.py        知识点掌握度（Elo / IRT-1PL，含遗忘衰减）
+  core/review.py         错题复习调度（FSRS）
+  core/today.py          每日推荐（含随机题、变式轮换）
+  core/predict.py        预测分与提分建议
+  core/exam.py           模考组卷与成绩报告、多选分析
+  core/safe_expr.py      白名单表达式求值（变式题模板用）
+  core/stats.py          看板数据
+  ai/llm.py              OpenAI 兼容客户端
+  ai/service.py          提示、讲解、知识点推荐、识题（限额 + 缓存）
+  ai/variants.py         变式题：模板 → 计算 → 交叉验证
+  bank.py                YAML 校验、同步、写入
+  blueprint.py           试卷结构
+  services.py            记录作答（练习、模考、离线同步共用）
+  backup.py · images.py  备份、图片校验
+  api.py · exam_api.py · ai_api.py · main.py
+server/tests/            153 个测试：判分、算法、题库、模考、AI（假模型）、离线同步、迁移、备份
+web/src/                 React 前端（KaTeX 渲染公式）
+web/public/sw.js         离线缓存（Service Worker）
 ```
 
 示例题均为原创，仅用于演示格式，换成你自己的题即可。

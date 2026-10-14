@@ -1,16 +1,19 @@
 """每日推荐（ARCHITECTURE.md §5.5 的简化版）。
 
 1. 先放到期的错题（按到期时间）；
-2. 再从没做过的题里挑新题：
+   第 2 次及以后的复习，如果有没做过的变式题，就交替出变式，防止背答案；
+2. 再从没做过的题里挑新题（变式题只用于复习，不作为新题）：
    知识点优先级 = 卷面分值 × (1 − 把握) × 前置是否就绪 × 当前复习重点
    题目得分     = 优先级 × 难度贴合度（预测做对概率落在目标区间时为 1）
    同一知识点被选中后优先级减半，避免一天全是同一类题。
+3. 新题里留 settings.explore 道随机题，避免只刷推荐、视野变窄。
 每道题都附一句推荐理由。
 """
 
 from __future__ import annotations
 
 import math
+import random
 from collections import defaultdict
 from datetime import datetime
 
@@ -47,14 +50,22 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
         select(ReviewCard).where(ReviewCard.due <= now, ReviewCard.suspended == False)  # noqa: E712
         .order_by(ReviewCard.due)
     ).all()
+    variants: dict[str, list[str]] = defaultdict(list)
+    for q in questions.values():
+        if q.parent_id and q.id not in attempted:
+            variants[q.parent_id].append(q.id)
     reviews = []
     for card in due_cards:
         if card.question_id not in questions:
             continue
+        qid = card.question_id
         reason = f"到期错题 · 第 {card.reps + 1} 次复习"
+        if card.reps >= 2 and card.reps % 2 == 0 and variants.get(qid):
+            qid = sorted(variants[qid])[0]
+            reason += " · 换一道变式，检验是不是真会了"
         if card.last_error_type:
             reason += f" · 上次错因：{ERROR_LABELS.get(card.last_error_type, card.last_error_type)}"
-        reviews.append({"question_id": card.question_id, "kind": "review", "reason": reason})
+        reviews.append({"question_id": qid, "kind": "review", "reason": reason})
         if len(reviews) >= settings.daily_review:
             break
 
@@ -74,7 +85,7 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
     lo, hi = settings.target_band
     candidates = []
     for qid, q in questions.items():
-        if qid in attempted or not links.get(qid):
+        if qid in attempted or q.parent_id or not links.get(qid):
             continue
         weights = {k: w for k, w in links[qid].items() if k in kps}
         if not weights:
@@ -86,7 +97,8 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
 
     picked = []
     used: dict[str, int] = defaultdict(int)
-    while candidates and len(picked) < settings.daily_new:
+    n_explore = min(settings.explore, settings.daily_new)
+    while candidates and len(picked) < settings.daily_new - n_explore:
         def score(c):
             return sum(w * priority[k] * REPEAT_PENALTY ** used[k] for k, w in c["weights"].items()) * c["fit"]
         best = max(candidates, key=lambda c: (score(c), c["q"].id))
@@ -94,6 +106,10 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
         for k in best["weights"]:
             used[k] += 1
         picked.append(best)
+
+    # 随机题：同一天内固定，刷新页面不会变
+    rng = random.Random(now.date().toordinal())
+    explore = rng.sample(sorted(candidates, key=lambda c: c["q"].id), min(n_explore, len(candidates)))
 
     new_items = []
     for c in picked:
@@ -104,6 +120,10 @@ def build_plan(session: Session, settings, now: datetime) -> dict:
         reason = (f"{kp.name}：卷面约 {kp.exam_weight:g} 分，你的把握 {sigmoid(eff(kp.id)) * 100:.0f}%，"
                   f"{practiced}；预计做对 {c['p'] * 100:.0f}%")
         new_items.append({"question_id": c["q"].id, "kind": "new", "reason": reason})
+    for c in explore:
+        names = "、".join(kps[k].name for k in c["weights"])
+        new_items.append({"question_id": c["q"].id, "kind": "explore",
+                          "reason": f"随机题：{names}。换换脑子，也防止只刷推荐、视野变窄"})
 
     return {"generated_at": now, "items": reviews + new_items,
             "due_total": len(due_cards), "unseen_total": len(questions) - len(attempted & set(questions))}

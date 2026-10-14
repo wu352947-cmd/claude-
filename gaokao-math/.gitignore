@@ -7,3 +7,4 @@ server/**/__pycache__/
 server/.pytest_cache/
 web/node_modules/
 web/dist/
+.env

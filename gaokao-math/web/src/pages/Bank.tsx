@@ -68,9 +68,13 @@ export function Bank({ onStart }: { onStart: (ids: string[]) => void }) {
           <QuestionCard
             key={q.id}
             q={q}
-            badge={q.in_review ? "错题本" : undefined}
+            badge={q.in_review ? "错题本" : q.is_variant ? "变式" : undefined}
             onClick={() => onStart([q.id])}
-            extra={<p className="muted small">{q.source || q.id} · 做过 {q.attempts} 次</p>}
+            extra={
+              <p className="muted small">
+                {q.source || q.id} · 做过 {q.attempts} 次{q.variants ? ` · ${q.variants} 道变式` : ""}
+              </p>
+            }
           />
         ))}
       </ul>

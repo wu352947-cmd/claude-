@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
+import { aiStatus } from "../ai";
 import { api } from "../api";
 import { MathText } from "../components/MathText";
-import { TYPE_LABELS, type AnswerKind, type Kp, type QType } from "../types";
+import { PhotoCropper } from "../components/PhotoCropper";
+import { TYPE_LABELS, type AiStatus, type AnswerKind, type Kp, type OcrDraft, type QType } from "../types";
 
 const LETTERS = ["A", "B", "C", "D"];
 const DIFFICULTIES = ["基础", "中档", "较难", "压轴"];
@@ -40,12 +42,67 @@ export function AddQuestion({ onCreated }: { onCreated: (id: string) => void }) 
   const [solution, setSolution] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
+  const [ai, setAi] = useState<AiStatus | null>(null);
+  const [aiBusy, setAiBusy] = useState("");
+  const [figure, setFigure] = useState<{ name: string; url: string } | null>(null);
+  const [ocrNote, setOcrNote] = useState("");
 
   useEffect(() => {
     api<Kp[]>("/kps")
       .then(setKps)
       .catch((e) => setError(e.message));
+    aiStatus(true).then(setAi);
   }, []);
+
+  async function suggestKps(text: string) {
+    if (!ai?.text || !text.trim()) return;
+    setAiBusy("kps");
+    try {
+      const r = await api<{ kps: string[] }>("/ai/suggest-kps", { body: { stem: text } });
+      setChosenKps((old) => [...new Set([...old, ...r.kps])]);
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setAiBusy("");
+    }
+  }
+
+  async function ocr(dataUrl: string) {
+    setAiBusy("ocr");
+    setError("");
+    try {
+      const d = await api<OcrDraft>("/ai/ocr", { body: { image: dataUrl } });
+      setType(d.type);
+      setStem(d.stem);
+      setOcrNote(d.note);
+      if (d.options) setOptions({ A: "", B: "", C: "", D: "", ...d.options });
+      if (d.answer) {
+        const ans = Array.isArray(d.answer) ? d.answer : String(d.answer);
+        if (d.type === "single") setSingle(String(ans).trim().toUpperCase().slice(0, 1));
+        else if (d.type === "multi") setMulti([...(Array.isArray(ans) ? ans.join("") : ans).toUpperCase()].filter((c) => "ABCD".includes(c)));
+        else if (d.type === "fill") setFill(String(ans));
+      }
+      if (d.type === "solve" && d.parts?.length) {
+        setParts(d.parts.map((label) => ({ label, points: Math.round(13 / d.parts!.length), answer: "" })));
+      }
+      setAiBusy("");
+      await suggestKps(d.stem);
+    } catch (e) {
+      setError((e as Error).message);
+      setAiBusy("");
+    }
+  }
+
+  async function uploadFigure(dataUrl: string) {
+    setAiBusy("figure");
+    try {
+      setFigure(await api<{ name: string; url: string }>("/figures", { body: { image: dataUrl } }));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setAiBusy("");
+    }
+  }
 
   const kpById = useMemo(() => Object.fromEntries(kps.map((k) => [k.id, k])), [kps]);
   const matches = kpQuery.trim()
@@ -60,6 +117,7 @@ export function AddQuestion({ onCreated }: { onCreated: (id: string) => void }) 
       kps: chosenKps,
       source,
       difficulty_label: difficulty,
+      figure: figure?.name,
       hints: hints
         .split("\n")
         .map((h) => h.trim())
@@ -93,6 +151,9 @@ export function AddQuestion({ onCreated }: { onCreated: (id: string) => void }) 
         公式用 $...$ 包起来（如 $\frac{"{1}{2}"}$）。保存后会在 data/questions/inbox/ 生成一个 YAML 文件，之后也可以直接改文件。
       </p>
 
+      <PhotoCropper canOcr={!!ai?.vision} busy={aiBusy} onOcr={ocr} onFigure={uploadFigure} />
+      {ocrNote && <p className="notice">{ocrNote}</p>}
+
       <div className="chips">
         {(Object.keys(TYPE_LABELS) as QType[]).map((t) => (
           <button key={t} className={`chip ${type === t ? "on" : ""}`} onClick={() => setType(t)}>
@@ -111,6 +172,14 @@ export function AddQuestion({ onCreated }: { onCreated: (id: string) => void }) 
         <textarea rows={5} value={stem} onChange={(e) => setStem(e.target.value)} />
       </label>
       {stem.trim() && <MathText text={stem} className="math-text preview-box" />}
+      {figure && (
+        <div className="figure-row">
+          <img className="figure" src={figure.url} alt="题目配图" />
+          <button className="ghost" onClick={() => setFigure(null)}>
+            去掉配图
+          </button>
+        </div>
+      )}
 
       {(type === "single" || type === "multi") && (
         <fieldset>
@@ -196,6 +265,11 @@ export function AddQuestion({ onCreated }: { onCreated: (id: string) => void }) 
 
       <fieldset>
         <legend>知识点</legend>
+        {ai?.text && (
+          <button className="ghost small-btn" disabled={!stem.trim() || !!aiBusy} onClick={() => suggestKps(stem)}>
+            {aiBusy === "kps" ? "AI 推荐中…" : "AI 推荐知识点"}
+          </button>
+        )}
         <div className="chips">
           {chosenKps.map((id) => (
             <button key={id} className="chip on" onClick={() => setChosenKps(chosenKps.filter((k) => k !== id))}>

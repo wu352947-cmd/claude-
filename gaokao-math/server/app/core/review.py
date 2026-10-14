@@ -52,6 +52,8 @@ def on_attempt(session: Session, scheduler: Scheduler, question_id: str, rating:
         card.streak = 0
 
     fcard = Card.from_dict(card.fsrs) if card.fsrs else Card()
+    if fcard.last_review and now < fcard.last_review:
+        now = fcard.last_review  # 离线作答晚同步时，不让时间倒流
     fcard, _ = scheduler.review_card(fcard, rating, now)
     card.fsrs = fcard.to_dict()
     card.due = fcard.due

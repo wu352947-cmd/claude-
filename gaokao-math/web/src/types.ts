@@ -11,6 +11,7 @@ export interface KpRef {
 
 export interface QuestionSummary {
   id: string;
+  is_variant?: boolean;
   type: QType;
   source: string;
   difficulty_label: string;
@@ -22,6 +23,7 @@ export interface QuestionSummary {
 export interface BankItem extends QuestionSummary {
   attempts: number;
   in_review: boolean;
+  variants: number;
 }
 
 export interface QuestionDetail extends QuestionSummary {
@@ -31,6 +33,8 @@ export interface QuestionDetail extends QuestionSummary {
   parts: { label: string; points: number }[];
   hints_total: number;
   est_seconds: number;
+  figure: string | null;
+  parent_id: string | null;
   history: { created_at: string; score: number; max_score: number; seconds: number; error_type: ErrorType | null }[];
   card: { due: string; reps: number; lapses: number; graduated: boolean } | null;
 }
@@ -51,6 +55,7 @@ export interface Reveal {
 
 export interface AttemptResult {
   attempt_id: number;
+  queued?: boolean; // 离线保存，联网后再判分
   score: number;
   max_score: number;
   full: boolean;
@@ -62,7 +67,7 @@ export interface AttemptResult {
 
 export interface PlanItem {
   question_id: string;
-  kind: "review" | "new";
+  kind: "review" | "new" | "explore";
   reason: string;
   question: QuestionSummary;
 }
@@ -93,6 +98,7 @@ export interface Overview {
   cards_graduated: number;
   streak_days: number;
   bank_errors: string[];
+  blueprint: string;
 }
 
 export interface ModuleMastery {
@@ -131,3 +137,84 @@ export const ERROR_TYPES: { value: ErrorType; label: string }[] = [
   { value: "time", label: "时间不够" },
   { value: "guess", label: "不会，蒙的" },
 ];
+
+export interface AiStatus {
+  text: boolean;
+  vision: boolean;
+  used_today: number;
+  daily_limit: number;
+}
+
+export interface Prediction {
+  total: number;
+  points: number;
+  blueprint: string;
+  practiced_kps: number;
+  by_type: { type: QType; label: string; expected: number; points: number }[];
+  slots: { no: number; type: QType; points: number; expected: number; main_kp: string }[];
+  gains: { kp_id: string; name: string; gain: number }[];
+  exams: { id: number; title: string; date: string; score: number; predicted: number | null }[];
+}
+
+export interface TrendPoint {
+  date: string;
+  attempts: number;
+  score_rate: number | null;
+}
+
+export interface MultiAnalysis {
+  count: number;
+  full: number;
+  missed: { count: number; lost: number };
+  wrong: { count: number; lost: number };
+  blank: { count: number; lost: number };
+  advice: string;
+  days?: number;
+}
+
+export interface ExamBrief {
+  id: number;
+  title: string;
+  status: "ongoing" | "grading" | "done";
+  created_at: string;
+  minutes: number;
+  score: number | null;
+  predicted: number | null;
+}
+
+export interface ExamSlot {
+  no: number;
+  type: QType;
+  points: number;
+  question_id: string | null;
+  matched: string;
+  matched_label: string;
+  question: QuestionDetail | null;
+  reveal?: Reveal;
+  response?: { response: Record<string, unknown>; seconds: number };
+}
+
+export interface ExamReport {
+  total: number;
+  predicted: number | null;
+  by_type: { type: QType; label: string; score: number; points: number; minutes: number }[];
+  slots: { no: number; type: QType; points: number; score: number; seconds: number; question_id: string | null; kps: string[] }[];
+  multi: MultiAnalysis;
+  lost_by_module: { module: string; lost: number }[];
+  minutes_used: number;
+  available_points: number;
+}
+
+export interface ExamDetail extends ExamBrief {
+  slots: ExamSlot[];
+  report: ExamReport | null;
+}
+
+export interface OcrDraft {
+  type: QType;
+  stem: string;
+  options: Record<string, string> | null;
+  answer: string | string[] | null;
+  parts: string[] | null;
+  note: string;
+}

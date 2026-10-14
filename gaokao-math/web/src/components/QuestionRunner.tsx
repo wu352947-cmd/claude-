@@ -1,24 +1,21 @@
 import { useEffect, useRef, useState } from "react";
+import { AI_NOTE, aiStatus } from "../ai";
 import { api } from "../api";
+import { enqueue, isNetworkError } from "../offline";
 import { formatDue, formatSeconds } from "../format";
 import {
   ERROR_TYPES,
   TYPE_LABELS,
+  type AiStatus,
   type AttemptResult,
   type Confidence,
   type ErrorType,
   type QuestionDetail,
   type Reveal,
 } from "../types";
-import { AnswerPreview, MathText } from "./MathText";
+import { FillInput, Options } from "./Inputs";
+import { MathText } from "./MathText";
 
-const KIND_TIPS: Record<string, string> = {
-  expr: "可以写 LaTeX，也可以直接写 √3/2、2π/3",
-  set: "有多个答案时用逗号或「或」隔开",
-  interval: "如 (2,+∞)，多段用 ∪ 连接",
-  equation: "写成方程，如 x-y+1=0",
-};
-const INSERTS = ["√", "π", "∞", "∪", "(", ")", "[", "]", ",", "/", "^"];
 const CONFIDENCE: { value: Confidence; label: string }[] = [
   { value: "sure", label: "有把握" },
   { value: "unsure", label: "不踏实" },
@@ -45,18 +42,20 @@ interface Props {
 
 export function QuestionRunner({ questionId, reason, position, onNext }: Props) {
   const [q, setQ] = useState<QuestionDetail | null>(null);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // 题目加载失败
+  const [notice, setNotice] = useState(""); // 操作失败，题目照常显示
   const [choice, setChoice] = useState("");
   const [choices, setChoices] = useState<string[]>([]);
   const [value, setValue] = useState("");
-  const [hints, setHints] = useState<string[]>([]);
+  const [hints, setHints] = useState<{ text: string; ai: boolean }[]>([]);
+  const [ai, setAi] = useState<AiStatus | null>(null);
+  const [aiBusy, setAiBusy] = useState(false);
   const [confidence, setConfidence] = useState<Confidence>("sure");
   const [selfGrading, setSelfGrading] = useState<Reveal | null>(null);
   const [partScores, setPartScores] = useState<number[]>([]);
   const [result, setResult] = useState<AttemptResult | null>(null);
   const [busy, setBusy] = useState(false);
   const [frozen, setFrozen] = useState<number | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
   const elapsed = useElapsed(frozen === null);
   const seconds = frozen ?? elapsed;
 
@@ -64,6 +63,7 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
     api<QuestionDetail>(`/questions/${encodeURIComponent(questionId)}`)
       .then(setQ)
       .catch((e) => setError(e.message));
+    aiStatus().then(setAi);
   }, [questionId]);
 
   if (error) return <p className="error">{error}</p>;
@@ -71,10 +71,28 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
 
   const overtime = seconds > q.est_seconds * 1.5;
 
+  const manualHints = hints.filter((h) => !h.ai).length;
+  const aiHints = hints.filter((h) => h.ai).length;
+
   async function nextHint() {
     if (!q) return;
-    const r = await api<{ hint: string }>(`/questions/${encodeURIComponent(q.id)}/hints/${hints.length + 1}`);
-    setHints([...hints, r.hint]);
+    const r = await api<{ hint: string }>(`/questions/${encodeURIComponent(q.id)}/hints/${manualHints + 1}`);
+    setHints([...hints, { text: r.hint, ai: false }]);
+  }
+
+  async function aiHint() {
+    if (!q || aiBusy) return;
+    setAiBusy(true);
+    try {
+      const r = await api<{ hint: string }>("/ai/hint", {
+        body: { question_id: q.id, level: aiHints + 1, current_answer: value || choice || choices.join("") },
+      });
+      setHints([...hints, { text: r.hint, ai: true }]);
+    } catch (e) {
+      setNotice((e as Error).message);
+    } finally {
+      setAiBusy(false);
+    }
   }
 
   async function submit(revealed = false) {
@@ -89,13 +107,17 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
             : { part_scores: partScores };
     setBusy(true);
     setFrozen(seconds);
+    const body = { question_id: q.id, response, seconds, hints_used: hints.length, revealed, confidence };
     try {
-      const r = await api<AttemptResult>("/attempts", {
-        body: { question_id: q.id, response, seconds, hints_used: hints.length, revealed, confidence },
-      });
-      setResult(r);
+      setResult(await api<AttemptResult>("/attempts", { body }));
     } catch (e) {
-      setError((e as Error).message);
+      if (isNetworkError(e) && !revealed) {
+        await enqueue({ ...body, answered_at: new Date().toISOString() });
+        setResult({ attempt_id: 0, queued: true } as AttemptResult);
+      } else {
+        setNotice(isNetworkError(e) ? "没有网络：看答案需要联网" : (e as Error).message);
+        setFrozen(null);
+      }
     } finally {
       setBusy(false);
     }
@@ -103,23 +125,16 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
 
   async function startSelfGrading() {
     if (!q) return;
-    setFrozen(seconds);
-    const r = await api<Reveal>(`/questions/${encodeURIComponent(q.id)}/reveal`, { method: "POST" });
-    setPartScores(r.parts.map(() => 0));
-    setSelfGrading(r);
+    try {
+      const r = await api<Reveal>(`/questions/${encodeURIComponent(q.id)}/reveal`, { method: "POST" });
+      setFrozen(seconds);
+      setPartScores(r.parts.map(() => 0));
+      setSelfGrading(r);
+    } catch (e) {
+      setNotice(isNetworkError(e) ? "没有网络：对照答案需要联网" : (e as Error).message);
+    }
   }
 
-  function insert(text: string) {
-    const el = inputRef.current;
-    if (!el) return setValue(value + text);
-    const start = el.selectionStart ?? value.length;
-    const end = el.selectionEnd ?? value.length;
-    setValue(value.slice(0, start) + text + value.slice(end));
-    requestAnimationFrame(() => {
-      el.focus();
-      el.setSelectionRange(start + text.length, start + text.length);
-    });
-  }
 
   const canSubmit =
     (q.type === "single" && choice) || (q.type === "multi" && choices.length) || (q.type === "fill" && value.trim());
@@ -150,63 +165,26 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
       {q.source && <p className="muted small">{q.source}</p>}
 
       <MathText text={q.stem} className="math-text stem" />
+      {q.figure && <img className="figure" src={q.figure} alt="题目配图" loading="lazy" />}
 
       {q.options && (
-        <div className="options">
-          {Object.entries(q.options).map(([letter, text]) => {
-            const selected = q.type === "single" ? choice === letter : choices.includes(letter);
-            const correct = result && (result.reveal.answer as string[] | string).includes(letter);
-            return (
-              <button
-                key={letter}
-                className={`option ${selected ? "selected" : ""} ${result ? (correct ? "correct" : selected ? "wrong" : "") : ""}`}
-                disabled={!!result}
-                onClick={() =>
-                  q.type === "single"
-                    ? setChoice(letter)
-                    : setChoices(selected ? choices.filter((c) => c !== letter) : [...choices, letter].sort())
-                }
-              >
-                <span className="letter">{letter}</span>
-                <MathText text={text} inline className="math-text" />
-              </button>
-            );
-          })}
-        </div>
+        <Options
+          options={q.options}
+          type={q.type}
+          selected={q.type === "single" ? (choice ? [choice] : []) : choices}
+          onChange={(sel) => (q.type === "single" ? setChoice(sel[0] ?? "") : setChoices(sel))}
+          correct={result && !result.queued ? ([] as string[]).concat(result.reveal.answer ?? []) : undefined}
+        />
       )}
 
       {q.type === "fill" && (
-        <div className="fill">
-          <input
-            ref={inputRef}
-            value={value}
-            disabled={!!result}
-            placeholder="你的答案"
-            onChange={(e) => setValue(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && canSubmit && submit()}
-            autoCapitalize="off"
-            autoComplete="off"
-            spellCheck={false}
-          />
-          {!result && (
-            <div className="inserts">
-              {INSERTS.map((s) => (
-                <button key={s} className="chip" onClick={() => insert(s)}>
-                  {s}
-                </button>
-              ))}
-            </div>
-          )}
-          <p className="muted small">
-            {KIND_TIPS[q.answer_kind ?? "expr"]}
-            {value.trim() && (
-              <>
-                　预览：
-                <AnswerPreview value={value} />
-              </>
-            )}
-          </p>
-        </div>
+        <FillInput
+          value={value}
+          onChange={setValue}
+          kind={q.answer_kind}
+          disabled={!!result}
+          onEnter={() => canSubmit && submit()}
+        />
       )}
 
       {q.type === "solve" && !selfGrading && (
@@ -224,7 +202,8 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
         <ol className="hints">
           {hints.map((h, i) => (
             <li key={i}>
-              <MathText text={h} />
+              <MathText text={h.text} />
+              {h.ai && <span className="ai-note">{AI_NOTE}</span>}
             </li>
           ))}
         </ol>
@@ -268,6 +247,7 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
         </section>
       )}
 
+      {notice && <p className="error">{notice}</p>}
       {!result && (
         <footer className="actions">
           <div className="confidence">
@@ -282,9 +262,14 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
             ))}
           </div>
           <div className="buttons">
-            {hints.length < q.hints_total && (
+            {manualHints < q.hints_total && (
               <button className="ghost" onClick={nextHint}>
-                提示 {hints.length + 1}/{q.hints_total}
+                提示 {manualHints + 1}/{q.hints_total}
+              </button>
+            )}
+            {ai?.text && aiHints < 2 && (
+              <button className="ghost" disabled={aiBusy} onClick={aiHint}>
+                {aiBusy ? "AI 思考中…" : `AI 提示 ${aiHints + 1}/2`}
               </button>
             )}
             {q.type === "solve" ? (
@@ -311,16 +296,71 @@ export function QuestionRunner({ questionId, reason, position, onNext }: Props) 
         </footer>
       )}
 
-      {result && <ResultPanel result={result} type={q.type} onNext={onNext} />}
+      {result?.queued && (
+        <section className="result queued">
+          <h3>已离线保存</h3>
+          <p>现在没有网络，这道题的作答已经存在手机上，联网后会自动判分并更新错题本。</p>
+          {onNext && (
+            <button className="primary next" onClick={onNext}>
+              下一题 →
+            </button>
+          )}
+        </section>
+      )}
+      {result && !result.queued && <ResultPanel result={result} q={q} ai={ai} onNext={onNext} />}
     </article>
   );
 }
 
-function ResultPanel({ result, type, onNext }: { result: AttemptResult; type: string; onNext?: () => void }) {
+interface Explanation {
+  explanation: string;
+  error_type: ErrorType | null;
+  error_reason: string;
+}
+
+function ResultPanel({ result, q, ai, onNext }: { result: AttemptResult; q: QuestionDetail; ai: AiStatus | null; onNext?: () => void }) {
+  const type = q.type;
   const [errorType, setErrorType] = useState<ErrorType | null>(null);
   const [note, setNote] = useState("");
   const [saved, setSaved] = useState(false);
+  const [explain, setExplain] = useState<Explanation | null>(null);
+  const [variantMsg, setVariantMsg] = useState("");
+  const [aiBusy, setAiBusy] = useState("");
+  const [aiError, setAiError] = useState("");
   const { reveal, review } = result;
+
+  async function askExplain() {
+    setAiBusy("explain");
+    setAiError("");
+    try {
+      const r = await api<Explanation>("/ai/explain", { body: { attempt_id: result.attempt_id } });
+      setExplain(r);
+      if (r.error_type && !errorType) setErrorType(r.error_type);
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiBusy("");
+    }
+  }
+
+  async function makeVariants() {
+    setAiBusy("variants");
+    setAiError("");
+    try {
+      const r = await api<{ created: string[]; rejected: string[] }>("/ai/variants", {
+        body: { question_id: q.id, count: 2 },
+      });
+      setVariantMsg(
+        r.created.length
+          ? `已生成 ${r.created.length} 道变式题（通过交叉验证），以后复习这道题时会交替出现。`
+          : `这次没有生成成功：${r.rejected[0] ?? "原因未知"}`,
+      );
+    } catch (e) {
+      setAiError((e as Error).message);
+    } finally {
+      setAiBusy("");
+    }
+  }
 
   async function save() {
     await api(`/attempts/${result.attempt_id}/reflection`, { body: { error_type: errorType, note } });
@@ -365,6 +405,35 @@ function ResultPanel({ result, type, onNext }: { result: AttemptResult; type: st
             </li>
           ))}
       </ul>
+
+      {ai?.text && (
+        <div className="ai-actions">
+          {!explain && (
+            <button className="ghost" disabled={!!aiBusy} onClick={askExplain}>
+              {aiBusy === "explain" ? "AI 讲解中…" : "AI 讲解我的作答"}
+            </button>
+          )}
+          {!q.parent_id && !variantMsg && (
+            <button className="ghost" disabled={!!aiBusy} onClick={makeVariants}>
+              {aiBusy === "variants" ? "生成并验证中，约半分钟…" : "生成变式题"}
+            </button>
+          )}
+        </div>
+      )}
+      {aiError && <p className="error">{aiError}</p>}
+      {explain && (
+        <div className="ai-box">
+          <MathText text={explain.explanation} />
+          {explain.error_type && (
+            <p className="muted small">
+              AI 判断错因：{ERROR_TYPES.find((t) => t.value === explain.error_type)?.label}——
+              <MathText text={explain.error_reason} inline />
+            </p>
+          )}
+          <span className="ai-note">{AI_NOTE}</span>
+        </div>
+      )}
+      {variantMsg && <p className="muted small">{variantMsg}</p>}
 
       {!result.full && !saved && (
         <div className="reflection">

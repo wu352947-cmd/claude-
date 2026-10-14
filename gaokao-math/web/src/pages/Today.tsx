@@ -13,6 +13,8 @@ export function Today({ onStart }: { onStart: (ids: string[], reasons: Record<st
       .then(([p, o]) => {
         setPlan(p);
         setOverview(o);
+        // 预先取一遍今天的题，Service Worker 会缓存下来，路上没网也能做
+        p.items.forEach((i) => api(`/questions/${encodeURIComponent(i.question_id)}`).catch(() => {}));
       })
       .catch((e) => setError(e.message));
   }, []);
@@ -21,6 +23,7 @@ export function Today({ onStart }: { onStart: (ids: string[], reasons: Record<st
   if (!plan || !overview) return <p className="muted">加载中…</p>;
 
   const reviews = plan.items.filter((i) => i.kind === "review").length;
+  const explore = plan.items.filter((i) => i.kind === "explore").length;
   const fresh = plan.items.length - reviews;
   const start = () =>
     onStart(
@@ -51,7 +54,7 @@ export function Today({ onStart }: { onStart: (ids: string[], reasons: Record<st
 
       <div className="section-head">
         <h2>
-          今日题单 <span className="muted small">{reviews} 道错题复习 + {fresh} 道新题</span>
+          今日题单 <span className="muted small">{reviews} 道错题复习 + {fresh - explore} 道新题{explore ? ` + ${explore} 道随机题` : ""}</span>
         </h2>
         {plan.items.length > 0 && (
           <button className="primary" onClick={start}>
@@ -73,7 +76,7 @@ export function Today({ onStart }: { onStart: (ids: string[], reasons: Record<st
               key={item.question_id}
               q={item.question}
               note={item.reason}
-              badge={item.kind === "review" ? "复习" : "新题"}
+              badge={item.kind === "review" ? "复习" : item.kind === "explore" ? "随机" : "新题"}
               onClick={() => onStart([item.question_id], { [item.question_id]: item.reason })}
             />
           ))}

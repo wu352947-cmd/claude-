@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 from sqlmodel import Session, func, select
 
-from ..models import Attempt, KnowledgePoint, Mastery, Question, ReviewCard
+from ..models import Attempt, Exam, KnowledgePoint, Mastery, Question, ReviewCard
 from .mastery import effective_theta, mastery_percent
 from .today import ERROR_LABELS
 
@@ -91,3 +91,41 @@ def error_breakdown(session: Session, now: datetime, days: int = 30) -> dict:
     for b in items:
         b["share"] = round(b["lost_points"] / total * 100, 1) if total else 0.0
     return {"days": days, "lost_points": round(total, 2), "items": items}
+
+
+def trend(session: Session, now: datetime, tz: ZoneInfo, days: int = 30) -> list[dict]:
+    """最近 days 天每天做了几题、得分率多少（没做题的日子也列出来，方便画图）。"""
+    since = now - timedelta(days=days + 1)
+    buckets: dict = defaultdict(lambda: [0, 0.0, 0.0])
+    for a in session.exec(select(Attempt).where(Attempt.created_at >= since)):
+        b = buckets[_local_date(a.created_at, tz)]
+        b[0] += 1
+        b[1] += a.score
+        b[2] += a.max_score
+    today = _local_date(now, tz)
+    out = []
+    for i in range(days - 1, -1, -1):
+        day = today - timedelta(days=i)
+        n, score, max_score = buckets.get(day, (0, 0.0, 0.0))
+        out.append({"date": day.isoformat(), "attempts": n,
+                    "score_rate": round(score / max_score * 100, 1) if max_score else None})
+    return out
+
+
+def multi_analysis(session: Session, now: datetime, days: int = 60) -> dict:
+    from .exam import multi_breakdown
+
+    since = now - timedelta(days=days)
+    rows = session.exec(
+        select(Attempt, Question).join(Question, Question.id == Attempt.question_id)
+        .where(Question.type == "multi", Attempt.created_at >= since, Attempt.revealed == False)  # noqa: E712
+    ).all()
+    data = multi_breakdown([(a.response.get("choices") or [], q.answer, a.score, a.max_score) for a, q in rows])
+    data["days"] = days
+    return data
+
+
+def exam_history(session: Session) -> list[dict]:
+    exams = session.exec(select(Exam).where(Exam.status == "done").order_by(Exam.created_at)).all()
+    return [{"id": e.id, "title": e.title, "date": e.created_at.isoformat(), "score": e.score,
+             "predicted": e.predicted} for e in exams]

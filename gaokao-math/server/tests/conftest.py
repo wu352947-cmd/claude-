@@ -34,12 +34,17 @@ def clock() -> Clock:
     return Clock()
 
 
-def make_client(data_dir: Path, tmp_path: Path, clock: Clock, **overrides) -> TestClient:
+def make_client(data_dir: Path, tmp_path: Path, clock: Clock, *, llm=None, vision=None, **overrides) -> TestClient:
     settings = load_settings(data_dir=data_dir, db_path=tmp_path / "test.db", web_dist=tmp_path / "no-dist",
-                             **overrides)
+                             backup_dir=tmp_path / "backups", **overrides)
     settings.token = overrides.get("token")
+    for key in ("ai_daily_limit", "explore"):
+        if key in overrides:
+            setattr(settings, key, overrides[key])  # 覆盖 config.yaml 里的值
     app = create_app(settings)
     app.state.clock = clock
+    app.state.text_llm = llm
+    app.state.vision_llm = vision
     return TestClient(app)
 
 

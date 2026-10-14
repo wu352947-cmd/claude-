@@ -17,6 +17,7 @@ from sqlmodel import Session, delete, select
 
 from .core.grading import FILL_KINDS, ParseError, parse_answer
 from .core.mastery import DIFFICULTY_B
+from .images import FIGURE_NAME
 from .models import KnowledgePoint, Question, QuestionKp, utcnow
 
 TYPES = ("single", "multi", "fill", "solve")
@@ -92,7 +93,8 @@ def _check_acyclic(by_id: dict[str, dict]) -> None:
 
 # ---------------------------------------------------------------- 题目
 
-def normalize_question(raw: dict, qid: str, kp_ids: set[str], defaults: dict | None = None) -> dict:
+def normalize_question(raw: dict, qid: str, kp_ids: set[str], defaults: dict | None = None,
+                       figures_dir: Path | None = None) -> dict:
     """校验一道题并补全默认值，返回 Question 字段 + kps 权重。出错抛 BankError。"""
     defaults = {**FALLBACK_DEFAULTS, **(defaults or {})}
 
@@ -144,9 +146,16 @@ def normalize_question(raw: dict, qid: str, kp_ids: set[str], defaults: dict | N
         "est_seconds": int(raw.get("est_seconds") or defaults[qtype]["est_seconds"]),
         "source": str(raw.get("source") or ""),
         "parent_id": raw.get("parent"),
+        "figure": raw.get("figure"),
         "verified": bool(raw.get("verified", True)),
         "kps": kps,
     }
+
+    if out["figure"] is not None:
+        if not FIGURE_NAME.match(str(out["figure"])):
+            fail("figure 文件名格式不对（应由录题页面上传生成）")
+        if figures_dir is not None and not (figures_dir / out["figure"]).exists():
+            fail(f"配图 {out['figure']} 不在 data/figures/ 里")
 
     if qtype in ("single", "multi"):
         options = raw.get("options")
@@ -233,7 +242,7 @@ def sync_bank(session: Session, data_dir: Path, defaults: dict | None = None) ->
         try:
             with path.open(encoding="utf-8") as f:
                 raw = yaml.safe_load(f)
-            data = normalize_question(raw, qid, kp_ids, defaults)
+            data = normalize_question(raw, qid, kp_ids, defaults, data_dir / "figures")
         except yaml.YAMLError as exc:
             report.errors.append(f"{qid}：YAML 格式错误（{exc.__class__.__name__}）")
             continue
@@ -270,7 +279,7 @@ def _str_representer(dumper, value: str):
 
 _BlockDumper.add_representer(str, _str_representer)
 
-FIELD_ORDER = ("type", "source", "kps", "difficulty_label", "est_seconds", "points", "stem", "options",
+FIELD_ORDER = ("type", "source", "kps", "difficulty_label", "est_seconds", "points", "stem", "figure", "options",
                "answer", "answer_kind", "loose_endpoints", "parts", "hints", "solution", "parent", "verified")
 
 
