@@ -28,13 +28,15 @@ from .import_open_data import (DATA_DIR, USER_SUBDIR, Raw, clean, convert, drop_
 PAPERS = {
     "2025:xkb1": dict(paper="新课标I卷", fmt="new19", track="",
                       score={"single": 5, "multi": 6, "fill": 5}, solve={15: 13, 16: 15, 17: 15, 18: 17, 19: 17}),
+    "2023:jia": dict(paper="全国甲卷", fmt="old", track="理",
+                     score={"single": 5, "fill": 5}, solve={n: 12 for n in range(17, 22)}),
     "2024:jia": dict(paper="全国甲卷", fmt="old", track="理",
                      score={"single": 5, "fill": 5}, solve={n: 12 for n in range(17, 22)}),
 }
 # Word 里个别汉字是以图片（wmf）形式插入的，没法转成文字；按上下文人工认出来。
 GLYPHS = {
     "xkb1": {"image66.wmf": "【", "image108.wmf": "是", "image413.wmf": "在", "image417.wmf": "的"},
-    "jia": {"image121.wmf": "的", "image302.wmf": "是", "image431.wmf": "在"},
+    "jia": {"image55.wmf": ".", "image89.wmf": "的", "image265.wmf": "【", "image121.wmf": "的", "image302.wmf": "是", "image431.wmf": "在"},
 }
 IMG = "\0IMG\0"
 QNUM = re.compile(r"^\s*(\d{1,2})\s*[.．、]\s*")
