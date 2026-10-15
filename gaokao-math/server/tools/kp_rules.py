@@ -131,7 +131,7 @@ GENERIC = {"vec.linear", "deriv.basic", "expo.ops", "func.monotonic", "line.equa
 
 # 有些知识点的关键词容易误伤，要求全文同时出现相应的「语境」
 CONTEXT = {
-    "solid.": r"平面|棱|锥|柱|正方体|长方体|球|几何体|异面|四面体",
+    "solid.": r"平面|棱|锥|柱|圆台|棱台|正方体|长方体|球|几何体|异面|四面体",
     "complex.": r"复|虚|\\mathrm\{i\}|\di(?![A-Za-z_^{])|\}i(?![A-Za-z_^{])|[+-]i(?![A-Za-z_^{])|^i\(|=i",
     "vec.": r"向量|\\vec|\\overrightarrow",
     "conic.chord": r"椭圆|双曲线|抛物线|曲线|轨迹",

@@ -15,6 +15,17 @@
 
 另外：数据库每天自动备份；可以「添加到主屏幕」当 App 用；做题时发现题目有错可以点「这道题有问题？」，之后不再推送。
 
+### 导入自己的 Word 试卷（MathType 公式）
+
+学科网等导出的 Word 试卷，公式是 MathType 对象，直接复制会丢公式。`server/tools/import_user_docs.py` 会把公式转成 LaTeX、拆出题干/选项/答案/解析/插图后写入 `data/questions/gaokao-user/`（含第三方解析，已加入 `.gitignore`，不会提交）：
+
+```bash
+cd server
+uv run python -m tools.import_user_docs 2025:xkb1=/路径/2025新1卷解析版.docx 2024:jia=/路径/2024全国甲卷理科.docx
+```
+
+新的卷子先在 `tools/import_user_docs.py` 的 `PAPERS` 里登记题型分值。Word 文件必须带答案和解析；只有题目的试卷无法判分，不能导入。
+
 ## 运行
 
 需要 [uv](https://docs.astral.sh/uv/)（会自动装好合适版本的 Python）和 Node.js 22+。Windows、macOS、Linux 都可以。

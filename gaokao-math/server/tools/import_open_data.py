@@ -55,7 +55,9 @@ LICENSE_NOTE = {
     "mm": "GAOKAO-MM（Apache-2.0）",
     "xh2026": "gaokao_math_2026（Apache-2.0）",
     "agieval": "AGIEval（MIT）",
+    "user": "用户提供的 Word 试卷（学科网整理版），仅供个人学习",
 }
+USER_SUBDIR = "gaokao-user"
 
 
 @dataclass
@@ -562,6 +564,29 @@ def dedupe_text(raw: Raw) -> str:
     return "".join(re.findall(r"[\u4e00-\u9fff0-9a-zA-Z]", s))[:80]
 
 
+def squash_stem(text: str) -> str:
+    s = re.sub(r"\\[a-zA-Z]+", "", text)
+    return "".join(re.findall(r"[\u4e00-\u9fff0-9a-zA-Z]", s))
+
+
+def user_duplicates(data_dir: Path) -> dict[int, list[str]]:
+    """用户提供的 Word 试卷里已有的题干（按年份），开源数据里同一道题不再导入。"""
+    out: dict[int, list[str]] = defaultdict(list)
+    for p in (data_dir / "questions" / USER_SUBDIR).rglob("*.yaml"):
+        d = yaml.safe_load(p.read_text(encoding="utf-8"))
+        out[int(d["year"])].append(squash_stem(d["stem"]))
+    return out
+
+
+def is_user_duplicate(raw: Raw, users: dict[int, list[str]]) -> bool:
+    mine = squash_stem(raw.text)
+    for other in users.get(raw.year, []):
+        n = min(len(mine), len(other), 60)
+        if n >= 15 and SequenceMatcher(None, mine[:n], other[:n]).ratio() > 0.9:
+            return True
+    return False
+
+
 def answer_text(raw: Raw) -> str:
     a = "".join(map(str, raw.answer)) if isinstance(raw.answer, list) else str(raw.answer or "")
     return "".join(re.findall(r"[0-9a-zA-Z]", re.sub(r"\\(mathrm|left|right|dfrac|frac)", "", a)))
@@ -586,7 +611,30 @@ def group_duplicates(raws: list[Raw]) -> list[list[Raw]]:
     return [g[3] for g in groups]
 
 
-def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path) -> tuple[dict[str, dict], Counter, list[str]]:
+def drop_unrenderable(out: dict[str, dict], skipped: Counter, notes: list[str]) -> None:
+    """KaTeX：题干和选项渲染失败的题跳过；解析渲染失败的只去掉解析（解答题整题跳过）。"""
+    texts = {}
+    for qid, d in out.items():
+        texts[qid + "|stem"] = d["stem"] + "\n" + "\n".join((d.get("options") or {}).values())
+        texts[qid + "|sol"] = d.get("solution", "")
+    bad = katex_failures(texts)
+    for qid in list(out):
+        if qid + "|stem" in bad:
+            skipped["公式无法渲染"] += 1
+            notes.append(f"{qid}：题干公式无法渲染，已跳过")
+            del out[qid]
+        elif qid + "|sol" in bad:
+            if out[qid]["type"] == "solve":
+                skipped["解答公式无法渲染"] += 1
+                notes.append(f"{qid}：解答公式无法渲染，已跳过")
+                del out[qid]
+            else:
+                out[qid].pop("solution", None)
+                notes.append(f"{qid}：解析公式无法渲染，已去掉解析")
+
+
+def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path,
+            reserved: frozenset[str] = frozenset()) -> tuple[dict[str, dict], Counter, list[str]]:
     skipped: Counter = Counter()
     notes: list[str] = []
 
@@ -597,7 +645,7 @@ def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path) -> tuple[dict[
 
     out: dict[str, dict] = {}
     for group in group_duplicates(kept):
-        group.sort(key=lambda r: ({"mm": 0, "xh2026": 0, "updates": 1, "bench": 2, "agieval": 3}[r.origin], r.track))
+        group.sort(key=lambda r: ({"user": 0, "mm": 0, "xh2026": 0, "updates": 1, "bench": 2, "agieval": 3}[r.origin], r.track))
         r = group[0]
         tracks = sorted({g.track for g in group if g.track})
         track = "" if len(tracks) != 1 else tracks[0]
@@ -640,10 +688,10 @@ def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path) -> tuple[dict[
                 skipped["答案缺失或不在选项里"] += 1
                 continue
             entry.update(options=options, answer=answer[0] if qtype == "single" else answer)
-            if r.pictures:
-                figure = save_figure(figures_dir, compose_figure(r.pictures), "png")
         else:
             stem = r.text
+        if r.pictures:
+            figure = save_figure(figures_dir, compose_figure(r.pictures), "png")
 
         if NEED_FIGURE.search(re.sub(r"\s+", "", stem)) and not figure:
             skipped["需要配图但数据集里没有"] += 1
@@ -679,7 +727,10 @@ def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path) -> tuple[dict[
             labels = [p[0] for p in parts] or ["全题"]
             pts = part_points(r.score, len(labels), r.rate_rule)
             answers = [""] * len(labels)
-            if r.origin == "xh2026":
+            if isinstance(r.answer, list):  # 已按问拆好的参考答案
+                for i, a in enumerate(r.answer[:len(labels)]):
+                    answers[i] = a
+            elif r.origin == "xh2026":
                 segs = [s.strip() for s in str(r.answer).split("#")]
                 for i, s in enumerate(segs[:len(labels)]):
                     answers[i] = clean(re.sub(r"^\(\d\)", "", s))
@@ -706,6 +757,9 @@ def convert(raws: list[Raw], kp_ids: set[str], figures_dir: Path) -> tuple[dict[
         title = f"{r.year} {r.paper}{('（' + track + '科）') if track else ''} 第 {r.num} 题" if r.num and not r.num_estimated else \
             f"{r.year} {r.paper}{('（' + track + '科）') if track else ''} {kind_name}题"
         qid = f"gk{r.year}-{r.slug}{('-' + {'文': 'w', '理': 'l'}[track]) if track else ''}-{'x' if r.num_estimated else ''}{r.num or 0:02d}"
+        if qid in reserved:
+            skipped["已有用户提供的 Word 试卷版本（带完整解析）"] += 1
+            continue
         if qid in out:
             qid += f"-{len([k for k in out if k.startswith(qid)]) + 1}"
         data = {
@@ -759,25 +813,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         import tempfile
         figures_dir = Path(tempfile.mkdtemp())
-    out, skipped, notes = convert(raws, kp_ids, figures_dir)
+    # 用户自己提供的 Word 试卷（tools/import_user_docs.py 导入，带完整解析）优先：同一题不再重复导入
+    reserved = frozenset(p.stem for p in (args.data / "questions" / USER_SUBDIR).rglob("*.yaml"))
+    users = user_duplicates(args.data)
+    dup = [r for r in raws if is_user_duplicate(r, users)]
+    raws = [r for r in raws if r not in dup]
+    print(f"其中 {len(dup)} 条在用户提供的 Word 试卷里已有，不再导入")
+    out, skipped, notes = convert(raws, kp_ids, figures_dir, reserved)
 
-    # KaTeX：题干和选项渲染失败的题跳过；解析渲染失败的只去掉解析（选择填空题）
-    texts = {}
-    for qid, d in out.items():
-        texts[qid + "|stem"] = d["stem"] + "\n" + "\n".join((d.get("options") or {}).values())
-        texts[qid + "|sol"] = d.get("solution", "")
-    bad = katex_failures(texts)
-    for qid in list(out):
-        if qid + "|stem" in bad:
-            skipped["公式无法渲染"] += 1
-            del out[qid]
-        elif qid + "|sol" in bad:
-            if out[qid]["type"] == "solve":
-                skipped["解答公式无法渲染"] += 1
-                del out[qid]
-            else:
-                out[qid].pop("solution", None)
-                notes.append(f"{qid}：解析公式无法渲染，已去掉解析")
+    drop_unrenderable(out, skipped, notes)
 
     print(f"\n导入 {len(out)} 道", Counter(d["type"] for d in out.values()))
     print("按年份", sorted(Counter(d["year"] for d in out.values()).items()))

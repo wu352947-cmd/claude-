@@ -164,6 +164,11 @@ def normalize_question(raw: dict, qid: str, kp_ids: set[str], defaults: dict | N
         if figures_dir is not None and not (figures_dir / out["figure"]).exists():
             fail(f"配图 {out['figure']} 不在 data/figures/ 里")
 
+    if figures_dir is not None:
+        for name in re.findall(r"\[\[图:([^\]]*)\]\]", out["solution"]):
+            if not FIGURE_NAME.match(name) or not (figures_dir / name).exists():
+                fail(f"解析里引用的配图 {name} 不在 data/figures/ 里")
+
     if qtype in ("single", "multi"):
         options = raw.get("options")
         if not isinstance(options, dict) or len(options) < 2:

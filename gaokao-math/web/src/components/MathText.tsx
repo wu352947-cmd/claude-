@@ -3,13 +3,17 @@ import { useMemo } from "react";
 
 const MATH = /\$\$([\s\S]+?)\$\$|\$([^$]+?)\$/g;
 
+// 解析里的插图：[[图:<16位十六进制>.png]]，文件放在 data/figures/
+const FIGURE = /\[\[图:([0-9a-f]{16}\.(?:png|jpg|webp))\]\]/g;
+
 function escapeText(s: string): string {
   return s
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
-    .replace(/\n/g, "<br/>");
+    .replace(/\n/g, "<br/>")
+    .replace(FIGURE, (_, name) => `<img class="figure solution-figure" src="/api/figures/${name}" alt="解析配图" loading="lazy"/>`);
 }
 
 function tex(src: string, displayMode: boolean): string {
