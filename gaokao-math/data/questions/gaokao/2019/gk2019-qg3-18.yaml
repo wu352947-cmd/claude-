@@ -1,0 +1,26 @@
+type: solve
+source: 2019 全国III卷 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  tri.range: 0.5
+  tri.laws: 0.5
+difficulty_label: 中档
+stem: |-
+  $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $a \sin \frac{A+C}{2}=b \sin A$.
+
+  (1) 求 $B$;
+
+  (2) 若 $\triangle A B C$ 为锐角三角形, 且 $c=1$, 求 $\triangle A B C$ 面积的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【详解】(1)根据题意 $a \sin \frac{A+C}{2}=b \sin A$ 由正弦定理得 $\sin A \sin \frac{A+C}{2}=\sin B \sin A$, 因 为 $0<A<\pi$, 故 $\sin A>0$, 消去 $\sin A$ 得 $\sin \frac{A+C}{2}=\sin B$ 。
+
+  $0<B, 0<\frac{A+C}{2}<\pi$ 因为故 $\frac{A+C}{2}=B$ 或者 $\frac{A+C}{2}+B=\pi$, 而根据题意 $A+B+C=\pi$, 故 $\frac{A+C}{2}+B=\pi$ 不成立, 所以 $\frac{A+C}{2}=B$, 又因为 $A+B+C=\pi$, 代人得 $3 B=\pi$, 所以 $B=\frac{\pi}{3}$.
+
+  (2)因为 $\mathrm{V} A B C$ 是锐角三角形, 又由前问 $B=\frac{\pi}{3}, \frac{\pi}{6}<A, C<\frac{\pi}{2}, A+B+C=\pi$ 得到 $A+C=\frac{2}{3} \pi$, 故 $\frac{\pi}{6}<C<\frac{\pi}{2}$ 又应用正弦定理 $\frac{a}{\sin A}=\frac{c}{\sin C}, \frac{12}{25}$, 由三角形面积公式有 $S_{\triangle A B C}=\frac{1}{2} a c \cdot \sin B=\frac{1}{2} c^{2} \frac{a}{c} \cdot \sin B=\frac{1}{2} c^{2} \frac{\sin A}{\sin C} \cdot \sin B=\frac{\sqrt{3}}{4} \cdot \frac{\sin \left(\frac{2 \pi}{3}-C\right)}{\sin C}$ $=\frac{\sqrt{3}}{4} \cdot \frac{\sin \frac{2 \pi}{3} \cos C-\cos \frac{2 \pi}{3} \sin C}{\sin C}=\frac{\sqrt{3}}{4} \cdot\left(\sin \frac{2 \pi}{3} \cot C-\cos \frac{2 \pi}{3}\right)=\frac{3}{8} \cot C+\frac{\sqrt{3}}{8}$. 又因 $\frac{\pi}{6}<C<\frac{\pi}{2}$, 故 $\frac{\sqrt{3}}{8}=\frac{3}{8} \cot \frac{\pi}{2}+\frac{\sqrt{3}}{8}<S_{\triangle A B C}<\frac{3}{8} \cot \frac{\pi}{6}+\frac{\sqrt{3}}{8}=\frac{\sqrt{3}}{2}$, 故 $\frac{\sqrt{3}}{8}<S_{\triangle A B C}<\frac{\sqrt{3}}{2}$. 故 $S_{\triangle A B C}$ 的取值范围是 $\left(\frac{\sqrt{3}}{8}, \frac{\sqrt{3}}{2}\right)$

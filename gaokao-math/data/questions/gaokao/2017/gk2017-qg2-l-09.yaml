@@ -1,0 +1,25 @@
+type: single
+source: 2017 全国II卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.eccentricity: 0.61
+  conic.chord: 0.39
+difficulty_label: 中档
+points: 5.0
+stem: '若双曲线 $c: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的一条渐近线被圆 $(x-2)$ ${ }^{2}+y^{2}=4$ 所截得的弦长为 2 , 则 $C$ 的离心率为 ( )'
+options:
+  A: '2'
+  B: $\sqrt{3}$
+  C: $\sqrt{2}$
+  D: $\frac{2 \sqrt{3}}{3}$
+answer: A
+solution: |-
+  解 双曲线 $c: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的一条渐近线不妨为 $b x+a y=0$
+
+  圆 $(x-2)^{2}+y^{2}=4$ 的圆心 $(2,0)$, 半径为: 2 ,
+
+  双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的一条渐近线被圆 $(x-2)^{2}+y^{2}=4$ 所截得 的弦长为 2 , 可得圆心到直线的距离为: $\sqrt{2^{2}-1^{2}}=\sqrt{3}=\frac{|2 b|}{\sqrt{a^{2}+b^{2}}}$,
+
+  解得: $\frac{4 c^{2}-4 \mathrm{a}^{2}}{\mathrm{c}^{2}}=3$, 可得 $\mathrm{e}^{2}=4$, 即 $\mathrm{e}=2$.
+
+  故选: A.

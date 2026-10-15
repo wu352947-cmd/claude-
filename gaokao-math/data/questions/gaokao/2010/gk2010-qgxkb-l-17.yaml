@@ -1,0 +1,35 @@
+type: solve
+source: 2010 全国新课标卷（理科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  seq.sum_dislocation: 1.0
+difficulty_label: 中档
+stem: |-
+  设数列满足 $a_{1}=2, a_{n+1}-a_{n}=3 \cdot 2^{2 n-1}$
+
+  （1）求数列 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 令 $b_{n}=n a_{n}$, 求数列 $\left\{b_{n}\right\}$ 的前 $n$ 项和 $S_{n}$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解： ( I ) 由已知, 当 $n \geqslant 1$ 时, $a_{n+1}=\left[\left(a_{n+1}-a_{n}\right)+\left(a_{n}-a_{n-1}\right)+\ldots+(\right.$ $\left.\left.a_{2}-a_{1}\right)\right]+a_{1}$
+
+  $=3\left(2^{2 n-1}+2^{2 n-3}+\ldots+2\right)+2=3 \times \frac{2\left(1-4^{n}\right)}{1-4}+2=2^{2(n+1)-1}$.
+
+  而 $a_{1}=2$,
+
+  所以数列 $\left\{a_{n}\right\}$ 的通项公式为 $a_{n}=2^{2 n-1}$.
+
+  ( II ) 由 $b_{n}=n a_{n}=n \cdot 2^{2 n-1}$ 知 $S_{n}=1 \cdot 2+2 \cdot 2^{3}+3 \cdot 2^{5}+\ldots+n \cdot 2^{2 n-1}(1)$
+
+  从而 $2^{2} \mathrm{S}_{\mathrm{n}}=1 \cdot 2^{3}+2 \cdot 2^{5}+\ldots+n \cdot 2^{2 n+1}(2)$
+
+  (1)- (2)得 $\left(1-2^{2}\right) \cdot S_{n}=2+2^{3}+2^{5}+\ldots+2^{2 n-1}-n \cdot 2^{2 n+1}$.
+
+  即 $S_{n}=\frac{1}{9}\left[(3 n-1) 2^{2 n+1}+2\right]$.

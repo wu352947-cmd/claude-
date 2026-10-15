@@ -1,0 +1,50 @@
+type: solve
+source: 2026 北京卷 第 21 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  novel.definition: 1.0
+difficulty_label: 压轴
+stem: |-
+  设 $A = (a_{ij})_{m \times n}$ 是一个 $m$ 行 $n$ 列的数阵，且数阵中的每一项 $a_{ij} \in \{-1,1\}$，都等于 $1$ 或 $-1$。若对任意 $1 \leqslant i, p \leqslant m$，$1 \leqslant j, q \leqslant n$，其中 $i \neq p$，$j \neq q$，且 $||i - p| - |j - q|| = 2$，都有 $a_{ij} + a_{iq} + a_{pj} + a_{pq} = 0$，则称数阵 $A$ 具有性质 $P$。
+
+  (1) 判断下列两个数表是否具有性质 $P$。
+
+  $$
+  A_1 = \begin{array}{|c|c|c|c|}
+  \hline
+  1 & 1 & -1 & 1 \\
+  \hline
+  -1 & 1 & -1 & 1 \\
+  \hline
+  \end{array}
+  $$
+
+  $$
+  A_2 = \begin{array}{|c|c|c|c|}
+  \hline
+  1 & 1 & -1 & -1 \\
+  \hline
+  1 & -1 & 1 & -1 \\
+  \hline
+  -1 & 1 & -1 & 1 \\
+  \hline
+  \end{array}
+  $$
+
+  (2) 在所有具有性质 $P$ 的 $5 \times 4$ 数阵中，$1$ 的个数最多是多少？
+
+  (3) 若 $m = n = 6$，$a_{11} = 1$，且数阵 $A$ 具有性质 $P$，证明：对任意 $i$，$j \in \{1,2,3,4,5,6\}$，都有 $a_{ij} = a_{i1}a_{1j}$。
+parts:
+- label: (1)
+  points: 5.0
+  answer: $A_{1} $不具有性质P，$A_{2} $具有性质P
+- label: (2)
+  points: 5.0
+  answer: 最多为12
+- label: (3)
+  points: 5.0
+  answer: 证明略
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $A_{1} $不具有性质P，$A_{2} $具有性质P；(2) 最多为12；(3) 证明略

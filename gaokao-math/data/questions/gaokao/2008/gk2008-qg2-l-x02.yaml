@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $a, b \in R$ 且 $b \neq 0$, 若复数 $(a+b i)^{3}$ 是实数, 则($\qquad$)
+options:
+  A: $b^{2}=3 a^{2}$
+  B: $a^{2}=3 b^{2}$
+  C: $b^{2}=9 a^{2}$
+  D: $a^{2}=9 b^{2}$
+answer: A

@@ -1,0 +1,15 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  seq.arith: 0.6
+  seq.sum_telescoping: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 已知等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 $S_{n}, a_{5}=5, S_{5}=15$, 则数列 $\left\{\frac{1}{a_{n} a_{n+1}}\right\}$ 的前 100 项和为 ($\qquad$)
+options:
+  A: $\frac{100}{101}$
+  B: $\frac{99}{101}$
+  C: $\frac{99}{100}$
+  D: $\frac{101}{100}$
+answer: A

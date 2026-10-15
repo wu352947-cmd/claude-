@@ -1,0 +1,24 @@
+type: single
+source: 2013 全国II卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  expo.compare: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $a=\log _{3} 6, b=\log _{5} 10, c=\log _{7} 14$, 则（ ）
+options:
+  A: $c>b>a$
+  B: $b>c>a$
+  C: $a>c>b$
+  D: $a>b>c$
+answer: D
+solution: |-
+  解: 因为 $a=\log _{3} 6=1+\log _{3} 2, b=\log _{5} 10=1+\log _{5} 2, c=\log _{7} 14=1+\log _{7} 2$, 因为 $y=\log _{2} x$ 是增函数, 所以 $\log _{2} 7>\log _{2} 5>\log _{2} 3$,
+
+  $\because \log _{2} 7=\frac{1}{\log _{7} 2}, \log _{2} 5=\frac{1}{\log _{5} 2}, \log _{2} 3=\frac{1}{\log _{3} 2}$
+
+  所以 $\log _{3} 2>\log _{5} 2>\log _{7} 2$,
+
+  所以 $a>b>c$,
+
+  故选: D.

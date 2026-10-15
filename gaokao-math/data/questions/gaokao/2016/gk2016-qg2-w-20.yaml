@@ -1,0 +1,73 @@
+type: solve
+source: 2016 全国II卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 较难
+stem: |-
+  已知函数 $f(x)=(x+1) \ln x-a(x-1)$.
+
+  （1）当 $a=4$ 时, 求曲线 $y=f(x)$ 在 $(1, f(1 ）$ 处的切线方程;
+
+  (II) 若当 $x \in(1,+\infty)$ 时, $f(x)>0$, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 当 $a=4$ 时, $f(x)=(x+1) \ln x-4(x-1)$.
+
+  $f(1)=0$, 即点为 $(1,0)$,
+
+  函数的导数 $\mathrm{f}^{\prime}(\mathrm{x})=\ln \mathrm{x}+(\mathrm{x}+1) \cdot \frac{1}{\mathrm{x}}-4$,
+
+  则 $f^{\prime}(1)=\ln 1+2-4=2-4=-2$,
+
+  即函数的切线斜率 $k=f^{\prime}(1)=-2$,
+
+  则曲线 $y=f(x)$ 在 $(1,0)$ 处的切线方程为 $y=-2(x-1)=-2 x+2$;
+
+  (II) $\because f(x)=(x+1) \ln x-a(x-1)$,
+
+  $\therefore f^{\prime}(x)=1+\frac{1}{x}+\ln x-a$,
+
+  $\therefore f^{\prime \prime}(x)=\frac{x-1}{x^{2}}$,
+
+  $\because x>1, \therefore f^{\prime \prime}(x)>0$
+
+  $\therefore f^{\prime}(x)$ 在 $(1,+\infty)$ 上单调递增,
+
+  $\therefore f^{\prime}(x)>f^{\prime}(1)=2-a$. (1) $a \leqslant 2, \quad f^{\prime}(x)>f^{\prime}(1) \geqslant 0$
+
+  $\therefore f(x)$ 在 $(1,+\infty)$ 上单调递增,
+
+  $\therefore f(x)>f(1)=0$, 满足题意;
+
+  (2) $\mathrm{a}>2$, 存在 $\mathrm{x}_{0} \in(1,+\infty), \mathrm{f}^{\prime}\left(\mathrm{x}_{0}\right)=0$, 函数 $\mathrm{f}(\mathrm{x})$ 在 $\left(1, \mathrm{x}_{0}\right)$ 上单调递减, 在 $\left(\mathrm{x}_{0},+\infty\right)$ 上单调递增,
+
+  由 $f(1)=0$, 可得存在 $x_{0} \in(1,+\infty), f\left(x_{0}\right)<0$, 不合题意.
+
+  综上所述,$a \leqslant 2$.
+
+  另解: 若当 $x \in(1,+\infty)$ 时, $f(x)>0$,
+
+  可得 $(x+1) \ln x-a(x-1)>0$,
+
+  即为 $\mathrm{a}<\frac{(x+1) \ln x}{x-1}$,
+
+  由 $\mathrm{y}=\frac{(x+1) \ln x}{x-1}$ 的导数为 $y^{\prime}=\frac{x-\frac{1}{x}-2 \ln x}{(x-1)^{2}}$,
+
+  由 $y=x-\frac{1}{x}-2 \ln x$ 的导数为 $y^{\prime}=1+\frac{1}{x^{2}}-\frac{2}{x}=\frac{(x-1)^{2}}{x^{2}}>0$,
+
+  函数 $\mathrm{y}$ 在 $\mathrm{x}>1$ 递增, 可得 $\frac{\mathrm{x}-\frac{1}{\mathrm{x}}-2 \ln \mathrm{x}}{(\mathrm{x}-1)^{2}}>0$,
+
+  则函数 $\mathrm{y}=\frac{(\mathrm{x}+1) \ln x}{x-1}$ 在 $\mathrm{x}>1$ 递增,
+
+  则 $\lim _{x \rightarrow 1} \frac{(x+1) \ln x}{x-1}=\lim _{x \rightarrow 1} \frac{\ln x+1+\frac{1}{x}}{1}=2$,
+
+  可得 $\frac{(x+1) \ln x}{x-1}>2$ 恒成立,
+
+  即有 $a \leqslant 2$.

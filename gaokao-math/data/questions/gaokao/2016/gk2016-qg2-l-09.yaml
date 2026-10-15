@@ -1,0 +1,26 @@
+type: single
+source: 2016 全国II卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.identities: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $\cos \left(\frac{\pi}{4}-\alpha\right)=\frac{3}{5}$, 则 $\sin 2 \alpha=(\quad)$
+options:
+  A: $\frac{7}{25}$
+  B: $\frac{1}{5}$
+  C: $-\frac{1}{5}$
+  D: $-\frac{7}{25}$
+answer: D
+solution: |-
+  解: 法 $1^{\circ}: \because \cos \left(\frac{\pi}{4}-\alpha\right)=\frac{3}{5}$,
+
+  $\therefore \sin 2 \alpha=\cos \left(\frac{\pi}{2}-2 \alpha\right)=\cos 2\left(\frac{\pi}{4}-\alpha\right)=2 \cos ^{2}\left(\frac{\pi}{4}-\alpha\right)-1=2 \times \frac{9}{25}-1=-\frac{7}{25}$
+
+  法 $2^{\circ}: \because \cos \left(\frac{\pi}{4}-\alpha\right)=\frac{\sqrt{2}}{2}(\sin \alpha+\cos \alpha)=\frac{3}{5}$,
+
+  $\therefore \frac{1}{2}(1+\sin 2 \alpha)=\frac{9}{25}$,
+
+  $\therefore \sin 2 \alpha=2 \times \frac{9}{25}-1=-\frac{7}{25}$,
+
+  故选: D.

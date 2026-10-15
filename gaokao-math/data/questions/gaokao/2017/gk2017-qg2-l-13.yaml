@@ -1,0 +1,17 @@
+type: fill
+source: 2017 全国II卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  prob.distribution: 0.57
+  prob.classical: 0.43
+difficulty_label: 基础
+points: 5.0
+stem: 一批产品的二等品率为 0.02 , 从这批产品中每次随机取一件, 有放 回地抽取 100 次. $X$ 表示抽到的二等品件数, 则 $D X=$ ______
+answer: '1.96'
+answer_kind: expr
+solution: |-
+  解: 由题意可知, 该事件满足独立重复试验, 是一个二项分布模型, 其中, $p=0.02, n=100$,
+
+  则 $D X=n p q=n p(1-p)=100 \times 0.02 \times 0.98=1.96$.
+
+  故答案为: 1.96 .

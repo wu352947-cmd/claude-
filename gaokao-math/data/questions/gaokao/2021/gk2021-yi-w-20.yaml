@@ -1,0 +1,37 @@
+type: solve
+source: 2021 全国乙卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+stem: |-
+  已知抛物线 $C: y^{2}=2 p x(p>0)$ 的焦点 $F$ 到准线的距离为 2 .
+
+  (1) 求 $C$ 的方程,
+
+  (2) 已知 $O$ 为坐标原点, 点 $P$ 在 $C$ 上, 点 $Q$ 满足 $\overrightarrow{P Q}=9 \overrightarrow{Q F}$, 求直线 $O Q$ 斜率的最大值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解析
+
+  解析:
+
+  (1) 由焦点到准线的距离为 $p$, 则 $p=2$.
+
+  抛物线 $c$ 的方程: $y^{2}=4 x$.
+
+  (2) 设点 $P\left(\frac{y_{0}^{2}}{4}, y_{0}\right), Q\left(x_{Q}, y_{Q}\right), F(1,0)$.
+
+  $\because \overrightarrow{P Q}=9 \overrightarrow{Q F}$
+
+  $\therefore\left(x_{Q}-\frac{y_{0}^{2}}{4}, y_{Q}-y_{0}\right)=9\left(1-x_{Q},-y_{Q}\right) \Rightarrow\left\{\begin{array}{l}x_{Q}-\frac{y_{0}^{2}}{4}=9-9 x_{Q} \\ y_{Q}-y_{0}=-9 x_{Q}\end{array} \Rightarrow\left\{\begin{array}{l}x_{Q}=\frac{9+\frac{y_{0}^{2}}{4}}{10} \\ y_{Q}=\frac{y_{0}}{10}\end{array}\right.\right.$
+
+  则 $k_{O Q}=\frac{y_{Q}}{x_{Q}}=\frac{y_{0}}{9+\frac{y_{0}^{2}}{4}}=\frac{1}{\frac{9}{y_{0}}+\frac{y_{0}}{4}} \leq \frac{1}{2 \sqrt{\frac{9}{4}}}=\frac{1}{3}$.
+
+  $\therefore$ 直线 $O Q$ 斜率的最大值为 $\frac{1}{3}$.

@@ -1,0 +1,17 @@
+type: single
+source: 2022 全国甲卷 第 5 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2022
+kps:
+  trig.graph: 0.5
+  func.graph: 0.5
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $y=\left(3^x-3^{-x}\right) \cos x$ 在区间 $\left[-\frac{\pi}{2}, \frac{\pi}{2}\right]$ 的图象大致为 ()
+figure: 807db236801f0c4e.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: A
+solution: '【详解】令 $f(x)=\left(3^x-3^{-x}\right) \cos x, x \in\left[-\frac{\pi}{2}, \frac{\pi}{2}\right]$,则 $f(-x)=\left(3^{-x}-3^x\right) \cos (-x)=-\left(3^x-3^{-x}\right) \cos x=-f(x)$,所以 $f(x)$ 为奇函数, 排除 $\mathrm{BD}$;又当 $x \in\left(0, \frac{\pi}{2}\right)$ 时, $3^x-3^{-x}>0, \cos x>0$, 所以 $f(x)>0$, 排除 C.故选: A.'

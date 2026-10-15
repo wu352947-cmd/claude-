@@ -1,0 +1,27 @@
+type: solve
+source: 2019 全国III卷 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 中档
+stem: '设 $F_{1}, F_{2}$ 为椭圆 $C: \frac{x^{2}}{36}+\frac{y^{2}}{20}=1$ 的两个焦点, $M$ 为 $C$ 上一点且在第一象限. 若 $\triangle M F_{1} F_{2}$ 为等腰三角形, 则 $M$ 的坐标为'
+parts:
+- label: 答案
+  points: 5.0
+  answer: $(3, \sqrt{15})$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  【详 解 】由已知 可 得 $a^{2}=36, b^{2}=36, \therefore c^{2}=a^{2}-b^{2}=16, \therefore c=4$ ，
+
+  $\therefore\left|M F_{1}\right|=\left|F_{1} F_{2}\right|=2 c=8$.
+
+  $\because\left|M F_{1}\right|+\left|M F_{2}\right|=2 a=12,\left|M F_{2}\right|=4$
+
+  设点 $M$ 的坐标为 $\left(x_{0}, y_{0}\right)\left(x_{0}>0, y_{0}>0\right)$, 则 $S_{\triangle M F_{1} F_{2}}=\frac{1}{2} \cdot\left|F_{1} F_{2}\right| \cdot y_{0}=4 y_{0}$,
+
+  又 $S_{\triangle M F_{1} F_{2}}=\frac{1}{2} \times 4 \times \sqrt{8^{2}-2^{2}}=4 \sqrt{15}, \therefore 4 y_{0}=4 \sqrt{15}$, 解得 $y_{0}=\sqrt{15}$,
+
+  $\therefore \frac{x_{0}^{2}}{36}+\frac{(\sqrt{15})^{2}}{20}=1$, 解得 $x_{0}=3 \quad$ ( $x_{0}=-3$ 舍去),
+
+  $\backslash M$ 的坐标为 $(3, \sqrt{15})$.

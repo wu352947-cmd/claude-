@@ -1,0 +1,17 @@
+type: single
+source: 2017 全国III卷 第 7 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2017
+kps:
+  func.graph: 0.56
+  trig.graph: 0.44
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $y=1+x+\frac{\sin x}{x^2}$ 的部分图象大致为 ( )
+figure: 9352102027b8a0f3.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: D
+solution: '解: 函数 $y=1+x+\frac{\sin x}{x^2}$, 可知: $f(x)=x+\frac{\sin x}{x^2}$ 是奇函数, 所以函数的图象关于原点对称,则函数 $y=1+x+\frac{\sin x}{x^2}$ 的图象关于 $(0,1)$ 对称,当 $x \rightarrow 0^{+}, f(x)>0$, 排除 $A 、 C$, 当 $x=\pi$ 时, $y=1+\pi$, 排除 $B$.故选: D.'

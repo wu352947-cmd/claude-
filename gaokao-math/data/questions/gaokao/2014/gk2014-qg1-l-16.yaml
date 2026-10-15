@@ -1,0 +1,33 @@
+type: fill
+source: 2014 全国I卷（理科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  tri.range: 0.56
+  tri.laws: 0.44
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $a, b, c$ 分别为 $\triangle A B C$ 的三个内角 $A, B, C$ 的对边, $a=2$ 且 $(2+b$ ) $(\sin A-\sin B)=(c-b) \sin C$, 则 $\triangle A B C$ 面积的最大值为 ______
+answer: \sqrt{3}
+answer_kind: expr
+solution: |-
+  解: 因为: $(2+b)(\sin A-\sin B)=(c-b) \sin C$
+
+  $\Rightarrow(2+b) \quad(a-b)=(c-b) c$
+
+  $\Rightarrow 2 a-2 b+a b-b^{2}=c^{2}-b c$
+
+  又因为: $a=2$,
+
+  所以: $a^{2}-b^{2}=c^{2}-b c \Rightarrow b^{2}+c^{2}-a^{2}=b c \Rightarrow \cos A=\frac{b^{2}+c^{2}-a^{2}}{2 b c}=\frac{1}{2} \Rightarrow A=\frac{\pi}{3}$, $\triangle \mathrm{ABC}$ 面积 $\mathrm{S}=\frac{1}{2} b c \sin A=\frac{\sqrt{3}}{4} b c$,
+
+  而 $b^{2}+c^{2}-a^{2}=b c$
+
+  $\Rightarrow b^{2}+c^{2}-b c=a^{2}$
+
+  $\Rightarrow b^{2}+c^{2}-b c=4$
+
+  $\Rightarrow b c \leqslant 4$
+
+  所以: $S=\frac{1}{2} b c \sin A=\frac{\sqrt{3}}{4} b c \leqslant \sqrt{3}$, 即 $\triangle A B C$ 面积的最大值为 $\sqrt{3}$.
+
+  故答案为: $\sqrt{3}$.

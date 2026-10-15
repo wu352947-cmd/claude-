@@ -1,0 +1,26 @@
+type: multi
+source: 示例题（原创）
+kps: {trig.graph: 2, trig.transform: 1}
+difficulty_label: 中档
+stem: |
+  已知函数 $f(x)=\sin\left(2x+\dfrac{\pi}{3}\right)$，则
+options:
+  A: '$f(x)$ 的最小正周期为 $\pi$'
+  B: '$f(x)$ 的图像关于直线 $x=\dfrac{\pi}{12}$ 对称'
+  C: '$f(x)$ 在区间 $\left(0,\dfrac{\pi}{6}\right)$ 上单调递增'
+  D: '$f(x)$ 的图像关于点 $\left(\dfrac{\pi}{3},0\right)$ 对称'
+answer: [A, B, D]
+hints:
+  - 判断对称轴 / 对称中心，就把 $x$ 代进去，看 $2x+\dfrac{\pi}{3}$ 落在哪里。
+  - 判断单调区间，看 $2x+\dfrac{\pi}{3}$ 的范围是否落在 $\sin$ 的同一个单调区间内。
+solution: |
+  A：$T=\dfrac{2\pi}{2}=\pi$，正确。
+
+  B：$x=\dfrac{\pi}{12}$ 时 $2x+\dfrac{\pi}{3}=\dfrac{\pi}{2}$，$f$ 取最大值 $1$，是对称轴，正确。
+
+  C：$x\in\left(0,\dfrac{\pi}{6}\right)$ 时 $2x+\dfrac{\pi}{3}\in\left(\dfrac{\pi}{3},\dfrac{2\pi}{3}\right)$，
+  跨过了 $\dfrac{\pi}{2}$，先增后减，错误。
+
+  D：$x=\dfrac{\pi}{3}$ 时 $2x+\dfrac{\pi}{3}=\pi$，$f=0$，是对称中心，正确。
+
+  故选 ABD。

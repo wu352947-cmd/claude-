@@ -1,0 +1,15 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  conic.eccentricity: 0.57
+  conic.parabola: 0.43
+difficulty_label: 基础
+points: 5.0
+stem: '双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1$ 过点 $(\sqrt{2}, \sqrt{3})$, 且离心率为 2 , 则该双曲线的标准方程为 ($\quad$)'
+options:
+  A: $x^{2}-\frac{y^{2}}{3}=1$
+  B: $\frac{x^{2}}{3}-y^{2}=1$
+  C: $x^{2}-\frac{\sqrt{3} y^{2}}{3}=1$
+  D: $\frac{\sqrt{3} x^{2}}{3}-y^{2}=1$
+answer: A

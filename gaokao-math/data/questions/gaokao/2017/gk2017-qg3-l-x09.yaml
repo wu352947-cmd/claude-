@@ -1,0 +1,14 @@
+type: single
+source: 2017 全国III卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2017
+kps:
+  vec.linear: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 在矩形 $A B C D$ 中, $A B=1, A D=2$, 动点 $P$ 在以点 $C$ 为圆心且与 $B D$ 相 切的圆上. 若 $\overrightarrow{\mathrm{AP}}=\lambda \overrightarrow{\mathrm{AB}}+\mu \overrightarrow{\mathrm{AD}}$, 则 $\lambda+\mu$ 的最大值为 ($\qquad$)
+options:
+  A: '3'
+  B: $2 \sqrt{2}$
+  C: $\sqrt{5}$
+  D: '2'
+answer: A

@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标II卷 第 5 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 棱台上下底面均为有一个内角是$60^\circ$的菱形，且上下底面边长分别为$2$和$3$，该棱台的高为$\sqrt{3}$，则该棱台体积为$(\quad)$
+options:
+  A: $\dfrac{19}{12}$
+  B: $\dfrac{19}{6}$
+  C: $\dfrac{19}{4}$
+  D: $\dfrac{19}{2}$
+answer: D

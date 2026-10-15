@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国III卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $\cos C=\frac{2}{3}, A C=4, B C=3$, 则 $\tan B=(\quad)$
+options:
+  A: $\sqrt{5}$
+  B: $2 \sqrt{5}$
+  C: $4 \sqrt{5}$
+  D: $8 \sqrt{5}$
+answer: C
+solution: |-
+  【详解】设 $A B=c, B C=a, C A=b$
+
+  $c^{2}=a^{2}+b^{2}-2 a b \cos C=9+16-2 \times 3 \times 4 \times \frac{2}{3}=9 \therefore c=3$
+
+  $\cos B=\frac{a^{2}+c^{2}-b^{2}}{2 a c}=\frac{1}{9} \therefore \sin B=\sqrt{1-\left(\frac{1}{9}\right)^{2}}=\frac{4 \sqrt{5}}{9} \therefore \tan B=4 \sqrt{5}$
+
+  故选: C

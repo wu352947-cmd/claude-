@@ -1,0 +1,28 @@
+type: single
+source: 2017 全国I卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)$ 在 $(-\infty,+\infty)$ 单调递减, 且为奇函数. 若 $f(1)=-1$ , 则满足 $-1 \leqslant f(x-2) \leqslant 1$ 的 $x$ 的取值范围是 $(\quad)$
+options:
+  A: $[-2,2]$
+  B: $[-1,1]$
+  C: $[0,4]$
+  D: $[1,3]$
+answer: D
+solution: |-
+  解: $\because$ 函数 $f(x)$ 为奇函数.
+
+  若 $f(1)=-1$, 则 $f(-1)=1$,
+
+  又 $\because$ 函数 $f(x)$ 在 $(-\infty,+\infty)$ 单调递减, $-1 \leqslant f(x-2) \leqslant 1$,
+
+  $\therefore f(1) \leqslant f(x-2) \leqslant f(-1)$
+
+  $\therefore-1 \leqslant x-2 \leqslant 1$
+
+  解得: $x \in[1,3]$,
+
+  故选: D.

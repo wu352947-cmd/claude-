@@ -1,0 +1,44 @@
+type: single
+source: 2017 全国I卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $\sin B+\sin A$ ( $\sin C-\cos C)=0, a=2, \quad c=\sqrt{2}$, 则 $C=(\quad)$
+options:
+  A: $\frac{\pi}{12}$
+  B: $\frac{\pi}{6}$
+  C: $\frac{\pi}{4}$
+  D: $\frac{\pi}{3}$
+answer: B
+solution: |-
+  解: $\sin B=\sin (A+C)=\sin A \cos C+\cos A \sin C$,
+
+  $\because \sin B+\sin A(\sin C-\cos C)=0$,
+
+  $\therefore \sin A \cos C+\cos A \sin C+\sin A \sin C-\sin A \cos C=0$,
+
+  $\therefore \cos A \sin C+\sin A \sin C=0$, $\because \sin C \neq 0$
+
+  $\therefore \cos A=-\sin A$,
+
+  $\therefore \tan A=-1$,
+
+  $\because \frac{\pi}{2}<A<\pi$
+
+  $\therefore A=\frac{3 \pi}{4}$
+
+  由正弦定理可得 $\frac{c}{\sin C}=\frac{a}{\sin \mathrm{A}}$ ，
+
+  $\therefore \sin C=\frac{c \sin A}{a}$,
+
+  $\because a=2, c=\sqrt{2}$,
+
+  $\therefore \sin C=\frac{\operatorname{csin} A}{a}=\frac{\sqrt{2} \times \frac{\sqrt{2}}{2}}{2}=\frac{1}{2}$,
+
+  $\because a>c$
+
+  $\therefore C=\frac{\pi}{6}$
+
+  故选：B.

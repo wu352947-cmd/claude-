@@ -1,0 +1,55 @@
+type: solve
+source: 2017 全国III卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  circle.line: 1.0
+difficulty_label: 较难
+stem: |-
+  在直角坐标系 $x O y$ 中, 曲线 $y=x^{2}+m x-2$ 与 $x$ 轴交于 $A 、 B$ 两点, 点 $\mathrm{C}$ 的坐标为 $(0,1)$, 当 $\mathrm{m}$ 变化时, 解答下列问题:
+  （1）能否出现 $A C \perp B C$ 的情况? 说明理由;
+  (2) 证明过 $A 、 B 、 C$ 三点的圆在 $y$ 轴上截得的弦长为定值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 曲线 $y=x^{2}+m x-2$ 与 $x$ 轴交于 $A 、 B$ 两点,
+
+  可设 $A\left(x_{1}, 0\right), B\left(x_{2}, 0\right)$,
+
+  由韦达定理可得 $x_{1} x_{2}=-2$,
+
+  若 $A C \perp B C$, 则 $k_{A C} \cdot k_{B C}=-1$,
+
+  即有 $\frac{1-0}{0-x_{1}} \cdot \frac{1-0}{0-x_{2}}=-1$,
+
+  即为 $x_{1} x_{2}=-1$ 这与 $x_{1} x_{2}=-2$ 矛盾，
+
+  故不出现 $A C \perp B C$ 的情况;
+
+  (2) 证明: 设过 $A 、 B 、 C$ 三点的圆的方程为 $x^{2}+y^{2}+D x+E y+F=0 \quad\left(D^{2}+E^{2}-4 F\right.$ $>0)$
+
+  由题意可得 $y=0$ 时, $x^{2}+D x+F=0$ 与 $x^{2}+m x-2=0$ 等价,
+
+  可得 $D=m, F=-2$,
+
+  圆的方程即为 $x^{2}+y^{2}+m x+E y-2=0$,
+
+  由圆过 $C(0,1)$, 可得 $0+1+0+E-2=0$, 可得 $E=1$,
+
+  则圆的方程即为 $x^{2}+y^{2}+m x+y-2=0$,
+
+  另解: 设过 $A 、 B 、 C$ 三点的圆在 $\mathrm{y}$ 轴上的交点为 $H(0, d)$,
+
+  则由相交弦定理可得 $|O A| \cdot|O B|=|O C| \cdot|O H|$,
+
+  即有 $2=|\mathrm{OH}|$,
+
+  再令 $x=0$, 可得 $y^{2}+y-2=0$, 解得 $y=1$ 或 -2 .
+
+  即有圆与 $\mathrm{y}$ 轴的交点为 $(0,1),(0,-2)$,
+
+  则过 $A 、 B 、 C$ 三点的圆在 $y$ 轴上截得的弦长为定值 3 .

@@ -1,0 +1,20 @@
+type: fill
+source: 2015 全国II卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 中档
+points: 3.0
+stem: 已知双曲线过点 $(4, \sqrt{3})$ 且渐近线方程为 $y= \pm \frac{1}{2} x$, 则该双曲线的 标准方程是 ______
+answer: \frac{1}{4} x^{2}-y^{2}=1
+answer_kind: equation
+solution: |-
+  解：设双曲线方程为 $y^{2}-\frac{1}{4} x^{2}=\lambda$,
+
+  代入点 $(4, \sqrt{3})$, 可得 $3-\frac{1}{4} \times 16=\lambda$,
+
+  $\therefore \lambda=-1$
+
+  $\therefore$ 双曲线的标准方程是 $\frac{1}{4} x^{2}-y^{2}=1$.
+
+  故答案为: $\frac{1}{4} x^{2}-y^{2}=1$.

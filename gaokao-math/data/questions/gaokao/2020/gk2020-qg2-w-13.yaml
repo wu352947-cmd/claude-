@@ -1,0 +1,15 @@
+type: fill
+source: 2020 全国II卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  trig.identities: 0.59
+  trig.graph: 0.41
+difficulty_label: 基础
+points: 5.0
+stem: 若 $\sin x=-\frac{2}{3}$, 则 $\cos 2 x=$ ______
+answer: \frac{1}{9}
+answer_kind: expr
+solution: |-
+  【详解】 $\cos 2 x=1-2 \sin ^{2} x=1-2 \times\left(-\frac{2}{3}\right)^{2}=1-\frac{8}{9}=\frac{1}{9}$.
+
+  故答案为: $\frac{1}{9}$.

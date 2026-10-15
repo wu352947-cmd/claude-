@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 1 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  stat.sample: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 样本数据 $6$,$8$,$4$,$5$,$12$ 的中位数为（ ）
+options:
+  A: $5$
+  B: $6$
+  C: $8$
+  D: $9$
+answer: B

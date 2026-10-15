@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标II卷 第 2 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量$\overrightarrow{a},\overrightarrow{b}$满足$|\overrightarrow{a}+\overrightarrow{b}|=1$，$|\overrightarrow{a}-\overrightarrow{b}|=\sqrt{3}$，则$\overrightarrow{a}\cdot\overrightarrow{b}=(\quad)$
+options:
+  A: $\dfrac{1}{2}$
+  B: $\dfrac{1}{4}$
+  C: $-\dfrac{1}{2}$
+  D: $-\dfrac{1}{4}$
+answer: C

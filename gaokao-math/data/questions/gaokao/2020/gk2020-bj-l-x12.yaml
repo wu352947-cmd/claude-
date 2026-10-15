@@ -1,0 +1,17 @@
+type: solve
+source: 2020 北京卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+stem: '已知双曲线 $C: \frac{x^{2}}{6}-\frac{y^{2}}{3}=1$, 则 $C$ 的右焦点的坐标为 ______ ; $C$ 的焦点到其渐近线的距离是 ______ '
+parts:
+- label: 答案
+  points: 5.0
+  answer: $\left(3,0\right)$；$\sqrt{3}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $\left(3,0\right)$；$\sqrt{3}$

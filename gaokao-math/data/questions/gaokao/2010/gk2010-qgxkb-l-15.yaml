@@ -1,0 +1,18 @@
+type: fill
+source: 2010 全国新课标卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  circle.line: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 过点 $A(4,1)$ 的圆 $C$ 与直线 $x-y=1$ 相切于点 $B(2,1)$, 则圆 $C$ 的方程为 ______
+answer: (x-3)^{2}+y^{2}=2
+answer_kind: equation
+solution: |-
+  解：设圆的方程为 $(x-a)^{2}+(y-b)^{2}=r^{2}$,
+
+  则 $(4-a)^{2+}(1-b)^{2}=r^{2},(2-a)^{2+}(1-b)^{2}=r^{2}, \frac{b-1}{a-2}=-1$,
+
+  解得 $a=3, b=0, r=\sqrt{2}$, 故所求圆的方程为 $(x-3)^{2}+y^{2}=2$.
+
+  故答案为: $(x-3)^{2}+y^{2}=2$.

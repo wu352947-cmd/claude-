@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $(1+\sqrt{3} i)^{3}=(\qquad)$
+options:
+  A: '-8'
+  B: '8'
+  C: $-8 \mathrm{i}$
+  D: $8 \mathrm{i}$
+answer: A

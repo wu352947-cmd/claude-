@@ -1,0 +1,10 @@
+type: fill
+source: 2021 浙江卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  func.piecewise: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $a \in \mathrm{R}$, 函数 $f(x)=\left\{\begin{array}{l}x^{2}-4, x>2 \\ |x-3|+a, x \leq 2,\end{array}\right.$ 若 $f[f(\sqrt{6})]=3$, 则 $a=\underline{\qquad}$
+answer: '2'
+answer_kind: expr

@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国II卷（文科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $x_{1}=\frac{\pi}{4}, x_{2}=\frac{3 \pi}{4}$ 是函数 $f(x)=\sin \omega x(\omega>0)$ 两个相邻的极值点, 则 $\omega=$
+options:
+  A: '2'
+  B: $\frac{3}{2}$
+  C: '1'
+  D: $\frac{1}{2}$
+answer: A
+solution: 【详解】由题意知, $f(x)=\sin \omega x$ 的周期 $T=\frac{2 \pi}{\omega}=2\left(\frac{3 \pi}{4}-\frac{\pi}{4}\right)=\pi$, 得 $\omega=2$. 故选 A.

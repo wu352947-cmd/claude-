@@ -1,0 +1,21 @@
+type: single
+source: 2010 全国新课标卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  trig.identities: 0.57
+  trig.definition: 0.43
+difficulty_label: 较难
+points: 5.0
+stem: 若 $\cos \alpha=-\frac{4}{5}, \alpha$ 是第三象限的角, 则 $\sin \left(\alpha+\frac{\pi}{4}\right)=(\quad)$
+options:
+  A: $-\frac{7 \sqrt{2}}{10}$
+  B: $\frac{7 \sqrt{2}}{10}$
+  C: $\frac{\sqrt{2}}{10}$
+  D: $\frac{\sqrt{2}}{10}$
+answer: A
+solution: |-
+  解: $\because \alpha$ 是第三象限的角
+
+  $\therefore \sin \alpha=-\sqrt{1-\frac{16}{25}}=-\frac{3}{5}$, 所 以 $\sin \left(\alpha+\frac{\pi}{4}\right)=\sin \alpha \cos \frac{\pi}{4}+\cos \alpha \sin \frac{\pi}{4}=-$ $\frac{3}{5} \times \frac{\sqrt{2}}{2}-\frac{4}{5} \times \frac{\sqrt{2}}{2}=-\frac{7 \sqrt{2}}{10}$
+
+  故选: A.

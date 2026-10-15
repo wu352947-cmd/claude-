@@ -1,0 +1,18 @@
+type: single
+source: 2022 全国乙卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(2,1), \vec{b}=(-2,4)$, 则 ||$^{\prime} a-b \mid$ ()
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '5'
+answer: D
+solution: |-
+  【详解】因为 $\vec{a}-\vec{b}=(2,1)-(-2,4)=(4,-3)$, 所以 $|\vec{a}-\vec{b}|=\sqrt{4^{2}+(-3)^{2}}=5$.
+
+  故选: D

@@ -1,0 +1,17 @@
+type: multi
+source: 2026 新课标I卷 第 9 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  complex.modulus: 1.0
+difficulty_label: 中档
+points: 6.0
+stem: 设$z=3+2i$，则（ ）
+options:
+  A: $\overline{z}=3-2i$
+  B: $|z|=5$
+  C: $z^2=5+12i$
+  D: $\dfrac{z+3}{z-i}\in R$
+answer:
+- A
+- C
+- D

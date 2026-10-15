@@ -1,0 +1,22 @@
+type: single
+source: 2021 全国乙卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $S=\{s \mid s=2 n+1, n \in Z\}, T=\{t \mid t=4 n+1, n \in Z\}$, 则 $S \cap T=(\quad)$
+options:
+  A: $\varnothing$
+  B: $S$
+  C: $T$
+  D: $Z$
+answer: C
+solution: |-
+  解析:
+
+  $s=2 n+1, \quad n \in Z$
+
+  当 $n=2 k, k \in Z$ 时, $S=\{s \mid s=4 k+1, k \in Z\}$ ； 当 $n=2 k+1, k \in Z$ 时,
+
+  $S=\{s \mid s=4 k+3, k \in Z\}$.所以 $T \ddot{U} S, S \cap T=T$. 故选 C.

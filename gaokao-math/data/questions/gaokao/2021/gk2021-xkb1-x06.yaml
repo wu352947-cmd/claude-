@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若过点 $(a, b)$ 可以作曲线 $y=\mathrm{e}^{x}$ 的两条切线, 则 ($\quad$)
+options:
+  A: $\mathrm{e}^{b}<a$
+  B: $\mathrm{e}^{a}<b$
+  C: $0<a<\mathrm{e}^{b}$
+  D: $0<b<\mathrm{e}^{a}$
+answer: D

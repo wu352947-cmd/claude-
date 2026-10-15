@@ -1,0 +1,18 @@
+type: single
+source: 2013 全国II卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $(1+\mathrm{ax})(1+\mathrm{x}){ }^{5}$ 的展开式中 $\mathrm{x}^{2}$ 的系数为 5 , 则 $a=(\quad)$
+options:
+  A: '-4'
+  B: '-3'
+  C: '-2'
+  D: '-1'
+answer: D
+solution: |-
+  解: 已知 $(1+a x)(1+x)^{5}=(1+a x)\left(1+C_{5}^{1} x+C_{5}^{2} x^{2}+C_{5}^{3} x^{3}+C_{5}^{4} x^{4}+C_{5}^{5} x^{5}\right)$ 展开式中 $x^{2}$ 的系数为 $C_{5}^{2+} a \cdot C_{5}^{1}=5$, 解得 $a=-1$,
+
+  故选: D.

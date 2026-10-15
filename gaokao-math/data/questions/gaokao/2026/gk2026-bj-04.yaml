@@ -1,0 +1,14 @@
+type: single
+source: 2026 北京卷 第 4 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知$(a - \sqrt{x})^{7}$ 的展开式中的$x^{2}$ 的系数是280，则$a =$( )
+options:
+  A: '2'
+  B: $-2  $
+  C: '1'
+  D: $ -1$
+answer: A

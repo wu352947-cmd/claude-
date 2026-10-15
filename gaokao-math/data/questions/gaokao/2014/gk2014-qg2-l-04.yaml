@@ -1,0 +1,30 @@
+type: single
+source: 2014 全国II卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  tri.laws: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 钝角三角形 $A B C$ 的面积是 $\frac{1}{2}, A B=1, B C=\sqrt{2}$, 则 $A C=(\quad)$
+options:
+  A: '5'
+  B: $\sqrt{5}$
+  C: '2'
+  D: '1'
+answer: B
+solution: |-
+  解: $\because$ 针角三角形 $A B C$ 的面积是 $\frac{1}{2}, A B=c=1, B C=a=\sqrt{2}$, $\therefore S=\frac{1}{2} \operatorname{acsin} B=\frac{1}{2}$, 即 $\sin B=\frac{\sqrt{2}}{2}$,
+
+  当 $B$ 为针角时, $\cos B=-\sqrt{1-\sin ^{2} B}=-\frac{\sqrt{2}}{2}$,
+
+  利用余弦定理得: $A C^{2}=A B^{2}+B C^{2}-2 A B \cdot B C \cdot \cos B=1+2+2=5$, 即 $A C=\sqrt{5}$,
+
+  当 $B$ 为锐角时, $\cos B=\sqrt{1-\sin ^{2} B}=\frac{\sqrt{2}}{2}$,
+
+  利用余弦定理得: $A C^{2}=A B^{2}+B C^{2}-2 A B \cdot B C \cdot \cos B=1+2-2=1$, 即 $A C=1$,
+
+  此时 $A B^{2}+A C^{2}=B C^{2}$, 即 $\triangle A B C$ 为直角三角形, 不合题意, 舍去,
+
+  则 $A C=\sqrt{5}$.
+
+  故选: B.

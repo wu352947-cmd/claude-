@@ -1,0 +1,69 @@
+type: solve
+source: 2016 全国III卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.identities: 0.33
+  trig.graph: 0.33
+  deriv.extremum: 0.33
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=a \cos 2 x+(a-1)(\cos x+1)$, 其中 $a>0$, 记f $(x)$ |的最大值为 $A$.
+  (I) 求 $f^{\prime}(X)$;
+  (II) 求 $A$;
+  (III) 证明: If' $(x) \mid \leqslant 2 A$.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  (I) 解: $f^{\prime}(x)=-2 \operatorname{asin} 2 x-(a-1) \sin x$.
+
+  （II) 当 $a \geqslant 1$ 时, If $(x)|=| a \cos 2 x+(a-1) \quad(\cos x+1)|\leqslant a| \cos 2 x|+(a-1)|$ $(\cos x+1) \quad|\leqslant a| \cos 2 x|+(a-1) \quad(|\cos x|+1)| \leqslant a+2(a-1)=3 a-2=f(0)$,
+
+  因此 $A=3 a-2$.
+
+  当 $0<a<1$ 时, $f(x)=\operatorname{acos} 2 x+(a-1)(\cos x+1)=2 \operatorname{acos}^{2} x+(a-1) \cos x$ $-1$
+
+  今 $g(t)=2 a t^{2}+(a-1) t-1$,
+
+  则 $A$ 是 $\operatorname{gn}(t)$ |在 $[-1,1]$ 上的最大值, $g(-1)=a, g(1)=3 a-2$,
+
+  且当 $t=\frac{1-a}{4 a}$ 时, $g(t)$ 取得极小值, 极小值为 $g\left(\frac{1-a}{4 a}\right)=-\frac{(a-1)^{2}}{8 a}-1=-\frac{a^{2}+6 a+1}{8 a}$,
+
+  (二次函数在对称轴处取得极值)
+
+  令 $-1<\frac{1-a}{4 a}<1$, 得 $a<-\frac{1}{3}$ (舍) 或 $a>\frac{1}{5}$.
+
+  (1)当 $0<a \leqslant \frac{1}{5}$ 时, $g(t)$ 在 $(-1,1)$ 内无极值点, $|g(-1)|=a,|g(1)|=2$ $-3 a, \lg (-1)|<\lg (1)|$,
+
+  $\therefore \mathrm{A}=2-3 \mathrm{a}$
+
+  (2)当 $\frac{1}{5}<a<1$ 时, 由 $g(-1)-g(1)=2(1-a)>0$, 得 $g(-1)>g$
+
+  $$
+  >\mathrm{g}\left(\frac{1-\mathrm{a}}{4 \mathrm{a}}\right)
+  $$
+
+  又 g $\left(\frac{1-a}{4 a}\right)|-\lg (-1)|=\frac{(1-a)(1+7 a)}{8 a}>0$,
+
+  $\therefore \mathrm{A}=\lg \left(\frac{1-\mathrm{a}}{4 \mathrm{a}}\right) \quad \mid=\frac{\mathrm{a}^{2}+6 \mathrm{a}+1}{8 \mathrm{a}}$,
+
+  综上, $\mathrm{A}=\left\{\begin{array}{ll}2-3 a, & 0<a \leqslant \frac{1}{5} \\ \frac{a^{2}+6 a+1}{8 a}, & \frac{1}{5}<a<1 \\ 3 a-2, & a \geqslant 1\end{array}\right.$.
+
+  (III) 证明: 由 (I) 可得: |f' ( $x)|=|-2 a \sin 2 x-(a-1) \sin x|\leqslant 2 a+| a-1 \mid$,
+
+  当 $0<a \leqslant \frac{1}{5}$ 时, If' $(x) \mid<1+a \leqslant 2-4 a<2(2-3 a)=2 A$,
+
+  当 $\frac{1}{5}<a<1$ 时, $A=\frac{a^{2}+6 a+1}{8 a}=\frac{a}{8}+\frac{1}{8 a}+\frac{3}{4}>1$,
+
+  $\therefore f^{\prime}(x) \quad 1 \leqslant 1+a \leqslant 2 A$,
+
+  当 $a \geqslant 1$ 时, If' $(x) \quad \mid \leqslant 3 a-1 \leqslant 6 a-4=2 A$,
+
+  综上: If' $(x) \mid \leqslant 2 A$.

@@ -1,0 +1,18 @@
+type: solve
+source: 2022 浙江卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  trig.identities: 0.57
+  trig.definition: 0.43
+difficulty_label: 基础
+stem: 若 $3 \sin \alpha-\sin \beta=\sqrt{10}, \alpha+\beta=\frac{\pi}{2}$, 则 $\sin \alpha=\underline{\qquad}$, $\cos 2 \beta=\underline{\qquad}$
+parts:
+- label: 答案
+  points: 5.0
+  answer: $\frac{3\sqrt{10}}{10}$；$\frac{4}{5}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $\frac{3\sqrt{10}}{10}$；$\frac{4}{5}$

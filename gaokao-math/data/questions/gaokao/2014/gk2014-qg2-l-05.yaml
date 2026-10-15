@@ -1,0 +1,20 @@
+type: single
+source: 2014 全国II卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 某地区空气质量监测资料表明,一天的空气质量为优良的概率是 0.75 , 连续两天为优良的概率是 0.6 , 已知某天的空气质量为优良, 则随后一天的 空气质量为优良的概率是（ $)$
+options:
+  A: '0.8'
+  B: '0.75'
+  C: '0.6'
+  D: '0.45'
+answer: A
+solution: |-
+  解：设随后一天的空气质量为优良的概率为 $p$, 则由题意可得 $0.75 \times$ $p=0.6$,
+
+  解得 $p=0.8$,
+
+  故选: A.

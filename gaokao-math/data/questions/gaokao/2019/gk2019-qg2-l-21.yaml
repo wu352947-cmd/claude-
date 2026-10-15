@@ -1,0 +1,76 @@
+type: solve
+source: 2019 全国II卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.fixed: 0.54
+  conic.ellipse: 0.46
+difficulty_label: 压轴
+stem: |-
+  已知点 $A(-2,0), B(2,0)$, 动点 $M(x, y)$ 满足直线 $A M$ 与 $B M$ 的斜率之积为 $-\frac{1}{2}$. 记 $M$ 的轨 迹为曲线 $C$. (1) 求 $C$ 的方程, 并说明 $C$ 是什么曲线;
+
+  (2) 过坐标原点的直线交 $C$ 于 $P, Q$ 两点, 点 $P$ 在第一象限, $P E \perp x$ 轴, 垂足为 $E$, 连结 $Q E$ 并延长交 $C$ 于点 $G$.
+
+  (i) 证明: $\triangle P Q G$ 是直角三角形;
+
+  (ii) 求 $\triangle P Q G$ 面积的最大值.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】(1) 直线 $A M$ 的斜率为 $\frac{y}{x+2}(x \neq-2)$, 直线 $B M$ 的斜率为 $\frac{y}{x-2}(x \neq 2)$, 由题意 可知: $\frac{y}{x+2} \cdot \frac{y}{x-2}=-\frac{1}{2} \Rightarrow x^{2}+2 y^{2}=4,(x \neq \pm 2)$, 所以曲线 $C$ 是以坐标原点为中心, 焦 点在 $x$ 轴上，不包括左右两顶点的椭圆，其方程为 $\frac{x^{2}}{4}+\frac{y^{2}}{2}=1,(x \neq \pm 2)$;
+
+  (2) (i) 设直线 $P Q$ 的方程为 $y=k x$, 由题意可知 $k>0$, 直线 $P Q$ 的方程与椭圆方程
+
+  $$
+  x^{2}+2 y^{2}=4 \text { 联立, 即 }\left\{\begin{array} { l }
+  { y = k x , } \\
+  { x ^ { 2 } + 2 y ^ { 2 } = 4 . }
+  \end{array} \Rightarrow \left\{\begin{array} { l }
+  { x = \frac { 2 } { \sqrt { 2 k ^ { 2 } + 1 } } , } \\
+  { y = \frac { 2 k } { \sqrt { 2 k ^ { 2 } + 1 } } . }
+  \end{array} \text { 或 } \left\{\begin{array}{l}
+  x=\frac{-2}{\sqrt{2 k^{2}+1}}, \\
+  y=\frac{-2 k}{\sqrt{2 k^{2}+1}} .
+  \end{array} \text {, 点 } P\right.\right.\right. \text { 在第一象 }
+  $$
+
+  限, 所以 $P\left(\frac{2}{\sqrt{2 k^{2}+1}}, \frac{2 k}{\sqrt{2 k^{2}+1}}\right), Q\left(\frac{-2}{\sqrt{2 k^{2}+1}}, \frac{-2 k}{\sqrt{2 k^{2}+1}}\right)$, 因此点 $E$ 的坐标为
+
+  $\left(\frac{2}{\sqrt{2 k^{2}+1}}, 0\right)$
+
+  直线 $Q E$ 的斜率为 $k_{Q E}=\frac{k}{2}$, 可得直线 $Q E$ 方程: $y=\frac{k}{2} x-\frac{k}{\sqrt{2 k^{2}+1}}$, 与椭圆方程联立,
+
+  $\left\{\begin{array}{l}y=\frac{k}{2} x-\frac{k}{\sqrt{2 k^{2}+1}}, \\ x^{2}+2 y^{2}=4 .\end{array}\right.$ 消去 $y$ 得, $\left(2+k^{2}\right) x^{2}-\frac{4 k^{2} x}{\sqrt{2 k^{2}+1}}-\frac{12 k^{2}+8}{2 k^{2}+1}=0 \quad\left({ }^{*}\right)$, 设点
+
+  $G\left(x_{1}, y_{1}\right)$ ，显然 $Q$ 点的横坐标 $\frac{-2}{\sqrt{2 k^{2}+1}}$ 和 $x_{1}$ 是方程 $(*)$ 的解
+
+  所以有 $x_{1} \cdot \frac{-2}{\sqrt{2 k^{2}+1}}=\frac{-\frac{12 k^{2}+8}{2 k^{2}+1}}{2+k^{2}} \Rightarrow x_{1}=\frac{6 k^{2}+4}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}$, 代人直线 $Q E$ 方程中, 得
+
+  $y_{1}=\frac{2 k^{3}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}$, 所以点 $G$ 的坐标为 $\left(\frac{6 k^{2}+4}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}, \frac{2 k^{3}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}\right)$,
+
+  直线 $P G$ 的斜率为; $k_{P G}=\frac{\frac{2 k^{3}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}-\frac{2 k}{\sqrt{2 k^{2}+1}}}{\frac{6 k^{2}+4}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}-\frac{2}{\sqrt{2 k^{2}+1}}}=\frac{2 k^{3}-2 k\left(k^{2}+2\right)}{6 k^{2}+4-2\left(k^{2}+2\right)}=-\frac{1}{k}$,
+
+  因为 $k_{P Q} k_{P G}=k \cdot\left(-\frac{1}{k}\right)=-1$, 所以 $P Q \perp P G$, 因此 $\triangle P Q G$ 是直角三角形;
+
+  (ii) 由 (i) 可知: $P\left(\frac{2}{\sqrt{2 k^{2}+1}}, \frac{2 k}{\sqrt{2 k^{2}+1}}\right), Q\left(\frac{-2}{\sqrt{2 k^{2}+1}}, \frac{-2 k}{\sqrt{2 k^{2}+1}}\right)$,
+
+  $G$ 的坐标为 $\left(\frac{6 k^{2}+4}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}, \frac{2 k^{3}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}\right)$,
+
+  $$
+  \begin{aligned}
+  & P Q=\sqrt{\left(\frac{-2}{\sqrt{2 k^{2}+1}}-\frac{2}{\sqrt{2 k^{2}+1}}\right)^{2}+\left(\frac{-2 k}{\sqrt{2 k^{2}+1}}-\frac{2 k}{\sqrt{2 k^{2}+1}}\right)^{2}}=\frac{4 \sqrt{1+k^{2}}}{\sqrt{2 k^{2}+1}} \\
+  & P G=\sqrt{\left(\frac{6 k^{2}+4}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}-\frac{2}{\sqrt{2 k^{2}+1}}\right)^{2}+\left(\frac{2 k^{3}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}-\frac{2 k}{\sqrt{2 k^{2}+1}}\right)^{2}}=\frac{4 k \sqrt{k^{2}+1}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}}
+  \end{aligned}
+  $$
+
+  $S_{\triangle P Q G}=\frac{1}{2} \times \frac{4 k \sqrt{k^{2}+1}}{\left(k^{2}+2\right) \sqrt{2 k^{2}+1}} \cdot \frac{4 \sqrt{1+k^{2}}}{\sqrt{2 k^{2}+1}}=\frac{8\left(k^{3}+k\right)}{2 k^{4}+5 k^{2}+2}$
+
+  $S^{\prime}=\frac{-8(k+1)(k-1)\left(2 k^{4}+3 k^{2}+2\right)}{\left(2 k^{4}+5 k^{2}+2\right)^{2}}$, 因为 $k>0$, 所以当 $0<k<1$ 时, $S^{\prime}>0$, 函数 $S(k)$ 单
+
+  调递增, 当 $k>1$ 时, $S<0$, 函数 $S(k)$ 单调递减, 因此当 $k=1$ 时, 函数 $S(k)$ 有最大值,
+
+  最大值为 $S(1)=\frac{16}{9}$.

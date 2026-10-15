@@ -1,0 +1,15 @@
+type: single
+source: 2021 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  prob.binomial_normal: 0.59
+  prob.classical: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 某物理量的测量结果服从正态分布 $N\left(10, \sigma^{2}\right)$, 下列结论中不正确的是 ($\quad$)
+options:
+  A: $\sigma$ 越小, 该物理量在一次测量中在 $(9.9,10.1)$ 的概率越大
+  B: $\sigma$ 越小, 该物理量在一次测量中大于 10 的概率为 $0.5$
+  C: $\sigma$ 越小, 该物理量在一次测量中小于 $9.99$ 与大于 $10.01$ 的概率相等
+  D: $\sigma$ 越小, 该物理量在一次测量中落在 $(9.9,10.2)$ 与落在 $(10,10.3)$ 的概率相等
+answer: D

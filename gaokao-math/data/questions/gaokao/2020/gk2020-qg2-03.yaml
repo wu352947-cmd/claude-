@@ -1,0 +1,27 @@
+type: single
+source: 2020 全国II卷 第 3 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2020
+kps:
+  complex.arith: 0.51
+  novel.definition: 0.49
+difficulty_label: 基础
+points: 5.0
+stem: 如图, 将钢琴上的 12 个键依次记为 $a_1, a_2, \ldots, a_{12}$. 设 $1 \leq i<j<k \leq 12$. 若 $k-j=3$ 且 $j-$ $i=4$, 则称 $a_i, a_j, a_k$ 为原位大三和弦; 若 $k-j=4$ 且 $j-$$i=3$, 则称 $a_i, a_j, a_k$ 为原位小三和弦. 用这 12 个键可以构成的原位大三和弦与原位小三和弦的个数之和为 (  )
+figure: d86dd46bccb393df.png
+options:
+  A: '5'
+  B: '8'
+  C: '10'
+  D: '15'
+answer: C
+solution: |-
+  【详解】根据题意可知, 原位大三和弦满足: $k-j=3, j-i=4$.
+  $$
+  \therefore i=1, j=5, k=8 ; i=2, j=6, k=9 \text {; } i=3, j=7, k=10 ; i=4, j=8, k=11 ; i=5, j=9, k=12 \text {. }
+  $$
+  原位小三和弦满足: $k-j=4, j-i=3$.
+  $$
+  \therefore i=1, j=4, k=8 ; i=2, j=5, k=9 ; i=3, j=6, k=10 ; i=4, j=7, k=11 ; i=5, j=8, k=12 \text {. }
+  $$
+  故个数之和为 10 .
+  故选: C.

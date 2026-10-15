@@ -1,0 +1,24 @@
+type: fill
+source: 2019 全国II卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$. 若 $b=6, a=2 c, B=\frac{\pi}{3}$, 则 $\triangle A B C$ 的面 积为 ______
+answer: 6 \sqrt{3}
+answer_kind: expr
+solution: |-
+  【详解】由余弦定理得 $b^{2}=a^{2}+c^{2}-2 a c \cos B$,
+
+  所以 $(2 c)^{2}+c^{2}-2 \times 2 c \times c \times \frac{1}{2}=6^{2}$,
+
+  即 $c^{2}=12$
+
+  解得 $c=2 \sqrt{3}, c=-2 \sqrt{3}$ (舍去)
+
+  所以 $a=2 c=4 \sqrt{3}$,
+
+  $$
+  S_{\triangle A B C}=\frac{1}{2} a c \sin B=\frac{1}{2} \times 4 \sqrt{3} \times 2 \sqrt{3} \times \frac{\sqrt{3}}{2}=6 \sqrt{3} \text {. }
+  $$

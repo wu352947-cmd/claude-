@@ -1,0 +1,14 @@
+type: single
+source: 2026 上海卷 第 14 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 4.0
+stem: 事件 $A$ 和事件 $B$ 相互独立，"$A$ 和 $B$ 至少一个发生"的对立事件是$（\quad）$。
+options:
+  A: $A\cap B$
+  B: $A\cup B$
+  C: $\overline{A}\cap \overline{B}$
+  D: $\overline{A}\cup \overline{B}$
+answer: C

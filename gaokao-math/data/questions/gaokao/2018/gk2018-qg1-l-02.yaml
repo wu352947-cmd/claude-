@@ -1,0 +1,23 @@
+type: single
+source: 2018 全国I卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\left\{x \mid x^{2}-x-2>0\right\}$, 则 $\left.\complement_{R} A=（ \quad\right)$
+options:
+  A: $\{x \mid-1<x<2\}$
+  B: $\{x \mid-1 \leqslant x \leqslant 2\}$
+  C: $\{x \mid x<-1\} \cup\{x \mid x>2\}$
+  D: |-
+    $\{x \mid x \leqslant-1\}$
+
+    $U\{x \mid x \geqslant 2\}$
+answer: B
+solution: |-
+  解：集合 $A=\left\{x \mid x^{2}-x-2>0\right\}$,
+
+  可得 $A=\{x \mid x<-1$ 或 $x>2\}$, 则: $\complement_{R} A=\{x \mid-1 \leqslant x \leqslant 2\}$.
+
+  故选: B.

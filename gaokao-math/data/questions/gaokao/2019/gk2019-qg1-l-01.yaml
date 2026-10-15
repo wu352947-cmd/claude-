@@ -1,0 +1,18 @@
+type: single
+source: 2019 全国I卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $M=\{x \mid-4<x<2\}, N=\left\{x \mid x^{2}-x-6<0\right\}$, 则 $M \cap N=$
+options:
+  A: $\{x \mid-4<x<3\}$
+  B: $\{x \mid-4<x<-2\}$
+  C: $\{x \mid-2<x<2\}$
+  D: $\{x \mid 2<x<3\}$
+answer: C
+solution: |-
+  【详解】由题意得, $M=\{x \mid-4<x<2\}, N=\{x \mid-2<x<3\}$, 则
+
+  $M \cap N=\{x \mid-2<x<2\}$. 故选 C.

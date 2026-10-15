@@ -1,0 +1,14 @@
+type: single
+source: 2026 北京卷 第 1 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $M=\{x \mid-1<x<3\}$ , $N=\{x \mid x \geq2\}$ ,则 $M \cup N=(\ )$
+options:
+  A: $(2,3)$
+  B: $(-1, + \infty)$
+  C: $[2,3) $
+  D: $ (-1,2]$
+answer: B

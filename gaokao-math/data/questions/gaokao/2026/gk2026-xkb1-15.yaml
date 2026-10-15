@@ -1,0 +1,21 @@
+type: solve
+source: 2026 新课标I卷 第 15 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+stem: |-
+  直三棱柱$ABC-A_1B_1C_1$中，$\angle ACB=90^\circ$，$AC=BC$，$D,E$分别为$AB,AC_1$的中点。
+  (1) 证明：$DE\parallel$平面$BCC_1B_1$；
+  (2) 设$CC_1=2$，直线$DE$与平面$ACC_1A_1$所成的角为$45^\circ$，求直线$DE$到平面$BCC_1B_1$的距离。
+parts:
+- label: (1)
+  points: 6.0
+  answer: （证明题）
+- label: (2)
+  points: 7.0
+  answer: '1'
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 证明题答案略；(2) 1

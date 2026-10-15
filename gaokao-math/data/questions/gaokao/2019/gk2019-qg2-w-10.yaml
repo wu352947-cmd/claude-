@@ -1,0 +1,16 @@
+type: single
+source: 2019 全国II卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 0.54
+  deriv.tangent: 0.46
+difficulty_label: 较难
+points: 5.0
+stem: 曲线 $y=2 \sin x+\cos x$ 在点 $(\pi,-1)$ 处的切线方程为
+options:
+  A: $x-y-\pi-1=0$
+  B: $2 x-y-2 \pi-1=0$
+  C: $2 x+y-2 \pi+1=0$
+  D: $x+y-\pi+1=0$
+answer: C
+solution: 【详解】当 $x=\pi$ 时, $y=2 \sin \pi+\cos \pi=-1$, 即点 $(\pi,-1)$ 在曲线 $y=2 \sin x+\cos x$ 上. $\because y^{\prime}=2 \cos x-\sin x,\left.\therefore y^{\prime}\right|_{x=\pi}=2 \cos \pi-\sin \pi=-2$, 则 $y=2 \sin x+\cos x$ 在点 $(\pi,-1)$ 处的切线方程为 $y-(-1)=-2(x-\pi)$, 即 $2 x+y-2 \pi+1=0$. 故选 C.

@@ -1,0 +1,47 @@
+type: solve
+source: 2013 全国I卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=x^{2}+a x+b, g(x)=e^{x}(c x+d)$, 若曲线 $y=f(x)$ 和 曲线 $y=g(x)$ 都过点 $P(0,2)$, 且在点 $P$ 处有相同的切线 $y=4 x+2$.
+
+  (I ) 求 $a, b, c, d$ 的值;
+
+  (II ) 若 $x \geqslant-2$ 时, $f(x) \leqslant k g(x)$, 求 $k$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 由题意知 $f(0)=2, g(0)=2, f^{\prime}(0)=4, g^{\prime}(0)=4$, 而 $f^{\prime}(x)=2 x+a, g^{\prime}(x)=e^{x}(c x+d+c)$, 故 $b=2, d=2, a=4, d+c=4$, 从而 $a=4, b=2, c=2, d=2$;
+
+  (II ) 由 (I) 知, $f(x)=x^{2}+4 x+2, g(x)=2 e^{x}(x+1)$
+
+  设 $F(x)=k g(x)-f(x)=2 k e^{x}(x+1)-x^{2}-4 x-2$,
+
+  则 $F^{\prime}(x)=2 k e^{x}(x+2)-2 x-4=2(x+2)\left(k e^{x}-1\right)$,
+
+  由题设得 $F(0) \geqslant 0$, 即 $k \geqslant 1$,
+
+  令 $F^{\prime}(x)=0$, 得 $x_{1}=-\operatorname{lnk}, x_{2}=-2$,
+
+  (1)若 $1 \leqslant k<e^{2}$, 则 $-2<x_{1} \leqslant 0$, 从而当 $x \in\left(-2, x_{1}\right)$ 时, $F^{\prime}(x)<0$, 当 $x \in\left(x_{1}\right.$ $,+\infty)$ 时, $\mathrm{F}^{\prime}(\mathrm{x})>0$,
+
+  即 $F(x)$ 在 $\left(-2, x_{1}\right)$ 上减, 在 $\left(x_{1},+\infty\right)$ 上是增, 故 $F(x)$ 在 $[-2,+\infty)$ 上的最小值为 $F\left(x_{1}\right)$,
+
+  而 $F\left(x_{1}\right)=-x_{1}\left(x_{1}+2\right) \geqslant 0, x \geqslant-2$ 时 $F(x) \geqslant 0$, 即 $f(x) \leqslant k g(x)$ 恒成立.
+
+  (2)若 $k=e^{2}$, 则 $F^{\prime}(x)=2 e^{2}(x+2)\left(e^{x}-e^{-2}\right)$, 从而当 $x \in(-2,+\infty)$ 时, $F^{\prime}($ x) $>0$,
+
+  即 $F(x)$ 在 $(-2,+\infty)$ 上是增, 而 $F(-2)=0$, 故当 $x \geqslant-2$ 时, $F(x) \geqslant 0$, 即 $f(x) \leqslant k g(x)$ 恒成立.
+
+  (3)若 $k>e^{2}$ 时, $F^{\prime}(x)>2 e^{2}(x+2)\left(e^{x}-e^{-2}\right)$,
+
+  而 $F(-2)=-2 k e^{-2}+2<0$, 所以当 $x>-2$ 时, $f(x) \leqslant k g(x)$ 不恒成立,
+
+  综上, $k$ 的取值范围是 $\left[1, \mathrm{e}^{2}\right]$.

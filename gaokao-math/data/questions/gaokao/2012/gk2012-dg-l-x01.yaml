@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\frac{-1+3 i}{1+i}=(\qquad)$
+options:
+  A: $2+i$
+  B: $2-\mathrm{i}$
+  C: $1+2 i$
+  D: $1-2 \mathrm{i}$
+answer: C

@@ -1,0 +1,39 @@
+type: solve
+source: 2022 全国乙卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  记 $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知
+
+  $\sin C \sin (A-B)=\sin B \sin (C-A)$
+
+  (1) 若 $A=2 B$, 求 $C$;
+
+  (2) 证明: $2 a^{2}=b^{2}+c^{2}$
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  由 $A=2 B, \quad \sin C \sin (A-B)=\sin B \sin (C-A)$ 可得, $\quad \sin C \sin B=\sin B \sin (C-A)$,
+
+  而 $0<B<\frac{\pi}{2}$, 所以 $\sin B \in(0,1)$, 即有 $\sin C=\sin (C-A)>0$, 而 $0<C<\pi, 0<C-A<\pi$, 显然 $C \neq C-A$, 所以, $C+C-A=\pi$, 而 $A=2 B$,
+
+  $A+B+C=\pi$, 所以 $C=\frac{5 \pi}{8}$.
+
+  【小问 2 详解】}
+
+  由 $\sin C \sin (A-B)=\sin B \sin (C-A)$ 可得，
+
+  $\sin C(\sin A \cos B-\cos A \sin B)=\sin B(\sin C \cos A-\cos C \sin A)$, 再由正弦定理可得, $a c \cos B-b c \cos A=b c \cos A-a b \cos C$, 然后根据余弦定理可知,
+
+  $\frac{1}{2}\left(a^{2}+c^{2}-b^{2}\right)-\frac{1}{2}\left(b^{2}+c^{2}-a^{2}\right)=\frac{1}{2}\left(b^{2}+c^{2}-a^{2}\right)-\frac{1}{2}\left(a^{2}+b^{2}-c^{2}\right)$, 化简得:
+
+  $2 a^{2}=b^{2}+c^{2}$, 故原等式成立.

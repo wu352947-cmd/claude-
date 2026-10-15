@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标II卷 第 4 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 双曲线$C:\dfrac{x^2}{a^2}-\dfrac{y^2}{b^2}=1(a>0,b>0)$过点$(1,0)$和$\left(\dfrac{\sqrt{7}}{2},3\right)$，则其渐近线方程为$(\quad)$
+options:
+  A: $y=\pm 3\sqrt{2}x$
+  B: $y=\pm 2\sqrt{3}x$
+  C: $y=\pm \dfrac{\sqrt{3}}{2}x$
+  D: $y=\pm \dfrac{\sqrt{2}}{6}x$
+answer: B

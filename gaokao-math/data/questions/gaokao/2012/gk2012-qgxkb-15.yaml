@@ -1,0 +1,20 @@
+type: fill
+source: 2012 全国新课标卷 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  vec.projection: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知向量 $\vec{a}, \vec{b}$ 夹角为 $45^{\circ}$, 且 $|\vec{a}|=1,|2 \vec{a}-\vec{b}|=\sqrt{10}$, 则 $|\vec{b}|=$ ______
+answer: 3 \sqrt{2}
+answer_kind: expr
+solution: |-
+  解: $\because<\overrightarrow{\mathrm{a}}, \overrightarrow{\mathrm{b}}>=45^{\circ},|\overrightarrow{\mathrm{a}}|=1$
+
+  $\therefore \vec{a} \cdot \vec{b}=|\vec{a}||\vec{b}| \cos 45^{\circ}=\frac{\sqrt{2}}{2}|\vec{b}|$
+
+  $\therefore|2 \vec{a}-\vec{b}|=\sqrt{(2 \vec{a}-\vec{b})^{2}}=\sqrt{4 \vec{a}^{2}-4 \vec{a} \cdot \vec{b}+\vec{b}^{2}}=\sqrt{4-2 \sqrt{2}|\vec{b}|+|\vec{b}|^{2}}=\sqrt{10}$
+
+  解得 $|\vec{b}|=3 \sqrt{2}$
+
+  故答案为: $3 \sqrt{2}$

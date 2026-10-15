@@ -1,0 +1,17 @@
+type: single
+source: 2018 全国I卷 第 10 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2018
+kps:
+  tri.laws: 0.5
+  prob.classical: 0.5
+difficulty_label: 较难
+points: 5.0
+stem: 如图来自古希腊数学家希波克拉底所研究的几何图形. 此图由三个半圆构成, 三个半圆的直径分别为直角三角形 $A B C$ 的斜边 $B C$, 直角边 $A B, A C$ . $\triangle A B C$ 的三边所围成的区域记为 I, 黑色部分记为 II, 其余部分记为 III. 在整个图形中随机取一点, 此点取自 I, II, III 的概率分别记为 $\mathrm{p}_1, \mathrm{p}_2, \mathrm{p}_3$,则 $(\quad)$
+figure: 332fa098bcbac4ba.png
+options:
+  A: $p_1=p_2$
+  B: $\mathrm{p}_1=\mathrm{p}_3$
+  C: $\mathrm{p}_2=\mathrm{p}_3$
+  D: $p_1=p_2+p_3$
+answer: A
+solution: '解: 如图: 设 $B C=2 r_1, A B=2 r_2, A C=2 r_3$,$$\begin{aligned}& \therefore \mathrm{r}_1^2=\mathrm{r}_2^2+\mathrm{r}_3^2, \\& \therefore \mathrm{S}_{\mathrm{I}}=\frac{1}{2} \times 4 \mathrm{r}_2 \mathrm{r}_3=2 \mathrm{r}_2 \mathrm{r}_3, \mathrm{S}_{\mathrm{II}}=\frac{1}{2} \times \pi \mathrm{r}_1^2-2 \mathrm{r}_2 \mathrm{r}_3, \\& \mathrm{S}_{\mathrm{II}}=\frac{1}{2} \times \pi \mathrm{r}_3^2+\frac{1}{2} \times \pi r_2^2-\mathrm{S}_{\mathrm{II}}=\frac{1}{2} \times \pi r_3^2+\frac{1}{2} \times \pi r_2^2-\frac{1}{2} \times \pi r_1^2+2 \mathrm{r}_2 \mathrm{r}_3=2 \mathrm{r}_2 \mathrm{r}_3, \\& \therefore \mathrm{S}_{\mathrm{I}}=\mathrm{S}_{\mathrm{II}}, \\& \therefore \mathrm{P}_1=\mathrm{P}_2,\end{aligned}$$故选: A.'

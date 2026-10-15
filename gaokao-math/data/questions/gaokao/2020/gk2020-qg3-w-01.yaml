@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国III卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{1,2,3,5,7,11\}, B=\{x \mid 3<x<15\}$, 则 $A \cap B$ 中元素的个数为（）
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '5'
+answer: B
+solution: |-
+  【详解】由题意, $A \cap B=\{5,7,11\}$, 故 $A \cap B$ 中元素的个数为 3 .
+
+  故选: B
+
+  【点晴】本题主要考查集合的交集运算, 考查学生对交集定义的理解, 是一道容易题.

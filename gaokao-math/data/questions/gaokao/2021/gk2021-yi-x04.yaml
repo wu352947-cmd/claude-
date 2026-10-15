@@ -1,0 +1,14 @@
+type: single
+source: 2021 全国乙卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  solid.vector: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 在正方体 $A B C D-A_{1} B_{1} C_{1} D_{1}$ 中, $P$ 为 $B_{1} D_{1}$ 的中点, 则直线 $P B$ 与 $A D_{1}$ 所成的角为 ($\qquad$)
+options:
+  A: $\frac{\pi}{2}$
+  B: $\frac{\pi}{3}$
+  C: $\frac{\pi}{4}$
+  D: $\frac{\pi}{6}$
+answer: D

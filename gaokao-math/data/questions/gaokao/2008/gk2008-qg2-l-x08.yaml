@@ -1,0 +1,15 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  trig.graph: 0.59
+  deriv.extremum: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 若动直线 $x=a$ 与函数 $f(x)=\sin x$ 和 $g(x)=\cos x$ 的图象分别交于 $M$, $N$ 两点，则 $|M N|$ 的最大值为($\qquad$)
+options:
+  A: '1'
+  B: $\sqrt{2}$
+  C: $\sqrt{3}$
+  D: '2'
+answer: B

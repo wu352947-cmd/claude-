@@ -1,0 +1,23 @@
+type: single
+source: 2018 全国III卷（理科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  prob.classical: 0.6
+  prob.distribution: 0.4
+difficulty_label: 中档
+points: 5.0
+stem: 某群体中的每位成员使用移动支付的概率都为 $\mathrm{p}$, 各成员的支付方式 相互独立. 设 $\mathrm{X}$ 为该群体的 10 位成员中使用移动支付的人数, $D X=2.4, P$ $(x=4)<P(X=6)$, 则 $p=(\quad)$
+options:
+  A: '0.7'
+  B: '0.6'
+  C: '0.4'
+  D: '0.3'
+answer: B
+solution: |-
+  解：某群体中的每位成员使用移动支付的概率都为 $\mathrm{p}$, 看做是独立重复 事件，满足 $X \sim B \quad(10, \mathrm{p})$,
+
+  $P(x=4)<P(X=6)$, 可得 $C_{10}^{4} p^{4}(1-p)^{6}<c_{10}^{6} p^{6}(1-p)^{4}$, 可得 $1-2 p<0$. 即 $p>\frac{1}{2}$
+
+  因为 $D X=2.4$, 可得 $10 p(1-p)=2.4$, 解得 $p=0.6$ 或 $p=0.4$ (舍去).
+
+  故选: $B$.

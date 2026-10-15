@@ -1,0 +1,45 @@
+type: solve
+source: 2021 全国乙卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.parabola: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知抛物线 $C: x^{2}=2 p y(p>0)$ 的焦点为 $F$, 且 $F$ 与圆 $M: x^{2}+(y+4)^{2}=1$ 上点的 距离的最小值为 4 .
+
+  (1) 求 $p$;
+
+  (2) 若点 $P$ 在 $M$ 上, $P A, P B$ 是 $C$ 的两条切线, $A, B$ 是切点, 求 $\triangle P A B$ 面积的最 大值.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  解析
+
+  解析:
+
+  (1) 焦点 $F\left(0, \frac{p}{2}\right)$ 到 $x^{2}+(y+4)^{2}=1$ 的最短距离为 $\frac{p}{2}+3=4$, 所以 $p=2$.
+
+  （2）抛物线 $y=\frac{1}{4} x^{2}$, 设 $A\left(x_{1}, y_{1}\right), B\left(x_{2}, y_{2}\right), P\left(x_{0}, y_{0}\right)$, 得
+
+  $l_{P A}: \quad y=\frac{1}{2} x_{1}\left(x-x_{1}\right)+y_{1}=\frac{1}{2} x_{1} x-\frac{1}{4} x_{1}^{2}=\frac{1}{2} x_{1} x-y_{1}$
+
+  $l_{P B}: y=\frac{1}{2} x_{2} x-y_{2}$, 且 $x_{0}^{2}=-y_{0}^{2}-8 y_{0}-15$,
+
+  $l_{P A}, l_{P B}$ 都过点 $P\left(x_{0}, y_{0}\right)$, 则 $\left\{\begin{array}{l}y_{0}=\frac{1}{2} x_{1} x_{0}-y_{1} \\ y_{0}=\frac{1}{2} x_{2} x_{0}-y_{2}\end{array}\right.$,
+
+  故 $l_{A B}: y_{0}=\frac{1}{2} x_{0} x-y$, 即 $y=\frac{1}{2} x_{0} x-y_{0}$,
+
+  联立 $\left\{\begin{array}{l}y=\frac{1}{2} x_{0} x-y_{0} \\ x^{2}=4 y\end{array}\right.$, 得 $x^{2}-2 x_{0} x+4 y_{0}=0, \Delta=4 x_{0}^{2}-16 y_{0}$, 所以 $|A B|=\sqrt{1+\frac{x_{0}{ }^{2}}{4}} \cdot \sqrt{4 x_{0}{ }^{2}-16 y_{0}}=\sqrt{4+x_{0}{ }^{2}} \cdot \sqrt{x_{0}{ }^{2}-4 y_{0}}$,
+
+  $d_{P \rightarrow A B}=\frac{\left|x_{0}^{2}-4 y_{0}\right|}{\sqrt{x_{0}^{2}+4}}$, 所以
+
+  $S_{\triangle P A B}=\frac{1}{2}|A B| \cdot d_{P \rightarrow A B}=\frac{1}{2}\left|x_{0}^{2}-4 y_{0}\right| \cdot \sqrt{x_{0}^{2}-4 y_{0}}$
+
+  $=\frac{1}{2}\left(x_{0}^{2}-4 y_{0}\right)^{\frac{3}{2}}=\frac{1}{2}\left(-y_{0}^{2}-12 y_{0}-15\right)^{\frac{3}{2}}$
+
+  而 $y_{0} \in[-5,-3]$, 故当 $y_{0}=-5$ 时, $S_{\triangle P A B}$ 达到最大, 最大值为 $20 \sqrt{5}$.

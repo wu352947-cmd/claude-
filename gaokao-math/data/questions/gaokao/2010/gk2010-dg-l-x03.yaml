@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  expo.compare: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $a=\log _{3} 2, b=\ln 2, c=5^{-\frac{1}{2}}$, 则 ($\qquad$)
+options:
+  A: $a<b<c$
+  B: $b<c<a$
+  C: $c<a<b$
+  D: $c<b<a$
+answer: C

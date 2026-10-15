@@ -1,0 +1,15 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  conic.ellipse: 0.59
+  conic.parabola: 0.41
+difficulty_label: 基础
+points: 5.0
+stem: 椭圆的中心在原点, 焦距为 4 , 一条准线为 $x=-4$, 则该椭圆的方程为 ($\qquad$)
+options:
+  A: $\frac{x^{2}}{16}+\frac{y^{2}}{12}=1$
+  B: $\frac{x^{2}}{12}+\frac{y^{2}}{8}=1$
+  C: $\frac{x^{2}}{8}+\frac{y^{2}}{4}=1$
+  D: $\frac{x^{2}}{12}+\frac{y^{2}}{4}=1$
+answer: C

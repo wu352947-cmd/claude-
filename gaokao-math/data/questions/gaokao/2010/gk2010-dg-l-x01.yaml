@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\frac{3+2 i}{2-3 i}= $ ($\qquad$)
+options:
+  A: i
+  B: '- i'
+  C: $12-13 i$
+  D: $12+13 \mathrm{i}$
+answer: B

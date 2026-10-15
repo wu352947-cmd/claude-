@@ -1,0 +1,10 @@
+type: fill
+source: 2022 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\left(1-\frac{y}{x}\right)(x+y)^{8}$ 的展开式中 $x^{2} y^{6}$ 的系数为 ______ (用数字作答).
+answer: '-28'
+answer_kind: expr

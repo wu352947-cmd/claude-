@@ -1,0 +1,24 @@
+type: single
+source: 2015 全国I卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  count.binomial: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: $\left(x^{2}+x+y\right)^{5}$ 的展开式中, $x^{5} y^{2}$ 的系数为 $(\quad)$
+options:
+  A: '10'
+  B: '20'
+  C: '30'
+  D: '60'
+answer: C
+solution: |-
+  解: $\left(x^{2}+x+y\right)^{5}$ 的展开式的通项为 $T_{r+1}=C_{5}^{r}\left(x^{2}+x\right)^{5-r} y^{r}$,
+
+  令 $r=2$, 则 $\left(x^{2}+x\right)^{3}$ 的通项为 $C_{3}^{k}\left(x^{2}\right)^{3-k} x^{k}=C_{3}^{k} x^{6-k}$,
+
+  令 6- $k=5$, 则 $k=1$,
+
+  $\therefore\left(x^{2}+x+y\right)^{5}$ 的展开式中, $x^{5} y^{2}$ 的系数为 $C_{5}^{2} C_{3}^{1}=30$.
+
+  故选: C.

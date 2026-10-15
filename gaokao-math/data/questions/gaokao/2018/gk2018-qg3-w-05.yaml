@@ -1,0 +1,20 @@
+type: single
+source: 2018 全国III卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若某群体中的成员只用现金支付的概率为 0.45 , 既用现金支付也用非 现金支付的概率为 0.15 , 则不用现金支付的概率为 $($ )
+options:
+  A: '0.3'
+  B: '0.4'
+  C: '0.6'
+  D: '0.7'
+answer: B
+solution: |-
+  解：某群体中的成员只用现金支付, 既用现金支付也用非现金支付, 不 用现金支付，是互斥事件，
+
+  所以不用现金支付的概率为: $1-0.45-0.15=0.4$.
+
+  故选: B.

@@ -1,0 +1,22 @@
+type: fill
+source: 2014 全国II卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  func.parity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知偶函数 $f(x)$ 在 $[0,+\infty)$ 单调递减, $f(2)=0$, 若 $f(x-1)>$ 0 , 则 $x$ 的取值范围是 ______
+answer: (-1,3)
+answer_kind: interval
+solution: |-
+  解: $\because$ 偶函数 $f(x)$ 在 $[0,+\infty)$ 单调递减, $f(2)=0$,
+
+  $\therefore$ 不等式 $f(x-1)>0$ 等价为 $f(x-1)>f(2)$,
+
+  即 $f(|x-1|)>f(2) ，$
+
+  $\therefore|x-1|<2$
+
+  解得 $-1<x<3$,
+
+  故答案为: $(-1,3)$

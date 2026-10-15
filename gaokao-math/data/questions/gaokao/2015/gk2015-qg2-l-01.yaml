@@ -1,0 +1,20 @@
+type: single
+source: 2015 全国II卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $\mathrm{A}=\{-2,-1,0,1,2\}, B=\{x \mid(x-1)(x+2)<0\}$, 则 $A \cap B=(\quad)$
+options:
+  A: $\{-1,0\}$
+  B: $\{0,1\}$
+  C: $\{-1,0,1\}$
+  D: $\{0,1,2\}$
+answer: A
+solution: |-
+  解: $\mathrm{B}=\{x \mid-2<x<1\}, \mathrm{A}=\{-2,-1,0,1,2\}$;
+
+  $\therefore A \cap B=\{-1,0\}$.
+
+  故选: A.

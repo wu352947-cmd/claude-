@@ -1,0 +1,44 @@
+type: solve
+source: 2011 全国新课标卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  deriv.construct: 0.58
+  deriv.tangent: 0.42
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\frac{a \ln x}{x+1}+\frac{b}{x}$, 曲线 $y=f(x)$ 在点 $(1, f(1))$ 处的 切线方程为 $x+2 y-3=0$.
+
+  (I) 求 $a 、 b$ 的值;
+
+  （II) 证明: 当 $x>0$, 且 $x \neq 1$ 时, $f(x)>\frac{\ln x}{x-1}$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) $f^{\prime}(x)=\frac{a\left(\frac{x+1}{x}-\ln x\right)}{(x+1)^{2}}-\frac{b}{x^{2}}$.
+
+  由于直线 $x+2 y-3=0$ 的斜率为 $-\frac{1}{2}$, 且过点 $(1,1)$ 所以 $\left\{\begin{array}{l}b=1 \\ \frac{a}{2}-b\end{array}=-\frac{1}{2}\right.$
+
+  解得 $a=1, b=1$
+
+  (II) 由 (I) 知 $f(x)=\frac{\ln x}{x+1}+\frac{1}{x}$
+
+  所以 $f(x)-\frac{\ln x}{x-1}=\frac{1}{1-x^{2}}\left(2 \ln x-\frac{x^{2}-1}{x}\right)$
+
+  考虑函数 $h(x)=2 \ln x-\frac{x^{2}-1}{x}(x>0)$,
+
+  则 $h^{\prime}(x)=\frac{2}{x}-\frac{2 x^{2}-\left(x^{2}-1\right)}{x^{2}}=-\frac{(x-1)^{2}}{x^{2}}$
+
+  所以当 $x \neq 1$ 时, $h^{\prime}(x)<0$ 而 $h(1)=0$,
+
+  当 $x \in(0,1)$ 时, $h(x)>0$ 可得 $\frac{1}{1-x^{2}} h(x)>0$;
+
+  当 $x \in(1,+\infty)$ 时, $h(x)<0$, 可得 $1 \frac{1-x^{2}}{} h(x)>0$
+
+  从而当 $x>0$ 且 $x \neq 1$ 时,
+
+  $f(x)-\frac{\ln x}{x-1}>0$ 即 $f(x)>\frac{\ln x}{x-1}$

@@ -1,0 +1,88 @@
+type: solve
+source: 2018 全国III卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  deriv.extremum: 0.55
+  deriv.construct: 0.45
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\left(2+x+a x^{2}\right) \ln (1+x)-2 x$.
+
+  （1）若 $a=0$, 证明: 当 $-1<x<0$ 时, $f(x)<0$; 当 $x>0$ 时, $f(x)>0$;
+
+  (2) 若 $x=0$ 是 $f(x)$ 的极大值点, 求 $a$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  (1) 证明: 当 $a=0$ 时, $f(x)=(2+x) \ln (1+x)-2 x,(x>-1)$. $f^{\prime}(x)=\ln (x+1) \frac{x}{x+1}, \quad f^{\prime \prime}(x)=\frac{x}{(x+1)^{2}}$ 可得 $x \in(-1,0)$ 时, $f^{\prime \prime}(x) \leqslant 0, x \in(0,+\infty)$ 时, $f^{\prime \prime}(x) \geqslant 0$
+
+  $\therefore f^{\prime}(x)$ 在 $(-1,0)$ 递减, 在 $(0,+\infty)$ 递增,
+
+  $\therefore f^{\prime}(x) \geqslant f^{\prime}(0)=0$
+
+  $\therefore f(x)=(2+x) \ln (1+x)-2 x$ 在 $(-1,+\infty)$ 上单调递增, 又 $f(0)=0$.
+
+  $\therefore$ 当 $-1<x<0$ 时, $f(x)<0$; 当 $x>0$ 时, $f(x)>0$.
+
+  (2) 解: 由 $f(x)=\left(2+x+a x^{2}\right) \ln (1+x)-2 x$, 得
+
+  $f^{\prime}(x)=(1+2 a x) \ln (1+x)+\frac{2+x+a x^{2}}{x+1}-2=\frac{a x^{2}-x+(1+2 a x)(1+x) \ln (x+1)}{x+1}$
+
+  今 $h(x)=a x^{2}-x+(1+2 a x)(1+x) \ln (x+1)$,
+
+  $h^{\prime}(x)=4 a x+(4 a x+2 a+1) \ln (x+1)$
+
+  当 $a \geqslant 0, x>0$ 时, $h^{\prime}(x)>0, h(x)$ 单调递增,
+
+  $\therefore h(x)>h(0)=0$, 即 $f^{\prime}(x)>0$,
+
+  $\therefore f(x)$ 在 $(0,+\infty)$ 上单调递增, 故 $x=0$ 不是 $f(x)$ 的极大值点, 不符合题 意.
+
+  当 $a<0$ 时, $h^{\prime \prime}(x)=8 a+4 a l n(x+1)+\frac{1-2 a}{x+1}$,
+
+  显然 $h^{\prime \prime}(x)$ 单调递减,
+
+  (1) 令 $h^{\prime \prime}(0)=0$, 解得 $a=-\frac{1}{6}$.
+
+  $\therefore$ 当 $-1<x<0$ 时, $h^{\prime \prime}(x)>0$, 当 $x>0$ 时, $h^{\prime \prime}(x)<0$,
+
+  $\therefore \mathrm{h}^{\prime}(\mathrm{x})$ 在 $(-1,0)$ 上单调递增, 在 $(0,+\infty)$ 上单调递减,
+
+  $\therefore \mathrm{h}^{\prime}(\mathrm{x}) \leqslant \mathrm{h}^{\prime}(0)=0$
+
+  $\therefore \mathrm{h}(\mathrm{x})$ 单调递减, 又 $h(0)=0$,
+
+  $\therefore$ 当 $-1<x<0$ 时, $h(x)>0$, 即 $f^{\prime}(x)>0$,
+
+  当 $x>0$ 时, $h(x)<0$, 即 $f^{\prime}(x)<0$, $\therefore f(x)$ 在 $(-1,0)$ 上单调递增, 在 $(0,+\infty)$ 上单调递减,
+
+  $\therefore x=0$ 是 $f(x)$ 的极大值点, 符合题意;
+
+  (2) 若 $-\frac{1}{6}<a<0$, 则 $h^{\prime \prime}(0)=1+6 a>0, h^{\prime \prime}\left(e^{-\frac{1+6 a}{4 a}}-1\right)=(2 a-1)\left(1-e^{\frac{1+6 a}{4 a}}\right)$ $<0$,
+
+  $\therefore h^{\prime \prime}(\mathrm{x})=0$ 在 $(0,+\infty)$ 上有唯一一个零点, 设为 $\mathrm{x}_{0}$,
+
+  $\therefore$ 当 $0<x<x_{0}$ 时, $h^{\prime \prime}(x)>0, h^{\prime}(x)$ 单调递增,
+
+  $\therefore h^{\prime}(x)>h^{\prime}(0)=0$, 即 $f^{\prime}(x)>0$,
+
+  $\therefore f(x)$ 在 $\left(0, x_{0}\right)$ 上单调递增, 不符合题意;
+
+  (3)若 $a<-\frac{1}{6}$, 则 $h^{\prime \prime}(0)=1+6 a<0, h^{\prime \prime}\left(\frac{1}{e^{2}}-1\right)=(1-2 a) e^{2}>0$,
+
+  $\therefore h^{\prime \prime}(x)=0$ 在 $(-1,0)$ 上有唯一一个零点, 设为 $x_{1}$,
+
+  $\therefore$ 当 $\mathrm{x}_{1}<\mathrm{x}<0$ 时, $\mathrm{h}^{\prime \prime}(\mathrm{x})<0, \mathrm{h}^{\prime}(\mathrm{x})$ 单调递减,
+
+  $\therefore \mathrm{h}^{\prime}(\mathrm{x})>\mathrm{h}^{\prime}(0)=0, \therefore \mathrm{h}(\mathrm{x})$ 单调递增,
+
+  $\therefore h(x)<h(0)=0$, 即 $f^{\prime}(x)<0$,
+
+  $\therefore f(x)$ 在 $\left(x_{1}, 0\right)$ 上单调递减, 不符合题意.
+
+  综上, $\mathrm{a}=-\frac{1}{6}$.

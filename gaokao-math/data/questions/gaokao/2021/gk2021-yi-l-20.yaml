@@ -1,0 +1,59 @@
+type: solve
+source: 2021 全国乙卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 较难
+stem: |-
+  设函数 $f(x)=\ln (a-x)$, 已知 $x=0$ 是函数 $y=x f(x)$ 的极值点.
+
+  (1) 求 $a$;
+
+  (2) 设函数 $g(x)=\frac{x+f(x)}{x f(x)}$, 证明: $g(x)<1$.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  解析
+
+  解析:
+
+  (1) 令 $h(x)=x f(x)=x \ln (a-x)$
+
+  则 $h^{\prime}(x)=\ln (a-x)-\frac{x}{a-x}$.
+
+  $\because x=0$ 是函数 $y=x f(x)$ 的极值点.
+
+  $\therefore h^{\prime}(0)=0$.
+
+  解得: $a=1$;
+
+  (2) 由 (1) 可知: $f(x)=\ln (1-x)$
+
+  $g(x)=\frac{x+f(x)}{x f(x)}=\frac{1}{f(x)}+\frac{1}{x}$
+
+  要证 $g(x)<1$, 即证 $\frac{1}{f(x)}+\frac{1}{x}<1 \Leftrightarrow \frac{1}{\ln (1-x)}+\frac{1-x}{x}<0 \quad(x<1$ 且 $x \neq 0)$
+
+  $\Leftrightarrow \frac{x+(1-x) \ln (1-x)}{x \ln (1-x)}<0$
+
+  $\because$ 当 $x<0$ 时, $x \cdot \ln (1-x)<0$.
+
+  当 $0<x<1$ 时, $x \cdot \ln (1-x)<0$.
+
+  $\therefore$ 只需证明 $x+(1-x) \ln (1-x)>0$
+
+  令 $H(x)=x+(1-x) \ln (1-x)$ ，且易知 $H(0)=0$. 则 $H^{\prime}(x)=1-\ln (1-x)+\frac{-1}{1-x}(1-x)=-\ln (1-x)$
+
+  （i）当 $x<0$ 时, 易得 $H^{\prime}(x)<0$, 则 $H(x)$ 在 $(-\infty, 0)$ 上单调递减,
+
+  $\because H(0)=0, \therefore H(x)>H(0)=0$, 得证.
+
+  (ii) 当 $0<x<1$ 时, 易得 $H^{\prime}(x)>0$, 则 $H(x)$ 在 $(0,1)$ 上单调递增.
+
+  $\because H(0)=0, \therefore H(x)>H(0)=0$, 得证.
+
+  综上证得 $g(x)<1$.

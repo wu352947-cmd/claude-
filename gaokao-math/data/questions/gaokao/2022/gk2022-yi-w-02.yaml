@@ -1,0 +1,15 @@
+type: single
+source: 2022 全国乙卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $(1+2 \mathrm{i}) a+b=2 \mathrm{i}$, 其中 $a, b$ 为实数, 则（)
+options:
+  A: $a=1, b=-1$
+  B: $a=1, b=1$
+  C: $a=-1, b=1$
+  D: $a=-1, b=-1$
+answer: A
+solution: '【详解】因为 $a, b \hat{\mathbf{|}} \mathbf{R},(a+b)+2 a \mathrm{i}=2 \mathrm{i}$, 所以 $a+b=0,2 a=2$, 解得: $a=1, b=-1$. 故选: A.'

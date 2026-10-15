@@ -1,0 +1,38 @@
+type: solve
+source: 2016 全国II卷（文科） 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  prob.classical: 1.0
+difficulty_label: 中档
+stem: |-
+  某险种的基本保费为 a（单位: 元), 继续购买该险种的投保人称 为续保人, 续保人本年度的保费与其上年度出险次数的关联如下:
+
+  $$\begin{array}{|c|c|c|c|c|c|c|}\hline \text{上年度出险次数} & 0 & 1 & 2 & 3 & 4 & \geqslant 5 \\ \hline \text{保费} & 0.85 a & a & 1.25 a & 1.5 a & 1.75 a & 2 a \\ \hline \end{array}$$
+
+  随机调查了该险种的 200 名续保人在一年内的出险情况, 得到如下统计表:
+
+  $$\begin{array}{|c|c|c|c|c|c|c|}\hline \text{出险次数} & 0 & 1 & 2 & 3 & 4 & \geqslant 5 \\ \hline \text{频数} & 60 & 50 & 30 & 30 & 20 & 10 \\ \hline \end{array}$$
+
+  （I）记 $A$ 为事件: “一续保人本年度的保费不高于基本保费”. 求 $P$ ( $A$ ）的估计 值;
+
+  ( II ) 记 B 为事件: “一续保人本年度的保费高于基本保费但不高于基本保费的 $160 \%$ ". 求 P (B) 的估计值;
+
+  (III) 求续保人本年度的平均保费估计值.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  解: (I) 记 $\mathrm{A}$ 为事件: "一续保人本年度的保费不高于基本保费". 事 件 $A$ 的人数为: $60+50=110$, 该险种的 200 名续保,
+
+  $P(A)$ 的估计值为: $\frac{110}{200}=\frac{11}{20}$;
+
+  （II ) 记 B 为事件: “一续保人本年度的保费高于基本保费但不高于基本保费的 $160 \%$ ". 事件 $B$ 的人数为: $30+30=60, P(B)$ 的估计值为: $\frac{60}{200}=\frac{3}{10}$;
+
+  (III) 续 保人本年度的平均保费估计 值为 $\bar{x}=$ $\frac{0.85 \mathrm{a} \times 60+\mathrm{a} \times 50+1.25 \mathrm{a} \times 30+1.5 \mathrm{a} \times 30+1.75 \mathrm{a} \times 20+2 \mathrm{a} \times 1}{200}=1.1925 \mathrm{a}$.

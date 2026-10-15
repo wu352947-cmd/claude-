@@ -1,0 +1,20 @@
+type: fill
+source: 2018 全国II卷（理科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  solid.vector: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知圆锥的顶点为 $\mathrm{S}$, 母线 $\mathrm{SA}, \mathrm{SB}$ 所成角的余弦值为 $\frac{7}{8}, \mathrm{SA}$ 与圆 锥底面所成角为 $45^{\circ}$, 若 $\triangle S A B$ 的面积为 $5 \sqrt{15}$, 则该圆锥的侧面积为 ______
+answer: 40 \sqrt{2} \pi
+answer_kind: expr
+solution: |-
+  解 圆锥的顶点为 $\mathrm{S}$, 母线 $\mathrm{SA}, \mathrm{SB}$ 所成角的余弦值为 $\frac{7}{8}$, 可得 $\sin \angle A S B=$ $\sqrt{1-\left(\frac{7}{8}\right)^{2}}=\frac{\sqrt{15}}{8}$
+
+  $\triangle S A B$ 的面积为 $5 \sqrt{15}$,
+
+  可得 $\frac{1}{2} S A^{2} \sin \angle A S B=5 \sqrt{15}$, 即 $\frac{1}{2} S A^{2} \times \frac{\sqrt{15}}{8}=5 \sqrt{15}$, 即 $S A=4 \sqrt{5}$.
+
+  $S A$ 与圆锥底面所成角为 $45^{\circ}$, 可得圆锥的底面半径为: $\frac{\sqrt{2}}{2} \times 4 \sqrt{5}=2 \sqrt{10}$.
+
+  则该圆锥的侧面积: $\frac{1}{2} \times 4 \sqrt{10} \times 4 \sqrt{5} \pi=40 \sqrt{2} \pi$. 故答案为: $40 \sqrt{2} \pi$.

@@ -1,0 +1,17 @@
+type: solve
+source: 2021 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  func.symmetry: 1.0
+difficulty_label: 较难
+stem: 某校学生在研究民间剪纸艺术时, 发现剪纸时经常会沿纸的某条对称轴把纸对折, 规格为 $20 \mathrm{dm} \times 12 \mathrm{dm}$ 的长方形纸, 对折 1 次共可以得到 $10 \mathrm{dm} \times 12 \mathrm{dm}, 20 \mathrm{dm} \times 6 \mathrm{dm}$ 两种规格的图形, 它们的面积之和 $S_{1}=240 \mathrm{dm}^{2}$, 对折 2 次共可以得到 $5 \mathrm{dm} \times 12 \mathrm{dm}, 10 \mathrm{dm} \times 6 \mathrm{dm}, 20 \mathrm{dm} \times 3 \mathrm{dm}$ 三种规格的图形, 它们的 面积之和 $S_{2}=180 \mathrm{dm}^{2}$, 以此类推, 则对折 4 次共可以得到不同规格图形的种数为 ______ ; 如果对折 $n$ 次, 那么 $\sum_{k=1}^{n} S_{k}=\underline{\qquad}\mathrm{dm}^{2}$.
+parts:
+- label: 答案
+  points: 5.0
+  answer: 5；$720-\frac{15(3+n)}{2^{n-4}}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 5；$720-\frac{15(3+n)}{2^{n-4}}$

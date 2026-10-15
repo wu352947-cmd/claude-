@@ -1,0 +1,14 @@
+type: single
+source: 2021 浙江卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\{x \mid x \geq 1\}, B=\{x \mid-1<x<2\}$, 则 $A \cap B=$ ($\quad$)
+options:
+  A: $\{x \mid x>-1\}$
+  B: $\{x \mid x \geq 1\}$
+  C: $\{x \mid-1<x<1\}$
+  D: $\{x \mid 1 \leq x<2\}$
+answer: D

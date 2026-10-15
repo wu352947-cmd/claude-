@@ -1,0 +1,22 @@
+type: fill
+source: 2017 全国II卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  trig.graph: 0.42
+  trig.identities: 0.31
+  deriv.extremum: 0.28
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\sin ^{2} x+\sqrt{3} \cos x-\frac{3}{4}\left(x \in\left[0, \frac{\pi}{2}\right]\right)$ 的最大值是 ______
+answer: '1'
+answer_kind: expr
+solution: |-
+  解: $f(x)=\sin ^{2} x+\sqrt{3} \cos x-\frac{3}{4}=1-\cos ^{2} x+\sqrt{3} \cos x-\frac{3}{4}$,
+
+  令 $\cos x=t$ 且 $t \in[0,1]$,
+
+  则 $y=-t^{2}+\sqrt{3} t+\frac{1}{4}=-\quad\left(t-\frac{\sqrt{3}}{2}\right)^{2+1}$,
+
+  当 $t=\frac{\sqrt{3}}{2}$ 时, $f(t)_{\text {max }}=1$,
+
+  即 $f(x)$ 的最大值为 1 , 故答案为: 1

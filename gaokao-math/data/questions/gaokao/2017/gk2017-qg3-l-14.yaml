@@ -1,0 +1,20 @@
+type: fill
+source: 2017 全国III卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  seq.geom: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设等比数列 $\left\{a_{n}\right\}$ 满足 $a_{1}+a_{2}=-1, a_{1}-a_{3}=-3$, 则 $a_{4}=$ ______
+answer: '-8'
+answer_kind: expr
+solution: |-
+  解：设等比数列 $\left\{a_{n}\right\}$ 的公比为 $\mathrm{q}, \because a_{1}+a_{2}=-1, a_{1}-a_{3}=-3$,
+
+  $\therefore a_{1}(1+q)=-1, a_{1}\left(1-q^{2}\right)=-3$
+
+  解得 $a_{1}=1, q=-2$.
+
+  则 $a_{4}=(-2)^{3}=-8$.
+
+  故答案为: -8 .

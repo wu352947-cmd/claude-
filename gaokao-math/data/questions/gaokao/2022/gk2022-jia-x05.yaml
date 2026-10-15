@@ -1,0 +1,16 @@
+type: single
+source: 2022 全国甲卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  trig.graph: 0.41
+  func.zeros: 0.35
+  deriv.extremum: 0.24
+difficulty_label: 基础
+points: 5.0
+stem: 设函数 $f(x)=\sin \left(\omega x+\frac{\pi}{3}\right)$ 在区间 $(0, \pi)$ 恰有三个极值点、两个零点, 则 $\omega$ 的取值范围是 ($\qquad$)
+options:
+  A: $\left[\frac{5}{3}, \frac{13}{6}\right)$
+  B: $\left[\frac{5}{3}, \frac{19}{6}\right)$
+  C: $\left(\frac{13}{6}, \frac{8}{3}\right]$
+  D: $\left(\frac{13}{6}, \frac{19}{6}\right]$
+answer: C

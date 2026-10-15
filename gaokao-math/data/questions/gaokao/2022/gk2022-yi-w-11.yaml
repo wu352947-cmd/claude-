@@ -1,0 +1,19 @@
+type: single
+source: 2022 全国乙卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  trig.graph: 0.6
+  deriv.extremum: 0.4
+difficulty_label: 较难
+points: 5.0
+stem: 函数 $f(x)=\cos x+(x+1) \sin x+1$ 在区间 $[0,2 \pi]$ 的最小值、最大值分别为 ()
+options:
+  A: $-\frac{\pi}{2}, \frac{\pi}{2}$
+  B: $-\frac{3 \pi}{2}, \frac{\pi}{2}$
+  C: $-\frac{\pi}{2}, \frac{\pi}{2}+2$
+  D: $-\frac{3 \pi}{2}, \frac{\pi}{2}+2$
+answer: D
+solution: |-
+  【详解】 $f^{\prime}(x)=-\sin x+\sin x+(x+1) \cos x=(x+1) \cos x$, 所以 $f(x)$ 在区间 $\left(0, \frac{\pi}{2}\right)$ 和 $\left(\frac{3 \pi}{2}, 2 \pi\right)$ 上 $f^{\prime}(x)>0$, 即 $f(x)$ 单调递增; 在区间 $\left(\frac{\pi}{2}, \frac{3 \pi}{2}\right)$ 上 $f^{\prime}(x)<0$, 即 $f(x)$ 单调递减, 又 $f(0)=f(2 \pi)=2, f\left(\frac{\pi}{2}\right)=\frac{\pi}{2}+2, f\left(\frac{3 \pi}{2}\right)=-\left(\frac{3 \pi}{2}+1\right)+1=-\frac{3 \pi}{2}$ ， 所以 $f(x)$ 在区间 $[0,2 \pi]$ 上的最小值为 $-\frac{3 \pi}{2}$, 最大值为 $\frac{\pi}{2}+2$.
+
+  故选: D

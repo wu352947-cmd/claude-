@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  trig.graph: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 下列区间中，函数 $f(x)=7 \sin \left(x-\frac{\pi}{6}\right)$ 单调递增的区间是 ($\quad$)
+options:
+  A: $\left(0, \frac{\pi}{2}\right)$
+  B: $\left(\frac{\pi}{2}, \pi\right)$
+  C: $\left(\pi, \frac{3 \pi}{2}\right)$
+  D: $\left(\frac{3 \pi}{2}, 2 \pi\right)$
+answer: A

@@ -1,0 +1,21 @@
+type: solve
+source: 2026 天津卷 第 18 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 中档
+stem: |-
+  已知椭圆 $C: \frac{x^2}{a^2} + \frac{y^2}{b^2} = 1 (a>b>0)$ 的离心率为 $\frac{1}{2}$，椭圆被直线 $x = b$ 截得的线段长为 $\sqrt{3}$。
+      (1) 求 $C$ 的标准方程；
+      (2) 斜率为 $-\sqrt{3}$ 的直线与圆 $x^2 + y^2 = b^2$ 相切，且该直线交椭圆于 $P(x_1, y_1)$，$Q(x_2, y_2)$（$y_1 < y_2$），$A$ 是椭圆的上顶点。记直线 $AP$，$AQ$ 的斜率分别为 $k_1, k_2$，求 $\frac{k_1}{k_2}$。
+parts:
+- label: (1)
+  points: 7.0
+  answer: $\frac{x^2}{4} + \frac{y^2}{3} = 1$
+- label: (2)
+  points: 8.0
+  answer: $\frac{k_1}{k_2} = 3$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $\frac{x^2}{4} + \frac{y^2}{3} = 1$；(2) $\frac{k_1}{k_2} = 3$

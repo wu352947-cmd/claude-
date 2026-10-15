@@ -1,0 +1,20 @@
+type: fill
+source: 2017 全国II卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知函数 $f(x)$ 是定义在 $R$ 上的奇函数, 当 $x \in(-\infty, 0)$ 时, $f($ x) $=2 x^{3}+x^{2}$, 则 $f(2)=$ ______
+answer: '12'
+answer_kind: expr
+solution: |-
+  解: $\because$ 当 $x \in(-\infty, 0)$ 时, $f(x)=2 x^{3}+x^{2}$,
+
+  $\therefore f(-2)=-12$,
+
+  又 $\because$ 函数 $f(x)$ 是定义在 $R$ 上的奇函数,
+
+  $\therefore f(2)=12$,
+
+  故答案为: 12

@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 3 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合$A=\left\{\sin\dfrac{7\pi}{6},\cos\dfrac{5\pi}{3},\tan\dfrac{5\pi}{4}\right\}$，$B=\left\{-\dfrac{\sqrt{3}}{2},-\dfrac{1}{2},1\right\}$，则$A\cap B=$（ ）
+options:
+  A: $\left\{-\dfrac{\sqrt{3}}{2},-\dfrac{1}{2}\right\}$
+  B: $\left\{-\dfrac{\sqrt{3}}{2},1\right\}$
+  C: $\left\{-\dfrac{1}{2},1\right\}$
+  D: $\left\{-\dfrac{\sqrt{3}}{2},-\dfrac{1}{2},1\right\}$
+answer: C

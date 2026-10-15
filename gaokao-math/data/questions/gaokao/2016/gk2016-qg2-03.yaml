@@ -1,0 +1,22 @@
+type: single
+source: 2016 全国II卷 第 3 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2016
+kps:
+  trig.graph: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $y=A \sin (\omega x+\phi)$ 的部分图象如图所示, 则 $(\quad)$
+figure: 4df66158f51db92e.png
+options:
+  A: $y=2 \sin \left(2 x-\frac{\pi}{6}\right)$
+  B: $y=2 \sin \left(2 x-\frac{\pi}{3}\right)$
+  C: $y=2 \sin \left(x+\frac{\pi}{6}\right)$
+  D: $y=2 \sin \left(x+\frac{\pi}{3}\right)$
+answer: A
+solution: |-
+  解：由图可得：函数的最大值为 2 , 最小值为 -2 , 故 $A=2$, $\frac{T}{2}=\frac{\pi}{3}+\frac{\pi}{6}$, 故 $T=\pi, \omega=2$,
+  故 $y=2 \sin (2 x+\phi)$,
+  将 $\left(\frac{\pi}{3}, 2\right)$ 代入可得: $2 \sin \left(\frac{2 \pi}{3}+\phi\right)=2$,
+  则 $\phi=-\frac{\pi}{6}$ 满足要求,
+  故 $y=2 \sin \left(2 x-\frac{\pi}{6}\right)$,
+  故选: A.

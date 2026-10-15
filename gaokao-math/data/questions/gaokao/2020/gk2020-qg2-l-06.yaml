@@ -1,0 +1,26 @@
+type: single
+source: 2020 全国II卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  seq.recurrence: 0.46
+  seq.geom: 0.27
+  stat.regression: 0.27
+difficulty_label: 中档
+points: 5.0
+stem: 数列 $\left\{a_{n}\right\}$ 中, $a_{1}=2, a_{m+n}=a_{m} a_{n}$, 若 $a_{k+1}+a_{k+2}+\cdots+a_{k+10}=2^{15}-2^{5}$, 则 $k=(\quad)$
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '5'
+answer: C
+solution: |-
+  【详解】在等式 $a_{m+n}=a_{m} a_{n}$ 中, 令 $m=1$, 可得 $a_{n+1}=a_{n} a_{1}=2 a_{n}, \therefore \frac{a_{n+1}}{a_{n}}=2$,
+
+  所以, 数列 $\left\{a_{n}\right\}$ 是以 2 为首项, 以 2 为公比的等比数列, 则 $a_{n}=2 \times 2^{n-1}=2^{n}$,
+
+  $\therefore a_{k+1}+a_{k+2}+\cdots+a_{k+10}=\frac{a_{k+1} \cdot\left(1-2^{10}\right)}{1-2}=\frac{2^{k+1} \cdot\left(1-2^{10}\right)}{1-2}=2^{k+1}\left(2^{10}-1\right)=2^{5}\left(2^{10}-1\right)$,
+
+  $\therefore 2^{k+1}=2^{5}$, 则 $k+1=5$, 解得 $k=4$.
+
+  故选: C.

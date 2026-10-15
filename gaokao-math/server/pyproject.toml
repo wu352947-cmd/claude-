@@ -1,0 +1,27 @@
+[project]
+name = "gaokao-math-server"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "antlr4-python3-runtime==4.11",
+    "fastapi>=0.143.1",
+    "fsrs>=6.3.2",
+    "pyyaml>=6.0.3",
+    "sqlmodel>=0.0.48",
+    "sympy>=1.14.0",
+    "tzdata>=2026.5",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "httpx2>=2.13.1",
+    "lxml>=5.0",
+    "olefile>=0.47",
+    "pillow>=10.1",
+    "pytest>=9.1.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]

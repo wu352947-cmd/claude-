@@ -1,0 +1,26 @@
+type: fill
+source: 2018 全国I卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 记 $S_{n}$ 为数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $S_{n}=2 a_{n}+1$, 则 $S_{6}=$ ______
+answer: '-63'
+answer_kind: expr
+solution: |-
+  解: $S_{n}$ 为数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, $S_{n}=2 a_{n}+1$, (1)
+
+  当 $n=1$ 时, $a_{1}=2 a_{1}+1$, 解得 $a_{1}=-1$,
+
+  当 $n \geqslant 2$ 时, $S_{n-1}=2 a_{n-1}+1$, (2),
+
+  由(1)- (2)可得 $a_{n}=2 a_{n}-2 a_{n-1}$,
+
+  $\therefore a_{n}=2 a_{n-1}$,
+
+  $\therefore\left\{a_{n}\right\}$ 是以 -1 为首项, 以 2 为公比的等比数列,
+
+  $\therefore S_{6}=\frac{-1 \times\left(1-2^{6}\right)}{1-2}=-63$,
+
+  故答案为: -63

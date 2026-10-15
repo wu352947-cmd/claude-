@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标II卷 第 6 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 甲、乙、丙、丁等$8$人分成$A$，$B$两技术小组，要求每组$4$人，且甲乙必须在同一组，丙丁不能在同一组，共有多少分配方案$(\quad)$
+options:
+  A: $10$
+  B: $12$
+  C: $16$
+  D: $24$
+answer: C

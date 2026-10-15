@@ -1,0 +1,26 @@
+type: single
+source: 2022 全国乙卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  seq.geom: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知等比数列 $\left\{a_{n}\right\}$ 的前 3 项和为 $168, a_{2}-a_{5}=42$, 则 $a_{6}=()$
+options:
+  A: '14'
+  B: '12'
+  C: '6'
+  D: '3'
+answer: D
+solution: |-
+  【详解】解：设等比数列 $\left\{a_{n}\right\}$ 的公比为 $q, q \neq 0$,
+
+  若 $q=1$, 则 $a_{2}-a_{5}=0$, 与题意矛盾,
+
+  所以 $q \neq 1$,
+
+  则 $\left\{\begin{array}{l}a_{1}+a_{2}+a_{3}=\frac{a_{1}\left(1-q^{3}\right)}{1-q}=168 \\ a_{2}-a_{5}=a_{1} q-a_{1} q^{4}=42\end{array}\right.$, 解得 $\left\{\begin{array}{l}a_{1}=96 \\ q=\frac{1}{2}\end{array}\right.$,
+
+  所以 $a_{6}=a_{1} q^{5}=3$.
+
+  故选：D.

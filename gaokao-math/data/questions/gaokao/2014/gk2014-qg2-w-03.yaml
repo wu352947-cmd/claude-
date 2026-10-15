@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国II卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  logic.condition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '函数 $f(x)$ 在 $x=x_{0}$ 处导数存在, 若 $p: f^{\prime}\left(x_{0}\right)=0: q: x=x_{0}$ 是 $f(x)$ 的极值点, 则 ( )'
+options:
+  A: $p$ 是 $q$ 的充分必要条件
+  B: $p$ 是 $q$ 的充分条件，但不是 $q$ 的必要条件
+  C: $p$ 是 $q$ 的必要条件, 但不是 $q$ 的充分条件
+  D: $p$ 既不是 $q$ 的充分条件, 也不是 $q$ 的必要条件
+answer: C
+solution: |-
+  解: 函数 $\mathrm{f}(\mathrm{x})=\mathrm{x}^{3}$ 的导数为 $\mathrm{f}^{\prime}(x)=3 \mathrm{x}^{2}$, 由 $\mathrm{f}^{\prime}\left(\mathrm{x}_{0}\right)=0$, 得 $\mathrm{x}_{0}=0$, 但此 时函数 $f(x)$ 单调递增, 无极值，充分性不成立.
+
+  根据极值的定义和性质, 若 $x=x_{0}$ 是 $f(x)$ 的极值点, 则 $f^{\prime}\left(x_{0}\right)=0$ 成立, 即必要 性成立，
+
+  故 $p$ 是 $q$ 的必要条件, 但不是 $q$ 的充分条件,
+
+  故选: C.

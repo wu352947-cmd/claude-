@@ -1,0 +1,20 @@
+type: single
+source: 2021 全国甲卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 点 $(3,0)$ 到双曲线 $\frac{x^{2}}{16}-\frac{y^{2}}{9}=1$ 的一条渐近线的距离为 $(\quad)$
+options:
+  A: $\frac{9}{5}$
+  B: $\frac{8}{5}$
+  C: $\frac{6}{5}$
+  D: $\frac{4}{5}$
+answer: A
+solution: |-
+  【详解】由题意可知, 双曲线的渐近线方程为: $\frac{x^{2}}{16}-\frac{y^{2}}{9}=0$ ，即 $3 x \pm 4 y=0$ ，
+
+  结合对称性，不妨考虑点 $(3,0)$ 到直线 $3 x+4 y=0$ 的距离: $d=\frac{9+0}{\sqrt{9+16}}=\frac{9}{5}$.
+
+  故选: A.

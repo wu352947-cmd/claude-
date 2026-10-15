@@ -1,0 +1,15 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  solid.sphere: 0.63
+  solid.section: 0.37
+difficulty_label: 较难
+points: 5.0
+stem: 已知球的半径为 2 , 相互垂直的两个平面分别截球面得两个圆, 若 两圆的公共弦长为 2 , 则两圆的圆心距等于($\qquad$)
+options:
+  A: '1'
+  B: $\sqrt{2}$
+  C: $\sqrt{3}$
+  D: '2'
+answer: C

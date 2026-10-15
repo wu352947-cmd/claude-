@@ -1,0 +1,26 @@
+type: fill
+source: 2015 全国II卷（理科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和为 $S_{n}$, 且 $a_{1}=-1, a_{n+1}=S_{n+1} S_{n}$, 则 $S_{n}=$ ______
+answer: -\frac{1}{n}
+answer_kind: expr
+solution: |-
+  解: $\because a_{n+1}=S_{n+1} s_{n}$,
+
+  $\therefore \mathrm{s}_{\mathrm{n}+1}-\mathrm{S}_{\mathrm{n}}=\mathrm{S}_{\mathrm{n}+1} \mathrm{S}_{\mathrm{n}}$,
+
+  $\therefore \frac{1}{S_{n}}-\frac{1}{S_{n+1}}=1$,
+
+  又 $\because a_{1}=-1$, 即 $\frac{1}{S_{1}}=-1$,
+
+  $\therefore$ 数列 $\left\{\frac{1}{S_{n}}\right\}$ 是以首项是- 1 、公差为- 1 的等差数列,
+
+  $\therefore \frac{1}{S_{n}}=-\mathrm{n}$,
+
+  $\therefore S_{n}=-\frac{1}{n}$,
+
+  故答案为: $-\frac{1}{n}$.

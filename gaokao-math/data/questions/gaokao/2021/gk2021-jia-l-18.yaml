@@ -1,0 +1,60 @@
+type: solve
+source: 2021 全国甲卷（理科） 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+stem: |-
+  已知数列 $\left\{a_{n}\right\}$ 的各项均为正数, 记 $S_{n}$ 为 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 从下面(1)(2)(3)中选取两个作为条件, 证明另 外一个成立.
+
+  (1)数列 $\left\{a_{n}\right\}$ 是等差数列: (2)数列 $\left\{\sqrt{S_{n}}\right\}$ 是等差数列; (3) $a_{2}=3 a_{1}$.
+
+  注: 若选择不同的组合分别解答, 则按第一个解答计分.
+parts:
+- label: (1)
+  points: 3
+  answer: ''
+- label: (2)
+  points: 3
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  【详解】选(1)(2)作条件证明(3):
+
+  设 $\sqrt{S_{n}}=a n+b(a>0)$, 则 $S_{n}=(a n+b)^{2}$,
+
+  当 $n=1$ 时, $a_{1}=S_{1}=(a+b)^{2}$; 当 $n \geq 2$ 时, $a_{n}=S_{n}-S_{n-1}=(a n+b)^{2}-(a n-a+b)^{2}=a(2 a n-a+2 b)$;
+
+  因为 $\left\{a_{n}\right\}$ 也是等差数列, 所以 $(a+b)^{2}=a(2 a-a+2 b)$, 解得 $b=0$ ；
+
+  所以 $a_{n}=a^{2}(2 n-1)$, 所以 $a_{2}=3 a_{1}$.
+
+  选(1)(3)作条件证明(2):
+
+  因为 $a_{2}=3 a_{1},\left\{a_{n}\right\}$ 是等差数列,
+
+  所以公差 $d=a_{2}-a_{1}=2 a_{1}$,
+
+  所以 $S_{n}=n a_{1}+\frac{n(n-1)}{2} d=n^{2} a_{1}$, 即 $\sqrt{S_{n}}=\sqrt{a_{1}} n$ ，
+
+  因为 $\sqrt{S_{n+1}}-\sqrt{S_{n}}=\sqrt{a_{1}}(n+1)-\sqrt{a_{1}} n=\sqrt{a_{1}}$,
+
+  所以 $\left\{\sqrt{S_{n}}\right\}$ 是等差数列.
+
+  选(2)(3)作条件证明(1):
+
+  设 $\sqrt{S_{n}}=a n+b(a>0)$, 则 $S_{n}=(a n+b)^{2}$,
+
+  当 $n=1$ 时, $a_{1}=S_{1}=(a+b)^{2}$;
+
+  当 $n \geq 2$ 时, $a_{n}=S_{n}-S_{n-1}=(a n+b)^{2}-(a n-a+b)^{2}=a(2 a n-a+2 b)$;
+
+  因为 $a_{2}=3 a_{1}$, 所以 $a(3 a+2 b)=3(a+b)^{2}$ ， 解得 $b=0$ 或 $b=-\frac{4 a}{3}$ ；
+
+  当 $b=0$ 时, $a_{1}=a^{2}, a_{n}=a^{2}(2 n-1)$, 当 $n \geq 2$ 时, $a_{n}-a_{n-1}=2 a^{2}$ 满足等差数列的定义, 此时 $\left\{a_{n}\right\}$ 为等差 数列;
+
+  当 $b=-\frac{4 a}{3}$ 时, $\sqrt{S_{n}}=a n+b=a n-\frac{4}{3} a, \sqrt{S_{1}}=-\frac{a}{3}<0$ 不合题意, 舍去.
+
+  综上可知 $\left\{a_{n}\right\}$ 为等差数列.

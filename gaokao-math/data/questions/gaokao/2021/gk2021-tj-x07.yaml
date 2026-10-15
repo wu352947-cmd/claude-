@@ -1,0 +1,15 @@
+type: single
+source: 2021 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  func.zeros: 0.55
+  func.piecewise: 0.45
+difficulty_label: 较难
+points: 5.0
+stem: 设 $a \in \mathbf{R}$, 函数 $f(x)=\left\{\begin{array}{ll}\cos (2 \pi x-2 \pi a) . & x<a \\ x^{2}-2(a+1) x+a^{2}+5, & x \geq a\end{array}\right.$, 若 $f(x)$ 在区间 $(0,+\infty)$ 内 恰有 6 个零点, 则 $a$ 的取值范围是 ($\quad$)
+options:
+  A: $\left(2, \frac{9}{4}\right] \cup\left(\frac{5}{2}, \frac{11}{4}\right]$
+  B: $\left(\frac{7}{4}, 2\right) \cup\left(\frac{5}{2}, \frac{11}{4}\right)$
+  C: $\left(2, \frac{9}{4}\right] \cup\left[\frac{11}{4}, 3\right)$
+  D: $\left(\frac{7}{4}, 2\right) \cup\left[\frac{11}{4}, 3\right)$
+answer: A

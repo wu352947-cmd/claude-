@@ -1,0 +1,20 @@
+type: single
+source: 2021 全国乙卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $2(z+\bar{z})+3(z-\bar{z})=4+6 i$ ，则 $z=(\quad)$
+options:
+  A: $1-2 i$
+  B: $1+2 i$
+  C: $1+i$
+  D: $1-i$
+answer: C
+solution: |-
+  解析:
+
+  设 $z=a+b i$, 则 $\bar{z}=a-b i, 2(z+\bar{z})+3(z-\bar{z})=4 a+6 b i=4+6 i$, 所以 $a=1, b=1$,
+
+  所以 $z=1+i$.

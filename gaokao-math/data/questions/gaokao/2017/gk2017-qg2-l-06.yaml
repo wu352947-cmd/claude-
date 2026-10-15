@@ -1,0 +1,18 @@
+type: single
+source: 2017 全国II卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 安排 3 名志愿者完成 4 项工作, 每人至少完成 1 项, 每项工作由 1 人完成, 则不同的安排方式共有（ $)$
+options:
+  A: 12 种
+  B: 18 种
+  C: 24 种
+  D: 36 种
+answer: D
+solution: |-
+  解： 4 项工作分成 3 组, 可得: $C_{4}^{2}=6$, 安排 3 名志愿者完成 4 项工作, 每人至少完成 1 项, 每项工作由 1 人完成, 可得： $6 \times \mathrm{A}_{3}^{3}=36$ 种.
+
+  故选: D.

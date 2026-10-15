@@ -1,0 +1,50 @@
+type: solve
+source: 2020 全国I卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  deriv.monotonic: 0.53
+  deriv.zeros: 0.47
+difficulty_label: 较难
+stem: |-
+  已知函数 $f(x)=e^{x}-a(x+2)$.
+
+  (1) 当 $a=1$ 时, 讨论 $f(x)$ 的单调性;
+
+  (2) 若 $f(x)$ 有两个零点, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【分析】
+
+  (1) 将 $a=1$
+
+  代入函数解析式，对函数求导，分别令导数大于零和小于零，求得函数的单调增区间和减区间;
+
+  (2) 若 $f(x)$ 有两个零点, 即 $e^{x}-a(x+2)=0$ 有两个解, 将其转化为 $a=\frac{e^{x}}{x+2}$ 有两个解, 令 $h(x)=\frac{e^{x}}{x+2}(x \neq-2)$, 求导研究函数图象的走向, 从而求得结果. 【详解】（1）当 $a=1$ 时, $f(x)=e^{x}-(x+2), f^{\prime}(x)=e^{x}-1$,
+
+  令 $f^{\prime}(x)<0$, 解得 $x<0$, 令 $f^{\prime}(x)>0$, 解得 $x>0$,
+
+  所以 $f(x)$ 的减区间为 $(-\infty, 0)$, 增区间为 $(0,+\infty)$;
+
+  (2) 若 $f(x)$ 有两个零点, 即 $e^{x}-a(x+2)=0$ 有两个解,
+
+  从方程可知, $x=2$ 不成立, 即 $a=\frac{e^{x}}{x+2}$ 有两个解,
+
+  令 $h(x)=\frac{e^{x}}{x+2}(x \neq-2)$, 则有 $h^{\prime}(x)=\frac{e^{x}(x+2)-e^{x}}{(x+2)^{2}}=\frac{e^{x}(x+1)}{(x+2)^{2}}$,
+
+  令 $h^{\prime}(x)>0$, 解得 $x>-1$, 令 $h^{\prime}(x)<0$, 解得 $x<-2$ 或 $-2<x<-1$,
+
+  所以函数 $h(x)$ 在 $(-\infty,-2)$ 和 $(-2,-1)$ 上单调递减, 在 $(-1,+\infty)$ 上单调递增,
+
+  且当 $x<-2$ 时, $h(x)<0$,
+
+  而 $x \rightarrow-2^{+}$时, $h(x) \rightarrow+\infty$, 当 $x \rightarrow+\infty$ 时, $h(x) \rightarrow+\infty$,
+
+  所以当 $a=\frac{e^{x}}{x+2}$ 有两个解时, 有 $a>h(-1)=\frac{1}{e}$,
+
+  所以满足条件的 $a$ 的取值范围是: $\left(\frac{1}{e},+\infty\right)$.

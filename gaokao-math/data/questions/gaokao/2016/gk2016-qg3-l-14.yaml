@@ -1,0 +1,23 @@
+type: fill
+source: 2016 全国III卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.graph: 0.6
+  trig.transform: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $y=\sin x-\sqrt{3} \cos x$ 的图象可由函数 $y=\sin x+\sqrt{3} \cos x$ 的图象至少 向右平移 个单位长度得到 ______
+answer: \frac{2 \pi}{3}
+answer_kind: expr
+solution: |-
+  解: $\because y=f(x)=\sin x+\sqrt{3} \cos x=2 \sin \left(x+\frac{\pi}{3}\right), y=\sin x-\sqrt{3} \cos x=2 \sin$ $\left(x-\frac{\pi}{3}\right)$, $\therefore f(x-\phi)=2 \sin \left(x+\frac{\pi}{3}-\phi\right) \quad(\phi>0)$
+
+  今 $2 \sin \left(x+\frac{\pi}{3}-\phi\right)=2 \sin \left(x-\frac{\pi}{3}\right)$ ，
+
+  则 $\frac{\pi}{3}-\phi=2 k \pi-\frac{\pi}{3} \quad(k \in Z)$ ，
+
+  即 $\phi=\frac{2 \pi}{3}-2 k \pi \quad(k \in Z)$ ，
+
+  当 $\mathrm{k}=0$ 时，正数 $\phi_{\min }=\frac{2 \pi}{3}$ ，
+
+  故答案为: $\frac{2 \pi}{3}$.

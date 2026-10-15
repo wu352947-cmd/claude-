@@ -1,0 +1,14 @@
+type: fill
+source: 2021 全国乙卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 双曲线 $\frac{x^{2}}{4}-\frac{y^{2}}{5}=1$ 的右焦点到直线 $x+2 y-8=0$ 的距离为 ______
+answer: \sqrt{5}
+answer_kind: expr
+solution: |-
+  解析:
+
+  $\frac{x^{2}}{4}-\frac{y^{2}}{5}=1$ 的右焦点为 $(3,0)$, 到直线 $x+2 y-8=0$ 的距离 $d=\frac{|3-8|}{\sqrt{1^{2}+2^{2}}}=\sqrt{5}$.

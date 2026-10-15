@@ -1,0 +1,16 @@
+type: fill
+source: 2013 全国II卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 4.0
+stem: 从 $1,2,3,4,5$ 中任意取出两个不同的数, 其和为 5 的概率是 ______
+answer: '0.2'
+answer_kind: expr
+solution: |-
+  解：从 $1,2,3,4,5$ 中任意取出两个不同的数共有 $C_{5}^{2}=10$ 种情况, 和为 5 的有 $(1,4)(2,3)$ 两种情况，
+
+  故所求的概率为: $\frac{2}{10}=0.2$
+
+  故答案为: 0.2

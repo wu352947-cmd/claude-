@@ -1,0 +1,147 @@
+"""每日推荐（ARCHITECTURE.md §5.5 的简化版）。
+
+1. 先放到期的错题（按到期时间）；
+   第 2 次及以后的复习，如果有没做过的变式题，就交替出变式，防止背答案；
+2. 再从没做过的题里挑新题（变式题只用于复习，不作为新题）：
+   知识点优先级 = 卷面分值 × (1 − 把握) × 前置是否就绪 × 当前复习重点
+   题目得分     = 优先级 × 难度贴合度（预测做对概率落在目标区间时为 1）
+   同一知识点被选中后优先级减半，避免一天全是同一类题。
+3. 新题里留 settings.explore 道随机题，避免只刷推荐、视野变窄。
+4. 近几年的真题、新高考的卷子优先（见 recency_weight）；标记了「有问题」的题不推送。
+每道题都附一句推荐理由。
+"""
+
+from __future__ import annotations
+
+import math
+import random
+from collections import defaultdict
+from datetime import datetime
+
+from sqlmodel import Session, select
+
+from ..models import Attempt, KnowledgePoint, Mastery, Question, QuestionFlag, QuestionKp, ReviewCard
+from .mastery import effective_theta, predict, sigmoid
+
+ERROR_LABELS = {
+    "concept": "概念不清", "method": "方法没想到", "calc": "计算失误",
+    "reading": "审题错误", "time": "时间不够", "guess": "不会，蒙的",
+}
+READY_THRESHOLD = 0.4
+NOT_READY_FACTOR = 0.3
+FOCUS_FACTOR = 1.5
+REPEAT_PENALTY = 0.5
+
+
+def recency_weight(year: int | None) -> float:
+    """越新的真题越像今年的卷子：2021 年起的卷子不打折，越早的老高考题权重越低。自编题、变式题不打折。"""
+    if year is None or year >= 2021:
+        return 1.0
+    if year >= 2017:
+        return 0.85
+    if year >= 2013:
+        return 0.7
+    return 0.55
+
+
+def flagged_ids(session: Session) -> set[str]:
+    return set(session.exec(select(QuestionFlag.question_id)))
+
+
+def _days_since(dt: datetime | None, now: datetime) -> int | None:
+    return None if dt is None else max(int((now - dt).total_seconds() // 86400), 0)
+
+
+def build_plan(session: Session, settings, now: datetime) -> dict:
+    kps = {k.id: k for k in session.exec(select(KnowledgePoint).where(KnowledgePoint.active))}
+    masteries = {m.kp_id: m for m in session.exec(select(Mastery))}
+    flagged = flagged_ids(session)
+    questions = {q.id: q for q in session.exec(select(Question).where(Question.active, Question.verified))
+                 if q.id not in flagged}
+    links: dict[str, dict[str, float]] = defaultdict(dict)
+    for link in session.exec(select(QuestionKp)):
+        links[link.question_id][link.kp_id] = link.weight
+    attempted = set(session.exec(select(Attempt.question_id).distinct()))
+
+    # ---- 到期错题
+    due_cards = session.exec(
+        select(ReviewCard).where(ReviewCard.due <= now, ReviewCard.suspended == False)  # noqa: E712
+        .order_by(ReviewCard.due)
+    ).all()
+    variants: dict[str, list[str]] = defaultdict(list)
+    for q in questions.values():
+        if q.parent_id and q.id not in attempted:
+            variants[q.parent_id].append(q.id)
+    reviews = []
+    for card in due_cards:
+        if card.question_id not in questions:
+            continue
+        qid = card.question_id
+        reason = f"到期错题 · 第 {card.reps + 1} 次复习"
+        if card.reps >= 2 and card.reps % 2 == 0 and variants.get(qid):
+            qid = sorted(variants[qid])[0]
+            reason += " · 换一道变式，检验是不是真会了"
+        if card.last_error_type:
+            reason += f" · 上次错因：{ERROR_LABELS.get(card.last_error_type, card.last_error_type)}"
+        reviews.append({"question_id": qid, "kind": "review", "reason": reason})
+        if len(reviews) >= settings.daily_review:
+            break
+
+    # ---- 知识点优先级
+    def eff(k: str) -> float:
+        return effective_theta(masteries.get(k), now, settings.tau_days)
+
+    priority: dict[str, float] = {}
+    for k, kp in kps.items():
+        ready = 1.0
+        if kp.prereq:
+            avg = sum(sigmoid(eff(p)) for p in kp.prereq) / len(kp.prereq)
+            ready = 1.0 if avg >= READY_THRESHOLD else NOT_READY_FACTOR
+        focus = FOCUS_FACTOR if kp.module in settings.focus_modules else 1.0
+        priority[k] = kp.exam_weight * (1 - sigmoid(eff(k))) * ready * focus
+
+    lo, hi = settings.target_band
+    candidates = []
+    for qid, q in questions.items():
+        if qid in attempted or q.parent_id or not links.get(qid):
+            continue
+        weights = {k: w for k, w in links[qid].items() if k in kps}
+        if not weights:
+            continue
+        p = predict(weights, masteries, q.difficulty, now, settings.tau_days)
+        fit = 1.0 if lo <= p <= hi else math.exp(-4 * (lo - p if p < lo else p - hi))
+        main_kp = max(weights, key=lambda k: weights[k] * priority[k])
+        candidates.append({"q": q, "p": p, "fit": fit * recency_weight(q.year), "weights": weights, "main": main_kp})
+
+    picked = []
+    used: dict[str, int] = defaultdict(int)
+    n_explore = min(settings.explore, settings.daily_new)
+    while candidates and len(picked) < settings.daily_new - n_explore:
+        def score(c):
+            return sum(w * priority[k] * REPEAT_PENALTY ** used[k] for k, w in c["weights"].items()) * c["fit"]
+        best = max(candidates, key=lambda c: (score(c), c["q"].id))
+        candidates.remove(best)
+        for k in best["weights"]:
+            used[k] += 1
+        picked.append(best)
+
+    # 随机题：同一天内固定，刷新页面不会变
+    rng = random.Random(now.date().toordinal())
+    explore = rng.sample(sorted(candidates, key=lambda c: c["q"].id), min(n_explore, len(candidates)))
+
+    new_items = []
+    for c in picked:
+        kp = kps[c["main"]]
+        m = masteries.get(kp.id)
+        days = _days_since(m.last_practiced if m else None, now)
+        practiced = "还没练过" if days is None else ("今天练过" if days == 0 else f"已 {days} 天未练")
+        reason = (f"{kp.name}：卷面约 {kp.exam_weight:g} 分，你的把握 {sigmoid(eff(kp.id)) * 100:.0f}%，"
+                  f"{practiced}；预计做对 {c['p'] * 100:.0f}%")
+        new_items.append({"question_id": c["q"].id, "kind": "new", "reason": reason})
+    for c in explore:
+        names = "、".join(kps[k].name for k in c["weights"])
+        new_items.append({"question_id": c["q"].id, "kind": "explore",
+                          "reason": f"随机题：{names}。换换脑子，也防止只刷推荐、视野变窄"})
+
+    return {"generated_at": now, "items": reviews + new_items,
+            "due_total": len(due_cards), "unseen_total": len(questions) - len(attempted & set(questions))}

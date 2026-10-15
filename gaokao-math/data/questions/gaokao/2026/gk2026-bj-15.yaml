@@ -1,0 +1,18 @@
+type: fill
+source: 2026 北京卷 第 15 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  func.zeros: 0.38
+  deriv.extremum: 0.36
+  trig.graph: 0.26
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  已知 $f(x) = \left|x^{2} - \cos x - c^{2}\right|$，给出下列四个结论：
+  $\textcircled{1}$ $f(x)$在 $(-1,1]$ 上有最小值和最大值；
+  $\textcircled{2}$ $c = 0$， $f(x) = 1$ 有3个解；
+  $\textcircled{3}$ $c = 1$ ， $x\in (-1,2]$ 时， $f(x)$有最大值；
+  $\textcircled{4}$ $c > 0$ ， $f(x)$ 与 $y = c$ 有4个交点。
+  其中正确结论的序号是__.
+answer: \textcircled{1}\textcircled{2}\textcircled{3}\textcircled{4}
+answer_kind: expr

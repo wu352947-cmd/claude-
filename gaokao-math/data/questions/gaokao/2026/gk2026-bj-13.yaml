@@ -1,0 +1,10 @@
+type: fill
+source: 2026 北京卷 第 13 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  expo.ops: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 音高 $y$ (单位：$mel$ )与频率 $f$ (单位：$Hz$ )满足 $y = \lg \left(1 + \frac{f}{700}\right)$ ，若 $\lg 2\leqslant y< 3\lg 2$ ，则 $f$ 的取值范围为 ______
+answer: '[700,4900)'
+answer_kind: interval

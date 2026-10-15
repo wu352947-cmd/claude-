@@ -1,0 +1,20 @@
+type: single
+source: 2016 全国I卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $(1+i) x=1+y i$, 其中 $x, y$ 是实数, 则 $|x+y i|=(\quad)$
+options:
+  A: '1'
+  B: $\sqrt{2}$
+  C: $\sqrt{3}$
+  D: '2'
+answer: B
+solution: |-
+  解: $\because(1+\mathrm{i}) \mathrm{x}=1+\mathrm{yi}$,
+
+  $\therefore x+x i=1+y i$,
+
+  即 $\left\{\begin{array}{l}x=1 \\ y=x\end{array}\right.$, 解得 $\left\{\begin{array}{l}x=1 \\ y=1\end{array}\right.$, 即 $|x+y i|=|1+i|=\sqrt{2}$, 故选: B.

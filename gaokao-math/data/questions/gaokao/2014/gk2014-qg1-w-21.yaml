@@ -1,0 +1,47 @@
+type: solve
+source: 2014 全国I卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 压轴
+stem: |-
+  设函数 $f(x)=a \ln x+\frac{1-a}{2} x^{2}-b x(a \neq 1)$, 曲线 $y=f(x)$ 在点（1, $f(1 ）$ 处的切线斜率为 0 ,
+
+  (1) 求 b;
+
+  （2）若存在 $x_{0} \geqslant 1$, 使得 $f\left(x_{0}\right)<\frac{a}{a-1}$, 求 $a$ 的取值范围. 请考生在第 22, 23, 24 题中任选一题作答, 如果多做, 则按所做的第一题记分。
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) $f^{\prime}(x)=\frac{a}{x}+(1-a) x-b(x>0)$,
+
+  $\because$ 曲线 $y=f(x)$ 在点 $(1, f(1))$ 处的切线斜率为 0 ,
+
+  $\therefore f^{\prime}(1)=a+(1-a) \times 1-b=0$, 解得 $b=1$.
+
+  （2）函数 $f(x)$ 的定义域为 $(0,+\infty)$, 由（1）可知: $f(x)=a \ln x+\frac{1-a}{2} x^{2}-x$,
+
+  $\therefore f^{\prime}(x)=\frac{a}{x}+(1-a) x-1=\frac{(1-a)}{x}\left(x-\frac{a}{1-a}\right)(x-1)$.
+
+  (1)当 $a \leqslant \frac{1}{2}$ 时, 则 $\frac{a}{1-a} \leqslant 1$,
+
+  则当 $x>1$ 时, $f^{\prime}(x)>0$,
+
+  $\therefore$ 函数 $f(x)$ 在 $(1,+\infty)$ 单调递增,
+
+  $\therefore$ 存在 $\mathrm{x}_{0} \geqslant 1$, 使得 $\mathrm{f}\left(\mathrm{x}_{0}\right)<\frac{\mathrm{a}}{\mathrm{a}-1}$ 的充要条件是 $\mathrm{f}(1)<\frac{\mathrm{a}}{\mathrm{a}-1}$, 即 $\frac{1-\mathrm{a}}{2}-1<\frac{a}{a-1}$, 解得 $-\sqrt{2}-1<a<\sqrt{2}-1$;
+
+  (2)当 $\frac{1}{2}<a<1$ 时, 则 $\frac{a}{1-a}>1$,
+
+  则当 $x \in\left(1, \frac{a}{1-a}\right)$ 时, $f^{\prime}(x)<0$, 函数 $f(x)$ 在 $\left(1, \frac{a}{1-a}\right)$ 上单调递减;
+
+  当 $x \in\left(\frac{a}{1-a},+\infty\right)$ 时, $f^{\prime}(x)>0$, 函数 $f(x)$ 在 $\left(\frac{a}{1-a},+\infty\right)$ 上单调递增.
+
+  $\therefore$ 存在 $x_{0} \geqslant 1$, 使得 $f\left(x_{0}\right)<\frac{a}{a-1}$ 的充要条件是 $f\left(\frac{a}{1-a}\right)<\frac{a}{a-1}$, 而 $\mathrm{f}\left(\frac{\mathrm{a}}{1-\mathrm{a}}\right)=\operatorname{aln} \frac{a}{1-a}+\frac{a^{2}}{2(1-a)}+\frac{a}{a-1}>\frac{a}{a-1}$, 不符合题意, 应舍去. (3)若 $a>1$ 时, $f(1)=\frac{1-a}{2}-1=\frac{-a-1}{2}<\frac{a}{a-1}$, 成立.
+
+  综上可得: $a$ 的取值范围是 $(-\sqrt{2}-1, \sqrt{2}-1) \cup(1,+\infty)$.

@@ -1,0 +1,14 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\left\{a_{n}\right\}$ 和 $\left\{b_{n}\right\}$ 是两个等差数列, 其中 $\frac{a_{k}}{b_{k}}(1 \leq k \leq 5)$ 为常值, $a_{1}=288, a_{5}=96, b_{1}=192$, 则 $b_{3}= (\quad)$
+options:
+  A: '64'
+  B: '128'
+  C: '256'
+  D: '512'
+answer: B

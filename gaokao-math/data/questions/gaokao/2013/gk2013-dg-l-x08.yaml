@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '椭圆 $C: \frac{x^{2}}{4}+\frac{y^{2}}{3}=1$ 的左、右顶点分别为 $A_{1}$、 $A_{2}$, 点 $P$ 在 $C$ 上且直线 $\mathrm{PA}_{2}$ 斜率的取值范围是 $[-2,-1]$, 那么直线 $\mathrm{PA}_{1}$ 斜率的取值范围是 （$\qquad$）'
+options:
+  A: $\left[\frac{1}{2}, \frac{3}{4}\right]$
+  B: $\left[\frac{3}{8}, \frac{3}{4}\right]$
+  C: $\left[\frac{1}{2}, 1\right]$
+  D: $\left[\frac{3}{4}, 1\right]$
+answer: B

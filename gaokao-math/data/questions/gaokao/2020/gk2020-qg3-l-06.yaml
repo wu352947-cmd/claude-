@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国III卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  vec.dot: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知向量 $\boldsymbol{a}, \boldsymbol{b}$ 满足 $|a|=5,|b|=6, a \cdot b=-6$, 则 $\cos \langle\boldsymbol{a}, \boldsymbol{a}+\boldsymbol{b}\rangle=(\quad)$
+options:
+  A: $-\frac{31}{35}$
+  B: $-\frac{19}{35}$
+  C: $\frac{17}{35}$
+  D: $\frac{19}{35}$
+answer: D
+solution: |-
+  【详解】 $\because|\vec{a}|=5,|\vec{b}|=6, \vec{a} \cdot \vec{b}=-6, \quad \therefore \vec{a} \cdot(\vec{a}+\vec{b})=|\vec{a}|^{2}+\vec{a} \cdot \vec{b}=5^{2}-6=19$ ．
+
+  $|\vec{a}+\vec{b}|=\sqrt{(\vec{a}+\vec{b})^{2}}=\sqrt{\vec{a}^{2}+2 \vec{a} \cdot \vec{b}+\vec{b}^{2}}=\sqrt{25-2 \times 6+36}=7$
+
+  因此, $\cos \langle\vec{a}, \vec{a}+\vec{b}\rangle=\frac{\vec{a} \cdot(\vec{a}+\vec{b})}{|\vec{a}| \cdot|\vec{a}+\vec{b}|}=\frac{19}{5 \times 7}=\frac{19}{35}$.
+
+  故选: D.

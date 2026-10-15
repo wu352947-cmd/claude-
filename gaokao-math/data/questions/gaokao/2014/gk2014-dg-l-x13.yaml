@@ -1,0 +1,10 @@
+type: fill
+source: 2014 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2014
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\left(\frac{x}{\sqrt{y}}-\frac{y}{\sqrt{x}}\right)^{8}$ 的展开式中 $x^{2} y^{2}$ 的系数为 ______ . (用数字作答)
+answer: '70'
+answer_kind: expr

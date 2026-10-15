@@ -1,0 +1,26 @@
+type: fill
+source: 2017 全国III卷 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  func.piecewise: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)=\left\{\begin{array}{ll}x+1, & x \leqslant 0 \\ 2^{x}, & x>0\end{array}\right.$, 则满足 $f(x)+f\left(x-\frac{1}{2}\right)>1$ 的 $x$ 的 取值范围是 ______
+answer: (-\frac{1}{4},+\infty)
+answer_kind: interval
+solution: |-
+  解: 若 $x \leqslant 0$, 则 $x-\frac{1}{2} \leqslant-\frac{1}{2}$,
+
+  则 $f(x)+f\left(x-\frac{1}{2}\right)>1$ 等价为 $x+1+x-\frac{1}{2}+1>1$, 即 $2 x>-\frac{1}{2}$, 则 $x>-\frac{1}{4}$, 此时 $-\frac{1}{4}<x \leqslant 0$,
+
+  当 $x>0$ 时, $f(x)=2^{x}>1, x-\frac{1}{2}>-\frac{1}{2}$,
+
+  当 $x-\frac{1}{2}>0$ 即 $x>\frac{1}{2}$ 时, 满足 $f(x)+f\left(x-\frac{1}{2}\right)>1$ 恒成立,
+
+  当 $0 \geqslant x-\frac{1}{2}>-\frac{1}{2}$, 即 $\frac{1}{2} \geqslant x>0$ 时, $f\left(x-\frac{1}{2}\right)=x-\frac{1}{2}+1=x+\frac{1}{2}>\frac{1}{2}$,
+
+  此时 $f(x)+f\left(x-\frac{1}{2}\right)>1$ 恒成立,
+
+  综上 $x>-\frac{1}{4}$,
+
+  故答案为: $\left(-\frac{1}{4},+\infty\right)$.

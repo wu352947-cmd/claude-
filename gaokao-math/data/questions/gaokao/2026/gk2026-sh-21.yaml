@@ -1,0 +1,26 @@
+type: solve
+source: 2026 上海卷 第 21 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 压轴
+stem: |-
+  已知$(i,j,k)$是1，2，3的一个排列，若函数$f_{1}(x)$，$f_{2}(x)$，$f_{3}(x)$，对任意$x \in I$，都有$f_{1}(x) \leq f_{i}(x)$且$f_{1}(x) + f_{2}(x) \leq f_{i}(x) + f_{j}(x)$，则称$(i,j,k)$是关于$f_{1}(x)$，$f_{2}(x)$，$f_{3}(x)$的一个$I$排列，则关于$f_{1}(x)$，$f_{2}(x)$，$f_{3}(x)$的$I$排列总数记为$n_{I}.$
+
+  (1) 已知$I = [3, + \infty),f_{1}(x) = x,f_{2}(x) = 0,f_{3}(x) = x^{2} + 1,$判断$(3,1,2)$是否为$I$排列；
+  (2) 对$I = (0, + \infty)$，$f_{1}(x) = x - 1$，$f_{2}(x) = x + m$，$f_{3}(x) = x^{2}$满足条件的$n_{I} = 6$，求$m$的取值范围；
+  (3) 对$x \in [0, + \infty),$且对任意$x \in [0, + \infty),0 < F(x) < 1,$令$I = [a, + \infty),f_{1}(x) = F(x),f_{2}(x) = \frac{1}{2}\left( F(x + a) + F(x - a) \right),f_{3}(x) = 1 - e^{- x},$证明：若$F(x)$严格减，则存在$a > 0$，使$n_{I} \geq 4$；若$F(x)$严格增，则存在$a \in (0,1)$，$n_{I} \neq 2.$
+parts:
+- label: (1)
+  points: 5.0
+  answer: 是*I*排列
+- label: (2)
+  points: 6.0
+  answer: $m$的取值范围为$\left[ -1, -\frac{1}{4} \right]$
+- label: (3)
+  points: 6.0
+  answer: 证明略
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 是*I*排列；(2) $m$的取值范围为$\left[ -1, -\frac{1}{4} \right]$；(3) 证明略

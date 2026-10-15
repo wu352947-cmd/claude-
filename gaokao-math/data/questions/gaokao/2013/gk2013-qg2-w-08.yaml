@@ -1,0 +1,20 @@
+type: single
+source: 2013 全国II卷（文科） 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  expo.compare: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $a=\log _{3} 2, b=\log _{5} 2, c=\log _{2} 3$, 则（ $）$
+options:
+  A: $a>c>b$
+  B: $b>c>a$
+  C: $c>a>b$
+  D: $c>b>a$
+answer: C
+solution: |-
+  解: 由题意可知: $a=\log _{3} 2 \in(0,1), b=\log _{5} 2 \in(0,1), c=\log _{2} 3>1$, 所以 $a=\log _{3} 2, b=\log _{5} 2=\frac{\log _{3} 2}{\log _{3} 5}<\log _{3} 2$,
+
+  所以 $c>a>b$,
+
+  故选: C.

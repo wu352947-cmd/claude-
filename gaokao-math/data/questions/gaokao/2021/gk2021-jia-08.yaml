@@ -1,0 +1,16 @@
+type: single
+source: 2021 全国甲卷 第 8 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2021
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '2020 年 12 月 8 日, 中国和尼泊尔联合公布珠穆朗玛峰最新高程为 8848.86 (单位: $\mathrm{m}$ ), 三角高程测量法是珠峰高程测量方法之一. 如图是三角高程测量法的一个示意图, 现有 $A, B, C$ 三点, 且 $A, B, C$ 在同一水平面上的投影 $A^{\prime}, B^{\prime}, C^{\prime}$ 满足 $\angle A^{\prime} C^{\prime} B^{\prime}=45^{\circ}, \angle A^{\prime} B^{\prime} C^{\prime}=60^{\circ}$. 由 $C$ 点测得 $B$ 点的仰角为 $15^{\circ}, B B^{\prime}$ 与 $C C^{\prime}$ 的差为 100 ; 由 $B$ 点测得 $A$ 点的仰角为 $45^{\circ}$, 则 $A, C$ 两点到水平面 $A^{\prime} B^{\prime} C^{\prime}$ 的高度差 $A A^{\prime}-C C^{\prime}$ 约为 $(\sqrt{3} \approx 1.732)(\quad)$'
+figure: 5c97adac656679fc.png
+options:
+  A: '346'
+  B: '373'
+  C: '446'
+  D: '473'
+answer: B
+solution: 【

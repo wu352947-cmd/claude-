@@ -1,0 +1,34 @@
+type: solve
+source: 2021 全国甲卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  deriv.monotonic: 0.52
+  expo.functions: 0.48
+difficulty_label: 压轴
+stem: |-
+  已知 $a>0$ 且 $a \neq 1$, 函数 $f(x)=\frac{x^{a}}{a^{x}}(x>0)$.
+
+  （1）当 $a=2$ 时, 求 $f(x)$ 的单调区间;
+
+  (2) 若曲线 $y=f(x)$ 与直线 $y=1$ 有且仅有两个交点, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】（1）当 $a=2$ 时, $f(x)=\frac{x^{2}}{2^{x}}, f^{\prime}(x)=\frac{2 x-2^{x}-x^{2} \diamond 2^{x} \ln 2}{\left(2^{x}\right)^{2}}=\frac{x \diamond 2^{x}(2-x \ln 2)}{4^{x}}$, 令 $f^{\prime}(x)=0$ 得 $x=\frac{2}{\ln 2}$, 当 $0<x<\frac{2}{\ln 2}$ 时, $f^{\prime}(x)>0$, 当 $x>\frac{2}{\ln 2}$ 时, $f^{\prime}(x)<0$, $\therefore$ 函数 $f(x)$ 在 $\left(0, \frac{2}{\ln 2}\right]$ 上单调递增; $\left[\frac{2}{\ln 2},+\infty\right)$ 上单调递减;
+
+  (2) $f(x)=\frac{x^{a}}{a^{x}}=1 \Leftrightarrow a^{x}=x^{a} \Leftrightarrow x \ln a=a \ln x \Leftrightarrow \frac{\ln x}{x}=\frac{\ln a}{a}$, 设函数 $g(x)=\frac{\ln x}{x}$, 则 $g^{\prime}(x)=\frac{1-\ln x}{x^{2}}$, 令 $g^{\prime}(x)=0$, 得 $x=e$,
+
+  在 $(0, e)$ 内 $g^{\prime}(x)>0, g(x)$ 单调递增;
+
+  在 $(e,+\infty)$ 上 $g^{\prime}(x)<0, g(x)$ 单调递减;
+
+  $\therefore g(x)_{\max }=g(e)=\frac{1}{e}$,
+
+  又 $g(1)=0$, 当 $x$ 趋近于 $+\infty$ 时, $g(x)$ 趋近于 0 , 所以曲线 $y=f(x)$ 与直线 $y=1$ 有且仅有两个交点, 即曲线 $y=g(x)$ 与直线 $y=\frac{a}{\ln a}$ 有两个交点的充分必 要条件是 $0<\frac{\ln a}{a}<\frac{1}{e}$, 这即是 $0<g(a)<g(e)$,
+
+  所以 $a$ 的取值范围是 $(1, e) \cup(e,+\infty)$.

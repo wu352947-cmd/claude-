@@ -1,0 +1,20 @@
+type: single
+source: 2016 全国III卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.identities: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $\tan a=\frac{3}{4}$, 则 $\cos ^{2} a+2 \sin 2 a=(\quad)$
+options:
+  A: $\frac{64}{25}$
+  B: $\frac{48}{25}$
+  C: '1'
+  D: $\frac{16}{25}$
+answer: A
+solution: |-
+  解: $\because \tan \mathrm{a}=\frac{3}{4}$,
+
+  $\therefore \cos ^{2} \alpha+2 \sin 2 \alpha=\frac{\cos ^{2} \alpha+4 \sin \alpha \cos \alpha}{\sin ^{2} \alpha+\cos ^{2} \alpha}=\frac{1+4 \tan \alpha}{\tan ^{2} \alpha+1}=\frac{1+4 \times \frac{3}{4}}{\frac{9}{16}+1}=\frac{64}{25}$.
+
+  故选: A.

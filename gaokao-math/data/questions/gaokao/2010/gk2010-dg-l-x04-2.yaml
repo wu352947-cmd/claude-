@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 如果等差数列 $\left\{a_{n}\right\}$ 中, $a_{3}+a_{4}+a_{5}=12$, 那么 $a_{1}+a_{2}+\ldots+a_{7}=$ ($\qquad$)
+options:
+  A: '14'
+  B: '21'
+  C: '28'
+  D: '35'
+answer: C

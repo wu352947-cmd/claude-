@@ -1,0 +1,20 @@
+type: single
+source: 2019 全国I卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的 一条渐近线的倾斜角为 $130^{\circ}$, 则 $\mathrm{C}$ 的离心率为'
+options:
+  A: $2 \sin 40^{\circ}$
+  B: $2 \cos 40^{\circ}$
+  C: $\frac{1}{\sin 50^{\circ}}$
+  D: $\frac{1}{\cos 50^{\circ}}$
+answer: D
+solution: |-
+  【详解】由已知可得 $-\frac{b}{a}=\tan 130^{\circ}, \therefore \frac{b}{a}=\tan 50^{\circ}$,
+
+  $\therefore e=\frac{c}{a}=\sqrt{1+\left(\frac{b}{a}\right)^{2}}=\sqrt{1+\tan ^{2} 50^{\circ}}=\sqrt{1+\frac{\sin ^{2} 50^{\circ}}{\cos ^{2} 50^{\circ}}}=\sqrt{\frac{\sin ^{2} 50^{\circ}+\cos ^{2} 50^{\circ}}{\cos ^{2} 50^{\circ}}}=\frac{1}{\cos 50^{\circ}}$,
+
+  故选 D.

@@ -1,0 +1,45 @@
+type: solve
+source: 2018 全国I卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+stem: |-
+  设抛物线 $C: y^{2}=2 x$, 点 $A(2,0), B(-2,0)$, 过点 $A$ 的直线 $I$ 与 $C$ 交于 $M, N$ 两点.
+
+  （1）当 $\mathrm{l}$ 与 $\mathrm{x}$ 轴垂直时, 求直线 BM 的方程;
+
+  (2) 证明: $\angle \mathrm{ABM}=\angle \mathrm{ABN}$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 当 1 与 $x$ 轴垂直时, $x=2$, 代入抛物线解得 $y= \pm 2$,
+
+  所以 $M(2,2)$ 或 $M(2,-2)$,
+
+  直线 BM 的方程: $y=\frac{1}{2} x+1$, 或: $y=-\frac{1}{2} x-1$.
+
+  (2) 证明: 设直线 $\mid$ 的方程为 $1: x=t y+2, M\left(x_{1}, y_{1}\right), N\left(x_{2}, y_{2}\right)$,
+
+  联立直线 I 与抛物线方程得 $\left\{\begin{array}{l}y^{2}=2 x \\ x=t y+2\end{array}\right.$, 消 $x$ 得 $y^{2}-2 t y-4=0$,
+
+  即 $y_{1}+y_{2}=2 t, y_{1} y_{2}=-4$,
+
+  则
+
+  $$
+  k_{B N}+k_{B M}=\frac{y_{1}}{x_{1}+2}+\frac{y_{2}}{x_{2}+2}=\frac{\left(\frac{y_{2}^{2}}{2} \times y_{1}+\frac{y_{1}^{2}}{2} \times y_{2}\right)+2\left(y_{1}+y_{2}\right)}{\left(x_{1}+2\right)\left(x_{2}+2\right)}=
+  $$
+
+  $$
+  \frac{\left(y_{1}+y_{2}\right)\left(\frac{y_{1} y_{2}}{2}+2\right)}{\left(x_{1}+2\right)\left(x_{2}+2\right)}=0
+  $$
+
+  所以直线 BN 与 $B M$ 的倾斜角互补,
+
+  $\therefore \angle \mathrm{ABM}=\angle \mathrm{ABN}$.

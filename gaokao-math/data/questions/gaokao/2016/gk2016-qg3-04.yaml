@@ -1,0 +1,16 @@
+type: single
+source: 2016 全国III卷 第 4 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2016
+kps:
+  stat.sample: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 某旅游城市为向游客介绍本地的气温情况, 绘制了一年中各月平均最高气温和平均最低气温的雷达图, 图中 $\mathrm{A}$ 点表示十月的平均最高气温约为 $15^{\circ} \mathrm{C}$, B 点表示四月的平均最低气温约为 $5^{\circ} \mathrm{C}$, 下面叙述不正确的是 ( )
+figure: a045ec08f4d33f5e.png
+options:
+  A: 各月的平均最低气温都在 $0^{\circ} \mathrm{C}$ 以上
+  B: 七月的平均温差比一月的平均温差大
+  C: 三月和十一月的平均最高气温基本相同
+  D: 平均最高气温高于 $20^{\circ} \mathrm{C}$ 的月份有 5 个
+answer: D
+solution: '解: A. 由雷达图知各月的平均最低气温都在 $0^{\circ} \mathrm{C}$ 以上, 正确B. 七月的平均温差大约在 $10^{\circ}$ 左右, 一月的平均温差在 $5^{\circ}$ 左右, 故七月的平均温差比一月的平均温差大, 正确C. 三月和十一月的平均最高气温基本相同, 都为 $10^{\circ}$, 正确D. 平均最高气温高于 $20^{\circ} \mathrm{C}$ 的月份有 7,8 两个月, 故 D 错误,故选D'

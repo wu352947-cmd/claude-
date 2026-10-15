@@ -1,0 +1,23 @@
+type: single
+source: 2011 全国新课标卷 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  trig.identities: 0.61
+  trig.definition: 0.39
+difficulty_label: 中档
+points: 5.0
+stem: 已知角 $\theta$ 的顶点与原点重合, 始边与 $\mathrm{x}$ 轴的正半轴重合, 终边在直 线 $y=2 x$ 上, 则 $\cos 2 \theta=(\quad)$
+options:
+  A: $-\frac{4}{5}$
+  B: $-\frac{3}{5}$
+  C: $\frac{3}{5}$
+  D: $\frac{4}{5}$
+answer: B
+solution: |-
+  解：根据题意可知: $\tan \theta=2$,
+
+  所以 $\cos ^{2} \theta=\frac{1}{\sec ^{2} \theta}=\frac{1}{\tan ^{2} \theta+1}=\frac{1}{5}$,
+
+  则 $\cos 2 \theta=2 \cos ^{2} \theta-1=2 \times \frac{1}{5}-1=-\frac{3}{5}$.
+
+  故选：B.

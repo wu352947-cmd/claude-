@@ -1,0 +1,14 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  circle.line: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '已知圆 $C: x^{2}+y^{2}=4$, 直线 $l: y=k x+m$, 当 $k$ 变化时, $l$ 截得圆 $C$ 弦长的最小值为 2 , 则 $m=(\quad)$'
+options:
+  A: $\pm 2$
+  B: $\pm \sqrt{2}$
+  C: $\pm \sqrt{3}$
+  D: $\pm \sqrt{5}$
+answer: C

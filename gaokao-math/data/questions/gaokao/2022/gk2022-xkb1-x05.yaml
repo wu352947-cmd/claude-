@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  expo.compare: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $a=0.1 \mathrm{e}^{0.1}, b=\frac{1}{9}, c=-\ln 0.9$, 则 ($\qquad$)
+options:
+  A: $a<b<c$
+  B: $c<b<a$
+  C: $c<a<b$
+  D: $a<c<b$
+answer: C

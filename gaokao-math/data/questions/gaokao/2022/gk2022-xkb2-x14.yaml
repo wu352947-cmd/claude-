@@ -1,0 +1,17 @@
+type: solve
+source: 2022 新课标II卷 填空题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+stem: '写出曲线 $y=\ln |x|$ 过坐标原点的切线方程: ______ , ______ '
+parts:
+- label: 答案
+  points: 5.0
+  answer: $y=\frac{1}{\mathrm{e}}x$；$y=-\frac{1}{\mathrm{e}}x$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $y=\frac{1}{\mathrm{e}}x$；$y=-\frac{1}{\mathrm{e}}x$

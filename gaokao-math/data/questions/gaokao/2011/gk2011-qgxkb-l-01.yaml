@@ -1,0 +1,19 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  complex.modulus: 0.56
+  complex.arith: 0.44
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\frac{2+i}{1-2 i}$ 的共轭复数是 $(\quad)$
+options:
+  A: $-\frac{3}{5} i$
+  B: $\frac{3}{5} i$
+  C: $-\mathrm{i}$
+  D: i
+answer: C
+solution: |-
+  解：复数 $\frac{2+i}{1-2 i}=\frac{(2+i)(1+2 i)}{(1-2 i)(1+2 i)}=\frac{5 i}{5}=i$, 它的共轭复数为: $-i$.
+
+  故选: C.

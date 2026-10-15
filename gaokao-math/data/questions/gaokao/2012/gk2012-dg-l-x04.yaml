@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  solid.measure: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知正四棱柱 $A B C D-A_{1} B_{1} C_{1} D_{1}$ 中, $A B=2, C C_{1}=2 \sqrt{2}, E$ 为 $C C_{1}$ 的中 点, 则直线 $A C_{1}$ 与平面 $\mathrm{BED}$ 的距离为 ($\qquad$)
+options:
+  A: '2'
+  B: $\sqrt{3}$
+  C: $\sqrt{2}$
+  D: '1'
+answer: D

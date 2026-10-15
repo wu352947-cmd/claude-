@@ -1,0 +1,19 @@
+type: fill
+source: 2018 全国II卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  trig.identities: 0.61
+  trig.definition: 0.39
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $\tan \left(\alpha-\frac{5 \pi}{4}\right)=\frac{1}{5}$, 则 $\tan \alpha=$ ______
+answer: \frac{3}{2}
+answer_kind: expr
+solution: |-
+  解: $\because \tan \left(\alpha-\frac{5 \pi}{4}\right)=\frac{1}{5}$,
+
+  $\therefore \tan \left(\alpha-\frac{\pi}{4}\right)=\frac{1}{5}$
+
+  则 $\tan \alpha=\tan \left(\alpha-\frac{\pi}{4}+\frac{\pi}{4}\right)=\frac{\tan \left(\alpha-\frac{\pi}{4}\right)+\tan \frac{\pi}{4}}{1-\tan \left(\alpha-\frac{\pi}{4}\right) \tan \frac{\pi}{4}}=\frac{\frac{1}{5}+1}{1-\frac{1}{5} \times 1}=\frac{1+5}{5-1}=\frac{6}{4}=\frac{3}{2}$,
+
+  故答案为: $\frac{3}{2}$.

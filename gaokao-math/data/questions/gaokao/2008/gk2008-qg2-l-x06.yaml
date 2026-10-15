@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  prob.classical: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 从 20 名男同学, 10 名女同学中任选 3 名参加体能测试, 则选到的 3 名同学中既有男同学又有女同学的概率为($\qquad$)
+options:
+  A: $\frac{9}{29}$
+  B: $\frac{10}{29}$
+  C: $\frac{19}{29}$
+  D: $\frac{20}{29}$
+answer: D

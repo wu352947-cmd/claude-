@@ -1,0 +1,43 @@
+type: solve
+source: 2020 全国III卷（理科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  trig.graph: 0.61
+  logic.quantifier: 0.39
+difficulty_label: 较难
+stem: |-
+  关于函数 $f(x)=\sin x+\frac{1}{\sin x}$ 有如下四个命题:
+
+  (1) $f(x)$ 的图像关于 $y$ 轴对称.
+
+  (2) $f(x)$ 的图像关于原点对称.
+
+  (3) $f(x)$ 的图像关于直线 $x=\frac{\pi}{2}$ 对称.
+
+  (4) $f(x)$ 的最小值为 2 .
+
+  其中所有真命题的序号是
+parts:
+- label: 答案
+  points: 5.0
+  answer: (2)(3)
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  【详解】对于命题(1), $f\left(\frac{\pi}{6}\right)=\frac{1}{2}+2=\frac{5}{2}, f\left(-\frac{\pi}{6}\right)=-\frac{1}{2}-2=-\frac{5}{2}$, 则 $f\left(-\frac{\pi}{6}\right) \neq f\left(\frac{\pi}{6}\right)$, 所以, 函数 $f(x)$ 的图象不关于 $y$ 轴对称，命题(1)错误;
+
+  对于命题(2), 函数 $f(x)$ 的定义域为 $\{x \mid x \neq k \pi, k \in Z\}$, 定义域关于原点对称, $f(-x)=\sin (-x)+\frac{1}{\sin (-x)}=-\sin x-\frac{1}{\sin x}=-\left(\sin x+\frac{1}{\sin x}\right)=-f(x)$,
+
+  所以, 函数 $f(x)$ 的图象关于原点对称，命题(2)正确;
+
+  对于命题(3), $\because f\left(\frac{\pi}{2}-x\right)=\sin \left(\frac{\pi}{2}-x\right)+\frac{1}{\sin \left(\frac{\pi}{2}-x\right)}=\cos x+\frac{1}{\cos x}$,
+
+  $f\left(\frac{\pi}{2}+x\right)=\sin \left(\frac{\pi}{2}+x\right)+\frac{1}{\sin \left(\frac{\pi}{2}+x\right)}=\cos x+\frac{1}{\cos x}, \quad$ 则 $f\left(\frac{\pi}{2}-x\right)=f\left(\frac{\pi}{2}+x\right)$,
+
+  所以, 函数 $f(x)$ 的图象关于直线 $x=\frac{\pi}{2}$ 对称, 命题(3)正确;
+
+  对于命题(4), 当 $-\pi<x<0$ 时, $\sin x<0$, 则 $f(x)=\sin x+\frac{1}{\sin x}<0<2$,
+
+  命题(4)错误.
+
+  故答案为: (2)(3).

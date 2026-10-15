@@ -1,0 +1,29 @@
+type: single
+source: 2010 全国新课标卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知复数 $z=\frac{\sqrt{3}+i}{(1-\sqrt{3} i)^{2}}, \bar{z}$ 是 $z$ 的共轭复数, 则 $z\cdot\bar{z}=(\quad)$
+options:
+  A: $\frac{1}{4}$
+  B: $\frac{1}{2}$
+  C: '1'
+  D: '2'
+answer: A
+solution: |-
+  解: 由 $|z|=\left|\frac{\sqrt{3}+i}{(1-\sqrt{3} i)^{2}}\right|=\frac{|\sqrt{3}+i|}{|1-\sqrt{3} i|^{2}}=\frac{2}{2^{2}}=\frac{1}{2}$ 可得 $z \cdot \bar{z}=|z|^{2}=\frac{1}{4}$.
+
+  另
+
+  解
+
+  $$
+  \begin{aligned}
+  & z=\frac{\sqrt{3}+i}{(1-\sqrt{3} i)^{2}}=\frac{\sqrt{3}+i}{-2-2 \sqrt{3} i}=-\frac{1 \sqrt{3}+i}{21+\sqrt{3} i}=-\frac{1}{8}(\sqrt{3}+i)(1-\sqrt{3} i)=\frac{1}{4}(\sqrt{3}-i) \\
+  & z \cdot \bar{z}=\frac{1}{4}(\sqrt{3}-i) \cdot \frac{1}{4}(\sqrt{3}+i)=\frac{1}{4}
+  \end{aligned}
+  $$
+
+  故选: A.

@@ -1,0 +1,22 @@
+type: single
+source: 2017 全国III卷 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '已知椭圆 C: $\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的左、右顶点分别为 $A_{1}, A_{2}$, 且以线段 $A_{1} A_{2}$ 为直径的圆与直线 $b x-a y+2 a b=0$ 相切, 则 $C$ 的离心率为'
+options:
+  A: $\frac{\sqrt{6}}{3}$
+  B: $\frac{\sqrt{3}}{3}$
+  C: $\frac{\sqrt{2}}{3}$
+  D: $\frac{1}{3}$
+answer: A
+solution: |-
+  解: 以线段 $A_{1} A_{2}$ 为直径的圆与直线 $b x-a y+2 a b=0$ 相切,
+
+  $\therefore$ 原点到直线的距离 $\frac{2 a b}{\sqrt{a^{2}+b^{2}}}=a$, 化为: $a^{2}=3 b^{2}$.
+
+  $\therefore$ 椭圆 $\mathrm{C}$ 的离心率 $e=\frac{c}{a}=\sqrt{1-\frac{b^{2}}{a^{2}}}=\frac{\sqrt{6}}{3}$.
+
+  故选: A.

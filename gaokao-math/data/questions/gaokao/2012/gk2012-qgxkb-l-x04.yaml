@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国新课标卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '设 $F_{1}$、 $F_{2}$ 是椭圆 $E: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的左、右焦点, $P$ 为直线 $x=\frac{3 a}{2}$ 上一点, $\triangle F_{2} P F_{1}$ 是底角为 $30^{\circ}$ 的等腰三角形, 则 $E$ 的离心率为 （$\qquad $）'
+options:
+  A: $\frac{1}{2}$
+  B: $\frac{2}{3}$
+  C: $\frac{3}{4}$
+  D: $\frac{4}{5}$
+answer: C

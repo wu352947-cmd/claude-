@@ -1,0 +1,16 @@
+type: multi
+source: 2026 新课标II卷 第 9 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  circle.line: 1.0
+difficulty_label: 中档
+points: 6.0
+stem: 已知$\odot O:x^2+y^2=1$，$\odot A:x^2+y^2-6x-8y+k=0$，则$(\quad)$
+options:
+  A: 点$A$的坐标为$(-3,-4)$
+  B: $k=9$时，$\odot A$与$x$轴相切
+  C: 当$k=-11$时，$\odot A$与$\odot O$相切
+  D: 当$\odot O$与$\odot A$相交时，两交点所在直线的方程是$6x+8y-k-2=0$
+answer:
+- B
+- C

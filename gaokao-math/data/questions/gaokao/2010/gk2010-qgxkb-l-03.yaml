@@ -1,0 +1,26 @@
+type: single
+source: 2010 全国新课标卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 曲线 $y=\frac{x}{x+2}$ 在点 $(-1,-1)$ 处的切线方程为（ $）$
+options:
+  A: $y=2 x+1$
+  B: $y=2 x-1$
+  C: $y=-2 x-3$
+  D: $y=-2 x-2$
+answer: A
+solution: |-
+  解: $\because y=\frac{x}{x+2}$,
+
+  $\therefore y^{\prime}=\frac{2}{(x+2)^{2}}$
+
+  所以 $\mathrm{k}=\left.\mathrm{y}^{\prime}\right|_{\mathrm{x}=-1}=2$, 得切线的斜率为 2 , 所以 $\mathrm{k}=2$;
+
+  所以曲线 $y=f(x)$ 在点 $(-1,-1)$ 处的切线方程为:
+
+  $y+1=2 \times(x+1)$ ，即 $y=2 x+1$.
+
+  故选: A.

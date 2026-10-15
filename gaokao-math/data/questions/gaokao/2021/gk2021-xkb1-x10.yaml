@@ -1,0 +1,17 @@
+type: multi
+source: 2021 新课标I卷 多选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  vec.dot: 0.55
+  trig.identities: 0.45
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $O$ 为坐标原点, 点 $P_{1}(\cos \alpha, \sin \alpha), P_{2}(\cos \beta,-\sin \beta), P_{3}(\cos (\alpha+\beta), \sin (\alpha+\beta)), A(1,0)$, 则 ($\quad$)
+options:
+  A: $|\overrightarrow{O P_{1}}|=|\overrightarrow{O P_{2}}|$
+  B: $\left|\overrightarrow{A P_{1}}\right|=\left|\overrightarrow{A P_{2}}\right|$
+  C: $\overrightarrow{O A} \cdot \overrightarrow{O P_{3}}=\overrightarrow{O P_{1}} \cdot \overrightarrow{O P_{2}}$
+  D: $\overrightarrow{O A} \cdot \overrightarrow{O P_{1}}=\overrightarrow{O P_{2}} \cdot \overrightarrow{O P_{3}}$
+answer:
+- A
+- C

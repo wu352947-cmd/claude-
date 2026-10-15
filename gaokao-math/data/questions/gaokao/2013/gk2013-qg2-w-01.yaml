@@ -1,0 +1,20 @@
+type: single
+source: 2013 全国II卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $M=\{x \mid-3<x<1, x \in R\}, N=\{-3,-2,-1,0,1\}$, 则 $M \cap N=(\quad)$
+options:
+  A: $\{-2,-1,0,1\}$
+  B: $\{-3,-2,-1,0\}$
+  C: $\{-2,-1,0\}$
+  D: $\{-3,-2,-1\}$
+answer: C
+solution: |-
+  解: $\because$ 集合 $M=\{x \mid-3<x<1, x \in R\}, N=\{-3,-2,-1,0,1\}$,
+
+  $\therefore M \cap N=\{-2,-1,0\}$.
+
+  故选: C.

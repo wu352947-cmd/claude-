@@ -1,0 +1,43 @@
+type: solve
+source: 2013 全国I卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  deriv.monotonic: 0.37
+  deriv.extremum: 0.37
+  deriv.tangent: 0.25
+difficulty_label: 较难
+stem: |-
+  已知函数 $f(x)=e^{x}(a x+b)-x^{2}-4 x$, 曲线 $y=f(x)$ 在点 $(0, f($
+
+  0））处切线方程为 $\mathrm{y}=4 \mathrm{x}+4$.
+
+  ( I ) 求 $a, b$ 的值;
+
+  (II ) 讨论 $f(x)$ 的单调性, 并求 $f(x)$ 的极大值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) $\because f(x)=e^{x}(a x+b)-x^{2}-4 x$,
+
+  $\therefore f^{\prime}(x)=e^{x}(a x+a+b)-2 x-4$,
+
+  $\because$ 曲线 $y=f(x)$ 在点 $(0, f(0))$ 处切线方程为 $y=4 x+4$
+
+  $\therefore f(0)=4, f^{\prime}(0)=4$ $\therefore b=4, a+b=8$
+
+  $\therefore a=4, b=4$
+
+  (II ) 由（I ) 知, $f(x)=4 e^{x}(x+1)-x^{2}-4 x, f^{\prime}(x)=4 e^{x}(x+2)-2 x-4=4($ $x+2)\left(e^{x}-\frac{1}{2}\right)$
+
+  令 $f^{\prime}(x)=0$, 得 $x=-\ln 2$ 或 $x=-2$
+
+  $\therefore x \in(-\infty,-2)$ 或 $(-\ln 2,+\infty)$ 时, $f^{\prime}(x)>0 ; x \in(-2,-\ln 2)$ 时, $f^{\prime}($ x) $<0$
+
+  $\therefore f(x)$ 的单调增区间是 $(-\infty,-2),(-\ln 2,+\infty)$, 单调减区间是 $(-2$, $-\ln 2)$
+
+  当 $x=-2$ 时，函数 $f(x)$ 取得极大值，极大值为 $f(-2)=4\left(1-e^{-2}\right)$.

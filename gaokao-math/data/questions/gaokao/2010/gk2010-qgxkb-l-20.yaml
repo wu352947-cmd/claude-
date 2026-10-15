@@ -1,0 +1,46 @@
+type: solve
+source: 2010 全国新课标卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  conic.eccentricity: 0.63
+  seq.arith: 0.37
+difficulty_label: 较难
+stem: |-
+  设 $F_{1}, F_{2}$ 分别是椭圆 $E: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的左、右焦点, 过 $F_{1}$ 斜率为 1 的直线 $e$ 与 $E$ 相交于 $A, B$ 两点, 且 $\left|A F_{2}\right|,|A B|,\left|B F_{2}\right|$ 成等差数列
+
+  (1) 求 $E$ 的离心率;
+
+  (2) 设点 $P(0,-1)$ 满足 $|P A|=|P B|$, 求 $E$ 的方程.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解：（1）由椭圆定义知 $\left|\mathrm{AF}_{2}\right|+\left|\mathrm{BF}_{2}\right|+|\mathrm{AB}|=4 \mathrm{a}$, 又 $2|\mathrm{AB}|=\left|\mathrm{AF}_{2}\right|+\left|\mathrm{BF}_{2}\right|$, 得 $|A B|=\frac{4}{3} a$, 1 的方程为 $y=x+c$, 其中 $c=\sqrt{a^{2}-b^{2}}$.
+
+  设 $A\left(x_{1}, y_{1}\right), B\left(x_{2}, y_{2}\right)$, 则 $A 、 B$ 两点坐标满足方程组 $\left\{\begin{array}{l}y=x+c \\ \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1\end{array}\right.$
+
+  化简的 $\left(a^{2}+b^{2}\right) x^{2}+2 a^{2} c x+a^{2}\left(c^{2}-b^{2}\right)=0$
+
+  则 $x_{1}+x_{2}=\frac{-2 a^{2} c}{a^{2}+b^{2}}, x_{1} x_{2}=\frac{a^{2}\left(c^{2}-b^{2}\right)}{a^{2}+b^{2}}$
+
+  因为直线 $A B$ 斜率为 $1,|A B|=\sqrt{2}\left|x_{1}-x_{2}\right|=\sqrt{2\left[\left(x_{1}+x_{2}\right)^{2}-4 x_{1} x_{2}\right]}$, 得 $\frac{4}{3} a=\frac{4 a b^{2}}{a^{2}+b^{2}}$, 故 $a^{2}=2 b^{2}$
+
+  所以 $E$ 的离心率 $\mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\frac{\sqrt{\mathrm{a}^{2}-\mathrm{b}^{2}}}{\mathrm{a}}=\frac{\sqrt{2}}{2}$
+
+  (II) 设 $A B$ 的中点为 $N\left(x_{0}, y_{0}\right)$, 由 (1) 知 $x_{0}=\frac{x_{1}+x_{2}}{2}=\frac{-a^{2} c}{a^{2}+b^{2}}=-\frac{2}{3} c$,
+
+  $$
+  y_{0}=x_{0}+c=\frac{c}{3} \text {. }
+  $$
+
+  由 $|P A|=|P B|$, 得 $k_{P N}=-1$,
+
+  即 $\frac{y_{0}+1}{x_{0}}=-1$
+
+  得 $c=3$, 从而 $a=3 \sqrt{2}, b=3$
+
+  故椭圆 $E$ 的方程为 $\frac{x^{2}}{18}+\frac{y^{2}}{9}=1$.

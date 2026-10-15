@@ -1,0 +1,28 @@
+type: single
+source: 2013 全国II卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  solid.position: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $m, n$ 为异面直线, $m \perp$ 平面 $\alpha, n \perp$ 平面 $\beta$. 直线 $\mid$ 满足 $\mid \perp m$, $\mathrm{I} \perp \mathrm{n},|\not \subset \alpha,| \not \subset \beta$, 则 $(\quad)$
+options:
+  A: $\alpha / / \beta$ 且 $\mid / / \alpha$
+  B: $\alpha \perp \beta$ 且 $l \perp \beta$
+  C: $\alpha$ 与 $\beta$ 相交, 且交线垂直于।
+  D: $\alpha$ 与 $\beta$ 相交, 且 交线平行于।
+answer: D
+solution: |-
+  解: 由 $m \perp$ 平面 $\alpha$, 直线 $\mid$ 满足 $\mid \perp m$, 且 $\mid \subset \alpha$, 所以 $\mid / / \alpha$,
+
+  又 $n \perp$ 平面 $\beta, 1 \perp n, \mid \not \subset \beta$, 所以 $I / / \beta$.
+
+  由直线 $m, n$ 为异面直线, 且 $m \perp$ 平面 $\alpha, n \perp$ 平面 $\beta$, 则 $\alpha$ 与 $\beta$ 相交, 否则,
+
+  若 $\alpha / / \beta$ 则推出 $m / / n$,
+
+  与 $m, n$ 异面矛盾.
+
+  故 $\alpha$ 与 $\beta$ 相交, 且交线平行于 1 .
+
+  故选: D.

@@ -1,0 +1,18 @@
+type: fill
+source: 2021 全国甲卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若向量 $\vec{a}, \vec{b}$ 满足 $|\vec{a}|=3,|\vec{a}-\vec{b}|=5, \vec{a} \cdot \vec{b}=1$, 则 $|\vec{b}|=$ ______
+answer: 3 \sqrt{2}
+answer_kind: expr
+solution: |-
+  【详解】 $\because|\vec{a}-\vec{b}|=5$
+
+  $\therefore|\vec{a}-\vec{b}|^{2}=\vec{a}^{2}+\vec{b}^{2}-2 \vec{a} \cdot \vec{b}=9+|\vec{b}|^{2}-2=25$
+
+  $\therefore|b|=3 \sqrt{2}$.
+
+  故答案为: $3 \sqrt{2}$.

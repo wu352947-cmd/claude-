@@ -1,0 +1,23 @@
+type: solve
+source: 2026 上海卷 第 19 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+stem: |-
+  已知 $a\in \mathbf{R}$，函数 $f(x)=x^2+ax+3$，$g(x)=4x+\dfrac{1}{x^2}$。
+
+  (1)已知 $f(1)=4$，求 $f(x)+\dfrac{1}{x^2}>g(x)$的解集；
+
+  (2)已知 $a\neq 0$，$l_1$是 $f(x)$在点$(0,3)$处的切线，$l_2$是过点$(0,3)$且垂直于 $l_1$的直线，$g(x)$与 $l_1$、$l_2$在第一象限内均无公共点，求 $a$ 的取值范围。
+parts:
+- label: (1)
+  points: 7.0
+  answer: 解集为$( - \infty,0) \cup (0,1) \cup (3, + \infty)$
+- label: (2)
+  points: 8.0
+  answer: $a$的取值范围为$\left( - \infty, - \frac{1}{2} \right) \cup (0,2)$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 解集为$( - \infty,0) \cup (0,1) \cup (3, + \infty)$；(2) $a$的取值范围为$\left( - \infty, - \frac{1}{2} \right) \cup (0,2)$

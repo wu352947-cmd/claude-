@@ -1,0 +1,14 @@
+type: single
+source: 2020 北京卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  logic.condition: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 2020 年 3 月 14 日是全球首个国际圆周率日（ $\pi$ Day ). 历史上, 求圆周率 $\pi$ 的方法有多 种, 与中国传统数学中的“割圆术”相似. 数学家阿尔. 卡西的方法是：当正整数 $n$ 充分大时, 计算单位圆的内接正 $6 n$ 边形的周长和外切正 $6 n$ 边形 (各边均与圆相切的正 $6 n$ 边形) 的周 长, 将它们的算术平均数作为 $2 \pi$ 的近似值. 按照阿尔. 卡西的方法, $\pi$ 的近似值的表达式是 ($\quad$).
+options:
+  A: $3 n\left(\sin \frac{30^{\circ}}{n}+\tan \frac{30^{\circ}}{n}\right)$
+  B: $6 n\left(\sin \frac{30^{\circ}}{n}+\tan \frac{30^{\circ}}{n}\right)$
+  C: $3 n\left(\sin \frac{60^{\circ}}{n}+\tan \frac{60^{\circ}}{n}\right)$
+  D: $6 n\left(\sin \frac{60^{\circ}}{n}+\tan \frac{60^{\circ}}{n}\right)$
+answer: A

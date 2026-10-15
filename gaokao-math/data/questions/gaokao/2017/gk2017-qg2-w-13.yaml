@@ -1,0 +1,17 @@
+type: fill
+source: 2017 全国II卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  trig.graph: 0.6
+  deriv.extremum: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=2 \cos x+\sin x$ 的最大值为 ______
+answer: \sqrt{5}
+answer_kind: expr
+solution: |-
+  解：函数 $\mathrm{f}(\mathrm{x})=2 \cos x+\sin x=\sqrt{5}\left(\frac{2 \sqrt{5}}{5} \cos x+\frac{\sqrt{5}}{5} \sin x\right)=\sqrt{5} \sin (x+\theta)$, 其中 $\tan \theta=2$,
+
+  可知函数的最大值为: $\sqrt{5}$.
+
+  故答案为: $\sqrt{5}$.

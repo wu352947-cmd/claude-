@@ -1,0 +1,21 @@
+type: solve
+source: 2026 新课标I卷 第 16 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  已知在$\triangle ABC$中，$AB=3$，$BC=2\sqrt{3}$，$\cos B=\dfrac{\sqrt{3}}{3}$。
+  (1) 求$\cos A$；
+  (2) 设$D,E$两点满足：$D$在$BA$的延长线上，$DE\parallel BC$，$AE\perp AC$，若$DE=\sqrt{6}$，求$CE$。
+parts:
+- label: (1)
+  points: 7.0
+  answer: $\dfrac{1}{3}$
+- label: (2)
+  points: 8.0
+  answer: $3\sqrt{5}$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $\dfrac{1}{3}$；(2) $3\sqrt{5}$

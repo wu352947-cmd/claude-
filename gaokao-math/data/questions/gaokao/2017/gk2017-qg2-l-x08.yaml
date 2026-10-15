@@ -1,0 +1,14 @@
+type: single
+source: 2017 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2017
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知直三棱柱 $A B C-A_{1} B_{1} C_{1}$ 中, $\angle A B C=120^{\circ}, A B=2, B C=C C_{1}=1$, 则 异面直线 $A B_{1}$ 与 $B C_{1}$ 所成角的余弦值为 ($\qquad$)
+options:
+  A: $\frac{\sqrt{3}}{2}$
+  B: $\frac{\sqrt{15}}{5}$
+  C: $\frac{\sqrt{10}}{5}$
+  D: $\frac{\sqrt{3}}{3}$
+answer: C

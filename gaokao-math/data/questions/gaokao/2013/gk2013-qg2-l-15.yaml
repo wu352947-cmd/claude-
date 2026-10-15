@@ -1,0 +1,24 @@
+type: fill
+source: 2013 全国II卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  trig.definition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $\theta$ 为第二象限角, 若 $\tan \left(\theta+\frac{\pi}{4}\right)=\frac{1}{2}$, 则 $\sin \theta+\cos \theta=$ ______
+answer: -\frac{\sqrt{10}}{5}
+answer_kind: expr
+solution: |-
+  解: $\because \tan \left(\theta+\frac{\pi}{4}\right)=\frac{\tan \theta+1}{1-\tan \theta}=\frac{1}{2}$,
+
+  $\therefore \tan \theta=-\frac{1}{3}$,
+
+  而 $\cos ^{2} \theta=\frac{\cos ^{2} \theta}{\sin ^{2} \theta+\cos ^{2} \theta}=\frac{1}{1+\tan ^{2} \theta}$,
+
+  $\because \theta$ 为第二象限角,
+
+  $\therefore \cos \theta=-\sqrt{\frac{1}{1+\tan ^{2} \theta}}=-\frac{3 \sqrt{10}}{10}, \sin \theta=\sqrt{1-\cos ^{2} \theta}=\frac{\sqrt{10}}{10}$,
+
+  则 $\sin \theta+\cos \theta=\frac{\sqrt{10}}{10}-\frac{3 \sqrt{10}}{10}=-\frac{\sqrt{10}}{5}$.
+
+  故答案为: $-\frac{\sqrt{10}}{5}$

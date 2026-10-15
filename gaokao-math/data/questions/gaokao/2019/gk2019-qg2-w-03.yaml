@@ -1,0 +1,20 @@
+type: single
+source: 2019 全国II卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\boldsymbol{a}=(2,3), \boldsymbol{b}=(3,2)$, 则 $|\boldsymbol{a}-\boldsymbol{b}|=$
+options:
+  A: $\sqrt{2}$
+  B: '2'
+  C: $5 \sqrt{2}$
+  D: '50'
+answer: A
+solution: |-
+  【详解】由已知, $\boldsymbol{a}-\boldsymbol{b}=(2,3)-(3,2)=(-1,1)$,
+
+  所以 $|\boldsymbol{a}-\boldsymbol{b}|=\sqrt{(-1)^{2}+1^{2}}=\sqrt{2}$ ，
+
+  故选 A

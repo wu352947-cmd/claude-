@@ -1,0 +1,51 @@
+type: solve
+source: 2013 全国I卷 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  conic.chord: 0.38
+  circle.line: 0.37
+  conic.ellipse: 0.24
+difficulty_label: 压轴
+stem: |-
+  已知圆 $M:(x+1)^{2}+y^{2}=1$, 圆 $N:(x-1)^{2}+y^{2}=9$, 动圆 $P$ 与圆 $M$ 外切并与圆 $N$ 内切, 圆心 $P$ 的轨迹为曲线 $C$.
+
+  (I ) 求 C 的方程;
+
+  ( II ) I 是与圆 $P$, 圆 $M$ 都相切的一条直线, $\mid$ 与曲线 $C$ 交于 $A, B$ 两点, 当圆 $P$ 的半径最长时, 求 $|A B|$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 由圆 $M:(x+1)^{2}+y^{2}=1$, 可知圆心 $M(-1,0)$; 圆 $N:(x-1$ )$^{2}+y^{2}=9$, 圆心 $N(1,0)$, 半径 3 .
+
+  设动圆的半径为 $R$,
+
+  $\because$ 动圆 $P$ 与圆 $M$ 外切并与圆 $N$ 内切, $\therefore|P M|+|P N|=R+1+(3-R)=4$,
+
+  而 $|N M|=2$, 由椭圆的定义可知: 动点 $P$ 的轨迹是以 $M, N$ 为焦点, 4 为长轴长 的椭圆,
+
+  $\therefore a=2, c=1, \quad b^{2}=a^{2}-c^{2}=3$.
+
+  $\therefore$ 曲线 C 的方程为 $\frac{x^{2}}{4}+\frac{y^{2}}{3}=1 \quad(x \neq-2)$.
+
+  (II) 设曲线 $C$ 上任意一点 $P(x, y)$,
+
+  由于 $|P M|-|P N|=2 R-2 \leqslant 3-1=2$, 所以 $R \leqslant 2$, 当且仅当 $\odot P$ 的圆心为 $(2,0)$ $R=2$ 时，其半径最大，其方程为 $(x-2)^{2}+y^{2}=4$.
+
+  (1) 的倾斜角为 $90^{\circ}$, 则 $I$ 与 $\mathrm{y}$ 轴重合, 可得 $|A B|=2 \sqrt{3}$.
+
+  (2)若 $\mathrm{I}$ 的倾斜角不为 $90^{\circ}$, 由于 $\odot \mathrm{M}$ 的半径 $1 \neq \mathrm{R}$, 可知 $\mathrm{I}$ 与 $\mathrm{x}$ 轴不平行, 设 $\mid$ 与 $x$ 轴的交点为 $Q$, 则 $\frac{|Q P|}{\mid Q M}=\frac{R}{r_{1}}$, 可得 $Q(-4,0)$, 所以可设 $\mid: y=k(x+4$ )
+
+  由 I于 $M$ 相切可得: $\frac{|3 k|}{\sqrt{1+k^{2}}}=1$, 解得 $k= \pm \frac{\sqrt{2}}{4}$.
+
+  当 $k=\frac{\sqrt{2}}{4}$ 时, 联立 $\left\{\begin{array}{l}y=\frac{\sqrt{2}}{4} x+\sqrt{2} \\ \frac{x^{2}}{4}+\frac{y^{2}}{3}=1\end{array}\right.$, 得到 $7 x^{2}+8 x-8=0$. $\therefore \mathrm{x}_{1}+\mathrm{x}_{2}=-\frac{8}{7}, \mathrm{x}_{1} \mathrm{x}_{2}=-\frac{8}{7}$.
+
+  $\therefore|\mathrm{AB}|=\sqrt{1+\mathrm{k}^{2}}\left|\mathrm{x}_{2}-\mathrm{x}_{1}\right|=\sqrt{1+\left(\frac{\sqrt{2}}{4}\right)^{2}} \sqrt{\left(-\frac{8}{7}\right)^{2}-4 \times\left(-\frac{8}{7}\right)}=\frac{18}{7}$
+
+  由于对称性可知: 当 $k=-\frac{\sqrt{2}}{4}$ 时, 也有 $|A B|=\frac{18}{7}$.
+
+  综上可知: $|A B|=2 \sqrt{3}$ 或 $\frac{18}{7}$.

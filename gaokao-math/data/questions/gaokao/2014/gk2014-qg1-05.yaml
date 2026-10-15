@@ -1,0 +1,28 @@
+type: single
+source: 2014 全国I卷 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设函数 $f(x), g(x)$ 的定义域都为 $R$, 且 $f(x)$ 是奇函数, $g(x)$ 是偶函数，则下列结论正确的是（）
+options:
+  A: $f(x) \bullet g(x)$ 是偶函数
+  B: $|f(x)| \bullet g(x)$ 是奇函数
+  C: $f(x) \bullet|g(x)|$ 是奇函数
+  D: $|f(x) \bullet g(x)|$ 是奇函数
+answer: C
+solution: |-
+  解: $\because \mathrm{f}(\mathrm{x})$ 是奇函数, $\mathrm{g}(\mathrm{x})$ 是偶函数,
+
+  $\therefore f(-x)=-f(x), g(-x)=g(x)$,
+
+  $f(-x) \cdot g(-x)=-f(x) \cdot g(x)$, 故函数是奇函数, 故 $A$ 错误,
+
+  $|f(-x)| \cdot g(-x)=|f(x)| \cdot g(x)$ 为偶函数, 故 $B$ 错误,
+
+  $f(-x) \cdot|g(-x)|=-f(x) \bullet|g(x)|$ 是奇函数, 故 C 正确.
+
+  $|f(-\mathrm{x}) \cdot g(-\mathrm{x})|=|\mathrm{f}(\mathrm{x}) \cdot \mathrm{g}(\mathrm{x})|$ 为偶函数, 故 $\mathrm{D}$ 错误,
+
+  故选: C.

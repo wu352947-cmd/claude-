@@ -1,0 +1,16 @@
+type: fill
+source: 2026 天津卷 第 15 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  在平面内，$O$ 为坐标原点，抛物线 $y^2 = 2x$ 上有 $A, B, C, D$ 四个点，$A, B, C, D$的纵坐标分别为 $y_A, y_B, y_C, y_D$，直线 $AB$ 与直线 $CD$ 交 $x$ 轴于点 $P$，直线 $AC$ 交 $x$ 轴于点 $M$，直线 $BD$ 交 $x$ 轴于点 $N$，以下说法正确的有 ______。
+    $\textcircled1$ 若 $P$ 与抛物线焦点重合，则 $y_A y_B = -2$；
+    $\textcircled2$ $y_A y_B = y_C y_D$；
+    $\textcircled3$ $|OM||ON| = 2|OP|^2$；
+    $\textcircled4$ $|y_A - y_C||OP| = |y_B - y_D||OM|$；
+    $\textcircled5$ $\frac{S_{\triangle ACP}}{S_{\triangle BDP}} = \left( \frac{|OM|}{|ON|} \right)^2$
+answer: \textcircled2\textcircled4
+answer_kind: expr

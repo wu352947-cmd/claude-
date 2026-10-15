@@ -1,0 +1,25 @@
+type: single
+source: 2017 全国III卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.hyperbola: 0.6
+  conic.ellipse: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: '已知双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1 \quad(a>0, b>0)$ 的一条渐近线方程为 $y=\frac{\sqrt{5}}{2} x$, 且与椭圆 $\frac{x^{2}}{12}+\frac{y^{2}}{3}=1$ 有公共焦点, 则 $C$ 的方程为 $(\quad)$'
+options:
+  A: $\frac{x^{2}}{8}-\frac{y^{2}}{10}=1$
+  B: $\frac{x^{2}}{4}-\frac{y^{2}}{5}=1$
+  C: $\frac{x^{2}}{5}-\frac{y^{2}}{4}=1$
+  D: $\frac{x^{2}}{4}-\frac{y^{2}}{3}=1$
+answer: B
+solution: |-
+  解: 椭圆 $\frac{x^{2}}{12}+\frac{y^{2}}{3}=1$ 的焦点坐标 $( \pm 3,0)$,
+
+  则双曲线的焦点坐标为 $( \pm 3,0)$, 可得 $c=3$,
+
+  双曲线 C: $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1 \quad(a>0, b>0)$ 的一条渐近线方程为 $y=\frac{\sqrt{5}}{2} x$, 可得 $\frac{b}{a}=\frac{\sqrt{5}}{2}$, 即 $\frac{c^{2}-a^{2}}{a^{2}}=\frac{5}{4}$, 可得 $\frac{c}{a}=\frac{3}{2}$, 解得 $a=2, b=\sqrt{5}$,
+
+  所求的双曲线方程为: $\frac{x^{2}}{4}-\frac{y^{2}}{5}=1$.
+
+  故选: B.

@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $A=\{x \mid-2<x<4\}, B=\{2,3,4,5\}$, 则 $A \cap B=(\quad)$
+options:
+  A: $\{2\}$
+  B: $\{2,3\}$
+  C: $\{3,4\}$
+  D: $\{2,3,4\}$
+answer: B

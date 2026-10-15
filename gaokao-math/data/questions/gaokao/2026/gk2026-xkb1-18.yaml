@@ -1,0 +1,23 @@
+type: solve
+source: 2026 新课标I卷 第 18 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+stem: |-
+  已知椭圆$C:\dfrac{x^2}{a^2}+\dfrac{y^2}{b^2}=1\ (a>b>0)$的左焦点为$F(-1,0)$，离心率为$\dfrac{1}{2}$。
+  (1) 求$C$的方程；
+  (2) 设$O$为坐标原点，过$F$且斜率大于0的动直线$l$与$C$交于$P,Q$两点，其中$Q$在第三象限，直线$PO$与$C$的另一个交点为$R$。
+  (i) 若$\triangle PQR$的面积是$\triangle PFO$的面积的3倍，求$l$的方程；
+  (ii) 求$\tan\angle PQR$的最小值。
+parts:
+- label: (1)
+  points: 7
+  answer: $\frac{x^2}{4}+\frac{y^2}{3}=1$
+- label: (2)
+  points: 10.0
+  answer: (i)$\sqrt{5}\,x-2y+\sqrt{5}=0$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $\frac{x^2}{4}+\frac{y^2}{3}=1$；(2) (i)$\sqrt{5}\,x-2y+\sqrt{5}=0$

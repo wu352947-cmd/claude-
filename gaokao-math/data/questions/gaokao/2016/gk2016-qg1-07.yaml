@@ -1,0 +1,16 @@
+type: single
+source: 2016 全国I卷 第 7 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2016
+kps:
+  func.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $y=2 x^2-e^{|x|}$ 在 $[-2,2]$ 的图象大致为 $(\quad)$
+figure: 20dbb39d586daecc.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: D
+solution: '解: $\because f(x)=y=2 x^2-e^{|x|}$,$$\therefore f(-x)=2(-x)^2-e^{|-x|}=2 x^2-e^{|x|},$$故函数为偶函数,当 $x= \pm 2$ 时, $y=8-e^2 \in(0,1)$, 故排除 $A, B$;当 $x \in[0,2]$ 时, $f(x)=y=2 x^2-e^x$,$\therefore f^{\prime}(x)=4 x-e^x=0$ 有解,故函数 $y=2 x^2-e^{|x|}$ 在 $[0,2]$ 不是单调的, 故排除 $C$,故选: D.'

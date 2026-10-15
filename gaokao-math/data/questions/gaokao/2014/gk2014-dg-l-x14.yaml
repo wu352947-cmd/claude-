@@ -1,0 +1,10 @@
+type: fill
+source: 2014 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2014
+kps:
+  circle.line: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '直线 $l_{1}$ 和 $l_{2}$ 是圆 $x^{2}+y^{2}=2$ 的两条切线, 若 $l_{1}$ 与 $l_{2}$ 的交点为 $(1,3)$, 则 $I_{1}$ 与 $I_{2}$ 的夹角的正切值等于 ______ '
+answer: \frac{4}{3}
+answer_kind: expr

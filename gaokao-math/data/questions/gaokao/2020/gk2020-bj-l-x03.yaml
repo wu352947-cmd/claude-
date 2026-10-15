@@ -1,0 +1,14 @@
+type: single
+source: 2020 北京卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  circle.equation: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知半径为 1 的圆经过点 $(3,4)$, 则其圆心到原点的距离的最小值为 ($\quad$).
+options:
+  A: '4'
+  B: '5'
+  C: '6'
+  D: '7'
+answer: A

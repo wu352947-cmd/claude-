@@ -1,0 +1,14 @@
+type: single
+source: 2016 全国III卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2016
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设集合 $S=\{x \mid(x-2)(x-3) \geqslant 0\}, ~ T=\{x \mid x>0\}$, 则 $S \cap T=(\qquad)$
+options:
+  A: $[2,3]$
+  B: $(-\infty, 2] \cup[3,+\infty)$
+  C: $[3,+\infty)$
+  D: $(0,2] \cup[3,+\infty)$
+answer: D

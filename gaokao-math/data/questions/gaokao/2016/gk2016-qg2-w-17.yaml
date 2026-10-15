@@ -1,0 +1,39 @@
+type: solve
+source: 2016 全国II卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+stem: |-
+  等差数列 $\left\{a_{n}\right\}$ 中, $a_{3}+a_{4}=4, a_{5}+a_{7}=6$.
+
+  (I) 求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (II ) 设 $b_{n}=\left[a_{n}\right]$, 求数列 $\left\{b_{n}\right\}$ 的前 10 项和, 其中 $[x]$ 表示不超过 $x$ 的最大整数, 如 $[0.9]=0,[2.6]=2$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解： ( I ) 设等差数列 $\left\{a_{n}\right\}$ 的公差为 $d$,
+
+  $\because a_{3}+a_{4}=4, a_{5}+a_{7}=6$
+
+  $\therefore\left\{\begin{array}{l}2 a_{1}+5 d=4 \\ 2 a_{1}+10 d=6\end{array}\right.$,
+
+  解得: $\left\{\begin{array}{l}a_{1}=1 \\ d=\frac{2}{5}\end{array}\right.$,
+
+  $\therefore a_{n}=\frac{2}{5} n+\frac{3}{5}$
+
+  ( II ) $\because b_{n}=\left[a_{n}\right]$, $\therefore b_{1}=b_{2}=b_{3}=1$,
+
+  $\mathrm{b}_{4}=\mathrm{b}_{5}=2$
+
+  $b_{6}=b_{7}=b_{8}=3$,
+
+  $b_{9}=b_{10}=4$.
+
+  故数列 $\left\{b_{n}\right\}$ 的前 10 项和 $S_{10}=3 \times 1+2 \times 2+3 \times 3+2 \times 4=24$.

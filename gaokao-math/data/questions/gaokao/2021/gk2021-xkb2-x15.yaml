@@ -1,0 +1,10 @@
+type: fill
+source: 2021 新课标II卷 填空题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数 $f(x)=\left|e^{x}-1\right|, x_{1}<0, x_{2}>0$, 函数 $f(x)$ 的图象在点 $A\left(x_{1}, f\left(x_{1}\right)\right)$ 和点 $B\left(x_{2}, f\left(x_{2}\right)\right)$ 的两条 切线互相垂直, 且分别交 $y$ 轴于 $M, N$ 两点, 则 $\frac{|A M|}{|B N|}$ 取值范围是 ______ .
+answer: (0,1)
+answer_kind: interval

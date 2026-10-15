@@ -1,0 +1,25 @@
+type: single
+source: 2015 全国I卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  conic.hyperbola: 0.54
+  vec.dot: 0.46
+difficulty_label: 基础
+points: 5.0
+stem: '已知 $M\left(x_{0}, y_{0}\right)$ 是双曲线 $C: \frac{x^{2}}{2}-y^{2}=1$ 上的一点, $F_{1}, F_{2}$ 是 $C$ 的左 、右两个焦点, 若 $\overrightarrow{M F_{1}} \cdot \overrightarrow{\mathrm{MF}_{2}}<0$, 则 $\mathrm{y}_{0}$ 的取值范围是（ )'
+options:
+  A: $\left(\frac{\sqrt{3}}{3}, \frac{\sqrt{3}}{3}\right)$
+  B: $\left(-\frac{\sqrt{3}}{6}, \frac{\sqrt{3}}{6}\right)$
+  C: $\left(-\frac{2 \sqrt{2}}{3}, \frac{2 \sqrt{2}}{3}\right)$
+  D: $\left(-\frac{2 \sqrt{3}}{3}, \frac{2 \sqrt{3}}{3}\right)$
+answer: A
+solution: |-
+  解：由题意, $\overrightarrow{M_{1}} \cdot \overrightarrow{M_{2}}=\left(-\sqrt{3}-x_{0},-y_{0}\right) \cdot\left(\sqrt{3}-x_{0},-y_{0}\right)$
+
+  $$
+  =\mathrm{x}_{0}^{2}-3+\mathrm{y}_{0}^{2}=3 \mathrm{y}_{0}^{2}-1<0
+  $$
+
+  所以 $-\frac{\sqrt{3}}{3}<y_{0}<\frac{\sqrt{3}}{3}$.
+
+  故选: $A$.

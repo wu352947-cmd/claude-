@@ -1,0 +1,62 @@
+# 试卷结构：新课标 I 卷（2024 年起的 19 题结构，150 分，120 分钟）。
+#
+# sections：各题型的默认分值和建议用时（录题时用）。
+# slots：每个题号的分值、典型难度、以及「这个题位考哪些知识点」的概率分布。
+#   预测分、模考组卷都用它。下面的分布是按 2024、2025 年新课标 I 卷大致归纳的估计，
+#   不是官方信息。建议你把 2024–2026 年的 I 卷逐题统计一遍后修改——这本身就是很好的复盘。
+#   每个题位的概率之和不必正好是 1，程序会自动归一化。
+
+name: 新课标I卷
+total_points: 150
+minutes: 120
+
+sections:
+  - {type: single, label: 单选题, points: 5, est_seconds: 150}
+  - {type: multi, label: 多选题, points: 6, est_seconds: 240}   # 全对 6 分；部分选对按「每对一个 = 6 / 正确选项数」；有错选 0 分
+  - {type: fill, label: 填空题, points: 5, est_seconds: 240}
+  - {type: solve, label: 解答题, points: 15, est_seconds: 900}
+
+slots:
+  # ---------------- 单选 1–8
+  - {num: 1, type: single, points: 5, difficulty: 基础, kps: {set.operations: 0.55, ineq.quadratic: 0.15, complex.arith: 0.3}}
+  - {num: 2, type: single, points: 5, difficulty: 基础, kps: {complex.arith: 0.5, complex.modulus: 0.2, set.operations: 0.3}}
+  - {num: 3, type: single, points: 5, difficulty: 基础, kps: {vec.dot: 0.45, vec.linear: 0.2, conic.eccentricity: 0.2, logic.condition: 0.15}}
+  - {num: 4, type: single, points: 5, difficulty: 基础, kps: {trig.identities: 0.6, seq.arith: 0.2, seq.geom: 0.2}}
+  - {num: 5, type: single, points: 5, difficulty: 中档, kps: {solid.measure: 0.6, solid.sphere: 0.2, count.perm_comb: 0.2}}
+  - {num: 6, type: single, points: 5, difficulty: 中档, kps: {func.monotonic: 0.3, func.piecewise: 0.3, expo.functions: 0.2, circle.line: 0.2}}
+  - {num: 7, type: single, points: 5, difficulty: 中档, kps: {trig.graph: 0.4, func.zeros: 0.3, func.graph: 0.3}}
+  - {num: 8, type: single, points: 5, difficulty: 较难, kps: {func.abstract: 0.3, expo.compare: 0.25, deriv.construct: 0.25, conic.fixed: 0.2}}
+  # ---------------- 多选 9–11
+  - {num: 9, type: multi, points: 6, difficulty: 基础, kps: {stat.sample: 0.35, prob.binomial_normal: 0.3, stat.regression: 0.15, trig.graph: 0.2}}
+  - {num: 10, type: multi, points: 6, difficulty: 中档, kps: {deriv.extremum: 0.35, deriv.monotonic: 0.25, func.symmetry: 0.2, trig.graph: 0.2}}
+  - {num: 11, type: multi, points: 6, difficulty: 较难, kps: {novel.definition: 0.35, conic.parabola: 0.2, solid.position: 0.2, func.abstract: 0.25}}
+  # ---------------- 填空 12–14
+  - {num: 12, type: fill, points: 5, difficulty: 基础, kps: {conic.eccentricity: 0.35, conic.hyperbola: 0.25, count.binomial: 0.2, vec.dot: 0.2}}
+  - {num: 13, type: fill, points: 5, difficulty: 中档, kps: {deriv.tangent: 0.45, trig.identities: 0.3, circle.line: 0.25}}
+  - {num: 14, type: fill, points: 5, difficulty: 较难, kps: {prob.classical: 0.3, count.perm_comb: 0.3, prob.conditional: 0.2, seq.recurrence: 0.2}}
+  # ---------------- 解答 15–19（parts：每一问的分值和难度）
+  - num: 15
+    type: solve
+    points: 13
+    kps: {tri.laws: 0.5, tri.range: 0.15, stat.regression: 0.2, prob.distribution: 0.15}
+    parts: [{points: 6, difficulty: 基础}, {points: 7, difficulty: 中档}]
+  - num: 16
+    type: solve
+    points: 15
+    kps: {conic.chord: 0.35, conic.ellipse: 0.15, seq.recurrence: 0.2, seq.sum_dislocation: 0.15, seq.sum_telescoping: 0.15}
+    parts: [{points: 6, difficulty: 基础}, {points: 9, difficulty: 中档}]
+  - num: 17
+    type: solve
+    points: 15
+    kps: {solid.vector: 0.6, solid.position: 0.4}
+    parts: [{points: 6, difficulty: 基础}, {points: 9, difficulty: 中档}]
+  - num: 18
+    type: solve
+    points: 17
+    kps: {deriv.monotonic: 0.2, deriv.always_true: 0.3, deriv.zeros: 0.2, conic.fixed: 0.3}
+    parts: [{points: 4, difficulty: 基础}, {points: 6, difficulty: 较难}, {points: 7, difficulty: 压轴}]
+  - num: 19
+    type: solve
+    points: 17
+    kps: {novel.definition: 0.6, prob.distribution: 0.2, seq.recurrence: 0.2}
+    parts: [{points: 4, difficulty: 中档}, {points: 6, difficulty: 较难}, {points: 7, difficulty: 压轴}]

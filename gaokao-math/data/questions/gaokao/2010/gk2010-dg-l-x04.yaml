@@ -1,0 +1,15 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  vec.dot: 0.57
+  circle.line: 0.43
+difficulty_label: 基础
+points: 5.0
+stem: 已知圆 $O$ 的半径为 $1, P A$、 $P B$ 为该圆的两条切线, $A$、 $B$ 为两切点, 那么 $\overrightarrow{\mathrm{PA}} \cdot \overrightarrow{\mathrm{PB}}$ 的最小值为 ($\qquad$)
+options:
+  A: $-4+\sqrt{2}$
+  B: $-3+\sqrt{2}$
+  C: $-4+2 \sqrt{2}$
+  D: $-3+2 \sqrt{2}$
+answer: D

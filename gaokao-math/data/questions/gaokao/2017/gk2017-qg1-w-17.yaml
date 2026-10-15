@@ -1,0 +1,44 @@
+type: solve
+source: 2017 全国I卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  seq.arith: 0.5
+  seq.geom: 0.5
+difficulty_label: 中档
+stem: |-
+  记 $S_{n}$ 为等比数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 已知 $S_{2}=2, S_{3}=-6$.
+
+  （1）求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 求 $S_{n}$, 并判断 $S_{n+1}, S_{n}, S_{n+2}$ 是否成等差数列.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解：（1）设等比数列 $\left\{a_{n}\right\}$ 首项为 $a_{1}$, 公比为 $q$,
+
+  则 $a_{3}=S_{3}-S_{2}=-6-2=-8$, 则 $a_{1}=\frac{a_{3}}{q^{2}}=\frac{-8}{q^{2}}, a_{2}=\frac{a_{3}}{q}=\frac{-8}{q}$,
+
+  由 $a_{1}+a_{2}=2, \frac{-8}{q^{2}}+\frac{-8}{q}=2$, 整理得: $q^{2}+4 q+4=0$, 解得: $q=-2$,
+
+  则 $a_{1}=-2, a_{n}=(-2)(-2)^{n-1}=(-2)^{n}$,
+
+  $\therefore\left\{a_{n}\right\}$ 的通项公式 $a_{n}=(-2)^{n}$;
+
+  （2）由（1）可知: $S_{n}=\frac{a_{1}\left(1-q^{n}\right)}{1-q}=\frac{-2\left[1-(-2)^{n}\right]}{1-(-2)}=-\frac{1}{3}\left[2+(-2)^{n+1}\right]$,
+
+  则 $S_{n+1}=-\frac{1}{3}\left[2+(-2)^{n+2}\right], S_{n+2}=-\frac{1}{3}\left[2+(-2)^{n+3}\right]$, 由 $S_{n+1}+S_{n+2}=-\frac{1}{3}\left[2+(-2)^{n+2}\right]-\frac{1}{3}\left[2+(-2)^{n+3}\right]$,
+
+  $=-\frac{1}{3}\left[4+(-2) \times(-2)^{n+1}+(-2)^{2} \times(-2)^{n+1}\right]$
+
+  $=-\frac{1}{3}\left[4+2(-2)^{n+1}\right]=2 \times\left[-\frac{1}{3}\left(2+(-2)^{n+1}\right)\right]$,
+
+  $=2 S_{n}$,
+
+  即 $S_{n+1}+S_{n+2}=2 S_{n}$,
+
+  $\therefore S_{n+1}, S_{n}, S_{n+2}$ 成等差数列.

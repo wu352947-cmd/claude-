@@ -1,0 +1,18 @@
+type: fill
+source: 2017 全国II卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  solid.sphere: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 长方体的长、宽、高分别为 $3,2 ， 1$, 其顶点都在球 $\mathrm{O}$ 的球面上, 则球 $\mathrm{O}$ 的表面积为 ______
+answer: 14 \pi
+answer_kind: expr
+solution: |-
+  解：长方体的长、宽、高分别为 $3,2,1$, 其顶点都在球 $\mathrm{O}$ 的球面上, 可知长方体的对角线的长就是球的直径,
+
+  所以球的半径为: $\frac{1}{2} \sqrt{3^{2}+2^{2}+1^{2}}=\frac{\sqrt{14}}{2}$.
+
+  则球 $O$ 的表面积为: $4 \times\left(\frac{\sqrt{14}}{2}\right)^{2} \pi=14 \pi$.
+
+  故答案为: $14 \pi$.

@@ -1,0 +1,34 @@
+type: single
+source: 2020 全国I卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '设 $F_{1}, F_{2}$ 是双曲线 $C: x^{2}-\frac{y^{2}}{3}=1$ 的两个焦点, $O$ 为坐标原点, 点 $P$ 在 $C$ 上且 $|O P|=2$, 则 $\triangle P F_{1} F_{2}$ 的面积为 ( )'
+options:
+  A: $\frac{7}{2}$
+  B: '3'
+  C: $\frac{5}{2}$
+  D: '2'
+answer: B
+solution: |-
+  【详解】由已知, 不妨设 $F_{1}(-2,0), F_{2}(2,0)$,
+
+  则 $a=1, c=2$, 因为 $|O P|=1=\frac{1}{2}\left|F_{1} F_{2}\right|$,
+
+  所以点 $P$ 在以 $F_{1} F_{2}$ 为直径的圆上,
+
+  即 $\square F_{1} F_{2} P$ 是以 $P$ 为直角顶点的直角三角形,
+
+  故 $\left|P F_{1}\right|^{2}+\left|P F_{2}\right|^{2}=\left|F_{1} F_{2}\right|^{2}$ ，
+
+  即 $\left|P F_{1}\right|^{2}+\left|P F_{2}\right|^{2}=16$, 又 $\left|P F_{1}\right|-\left|P F_{2}\right|=2 a=2$ ，
+
+  所以 $4=|| P F_{1}|-| P F_{2}\left\|^{2}=\left|P F_{1}\right|^{2}+\left|P F_{2}\right|^{2}-2\left|P F_{1} \| P F_{2}\right|=16-2\left|P F_{1}\right|\left|P F_{2}\right|\right.$,
+
+  解得 $\left|P F_{1}\right|\left|P F_{2}\right|=6$, 所以 $S_{\triangle F_{1} F_{2} P}=\frac{1}{2}\left|P F_{1}\right|\left|P F_{2}\right|=3$
+
+  故选：B
+
+  【点晴】本题考查双曲线中焦点三角面积的计算问题, 涉及到双曲线的定义, 考查学生的数学运算能力, 是一道中档题.

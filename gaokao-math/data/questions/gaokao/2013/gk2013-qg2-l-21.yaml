@@ -1,0 +1,47 @@
+type: solve
+source: 2013 全国II卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  deriv.extremum: 0.36
+  deriv.monotonic: 0.34
+  deriv.construct: 0.29
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=\mathrm{e}^{\mathrm{x}}-\ln (\mathrm{x}+\mathrm{m})$
+
+  （I）设 $x=0$ 是 $f(x)$ 的极值点, 求 $m$, 并讨论 $f(x)$ 的单调性;
+
+  (II）当 $m \leqslant 2$ 时, 证明 $f(x)>0$. 选考题: (第 22 题～第 24 题为选考题, 考生根据要求作答. 请考生在第 22、
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  ( I ) 解 $\because f^{\prime}(x)=e^{x}-\frac{1}{x+m}, x=0$ 是 $f(x)$ 的极值点, $\therefore f^{\prime}(0)=1-\frac{1}{m}=0$ , 解得 $\mathrm{m}=1$.
+
+  所以函数 $f(x)=e^{x}-\ln (x+1)$, 其定义域为 $(-1,+\infty)$.
+
+  $\because f^{\prime}(x)=e^{x}-\frac{1}{x+1}=\frac{e^{x}(x+1)-1}{x+1}$
+
+  设 $g(x)=e^{x}(x+1)-1$, 则 $g^{\prime}(x)=e^{x}(x+1)+e^{x}>0$, 所以 $g(x)$ 在 $(-1,+$ $\infty$ )上为增函数,
+
+  又 $\because g(0)=0$, 所以当 $x>0$ 时, $g(x)>0$, 即 $f^{\prime}(x)>0$; 当 $-1<x<0$ 时, $g$ $(x)<0, f^{\prime}(x)<0$.
+
+  所以 $\mathrm{f}(\mathrm{x})$ 在 $(-1,0)$ 上为减函数; 在 $(0,+\infty)$ 上为增函数; （II ) 证明: 当 $m \leqslant 2, x \in(-m,+\infty)$ 时, $\ln (x+m) \leqslant \ln (x+2)$, 故只需证 明当 $m=2$ 时 $f(x)>0$.
+
+  当 $m=2$ 时, 函数 $f^{\prime}(x)=e^{x}-\frac{1}{x+2}$ 在 $(-2,+\infty)$ 上为增函数, 且 $f^{\prime}(-1)<0$ $f^{\prime}(0)>0$
+
+  故 $\mathrm{f}^{\prime}(\mathrm{x})=0$ 在 $(-2,+\infty)$ 上有唯一实数根 $\mathrm{x}_{0}$, 且 $\mathrm{x}_{0} \in(-1,0)$.
+
+  当 $x \in\left(-2, x_{0}\right)$ 时, $f^{\prime}(x)<0$, 当 $x \in\left(x_{0},+\infty\right)$ 时, $f^{\prime}(x)>0$,
+
+  从而当 $x=x_{0}$ 时, $f(x)$ 取得最小值.
+
+  由 $f^{\prime}\left(x_{0}\right)=0$, 得 $e^{x_{0}}=\frac{1}{x_{0}+2}, \ln \left(x_{0}+2\right)=-x_{0}$.
+
+  故 $f(x) \geqslant f\left(x_{0}\right)=\frac{1}{x_{0}+2}+x_{0}=\frac{\left(x_{0}+1\right)^{2}}{x_{0}+2}>0$.
+
+  综上, 当 $m \leqslant 2$ 时, $f(x)>0$.

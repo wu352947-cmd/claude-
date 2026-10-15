@@ -1,0 +1,16 @@
+type: fill
+source: 2014 全国I卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 将 2 本不同的数学书和 1 本语文书在书架上随机排成一行, 则 2 本 数学书相邻的概率为 ______
+answer: \frac{2}{3}
+answer_kind: expr
+solution: |-
+  解: 2 本不同的数学书和 1 本语文书在书架上随机排成一行, 所有的基 本事件有共有 $\mathrm{A}_{3}^{3}=6$ 种结果，
+
+  其中 2 本数学书相邻的有 (数学 1 , 数学 2 , 语文), (数学 2 , 数学 1 , 语文) , (语文, 数学 1 , 数学 2), (语文, 数学 2 , 数学 1) 共 4 个, 故本数学 书相邻的概率 $\mathrm{P}=\frac{4}{6}=\frac{2}{3}$.
+
+  故答案为: $\frac{2}{3}$.

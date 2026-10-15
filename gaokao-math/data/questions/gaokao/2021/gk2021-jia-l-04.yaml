@@ -1,0 +1,18 @@
+type: single
+source: 2021 全国甲卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  expo.ops: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 青少年视力是社会普遍关注的问题, 视力情况可借助视力表测量. 通常用五分记录法和小数记录法记录 视力数据, 五分记录法的数据 $L$ 和小数记录表的数据 $V$ 的满足 $L=5+\lg V$. 已知某同学视力的五分记录法 的数据为 4.9 , 则其视力的小数记录法的数据为 $(\quad) \quad(\sqrt[10]{10} \approx 1.259)$
+options:
+  A: '1.5'
+  B: '1.2'
+  C: '0.8'
+  D: '0.6'
+answer: C
+solution: |-
+  【详解】由 $L=5+\lg V$, 当 $L=4.9$ 时, $\lg V=-0.1$, 则 $V=10^{-0.1}=10^{-\frac{1}{10}}=\frac{1}{\sqrt[10]{10}} \approx \frac{1}{1.259} \approx 0.8$.
+
+  故选: C.

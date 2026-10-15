@@ -1,0 +1,28 @@
+type: solve
+source: 2026 上海卷 第 20 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 较难
+stem: |-
+  已知双曲线 $\Gamma: x^2-y^2=1$，点 $P$ 在 $\Gamma$ 上，$F_1$，$F_2$ 分别为双曲线的左、右焦点。
+
+  (1)求点 $(2,0)$到双曲线渐近线的距离；
+
+  (2)若 $\overrightarrow{PF_1}\cdot \overrightarrow{PF_2}=1$，求 $S_{\triangle PF_1F_2}$；
+
+  (3)记 $\Omega$ 为双曲线 $\Gamma$ 满足 $\begin{cases} x>0\\ y\ge -1 \end{cases}$ 和 $\begin{cases} x<0\\ y\le -1 \end{cases}$ 的部分；直线 $l$，$m$ 均过右焦点 $F_2$，$l$ 与 $\Omega$ 交于 $P$，$Q$ 两点(分别在第一、第四象限)，$m$ 与 $\Omega$ 交于 $M$，$N$ 两点(分别在第三、四象限)，问：是否存在常数 $\lambda$，使得对任意直线 $l$，都存在唯一一对应的直线 $m$ 满足 $\lambda|PQ|=|MN|$？若存在，求出 $\lambda$ 的值；若不存在，请说明理由。
+parts:
+- label: (1)
+  points: 5.0
+  answer: 距离为$\sqrt{2}$
+- label: (2)
+  points: 6.0
+  answer: 面积为$\sqrt{2}$
+- label: (3)
+  points: 6.0
+  answer: 存在常数$\lambda$，满足条件的$\lambda$的取值范围为$\left[ \frac{9}{7}, + \infty \right)$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 距离为$\sqrt{2}$；(2) 面积为$\sqrt{2}$；(3) 存在常数$\lambda$，满足条件的$\lambda$的取值范围为$\left[ \frac{9}{7}, + \infty \right)$

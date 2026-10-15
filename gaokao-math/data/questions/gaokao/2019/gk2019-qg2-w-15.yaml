@@ -1,0 +1,11 @@
+type: fill
+source: 2019 全国II卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$. 已知 $b \sin A+a \cos B=0$, 则 $B=$ ______
+answer: \frac{3 \pi}{4}
+answer_kind: expr
+solution: 【详解】由正弦定理, 得 $\sin B \sin A+\sin A \cos B=0 \therefore A \in(0, \pi), B \in(0, \pi), \therefore \sin A \neq 0$, 得 $\sin B+\cos B=0$, 即 $\tan B=-1, \therefore B=\frac{3 \pi}{4}$. 故选 D.

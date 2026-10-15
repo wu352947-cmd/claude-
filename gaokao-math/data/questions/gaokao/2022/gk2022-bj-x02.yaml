@@ -1,0 +1,15 @@
+type: single
+source: 2022 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  complex.modulus: 0.63
+  complex.arith: 0.37
+difficulty_label: 基础
+points: 5.0
+stem: 若复数 $z$ 满足 $\mathrm{i} \cdot z=3-4 \mathrm{i}$, 则 $|z|=(\quad)$
+options:
+  A: '1'
+  B: '5'
+  C: '7'
+  D: '25'
+answer: B

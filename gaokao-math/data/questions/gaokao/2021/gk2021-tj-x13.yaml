@@ -1,0 +1,10 @@
+type: fill
+source: 2021 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  ineq.mean: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $a>0, b>0$, 则 $\frac{1}{a}+\frac{a}{b^{2}}+b$ 的最小值为 ______ .
+answer: 2\sqrt{2}
+answer_kind: expr

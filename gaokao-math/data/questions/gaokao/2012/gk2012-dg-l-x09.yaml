@@ -1,0 +1,14 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  expo.ops: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $x=\ln \pi, y=\log _{5} 2, z=e^{-\frac{1}{2}}$, 则 ($\qquad$)
+options:
+  A: $x<y<z$
+  B: $z<x<y$
+  C: $z<y<x$
+  D: $\mathrm{y}<\mathrm{z}<\mathrm{x}$
+answer: D

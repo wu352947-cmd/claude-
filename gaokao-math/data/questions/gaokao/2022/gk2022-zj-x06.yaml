@@ -1,0 +1,14 @@
+type: single
+source: 2022 浙江卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  deriv.always_true: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $a, b \in \mathbf{R}$, 若对任意 $x \in \mathbf{R}, a|x-b|+|x-4|-|2 x-5| \geq 0$, 则 ($\qquad$)
+options:
+  A: $a \leq 1, b \geq 3$
+  B: $a \leq 1, b \leq 3$
+  C: $a \geq 1, b \geq 3$
+  D: $a \geq 1, b \leq 3$
+answer: D

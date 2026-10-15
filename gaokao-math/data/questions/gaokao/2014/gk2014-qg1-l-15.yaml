@@ -1,0 +1,24 @@
+type: fill
+source: 2014 全国I卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  vec.projection: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $A, B, C$ 为圆 $O$ 上的三点, 若 $\overrightarrow{\mathrm{AO}}=\frac{1}{2}(\overrightarrow{\mathrm{AB}}+\overrightarrow{\mathrm{AC}})$, 则 $\overrightarrow{\mathrm{AB}} \overrightarrow{\mathrm{AC}}$ 的 夹角为 ______
+answer: 90^{\circ}
+answer_kind: expr
+solution: |-
+  解：在圆中若 $\overrightarrow{\mathrm{AO}}=\frac{1}{2}(\overrightarrow{\mathrm{AB}}+\overrightarrow{\mathrm{AC}})$,
+
+  即 $2 \overrightarrow{\mathrm{AO}}=\overrightarrow{\mathrm{AB}}+\overrightarrow{\mathrm{AC}}$,
+
+  即 $\overrightarrow{A B}+\overrightarrow{A C}$ 的和向量是过 $A$, $O$ 的直径,
+
+  则以 $A B, A C$ 为邻边的四边形是矩形,
+
+  则 $\overrightarrow{\mathrm{AB}} \perp \overrightarrow{\mathrm{AC}}$,
+
+  即 $\overrightarrow{\mathrm{AB}}$ 与 $\overrightarrow{\mathrm{AC}}$ 的夹角为 $90^{\circ}$,
+
+  故答案为: $90^{\circ}$

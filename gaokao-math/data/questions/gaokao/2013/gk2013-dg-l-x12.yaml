@@ -1,0 +1,16 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  func.symmetry: 0.41
+  func.parity: 0.35
+  trig.identities: 0.24
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)=\cos x \sin 2 x$, 下列结论中不正确的是 （$\qquad$）
+options:
+  A: $y=f(x)$ 的图象关于 $(\pi, 0)$ 中心对称
+  B: $y=f(x)$ 的图象关于 $x=\frac{\pi}{2}$ 对称
+  C: $f(x)$ 的最大值为 $\frac{\sqrt{3}}{2}$
+  D: $f(x)$ 既是奇函数, 又是周期函数
+answer: C

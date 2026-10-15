@@ -1,0 +1,24 @@
+type: single
+source: 2019 全国III卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '双曲线 $C: \frac{x^{2}}{4}-\frac{y^{2}}{2}=1$ 的右焦点为 $F$, 点 $P$ 在 $C$ 的一条渐近线上, $O$ 为坐标原点, 若 $|P O|=|P F|$, 则 $\triangle P F O$ 的面积为'
+options:
+  A: $\frac{3 \sqrt{2}}{4}$
+  B: $\frac{3 \sqrt{2}}{2}$
+  C: $\frac{\mathrm{x}_{1}}{\mathrm{x}_{2}}$
+  D: $3 \sqrt{2}$
+answer: A
+solution: |-
+  【详解】由 $a=2, b=\sqrt{2}, c=\sqrt{a^{2}+b^{2}}=\sqrt{6}$ ．
+
+  $$
+  \because|P O|=|P F|, \therefore x_{P}=\frac{\sqrt{6}}{2}
+  $$
+
+  又 $P$ 在 $C$ 的一条渐近线上, 不妨设为在 $y=\frac{b}{a} x$ 上,
+
+  $\therefore S_{\triangle P F O}=\frac{1}{2}|O F| \cdot\left|y_{P}\right|=\frac{1}{2} \times \sqrt{6} \times \frac{\sqrt{3}}{2}=\frac{3 \sqrt{2}}{4}$, 故选 A.

@@ -1,0 +1,26 @@
+type: fill
+source: 2016 全国I卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  circle.line: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '设直线 $y=x+2 a$ 与圆 $C: x^{2}+y^{2}-2 a y-2=0$ 相交于 $A, B$ 两点, 若 $|A B|=2$ $\sqrt{3}$, 则圆 $C$ 的面积为 ______'
+answer: 4 \pi
+answer_kind: expr
+solution: |-
+  解: 圆 $C: x^{2}+y^{2}-2 a y-2=0$ 的圆心坐标为 $(0, a)$, 半径为 $\sqrt{a^{2}+2}$,
+
+  $\because$ 直线 $y=x+2 a$ 与圆 $C: x^{2}+y^{2}-2 a y-2=0$ 相交于 $A, B$ 两点, 且 $|A B|=2 \sqrt{3}$,
+
+  $\therefore$ 圆心 $(0, a)$ 到直线 $\mathrm{y}=\mathrm{x}+2 \mathrm{a}$ 的距离 $\mathrm{d}=\frac{|\mathrm{a}|}{\sqrt{2}}$,
+
+  即 $\frac{a^{2}}{2}+3=a^{2}+2$,
+
+  解得: $a^{2}=2$,
+
+  故圆的半径 $r=2$.
+
+  故圆的面积 $S=4 \pi$,
+
+  故答案为: $4 \pi$

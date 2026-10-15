@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国III卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  trig.definition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $2 \tan \theta-\tan \left(\theta+\frac{\pi}{4}\right)=7$, 则 $\tan \theta=(\quad)$
+options:
+  A: '-2'
+  B: '-1'
+  C: '1'
+  D: '2'
+answer: D
+solution: |-
+  【详解】 $\because 2 \tan \theta-\tan \left(\theta+\frac{\pi}{4}\right)=7, \therefore 2 \tan \theta-\frac{\tan \theta+1}{1-\tan \theta}=7$,
+
+  令 $t=\tan \theta, t \neq 1$, 则 $2 t-\frac{1+t}{1-t}=7$, 整理得 $t^{2}-4 t+4=0$, 解得 $t=2$, 即 $\tan \theta=2$.
+
+  故选: D.

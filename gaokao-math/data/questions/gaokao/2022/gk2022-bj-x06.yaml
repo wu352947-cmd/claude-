@@ -1,0 +1,15 @@
+type: single
+source: 2022 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  tri.range: 0.5
+  vec.dot: 0.5
+difficulty_label: 中档
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $A C=3, B C=4, \angle C=90^{\circ} . P$ 为 $\triangle A B C$ 所在平面内的动点, 且 $P C=1$, 则 $\overrightarrow{P A} \cdot \overrightarrow{P B}$ 的取值范围是 ($\quad$)
+options:
+  A: $[-5,3]$
+  B: $[-3,5]$
+  C: $[-6,4]$
+  D: $[-4,6]$
+answer: D

@@ -1,0 +1,16 @@
+type: fill
+source: 2017 全国III卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(-2,3), \vec{b}=(3, m)$, 且 $\vec{a} \perp \vec{b}$, 则 $m=$ ______
+answer: '2'
+answer_kind: expr
+solution: |-
+  解: $\because$ 向量 $\vec{a}=(-2,3), \vec{b}=(3, m)$, 且 $\vec{a} \perp \vec{b}$, $\therefore \vec{a} \cdot \vec{b}=-6+3 m=0$
+
+  解得 $m=2$.
+
+  故答案为: 2 .

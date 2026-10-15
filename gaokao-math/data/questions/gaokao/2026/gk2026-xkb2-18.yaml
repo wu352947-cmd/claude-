@@ -1,0 +1,25 @@
+type: solve
+source: 2026 新课标II卷 第 18 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  conic.eccentricity: 0.41
+  func.symmetry: 0.29
+  conic.chord: 0.29
+difficulty_label: 较难
+stem: |-
+  已知椭圆$E:\dfrac{x^2}{a^2}+y^2=1(a>1)$，过椭圆焦点作垂直于$x$轴的直线，截椭圆所得弦长为$\sqrt{2}$.
+  (1)求椭圆$E$的离心率；
+  (2)设点$A(x_0,y_0)$在椭圆$E$上且$y_0 \neq 0$，过$A$作$y$轴的垂线，垂足为$B$，点$M(t,0)$，$t>0$，连接$BM$，$AO$，两直线交于点$P$，点$P$的轨迹记为$M$.
+  (i)求轨迹$M$的方程；
+  (ii)当$t$取何值时，轨迹$M$存在对称中心？并将该曲线平移得到曲线$M'$，使坐标原点$O$为$M'$的对称中心，判断$M'$是什么曲线？
+parts:
+- label: (1)
+  points: 7
+  answer: $\dfrac{\sqrt{2}}{2}$
+- label: (2)
+  points: 10.0
+  answer: (i)$\dfrac{t^2-2}{2t^2}x^2+y^2+\dfrac{2}{t}x-1=0(y\neq 0,t>0)$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $\dfrac{\sqrt{2}}{2}$；(2) (i)$\dfrac{t^2-2}{2t^2}x^2+y^2+\dfrac{2}{t}x-1=0(y\neq 0,t>0)$

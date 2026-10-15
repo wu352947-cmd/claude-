@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  trig.transform: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 为了得到函数 $y=\sin \left(2 x-\frac{\pi}{3}\right)$ 的图象, 只需把函数 $y=\sin \left(2 x+\frac{\pi}{6}\right)$ 的图象 ($\qquad$)
+options:
+  A: 向左平移 $\frac{\pi}{4}$ 个长度单位
+  B: 向右平移 $\frac{\pi}{4}$ 个长度单位
+  C: 向左平移 $\frac{\pi}{2}$ 个长度单位
+  D: 向右平移 $\frac{\pi}{2}$ 个长度单位
+answer: B

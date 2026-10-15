@@ -1,0 +1,10 @@
+type: fill
+source: 2010 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $\left(x-\frac{a}{x}\right){ }^{9}$ 的展开式中 $x^{3}$ 的系数是 -84 , 则 $a=\underline{\qquad}$.
+answer: '1'
+answer_kind: expr

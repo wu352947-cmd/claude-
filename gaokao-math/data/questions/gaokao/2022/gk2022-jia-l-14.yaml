@@ -1,0 +1,21 @@
+type: fill
+source: 2022 全国甲卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: |-
+  若双曲线 $y^{2}-\frac{x^{2}}{m^{2}}=1(m>0)$ 的渐近线与圆 $x^{2}+y^{2}-4 y+3=0$ 相切, 则
+
+  $m=$ ______
+answer: \frac{\sqrt{3}}{3}
+answer_kind: expr
+solution: |-
+  【详解】解: 双曲线 $y^{2}-\frac{x^{2}}{m^{2}}=1(m>0)$ 的渐近线为 $y= \pm \frac{x}{m}$, 即 $x \pm m y=0$,
+
+  不妨取 $x+m y=0$, 圆 $x^{2}+y^{2}-4 y+3=0$, 即 $x^{2}+(y-2)^{2}=1$, 所以圆心为 $(0,2)$, 半 径 $r=1$, 依题意圆心 $(0,2)$ 到渐近线 $x+m y=0$ 的距离 $d=\frac{|2 m|}{\sqrt{1+m^{2}}}=1$,
+
+  解得 $m=\frac{\sqrt{3}}{3}$ 或 $m=-\frac{\sqrt{3}}{3}$ (舍去).
+
+  故答案为: $\frac{\sqrt{3}}{3}$.

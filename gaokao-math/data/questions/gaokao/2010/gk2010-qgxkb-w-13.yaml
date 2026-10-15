@@ -1,0 +1,14 @@
+type: fill
+source: 2010 全国新课标卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  circle.line: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 圆心在原点上与直线 $x+y-2=0$ 相切的圆的方程为 ______
+answer: x^{2}+y^{2}=2
+answer_kind: equation
+solution: |-
+  解: 圆心到直线的距离: $r=\frac{2}{\sqrt{2}}=\sqrt{2}$, 所求圆的方程为 $x^{2}+y^{2}=2$.
+
+  故答案为: $x^{2}+y^{2}=2$

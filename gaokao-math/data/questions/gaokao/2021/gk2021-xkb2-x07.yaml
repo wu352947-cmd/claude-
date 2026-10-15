@@ -1,0 +1,15 @@
+type: single
+source: 2021 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  func.parity: 0.63
+  func.domain_range: 0.37
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)$ 的定义域为 $\mathbf{R}, f(x+2)$ 为偶函数, $f(2 x+1)$ 为奇函数, 则 ($\quad$)
+options:
+  A: $f\left(-\frac{1}{2}\right)=0$
+  B: $f(-1)=0$
+  C: $f(2)=0$
+  D: $f(4)=0$
+answer: B

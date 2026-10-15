@@ -1,0 +1,14 @@
+type: single
+source: 2009 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2009
+kps:
+  solid.position: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知正四棱柱 $A B C D-A_{1} B_{1} C_{1} D_{1}$ 中, $A A_{1}=2 A B, E$ 为 $A A_{1}$ 中点, 则异 面直线 $\mathrm{BE}$ 与 $\mathrm{CD}_{1}$ 所形成角的余弦值为（$\qquad$）
+options:
+  A: $\frac{\sqrt{10}}{10}$
+  B: $\frac{1}{5}$
+  C: $\frac{3 \sqrt{10}}{10}$
+  D: $\frac{3}{5}$
+answer: C

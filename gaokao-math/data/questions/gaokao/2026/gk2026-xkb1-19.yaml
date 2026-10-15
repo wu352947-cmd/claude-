@@ -1,0 +1,29 @@
+type: solve
+source: 2026 新课标I卷 第 19 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  deriv.construct: 0.43
+  func.parity: 0.31
+  func.domain_range: 0.26
+difficulty_label: 压轴
+stem: |-
+  已知函数$f(x)$的定义域为$R$，且当$x<0$时，$f(x)=2^x$，对任意$x_0\in R$，定义集合$D(x_0)=\{d\in R\mid f(x_0+d)>f(x_0)\}$。
+  (1) 若当$x\geqslant0$时，$f(x)=1-x$，求$D(-1)$；
+  (2) 若$f(x)$是奇函数，$f(x_1)\leqslant f(x_2)$，且$x_1x_2\neq0$，证明：$D(x_2)\subseteq D(x_1)$；
+  (3) 设$f(x)$满足：$\textcircled1$ 若$f(x_1)\leqslant f(x_2)$，则$D(x_2)\subseteq D(x_1)$；$\textcircled2$ 当$0<x<1$时，$f(x)<f(0)$。
+  (i) 证明：$f(0)\geqslant1$；
+  (ii) 证明：$f(x)$在区间$(0,+\infty)$单调递增。
+parts:
+- label: (1)
+  points: 5
+  answer: $D(-1)=\left\{d\in R\,\big|\,0<d<\dfrac{3}{2}\right\}$
+- label: (2)
+  points: 5
+  answer: （证明题）
+- label: (3)
+  points: 7.0
+  answer: （证明题）
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $D(-1)=\left\{d\in R\,\big|\,0<d<\dfrac{3}{2}\right\}$；(2) 证明题答案略；(3) (i)证明题答案略

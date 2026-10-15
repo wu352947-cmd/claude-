@@ -1,0 +1,43 @@
+type: solve
+source: 2019 全国II卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+stem: |-
+  已知 $F_{1}, F_{2}$ 是椭圆 $C: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的两个焦点, $P$ 为 $C$ 上一点, $O$ 为坐标原点.
+
+  (1) 若 $\bigvee P O F_{2}$ 为等边三角形, 求 $C$ 的离心率;
+
+  (2)如果存在点 $P$, 使得 $P F_{1} \perp P F_{2}$, 且 $\triangle F_{1} P F_{2}$ 的面积等于 16 , 求 $b$ 的值和 $a$ 的 取值范围.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】(1) 连结 $P F_{1}$, 由 $\bigvee P O F_{2}$ 为等边三角形可知: 在 $\triangle F_{1} P F_{2}$ 中, $\angle F_{1} P F_{2}=90^{\circ}$, $\left|P F_{2}\right|=c,\left|P F_{1}\right|=\sqrt{3} c$
+
+  于是 $2 a=\left|P F_{1}\right|+\left|P F_{2}\right|=c+\sqrt{3} c$,
+
+  故椭圆 $C$ 的离心率为 $e=\frac{c}{a}=\frac{2}{1+\sqrt{3}}=\sqrt{3}-1$;
+
+  (2) 由题意可知, 满足条件的点 $P(x, y)$ 存在, 当且仅当 $\frac{1}{2}|y| \cdot 2 c=16, \frac{y}{x+c} \cdot \frac{y}{x-c}=-1$, $\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1$
+
+  即 $c|y|=16$
+
+  $$
+  x^{2}+y^{2}=c^{2}
+  $$
+
+  $\frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1$
+
+  由(2)(3)以 $a^{2}=b^{2}+c^{2}$ 得 $y^{2}=\frac{b^{4}}{c^{2}}$, 又由(1)知 $y^{2}=\frac{16^{2}}{c^{2}}$, 故 $b=4$;
+
+  由(2)(3)得 $x^{2}=\frac{a^{2}}{c^{2}}\left(c^{2}-b^{2}\right)$, 所以 $c^{2} \geq b^{2}$, 从而 $a^{2}=b^{2}+c^{2} \geq 2 b^{2}=32$, 故 $a \geq 4 \sqrt{2}$;
+
+  当 $b=4, a \geq 4 \sqrt{2}$ 时, 存在满足条件的点 $P$.
+
+  故 $b=4, a$ 的取值范围为 $[4 \sqrt{2},+\infty)$.

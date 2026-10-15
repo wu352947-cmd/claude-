@@ -1,0 +1,14 @@
+type: single
+source: 2020 北京卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  conic.parabola: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设抛物线的顶点为 $O$, 焦点为 $F$, 准线为 $l . P$ 是抛物线上异于 $O$ 的一点, 过 $P$ 作 $P Q \perp l$ 于 $Q$, 则线段 $F Q$ 的垂直平分线 ($\quad$).
+options:
+  A: 经过点 $O$
+  B: 经过点 $P$
+  C: 平行于直线 $O P$
+  D: 垂直于直线 $O P$
+answer: B

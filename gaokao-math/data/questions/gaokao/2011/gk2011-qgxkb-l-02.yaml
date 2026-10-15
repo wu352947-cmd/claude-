@@ -1,0 +1,24 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 下列函数中, 既是偶函数又在 $(0,+\infty)$ 上单调递增的函数是 $(\quad)$
+options:
+  A: $y=2 x^{3}$
+  B: $y=|x|+1$
+  C: $y=-x^{2}+4$
+  D: $y=2^{-\mid x}$
+answer: B
+solution: |-
+  解：对于 $A . y=2 x^{3}$, 由 $f(-x)=-2 x^{3}=-f(x)$, 为奇函数, 故排除 $A$
+
+  对于 B. $y=|x|+1$, 由 $f(-x)=|-x|+1=f(x)$, 为偶函数, 当 $x>0$ 时, $y=x+1$, 是增函数，故 B 正确;
+
+  对于 $C . y=-x^{2}+4$, 有 $f(-x)=f(x)$, 是偶函数, 但 $x>0$ 时为减函数, 故排 除 C;
+
+  对于 D. $y=2^{-|x|}$, 有 $f(-x)=f(x)$, 是偶函数, 当 $x>0$ 时, $y=2^{-x}$, 为减函数 ，故排除 D.
+
+  故选: B.
