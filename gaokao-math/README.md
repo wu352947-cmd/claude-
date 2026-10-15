@@ -30,6 +30,12 @@ uv run python -m tools.import_user_docs 2025:xkb1=/路径/2025新1卷解析版.d
 
 需要 [uv](https://docs.astral.sh/uv/)（会自动装好合适版本的 Python）和 Node.js 22+。Windows、macOS、Linux 都可以。
 
+### 最省事的用法：双击启动
+
+压缩包里已带好构建好的网页，不需要 Node.js。Windows 双击 `start.bat`，Mac/Linux 双击（或终端运行）`start.command`：第一次会自动安装 uv 和依赖，然后自动打开浏览器；以后同样双击即可。关掉黑色窗口就是退出。
+
+从源码构建（改了前端代码时）：
+
 ```bash
 # 1. 构建前端（只在前端代码有改动时需要）
 cd web
