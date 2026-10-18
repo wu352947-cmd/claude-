@@ -1,0 +1,24 @@
+type: single
+source: 2017 全国I卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $A=\{x \mid x<1\}, B=\left\{x \mid 3^{x}<1\right\}$, 则（）
+options:
+  A: $A \cap B=\{x \mid x<0\}$
+  B: $A \cup B=R$
+  C: $\mathrm{A} \cup \mathrm{B}=\{\mathrm{x} \mid \mathrm{x}>1\}$
+  D: $A \cap B=\varnothing$
+answer: A
+solution: |-
+  解: $\because$ 集合 $A=\{x \mid x<1\}$,
+
+  $B=\left\{x \mid 3^{x}<1\right\}=\{x \mid x<0\}$
+
+  $\therefore A \cap B=\{x \mid x<0\}$, 故 $A$ 正确, $D$ 错误;
+
+  $A \cup B=\{x \mid x<1\}$, 故 $B$ 和 $C$ 都错误.
+
+  故选: A.

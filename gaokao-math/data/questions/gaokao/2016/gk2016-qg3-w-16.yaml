@@ -1,0 +1,25 @@
+type: fill
+source: 2016 全国III卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  func.parity: 0.55
+  deriv.tangent: 0.45
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $f(x)$ 为偶函数, 当 $x \leqslant 0$ 时, $f(x)=e^{-x-1}-x$, 则曲线 $y=f$ $(x)$ 在点 $(1,2)$ 处的切线方程是 ______
+answer: y=2 x
+answer_kind: equation
+solution: |-
+  解: 已知 $f(x)$ 为偶函数, 当 $x \leqslant 0$ 时, $f(x)=e^{-x-1}-x$,
+
+  设 $x>0$, 则 $-x<0$,
+
+  $\therefore f(x)=f(-x)=e^{x-1}+x$
+
+  则 $f^{\prime}(x)=e^{x-1}+1$, $f^{\prime}(1)=e^{0}+1=2$
+
+  $\therefore$ 曲线 $y=f(x)$ 在点 $(1,2)$ 处的切线方程是 $y-2=2(x-1)$.
+
+  即 $y=2 x$.
+
+  故答案为: $y=2 x$.

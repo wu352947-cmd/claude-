@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $z=2-i$, 则 $z(\bar{z}+\mathrm{i})=(\quad)$
+options:
+  A: $6-2 \mathrm{i}$
+  B: $4-2 \mathrm{i}$
+  C: $6+2 i$
+  D: $4+2 i$
+answer: C

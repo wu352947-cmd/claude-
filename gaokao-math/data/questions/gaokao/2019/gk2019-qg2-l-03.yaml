@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国II卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\overrightarrow{A B}=(2,3), \overrightarrow{A C}=(3, t), \overrightarrow{B C}=1$, 则 $\overrightarrow{A B} \cdot \overrightarrow{B C}=$
+options:
+  A: '-3'
+  B: '-2'
+  C: '2'
+  D: '3'
+answer: C
+solution: 【详解】由 $\overrightarrow{B C}=\overrightarrow{A C}-\overrightarrow{A B}=(1, t-3),|\overrightarrow{B C}|=\sqrt{1^{2}+(t-3)^{2}}=1$, 得 $t=3$, 则 $\overrightarrow{B C}=(1,0)$, $\overrightarrow{A B} \cdot \overrightarrow{B C}=(2,3) \cdot(1,0)=2 \times 1+3 \times 0=2$. 故选 C.

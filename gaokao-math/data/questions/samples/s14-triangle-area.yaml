@@ -1,0 +1,36 @@
+type: solve
+source: 示例题（原创）
+kps: {tri.laws: 3, trig.identities: 1}
+difficulty_label: 中档
+est_seconds: 600
+stem: |
+  在 $\triangle ABC$ 中，内角 $A,B,C$ 所对的边分别为 $a,b,c$，已知 $b\cos C+c\cos B=2a\cos A$。
+
+  (1) 求 $A$；
+
+  (2) 若 $a=\sqrt{7}$，$\triangle ABC$ 的面积为 $\dfrac{3\sqrt{3}}{2}$，求 $b+c$。
+parts:
+  - label: (1)
+    points: 6
+    answer: '$A=\dfrac{\pi}{3}$'
+    rubric:
+      - 正弦定理边化角，得到 $\sin(B+C)=2\sin A\cos A$（3 分）
+      - 由 $\sin A\neq 0$ 得 $\cos A=\dfrac{1}{2}$，$A=\dfrac{\pi}{3}$（3 分）
+  - label: (2)
+    points: 7
+    answer: '$b+c=5$'
+    rubric:
+      - 由面积公式得 $bc=6$（2 分）
+      - 余弦定理 $a^2=(b+c)^2-3bc$（3 分）
+      - 解得 $b+c=5$（2 分）
+hints:
+  - 第 (1) 问：用正弦定理把边化成角，$\sin B\cos C+\sin C\cos B$ 是什么？
+  - 第 (2) 问：先由面积求 $bc$，再把余弦定理写成含 $b+c$ 与 $bc$ 的形式。
+solution: |
+  (1) 由正弦定理，$\sin B\cos C+\sin C\cos B=2\sin A\cos A$，即 $\sin(B+C)=2\sin A\cos A$。
+  因为 $B+C=\pi-A$，所以 $\sin A=2\sin A\cos A$。又 $\sin A\neq 0$，所以 $\cos A=\dfrac{1}{2}$。
+  因为 $0<A<\pi$，所以 $A=\dfrac{\pi}{3}$。
+
+  (2) $S=\dfrac{1}{2}bc\sin A=\dfrac{\sqrt{3}}{4}bc=\dfrac{3\sqrt{3}}{2}$，所以 $bc=6$。
+  由余弦定理，$a^2=b^2+c^2-2bc\cos A=(b+c)^2-3bc$，即 $7=(b+c)^2-18$，
+  所以 $(b+c)^2=25$，$b+c=5$。

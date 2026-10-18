@@ -1,0 +1,24 @@
+type: single
+source: 2016 全国III卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  expo.compare: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $a=2^{\frac{4}{3}}, b=3^{\frac{2}{3}}, c=25^{\frac{1}{3}}$, 则 ( )
+options:
+  A: $b<a<c$
+  B: $a<b<c$
+  C: $\mathrm{b}<\mathrm{c}<\mathrm{a}$
+  D: $c<a<b$
+answer: A
+solution: |-
+  解: $\because a=2^{\frac{4}{3}}=4^{\frac{2}{3}}$,
+
+  $b=3^{\frac{2}{3}}$
+
+  $\mathrm{C}=25^{\frac{1}{3}}=5^{\frac{2}{3}}$
+
+  综上可得： $b<a<c$,
+
+  故选: A.

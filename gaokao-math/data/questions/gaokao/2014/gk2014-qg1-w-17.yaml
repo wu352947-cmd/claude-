@@ -1,0 +1,32 @@
+type: solve
+source: 2014 全国I卷（文科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  seq.arith: 0.56
+  seq.sum_dislocation: 0.44
+difficulty_label: 中档
+stem: |-
+  已知 $\left\{a_{n}\right\}$ 是递增的等差数列, $a_{2}, a_{4}$ 是方程 $x^{2}-5 x+6=0$ 的根.
+
+  （1）求 $\left\{a_{n}\right\}$ 的通项公式;
+
+  (2) 求数列 $\left\{\frac{a_{n}}{2^{n}}\right\}$ 的前 $\mathrm{n}$ 项和.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) 方程 $x^{2}-5 x+6=0$ 的根为 2,3 . 又 $\left\{a_{n}\right\}$ 是递增的等差数列, 故 $a_{2}=2, a_{4}=3$, 可得 $2 d=1, d=\frac{1}{2}$,
+
+  故 $a_{n}=2+(n-2) \times \frac{1}{2}=\frac{1}{2} n+1$, (2) 设数列 $\left\{\frac{a_{n}}{2^{n}}\right\}$ 的前 $\mathrm{n}$ 项和为 $S_{n}$,
+
+  $S_{n}=\frac{a_{1}}{2^{1}}+\frac{a_{2}}{2^{2}}+\frac{a_{3}}{2^{3}}+\cdots+\frac{a_{n-1}}{2^{n-1}}+\frac{a_{n}}{2^{n}}$
+
+  $\frac{1}{2} S_{n}=\frac{a_{1}}{2^{2}}+\frac{a_{2}}{2^{3}}+\frac{a_{3}}{2^{4}}+\cdots+\frac{a_{n-1}}{2^{n}}+\frac{a_{n}}{2^{n+1}}$
+
+  (1)- (2)得 $\frac{1}{2} S_{n}=\frac{a_{1}}{2}+d\left(\frac{1}{2^{2}}+\frac{1}{2^{3}}+\frac{1}{2^{4}}+\cdots+\frac{1}{2^{n}}\right)-\frac{a_{n}}{2^{n+1}}=\frac{\frac{3}{2}}{2}+\frac{1}{2} \times \frac{\frac{1}{4}\left(1-\frac{1}{2^{n-1}}\right)}{1-\frac{1}{2}}-\frac{a_{n}}{2^{n+1}}$,
+
+  解得 $S_{n}=\frac{3}{2}+\frac{1}{2}\left(1-\frac{1}{2^{n-1}}\right)-\frac{n+2}{2^{n+1}}=2-\frac{n+4}{2^{n+1}}$.

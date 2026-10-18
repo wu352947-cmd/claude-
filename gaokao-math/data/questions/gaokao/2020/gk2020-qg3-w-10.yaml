@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国III卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.compare: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $a=\log _{3} 2, b=\log _{5} 3, c=\frac{2}{3}$, 则 $(\quad)$
+options:
+  A: $a<c<b$
+  B: $a<b<c$
+  C: $b<c<a$
+  D: $c<a<b$
+answer: A
+solution: |-
+  【详解】因为 $a=\frac{1}{3} \log _{3} 2^{3}<\frac{1}{3} \log _{3} 9=\frac{2}{3}=c, b=\frac{1}{3} \log _{5} 3^{3}>\frac{1}{3} \log _{5} 25=\frac{2}{3}=c$,
+
+  所以 $a<c<b$.
+
+  故选: A
+
+  【点晴】本题考查对数式大小的比较, 考查学生转化与回归的思想, 是一道中档题.

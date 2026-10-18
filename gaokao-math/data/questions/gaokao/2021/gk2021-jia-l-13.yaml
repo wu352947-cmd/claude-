@@ -1,0 +1,18 @@
+type: fill
+source: 2021 全国甲卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 曲线 $y=\frac{2 x-1}{x+2}$ 在点 $(-1,-3)$ 处的切线方程为 ______
+answer: 5 x-y+2=0
+answer_kind: equation
+solution: |-
+  【详解】由题, 当 $x=-1$ 时, $y=-3$, 故点在曲线上.
+
+  求导得: $y^{\prime}=\frac{2(x+2)-(2 x-1)}{(x+2)^{2}}=\frac{5}{(x+2)^{2}}$, 所以 $\left.y^{\prime}\right|_{x=-1}=5$.
+
+  故切线方程为 $5 x-y+2=0$.
+
+  故答案为: $5 x-y+2=0$.

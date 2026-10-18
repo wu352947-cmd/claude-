@@ -1,0 +1,15 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  complex.geometry: 0.6
+  complex.arith: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 在复平面内, 复数 $z$ 满足 $(1-i) z=2$, 则 $z=(\quad)$
+options:
+  A: $2+i$
+  B: $2-i$
+  C: $1-i$
+  D: $1+i$
+answer: D

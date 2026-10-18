@@ -1,0 +1,37 @@
+type: solve
+source: 2012 全国新课标卷 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2012
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  已知 $a, b, c$ 分别为 $\triangle A B C$ 三个内角 $A, B, C$ 的对边, $c=\sqrt{3} a \sin C-\cos A$.
+
+  (1) 求 $A$;
+
+  (2) 若 $a=2, \triangle A B C$ 的面积为 $\sqrt{3}$, 求 $b, c$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) $\mathrm{c}=\sqrt{3} a \operatorname{asin} \mathrm{C}-\mathrm{ccos} \mathrm{A}$, 由正弦定理有:
+
+  $\sqrt{3} \sin A \sin C-\sin C \cos A-\sin C=0$, 即 $\sin C \cdot(\sqrt{3} \sin A-\cos A-1)=0$,
+
+  又, $\sin C \neq 0$,
+
+  所以 $\sqrt{3} \sin A-\cos A-1=0$, 即 $2 \sin \left(A-\frac{\pi}{6}\right)=1$,
+
+  所以 $A=\frac{\pi}{3}$;
+
+  (2) $\mathrm{S}_{\triangle \mathrm{ABC}}=\frac{1}{2} b c \sin A=\sqrt{3}$, 所以 $b c=4$,
+
+  $a=2$, 由余弦定理得: $a^{2}=b^{2}+c^{2}-2 b c \cos A$, 即 $4=b^{2}+c^{2}-b c$,
+
+  即有 $\left\{\begin{array}{l}b c=4 \\ b^{2}+c^{2}-b c=4\end{array}\right.$ ，
+
+  解得 $b=c=2$.

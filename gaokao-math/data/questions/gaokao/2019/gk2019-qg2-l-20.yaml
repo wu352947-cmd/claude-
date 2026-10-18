@@ -1,0 +1,41 @@
+type: solve
+source: 2019 全国II卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  deriv.monotonic: 0.36
+  deriv.tangent: 0.34
+  deriv.zeros: 0.3
+difficulty_label: 较难
+stem: |-
+  已知函数 $f(x)=\ln x-\frac{x+1}{x-1}$.
+
+  (1) 讨论 $f(x)$ 的单调性, 并证明 $f(x)$ 有且仅有两个零点;
+
+  (2) 设 $x_{0}$ 是 $f(x)$ 的一个零点, 证明曲线 $y=\ln x$ 在点 $A\left(x_{0}, \ln x_{0}\right)$ 处的切线也是曲线 $y=\mathrm{e}^{x}$ 的切线.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】(1) 函数 $f(x)$ 的定义域为 $(0,1) \cup(1,+\infty)$,
+
+  $f(x)=\ln x-\frac{x+1}{x-1} \Rightarrow f^{\prime}(x)=\frac{x^{2}+1}{x(x-1)^{2}}$, 因为函数 $f(x)$ 的定义域为 $(0,1) \cup(1,+\infty)$, 所以 $f^{\prime}(x)>0$, 因此函数 $f(x)$ 在 $(0,1)$ 和 $(1,+\infty)$ 上是单调增函数;
+
+  当 $x \in(0,1)$, 时, $x \rightarrow 0, y \rightarrow-\infty$, 而 $f\left(\frac{1}{e}\right)=\ln \frac{1}{e}-\frac{\frac{1}{e}+1}{\frac{1}{e}-1}=\frac{2}{e-1}>0$, 显然当 $x \in(0,1)$, 函数 $f(x)$ 有零点, 而函数 $f(x)$ 在 $x \in(0,1)$ 上单调递增, 故当 $x \in(0,1)$ 时, 函数 $f(x)$ 有唯一 的零点;
+
+  当 $x \in(1,+\infty)$ 时, $f(e)=\ln e-\frac{e+1}{e-1}=\frac{-2}{e-1}<0, f\left(e^{2}\right)=\ln e^{2}-\frac{e^{2}+1}{e^{2}-1}=\frac{e^{2}-3}{e^{2}-1}>0$, 因为 $f(e) \cdot f\left(e^{2}\right)<0$, 所以函数 $f(x)$ 在 $\left(e, e^{2}\right)$ 必有一零点, 而函数 $f(x)$ 在 $(1,+\infty)$ 上是单 调递增, 故当 $x \in(1,+\infty)$ 时, 函数 $f(x)$ 有唯一的零点
+
+  综上所述, 函数 $f(x)$ 的定义域 $(0,1) \cup(1,+\infty)$ 内有 2 个零点;
+
+  (2) 因为 $x_{0}$ 是 $f(x)$ 的一个零点, 所以 $f\left(x_{0}\right)=\ln x_{0}-\frac{x_{0}+1}{x_{0}-1}=0 \Rightarrow \ln x_{0}=\frac{x_{0}+1}{x_{0}-1}$
+
+  $y=\ln x \Rightarrow y^{\prime}=\frac{1}{x}$, 所以曲线 $y=\ln x$ 在 $\mathrm{A}\left(x_{0}, \ln x_{0}\right)$ 处的切线 $l$ 的斜率 $k=\frac{1}{x_{0}}$, 故曲线 $y=\ln x$ 在 $\mathrm{A}\left(x_{0}, \ln x_{0}\right)$ 处的切线 $l$ 的方程为: $y-\ln x_{0}=\frac{1}{x_{0}}\left(x-x_{0}\right)$ 而 $\ln x_{0}=\frac{x_{0}+1}{x_{0}-1}$, 所以 $l$ 的方程为 $y=\frac{x}{x_{0}}+\frac{2}{x_{0}-1}$, 它在纵轴的截距为 $\frac{2}{x_{0}-1}$.
+
+  设曲线 $y=e^{x}$ 的切点为 $B\left(x_{1}, e^{x_{1}}\right)$, 过切点为 $B\left(x_{1}, e^{x_{1}}\right)$ 切线 $l^{\prime}, y=e^{x} \Rightarrow y^{\prime}=e^{x}$, 所以在 $B\left(x_{1}, e^{x_{1}}\right)$ 处的切线 $l^{\prime}$ 的斜率为 $e^{x_{1}}$, 因此切线 $l^{\prime}$ 的方程为 $y=e^{x_{1}} x+e^{x_{1}}\left(1-x_{1}\right)$,
+
+  当切线 $l^{\prime}$ 的斜率 $k_{1}=e^{x_{1}}$ 等于直线 $l$ 的斜率 $k=\frac{1}{x_{0}}$ 时, 即 $e^{x_{1}}=\frac{1}{x_{0}} \Rightarrow x_{1}=-\left(\ln x_{0}\right)$,
+
+  切线 $l^{\prime}$ 在纵轴的截距为 $b_{1}=e^{x_{1}}\left(1-x_{1}\right)=e^{-\ln x_{0}}\left(1+\ln x_{0}\right)=\frac{1}{x_{0}}\left(1+\ln x_{0}\right)$, 而 $\ln x_{0}=\frac{x_{0}+1}{x_{0}-1}$, 所以 $b_{1}=\frac{1}{x_{0}}\left(1+\frac{x_{0}+1}{x_{0}-1}\right)=\frac{2}{x_{0}-1}$, 直线 $l, l^{\prime}$ 的斜率相等, 在纵轴上的截距也相等, 因此直线 $l, l^{\prime}$ 重合, 故曲线 $y=\ln x$ 在 $\mathrm{A}\left(x_{0}, \ln x_{0}\right)$ 处的切线也是曲线 $y=e^{x}$ 的切线.

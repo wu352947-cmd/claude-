@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  ineq.quadratic: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 不等式 $\frac{x^{2}-x-6}{x-1}>0$ 的解集为 ($\qquad$)
+options:
+  A: $\{x \mid x<-2$, 或 $x>3\}$
+  B: $\{x \mid x<-2$, 或 $1<x<3\}$
+  C: $\{x \mid-2<x<1$, 或 $x>3\}$
+  D: $\{x \mid-2<x<1$, 或 $1<x<3\}$
+answer: C

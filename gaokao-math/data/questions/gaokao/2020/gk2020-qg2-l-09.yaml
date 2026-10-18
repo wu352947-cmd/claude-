@@ -1,0 +1,32 @@
+type: single
+source: 2020 全国II卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  func.parity: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设函数 $f(x)=\ln |2 x+1-| \ln |2 x-1|$, 则 $f(x)(\quad)$
+options:
+  A: 是偶函数, 且在 $\left(\frac{1}{2},+\infty\right)$ 单调递增
+  B: 是奇函数, 且在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 单调递减
+  C: 是偶函数, 且在 $\left(-\infty,-\frac{1}{2}\right)$ 单调递增
+  D: 是奇函数, 且在 $\left(-\infty,-\frac{1}{2}\right)$ 单调递减
+answer: D
+solution: |-
+  【详解】由 $f(x)=\ln |2 x+1|-\ln |2 x-1|$ 得 $f(x)$ 定义域为 $\left\{x \mid x \neq \pm \frac{1}{2}\right\}$, 关于坐标原点对称,
+
+  又 $f(-x)=\ln |1-2 x|-\ln |-2 x-1|=\ln |2 x-1|-\ln |2 x+1|=-f(x)$,
+
+  $\therefore f(x)$ 为定义域上的奇函数，可排除 $\mathrm{AC}$;
+
+  当 $x \in\left(-\frac{1}{2}, \frac{1}{2}\right)$ 时, $f(x)=\ln (2 x+1)-\ln (1-2 x)$,
+
+  $\mathrm{Q} y=\ln (2 x+1)$ 在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 上单调递增, $y=\ln (1-2 x)$ 在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 上单调递减,
+
+  $\therefore f(x)$ 在 $\left(-\frac{1}{2}, \frac{1}{2}\right)$ 上单调递增，排除 $\mathrm{B}$;
+
+  当 $x \in\left(-\infty,-\frac{1}{2}\right)$ 时, $f(x)=\ln (-2 x-1)-\ln (1-2 x)=\ln \frac{2 x+1}{2 x-1}=\ln \left(1+\frac{2}{2 x-1}\right)$,
+
+  $\because \mu=1+\frac{2}{2 x-1}$ 在 $\left(-\infty,-\frac{1}{2}\right)$ 上单调递减, $f(\mu)=\ln \mu$ 在定义域内单调递增,
+
+  根据复合函数单调性可知: $f(x)$ 在 $\left(-\infty,-\frac{1}{2}\right)$ 上单调递减, D正确. 故选: D.

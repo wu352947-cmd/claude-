@@ -1,0 +1,15 @@
+type: single
+source: 2021 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  conic.parabola: 0.57
+  conic.eccentricity: 0.43
+difficulty_label: 中档
+points: 5.0
+stem: 已知双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1(a>0, b>0)$ 的右焦点与抛物线 $y^{2}=2 p x(p>0)$ 的焦点重 合, 抛物线的准线交双曲线于 $A, B$ 两点, 交双曲线的渐近线于 $C 、 D$ 两点, 若 $|C D|=\sqrt{2}|A B|$. 则双曲线的离心率为 ($\quad$)
+options:
+  A: $\sqrt{2}$
+  B: $\sqrt{3}$
+  C: $2$
+  D: $3$
+answer: A

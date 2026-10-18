@@ -1,0 +1,15 @@
+type: single
+source: 2022 全国乙卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  conic.eccentricity: 0.62
+  deriv.tangent: 0.38
+difficulty_label: 较难
+points: 5.0
+stem: 双曲线 $C$ 的两个焦点为 $F_{1}, F_{2}$, 以 $C$ 的实轴为直径的圆记为 $D$, 过 $F_{1}$ 作 $D$ 的切线与 $C$ 的两支交于 $M, N$ 两点, 且 $\cos \angle F_{1} N F_{2}=\frac{3}{5}$, 则 $C$ 的离心率为 ($\quad$)
+options:
+  A: $\frac{\sqrt{5}}{2}$
+  B: $\frac{3}{2}$
+  C: $\frac{\sqrt{13}}{2}$
+  D: $\frac{\sqrt{17}}{2}$
+answer: D

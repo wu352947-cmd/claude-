@@ -1,0 +1,14 @@
+type: single
+source: 2021 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  expo.compare: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $a=\log _{2} 0.3, b=\log _{\frac{1}{2}} 0.4, c=0.4^{0.3}$, 则 $a, b, c$ 的大小关系为 ($\quad$)
+options:
+  A: $a<b<c$
+  B: $c<a<b$
+  C: $b<c<a$
+  D: $a<c<b$
+answer: D

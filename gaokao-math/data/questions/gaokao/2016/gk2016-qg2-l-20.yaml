@@ -1,0 +1,63 @@
+type: solve
+source: 2016 全国II卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 较难
+stem: |-
+  已知椭圆 $E: \frac{x^{2}}{t}+\frac{y^{2}}{3}=1$ 的焦点在 $x$ 轴上, $A$ 是 $E$ 的左顶点, 斜率 为 $k(k>0)$ 的直线交 $E$ 于 $A, M$ 两点, 点 $N$ 在 $E$ 上, $M A \perp N A$.
+
+  （I ) 当 $t=4,|A M|=|A N|$ 时, 求 $\triangle A M N$ 的面积;
+
+  （II）当 $2|\mathrm{AM}|=|\mathrm{AN}|$ 时, 求 $\mathrm{k}$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 方法一、 $\mathrm{t}=4$ 时, 椭圆 $\mathrm{E}$ 的方程为 $\frac{x^{2}}{4}+\frac{y^{2}}{3}=1, A(-2,0)$
+
+  直线 $A M$ 的方程为 $y=k(x+2)$, 代入椭圆方程, 整理可得 $\left(3+4 k^{2}\right)$
+
+  $$
+  x^{2}+16 k^{2} x+16 k^{2}-12=0
+  $$
+
+  解得 $x=-2$ 或 $x=-\frac{8 k^{2}-6}{3+4 k^{2}}$, 则 $|A M|=\sqrt{1+k^{2}} \cdot\left|2-\frac{8 k^{2}-6}{3+4 k^{2}}\right|=\sqrt{1+k^{2}} \cdot \frac{12}{3+4 k^{2}}$,
+
+  由 $A N \perp A M$, 可得 $|A N|=\sqrt{1+\left(-\frac{1}{k}\right)^{2}} \cdot \frac{12}{3+4 \cdot\left(\frac{-1}{k}\right)^{2}}=\sqrt{1+k^{2}} \cdot \frac{12}{3|k|+\frac{4}{|k|}}$,
+
+  由 $|\mathrm{AM}|=|\mathrm{AN}|, \mathrm{k}>0$, 可得 $\sqrt{1+k^{2}} \cdot \frac{12}{3+4 k^{2}}=\sqrt{1+k^{2}} \cdot \frac{12}{3 k+\frac{4}{k}}$,
+
+  整理可得 $(k-1)\left(4 k^{2}+k+4\right)=0$, 由 $4 k^{2}+k+4=0$ 无实根, 可得 $k=1$, 即有 $\triangle A M N$ 的面积为 $\frac{1}{2}|A M|^{2}=\frac{1}{2}\left(\sqrt{1+1} \cdot \frac{12}{3+4}\right){ }^{2}=\frac{144}{49}$;
+
+  方法二、由 $|A M|=|A N|$, 可得 $M, N$ 关于 $x$ 轴对称,
+
+  由 $M A \perp N A$. 可得直线 $A M$ 的斜率为 1 , 直线 $A M$ 的方程为 $y=x+2$,
+
+  代入椭圆方程 $\frac{x^{2}}{4}+\frac{y^{2}}{3}=1$, 可得 $7 x^{2}+16 x+4=0$,
+
+  解得 $x=-2$ 或 $-\frac{2}{7}, M\left(-\frac{2}{7}, \frac{12}{7}\right), N\left(-\frac{2}{7},-\frac{12}{7}\right)$,
+
+  则 $\triangle A M N$ 的面积为 $\frac{1}{2} \times \frac{24}{7} \times\left(-\frac{2}{7}+2\right)=\frac{144}{49}$;
+
+  ( II ) 直线 AM 的方程为 $y=k(x+\sqrt{t})$, 代入陏圆方程,
+
+  可得 $\left(3+t k^{2}\right) x^{2}+2 t \sqrt{t} k^{2} x+t^{2} k^{2}-3 t=0$,
+
+  解得 $x=-\sqrt{t}$ 或 $x=-\frac{t \sqrt{t} k^{2}-3 \sqrt{t}}{3+t k^{2}}$,
+
+  即有 $|A M|=\sqrt{1+k^{2}} \cdot\left|\frac{t \sqrt{t} k^{2}-3 \sqrt{t}}{3+t k^{2}}-\sqrt{t}\right|=\sqrt{1+k^{2}} \cdot \frac{6 \sqrt{t}}{3+t k^{2}}$,
+
+  $|\mathrm{AN}|=\sqrt{1+\frac{1}{\mathrm{k}^{2}}} \cdot \frac{6 \sqrt{t}}{3+\frac{t}{k^{2}}}=\sqrt{1+\mathrm{k}^{2}} \cdot \frac{6 \sqrt{t}}{3 \mathrm{k}+\frac{\mathrm{t}}{\mathrm{k}}}$,
+
+  由 $2|A M|=|A N|$, 可得 $2 \sqrt{1+k^{2}} \cdot \frac{6 \sqrt{t}}{3+k^{2}}=\sqrt{1+k^{2}} \cdot \frac{6 \sqrt{t}}{3 k+\frac{t}{k}}$,
+
+  整理得 $\mathrm{t}=\frac{6 \mathrm{k}^{2}-3 \mathrm{k}}{\mathrm{k}^{3}-2}$,
+
+  由椭圆的焦点在 $x$ 轴上, 则 $\mathrm{t}>3$, 即有 $\frac{6 k^{2}-3 k}{k^{3}-2}>3$, 即有 $\frac{\left(k^{2}+1\right)(k-2)}{k^{3}-2}<0$,
+
+  可得 $\sqrt[3]{2}<k<2$, 即 $k$ 的取值范围是 $(\sqrt[3]{2}, 2)$.

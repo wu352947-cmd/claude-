@@ -1,0 +1,14 @@
+type: single
+source: 2021 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  solid.measure: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 正四棱台的上、下底面的边长分别为 2,4 , 侧棱长为 2 , 则其体积为 ($\quad$)
+options:
+  A: $20+12 \sqrt{3}$
+  B: $28 \sqrt{2}$
+  C: $\frac{56}{3}$
+  D: $\frac{28 \sqrt{2}}{3}$
+answer: D

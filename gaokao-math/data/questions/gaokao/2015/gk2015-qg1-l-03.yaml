@@ -1,0 +1,18 @@
+type: single
+source: 2015 全国I卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  logic.quantifier: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '设命题 $p: \exists n \in N, n^{2}>2^{n}$, 则 $p$ 为 $(\quad)$'
+options:
+  A: $\forall n \in N, n^{2}>2^{n}$
+  B: $\exists n \in N, n^{2} \leqslant 2^{n}$
+  C: $\forall n \in N, n^{2} \leqslant 2^{n}$
+  D: $\exists n \in N, n^{2}=2^{n}$
+answer: C
+solution: |-
+  解: 命题的否定是: $\forall n \in N, n^{2} \leqslant 2^{n}$,
+
+  故选: C.

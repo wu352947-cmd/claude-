@@ -1,0 +1,27 @@
+type: solve
+source: 2026 天津卷 第 16 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  trig.graph: 0.41
+  func.symmetry: 0.29
+  deriv.extremum: 0.29
+difficulty_label: 中档
+stem: |-
+  已知 $f(x) = \sin(2x + \frac{\pi}{6})$。
+      (1) 求最小正周期；
+      (2) 若 $x \in [-\frac{\pi}{6}, \frac{\pi}{12}]$，求 $f(x)$ 的最大值和最小值；
+      (3) 若 $\alpha \in (0, \frac{\pi}{2})$，$\sin\alpha = \frac{\sqrt{3}}{3}$，求 $f(\alpha)$。
+parts:
+- label: (1)
+  points: 5.0
+  answer: $T = \pi$
+- label: (2)
+  points: 5.0
+  answer: 最大值 $\frac{\sqrt{3}}{2}$
+- label: (3)
+  points: 5.0
+  answer: 最小值 $-\frac{1}{2}$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) $T = \pi$；(2) 最大值 $\frac{\sqrt{3}}{2}$；(3) 最小值 $-\frac{1}{2}$

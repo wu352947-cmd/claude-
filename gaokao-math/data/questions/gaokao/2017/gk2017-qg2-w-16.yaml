@@ -1,0 +1,24 @@
+type: fill
+source: 2017 全国II卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  tri.laws: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 若 $2 b \cos B=a \cos C+\cos A$ , 则 $B=$ ______
+answer: \frac{\pi}{3}
+answer_kind: expr
+solution: |-
+  解: $\because 2 \mathrm{b} \cos \mathrm{B}=\mathrm{a} \cos \mathrm{C}+\cos \mathrm{A}$, 由正弦定理可得,
+
+  $2 \cos B \sin B=\sin A \cos C+\sin C \cos A=\sin (A+C)=\sin B$,
+
+  $\because \sin \mathrm{B} \neq 0$,
+
+  $\therefore \cos B=\frac{1}{2}$,
+
+  $\because 0<\mathrm{B}<\pi$
+
+  $\therefore B=\frac{\pi}{3}$
+
+  故答案为: $\frac{\pi}{3}$

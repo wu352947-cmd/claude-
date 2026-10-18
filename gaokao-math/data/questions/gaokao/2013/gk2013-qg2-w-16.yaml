@@ -1,0 +1,19 @@
+type: fill
+source: 2013 全国II卷（文科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  trig.transform: 0.54
+  trig.graph: 0.46
+difficulty_label: 较难
+points: 4.0
+stem: 函数 $y=\cos (2 x+\phi) \quad(-\pi \leqslant \phi<\pi)$ 的图象向右平移 $\frac{\pi}{2}$ 个单位后, 与函数 $y=\sin \left(2 x+\frac{\pi}{3}\right)$ 的图象重合, 则 $\phi=$ ______
+answer: \frac{5 \pi}{6}
+answer_kind: expr
+solution: |-
+  解: 函数 $y=\cos (2 x+\phi) \quad(-\pi \leqslant \phi<\pi)$ 的图象向右平移 $\frac{\pi}{2}$ 个单位后, 得平移后的图象的函数解析式为 $y=\cos \left[2\left(x-\frac{\pi}{2}\right)+\phi\right]=\cos (2 x+\phi-\pi)$, 而函数 $y=\sin \left(2 x+\frac{\pi}{3}\right)=\cos \left(2 x+\frac{\pi}{3}-\frac{\pi}{2}\right)$,
+
+  由函数 $y=\cos (2 x+\phi) \quad(-\pi \leqslant \phi<\pi)$ 的图象向右平移 $\frac{\pi}{2}$ 个单位后, 与函数 $y=\sin$ $\left(2 x+\frac{\pi}{3}\right)$ 的图象重合, 得 $2 x+\phi-\pi=2 x+\frac{\pi}{3}-\frac{\pi}{2}$, 解得: $\phi=\frac{5 \pi}{6}$.
+
+  符合 $-\pi \leqslant \phi<\pi$.
+
+  故答案为: $\frac{5 \pi}{6}$.

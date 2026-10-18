@@ -1,0 +1,22 @@
+type: single
+source: 2010 全国新课标卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 中心在原点, 焦点在 $\mathrm{x}$ 轴上的双曲线的一条渐近线经过点 $(4,2)$, 则它的离心率为 $(\quad)$
+options:
+  A: $\sqrt{6}$
+  B: $\sqrt{5}$
+  C: $\frac{\sqrt{6}}{2}$
+  D: $\frac{\sqrt{5}}{2}$
+answer: D
+solution: |-
+  解: $\because$ 渐近线的方程是 $y= \pm \frac{b}{a} x$,
+
+  $\therefore 2=\frac{b}{a} \bullet 4, \frac{b}{a}=\frac{1}{2}, \quad a=2 b$,
+
+  $c=\sqrt{a^{2}+b^{2}}=\frac{\sqrt{5}}{2} a, \quad e=\frac{c}{a}=\frac{\sqrt{5}}{2}$ 即它的离心率为 $\frac{\sqrt{5}}{2}$.
+
+  故选: D.

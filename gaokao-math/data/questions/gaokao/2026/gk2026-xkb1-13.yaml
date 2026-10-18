@@ -1,0 +1,18 @@
+type: solve
+source: 2026 新课标I卷 第 13 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  func.parity: 0.6
+  trig.graph: 0.4
+difficulty_label: 中档
+stem: 已知$f(x)=2\sin(ax+\theta)\ (a\in Z,0\leqslant\theta<2\pi)$是偶函数，$f(x)$在区间$\left(0,\dfrac{\pi}{2}\right)$单调递增，则$\theta=$______，$f\left(\dfrac{2\pi}{3}\right)=$______。
+parts:
+- label: 答案
+  points: 5.0
+  answer: $\dfrac{3\pi}{2}$；1
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $\dfrac{3\pi}{2}$；1

@@ -1,0 +1,10 @@
+type: fill
+source: 2008 全国II卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设曲线 $y=e^{a x}$ 在点 $(0,1)$ 处的切线与直线 $x+2 y+1=0$ 垂直, 则 $ a=\underline{\qquad}$.
+answer: '2'
+answer_kind: expr

@@ -1,0 +1,10 @@
+type: fill
+source: 2026 天津卷 第 12 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 在 $\triangle ABC$ 中，$BC = 4$，$AC = 3$，$\cos A = -\frac{1}{4}$，则 $\sin B =$ ______。
+answer: \frac{3\sqrt{15}}{16}
+answer_kind: expr

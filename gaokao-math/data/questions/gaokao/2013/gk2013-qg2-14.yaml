@@ -1,0 +1,14 @@
+type: fill
+source: 2013 全国II卷 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 4.0
+stem: 已知正方形 $A B C D$ 的边长为 $2, E$ 为 $C D$ 的中点, 则 $\overrightarrow{\mathrm{AE}} \cdot \overrightarrow{\mathrm{BD}}=$ ______
+answer: '2'
+answer_kind: expr
+solution: |-
+  解: $\because$ 已知正方形 $\mathrm{ABCD}$ 的边长为 $2, E$ 为 $C D$ 的中点, 则 $\overrightarrow{\mathrm{AB}} \cdot \overrightarrow{\mathrm{AD}}=0$, 故 $\overrightarrow{\mathrm{AE}} \cdot \overrightarrow{\mathrm{BD}}=(\overrightarrow{\mathrm{AD}}+\overrightarrow{\mathrm{DE}}) \cdot(\overrightarrow{\mathrm{BA}}+\overrightarrow{\mathrm{AD}})=\left(\overrightarrow{\mathrm{AD}}+\frac{1}{2} \overrightarrow{\mathrm{AB}}\right) \cdot(\overrightarrow{\mathrm{AD}}-\overrightarrow{\mathrm{AB}})=\overrightarrow{\mathrm{AD}}^{2}-\overrightarrow{\mathrm{AD}} \cdot \overrightarrow{\mathrm{AB}}+$ $\frac{1}{2} \overrightarrow{\mathrm{AB}} \cdot \overrightarrow{\mathrm{AD}}^{-}-\frac{1}{2} \overrightarrow{\mathrm{AB}}^{2}=4+0-0-\frac{1}{2} \times 4=2$,
+
+  故答案为: 2 .

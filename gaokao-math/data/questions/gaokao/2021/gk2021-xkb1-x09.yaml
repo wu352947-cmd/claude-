@@ -1,0 +1,16 @@
+type: multi
+source: 2021 新课标I卷 多选题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  stat.sample: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 有一组样本数据 $x_{1}, x_{2}, \ldots, x_{n}$, 由这组数据得到新样本数据 $y_{1}, y_{2}, \ldots, y_{n}$, 其中 $y_{i}=x_{i}+c(i=1,2, \cdots, n), c$ 为非零常数, 则 ($\quad$)
+options:
+  A: 两组样本数据的样本平均数相同
+  B: 两组样本数据的样本中位数相同
+  C: 两组样本数据的样本标准差相同
+  D: 两组样数据的样本极差相同
+answer:
+- C
+- D

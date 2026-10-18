@@ -1,0 +1,16 @@
+type: single
+source: 2019 全国III卷 第 8 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2019
+kps:
+  solid.position: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 如图, 点 $N$ 为正方形 $A B C D$ 的中心, $\triangle E C D$ 为正三角形, 平面 $E C D \perp$ 平面 $A B C D, M$ 是线段 $E D$ 的中点, 则 ( )
+figure: 0f1e0c152fb648de.png
+options:
+  A: $B M=E N$, 且直线 $B M, E N$ 是相交直线
+  B: $B M \neq E N$, 且直线 $B M, E N$ 是相交直线
+  C: $B M=E N$, 且直线 $B M, E N$ 是异面直线
+  D: $B M \neq E N$, 且直线 $B M, E N$ 是异面直线
+answer: B
+solution: 【详解】 $\because \triangle B D E, N$ 为 $B D$ 中点 $M$ 为 $D E$ 中点, $\therefore B M, E N$ 共面相交, 选项 C, D 为错. 作 $E O \perp C D$ 于 $O$, 连接 $O N$, 过 $M$ 作 $M F \perp O D$ 于 $F$.连 $B F, \because$ 平面 $C D E \perp$ 平面 $A B C D$.$E O \perp C D, E O \subset$ 平面 $C D E, \therefore E O \perp$ 平面 $A B C D, M F \perp$ 平面 $A B C E$,$\therefore \triangle M F B$ 与 $\triangle E O N$ 均为直角三角形.设正方形边长为 2 , 易知 $E O=\sqrt{3}, 0 N=1 \quad E N=2$,$$M F=\frac{\sqrt{3}}{2}, \quad B F=\sqrt{2^2+\frac{9}{4}}=\frac{5}{2} \quad \therefore \quad B M=\sqrt{\frac{3}{4}+\frac{24}{4}}=\sqrt{7} .$$$\therefore B M \neq E N$, 故选 B.

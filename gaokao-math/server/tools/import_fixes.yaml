@@ -1,0 +1,23 @@
+# 导入后人工修正：数据集里答案或文字有误、并且已经人工验算过的题。
+# 键是题目 id；值里的字段会覆盖导入结果（options 只覆盖列出的选项）。
+gk2021-xkb1-x10:
+  # 选项 A、C 的下标在数据集里识别错了（原题：|OP1|=|OP2|；OA·OP3=OP1·OP2），答案 AC 对应原题
+  options:
+    A: '$|\overrightarrow{O P_{1}}|=|\overrightarrow{O P_{2}}|$'
+    C: '$\overrightarrow{O A} \cdot \overrightarrow{O P_{3}}=\overrightarrow{O P_{1}} \cdot \overrightarrow{O P_{2}}$'
+gk2021-xkb2-x08:
+  # 2021 新高考 II 卷第 9 题是多选题：标准差和极差都度量离散程度
+  type: multi
+  answer: [A, C]
+gk2022-xkb1-x04:
+  # 2~8 中不互质的数对：偶数之间 C(4,2)=6 对，再加 (3,6)，共 7 对；互质概率 (21-7)/21 = 2/3
+  answer: D
+gk2022-xkb1-x10:
+  options:
+    D: '直线 $y=2 x$ 是曲线 $y=f(x)$ 的切线'
+gk2022-xkb2-x01:
+  stem: '已知集合 $A=\{-1,1,2,4\}, B=\{x \mid |x-1| \leq 1\}$, 则 $A \cap B=(\quad)$'
+gk2026-xkb1-14:
+  # 数据集把同一个值的两种写法当成了两个答案
+  answer: '\sqrt[3]{\dfrac{3}{2}}'
+  answer_kind: expr

@@ -1,0 +1,24 @@
+type: single
+source: 2020 全国III卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  trig.definition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\sin \theta+\sin \left(\theta+\frac{\pi}{3}\right)=1$, 则 $\sin \left(\theta+\frac{\pi}{6}\right)=(\quad)$
+options:
+  A: $\frac{1}{2}$
+  B: $\frac{\sqrt{3}}{3}$
+  C: $\frac{2}{3}$
+  D: $\frac{\sqrt{2}}{2}$
+answer: B
+solution: |-
+  【详解】由题意可得： $\sin \theta+\frac{1}{2} \sin \theta+\frac{\sqrt{3}}{2} \cos \theta=1$,
+
+  则: $\frac{3}{2} \sin \theta+\frac{\sqrt{3}}{2} \cos \theta=1, \frac{\sqrt{3}}{2} \sin \theta+\frac{1}{2} \cos \theta=\frac{\sqrt{3}}{3}$,
+
+  从而有: $\sin \theta \cos \frac{\pi}{6}+\cos \theta \sin \frac{\pi}{6}=\frac{\sqrt{3}}{3}$,
+
+  即 $\sin \left(\theta+\frac{\pi}{6}\right)=\frac{\sqrt{3}}{3}$.
+
+  故选: B.

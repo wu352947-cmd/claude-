@@ -1,0 +1,27 @@
+type: fill
+source: 2020 全国II卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  complex.arith: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设复数 $z_{1}, z_{2}$ 满足 $\left|z_{1}\right|=\left|z_{2}\right|=2, z_{1}+z_{2}=\sqrt{3}+\mathrm{i}$, 则 $\left|z_{1}-z_{2}\right|=$ ______
+answer: 2 \sqrt{3}
+answer_kind: expr
+solution: |-
+  【详解】 $\because\left|z_{1}\right|=\left|z_{2}\right|=2$, 可设 $z_{1}=2 \cos \theta+2 \sin \theta \cdot i, z_{2}=2 \cos \alpha+2 \sin \alpha \cdot i$,
+
+  $\therefore z_{1}+z_{2}=2(\cos \theta+\cos \alpha)+2(\sin \theta+\sin \alpha) \cdot i=\sqrt{3}+i$,
+
+  $\therefore\left\{\begin{array}{l}2(\cos \theta+\cos \alpha)=\sqrt{3} \\ 2(\sin \theta+\sin \alpha)=1\end{array}\right.$, 两式平方作和得: $4(2+2 \cos \theta \cos \alpha+2 \sin \theta \sin \alpha)=4$,
+
+  化简得: $\cos \theta \cos \alpha+\sin \theta \sin \alpha=-\frac{1}{2}$
+
+  $$
+  \begin{aligned}
+  & \therefore\left|z_{1}-z_{2}\right|=|2(\cos \theta-\cos \alpha)+2(\sin \theta-\sin \alpha) \cdot i| \\
+  & =\sqrt{4(\cos \theta-\cos \alpha)^{2}+4(\sin \theta-\sin \alpha)^{2}}=\sqrt{8-8(\cos \theta \cos \alpha+\sin \theta \sin \alpha)}=\sqrt{8+4}=2 \sqrt{3} .
+  \end{aligned}
+  $$
+
+  故答案为: $2 \sqrt{3}$.

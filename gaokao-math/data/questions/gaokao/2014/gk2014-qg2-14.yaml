@@ -1,0 +1,23 @@
+type: fill
+source: 2014 全国II卷 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  trig.graph: 0.6
+  deriv.extremum: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\sin (x+\phi)-2 \sin \phi \cos x$ 的最大值为 ______
+answer: '1'
+answer_kind: expr
+solution: |-
+  解：函数 $\mathrm{f}(\mathrm{x})=\sin (x+\phi)-2 \sin \phi \cos x$
+
+  $=\sin x \cos \phi+\sin \phi \cos x-2 \sin \phi \cos x$
+
+  $=\sin x \cos \phi-\sin \phi \cos x$
+
+  $=\sin (x-\phi) \leqslant 1$
+
+  所以函数的最大值为 1 .
+
+  故答案为: 1 .

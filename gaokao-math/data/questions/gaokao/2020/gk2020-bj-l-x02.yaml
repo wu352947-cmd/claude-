@@ -1,0 +1,14 @@
+type: single
+source: 2020 北京卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  complex.geometry: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 在复平面内, 复数 $z$ 对应的点的坐标是 $(1,2)$, 则 $i \cdot z=()$ ($\quad$).
+options:
+  A: $1+2 i$
+  B: $-2+i$
+  C: $1-2 i$
+  D: $-2-i$
+answer: B

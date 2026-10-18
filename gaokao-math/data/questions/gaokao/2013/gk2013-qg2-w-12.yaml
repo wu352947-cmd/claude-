@@ -1,0 +1,22 @@
+type: single
+source: 2013 全国II卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  func.monotonic: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若存在正数 $x$ 使 $2^{x}(x-a)<1$ 成立, 则 $a$ 的取值范围是（ $)$
+options:
+  A: $(-\infty,+\infty)$
+  B: $(-2,+\infty)$
+  C: $(0,+\infty)$
+  D: $(-1,+\infty)$
+answer: D
+solution: |-
+  解: 因为 $2^{x}(x-a)<1$, 所以 $a>x-\frac{1}{2^{x}}$,
+
+  函数 $y=x-\frac{1}{2^{x}}$ 是增函数, $x>0$, 所以 $y>-1$, 即 $a>-1$,
+
+  所以 $\mathrm{a}$ 的取值范围是 $(-1,+\infty)$.
+
+  故选: D.

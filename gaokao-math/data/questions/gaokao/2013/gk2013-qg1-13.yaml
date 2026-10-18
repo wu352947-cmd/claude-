@@ -1,0 +1,16 @@
+type: fill
+source: 2013 全国I卷 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  vec.projection: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知两个单位向量 $\vec{a}, \vec{b}$ 的夹角为 $60^{\circ}, \vec{c}=t \vec{a}+(1-t) \vec{b}$. 若 $\vec{b} \bullet \vec{c}=0$, 则 $t=$ ______
+answer: '2'
+answer_kind: expr
+solution: |-
+  解: $\because \vec{c}=t \vec{a}+(1-t) \vec{b}, \vec{c} \cdot \vec{b}=0, \quad \therefore \vec{c} \cdot \vec{b}=t \vec{a} \cdot \vec{b}+(1-t) \vec{b}^{2}=0$,
+
+  $\therefore \mathrm{t} \cos 60^{\circ}+1-t=0, \therefore 1-\frac{1}{2} t=0$, 解得 $t=2$.
+
+  故答案为: 2 .

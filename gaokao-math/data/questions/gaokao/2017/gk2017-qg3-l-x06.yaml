@@ -1,0 +1,14 @@
+type: single
+source: 2017 全国III卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2017
+kps:
+  solid.sphere: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知圆柱的高为 1 , 它的两个底面的圆周在直径为 2 的同一个球的球 面上，则该圆柱的体积为 ($\qquad$)
+options:
+  A: $\pi$
+  B: $\frac{3 \pi}{4}$
+  C: $\frac{\pi}{2}$
+  D: $\frac{\pi}{4}$
+answer: B

@@ -1,0 +1,15 @@
+type: single
+source: 示例题（原创）
+kps: [vec.dot]
+difficulty_label: 基础
+est_seconds: 60
+stem: |
+  已知向量 $\boldsymbol{a}=(1,2)$，$\boldsymbol{b}=(x,-1)$，若 $\boldsymbol{a}\perp\boldsymbol{b}$，则 $x=$
+options:
+  A: '$-2$'
+  B: '$-\dfrac{1}{2}$'
+  C: '$\dfrac{1}{2}$'
+  D: '$2$'
+answer: D
+solution: |
+  $\boldsymbol{a}\perp\boldsymbol{b} \iff \boldsymbol{a}\cdot\boldsymbol{b}=x-2=0$，所以 $x=2$，选 D。

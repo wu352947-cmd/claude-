@@ -1,0 +1,10 @@
+type: fill
+source: 示例题（原创）
+kps: {conic.eccentricity: 1, conic.ellipse: 1}
+difficulty_label: 基础
+est_seconds: 60
+stem: |
+  椭圆 $\dfrac{x^2}{4}+\dfrac{y^2}{3}=1$ 的离心率为 ______。
+answer: '\frac{1}{2}'
+solution: |
+  $a=2$，$b=\sqrt{3}$，$c=\sqrt{a^2-b^2}=1$，$e=\dfrac{c}{a}=\dfrac{1}{2}$。

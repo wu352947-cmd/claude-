@@ -1,0 +1,14 @@
+type: single
+source: 2014 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2014
+kps:
+  trig.definition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $\alpha \in\left(0, \frac{\pi}{2}\right), \beta \in\left(0, \frac{\pi}{2}\right)$, 且 $\tan \alpha=\frac{1+\sin \beta}{\cos \beta}$, 则 ($\qquad$)
+options:
+  A: $3 \alpha-\beta=\frac{\pi}{2}$
+  B: $3 \alpha+\beta=\frac{\pi}{2}$
+  C: $2 \alpha-\beta=\frac{\pi}{2}$
+  D: $2 \alpha+\beta=\frac{\pi}{2}$
+answer: C

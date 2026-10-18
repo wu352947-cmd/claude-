@@ -1,0 +1,14 @@
+# 根目录 .gitignore 会忽略所有 data/ 目录；题库是这个项目的源数据，要放行
+!/data/
+
+/var/
+server/.venv/
+server/**/__pycache__/
+server/.pytest_cache/
+web/node_modules/
+web/dist/
+.env
+# 没有附许可的数据集转换出的真题：只留在本机，不提交（见 server/tools/import_open_data.py）
+/data/questions/gaokao-local/
+# 用户自己提供的 Word 试卷（含第三方解析，不随代码公开）：tools/import_user_docs.py 在本机生成
+/data/questions/gaokao-user/

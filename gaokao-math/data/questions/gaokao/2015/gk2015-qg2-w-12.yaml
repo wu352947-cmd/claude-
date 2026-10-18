@@ -1,0 +1,35 @@
+type: single
+source: 2015 全国II卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  ineq.quadratic: 0.6
+  expo.ops: 0.4
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $f(x)=\ln (1+|x|)-\frac{1}{1+x^{2}}$, 则使得 $f(x)>f(2 x-1)$ 成 立的 $\mathrm{x}$ 的取值范围是 ( $)$
+options:
+  A: $\left(-\infty, \frac{1}{3}\right) \cup(1,+\infty)$
+  B: $\left(\frac{1}{3}, 1\right)$
+  C: $\left(-\frac{1}{3}, \frac{1}{3}\right)$
+  D: $\left(-\infty,-\frac{1}{3},\right) \cup\left(\frac{1}{3},+\infty\right)$
+answer: B
+solution: |-
+  解: $\because$ 函数 $\mathrm{f}(\mathrm{x})=\ln (1+|\mathrm{x}|)-\frac{1}{1+\mathrm{x}^{2}}$ 为偶函数,
+
+  且在 $x \geqslant 0$ 时, $f(x)=\ln (1+x)-\frac{1}{1+x^{2}}$,
+
+  导数为 $f^{\prime}(x)=\frac{1}{1+x}+\frac{2 x}{\left(1+x^{2}\right)^{2}}>0$,
+
+  即有函数 $f(x)$ 在 $[0,+\infty)$ 单调递增,
+
+  $\therefore f(x)>f(2 x-1)$ 等价为 $f(|x|)>f(|2 x-1|)$,
+
+  即 $|x|>|2 x-1|$,
+
+  平方得 $3 x^{2}-4 x+1<0$,
+
+  解得: $\frac{1}{3}<x<1$,
+
+  所求 $x$ 的取值范围是 $\left(\frac{1}{3}, 1\right)$.
+
+  故选: B.

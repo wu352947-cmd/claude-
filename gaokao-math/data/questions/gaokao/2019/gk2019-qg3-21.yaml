@@ -1,0 +1,37 @@
+type: solve
+source: 2019 全国III卷 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  deriv.tangent: 0.46
+  conic.chord: 0.28
+  conic.fixed: 0.26
+difficulty_label: 压轴
+stem: |-
+  已知曲线 $C: y=\frac{x^{2}}{2}, D$, 为直线 $y=-\frac{1}{2}$ 上的动点, 过 $D$ 作 $C$ 的两条切线, 切点分别为 $A, B$.
+
+  (1) 证明: 直线 $A B$ 过定点:
+
+  (2) 若以 $E\left(0, \frac{5}{2}\right)$ 为圆心的圆与直线 $A B$ 相切, 且切点为线段 $A B$ 的中点, 求该圆的方程.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【详解】(1)证明: 设 $D\left(t,-\frac{1}{2}\right), A\left(x_{1}, y_{1}\right)$, 则 $y_{1}=\frac{1}{2} x_{1}^{2}$ 。又因为 $y=\frac{1}{2} x^{2}$, 所以 $y^{\prime}=x$. 则切 线 DA 的斜率为 $x_{1}$, 故 $y_{1}+\frac{1}{2}=x_{1}\left(x_{1}-t\right)$, 整理得 $2 x_{1}-2 y_{1}+1=0$. 设 $B\left(x_{2}, y_{2}\right)$, 同理 得 $2 t x_{1}-2 y_{1}+1=0 . A\left(x_{1}, y_{1}\right), B\left(x_{2}, y_{2}\right)$ 都满足直线方程 $2 t x-2 y+1=0$. 于是直线 $2 t x-2 y+1=0$ 过点 $A, B$, 而两个不同的点确定一条直线, 所以直线 $A B$ 方程为 $2 t x-2 y+1=0$. 即 $2 t x+(-2 y+1)=0$, 当 $2 t=0,-2 y+1=0$ 时等式恒成立。所以直线 $A B$ 恒过定点 $\left(0, \frac{1}{2}\right)$. (2)由(1)得直线 $A B$ 方程为 $2 t x-2 y+1=0$, 和抛物线方程联立得:
+
+  $\left\{\begin{array}{l}2 t x-2 y+1=0 \\ y=\frac{1}{2} x^{2}\end{array}\right.$ 化简得 $x^{2}-2 t x-1=0$. 于是 $x_{1}+x_{2}=2 t, y_{1}+y_{2}=t\left(x_{1}+x_{2}\right)+1=2 t^{2}+1$
+
+  设 $M$ 为线段 $A B$ 的中点, 则 $M\left(t, t^{2}+\frac{1}{2}\right)$
+
+  由于 $\overrightarrow{E M} \perp \overrightarrow{A B}$, 而 $\overrightarrow{E M}=\left(t, t^{2}-2\right), \overrightarrow{A B}$ 与向量 $(1, t)$ 平行, 所以 $t+t\left(t^{2}-2\right)=0$,
+
+  解得 $t=0$ 或 $t= \pm 1$.
+
+  当 $t=0$ 时, $\overrightarrow{E M}=(0,-2),|\overrightarrow{E M}|=2$ 所求圆的方程为 $x^{2}+\left(y-\frac{5}{2}\right)^{2}=4$;
+
+  当 $t= \pm 1$ 时, $\overrightarrow{E M}=(1,-1)$ 或 $\overrightarrow{E M}=(-1,-1),|E M|=\sqrt{2}$ 所求圆的方程为 $x^{2}+\left(y-\frac{5}{2}\right)^{2}=2$.
+
+  所以圆的方程为 $x^{2}+\left(y-\frac{5}{2}\right)^{2}=4$ 或 $x^{2}+\left(y-\frac{5}{2}\right)^{2}=2$.

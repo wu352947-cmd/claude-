@@ -1,0 +1,17 @@
+type: single
+source: 2022 全国乙卷 第 8 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2022
+kps:
+  trig.graph: 0.56
+  func.graph: 0.44
+difficulty_label: 中档
+points: 5.0
+stem: 如图是下列四个函数中的某个函数在区间 $[-3,3]$ 的大致图像, 则该函数是 ()
+figure: 9dc345a8ac8738f3.png
+options:
+  A: $y=\frac{-x^3+3 x}{x^2+1}$
+  B: $y=\frac{x^3-x}{x^2+1}$
+  C: $y=\frac{2 x \cos x}{x^2+1}$
+  D: $y=\frac{2 \sin x}{x^2+1}$
+answer: A
+solution: '【详解】设 $f(x)=\frac{x^3-x}{x^2+1}$, 则 $f(1)=0$, 故排除 B;设 $h(x)=\frac{2 x \cos x}{x^2+1}$, 当 $x \in\left(0, \frac{\pi}{2}\right)$ 时, $0<\cos x<1$,所以 $h(x)=\frac{2 x \cos x}{x^2+1}<\frac{2 x}{x^2+1} \leq 1$, 故排除 C;设 $g(x)=\frac{2 \sin x}{x^2+1}$, 则 $g(3)=\frac{2 \sin 3}{10}>0$, 故排除 D.故选: A.'

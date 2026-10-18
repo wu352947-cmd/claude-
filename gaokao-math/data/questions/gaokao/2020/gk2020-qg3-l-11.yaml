@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国III卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '设双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1 \quad(a>0, b>0)$ 的左、右焦点分别为 $F_{1}, F_{2}$, 离心率为 $\sqrt{5} . P$ 是 $C$ 上一点, 且 $F_{1} P \perp F_{2} P$. 若 $\triangle P F_{1} F_{2}$ 的面积为 4 , 则 $a=(\quad)$'
+options:
+  A: '1'
+  B: '2'
+  C: '4'
+  D: '8'
+answer: A
+solution: |-
+  【详解】 $\because \frac{c}{a}=\sqrt{5}, \therefore c=\sqrt{5} a$ ，根据双曲线的定义可得 ||$P F_{1}|-| P F_{2} \|=2 a$ ，
+
+  $S_{\triangle P F_{1} F_{2}}=\frac{1}{2}\left|P F_{1}\right| \cdot\left|P F_{2}\right|=4$, 即 $\left|P F_{1}\right| \cdot\left|P F_{2}\right|=8$ ，
+
+  $\because F_{1} P \perp F_{2} P, \quad \therefore\left|P F_{1}\right|^{2}+\left|P F_{2}\right|^{2}=(2 c)^{2}$
+
+  $\therefore\left(\left|P F_{1}\right|-\left|P F_{2}\right|\right)^{2}+2\left|P F_{1}\right| \cdot\left|P F_{2}\right|=4 c^{2}$, 即 $a^{2}-5 a^{2}+4=0$, 解得 $a=1$, 故选: A.

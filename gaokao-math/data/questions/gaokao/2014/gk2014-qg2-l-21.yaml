@@ -1,0 +1,63 @@
+type: solve
+source: 2014 全国II卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  deriv.monotonic: 0.55
+  deriv.extremum: 0.45
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=e^{x}-e^{-x}-2 x$.
+
+  (I) 讨论 $f(x)$ 的单调性;
+
+  （II）设 $g(x)=f(2 x)-4 b f(x)$, 当 $x>0$ 时, $g(x)>0$, 求 $b$ 的最大值; (III) 已知 $1.4142<\sqrt{2}<1.4143$, 估计 $\ln 2$ 的近似值（精确到 0.001 ）.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 4
+  answer: ''
+- label: (3)
+  points: 4.0
+  answer: ''
+solution: |-
+  解: ( I ) 由 $f(x)$ 得 $f^{\prime}(x)=e^{x}+e^{-x}-2 \geqslant 2 \sqrt{e^{x} \cdot e^{-x}}-2=0$,
+
+  即 $f^{\prime}(x) \geqslant 0$, 当且仅当 $e^{x}=e^{-x}$ 即 $x=0$ 时, $f^{\prime}(x)=0$,
+
+  $\therefore$ 函数 $\mathrm{f}(\mathrm{x})$ 在 $\mathrm{R}$ 上为增函数.
+
+  ( II ) $g(x)=f(2 x)-4 b f(x)=e^{2 x}-e^{-2 x}-4 b\left(e^{x}-e^{-x}\right)+(8 b-4) x$,
+
+  则 $g^{\prime}(x)=2\left[e^{2 x}+e^{-2 x}-2 b\left(e^{x}+e^{-x}\right)+(4 b-2)\right]$
+
+  $=2\left[\left(e^{x}+e^{-x}\right)^{2}-2 b\left(e^{x}+e^{-x}\right)+(4 b-4)\right]$
+
+  $=2\left(e^{x}+e^{-x}-2\right)\left(e^{x}+e^{-x}+2-2 b\right)$.
+
+  (1) $\because e^{x}+e^{-x}>2, e^{x}+e^{-x}+2>4$,
+
+  $\therefore$ 当 $2 b \leqslant 4$, 即 $b \leqslant 2$ 时, $g^{\prime}(x) \geqslant 0$, 当且仅当 $x=0$ 时取等号,
+
+  从而 $\mathrm{g}(\mathrm{x})$ 在 $\mathrm{R}$ 上为增函数, 而 $\mathrm{g}(0)=0$,
+
+  $\therefore \mathrm{x}>0$ 时, $\mathrm{g}(\mathrm{x})>0$, 符合题意. (2) 当 $b>2$ 时, 若 $x$ 满 足 $2<e^{x+e^{-x}}<2 b-2$ 即 $\left\{\begin{array}{l}2<e^{x}+e^{-x} \\ e^{x}+e^{-x}<2 b-2\end{array}\right.$, 得 $\ln \left(b-1-\sqrt{b^{2}-2 b}\right)<x<\ln \left(b-1+\sqrt{b^{2}-2 b}\right)$, 此时, $g^{\prime}(x)<0$,
+
+  又由 $g(0)=0$ 知, 当 $0<x \leqslant \ln \left(b-1+\sqrt{b^{2}-2 b}\right)$ 时, $g(x)<0$, 不符合题意.
+
+  综合(1)、(2)知, $b \leqslant 2$, 得 $b$ 的最大值为 2 .
+
+  (III) $\because 1.4142<\sqrt{2}<1.4143$, 根据（II ) 中 $g(x)=e^{2 x}-e^{-2 x}-4 b\left(e^{x}-e^{-x}\right)$ $+(8 b-4) x$,
+
+  为了凑配 $\ln 2$, 并利用 $\sqrt{2}$ 的近似值, 故将 $\ln \sqrt{2}$ 即 $\frac{1}{2} \ln 2$ 代入 $g(x)$ 的解析式中, 得 $g(\ln \sqrt{2})=\frac{3}{2}-2 \sqrt{2} b+2(2 b-1) \ln 2$.
+
+  当 $b=2$ 时, 由 $g(x)>0$, 得 $g(\ln \sqrt{2})=\frac{3}{2}-4 \sqrt{2}+6 \ln 2>0$,
+
+  从而 $\ln 2>\frac{8 \sqrt{2}-3}{12}>\frac{8 \times 1.4142-3}{12}=0.6928$;
+
+  令 $\ln \left(b-1+\sqrt{b^{2}-2 b}\right)=\ln \sqrt{2}$, 得 $b=\frac{3 \sqrt{2}}{4}+1>2$, 当 $0<x \leqslant \ln \left(b-1+\sqrt{b^{2}-2 b}\right)$ 时,
+
+  由 $g(x)<0$, 得 $g(\ln \sqrt{2})=-\frac{3}{2}-2 \sqrt{2}+(3 \sqrt{2}+2) \ln 2<0$, 得 $\ln 2<\frac{18+\sqrt{2}}{28}<\frac{18+1.4143}{28}<0.6934$.
+
+  所以 $\ln 2$ 的近似值为 0.693 .

@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国I卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $\mathrm{z}=1+i$ ，则 $\left|\mathrm{z}^{2}-2 z\right|=(\quad)$
+options:
+  A: '0'
+  B: '1'
+  C: $\sqrt{2}$
+  D: '2'
+answer: D
+solution: |-
+  【详解】由题意可得: $z^{2}=(1+i)^{2}=2 i$, 则 $z^{2}-2 z=2 i-2(1+i)=-2$.
+
+  故 $\left|z^{2}-2 z\right|=|-2|=2$.
+
+  故选: D.

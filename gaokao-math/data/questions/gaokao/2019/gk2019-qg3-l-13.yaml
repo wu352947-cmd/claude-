@@ -1,0 +1,16 @@
+type: fill
+source: 2019 全国III卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $\boldsymbol{a}, \boldsymbol{b}$ 为单位向量, 且 $\boldsymbol{a} \cdot \boldsymbol{b}=0$, 若 $\boldsymbol{c}=2 \boldsymbol{a}-\sqrt{5} \boldsymbol{b}$, 则 $\cos \langle\vec{a}, \vec{c}\rangle=$ ______
+answer: \frac{2}{3}
+answer_kind: expr
+solution: |-
+  【详解】因为 $\vec{c}=2 \vec{a}-\sqrt{5} \vec{b}, \vec{a} \cdot \vec{b}=0$ ， 所以 $\vec{a} \cdot \vec{c}=2 \vec{a}^{2}-\sqrt{5} \vec{a} \cdot \vec{b}=2$ ，
+
+  $|\vec{c}|^{2}=4|\vec{a}|^{2}-4 \sqrt{5} \vec{a} \cdot \vec{b}+5|\vec{b}|^{2}=9$, 所以 $|\vec{c}|=3$
+
+  所以 $\cos \langle\vec{a}, \vec{c}\rangle=\frac{\vec{a} \cdot \vec{c}}{|\vec{a}| \cdot|\vec{c}|}=\frac{2}{1 \times 3}=\frac{2}{3}$.

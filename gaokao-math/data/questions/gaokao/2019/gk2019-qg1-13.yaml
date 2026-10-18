@@ -1,0 +1,16 @@
+type: fill
+source: 2019 全国I卷 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 曲线 $y=3\left(x^{2}+x\right) \mathrm{e}^{x}$ 在点 $(0,0)$ 处的切线方程为 ______
+answer: 3 x-y=0
+answer_kind: equation
+solution: |-
+  【详解】详解: $y^{\prime}=3(2 x+1) e^{x}+3\left(x^{2}+x\right) e^{x}=3\left(x^{2}+3 x+1\right) e^{x}$,
+
+  所以, $k=\left.y^{\prime}\right|_{x=0}=3$
+
+  所以, 曲线 $y=3\left(x^{2}+x\right) \mathrm{e}^{x}$ 在点 $(0,0)$ 处的切线方程为 $y=3 x$, 即 $3 x-y=0$.

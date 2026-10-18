@@ -1,0 +1,33 @@
+type: solve
+source: 2022 全国乙卷（文科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  circle.equation: 1.0
+difficulty_label: 中档
+stem: 过四点 $(0,0),(4,0),(-1,1),(4,2)$ 中的三点的一个圆的方程为
+parts:
+- label: 答案
+  points: 5.0
+  answer: $(x-2)^{2}+(y-3)^{2}=13$ 或 $(x-2)^{2}+(y-1)^{2}=5$ 或 $\left(x-\frac{4}{3}\right)^{2}+\left(y-\frac{7}{3}\right)^{2}=\frac{65}{9}$ 或 $\left(x-\frac{8}{5}\right)^{2}+(y-1)^{2}=\frac{169}{25}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  【详解】 解: 依题意设圆的方程为 $x^{2}+y^{2}+D x+E y+F=0$,
+
+  若过 $(0,0),(4,0), \quad(-1,1)$, 则 $\left\{\begin{array}{l}F=0 \\ 16+4 D+F=0 \\ 1+1-D+E+F=0\end{array}\right.$, 解得 $\left\{\begin{array}{l}F=0 \\ D=-4 \\ E=-6\end{array}\right.$,
+
+  所以圆的方程为 $x^{2}+y^{2}-4 x-6 y=0$, 即 $(x-2)^{2}+(y-3)^{2}=13$;
+
+  若过 $(0,0),(4,0),(4,2), \quad$ 则 $\left\{\begin{array}{l}F=0 \\ 16+4 D+F=0 \\ 16+4+4 D+2 E+F=0\end{array}\right.$ ，解得 $\left\{\begin{array}{l}F=0 \\ D=-4 \\ E=-2\end{array}\right.$,
+
+  所以圆的方程为 $x^{2}+y^{2}-4 x-2 y=0$, 即 $(x-2)^{2}+(y-1)^{2}=5$;
+
+  若过 $(0,0),(4,2), \quad(-1,1)$, 则 $\left\{\begin{array}{l}F=0 \\ 1+1-D+E+F=0 \\ 16+4+4 D+2 E+F=0\end{array}\right.$, 解得 $\left\{\begin{array}{l}F=0 \\ D=-\frac{8}{3} \\ E=-\frac{14}{3}\end{array}\right.$,
+
+  所以圆的方程为 $x^{2}+y^{2}-\frac{8}{3} x-\frac{14}{3} y=0$, 即 $\left(x-\frac{4}{3}\right)^{2}+\left(y-\frac{7}{3}\right)^{2}=\frac{65}{9}$;
+
+  若过 $(-1,1),(4,0),(4,2)$, 则 $\left\{\begin{array}{l}1+1-D+E+F=0 \\ 16+4 D+F=0 \\ 16+4+4 D+2 E+F=0\end{array}\right.$, 解得 $\left\{\begin{array}{l}F=-\frac{16}{5} \\ D=-\frac{16}{5} \text {, } \\ E=-2\end{array}\right.$
+
+  所以圆的方程为 $x^{2}+y^{2}-\frac{16}{5} x-2 y-\frac{16}{5}=0$, 即 $\left(x-\frac{8}{5}\right)^{2}+(y-1)^{2}=\frac{169}{25}$;
+
+  故答案为: $(x-2)^{2}+(y-3)^{2}=13$ 或 $(x-2)^{2}+(y-1)^{2}=5$ 或 $\left(x-\frac{4}{3}\right)^{2}+\left(y-\frac{7}{3}\right)^{2}=\frac{65}{9}$ 或 $\left(x-\frac{8}{5}\right)^{2}+(y-1)^{2}=\frac{169}{25}$ ；

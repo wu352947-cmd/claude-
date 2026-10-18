@@ -1,0 +1,16 @@
+type: single
+source: 2017 全国I卷 第 2 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2017
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 如图, 正方形 $A B C D$ 内的图形来自中国古代的太极图. 正方形内切圆中的黑色部分和白色部分关于正方形的中心成中心对称. 在正方形内随机取一点, 则此点取自黑色部分的概率是 ( )
+figure: 1baa8abcbf029f2d.png
+options:
+  A: $\frac{1}{4}$
+  B: $\frac{\pi}{8}$
+  C: $\frac{1}{2}$
+  D: $\frac{\pi}{4}$
+answer: B
+solution: '解：根据图象的对称性知, 黑色部分为圆面积的一半, 设圆的半径为 1 , 则正方形的边长为 2 ,则黑色部分的面积 $S=\frac{\pi}{2}$,则对应概率 $\mathrm{P}=\frac{\frac{\pi}{2}}{4}=\frac{\pi}{8}$,故选: B.'

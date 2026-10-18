@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国I卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '已知 $F$ 为双曲线 $C: x^{2}-m y^{2}=3 m(m>0)$ 的一个焦点, 则点 $F$ 到 $C$ 的一条渐近线的距离为（）'
+options:
+  A: $\sqrt{3}$
+  B: '3'
+  C: $\sqrt{3} m$
+  D: $3 m$
+answer: A
+solution: |-
+  解：双曲线 $c: x^{2}-m y^{2}=3 m(m>0)$ 可化为 $\frac{x^{2}}{3 m}-\frac{y^{2}}{3}=1$,
+
+  $\therefore$ 一个焦点为 $(\sqrt{3 \pi+3}, 0)$, 一条渐近线方程为 $x+\sqrt{m} y=0$,
+
+  $\therefore$ 点 $\mathrm{F}$ 到 $\mathrm{C}$ 的一条渐近线的距离为 $\frac{\sqrt{3 \pi+3}}{\sqrt{1+\mathrm{m}}}=\sqrt{3}$.
+
+  故选: $A$.

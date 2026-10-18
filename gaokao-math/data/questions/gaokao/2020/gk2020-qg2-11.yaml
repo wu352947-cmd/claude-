@@ -1,0 +1,30 @@
+type: single
+source: 2020 全国II卷 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  solid.sphere: 0.62
+  solid.vector: 0.38
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  已知 $\triangle A B C$ 是面积为 $\frac{9 \sqrt{3}}{4}$
+
+  的等边三角形, 且其顶点都在球 $O$ 的球面上. 若球 $O$ 的表面积为 $16 \pi$, 则 $O$ 到平面 $A B C$ 的距离为（）
+options:
+  A: $\sqrt{3}$
+  B: $\frac{3}{2}$
+  C: '1'
+  D: $\frac{\sqrt{3}}{2}$
+answer: C
+solution: |-
+  【详解】设球 $O$ 的半径为 $R$, 则 $4 \pi R^{2}=16 \pi$, 解得： $R=2$.
+
+  设 $\square A B C$ 外接圆半径为 $r$, 边长为 $a$,
+
+  $\because \square A B C$ 是面积为 $\frac{9 \sqrt{3}}{4}$ 的等边三角形,
+
+  $\therefore \frac{1}{2} a^{2} \times \frac{\sqrt{3}}{2}=\frac{9 \sqrt{3}}{4}$, 解得: $a=3, \therefore r=\frac{2}{3} \times \sqrt{a^{2}-\frac{a^{2}}{4}}=\frac{2}{3} \times \sqrt{9-\frac{9}{4}}=\sqrt{3}$,
+
+  $\therefore$ 球心 $O$ 到平面 $A B C$ 的距离 $d=\sqrt{R^{2}-r^{2}}=\sqrt{4-3}=1$.
+
+  故选: C.

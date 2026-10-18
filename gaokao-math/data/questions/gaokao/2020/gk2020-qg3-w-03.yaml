@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国III卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  stat.sample: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设一组样本数据 $x_{1}, x_{2}, \ldots, x_{n}$ 的方差为 0.01 , 则数据 $10 x_{1}, 10 x_{2}, \ldots, 10 x_{n}$ 的方差为 $($ )
+options:
+  A: '0.01'
+  B: '0.1'
+  C: '1'
+  D: '10'
+answer: C
+solution: |-
+  【详解】因为数据 $a x_{i}+b,(i=1,2, \mathrm{L}, n)$ 的方差是数据 $x_{i},(i=1,2, \mathrm{L}, n)$ 的方差的 $a^{2}$ 倍,
+
+  所以所求数据方差为 $10^{2} \times 0.01=1$
+
+  故选: C

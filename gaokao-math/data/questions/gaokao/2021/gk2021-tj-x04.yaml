@@ -1,0 +1,15 @@
+type: single
+source: 2021 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  solid.sphere: 0.63
+  solid.section: 0.37
+difficulty_label: 基础
+points: 5.0
+stem: '两个圆锥的底面是一个球的同一截面, 顶点均在球面上, 若球的体积为 $\frac{32 \pi}{3}$, 两个圆锥的高之比为 $1: 3$, 则这两个圆锥的体积之和为 ($\quad$)'
+options:
+  A: $3 \pi$
+  B: $4 \pi$
+  C: $9 \pi$
+  D: $12 \pi$
+answer: B

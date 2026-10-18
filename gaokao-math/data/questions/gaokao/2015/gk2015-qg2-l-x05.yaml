@@ -1,0 +1,14 @@
+type: single
+source: 2015 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2015
+kps:
+  solid.sphere: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $A, B$ 是球 $O$ 的球面上两点, $\angle A O B=90^{\circ}, C$ 为该球面上的动点, 若三棱锥 $O-A B C$ 体积的最大值为 36 , 则球 $O$ 的表面积为 ($\qquad$)
+options:
+  A: $36 \pi$
+  B: $64 \pi$
+  C: $144 \pi$
+  D: $256 \pi$
+answer: C

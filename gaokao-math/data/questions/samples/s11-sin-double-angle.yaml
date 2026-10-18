@@ -1,0 +1,12 @@
+type: fill
+source: 示例题（原创）
+kps: [trig.identities]
+difficulty_label: 基础
+est_seconds: 90
+stem: |
+  已知 $\tan\alpha=2$，则 $\sin 2\alpha=$ ______。
+answer: '\frac{4}{5}'
+hints:
+  - 齐次化：$\sin 2\alpha=\dfrac{2\sin\alpha\cos\alpha}{\sin^2\alpha+\cos^2\alpha}$，上下同除以 $\cos^2\alpha$。
+solution: |
+  $\sin 2\alpha=\dfrac{2\sin\alpha\cos\alpha}{\sin^2\alpha+\cos^2\alpha}=\dfrac{2\tan\alpha}{1+\tan^2\alpha}=\dfrac{4}{5}$。

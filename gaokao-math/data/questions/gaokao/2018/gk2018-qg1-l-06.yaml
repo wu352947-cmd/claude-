@@ -1,0 +1,22 @@
+type: single
+source: 2018 全国I卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  vec.linear: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $A D$ 为 $B C$ 边上的中线, $E$ 为 $A D$ 的中点, 则 $\overrightarrow{E B}=(\quad)$
+options:
+  A: $\frac{3}{4} \overrightarrow{\mathrm{AB}}-\frac{1}{4} \overrightarrow{\mathrm{AC}}$
+  B: $\frac{1}{4} \overrightarrow{\mathrm{AB}}-\frac{3}{4} \overrightarrow{\mathrm{AC}}$
+  C: $\frac{3}{4} \overrightarrow{\mathrm{AB}}+\frac{1}{4} \overrightarrow{\mathrm{AC}}$
+  D: $\frac{1}{4} \overrightarrow{\mathrm{AB}}+\frac{3}{4} \overrightarrow{\mathrm{AC}}$
+answer: A
+solution: |-
+  解: 在 $\triangle A B C$ 中, $A D$ 为 $B C$ 边上的中线, $E$ 为 $A D$ 的中点,
+
+  $\overrightarrow{\mathrm{EB}}=\overrightarrow{\mathrm{AB}}-\overrightarrow{\mathrm{AE}}=\overrightarrow{\mathrm{AB}}-\frac{1}{2} \overrightarrow{\mathrm{AD}}$
+
+  $=\overrightarrow{\mathrm{AB}}-\frac{1}{2} \times \frac{1}{2}(\overrightarrow{\mathrm{AB}}+\overrightarrow{\mathrm{AC}})$
+
+  $=\frac{3}{4} \overrightarrow{\mathrm{AB}}-\frac{1}{4} \overrightarrow{\mathrm{AC}}$ 故选: A.

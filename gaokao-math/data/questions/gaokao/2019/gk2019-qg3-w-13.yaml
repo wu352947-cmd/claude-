@@ -1,0 +1,11 @@
+type: fill
+source: 2019 全国III卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(2,2), \vec{b}=(-8,6)$, 则 $\cos \langle\vec{a}, \vec{b}\rangle=$ ______
+answer: -\frac{\sqrt{2}}{10}
+answer_kind: expr
+solution: '【详解】详解: $\cos \langle\vec{a}, \vec{b}\rangle=\frac{\vec{a} \cdot \vec{b}}{|\vec{a}| \cdot|\vec{b}|}=\frac{2 \times(-8)+2 \times 6}{\sqrt{2^{2}+2^{2}} \times \sqrt{(-8)^{2}+6^{2}}}=-\frac{\sqrt{2}}{10}$.'

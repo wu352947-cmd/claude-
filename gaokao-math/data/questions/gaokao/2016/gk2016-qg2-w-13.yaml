@@ -1,0 +1,16 @@
+type: fill
+source: 2016 全国II卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(m, 4), \vec{b}=(3,-2)$, 且 $\vec{a} / / \vec{b}$, 则 $m=$ ______
+answer: '-6'
+answer_kind: expr
+solution: |-
+  解: 向量 $\vec{a}=(m, 4), \vec{b}=(3,-2)$, 且 $\vec{a} / / \vec{b}$,
+
+  可得 $12=-2 m$, 解得 $m=-6$.
+
+  故答案为: -6 .

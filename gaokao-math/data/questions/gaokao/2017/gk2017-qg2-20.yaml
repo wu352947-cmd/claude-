@@ -1,0 +1,70 @@
+type: solve
+source: 2017 全国II卷 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  conic.ellipse: 0.6
+  vec.dot: 0.4
+difficulty_label: 较难
+stem: |-
+  设 $O$ 为坐标原点, 动点 $M$ 在椭圆 $C: \frac{x^{2}}{2}+y^{2}=1$ 上, 过 $M$ 作 $x$ 轴的 垂线, 垂足为 $N$, 点 $P$ 满足 $\overrightarrow{\mathrm{NP}}=\sqrt{2} \overrightarrow{\mathrm{NM}}$.
+
+  (1) 求点 $P$ 的轨迹方程;
+
+  （2）设点 $Q$ 在直线 $x=-3$ 上, 且 $\overrightarrow{\mathrm{OP}} \bullet \overrightarrow{\mathrm{PQ}}=1$. 证明: 过点 $P$ 且垂直于 $\mathrm{OQ}$ 的直线 $\mid$ 过 $C$ 的左焦点 $F$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: （1）设 $M\left(x_{0}, y_{0}\right)$ ，由题意可得 $N\left(x_{0}, 0\right)$,
+
+  设 $P(x, y)$, 由点 $P$ 满足 $\overrightarrow{\mathrm{NP}}=\sqrt{2} \overrightarrow{\mathrm{NM}}$.
+
+  可得 $\left(x-x_{0}, y\right)=\sqrt{2}\left(0, y_{0}\right)$ ，
+
+  可得 $\mathrm{x}-\mathrm{x}_{0}=0, \mathrm{y}=\sqrt{2} \mathrm{y}_{0}$ ，
+
+  即有 $x_{0}=x, y_{0}=\frac{y}{\sqrt{2}} ，$
+
+  代入椭圆方程 $\frac{x^{2}}{2}+y^{2}=1$, 可得 $\frac{x^{2}}{2}+\frac{y^{2}}{2}=1$,
+
+  即有点 $P$ 的轨迹方程为圆 $x^{2}+y^{2}=2$;
+
+  （2）证明: 设 $Q(-3, m), P(\sqrt{2} \cos \alpha, \sqrt{2} \sin \alpha),(0 \leqslant \alpha<2 \pi)$,
+
+  $\overrightarrow{\mathrm{OP}} \bullet \overrightarrow{\mathrm{PQ}}=1$, 可得 $(\sqrt{2} \cos \alpha, \sqrt{2} \sin \alpha) \cdot(-3-\sqrt{2} \cos \alpha, m-\sqrt{2} \sin \alpha)=1$,
+
+  即为 $-3 \sqrt{2} \cos \alpha-2 \cos ^{2} \alpha+\sqrt{2} m \sin \alpha-2 \sin ^{2} \alpha=1$,
+
+  当 $\alpha=0$ 时, 上式不成立, 则 $0<\alpha<2 \pi$, 解得 $m=\frac{3(1+\sqrt{2} \cos \alpha)}{\sqrt{2} \sin \alpha}$,
+
+  即有 $Q\left(-3, \frac{3(1+\sqrt{2} \cos \alpha)}{\sqrt{2} \sin \alpha}\right)$ ，
+
+  椭圆 $\frac{x^{2}}{2}+y^{2}=1$ 的左焦点 $F(-1,0)$,
+
+  由 $\overrightarrow{\mathrm{PF}} \bullet \overrightarrow{\mathrm{OQ}}=(-1-\sqrt{2} \cos \alpha,-\sqrt{2} \sin \alpha) \cdot\left(-3, \frac{3(1+\sqrt{2} \cos \alpha)}{\sqrt{2} \sin \alpha}\right)$
+
+  $=3+3 \sqrt{2} \cos \alpha-3(1+\sqrt{2} \cos \alpha)=0$
+
+  可得过点 $P$ 且垂直于 $O Q$ 的直线 I 过 $C$ 的左焦点 $F$.
+
+  另解: 设 $Q(-3, t), P(m, n)$, 由 $\overrightarrow{\mathrm{OP}} \cdot \overrightarrow{\mathrm{PQ}}=1$,
+
+  可得 $(m, n) \cdot(-3-m, t-n)=-3 m-m^{2}+n t-n^{2}=1$,
+
+  又 $P$ 在圆 $x^{2}+y^{2}=2$ 上, 可得 $m^{2}+n^{2}=2$,
+
+  即有 $n t=3+3 m$,
+
+  又椭圆的左焦点 $F(-1,0)$ ，
+
+  $\overrightarrow{\mathrm{PF}} \cdot \overrightarrow{\mathrm{OQ}}=(-1-\mathrm{m},-\mathrm{n}) \cdot(-3, \mathrm{t})=3+3 m-\mathrm{nt}$
+
+  $=3+3 m-3-3 m=0$,
+
+  则 $\overrightarrow{\mathrm{PF}} \perp \overrightarrow{\mathrm{OQ}}$,
+
+  可得过点 $P$ 且垂直于 $O Q$ 的直线 I 过 $C$ 的左焦点 $F$.

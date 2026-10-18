@@ -1,0 +1,17 @@
+type: single
+source: 2019 全国III卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  func.zeros: 0.41
+  trig.graph: 0.32
+  trig.identities: 0.27
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=2 \sin x-\sin 2 x$ 在 $[0,2 \pi]$ 的零点个数为 $(\quad)$
+options:
+  A: '2'
+  B: '3'
+  C: '4'
+  D: '5'
+answer: B
+solution: 【详解】由 $f(x)=2 \sin x-\sin 2 x=2 \sin x-2 \sin x \cos x=2 \sin x(1-\cos x)=0$, 得 $\sin x=0$ 或 $\cos x=1, \because x \in[0,2 \pi], \therefore x=0 、 \pi$ 或 $2 \pi . \therefore f(x)$ 在 $[0,2 \pi]$ 的零点个数是 3. . 故选 B.

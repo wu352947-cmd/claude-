@@ -1,0 +1,27 @@
+type: solve
+source: 2021 全国甲卷（文科） 第 18 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  seq.arith: 1.0
+difficulty_label: 中档
+stem: '记 $S_{n}$ 为数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 已知 $a_{n}>0, a_{2}=3 a_{1}$, 且数列 $\left\{\sqrt{S_{n}}\right\}$ 是等差数列, 证明: $\left\{a_{n}\right\}$ 是等差数 列.'
+parts:
+- label: 全题
+  points: 12.0
+  answer: ''
+solution: |-
+  【详解】 $\because$ 数列 $\left\{\sqrt{S_{n}}\right\}$ 是等差数列, 设公差为 $d=\sqrt{S_{2}}-\sqrt{S_{1}}=\sqrt{a_{2}+a_{1}}-\sqrt{a_{1}}=\sqrt{a_{1}}$
+
+  $\therefore \sqrt{S_{n}}=\sqrt{a_{1}}+(n-1) \sqrt{a_{1}}=n \sqrt{a_{1}}, \quad\left(n \in \mathbf{N}^{\star}\right)$
+
+  $\therefore S_{n}=a_{1} n^{2}, \quad\left(n \in \mathbf{N}^{\star}\right)$
+
+  $\therefore$ 当 $n \geq 2$ 时, $a_{n}=S_{n}-S_{n-1}=a_{1} n^{2}-a_{1}(n-1)^{2}=2 a_{1} n-a_{1}$
+
+  当 $n=1$ 时, $2 a_{1} \times 1-a_{1}=a_{1}$, 满足 $a_{n}=2 a_{1} n-a_{1}$,
+
+  $\therefore\left\{a_{n}\right\}$ 的通项公式为 $a_{n}=2 a_{1} n-a_{1}, \quad\left(n \in \mathbf{N}^{*}\right)$
+
+  $\therefore a_{n}-a_{n-1}=\left(2 a_{1} n-a_{1}\right)-\left[2 a_{1}(n-1)-a_{1}\right]=2 a_{1}$
+
+  $\therefore\left\{a_{n}\right\}$ 是等差数列.

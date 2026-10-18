@@ -1,0 +1,15 @@
+type: single
+source: 2013 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  deriv.extremum: 0.53
+  logic.quantifier: 0.47
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数 $f(x)=x^{3}+a x^{2}+b x+c$, 下列结论中错误的是 ($\qquad$)
+options:
+  A: $\exists x_{0} \in R, f\left(x_{0}\right)=0$
+  B: 函数 $y=f(x)$ 的图象是中心对称图形
+  C: 若 $x_{0}$ 是 $f(x)$ 的极小值点, 则 $f(x)$ 在区间 $\left(-\infty, x_{0}\right)$ 单调递减
+  D: 若 $x_{0}$ 是 $f(x)$ 的极值点, 则 $f^{\prime}\left(x_{0}\right)=0$
+answer: C

@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 4 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 曲线$y=5x+8\ln x$在点$(1,5)$处的切线方程为（ ）
+options:
+  A: $y=3x+2$
+  B: $y=5x$
+  C: $y=8x-3$
+  D: $y=13x-8$
+answer: D

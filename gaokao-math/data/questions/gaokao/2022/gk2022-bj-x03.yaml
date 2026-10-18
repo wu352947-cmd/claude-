@@ -1,0 +1,15 @@
+type: single
+source: 2022 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  func.symmetry: 0.57
+  circle.line: 0.43
+difficulty_label: 基础
+points: 5.0
+stem: 若直线 $2 x+y-1=0$ 是圆 $(x-a)^{2}+y^{2}=1$ 的一条对称轴, 则 $a=(\quad)$
+options:
+  A: $\frac{1}{2}$
+  B: $-\frac{1}{2}$
+  C: '1'
+  D: $-1$
+answer: A

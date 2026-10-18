@@ -1,0 +1,14 @@
+type: single
+source: 2021 北京卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 数列 $\left\{a_{n}\right\}$ 是递增的整数数列, 且 $a_{1} \geq 3, a_{1}+a_{2}+\cdots+a_{n}=100$, 则 $n$ 的最大值为 ($\quad$)
+options:
+  A: '9'
+  B: '10'
+  C: '11'
+  D: '12'
+answer: C

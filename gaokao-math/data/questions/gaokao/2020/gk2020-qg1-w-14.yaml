@@ -1,0 +1,20 @@
+type: fill
+source: 2020 全国I卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设向量 $\boldsymbol{a}=(1,-1), \boldsymbol{b}=(m+1,2 m-4)$, 若 ${ }^{\prime} a \perp b^{\prime}$, 则 $m=$ ______
+answer: '5'
+answer_kind: expr
+solution: |-
+  【详解】由 ${ }^{\prime} a \perp b$
+
+  又因为 $\vec{a}=(1,-1), \vec{b}=(m+1,2 m-4)$,
+
+  所以 $\vec{a} \cdot \vec{b}=1 \cdot(m+1)+(-1) \cdot(2 m-4)=0$ ，
+
+  即 $m=5$ ，
+
+  故答案为: 5 .

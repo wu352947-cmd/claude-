@@ -1,0 +1,30 @@
+type: single
+source: 2019 全国II卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  stat.sample: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 演讲比赛共有 9 位评委分别给出某选手的原始评分, 评定该选手的成绩时, 从 9 个原 始评分中去掉 1 个最高分、 1 个最低分, 得到 7 个有效评分. 7 个有效评分与 9 个原始评 分相比, 不变的数字特征是
+options:
+  A: 中位数
+  B: 平均数
+  C: 方差
+  D: 极差
+answer: A
+solution: |-
+  【详解】设 9 位评委评分按从小到大排列为 $x_{1}<x_{2}<x_{3}<x_{4} \cdots<x_{8}<x_{9}$.
+
+  则(1)原始中位数为 $x_{5}$, 去掉最低分 $x_{1}$, 最高分 $x_{9}$, 后剩余 $x_{2}<x_{3}<x_{4} \cdots<x_{8}$,
+
+  中位数仍为 $x_{5}, \therefore \mathrm{A}$ 正确.
+
+  (2)原始平均数 $\bar{x}=\frac{1}{9}\left(x_{1}<x_{2}<x_{3}<x_{4} \cdots<x_{8}<x_{9}\right)$, 后来平均数 $\overline{x^{\prime}}=\frac{1}{7}\left(x_{2}<x_{3}<x_{4} \cdots<x_{8}\right)$
+
+  平均数受极端值影响较大, $\therefore \bar{x}$ 与 $\overline{x^{1}}$ 不一定相同, B 不正确
+
+  (3) $S^{2}=\frac{1}{9}\left[\left(x_{1}-\bar{x}\right)^{2}+\left(x_{1}-\bar{x}\right)^{2}+\cdots+\left(x_{q}-\bar{x}\right)^{2}\right]$
+
+  $s^{\prime 2}=\frac{1}{7}\left[\left(x_{2}-\overline{x^{\prime}}\right)^{2}+\left(x_{3}-\overline{x^{\prime}}\right)^{2}+\cdots+\left(x_{8}-\overline{x^{\prime}}\right)^{2}\right]$ 由(2)易知, C 不正确.
+
+  (4)原极差 $=x_{9}-x_{1}$, 后来极差 $=x_{8}-x_{2}$ 显然极差变小, $\mathrm{D}$ 不正确.

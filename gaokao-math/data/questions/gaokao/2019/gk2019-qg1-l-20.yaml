@@ -1,0 +1,81 @@
+type: solve
+source: 2019 全国I卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 0.37
+  deriv.extremum: 0.35
+  deriv.zeros: 0.28
+difficulty_label: 较难
+stem: |-
+  已知函数 $f(x)=\sin x-\ln (1+x), f^{\prime}(x)$ 为 $f(x)$ 的导数. 证明:
+
+  (1) $f^{\prime}(x)$ 在区间 $\left(-1, \frac{\pi}{2}\right)$ 存在唯一极大值点;
+
+  (2) $f(x)$ 有且仅有 2 个零点.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】(1) 由题意知: $f(x)$ 定义域为: $(-1,+\infty)$ 且 $f^{\prime}(x)=\cos x-\frac{1}{x+1}$ 令 $g(x)=\cos x-\frac{1}{x+1}, x \in\left(-1, \frac{\pi}{2}\right)$ $\therefore g^{\prime}(x)=-\sin x+\frac{1}{(x+1)^{2}}, \quad x \in\left(-1, \frac{\pi}{2}\right)$
+
+  $\because \frac{1}{(x+1)^{2}}$ 在 $\left(-1, \frac{\pi}{2}\right)$ 上单调递减, $\frac{1}{a_{n+1}}-\frac{1}{a_{n}}=\frac{1}{7}$, 在 $\left(-1, \frac{\pi}{2}\right)$ 上单调递减
+
+  $\therefore g^{\prime}(x)$ 在 $\left(-1, \frac{\pi}{2}\right)$ 上单调递减
+
+  又 $g^{\prime}(0)=-\sin 0+1=1>0, \quad g^{\prime}\left(\frac{\pi}{2}\right)=-\sin \frac{\pi}{2}+\frac{4}{(\pi+2)^{2}}=\frac{4}{(\pi+2)^{2}}-1<0$
+
+  $\therefore \exists x_{0} \in\left(0, \frac{\pi}{2}\right)$, 使得 $g^{\prime}\left(x_{0}\right)=0$
+
+  $\therefore$ 当 $x \in\left(-1, x_{0}\right)$ 时, $g^{\prime}(x)>0 ; x \in\left(x_{0}, \frac{\pi}{2}\right)$ 时, $g^{\prime}(x)<0$
+
+  即 $g(x)$ 在 $\left(-1, x_{0}\right)$ 上单调递增; 在 $\left(x_{0}, \frac{\pi}{2}\right)$ 上单调递减
+
+  则 $x=x_{0}$ 为 $g(x)$ 唯一的极大值点
+
+  即: $f^{\prime}(x)$ 在区间 $\left(-1, \frac{\pi}{2}\right)$ 上存在唯一的极大值点 $x_{0}$.
+
+  (2) 由 (1) 知: $f^{\prime}(x)=\cos x-\frac{1}{x+1}, x \in(-1,+\infty)$
+
+  (1)当 $x \in(-1,0]$ 时, 由 (1) 可知 $f^{\prime}(x)$ 在 $(-1,0]$ 上单调递增
+
+  $\therefore f^{\prime}(x) \leq f^{\prime}(0)=0 \quad \therefore f(x)$ 在 $(-1,0]$ 上单调递减
+
+  又 $f(0)=0$
+
+  $\therefore x=0$ 为 $f(x)$ 在 $(-1,0]$ 上的唯一零点
+
+  (2)当 $x \in\left(0, \frac{\pi}{2}\right]$ 时, $f^{\prime}(x)$ 在 $\left(0, x_{0}\right)$ 上单调递增, 在 $\left(x_{0}, \frac{\pi}{2}\right)$ 上单调递减
+
+  又 $f^{\prime}(0)=0 \quad \therefore f^{\prime}\left(x_{0}\right)>0$
+
+  $\therefore f(x)$ 在 $\left(0, x_{0}\right)$ 上单调递增, 此时 $f(x)>f(0)=0$, 不存在零点 又 $f^{\prime}\left(\frac{\pi}{2}\right)=\cos \frac{\pi}{2}-\frac{2}{\pi+2}=-\frac{2}{\pi+2}<0$
+
+  $\therefore \exists x_{1} \in\left(x_{0}, \frac{\pi}{2}\right)$, 使得 $f^{\prime}\left(x_{1}\right)=0$
+
+  $\therefore f(x)$ 在 $\left(x_{0}, x_{1}\right)$ 上单调递增, 在 $\left(x_{1}, \frac{\pi}{2}\right)$ 上单调递减
+
+  又 $f\left(x_{0}\right)>f(0)=0, f\left(\frac{\pi}{2}\right)=\sin \frac{\pi}{2}-\ln \left(1+\frac{\pi}{2}\right)=\ln \frac{2 e}{\pi+2}>\ln 1=0$
+
+  $\therefore f(x)>0$ 在 $\left(x_{0}, \frac{\pi}{2}\right)$ 上恒成立, 此时不存在零点
+
+  (3)当 $x \in\left[\frac{\pi}{2}, \pi\right]$ 时, $\sin x$ 单调递减, $-\ln (x+1)$ 单调递减
+
+  $\therefore f(x)$ 在 $\left[\frac{\pi}{2}, \pi\right]$ 上单调递减
+
+  又 $f\left(\frac{\pi}{2}\right)>0, \quad f(\pi)=\sin \pi-\ln (\pi+1)=-\ln (\pi+1)<0$
+
+  即 $f(\pi) \cdot f\left(\frac{\pi}{2}\right)<0$, 又 $f(x)$ 在 $\left[\frac{\pi}{2}, \pi\right]$ 上单调递减
+
+  $\therefore f(x)$ 在 $\left[\frac{\pi}{2}, \pi\right]$ 上存在唯一零点
+
+  (4)当 $x \in(\pi,+\infty)$ 时, $\sin x \in[-1,1], \ln (x+1)>\ln (\pi+1)>\ln e=1$
+
+  $\therefore \sin x-\ln (x+1)<0$
+
+  即 $f(x)$ 在 $(\pi,+\infty)$ 上不存在零点
+
+  综上所述: $f(x)$ 有且仅有 2 个零点

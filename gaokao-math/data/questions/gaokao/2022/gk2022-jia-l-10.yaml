@@ -1,0 +1,30 @@
+type: single
+source: 2022 全国甲卷（理科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  conic.eccentricity: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '椭圆 $C: \frac{x^{2}}{a^{2}}+\frac{y^{2}}{b^{2}}=1(a>b>0)$ 的左顶点为 $A$, 点 $P, Q$ 均在 $C$ 上, 且关于 $y$ 轴对称. 若 直线 $A P, A Q$ 的斜率之积为 $\frac{1}{4}$, 则 $C$ 的离心率为 ()'
+options:
+  A: $\frac{\sqrt{3}}{2}$
+  B: $\frac{\sqrt{2}}{2}$
+  C: $\frac{1}{2}$
+  D: $\frac{1}{3}$
+answer: A
+solution: |-
+  【详解】解: $A(-a, 0)$,
+
+  设 $P\left(x_{1}, y_{1}\right)$, 则 $Q\left(-x_{1}, y_{1}\right)$,
+
+  则 $k_{A P}=\frac{y_{1}}{x_{1}+a}, k_{A Q}=\frac{y_{1}}{-x_{1}+a}$,
+
+  故 $k_{A P} \cdot k_{A Q}=\frac{y_{1}}{x_{1}+a} \cdot \frac{y_{1}}{-x_{1}+a}=\frac{y_{1}^{2}}{-x_{1}^{2}+a^{2}}=\frac{1}{4}$,
+
+  又 $\frac{x_{1}^{2}}{a^{2}}+\frac{y_{1}^{2}}{b^{2}}=1$, 则 $y_{1}^{2}=\frac{b^{2}\left(a^{2}-x_{1}^{2}\right)}{a^{2}}$,
+
+  所以 $\frac{\frac{b^{2}\left(a^{2}-x_{1}^{2}\right)}{a^{2}}}{-x_{1}^{2}+a^{2}}=\frac{1}{4}$, 即 $\frac{b^{2}}{a^{2}}=\frac{1}{4}$,
+
+  所以椭圆 $C$ 的离心率 $e=\frac{c}{a}=\sqrt{1-\frac{b^{2}}{a^{2}}}=\frac{\sqrt{3}}{2}$.
+
+  故选: A.

@@ -1,0 +1,16 @@
+type: fill
+source: 2019 全国I卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  seq.geom: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 记 $S_{n}$ 为等比数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和. 若 $a_{1}=1, S_{3}=\frac{3}{4}$, 则 $S_{4}=$ ______
+answer: \frac{5}{8}
+answer_kind: expr
+solution: |-
+  【详解】详解: 设等比数列的公比为 $q$, 由已知 $S_{3}=a_{1}+a_{1} q+a_{1} q^{2}=1+q+q^{2}=\frac{3}{4}$, 即 $q^{2}+q+\frac{1}{4}=0$
+
+  解得 $q=-\frac{1}{2}$,
+
+  所以 $S_{4}=\frac{a_{1}\left(1-q^{4}\right)}{1-q}=\frac{1-\left(-\frac{1}{2}\right)^{4}}{1-\left(-\frac{1}{2}\right)}=\frac{5}{8}$.

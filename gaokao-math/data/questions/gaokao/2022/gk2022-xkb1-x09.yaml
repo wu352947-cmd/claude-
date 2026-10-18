@@ -1,0 +1,17 @@
+type: multi
+source: 2022 新课标I卷 多选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知正方体 $A B C D-A_{1} B_{1} C_{1} D_{1}$, 则 ($\qquad$)
+options:
+  A: 直线 $B C_{1}$ 与 $D A_{1}$ 所成的角为 $90^{\circ}$
+  B: 直线 $B C_{1}$ 与 $C A_{1}$ 所成的角为 $90^{\circ}$
+  C: 直线 $B C_{1}$ 与平面 $B B_{1} D_{1} D$ 所成的角为 $45^{\circ}$
+  D: 直线 $B C_{1}$ 与平面 $A B C D $ 所成的角为 $45^{\circ}$
+answer:
+- A
+- B
+- D

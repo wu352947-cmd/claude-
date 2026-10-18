@@ -1,0 +1,25 @@
+type: single
+source: 2020 全国III卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  trig.graph: 0.6
+  func.symmetry: 0.4
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)=\sin x+\frac{1}{\sin x}$, 则 $(\quad)$
+options:
+  A: $f(x)$ 的最小值为 2
+  B: $f(x)$ 的图像关于 $y$ 轴对称
+  C: $f(x)$ 的图像关于直线 $x=\pi$ 对称
+  D: $f(x)$ 的图像关于直线 $x=\frac{\pi}{2}$ 对称
+answer: D
+solution: |-
+  【详解】 $\because \sin x$ 可以为负, 所以 $\mathrm{A}$ 错;
+
+  $Q \sin x \neq 0 \therefore x \neq k \pi(k \in Z) Q f(-x)=-\sin x-\frac{1}{\sin x}=-f(x) \therefore f(x)$ 关于原点对称;
+
+  $Q f(2 \pi-x)=-\sin x-\frac{1}{\sin x} \neq f(x), f(\pi-x)=\sin x+\frac{1}{\sin x}=f(x)$, 故 B 错;
+
+  $\therefore f(x)$ 关于直线 $x=\frac{\pi}{2}$ 对称, 故 $\mathrm{C}$ 错, $\mathrm{D}$ 对
+
+  故选: D

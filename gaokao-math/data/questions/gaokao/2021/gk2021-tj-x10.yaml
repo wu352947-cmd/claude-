@@ -1,0 +1,10 @@
+type: fill
+source: 2021 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $i$ 是虚数单位, 复数 $\frac{9+2 i}{2+i}=\underline{\qquad}$.
+answer: 4-i
+answer_kind: expr

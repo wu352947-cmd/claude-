@@ -1,0 +1,40 @@
+type: single
+source: 2013 全国I卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $\triangle A_{n} B_{n} C_{n}$ 的三边长分别为 $a_{n}, b_{n}, c_{n}, \triangle A_{n} B_{n} C_{n}$ 的面积为 $S_{n}, n=1$ , 2, 3... 若 $b_{1}>c_{1}, b_{1}+c_{1}=2 a_{1}, a_{n+1}=a_{n}, b_{n+1}=\frac{c_{n}+a_{n}}{2}, c_{n+1}=\frac{b_{n}+a_{n}}{2}$, 则 ( )
+options:
+  A: $\left\{S_{n}\right\}$ 为递减数列
+  B: $\left\{S_{n}\right\}$ 为递增数列
+  C: $\left\{S_{2 n-1}\right\}$ 为递增数列, $\left\{S_{2 n}\right\}$ 为递减数列
+  D: $\left\{S_{2 n-1}\right\}$ 为递减数列, $\left\{S_{2 n}\right\}$ 为递增数列
+answer: B
+solution: |-
+  解: $b_{1}=2 a_{1}-c_{1}$ 且 $b_{1}>c_{1}, \quad \therefore 2 a_{1}-c_{1}>c_{1}, \quad \therefore a_{1}>c_{1}$,
+
+  $\therefore b_{1}-a_{1}=2 a_{1}-c_{1}-a_{1}=a_{1}-c_{1}>0, \quad \therefore b_{1}>a_{1}>c_{1}$,
+
+  又 $\mathrm{b}_{1}-\mathrm{c}_{1}<\mathrm{a}_{1}, \quad \therefore 2 \mathrm{a}_{1}-\mathrm{c}_{1}-\mathrm{c}_{1}<\mathrm{a}_{1}, \therefore 2 \mathrm{c}_{1}>\mathrm{a}_{1}, \therefore \mathrm{c}_{1}>\frac{\mathrm{a}_{1}}{2}$,
+
+  由题意, $b_{n+1}+c_{n+1}=\frac{b_{n}+c_{n}}{2}+a_{n}, \therefore b_{n+1}+c_{n+1}-2 a_{n}=\frac{1}{2}\left(b_{n}+c_{n}-2 a_{n}\right)$,
+
+  $\therefore b_{n}+c_{n}-2 a_{n}=0, \quad \therefore b_{n}+c_{n}=2 a_{n}=2 a_{1}, \quad \therefore b_{n}+c_{n}=2 a_{1}$,
+
+  由此可知顶点 $A_{n}$ 在以 $B_{n} 、 C_{n}$ 为焦点的椭圆上,
+
+  又由题意, $b_{n+1}-c_{n+1}=\frac{c_{n}-b_{n}}{2}, \quad \therefore b_{n+1}-\left(2 a_{1}-b_{n+1}\right)=\frac{2 a_{1}-b_{n}-b_{n}}{2}=a_{1}-b_{n}$,
+
+  $\therefore b_{n+1}-a_{1}=\frac{1}{2}\left(a_{1}-b_{n}\right), \quad \therefore b_{n}-a_{1}=\left(-\frac{1}{2}\right)^{n-1}$,
+
+  $\therefore b_{n}=a_{1}+\left(b_{1}-a_{1}\right)\left(-\frac{1}{2}\right)^{n-1}, c_{n}=2 a_{1}-b_{n}=a_{1}-\left(b_{1}-a_{1}\right)\left(-\frac{1}{2}\right)^{n-1}$,
+
+  $\therefore$
+
+  $S_{n}^{2}=\frac{3 a_{1}}{2}\left(\frac{3 a_{1}}{2}-a_{1}\right)\left[\frac{3 a_{1}}{2}-a_{1}-\left(b_{1}-a_{1}\right)\left(-\frac{1}{2}\right)^{r-1}\right][$ $\left.\frac{3 a_{1}}{2}-a_{1}+\left(b_{1}-a_{1}\right)\left(-\frac{1}{2}\right)^{r-1}\right]$
+
+  $=\frac{3}{4} a_{1}^{2}\left[\frac{a_{1}^{2}}{2}-\left(\frac{1}{4}\right)^{n-1}\left(b_{1}-a_{1}\right)^{2}\right]$ 单调递增（可证当 $n=1$ 时 $\frac{a_{1}^{2}}{4}-\left(b_{1}-a_{1}\right)^{2}>0$
+
+  故选: B.

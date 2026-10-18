@@ -1,0 +1,74 @@
+type: solve
+source: 2019 全国I卷（文科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  circle.line: 0.59
+  conic.parabola: 0.41
+difficulty_label: 压轴
+stem: |-
+  已知点 $A, B$ 关于坐标原点 $O$ 对称, $|A B|=4, \odot M$ 过点 $A, B$ 且与直线 $x+2=0$ 相切.
+
+  (1) 若 $A$ 在直线 $x+y=0$ 上, 求 $\odot M$ 的半径.
+
+  (2) 是否存在定点 $P$, 使得当 $A$ 运动时, $|M A|-|M P|$ 为定值? 并说明理由.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【详解】(1) $\because A$ 在直线 $C_{n}^{5-n}+C_{n+1}^{9-n}$ 上 $\therefore$ 设 $A(t,-t)$, 则 $B(-t, t)$
+
+  又 $|A B|=4 \quad \therefore 8 t^{2}=16$, 解得: $|t|=\sqrt{2}$
+
+  $\because \odot M$ 过点 $A, B \quad \therefore$ 圆心 $M$ 必在直线 $y=x$ 上
+
+  设 $M(a, a)$, 圆的半径为 $r$
+
+  $\because \odot M$ 与 $x+2=0$ 相切 $\quad \therefore r=|a+2|$
+
+  又 $|M A|=|M B|=r$, 即 $(a-\sqrt{2})^{2}+(a+\sqrt{2})^{2}=r^{2}$ $\therefore(a-\sqrt{2})^{2}+(a+\sqrt{2})^{2}=(a+2)^{2}$, 解得: $a=0$ 或 $a=4$
+
+  当 $a=0$ 时, $r=2$ ； 当 $a=4$ 时, $r=6$
+
+  $\therefore \odot M$ 的半径为: 2 或 6
+
+  (2) 存在定点 $P(1,0)$, 使得 $|M A|-|M P|=1$
+
+  说明如下:
+
+  $\because A, \quad B$ 关于原点对称且 $|A B|=4$
+
+  $\therefore$ 直线 $A B$ 必为过原点 $O$ 的直线, 且 $|O A|=2$
+
+  (1)当直线 $A B$ 斜率存在时, 设 $A B$ 方程为: $y=k x$
+
+  则 $\odot M$ 的圆心 $M$ 必在直线 $y=-\frac{1}{k} x$ 上
+
+  设 $M(-k m, m), \odot M$ 的半径为 $r$
+
+  $\because \odot M$ 与 $x+2=0$ 相切 $\quad \therefore r=|-k m+2|$
+
+  又 $r=|M A|=\sqrt{|O A|^{2}+|O M|^{2}}=\sqrt{4+k^{2} m^{2}+m^{2}}$
+
+  $\therefore|-k m+2|=\sqrt{4+k^{2} m^{2}+m^{2}}$ ，整理可得: $m^{2}=-4 k m$
+
+  即 $M$ 点轨迹方程为: $y^{2}=4 x$, 准线方程为: $x=-1$, 焦点 $F(1,0)$
+
+  $\because|M A|=r$, 即抛物线上点到 $a=-1$ 的距离 $\quad \therefore|M A|=|M F|+1$
+
+  $\therefore|M A|-|M F|=1$
+
+  $\therefore$ 当 $P$ 与 $F$ 重合, 即 $P$ 点坐标为 $(1,0)$ 时, $|M A|-|M P|=1$
+
+  (2)当直线 $A B$ 斜率不存在时, 则直线 $A B$ 方程为: $x=0$
+
+  $\backslash M$ 在 $x$ 轴上, 设 $M(n, 0)$
+
+  $\therefore|n+2|=\sqrt{n^{2}+4}$ ， 解得: $\frac{\sqrt{3}}{2}$, 即 $M(0,0)$
+
+  若 $P(1,0)$, 则 $|M A|-|M P|=2-1=1$
+
+  综上所述, 存在定点 $P(1,0)$, 使得 $|M A|-|M P|$ 为定值

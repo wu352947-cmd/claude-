@@ -1,0 +1,16 @@
+type: single
+source: 2018 全国III卷 第 7 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2018
+kps:
+  func.graph: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $y=-x^4+x^2+2$ 的图象大致为 ( )
+figure: ea7bd320b0464fc6.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: D
+solution: '解: 函数过定点 $(0,2)$, 排除 $A, B$.函数的导数 $f^{\prime}(x)=-4 x^3+2 x=-2 x\left(2 x^2-1\right)$,由 $f^{\prime}(x)>0$ 得 $2 x\left(2 x^2-1\right)<0$,得 $x<-\frac{\sqrt{2}}{2}$ 或 $0<x<\frac{\sqrt{2}}{2}$, 此时函数单调递增,由 $f^{\prime}(x)<0$ 得 $2 x\left(2 x^2-1\right)>0$,得 $x>\frac{\sqrt{2}}{2}$ 或 $-\frac{\sqrt{2}}{2}<x<0$, 此时函数单调递减, 排除 $C$,也可以利用 $f(1)=-1+1+2=2>0$, 排除 $A, B$,故选: D.'

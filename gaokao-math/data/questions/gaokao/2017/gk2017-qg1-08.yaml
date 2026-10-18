@@ -1,0 +1,18 @@
+type: single
+source: 2017 全国I卷 第 8 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2017
+kps:
+  func.graph: 0.37
+  trig.identities: 0.32
+  trig.graph: 0.32
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $y=\frac{\sin 2 x}{1-\cos x}$ 的部分图象大致为 ( )
+figure: 454ce09497632058.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: C
+solution: '解: 函数 $\mathrm{y}=\frac{\sin 2 \mathrm{x}}{1-\cos \mathrm{x}}$,可知函数是奇函数, 排除选项 $\mathrm{B}$,当 $x=\frac{\pi}{3}$ 时, $f\left(\frac{\pi}{3}\right)=\frac{\frac{\sqrt{3}}{2}}{1-\frac{1}{2}}=\sqrt{3}$, 排除 $A$, $x=\pi$ 时, $f(\pi)=0$, 排除 $D$.故选: C.'

@@ -1,0 +1,11 @@
+type: fill
+source: 示例题（原创）
+kps: [count.binomial]
+difficulty_label: 中档
+stem: |
+  $\left(x+\dfrac{2}{x}\right)^6$ 的展开式中，常数项为 ______。（用数字作答）
+answer: '160'
+hints:
+  - 写出通项 $T_{k+1}=\mathrm{C}_6^k x^{6-k}\left(\dfrac{2}{x}\right)^k$，令 $x$ 的指数为 $0$。
+solution: |
+  $T_{k+1}=\mathrm{C}_6^k\, 2^k x^{6-2k}$，令 $6-2k=0$ 得 $k=3$，常数项为 $\mathrm{C}_6^3\cdot 2^3=20\times 8=160$。

@@ -1,0 +1,16 @@
+type: fill
+source: 2010 全国新课标卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设函数 $\mathrm{y}=\mathrm{f}(\mathrm{x})$ 为区间 $(0,1]$ 上的图象是连续不断的一条曲线, 且恒有 $0 \leqslant f(x) \leqslant 1$, 可以用随机模拟方法计算由曲线 $y=f(x)$ 及直线 $x=0$, $x=1, y=0$ 所围成部分的面积 $S$, 先产生两组（每组 $N$ 个），区间（0, 1]上的 均匀随机数 $x_{1}, x_{2}, \ldots, x_{n}$ 和 $y_{1}, y_{2}, \ldots, y_{n}$, 由此得到 $N$ 个点 $(x, y)(i-1$ , 2..., $N \mathrm{ . ~ 再 数 出 其 中 满 足 ~} y_{1} \leqslant f(x) \quad(i=1,2 \ldots, N)$ 的点数 $N_{1}$, 那么由 随机模拟方法可得 $\mathrm{S}$ 的近似值为 ______
+answer: \frac{N_{1}}{N}
+answer_kind: expr
+solution: |-
+  解: $\because \int_{0}{ }^{1} f(x) d x$ 的几何意义是函数 $f(x)$ (其中 $0 \leqslant f(x) \leqslant 1$ ) 的图象与 $x$ 轴、直线 $x=0$ 和直线 $x=1$ 所围成图形的面积,
+
+  $\therefore$ 根据几何概型易知 $\int_{0}^{1} \mathrm{f}(\mathrm{x}) \mathrm{dx} \approx \frac{\mathrm{N}_{1}}{\mathrm{N}}$.
+
+  故答案为: $\frac{\mathrm{N}_{1}}{\mathrm{N}}$.

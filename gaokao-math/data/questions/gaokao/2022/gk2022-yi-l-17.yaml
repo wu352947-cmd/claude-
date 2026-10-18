@@ -1,0 +1,49 @@
+type: solve
+source: 2022 全国乙卷（理科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  记 $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $\sin C \sin (A-B)=\sin B \sin (C-A)$.
+
+  (1) 证明: $2 a^{2}=b^{2}+c^{2}$;
+
+  (2) 若 $a=5, \cos A=\frac{25}{31}$, 求 $\triangle A B C$ 的周长.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  证明: 因为 $\sin C \sin (A-B)=\sin B \sin (C-A)$,
+
+  所以 $\sin C \sin A \cos B-\sin C \sin B \cos A=\sin B \sin C \cos A-\sin B \sin A \cos C$,
+
+  所以 $a c \cdot \frac{a^{2}+c^{2}-b^{2}}{2 a c}-2 b c \cdot \frac{b^{2}+c^{2}-a^{2}}{2 b c}=-a b \cdot \frac{a^{2}+b^{2}-c^{2}}{2 a b}$,
+
+  即 $\frac{a^{2}+c^{2}-b^{2}}{2}-\left(b^{2}+c^{2}-a^{2}\right)=-\frac{a^{2}+b^{2}-c^{2}}{2}$,
+
+  所以 $2 a^{2}=b^{2}+c^{2}$;
+
+  【小问 2 详解】}
+
+  解: 因为 $a=5, \cos A=\frac{25}{31}$,
+
+  由 (1) 得 $b^{2}+c^{2}=50$,
+
+  由余弦定理可得 $a^{2}=b^{2}+c^{2}-2 b c \cos A$,
+
+  则 $50-\frac{50}{31} b c=25$ ，
+
+  所以 $b c=\frac{31}{2}$,
+
+  故 $(b+c)^{2}=b^{2}+c^{2}+2 b c=50+31=81$,
+
+  所以 $b+c=9$,
+
+  所以 $\triangle A B C$ 的周长为 $a+b+c=14$.

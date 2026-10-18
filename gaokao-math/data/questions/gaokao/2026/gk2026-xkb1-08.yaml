@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 8 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  prob.distribution: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设$U=\{(x_1,x_2,x_3)\mid x_i\in\{-2,-1,1,2\},\ i=1,2,3\}$为空间中$64$个点构成的集合，点$P(1,1,1)$，记样本空间$\Omega=\complement_U\{P\}$，从$\Omega$中随机取一个点，定义随机变量$X$如下：对$\Omega$中的每个点$A(x_1,x_2,x_3)$，令$X(A)=x_1+x_2+x_3$，则$X$的数学期望为（ ）
+options:
+  A: $-\dfrac{1}{21}$
+  B: $-\dfrac{1}{63}$
+  C: $0$
+  D: $\dfrac{1}{7}$
+answer: A

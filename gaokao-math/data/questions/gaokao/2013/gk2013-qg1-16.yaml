@@ -1,0 +1,24 @@
+type: fill
+source: 2013 全国I卷 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2013
+kps:
+  trig.graph: 0.44
+  deriv.extremum: 0.3
+  trig.definition: 0.26
+difficulty_label: 较难
+points: 5.0
+stem: 设当 $x=\theta$ 时, 函数 $f(x)=\sin x-2 \cos x$ 取得最大值, 则 $\cos \theta=$ ______
+answer: -\frac{2 \sqrt{5}}{5}
+answer_kind: expr
+solution: |-
+  解: $f(x)=\sin x-2 \cos x=\sqrt{5}\left(\frac{\sqrt{5}}{5} \sin x-\frac{2 \sqrt{5}}{5} \cos x\right)=\sqrt{5} \sin (x-\alpha)$ (其 中 $\left.\cos \alpha=\frac{\sqrt{5}}{5}, \sin \alpha=\frac{2 \sqrt{5}}{5}\right)$,
+
+  $\because x=\theta$ 时, 函数 $f(x)$ 取得最大值,
+
+  $\therefore \sin (\theta-\alpha)=1$, 即 $\sin \theta-2 \cos \theta=\sqrt{5}$,
+
+  又 $\sin ^{2} \theta+\cos ^{2} \theta=1$,
+
+  联立得 $(2 \cos \theta+\sqrt{5})^{2}+\cos ^{2} \theta=1$, 解得 $\cos \theta=-\frac{2 \sqrt{5}}{5}$.
+
+  故答案为: $-\frac{2 \sqrt{5}}{5}$

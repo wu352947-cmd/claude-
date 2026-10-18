@@ -1,0 +1,15 @@
+type: single
+source: 2011 全国新课标卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\frac{5 i}{1-2 i}=(\quad)$
+options:
+  A: $2-\mathrm{i}$
+  B: $1-2 \mathrm{i}$
+  C: $-2+i$
+  D: $-1+2 i$
+answer: C
+solution: '解: $\frac{5 i}{1-2 i}=\frac{5 i(1+2 i)}{(1-2 i)(1+2 i)}=-2+i$ 故选: C.'

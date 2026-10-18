@@ -1,0 +1,33 @@
+type: single
+source: 2011 全国新课标卷（理科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  conic.eccentricity: 0.61
+  func.symmetry: 0.39
+difficulty_label: 中档
+points: 5.0
+stem: 设直线 $\mid$ 过双曲线 $C$ 的一个焦点, 且与 $C$ 的一条对称轴垂直, $\mathrm{I}$ 与 $C$ 交于 $A, B$ 两点, $|A B|$ 为 $C$ 的实轴长的 2 倍, 则 $C$ 的离心率为（）
+options:
+  A: $\sqrt{2}$
+  B: $\sqrt{3}$
+  C: '2'
+  D: '3'
+answer: B
+solution: |-
+  解: 不妨设双曲线 $C: \frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1$,
+
+  焦点 $F(-c, 0)$, 对称轴 $y=0$,
+
+  由题设知 $\frac{c^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1$,
+
+  $y= \pm \frac{b^{2}}{a}$
+
+  $\therefore \frac{2 b^{2}}{a}=4 a$,
+
+  $b^{2}=2 a^{2}$, $c^{2}-a^{2}=2 a^{2}$
+
+  $c^{2}=3 a^{2}$
+
+  $\therefore \mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\sqrt{3}$
+
+  故选: B.

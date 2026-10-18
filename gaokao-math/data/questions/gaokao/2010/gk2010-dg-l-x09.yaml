@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  solid.measure: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知正四棱锥 $S-A B C D$ 中, $S A=2 \sqrt{3}$, 那么当该棱锥的体积最大时, 它的高为 ($\qquad$)
+options:
+  A: '1'
+  B: $\sqrt{3}$
+  C: '2'
+  D: '3'
+answer: C

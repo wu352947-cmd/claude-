@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  trig.identities: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 角 $\alpha, \beta$ 满足 $\sin (\alpha+\beta)+\cos (\alpha+\beta)=2 \sqrt{2} \cos \left(\alpha+\frac{\pi}{4}\right) \sin \beta$, 则 ($\quad$)
+options:
+  A: $\tan (\alpha+\beta)=1$
+  B: $\tan (\alpha+\beta)=-1$
+  C: $\tan (\alpha-\beta)=1$
+  D: $\tan (\alpha-\beta)=-1$
+answer: D

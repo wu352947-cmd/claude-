@@ -1,0 +1,16 @@
+type: fill
+source: 2021 全国甲卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知向量 $\vec{a}=(3,1), \vec{b}=(1,0), \vec{c}=\vec{a}+k \vec{b}$. 若 $\vec{a} \perp \vec{c}$, 则 $k=$ ______
+answer: -\frac{10}{3}
+answer_kind: expr
+solution: |-
+  【详解】 $\because \vec{a}=(3,1), \vec{b}=(1,0), \therefore \vec{c}=\vec{a}+k \vec{b}=(3+k, 1)$ ，
+
+  $\because \vec{a} \perp \vec{c}, \therefore \vec{a} \diamond \vec{c}=3(3+k)+1 \times 1=0$, 解得 $k=-\frac{10}{3}$,
+
+  故答案为: $-\frac{10}{3}$.

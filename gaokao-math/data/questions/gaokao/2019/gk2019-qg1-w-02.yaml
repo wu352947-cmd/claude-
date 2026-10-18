@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国I卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知集合 $U=\{1,2,3,4,5,6,7\}, A=\{2,3,4,5\}, B=\{2,3,6,7\}$, 则 $B \cap \complement_{U} A$
+options:
+  A: $\{1,6\}$
+  B: $\{1,7\}$
+  C: $\{6,7\}$
+  D: $\{1,6,7\}$
+answer: C
+solution: 【详解】由已知得 $\complement_{U} A=\{1,6,7\}$, 所以 $B \cap \complement_{U} A=\{6,7\}$, 故选 C.

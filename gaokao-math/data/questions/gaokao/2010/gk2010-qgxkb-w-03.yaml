@@ -1,0 +1,22 @@
+type: single
+source: 2010 全国新课标卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知复数 $Z=\frac{\sqrt{3}+i}{(1-\sqrt{3} i)^{2}}$, 则 $|z|=(\quad)$
+options:
+  A: $\frac{1}{4}$
+  B: $\frac{1}{2}$
+  C: '1'
+  D: '2'
+answer: B
+solution: |-
+  解: 化简得 $z=\frac{\sqrt{3}+i}{(1-\sqrt{3} i)^{2}}=\frac{\sqrt{3}+i}{-2-2 \sqrt{3} i}=-\frac{1}{2} \cdot \frac{\sqrt{3}+i}{1+\sqrt{3} i}$
+
+  $=-\frac{1}{2} \cdot \frac{(\sqrt{3}+i)(1-\sqrt{3} i)}{(1+\sqrt{3} i)(1-\sqrt{3} i)}=-\frac{1}{2} \cdot \frac{2 \sqrt{3}-2 i}{4}=-\frac{\sqrt{3}}{4}+\frac{i}{4}$,
+
+  故 $|z|=\sqrt{\left(\frac{\sqrt{3}}{4}\right)^{2}+\left(\frac{1}{4}\right)^{2}}=\frac{1}{2}$,
+
+  故选: B.

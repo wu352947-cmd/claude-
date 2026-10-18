@@ -1,0 +1,46 @@
+type: single
+source: 2017 全国III卷 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.zeros: 0.6
+  func.zeros: 0.4
+difficulty_label: 较难
+points: 5.0
+stem: 已知函数 $f(x)=x^{2}-2 x+a\left(e^{x-1}+e^{-x+1}\right)$ 有唯一零点, 则 $a=(\quad)$
+options:
+  A: $-\frac{1}{2}$
+  B: $\frac{1}{3}$
+  C: $\frac{1}{2}$
+  D: |-
+    1
+
+    \section{
+answer: C
+solution: |-
+  解: 因为 $f(x)=x^{2}-2 x+a\left(e^{x-1}+e^{-x+1}\right)=-1+(x-1)^{2}+a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ $=0$,
+
+  所以函数 $f(x)$ 有唯一零点等价于方程 $1-(x-1)^{2}=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 有唯一解, 等价于函数 $y=1-(x-1)^{2}$ 的图象与 $y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 的图象只有一个交点.
+
+  (1)当 $a=0$ 时, $f(x)=x^{2}-2 x \geqslant-1$, 此时有两个零点, 矛盾;
+
+  (2)当 $a<0$ 时, 由于 $y=1-(x-1)^{2}$ 在 $(-\infty, 1)$ 上递增、在 $(1,+\infty)$ 上递 减 且 $y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 在 $(-\infty, 1)$ 上递增、在 $(1,+\infty)$ 上递减,
+
+  所以函数 $y=1-(x-1)^{2}$ 的图象的最高点为 $A(1,1), y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 的
+
+  图象的最高点为 $B(1,2 a)$,
+
+  由于 $2 a<0<1$, 此时函数 $y=1-(x-1)^{2}$ 的图象与 $y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 的图象 有两个交点,矛盾;
+
+  (3)当 $a>0$ 时, 由于 $y=1-(x-1)^{2}$ 在 $(-\infty, 1)$ 上递增、在 $(1,+\infty)$ 上递 减
+
+  且 $y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 在 $(-\infty, 1)$ 上递减、在 $(1,+\infty)$ 上递增，
+
+  所以函数 $y=1-(x-1)^{2}$ 的图象的最高点为 $A(1,1), y=a\left(e^{x-1}+\frac{1}{e^{x-1}}\right)$ 的
+
+  图象的最低点为 $B(1,2 a)$,
+
+  由题可知点 $A$ 与点 $B$ 重合时满足条件, 即 $2 a=1$, 即 $a=\frac{1}{2}$, 符合条件;
+
+  综上所述, $a=\frac{1}{2}$,
+
+  故选: C.

@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标I卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  tri.laws: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 在 $\triangle A B C$ 中, 点 $D$ 在边 $A B$ 上, $B D=2 D A$. 记 $\overrightarrow{C A}=\vec{m}, \overrightarrow{C D}=\vec{n}$, 则 $\overrightarrow{C B}=(\qquad)$
+options:
+  A: $3 \vec{m}-2 \vec{n}$
+  B: $-2 \vec{m}+3 \vec{n}$
+  C: $3 \vec{m}+2 \vec{n}$
+  D: $2 \vec{m}+3 \vec{n}$
+answer: B

@@ -1,0 +1,20 @@
+type: single
+source: 2022 全国甲卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $z=-1+\sqrt{3} \mathbf{i}$, 则 $\frac{z}{z \bar{z}-1}=()$
+options:
+  A: $-1+\sqrt{3} \mathrm{i}$
+  B: $-1-\sqrt{3} i$
+  C: $-\frac{1}{3}+\frac{\sqrt{3}}{3} \mathrm{i}$
+  D: $-\frac{1}{3}-\frac{\sqrt{3}}{3} i$
+answer: C
+solution: |-
+  【详解】 $\bar{z}=-1-\sqrt{3} i, z \bar{z}=(-1+\sqrt{3} i)(-1-\sqrt{3} i)=1+3=4$.
+
+  $\frac{z}{z \bar{z}-1}=\frac{-1+\sqrt{3} \mathrm{i}}{3}=-\frac{1}{3}+\frac{\sqrt{3}}{3} \mathrm{i}$
+
+  故选: C

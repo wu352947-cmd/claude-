@@ -1,0 +1,14 @@
+type: single
+source: 2022 天津卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  logic.condition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: “ $x$ 为整数”是“ $2 x+1$ 为整数”的 ($\qquad$)
+options:
+  A: 充分不必要
+  B: 必要不充分
+  C: 充分必要
+  D: 既不允分也不必要
+answer: A

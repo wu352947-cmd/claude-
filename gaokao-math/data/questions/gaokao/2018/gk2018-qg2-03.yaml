@@ -1,0 +1,16 @@
+type: single
+source: 2018 全国II卷 第 3 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2018
+kps:
+  func.graph: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\frac{e^x-e^{-x}}{x^2}$ 的图象大致为 $(\quad)$
+figure: 40a147135917023a.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: B
+solution: '解: 函数 $\mathrm{f}(-\mathrm{x})=\frac{\mathrm{e}^{-\mathrm{x}}-\mathrm{e}^{\mathrm{x}}}{(-\mathrm{x})^2}=-\frac{\mathrm{e}^{\mathrm{x}}-\mathrm{e}^{-\mathrm{x}}}{\mathrm{x}^2}=-\mathrm{f}(\mathrm{x})$,则函数 $\mathrm{f}(\mathrm{x})$ 为奇函数, 图象关于原点对称, 排除 $\mathrm{A}$,当 $x=1$ 时, $f(1)=e-\frac{1}{e}>0$, 排除 $D$.当 $x \rightarrow+\infty$ 时, $f(x) \rightarrow+\infty$, 排除 $C$,故选: B.'

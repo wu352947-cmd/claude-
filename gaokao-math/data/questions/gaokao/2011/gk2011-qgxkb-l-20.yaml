@@ -1,0 +1,37 @@
+type: solve
+source: 2011 全国新课标卷（理科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  vec.dot: 0.43
+  deriv.tangent: 0.29
+  conic.fixed: 0.27
+difficulty_label: 较难
+stem: |-
+  在平面直角坐标系 $x O y$ 中, 已知点 $A(0,-1), B$ 点在直线 $y=-3$ 上, $M$ 点满足 $\overrightarrow{M B} / / \overrightarrow{O A}, \overrightarrow{M A} \cdot \overrightarrow{A B}=\overrightarrow{M B} \cdot \overrightarrow{B A}, M$ 点的轨迹为曲线 $C$.
+
+  (I ) 求 C 的方程;
+
+  (II) $\mathrm{P}$ 为 $C$ 上的动点, 1 为 $C$ 在 $\mathrm{P}$ 点处的切线, 求 $\mathrm{O}$ 点到 $I$ 距离的最小值.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 设 $M(x, y)$, 由已知得 $B(x,-3), A(0,-1)$. 所 $\overrightarrow{M A}=(-x,-1-y), \overrightarrow{M B}=(0,-3-y), \overrightarrow{A B}=(x,-2)$.
+
+  再由题意可知 $(\overrightarrow{M A}+\overrightarrow{M B}) \cdot \overrightarrow{\mathrm{AB}}=0$, 即 $(-x,-4-2 y) \cdot(x,-2)=0$.
+
+  所以曲线 $C$ 的方程式为 $y=\frac{1}{4} x^{2}-2$.
+
+  (II) 设 $P\left(x_{0}, y_{0}\right)$ 为曲线 $C: y=\frac{1}{4} x^{2}-2$ 上一点, 因为 $y^{\prime}=\frac{1}{2} x$, 所以 的斜率 为 $\frac{1}{2} x_{0}$,
+
+  因此直线 $I$ 的方程为 $y-y_{0}=\frac{1}{2} x_{0}\left(x-x_{0}\right)$, 即 $x_{0} x-2 y+2 y_{0}-x_{0}^{2}=0$.
+
+  则 0 点到I的距离 $\mathrm{d}=\frac{\left|2 y_{0}-x_{0}^{2}\right|}{\sqrt{4+x_{0}^{2}}}$. 又 $y_{0}=\frac{1}{4} x_{0}^{2}-2$,
+
+  所以 $d=\frac{\frac{1}{2} x_{0}{ }^{2}+4}{\sqrt{4+x_{0}^{2}}}=\frac{1}{2}\left(\sqrt{x_{0}{ }^{2}+4}+\frac{4}{\sqrt{4+x_{0}^{2}}}\right) \geqslant 2$,
+
+  所以 $x_{0}^{2}=0$ 时取等号, 所以 0 点到 $I$ 距离的最小值为 2 .

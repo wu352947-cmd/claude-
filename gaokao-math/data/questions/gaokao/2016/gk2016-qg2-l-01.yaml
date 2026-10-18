@@ -1,0 +1,20 @@
+type: single
+source: 2016 全国II卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  complex.geometry: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $z=(m+3)+(m-1) i$ 在复平面内对应的点在第四象限, 则实 数 $m$ 的取值范围是 $(\quad)$
+options:
+  A: $(-3,1)$
+  B: $(-1,3)$
+  C: $(1,+\infty)$
+  D: $(-\infty,-3)$
+answer: A
+solution: |-
+  解: $z=(m+3)+(m-1) \mathrm{i}$ 在复平面内对应的点在第四象限,
+
+  可得: $\left\{\begin{array}{l}m+3>0 \\ m-1<0\end{array}\right.$, 解得 $-3<m<1$.
+
+  故选: A.

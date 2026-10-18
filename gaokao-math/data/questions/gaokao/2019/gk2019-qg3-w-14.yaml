@@ -1,0 +1,11 @@
+type: fill
+source: 2019 全国III卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 记 $S_{n}$ 为等差数列 $\left\{a_{n}\right\}$ 的前 $n$ 项和, 若 $a_{3}=5, a_{7}=13$, 则 $S_{10}=$ ______
+answer: '100'
+answer_kind: expr
+solution: '【详解】详解: $\left\{\begin{array}{l}a_{3}=a_{1}+2 d=5 \\ a_{7}=a_{1}+6 d=13\end{array}\right.$,得 $\left\{\begin{array}{l}a_{1}=1 \\ d=2\end{array}\right.$, $\therefore S_{10}=10 a_{1}+\frac{10 \times 9}{2} d=10 \times 1+\frac{10 \times 9}{2} \times 2=100$.'

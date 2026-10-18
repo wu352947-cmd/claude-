@@ -1,0 +1,14 @@
+type: single
+source: 2015 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2015
+kps:
+  tri.laws: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $\mathrm{D}$ 为 $\triangle \mathrm{ABC}$ 所在平面内一点, $\overrightarrow{\mathrm{BC}}=3 \overrightarrow{\mathrm{CD}}$, 则 ($\qquad$)
+options:
+  A: $\overrightarrow{\mathrm{AD}}=-\frac{1}{3} \overrightarrow{\mathrm{AB}}+\frac{4}{3} \overrightarrow{\mathrm{AC}}$
+  B: $\overrightarrow{\mathrm{AD}}=\frac{1}{3} \overrightarrow{\mathrm{AB}}-\frac{4}{3} \overrightarrow{\mathrm{AC}}$
+  C: $\overrightarrow{\mathrm{AD}}=\frac{4}{3} \overrightarrow{\mathrm{AB}}+\frac{1}{3} \overrightarrow{\mathrm{AC}}$
+  D: $\overrightarrow{\mathrm{AD}}=\frac{4}{3} \overrightarrow{\mathrm{AB}}-\frac{1}{3} \overrightarrow{\mathrm{AC}}$
+answer: A

@@ -1,0 +1,18 @@
+type: single
+source: 2018 全国II卷（理科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\frac{1+2 i}{1-2 i}=(\quad)$
+options:
+  A: $-\frac{4}{5}-\frac{3}{5} i$
+  B: $-\frac{4}{5}+\frac{3}{5} i$
+  C: $-\frac{3}{5}-\frac{4}{5} i$
+  D: $-\frac{3}{5}+\frac{4}{5} i$
+answer: D
+solution: |-
+  解: $\frac{1+2 i}{1-2 i}=\frac{(1+2 i)(1+2 i)}{(1-2 i)(1+2 i)}=-\frac{3}{5}+\frac{4}{5} i$.
+
+  故选: D.

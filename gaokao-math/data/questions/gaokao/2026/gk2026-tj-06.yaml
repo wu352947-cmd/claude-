@@ -1,0 +1,14 @@
+type: single
+source: 2026 天津卷 第 6 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  expo.compare: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知函数 $f(x) = |\ln x|$，若 $a = f(2^{0.3})$，$b = f(3^{0.3})$，$c = f(3^{-0.5})$，则 $a, b, c$ 的大小关系为（ ）
+options:
+  A: $a < b < c$
+  B: $b < a < c$
+  C: $c < b < a$
+  D: $c < a < b$
+answer: A

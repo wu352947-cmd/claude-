@@ -1,0 +1,10 @@
+type: fill
+source: 2022 新课标II卷 填空题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  prob.binomial_normal: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知随机变量 $X$ 服从正态分布 $N\left(2, \sigma^{2}\right)$, 且 $P(2<X \leq 2.5)=0.36$, 则 $P(X>2.5)=\underline{\qquad}$
+answer: '0.14'
+answer_kind: expr

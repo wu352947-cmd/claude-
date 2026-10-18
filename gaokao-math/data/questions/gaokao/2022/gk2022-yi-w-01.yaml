@@ -1,0 +1,18 @@
+type: single
+source: 2022 全国乙卷（文科） 第 1 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 集合 $M=\{2,4,6,8,10\}, N=\{x \mid-1<x<6\}$, 则 $M \cap N=()$
+options:
+  A: $\{2,4\}$
+  B: $\{2,4,6\}$
+  C: $\{2,4,6,8\}$
+  D: $\{2,4,6,8,10\}$
+answer: A
+solution: |-
+  【详解】因为 $M=\{2,4,6,8,10\}, N=\{x \mid-1<x<6\}$, 所以 $M \cap N=\{2,4\}$.
+
+  故选: A.

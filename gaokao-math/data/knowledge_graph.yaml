@@ -1,0 +1,163 @@
+# 知识点图谱（ARCHITECTURE.md §3）。按人教 A 版新教材 + 高考常考题型整理。
+#
+# exam_weight：这个知识点平均每套卷贡献多少分。下面是初始估计（合计约 150），
+#   建议把近三年你所在省份的真题逐题打标签后，用「题目分值 ÷ 标签数」累加取平均来校准。
+# prereq：前置知识点。某知识点一直做不好时，系统会先检查前置是否掌握。
+# methods：常用方法，录题时可以参考。
+
+# ---------------- 集合与常用逻辑用语
+- {id: set.operations, name: 集合的运算, module: 集合与常用逻辑用语, exam_weight: 4.5}
+- {id: logic.condition, name: 充分必要条件, module: 集合与常用逻辑用语, exam_weight: 2, prereq: [set.operations]}
+- {id: logic.quantifier, name: 全称量词与存在量词, module: 集合与常用逻辑用语, exam_weight: 1}
+
+# ---------------- 复数
+- {id: complex.arith, name: 复数的四则运算, module: 复数, exam_weight: 3.5}
+- {id: complex.modulus, name: 复数的模与共轭, module: 复数, exam_weight: 1, prereq: [complex.arith]}
+- {id: complex.geometry, name: 复数的几何意义, module: 复数, exam_weight: 0.5, prereq: [complex.arith]}
+
+# ---------------- 不等式
+- {id: ineq.properties, name: 不等式的性质, module: 不等式, exam_weight: 1}
+- {id: ineq.quadratic, name: 一元二次不等式, module: 不等式, exam_weight: 2, prereq: [ineq.properties]}
+- id: ineq.mean
+  name: 基本不等式
+  module: 不等式
+  exam_weight: 2.5
+  prereq: [ineq.properties]
+  methods: [配凑, 1 的代换, 换元]
+
+# ---------------- 函数概念与性质
+- {id: func.domain_range, name: 定义域与值域, module: 函数概念与性质, exam_weight: 1.5}
+- {id: func.monotonic, name: 函数的单调性, module: 函数概念与性质, exam_weight: 2.5, prereq: [func.domain_range]}
+- {id: func.parity, name: 函数的奇偶性, module: 函数概念与性质, exam_weight: 2.5, prereq: [func.domain_range]}
+- id: func.symmetry
+  name: 周期性与对称性
+  module: 函数概念与性质
+  exam_weight: 2.5
+  prereq: [func.parity]
+  methods: [赋值法, 由两条对称轴推周期]
+- {id: func.abstract, name: 抽象函数, module: 函数概念与性质, exam_weight: 1.5, prereq: [func.monotonic, func.symmetry]}
+- {id: func.piecewise, name: 分段函数, module: 函数概念与性质, exam_weight: 2, prereq: [func.domain_range]}
+- {id: func.graph, name: 函数图像的识别与变换, module: 函数概念与性质, exam_weight: 1.5, prereq: [func.monotonic, func.parity]}
+
+# ---------------- 指对幂函数与函数应用
+- {id: expo.ops, name: 指数与对数运算, module: 指对幂函数与函数应用, exam_weight: 1.5}
+- {id: expo.functions, name: 指数函数与对数函数的性质, module: 指对幂函数与函数应用, exam_weight: 1.5, prereq: [expo.ops, func.monotonic]}
+- id: expo.compare
+  name: 比较大小
+  module: 指对幂函数与函数应用
+  exam_weight: 2
+  prereq: [expo.functions]
+  methods: [中间值法, 作差作商, 构造函数]
+- {id: func.zeros, name: 函数的零点与方程的根, module: 指对幂函数与函数应用, exam_weight: 2.5, prereq: [func.graph]}
+
+# ---------------- 三角函数与解三角形
+- {id: trig.definition, name: 任意角三角函数与同角关系, module: 三角函数与解三角形, exam_weight: 1}
+- id: trig.identities
+  name: 三角恒等变换
+  module: 三角函数与解三角形
+  exam_weight: 2.5
+  prereq: [trig.definition]
+  methods: [诱导公式, 和差角公式, 二倍角与降幂, 辅助角公式, 齐次化（弦化切）]
+- {id: trig.graph, name: 三角函数的图像与性质, module: 三角函数与解三角形, exam_weight: 3, prereq: [trig.identities]}
+- {id: trig.transform, name: 图像的平移与伸缩, module: 三角函数与解三角形, exam_weight: 1.5, prereq: [trig.graph]}
+- id: tri.laws
+  name: 正弦定理与余弦定理
+  module: 三角函数与解三角形
+  exam_weight: 5.5
+  prereq: [trig.identities]
+  methods: [边化角, 角化边, 射影定理]
+- id: tri.range
+  name: 解三角形中的面积与范围问题
+  module: 三角函数与解三角形
+  exam_weight: 3
+  prereq: [tri.laws, ineq.mean]
+  methods: [基本不等式, 转化为三角函数求值域]
+
+# ---------------- 平面向量
+- {id: vec.linear, name: 向量的线性运算与基本定理, module: 平面向量, exam_weight: 2}
+- {id: vec.dot, name: 数量积与坐标运算, module: 平面向量, exam_weight: 3, prereq: [vec.linear]}
+- {id: vec.projection, name: 投影向量与夹角, module: 平面向量, exam_weight: 1, prereq: [vec.dot]}
+
+# ---------------- 数列
+- {id: seq.arith, name: 等差数列, module: 数列, exam_weight: 3}
+- {id: seq.geom, name: 等比数列, module: 数列, exam_weight: 3}
+- id: seq.recurrence
+  name: 由递推关系求通项
+  module: 数列
+  exam_weight: 2
+  prereq: [seq.arith, seq.geom]
+  methods: [累加累乘, 构造等比数列, 取倒数, S_n 与 a_n 的关系]
+- {id: seq.sum_telescoping, name: 裂项相消求和, module: 数列, exam_weight: 2, prereq: [seq.arith]}
+- {id: seq.sum_dislocation, name: 错位相减求和, module: 数列, exam_weight: 2, prereq: [seq.geom]}
+
+# ---------------- 立体几何
+- {id: solid.measure, name: 表面积与体积, module: 立体几何, exam_weight: 2}
+- {id: solid.sphere, name: 外接球与内切球, module: 立体几何, exam_weight: 2, prereq: [solid.measure]}
+- {id: solid.position, name: 空间中的平行与垂直, module: 立体几何, exam_weight: 4}
+- id: solid.vector
+  name: 空间向量求角与距离
+  module: 立体几何
+  exam_weight: 5
+  prereq: [solid.position, vec.dot]
+  methods: [建系, 法向量, 二面角]
+- {id: solid.section, name: 截面与动点问题, module: 立体几何, exam_weight: 1, prereq: [solid.position]}
+
+# ---------------- 直线与圆
+- {id: line.equation, name: 直线的方程与位置关系, module: 直线与圆, exam_weight: 1}
+- {id: circle.equation, name: 圆的方程, module: 直线与圆, exam_weight: 1.5, prereq: [line.equation]}
+- {id: circle.line, name: 直线与圆的位置关系, module: 直线与圆, exam_weight: 2.5, prereq: [circle.equation]}
+
+# ---------------- 圆锥曲线
+- {id: conic.ellipse, name: 椭圆的定义与性质, module: 圆锥曲线, exam_weight: 2.5, prereq: [line.equation]}
+- {id: conic.hyperbola, name: 双曲线的定义与性质, module: 圆锥曲线, exam_weight: 2.5, prereq: [line.equation]}
+- {id: conic.parabola, name: 抛物线的定义与性质, module: 圆锥曲线, exam_weight: 2.5, prereq: [line.equation]}
+- {id: conic.eccentricity, name: 离心率, module: 圆锥曲线, exam_weight: 2.5, prereq: [conic.ellipse, conic.hyperbola]}
+- id: conic.chord
+  name: 直线与圆锥曲线：弦长与韦达定理
+  module: 圆锥曲线
+  exam_weight: 4
+  prereq: [conic.ellipse, conic.parabola]
+  methods: [设而不求, 设直线为 x=my+t, 点差法]
+- id: conic.fixed
+  name: 定点、定值与最值
+  module: 圆锥曲线
+  exam_weight: 4
+  prereq: [conic.chord]
+  methods: [特殊位置探路, 参数消元]
+
+# ---------------- 计数原理与概率统计
+- {id: count.perm_comb, name: 排列与组合, module: 计数原理与概率统计, exam_weight: 2.5}
+- {id: count.binomial, name: 二项式定理, module: 计数原理与概率统计, exam_weight: 2.5, prereq: [count.perm_comb]}
+- {id: prob.classical, name: 古典概型, module: 计数原理与概率统计, exam_weight: 2, prereq: [count.perm_comb]}
+- {id: prob.conditional, name: 条件概率与全概率公式, module: 计数原理与概率统计, exam_weight: 2, prereq: [prob.classical]}
+- {id: prob.distribution, name: 分布列与期望方差, module: 计数原理与概率统计, exam_weight: 4, prereq: [prob.classical]}
+- {id: prob.binomial_normal, name: 二项分布与正态分布, module: 计数原理与概率统计, exam_weight: 2, prereq: [prob.distribution]}
+- {id: stat.sample, name: 抽样与样本数字特征, module: 计数原理与概率统计, exam_weight: 2}
+- {id: stat.regression, name: 回归分析与独立性检验, module: 计数原理与概率统计, exam_weight: 1, prereq: [stat.sample]}
+
+# ---------------- 导数及其应用
+- {id: deriv.basic, name: 导数的运算, module: 导数及其应用, exam_weight: 1}
+- {id: deriv.tangent, name: 导数的几何意义与切线, module: 导数及其应用, exam_weight: 3, prereq: [deriv.basic]}
+- {id: deriv.monotonic, name: 利用导数研究单调性, module: 导数及其应用, exam_weight: 3, prereq: [deriv.basic, func.monotonic]}
+- {id: deriv.extremum, name: 极值与最值, module: 导数及其应用, exam_weight: 3, prereq: [deriv.monotonic]}
+- id: deriv.always_true
+  name: 恒成立与能成立问题
+  module: 导数及其应用
+  exam_weight: 4
+  prereq: [deriv.extremum]
+  methods: [分离参数, 端点效应, 必要性探路]
+- id: deriv.zeros
+  name: 利用导数研究零点
+  module: 导数及其应用
+  exam_weight: 3
+  prereq: [deriv.extremum, func.zeros]
+  methods: [数形结合, 隐零点]
+- id: deriv.construct
+  name: 构造函数（比较大小与证明不等式）
+  module: 导数及其应用
+  exam_weight: 2
+  prereq: [deriv.monotonic]
+  methods: [同构, 放缩（切线不等式）]
+
+# ---------------- 新定义与创新题
+- {id: novel.definition, name: 新定义与综合创新题, module: 新定义与创新题, exam_weight: 5}

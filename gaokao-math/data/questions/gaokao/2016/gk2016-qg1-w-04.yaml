@@ -1,0 +1,20 @@
+type: single
+source: 2016 全国I卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  tri.laws: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\triangle A B C$ 的内角 $A 、 B 、 C$ 的对边分别为 $a 、 b 、 c$. 已知 $a=\sqrt{5}, c=2, \cos A=$ $\frac{2}{3}$, 则 $b=(\quad)$
+options:
+  A: $\sqrt{2}$
+  B: $\sqrt{3}$
+  C: '2'
+  D: '3'
+answer: D
+solution: |-
+  解: $\because \mathrm{a}=\sqrt{5}, \mathrm{c}=2, \cos \mathrm{A}=\frac{2}{3}$,
+
+  $\therefore$ 由余弦定理可得: $\cos A=\frac{2}{3}=\frac{b^{2}+c^{2}-a^{2}}{2 b c}=\frac{b^{2}+4-5}{2 \times b \times 2}$, 整理可得: $3 b^{2}-8 b-3=0$, $\therefore$ 解得： $b=3$ 或 $-\frac{1}{3}$ (舍去）.
+
+  故选: D.

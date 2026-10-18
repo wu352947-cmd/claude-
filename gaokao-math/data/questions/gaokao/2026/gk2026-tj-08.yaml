@@ -1,0 +1,14 @@
+type: single
+source: 2026 天津卷 第 8 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  seq.recurrence: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $S_{2n} - S_n = n$，$a_3 = 6$，则 $a_7 + a_8 =$ （ ）
+options:
+  A: '68'
+  B: '56'
+  C: $-3$
+  D: $-4$
+answer: C

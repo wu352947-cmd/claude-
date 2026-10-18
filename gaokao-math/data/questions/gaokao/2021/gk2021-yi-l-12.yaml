@@ -1,0 +1,32 @@
+type: single
+source: 2021 全国乙卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  expo.compare: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $a=2 \ln 1.01, b=\ln 1.02, c=\sqrt{1.04}-1$, 则 $($ )
+options:
+  A: $a<b<c$
+  B: $b<c<a$
+  C: $b<a<c$
+  D: $c<a<b$
+answer: B
+solution: |-
+  解析:
+
+  设 $f(x)=\ln (1+x)-\sqrt{1+2 x}+1$, 则 $b-c=f(0.02)$ ，易得 $f^{\prime}(x)=\frac{1}{1+x}-\frac{2}{2 \sqrt{1+2 x}}=\frac{\sqrt{1+2 x}-(1+x)}{(1+x) \sqrt{1+2 x}}$.
+
+  当 $x \geq 0$ 时, $1+x=\sqrt{(1+x)^{2}} \geq \sqrt{1+2 x}$, 故 $f^{\prime}(x) \leq 0$.
+
+  所以 $f(x)$ 在 $[0,+\infty)$ 上单调递减, 所以 $f(0.02)<f(0)=0$, 故 $b<c$.
+
+  再设 $g(x)=2 \ln (1+x)-\sqrt{1+4 x}+1$, 则 $a-c=g(0.01)$, 易得
+
+  $g^{\prime}(x)=\frac{2}{1+x}-\frac{4}{2 \sqrt{1+4 x}}=2 \cdot \frac{\sqrt{1+4 x}-(1-x)}{(1+x) \sqrt{1+4 x}}$.
+
+  当 $0 \leq x<2$ 时, $\sqrt{1+4 x} \geq \sqrt{1+2 x+x^{2}}=1+x$, 所以 $g^{\prime}(x)$ 在 $[0.2)$ 上 $\geq 0$.
+
+  故 $g(x)$ 在 $[0.2)$ 上单调递增, 所以 $g(0.01)>g(0)=0$, 故 $a>c$.
+
+  综上, $a>c>b$.

@@ -1,0 +1,26 @@
+type: single
+source: 2016 全国I卷（理科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  seq.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知等差数列 $\left\{a_{n}\right\}$ 前 9 项的和为 $27, a_{10}=8$, 则 $a_{100}=(\quad)$
+options:
+  A: '100'
+  B: '99'
+  C: '98'
+  D: '97'
+answer: C
+solution: |-
+  解: $\because$ 等差数列 $\left\{a_{n}\right\}$ 前 9 项的和为 $27, \mathrm{S}_{9}=\frac{9\left(\mathrm{a}_{1}+\mathrm{a}_{9}\right)}{2}=\frac{9 \times 2 \mathrm{a}_{5}}{2}=9 a_{5}$.
+
+  $\therefore 9 a_{5}=27, a_{5}=3$,
+
+  又 $\because a_{10}=8$,
+
+  $\therefore \mathrm{d}=1$,
+
+  $\therefore \mathrm{a}_{100}=\mathrm{a}_{5}+95 \mathrm{d}=98$,
+
+  故选: C.

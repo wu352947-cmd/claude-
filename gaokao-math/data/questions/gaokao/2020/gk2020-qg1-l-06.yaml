@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国I卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=x^{4}-2 x^{3}$ 的图像在点 $(1, f(1))$ 处的切线方程为 ()
+options:
+  A: $y=-2 x-1$
+  B: $y=-2 x+1$
+  C: $y=2 x-3$
+  D: $y=2 x+1$
+answer: B
+solution: |-
+  【详解】 $\because f(x)=x^{4}-2 x^{3}, \therefore f^{\prime}(x)=4 x^{3}-6 x^{2}, \therefore f(1)=-1, f^{\prime}(1)=-2$,
+
+  因此, 所求切线的方程为 $y+1=-2(x-1)$, 即 $y=-2 x+1$.
+
+  故选: B.

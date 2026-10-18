@@ -1,0 +1,49 @@
+type: solve
+source: 2015 全国I卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  circle.line: 1.0
+difficulty_label: 较难
+stem: |-
+  已知过点 $A(0,1)$ 且斜率为 $k$ 的直线 I 与圆 $C:(x-2)^{2}+(y-3$ )$^{2}=1$ 交于点 $M 、 N$ 两点.
+
+  (1) 求 $\mathrm{k}$ 的取值范围;
+
+  （2）若 $\overrightarrow{O M} \bullet \overrightarrow{O N}=12$, 其中 $O$ 为坐标原点, 求 $|M N|$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  （1）由题意可得, 直线 I 的斜率存在,
+
+  设过点 $A(0,1)$ 的直线方程: $y=k x+1$, 即: $k x-y+1=0$.
+
+  由已知可得圆 $C$ 的圆心 $C$ 的坐标 $(2,3)$, 半径 $R=1$.
+
+  故由 $\frac{|2 k-3+1|}{\sqrt{k^{2}+1}}<1$,
+
+  故当 $\frac{4-\sqrt{7}}{3}<k<\frac{4+\sqrt{7}}{3}$, 过点 $A(0,1)$ 的直线与圆 $C:(x-2)^{2+}(y-3)^{2}=1$ 相交于 $M, N$ 两点.
+
+  (2) 设 $M\left(x_{1}, y_{1}\right) ; N\left(x_{2}, y_{2}\right)$ ，
+
+  由题意可得, 经过点 $M 、 N 、 A$ 的直线方程为 $y=k x+1$, 代入圆 $C$ 的方程 $(x-2)$
+
+  $2+(y-3)^{2}=1$
+
+  可得 $\left(1+k^{2}\right) x^{2}-4(k+1) x+7=0$, $\therefore x_{1}+x_{2}=\frac{4(1+k)}{1+k^{2}}, x_{1} \cdot x_{2}=\frac{7}{1+k^{2}}$,
+
+  $\therefore \mathrm{y}_{1} \cdot \mathrm{y}_{2}=\left(\mathrm{kx}_{1}+1\right) \quad\left(\mathrm{kx}_{2}+1\right)=\mathrm{k}^{2} \mathrm{x}_{1} \mathrm{x}_{2}+\mathrm{k}\left(\mathrm{x}_{1}+\mathrm{x}_{2}\right)+1$
+
+  $=\frac{7}{1+k^{2}} \cdot k^{2}+k \cdot \frac{4(1+k)}{1+k^{2}}+1=\frac{12 k^{2}+4 k+1}{1+k^{2}}$,
+
+  由 $\overrightarrow{\mathrm{OM}} \cdot \overrightarrow{\mathrm{ON}}=\mathrm{x}_{1} \cdot x_{2}+\mathrm{y}_{1} \cdot \mathrm{y}_{2}=\frac{12 \mathrm{k}^{2}+4 \mathrm{k}+8}{1+\mathrm{k}^{2}}=12$, 解得 $k=1$,
+
+  故直线 $\mid$ 的方程为 $y=x+1$, 即 $x-y+1=0$.
+
+  圆心 C 在直线 I 上, $M N$ 长即为圆的直径.
+
+  所以 $|M N|=2$.

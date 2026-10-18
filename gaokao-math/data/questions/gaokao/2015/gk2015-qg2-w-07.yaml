@@ -1,0 +1,27 @@
+type: single
+source: 2015 全国II卷（文科） 第 7 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  circle.equation: 0.59
+  tri.laws: 0.41
+difficulty_label: 中档
+points: 5.0
+stem: 已知三点 $A(1,0), B(0, \sqrt{3}), C(2, \sqrt{3})$ 则 $\triangle A B C$ 外接圆的 圆心到原点的距离为 ( )
+options:
+  A: $\frac{5}{3}$
+  B: $\frac{\sqrt{21}}{3}$
+  C: $\frac{2 \sqrt{5}}{3}$
+  D: $\frac{4}{3}$
+answer: B
+solution: |-
+  解: 因为 $\triangle A B C$ 外接圆的圆心在直线 $B C$ 垂直平分线上, 即直线 $x=1$ 上, 可设圆心 $P(1, p)$, 由 $P A=P B$ 得
+
+  $|\mathrm{p}|=\sqrt{1+(\mathrm{p}-\sqrt{3})^{2}}$
+
+  得 $p=\frac{2 \sqrt{3}}{3}$
+
+  圆心坐标为 $P\left(1, \frac{2 \sqrt{3}}{3}\right)$,
+
+  所以圆心到原点的距离 $|O P|=\sqrt{1+\left(\frac{2 \sqrt{3}}{3}\right)^{2}}=\sqrt{1+\frac{12}{9}}=\frac{\sqrt{21}}{3}$,
+
+  故选: B.

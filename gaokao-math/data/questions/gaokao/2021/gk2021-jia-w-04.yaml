@@ -1,0 +1,23 @@
+type: single
+source: 2021 全国甲卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  func.monotonic: 0.58
+  expo.ops: 0.42
+difficulty_label: 基础
+points: 5.0
+stem: 下列函数中是增函数的为 $(\quad ）$
+options:
+  A: $f(x)=-x$
+  B: $f(x)=\left(\frac{2}{3}\right)^{x}$
+  C: $f(x)=x^{2}$
+  D: $f(x)=\sqrt[3]{x}$
+answer: D
+solution: |-
+  【详解】对于 $\mathrm{A}, f(x)=-x$ 为 $R$ 上的减函数, 不合题意, 舍.
+
+  对于 $\mathrm{B}, f(x)=\left(\frac{2}{3}\right)^{x}$ 为 $R$ 上的减函数, 不合题意, 舍.
+
+  对于 $\mathrm{C}, f(x)=x^{2}$ 在 $(-\infty, 0)$ 为减函数, 不合题意, 舍.
+
+  对于 $\mathrm{D}, f(x)=\sqrt[3]{x}$ 为 $R$ 上的增函数, 符合题意, 故选: D.

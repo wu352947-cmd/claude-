@@ -1,0 +1,45 @@
+type: solve
+source: 2019 全国I卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  prob.distribution: 0.39
+  seq.geom: 0.36
+  count.perm_comb: 0.24
+difficulty_label: 压轴
+stem: |-
+  为了治疗某种疾病，研制了甲、乙两种新药，希望知道哪种新药更有效, 为此进行动物 试验. 试验方案如下: 每一轮选取两只白鼠对药效进行对比试验. 对于两只白鼠, 随机选一 只施以甲药, 另一只施以乙药. 一轮的治疗结果得出后, 再安排下一轮试验. 当其中一种药 治愈的白鼠比另一种药治愈的白鼠多 4 只时, 就停止试验, 并认为治愈只数多的药更有效. 为 了方便描述问题, 约定: 对于每轮试验, 若施以甲药的白鼠治愈且施以乙药的白鼠末治愈则 甲药得 1 分, 乙药得-1 分; 若施以乙药的白鼠治愈且施以甲药的白鼠末治愈则乙药得 1 分, 甲药得 - 1 分; 若都治愈或都末治愈则两种药均得 0 分. 甲、乙两种药的治愈率分别记为 $\alpha$ 和 $\beta$, 一轮试验中甲药的得分记为 $X$.
+
+  (1) 求 $X$ 的分布列;
+
+  (2) 若甲药、乙药在试验开始时都赋予 4 分, $p_{i}(i=0,1, \cdots, 8)$ 表示“甲药的累计得分为 $i$ 时, 最终认为甲药比乙药更有效”的概率，则 $p_{0}=0, \quad p_{8}=1$,
+
+  $p_{i}=a p_{i-1}+b p_{i}+c p_{i+1}(i=1,2, \cdots, 7)$, 其中 $a=P(X=-1), \quad b=P(X=0)$,
+
+  $c=P(X=1)$ ．假设 $a=0.5, \beta=0.8$.
+
+  (i)证明: $\left\{p_{i+1}-p_{i}\right\}(i=0,1,2, \cdots, 7)$ 为等比数列;
+
+  (ii)求 $p_{4}$, 并根据 $p_{4}$ 的值解释这种试验方案的合理性.
+parts:
+- label: (1)
+  points: 4
+  answer: ''
+- label: (2)
+  points: 6.0
+  answer: ''
+solution: |-
+  【详解】(1) 由题意可知 $X$ 所有可能的取值为: $-1,0,1$
+
+  $\therefore P(X=-1)=(1-a) \beta ; \quad P(X=0)=a \beta+(1-a)(1-\beta) ; \quad P(X=1)=a(1-\beta)$ 则 $X$ 的分布列如下:
+
+  $$\begin{array}{|l|l|l|l|}\hline X & -1 & 0 & 1 \\ \hline P & (1-a) \beta & a \beta+(1-a)(1-\beta) & a(1-\beta) \\ \hline \end{array}$$
+
+  (2) $\because a=0.5, \quad \beta=0.8$
+
+  $\therefore a=0.5 \times 0.8=0.4, \quad b=0.5 \times 0.8+0.5 \times 0.2=0.5, c=0.5 \times 0.2=0.1$
+
+  (i) $\because p_{i}=a p_{i-1}+b p_{i}+c p_{i+1}(i=1,2, \cdots, 7)$
+
+  即 $p_{i}=0.4 p_{i-1}+0.5 p_{i}+0.1 p_{i+1}(i=1,2, \cdots, 7)$
+
+  整理可得: $5 p_{i}=4 p_{i-1}+p_{i+1}(i=1,2, \cdots, 7) \quad \therefore p_{i+1}-p_{i}=4\left(p_{i}-p_{i-1}\right)(i=1,2, \cdots, 7)$

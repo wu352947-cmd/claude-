@@ -1,0 +1,15 @@
+type: single
+source: 2012 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2012
+kps:
+  trig.identities: 0.57
+  trig.definition: 0.43
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $\alpha$ 为第二象限角, $\sin \alpha+\cos \alpha=\frac{\sqrt{3}}{3}$, 则 $\cos 2 \alpha=(\qquad)$
+options:
+  A: $-\frac{\sqrt{5}}{3}$
+  B: $-\frac{\sqrt{5}}{9}$
+  C: $\frac{\sqrt{5}}{9}$
+  D: $\frac{\sqrt{5}}{3}$
+answer: A

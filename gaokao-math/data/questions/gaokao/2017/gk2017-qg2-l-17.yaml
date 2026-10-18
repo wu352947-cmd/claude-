@@ -1,0 +1,43 @@
+type: solve
+source: 2017 全国II卷（理科） 第 17 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  tri.laws: 1.0
+difficulty_label: 中档
+stem: |-
+  $\triangle A B C$ 的内角 $A, B, C$ 的对边分别为 $a, b, c$, 已知 $\sin (A+C)=8 \sin ^{2}$ $\frac{B}{2}$ (1) 求 $\cos B$;
+
+  (2) 若 $a+c=6, \triangle A B C$ 的面积为 2 , 求 $b$.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: (1) $\sin (A+C)=8 \sin ^{2} \frac{B}{2}$,
+
+  $\therefore \sin B=4(1-\cos B)$,
+
+  $\because \sin ^{2} \mathrm{B}+\cos ^{2} \mathrm{B}=1$
+
+  $\therefore 16(1-\cos B)^{2}+\cos ^{2} B=1$,
+
+  $\therefore 16(1-\cos B)^{2}+\cos ^{2} B-1=0$,
+
+  $\therefore 16(\cos B-1)^{2+}(\cos B-1)(\cos B+1)=0$,
+
+  $\therefore(17 \cos B-15)(\cos B-1)=0$,
+
+  $\therefore \cos B=\frac{15}{17}$ （2）由（1）可知 $\sin B=\frac{8}{17}$,
+
+  $\because S_{\triangle A B C}=\frac{1}{2} a c \cdot \sin B=2$,
+
+  $\therefore \mathrm{ac}=\frac{17}{2}$
+
+  $\therefore b^{2}=a^{2}+c^{2}-2 a c \cos B=a^{2}+c^{2}-2 \times \frac{17}{2} \times \frac{15}{17}$
+
+  $=\mathrm{a}^{2}+\mathrm{c}^{2}-15=(\mathrm{a}+\mathrm{c})^{2}-2 \mathrm{ac}-15=36-17-15=4$,
+
+  $\therefore b=2$.

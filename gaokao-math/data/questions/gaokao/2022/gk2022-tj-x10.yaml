@@ -1,0 +1,10 @@
+type: fill
+source: 2022 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2022
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '已知 $\mathrm{i}$ 是虚数单位, 化简 $\frac{11-3 \mathrm{i}}{1+2 \mathrm{i}}$ 的结果为 ______ '
+answer: 1-5i
+answer_kind: expr

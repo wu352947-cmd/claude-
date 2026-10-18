@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 有甲乙丙丁戊 5 名同学站成一排参加文艺汇演, 若甲不站在两端, 丙和丁相邻的不同排 列方式有多少种 ($\quad$)
+options:
+  A: 12 种
+  B: 24 种
+  C: 36 种
+  D: 48 种
+answer: B

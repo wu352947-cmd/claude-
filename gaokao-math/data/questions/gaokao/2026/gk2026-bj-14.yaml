@@ -1,0 +1,17 @@
+type: solve
+source: 2026 北京卷 第 14 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.measure: 1.0
+difficulty_label: 较难
+stem: 已知三棱锥 $A - BCD$ ， $AD = AB = AC = 2\sqrt{2}$ ， $BD = BC = 2$ ， $DC = 2\sqrt{3}$ ，则它的底面 $BCD$ 的面积为__ ，体积为__.
+parts:
+- label: 答案
+  points: 5.0
+  answer: $\sqrt{3}$；$\frac{2\sqrt{3}}{3} $
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 $\sqrt{3}$；$\frac{2\sqrt{3}}{3} $

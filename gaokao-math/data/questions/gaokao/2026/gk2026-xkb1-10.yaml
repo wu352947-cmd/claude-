@@ -1,0 +1,16 @@
+type: multi
+source: 2026 新课标I卷 第 10 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.vector: 1.0
+difficulty_label: 较难
+points: 6.0
+stem: 在空间中，$A,B$为两个定点，动点$C$到直线$AB$的距离为$2$，动点$D$到直线$AB$的距离为$1$，若二面角$C-AB-D$为$60^\circ$，则（ ）
+options:
+  A: $\angle CAD \ge 60^\circ$
+  B: $CD \ge \sqrt{3}$
+  C: 当$AB\perp CD$时，$CD\perp$平面$ABD$
+  D: 当$AB\perp$平面$ACD$时，$AC\perp AD$
+answer:
+- B
+- C

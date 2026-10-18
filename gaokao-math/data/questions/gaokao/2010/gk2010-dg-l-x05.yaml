@@ -1,0 +1,14 @@
+type: single
+source: 2010 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2010
+kps:
+  solid.sphere: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知在半径为 2 的球面上有 $A$、 $B$、 $C$、 $D$ 四点, 若 $A B=C D=2$, 则四 面体 $A B C D$ 的体积的最大值为 ($\qquad$)
+options:
+  A: $\frac{2 \sqrt{3}}{3}$
+  B: $\frac{4 \sqrt{3}}{3}$
+  C: $2 \sqrt{3}$
+  D: $\frac{8 \sqrt{3}}{3}$
+answer: B

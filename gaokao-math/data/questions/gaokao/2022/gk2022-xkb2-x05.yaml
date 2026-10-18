@@ -1,0 +1,14 @@
+type: single
+source: 2022 新课标II卷 单选题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  func.abstract: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若函数 $f(x)$ 的定义域为 $\mathbf{R}$, 且 $f(x+y)+f(x-y)=f(x) f(y), f(1)=1$, 则 $\sum_{k=1}^{22} f(k)=(\quad)$
+options:
+  A: $-3$
+  B: $-2$
+  C: '0'
+  D: '1'
+answer: A

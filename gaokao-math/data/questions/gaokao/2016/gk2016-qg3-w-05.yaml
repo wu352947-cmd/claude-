@@ -1,0 +1,24 @@
+type: single
+source: 2016 全国III卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 小敏打开计算机时，忘记了开机密码的前两位，只记得第一位是 M, I, $\mathrm{N}$ 中的一个字母, 第二位是 $1,2,3,4,5$ 中的一个数字, 则小敏输人一 次密码能够成功开机的概率是（）
+options:
+  A: $\frac{8}{15}$
+  B: $\frac{1}{8}$
+  C: $\frac{1}{15}$
+  D: $\frac{1}{30}$
+answer: C
+solution: |-
+  解: 从 $\mathrm{M}, \mathrm{I}, \mathrm{N}$ 中任取一个字母, 再从 $1,2,3,4,5$ 中任取一个数 字, 取法总数为:
+
+  $(\mathrm{M}, 1),(\mathrm{M}, 2),(\mathrm{M}, 3),(\mathrm{M}, 4),(\mathrm{M}, 5),(\mathrm{I}, 1),(\mathrm{I}, 2),(\mathrm{I}, 3), \quad(\mathrm{I}$ 4), $(\mathrm{I}, 5),(\mathrm{N}, 1),(\mathrm{N}, 2),(\mathrm{N}, 3),(\mathrm{N}, 4),(\mathrm{N}, 5)$ 共 15 种.
+
+  其中只有一个是小敏的密码前两位.
+
+  由随机事件发生的概率可得, 小敏输入一次密码能够成功开机的概率是 $\frac{1}{15}$.
+
+  故选: C.

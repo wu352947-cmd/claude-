@@ -1,0 +1,10 @@
+type: fill
+source: 2013 全国大纲卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  trig.definition: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: （5 分）已知 $\alpha$ 是第三象限角, $\sin \alpha=-\frac{1}{3}$, 则 $\cot\alpha=\underline{\qquad}$.
+answer: 2\sqrt{2}
+answer_kind: expr

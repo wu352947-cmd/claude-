@@ -1,0 +1,25 @@
+type: single
+source: 2017 全国III卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  seq.arith: 0.5
+  seq.geom: 0.5
+difficulty_label: 中档
+points: 5.0
+stem: 等差数列 $\left\{a_{n}\right\}$ 的首项为 1, 公差不为 0 . 若 $a_{2}, a_{3}, a_{6}$ 成等比数列, 则 $\left\{a_{n}\right\}$ 前 6 项的和为 $(\quad)$
+options:
+  A: '-24'
+  B: '-3'
+  C: '3'
+  D: '8'
+answer: A
+solution: |-
+  解: $\because$ 等差数列 $\left\{a_{n}\right\}$ 的首项为 1, 公差不为 $0 . a_{2}, a_{3}, a_{6}$ 成等比数列, $\therefore \mathrm{a}_{3}^{2}=\mathrm{a}_{2} \cdot \mathrm{a}_{6}$
+
+  $\therefore\left(a_{1}+2 d\right)^{2}=\left(a_{1}+d\right) \quad\left(a_{1}+5 d\right)$, 且 $a_{1}=1, d \neq 0$,
+
+  解得 $d=-2$,
+
+  $\therefore\left\{a_{n}\right\}$ 前 6 项的和为 $S_{6}=6 a_{1}+\frac{6 \times 5}{2} d=6 \times 1+\frac{6 \times 5}{2} \times(-2)=-24$.
+
+  故选: A.

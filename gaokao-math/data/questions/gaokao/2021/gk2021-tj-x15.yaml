@@ -1,0 +1,18 @@
+type: solve
+source: 2021 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  vec.dot: 0.59
+  tri.range: 0.41
+difficulty_label: 较难
+stem: 在边长为 1 的等边三角形 $A B C$ 中, $D$ 为线段 $B C$ 上的动点, $D E \perp A B$ 且交 $A B$ 于点E.$D F / / A B$ 且交 $A C$ 于点 $F$, 则 $|2 \overrightarrow{B E}+\overrightarrow{D F}|$ 的值为 ______ ; $(\overrightarrow{D E}+\overrightarrow{D F}) \cdot \overrightarrow{D A}$ 的最小值为 ______ .
+parts:
+- label: 答案
+  points: 5.0
+  answer: 1；$\frac{11}{20}$
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 1；$\frac{11}{20}$

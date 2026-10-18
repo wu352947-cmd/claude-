@@ -1,0 +1,10 @@
+type: fill
+source: 2021 天津卷 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2021
+kps:
+  circle.line: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若斜率为 $\sqrt{3}$ 的直线与 $y$ 轴交于点 $\mathrm{A}$, 与圆 $x^{2}+(y-1)^{2}=1$ 相切于点 $B$, 则 $|A B|=\underline{\qquad}$.
+answer: \sqrt{3}
+answer_kind: expr

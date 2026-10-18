@@ -1,0 +1,31 @@
+type: single
+source: 2018 全国III卷 第 8 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  tri.range: 0.63
+  circle.line: 0.37
+difficulty_label: 中档
+points: 5.0
+stem: 直线 $x+y+2=0$ 分别与 $x$ 轴, $y$ 轴交于 $A, B$ 两点, 点 $P$ 在圆 $(x-2)$ ${ }^{2}+y^{2}=2$ 上，则 $\triangle A B P$ 面积的取值范围是（）
+options:
+  A: $[2,6]$
+  B: $[4,8]$
+  C: $[\sqrt{2}, 3 \sqrt{2}]$
+  D: $[2 \sqrt{2}, 3 \sqrt{2}]$
+answer: A
+solution: |-
+  解: $\because$ 直线 $x+y+2=0$ 分别与 $x$ 轴, $y$ 轴交于 $A, B$ 两点, $\therefore$ 令 $\mathrm{x}=0$, 得 $\mathrm{y}=-2$, 令 $\mathrm{y}=0$, 得 $\mathrm{x}=-2$,
+
+  $\therefore A(-2,0), B(0,-2),|A B|=\sqrt{4+4}=2 \sqrt{2}$,
+
+  $\because$ 点 $P$ 在圆 $(x-2)^{2}+y^{2}=2$ 上, $\therefore$ 设 $P(2+\sqrt{2} \cos \theta, \sqrt{2} \sin \theta)$,
+
+  $\therefore$ 点 $\mathrm{P}$ 到直线 $\mathrm{x}+\mathrm{y}+2=0$ 的距离: $\mathrm{d}=\frac{|2+\sqrt{2} \cos \theta+\sqrt{2} \sin \theta+2|}{\sqrt{2}}=\frac{\left|2 \sin \left(\theta+\frac{\pi}{4}\right)+4\right|}{\sqrt{2}}$,
+
+  $\because \sin \left(\theta+\frac{\pi}{4}\right) \in[-1,1], \quad \therefore d=\frac{\left|2 \sin \left(\theta+\frac{\pi}{4}\right)+4\right|}{\sqrt{2}} \in[\sqrt{2}, 3 \sqrt{2}]$,
+
+  $\therefore \triangle \mathrm{ABP}$ 面积的取值范围是:
+
+  $\left[\frac{1}{2} \times 2 \sqrt{2} \times \sqrt{2}, \frac{1}{2} \times 2 \sqrt{2} \times 3 \sqrt{2}\right]=[2,6]$.
+
+  故选: $A$.

@@ -1,0 +1,40 @@
+type: single
+source: 2018 全国II卷 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  func.parity: 0.41
+  func.symmetry: 0.32
+  func.domain_range: 0.26
+difficulty_label: 较难
+points: 5.0
+stem: 已知 $f(x)$ 是定义域为 $(-\infty,+\infty)$ 的奇函数, 满足 $f(1-x)=f($ $1+x)$, 若 $f(1)=2$, 则 $f(1)+f(2)+f(3)+\ldots+f(50)=(\quad)$
+options:
+  A: '-50'
+  B: '0'
+  C: '2'
+  D: '50'
+answer: C
+solution: |-
+  解: $\because f(x)$ 是奇函数, 且 $f(1-x)=f(1+x)$,
+
+  $\therefore f(1-x)=f(1+x)=-f(x-1), f(0)=0$,
+
+  则 $f(x+2)=-f(x)$, 则 $f(x+4)=-f(x+2)=f(x)$,
+
+  即函数 $f(x)$ 是周期为 4 的周期函数,
+
+  $\because f(1)=2$,
+
+  $\therefore f(2)=f(0)=0, f(3)=f(1-2)=f(-1)=-f(1)=-2$,
+
+  $f(4)=f(0)=0$
+
+  则 $f(1)+f(2)+f(3)+f(4)=2+0-2+0=0$,
+
+  则 $f(1)+f(2)+f(3)+\ldots+f(50)=12[f(1)+f(2)+f(3)+f(4)]+f(49)$
+
+  $+f(50)$
+
+  $=f(1)+f(2)=2+0=2$,
+
+  故选: C.

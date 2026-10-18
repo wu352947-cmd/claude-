@@ -1,0 +1,26 @@
+type: single
+source: 2020 全国II卷 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  expo.ops: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 若 $2^{x}-2^{y}<3^{-x}-3^{-y}$ ，则 $(\quad)$
+options:
+  A: $\ln (y-x+1)>0$
+  B: $\ln (y-x+1)<0$
+  C: $\ln |x-y|>0$
+  D: $\ln |x-y|<0$
+answer: A
+solution: |-
+  【详解】由 $2^{x}-2^{y}<3^{-x}-3^{-y}$ 得: $2^{x}-3^{-x}<2^{y}-3^{-y}$,
+
+  令 $f(t)=2^{t}-3^{-t}$, $\because y=2^{x}$ 为 $R$ 上的增函数, $y=3^{-x}$ 为 $R$ 上的减函数, $\therefore f(t)$ 为 $R$ 上的增函数,
+
+  $\therefore x<y$,
+
+  $\mathrm{Q} y-x>0 \therefore, y-x+1>1 \therefore, \ln (y-x+1>) 0$, 则A正确, B错误;
+
+  $\mathrm{Q}|x-y|$ 与 1 的大小不确定, 故CD无法确定.
+
+  故选: A.

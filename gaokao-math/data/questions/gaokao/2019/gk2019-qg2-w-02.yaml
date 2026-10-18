@@ -1,0 +1,18 @@
+type: single
+source: 2019 全国II卷（文科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设 $z=\mathrm{i}(2+\mathrm{i})$ ，则 $\bar{z}=$
+options:
+  A: $1+2 \mathrm{i}$
+  B: $-1+2 \mathrm{i}$
+  C: $1-2 \mathrm{i}$
+  D: $-1-2 \mathrm{i}$
+answer: D
+solution: |-
+  【详解】 $z=\mathrm{i}(2+\mathrm{i})=2 \mathrm{i}+\mathrm{i}^{2}=-1+2 \mathrm{i}$,
+
+  所以 $\bar{z}=-1-2 i$, 选 D.

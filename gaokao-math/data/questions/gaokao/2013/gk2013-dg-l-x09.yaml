@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  func.monotonic: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若函数 $f(x)=x^{2}+a x+x$ 在 $\left(\frac{1}{2},+\infty\right)$ 是增函数, 则 $a$ 的取值范围是 （$\qquad$）
+options:
+  A: $[-1,0]$
+  B: $[-1,+\infty)$
+  C: $[0,3]$
+  D: $[3,+\infty)$
+answer: D

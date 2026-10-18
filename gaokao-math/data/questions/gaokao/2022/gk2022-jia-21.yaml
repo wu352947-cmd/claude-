@@ -1,0 +1,57 @@
+type: solve
+source: 2022 全国甲卷 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  conic.parabola: 1.0
+difficulty_label: 压轴
+stem: |-
+  设抛物线 $C: y^{2}=2 p x(p>0)$ 的焦点为 $F$, 点 $D(p, 0)$, 过 $F$ 的直线交 $C$ 于 $M, N$ 两 点. 当直线 $M D$ 垂直于 $x$ 轴时, $|M F|=3$. (1) 求 $C$ 的方程;
+
+  (2) 设直线 $M D, N D$ 与 $C$ 的另一个交点分别为 $A, B$, 记直线 $M N, A B$ 的倾斜角分别为 $a, \beta$. 当 $a-\beta$ 取得最大值时, 求直线 $A B$ 的方程.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  【小问 1 详解】}
+
+  抛物线的准线为 $x=-\frac{p}{2}$, 当 $M D$ 与 $x$ 轴垂直时, 点 $M$ 的横坐标为 $p$,
+
+  此时 $|M F|=p+\frac{p}{2}=3$, 所以 $p=2$ ，
+
+  所以抛物线 $C$ 的方程为 $y^{2}=4 x$;
+
+  【小问 2 详解】}
+
+  设 $M\left(\frac{y_{1}^{2}}{4}, y_{1}\right), N\left(\frac{y_{2}^{2}}{4}, y_{2}\right), A\left(\frac{y_{3}^{2}}{4}, y_{3}\right), B\left(\frac{y_{4}^{2}}{4}, y_{4}\right)$, 直线 $M N: x=m y+1$,
+
+  由 $\left\{\begin{array}{l}x=m y+1 \\ y^{2}=4 x\end{array}\right.$ 可得 $y^{2}-4 m y-4=0, \Delta>0, y_{1} y_{2}=-4$,
+
+  由斜率公式可得 $k_{M N}=\frac{y_{1}-y_{2}}{\frac{y_{1}^{2}}{4}-\frac{y_{2}^{2}}{4}}=\frac{4}{y_{1}+y_{2}}, \quad k_{A B}=\frac{y_{3}-y_{4}}{\frac{y_{3}^{2}}{4}-\frac{y_{4}^{2}}{4}}=\frac{4}{y_{3}+y_{4}}$ ，
+
+  直线 $M D: x=\frac{x_{1}-2}{y_{1}} \cdot y+2$, 代人抛物线方程可得 $y^{2}-\frac{4\left(x_{1}-2\right)}{y_{1}} \cdot y-8=0$,
+
+  $\Delta>0, y_{1} y_{3}=-8$, 所以 $y_{3}=2 y_{2}$, 同理可得 $y_{4}=2 y_{1}$, 所以 $k_{A B}=\frac{4}{y_{3}+y_{4}}=\frac{4}{2\left(y_{1}+y_{2}\right)}=\frac{k_{M N}}{2}$
+
+  又因为直线 $M N 、 A B$ 的倾斜角分别为 $a, \beta$,
+
+  所以 $k_{A B}=\tan \beta=\frac{k_{M N}}{2}=\frac{\tan a}{2}$,
+
+  若要使 $a-\beta$ 最大, 则 $\beta \in\left(0, \frac{\pi}{2}\right)$,
+
+  设 $k_{M N}=2 k_{A B}=2 k>0$, 则
+
+  $\tan (a-\beta)=\frac{\tan a-\tan \beta}{1+\tan a \tan \beta}=\frac{k}{1+2 k^{2}}=\frac{1}{\frac{1}{k}+2 k} \leq \frac{1}{2 \sqrt{\frac{1}{k} \cdot 2 k}}=\frac{\sqrt{2}}{4}$
+
+  当且仅当 $\frac{1}{k}=2 k$ 即 $k=\frac{\sqrt{2}}{2}$ 时, 等号成立,
+
+  所以当 $a-\beta$ 最大时, $k_{A B}=\frac{\sqrt{2}}{2}$, 设直线 $A B: x=\sqrt{2} y+n$,
+
+  代人抛物线方程可得 $y^{2}-4 \sqrt{2} y-4 n=0$,
+
+  $\Delta>0, y_{3} y_{4}=-4 n=4 y_{1} y_{2}=-16$, 所以 $n=4$,
+
+  所以直线 $A B: x=\sqrt{2} y+4$.

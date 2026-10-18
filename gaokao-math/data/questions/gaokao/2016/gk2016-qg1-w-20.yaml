@@ -1,0 +1,39 @@
+type: solve
+source: 2016 全国I卷（文科） 第 20 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  conic.parabola: 1.0
+difficulty_label: 较难
+stem: |-
+  在直角坐标系 $x O y$ 中, 直线 $I: y=t （ t \neq 0)$ 交 $y$ 轴于点 $M$, 交抛物 线 $C: y^{2}=2 p x(p>0)$ 于点 $P, M$ 关于点 $P$ 的对称点为 $N$, 连结 $O N$ 并延长交 $C$ 于点 $\mathrm{H}$.
+
+  ( I ) 求 $\frac{|\mathrm{OH}|}{|\mathrm{ON}|}$;
+
+  (II) 除 $\mathrm{H}$ 以外, 直线 $\mathrm{MH}$ 与 $\mathrm{C}$ 是否有其它公共点? 说明理由.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解: ( I ) 将直线 I 与抛物线方程联立, 解得 $P\left(\frac{\mathrm{t}^{2}}{2 \mathrm{p}}, \mathrm{t}\right)$,
+
+  $\because M$ 关于点 $P$ 的对称点为 $N$,
+
+  $\therefore \frac{\mathrm{x}_{\mathbb{N}}+\mathrm{x}_{\mathrm{K}}}{2}=\frac{\mathrm{t}^{2}}{2 \mathrm{p}}, \frac{\mathrm{y}_{\mathrm{N}}+\mathrm{y}_{\mathrm{M}}}{2}=\mathrm{t}$,
+
+  $\therefore N\left(\frac{t^{2}}{p}, t\right)$,
+
+  $\therefore O N$ 的方程为 $y=\frac{p}{t} x$,
+
+  与抛物线方程联立, 解得 $H\left(\frac{2 \mathrm{t}^{2}}{\mathrm{p}}, 2 \mathrm{t}\right)$ $\therefore \frac{|\mathrm{OH}|}{|\mathrm{ON}|}=\frac{\left|\mathrm{y}_{\mathrm{H}}\right|}{\left|\mathrm{y}_{\mathrm{N}}\right|}=2$
+
+  (II) 由 ( I ) 知 $k_{M H}=\frac{p}{2 t}$,
+
+  $\therefore$ 直线 $M H$ 的方程为 $y=\frac{p}{2 t} x+t$, 与抛物线方程联立，消去 $x$ 可得 $y^{2}-4 t y+4 t^{2}=0$,
+
+  $\therefore \triangle=16 \mathrm{t}^{2}-4 \times 4 \mathrm{t}^{2}=0$,
+
+  $\therefore$ 直线 $\mathrm{MH}$ 与 $\mathrm{C}$ 除点 $\mathrm{H}$ 外没有其它公共点.

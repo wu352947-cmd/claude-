@@ -1,0 +1,10 @@
+type: fill
+source: 2021 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2021
+kps:
+  func.parity: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知函数 $f(x)=x^{3}\left(a \cdot 2^{x}-2^{-x}\right)$ 是偶函数, 则 $a=\underline{\qquad}$
+answer: '1'
+answer_kind: expr

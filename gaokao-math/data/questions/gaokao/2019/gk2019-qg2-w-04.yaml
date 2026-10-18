@@ -1,0 +1,18 @@
+type: single
+source: 2019 全国II卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 生物实验室有 5 只兔子, 其中只有 3 只测量过某项指标, 若从这 5 只兔子中随机取出 3 只, 则恰有 2 只测量过该指标的概率为
+options:
+  A: $\frac{2}{3}$
+  B: $\frac{3}{5}$
+  C: $\frac{2}{5}$
+  D: $\frac{1}{5}$
+answer: B
+solution: |-
+  【详解】设其中做过测试的 3 只兔子为 $a, b, c$, 剩余的 2 只为 $A, B$, 则从这 5 只中任取 3 只 的 所 有 取 法 有 $\{a, b, c\},\{a, b, A\},\{a, b, B\},\{a, c, A\},\{a, c, B\},\{a, A, B\}$ ， $\{b, \mathrm{c}, A\},\{b, \mathrm{c}, B\},\{\mathrm{b}, A, B\},\{\mathrm{c}, A, B\}$ 共 10 种. 其中恰有 2 只做过测试的取法有 $\{a, b, A\},\{a, b, B\},\{a, c, A\},\{a, c, B\},\{b, \mathrm{c}, A\},\{b, \mathrm{c}, B\}$ 共 6 种,
+
+  所以恰有 2 只做过测试的概率为 $\frac{6}{10}=\frac{3}{5}$, 选 B.

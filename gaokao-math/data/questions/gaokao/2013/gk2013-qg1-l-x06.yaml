@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国I卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  count.binomial: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 设 $m$ 为正整数, $(x+y)^{2 m}$ 展开式的二项式系数的最大值为 $a,(x+y)^{2 m+1}$ 展开式的二项式系数的最大值为 $b$, 若 $13 a=7 b$, 则 $m=(\qquad)$
+options:
+  A: '5'
+  B: '6'
+  C: '7'
+  D: '8'
+answer: B

@@ -1,0 +1,16 @@
+type: fill
+source: 2018 全国I卷（理科） 第 15 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 从 2 位女生, 4 位男生中选 3 人参加科技比赛, 且至少有 1 位女生 入选，则不同的选法共有 种. (用数字填写答案) ______
+answer: '16'
+answer_kind: expr
+solution: |-
+  解：方法一：直接法, 1 女 2 男, 有 $\mathrm{C}_{2}{ }^{1} \mathrm{C}_{4}{ }^{2}=12,2$ 女 1 男, 有 $\mathrm{C}_{2}{ }^{2} \mathrm{C}_{4}{ }^{1}=4$ 根据分类计数原理可得, 共有 $12+4=16$ 种,
+
+  方法二, 间接法: $\mathrm{C}_{6}{ }^{3}-\mathrm{C}_{4}{ }^{3}=20-4=16$ 种,
+
+  故答案为: 16

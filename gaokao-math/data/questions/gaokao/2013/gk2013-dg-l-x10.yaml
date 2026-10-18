@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  solid.vector: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 已知正四棱柱 $A B C D-A_{1} B_{1} C_{1} D_{1}$ 中, $A A_{1}=2 A B$, 则 $C D$ 与平面 $B D C_{1}$ 所 成角的正弦值等于 （$\qquad$）
+options:
+  A: $\frac{2}{3}$
+  B: $\frac{\sqrt{3}}{3}$
+  C: $\frac{\sqrt{2}}{3}$
+  D: $\frac{1}{3}$
+answer: A

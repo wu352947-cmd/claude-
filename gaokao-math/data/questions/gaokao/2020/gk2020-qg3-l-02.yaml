@@ -1,0 +1,22 @@
+type: single
+source: 2020 全国III卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 复数 $\frac{1}{1-3 i}$ 的虚部是 $(\quad)$
+options:
+  A: $-\frac{3}{10}$
+  B: $-\frac{1}{10}$
+  C: $\frac{1}{10}$
+  D: $\frac{3}{10}$
+answer: D
+solution: |-
+  【详解】 因为 $z=\frac{1}{1-3 i}=\frac{1+3 i}{(1-3 i)(1+3 i)}=\frac{1}{10}+\frac{3}{10} i$,
+
+  所以复数 $z=\frac{1}{1-3 i}$ 的虚部为 $\frac{3}{10}$.
+
+  故选: D.
+
+  【点晴】本题主要考查复数的除法运算, 涉及到复数的虚部的定义, 是一道基础题.

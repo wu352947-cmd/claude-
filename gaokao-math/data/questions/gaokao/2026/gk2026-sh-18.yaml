@@ -1,0 +1,23 @@
+type: solve
+source: 2026 上海卷 第 18 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+stem: |-
+  已知四棱锥 $P-ABCD$，底面 $ABCD$ 为矩形，$PH\perp$底面 $ABCD$，垂足 $H$ 在 $AD$ 边上，且 $AH=1$，$HD=4$，$AB=2$。
+
+  (1)求证：$HC\perp PB$；
+
+  (2)若四棱锥 $P-ABCD$ 的体积为 $\dfrac{10\sqrt{5}}{3}$，求二面角 $C-PB-H$ 的大小。
+parts:
+- label: (1)
+  points: 7.0
+  answer: 证明略
+- label: (2)
+  points: 8.0
+  answer: 二面角大小为$\arccos\frac{1}{3}$（或余弦值为$\frac{1}{3}$）
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 证明略；(2) 二面角大小为$\arccos\frac{1}{3}$（或余弦值为$\frac{1}{3}$）

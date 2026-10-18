@@ -1,0 +1,48 @@
+type: fill
+source: 2011 全国新课标卷（理科） 第 16 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  tri.range: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 在 $\triangle A B C$ 中, $B=60^{\circ}, A C=\sqrt{3}$, 则 $A B+2 B C$ 的最大值为 ______
+answer: 2 \sqrt{7}
+answer_kind: expr
+solution: |-
+  解: 设 $A B=c A C=b B C=a$
+
+  由余弦定理
+
+  $\cos B=\frac{a^{2}+c^{2}-b^{2}}{2 a c}$
+
+  所以 $a^{2}+c^{2}-a c=b^{2}=3$
+
+  设 $\mathrm{c}+2 \mathrm{a}=\mathrm{m}$
+
+  代入上式得
+
+  $7 a^{2}-5 a m+m^{2}-3=0$
+
+  $\triangle=84-3 m^{2} \geqslant 0$ 故 $m \leqslant 2 \sqrt{7}$
+
+  当 $m=2 \sqrt{7}$ 时, 此时 $a=\frac{5 \sqrt{7}}{7}, c=\frac{4 \sqrt{7}}{7}$ 符合题意
+
+  因此最大值为 $2 \sqrt{7}$
+
+  另解: 因为 $B=60^{\circ}, A+B+C=180^{\circ}$, 所以 $A+C=120^{\circ}$,
+
+  由正弦定理，有
+
+  $\frac{A B}{\sin C}=\frac{B C}{\sin A}=\frac{A C}{\sin B}=\frac{\sqrt{3}}{\sin 60^{\circ}}=2$,
+
+  所以 $A B=2 \sin C, B C=2 \sin A$.
+
+  所以 $A B+2 B C=2 \sin C+4 \sin A=2 \sin \left(120^{\circ}-A\right)+4 \sin A$
+
+  $=2\left(\sin 120^{\circ} \cos A-\cos 120^{\circ} \sin A\right)+4 \sin A$
+
+  $=\sqrt{3} \cos A+5 \sin A$ $=2 \sqrt{7} \sin (A+\phi), \quad\left(\right.$ 其中 $\left.\sin \phi=\frac{\sqrt{3}}{2 \sqrt{7}}, \cos \phi=\frac{5}{2 \sqrt{7}}\right)$
+
+  所以 $A B+2 B C$ 的最大值为 $2 \sqrt{7}$.
+
+  故答案为: $2 \sqrt{7}$

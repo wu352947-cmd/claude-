@@ -1,0 +1,20 @@
+type: single
+source: 2010 全国新课标卷（理科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  prob.distribution: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 某种种子每粒发芽的概率都为 0.9 , 现播种了 1000 粒, 对于没有发 芽的种子, 每粒需再补种 2 粒, 补种的种子数记为 $X$, 则 $X$ 的数学期望为 $(\quad)$
+options:
+  A: '100'
+  B: '200'
+  C: '300'
+  D: '400'
+answer: B
+solution: |-
+  解：由题意可知播种了 1000 粒, 没有发芽的种子数 $\xi$ 服从二项分布, 即 $\xi \sim B(1000,0.1)$.
+
+  而每粒需再补种 2 粒, 补种的种子数记为 $X$
+
+  故 $X=2 \xi$, 则 $E X=2 E \xi=2 \times 1000 \times 0.1=200$. 故选: B.

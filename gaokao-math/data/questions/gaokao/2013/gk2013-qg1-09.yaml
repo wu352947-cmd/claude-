@@ -1,0 +1,25 @@
+type: single
+source: 2013 全国I卷 第 9 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2013
+kps:
+  trig.graph: 0.56
+  func.graph: 0.44
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $f(x)=(1-\cos x) \sin x$ 在 $[-\pi, \pi]$ 的图象大致为 $(\quad)$
+figure: 8bb17badf20bb242.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: C
+solution: |-
+  解: 由题意可知: $f(-x)=(1-\cos x) \sin (-x)=-f(x)$,故函数 $\mathrm{f}(\mathrm{x})$ 为奇函数, 故可排除 $\mathrm{B}$,又因为当 $x \in(0, \pi)$ 时, $1-\cos x>0, \sin x>0$,故 $f(x)>0$, 可排除 $A$,
+  $$
+  \begin{aligned}
+  & \text { 又 } f^{\prime}(x)=(1-\cos x)^{\prime} \sin x+(1-\cos x)(\sin x)^{\prime} \\
+  & =\sin ^2 x+\cos x-\cos ^2 x=\cos x-\cos 2 x,
+  \end{aligned}
+  $$
+  故可得 $f^{\prime}(0)=0$, 可排除 $D$,故选: C.

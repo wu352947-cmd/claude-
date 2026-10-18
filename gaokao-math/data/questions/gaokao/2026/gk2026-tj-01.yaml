@@ -1,0 +1,14 @@
+type: single
+source: 2026 天津卷 第 1 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  set.operations: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知全集 $U = \{ -2, -1, 0, 1, 2, 3 \}$，集合 $A = \{ -1, 0, 1, 3 \}$，集合 $B = \{ -2, 0, 1 \}$，则 $( \complement_U A ) \cup B =$ （ ）
+options:
+  A: $\{ -2 \}$
+  B: $\{ -2, 2 \}$
+  C: $\{ 0, 1, 2 \}$
+  D: $\{ -2, 0, 1, 2 \}$
+answer: D

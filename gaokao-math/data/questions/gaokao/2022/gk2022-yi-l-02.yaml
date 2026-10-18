@@ -1,0 +1,22 @@
+type: single
+source: 2022 全国乙卷（理科） 第 2 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  complex.modulus: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $z=1-2 i$ ，且 $z+a \bar{z}+b=0$ ，其中 $a, b$ 为实数，则（)
+options:
+  A: $a=1, b=-2$
+  B: $a=-1, b=2$
+  C: $a=1, b=2$
+  D: $a=-1, b=-2$
+answer: A
+solution: |-
+  【详解】 $\bar{z}=1+2 \mathrm{i}$
+
+  $z+a \bar{z}+b=1-2 \mathrm{i}+a(1+2 \mathrm{i})+b=(1+a+b)+(2 a-2) \mathrm{i}$
+
+  由 $z+a \bar{z}+b=0$, 得 $\left\{\begin{array}{l}1+a+b=0 \\ 2 a-2=0\end{array}\right.$,即 $\left\{\begin{array}{l}a=1 \\ b=-2\end{array}\right.$
+
+  故选: A

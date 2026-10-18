@@ -1,0 +1,26 @@
+type: single
+source: 2016 全国II卷（文科） 第 10 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  func.domain_range: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 下列函数中, 其定义域和值域分别与函数 $y=10^{\lg x}$ 的定义域和值域相 同的是 ( )
+options:
+  A: $y=x$
+  B: $y=\lg x$
+  C: $y=2^{x}$
+  D: $y=\frac{1}{\sqrt{x}}$
+answer: D
+solution: |-
+  解：函数 $\mathrm{y}=10^{\operatorname{lgx}}$ 的定义域和值域均为 $(0,+\infty)$,
+
+  函数 $y=x$ 的定义域和值域均为 $R$, 不满足要求;
+
+  函数 $y=\lg x$ 的定义域为 $(0,+\infty)$ ，值域为 $R$, 不满足要求;
+
+  函数 $y=2^{x}$ 的定义域为 $R$, 值域为 $(0,+\infty)$ ，不满足要求;
+
+  函数 $\mathrm{y}=\frac{1}{\sqrt{\mathrm{x}}}$ 的定义域和值域均为 $(0,+\infty)$ ，满足要求;
+
+  故选: D.

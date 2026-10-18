@@ -1,0 +1,26 @@
+type: fill
+source: 2022 全国甲卷（文科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  circle.line: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设点 $M$ 在直线 $2 x+y-1=0$ 上, 点 $(3,0)$ 和 $(0,1)$ 均在 $\odot M$ 上, 则 $\odot M$ 的方程为 ______
+answer: (x-1)^{2}+(y+1)^{2}=5
+answer_kind: equation
+solution: |-
+  【详解】解: $\because$ 点 $M$ 在直线 $2 x+y-1=0$ 上,
+
+  $\therefore$ 设点 $M$ 为 $(a, 1-2 a)$, 又因为点 $(3,0)$ 和 $(0,1)$ 均在 $\odot M$ 上,
+
+  $\therefore$ 点 $M$ 到两点的距离相等且为半径 $R$,
+
+  $\therefore \sqrt{(a-3)^{2}+(1-2 a)^{2}}=\sqrt{a^{2}+(-2 a)^{2}}=R$,
+
+  $a^{2}-6 a+9+4 a^{2}-4 a+1=5 a^{2}$, 解得 $a=1$,
+
+  $\therefore M(1,-1), \quad R=\sqrt{5}$
+
+  $\odot M$ 的方程为 $(x-1)^{2}+(y+1)^{2}=5$.
+
+  故答案为: $(x-1)^{2}+(y+1)^{2}=5$

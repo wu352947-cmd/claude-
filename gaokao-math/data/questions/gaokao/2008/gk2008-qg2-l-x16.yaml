@@ -1,0 +1,21 @@
+type: solve
+source: 2008 全国II卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  logic.condition: 1.0
+difficulty_label: 较难
+stem: |-
+  平面内的一个四边形为平行四边形的充要条件有多个, 如两组对边 分别平行, 类似地, 写出空间中的一个四棱柱为平行六面体的两个充要条件: \\
+  充要条件$\textcircled{1}\underline{\qquad}$;\\
+  充要条件$\textcircled{2}\underline{\qquad}$.\\
+  (写出你认为正确的两个充要条件)
+parts:
+- label: 答案
+  points: 5.0
+  answer: 三组对面分别平行的四棱柱为平行六面体；平行六面体的对角线交于一点,并且在交点处互相平分
+  rubric:
+  - 与参考答案一致即得分
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：答案 三组对面分别平行的四棱柱为平行六面体；平行六面体的对角线交于一点,并且在交点处互相平分

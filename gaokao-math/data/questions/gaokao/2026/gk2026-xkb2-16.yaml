@@ -1,0 +1,21 @@
+type: solve
+source: 2026 新课标II卷 第 16 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+stem: |-
+  三棱锥$A-BCD$中，$E$在$BD$上，$AE \perp CE$，$AE \perp DE$，$CD \perp AD$.
+  (1)证明：$CD \perp AB$；
+  (2)若$DE=2$，$BE=1$，$AE=\sqrt{2}$，$CD=2\sqrt{3}$，求$AD$与平面$ABC$所成角的正弦值.
+parts:
+- label: (1)
+  points: 7.0
+  answer: （证明题）
+- label: (2)
+  points: 8.0
+  answer: $\dfrac{\sqrt{6}}{3}$
+solution: |-
+  （数据集只提供了参考答案，没有解答过程）
+
+  参考答案：(1) 证明题答案略；(2) $\dfrac{\sqrt{6}}{3}$

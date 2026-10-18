@@ -1,0 +1,10 @@
+type: fill
+source: 2008 全国II卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设向量 $\vec{a}=(1,2), \vec{b}=(2,3)$, 若向量 $\lambda \vec{a}+\vec{b}$ 与向量 $\vec{c}=(-4,-7)$ 共 线, 则 $\lambda=\underline{\qquad}$.
+answer: '2'
+answer_kind: expr

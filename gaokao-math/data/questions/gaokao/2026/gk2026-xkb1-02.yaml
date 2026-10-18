@@ -1,0 +1,14 @@
+type: single
+source: 2026 新课标I卷 第 2 题 · 来源：gaokao_math_2026（Apache-2.0）
+year: 2026
+kps:
+  vec.linear: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知平面向量$\overrightarrow{a},\overrightarrow{b}$不共线，且 $2\overrightarrow{a}+y\overrightarrow{b}=x\overrightarrow{a}-3\overrightarrow{b}$，则（ ）
+options:
+  A: $x=2$,$y=-3$
+  B: $x=-2$,$y=3$
+  C: $x=2$,$y=3$
+  D: $x=-2$,$y=-3$
+answer: A

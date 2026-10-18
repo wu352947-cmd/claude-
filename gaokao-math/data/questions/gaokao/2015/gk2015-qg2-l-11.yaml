@@ -1,0 +1,33 @@
+type: single
+source: 2015 全国II卷（理科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  conic.hyperbola: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  已知 $A, B$ 为双曲线 $E$ 的左, 右顶点, 点 $M$ 在 $E$ 上, $\triangle A B M$ 为等
+
+  （图略）
+options:
+  A: $\sqrt{5}$
+  B: '2'
+  C: $\sqrt{3}$
+  D: $\sqrt{2}$
+answer: D
+solution: |-
+  解: 设 $M$ 在双曲线 $\frac{x^{2}}{a^{2}}-\frac{y^{2}}{b^{2}}=1$ 的左支上,
+
+  且 $M A=A B=2 a, \angle M A B=120^{\circ}$,
+
+  则 $M$ 的坐标为 $(-2 a, \sqrt{3} a)$,
+
+  代入双曲线方程可得, $\frac{4 a^{2}}{a^{2}}-\frac{3 a^{2}}{b^{2}}=1$
+
+  可得 $a=b$,
+
+  $c=\sqrt{a^{2}+b^{2}}=\sqrt{2} a$
+
+  即有 $\mathrm{e}=\frac{\mathrm{c}}{\mathrm{a}}=\sqrt{2}$.
+
+  故选: D.

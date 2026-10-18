@@ -1,0 +1,10 @@
+type: fill
+source: 2007 全国I卷（理科） 填空题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2007
+kps:
+  count.perm_comb: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 从班委会 5 名成员中选出 3 名, 分别担任班级学习委员、文娱委员与体育委员，其中甲、乙二人不能担任文娱委员，则不同的选法共有 ______ 种. (用数字作答)
+answer: '36'
+answer_kind: expr

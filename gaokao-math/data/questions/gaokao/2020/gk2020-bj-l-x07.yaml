@@ -1,0 +1,14 @@
+type: single
+source: 2020 北京卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2020
+kps:
+  logic.condition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 已知 $\alpha, \beta \in R$, 则“存在 $k \in Z$ 使得 $\alpha=k \pi+(-1)^{k} \beta$ ”是“ $\sin \alpha=\sin \beta$ ”的 ($\quad$).
+options:
+  A: 充分而不必要条件
+  B: 必要而不充分条件
+  C: 充分必要条件
+  D: 既不充分也不必要条件
+answer: C

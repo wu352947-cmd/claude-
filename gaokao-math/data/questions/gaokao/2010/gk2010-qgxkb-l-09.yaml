@@ -1,0 +1,22 @@
+type: single
+source: 2010 全国新课标卷（理科） 第 9 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2010
+kps:
+  trig.definition: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 若 $\cos \alpha=-\frac{4}{5}, \alpha$ 是第三象限的角, 则 $\frac{1+\tan \frac{\alpha}{2}}{1-\tan \frac{\alpha}{2}}=(\quad)$
+options:
+  A: $-\frac{1}{2}$
+  B: $\frac{1}{2}$
+  C: '2'
+  D: '-2'
+answer: A
+solution: |-
+  解: 由 $\cos \alpha=-\frac{4}{5}, \alpha$ 是第三象限的角,
+
+  $\therefore$ 可得 $\sin \alpha=-\frac{3}{5}$,
+
+  则 $\frac{1+\tan \frac{\alpha}{2}}{1-\tan \frac{\alpha}{2}}=\frac{\cos \frac{\alpha}{2}+\sin \frac{\alpha}{2}}{\cos \frac{\alpha}{2}-\sin \frac{\alpha}{2}}=\frac{1+\sin \alpha}{\cos \alpha}=\frac{1-\frac{3}{5}}{-\frac{4}{5}}=-\frac{1}{2}$,
+
+  应选 $A$.

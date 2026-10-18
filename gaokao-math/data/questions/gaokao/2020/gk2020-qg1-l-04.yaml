@@ -1,0 +1,20 @@
+type: single
+source: 2020 全国I卷（理科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  conic.parabola: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: '已知 $A$ 为抛物线 $C: y^{2}=2 p x(p>0)$ 上一点, 点 $A$ 到 $C$ 的焦点的距离为 12 , 到 $y$ 轴的距离为 9 , 则 $p=()$'
+options:
+  A: '2'
+  B: '3'
+  C: '6'
+  D: '9'
+answer: C
+solution: |-
+  【详解】设抛物线的焦点为 $F$, 由抛物线的定义知 $|A F|=x_{A}+\frac{p}{2}=12$, 即 $12=9+\frac{p}{2}$, 解得 $p=6$.
+
+  故选: C.
+
+  【点晴】本题主要考查利用抛物线的定义计算焦半径, 考查学生转化与化归思想, 是一道容易题.

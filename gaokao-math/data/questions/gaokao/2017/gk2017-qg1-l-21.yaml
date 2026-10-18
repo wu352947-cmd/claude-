@@ -1,0 +1,118 @@
+type: solve
+source: 2017 全国I卷（理科） 第 21 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2017
+kps:
+  deriv.monotonic: 0.54
+  deriv.zeros: 0.46
+difficulty_label: 压轴
+stem: |-
+  已知函数 $f(x)=a e^{2 x+}(a-2) e^{x}-x$.
+
+  （1）讨论 $f(x)$ 的单调性;
+
+  (2) 若 $f(x)$ 有两个零点, 求 $a$ 的取值范围.
+parts:
+- label: (1)
+  points: 5
+  answer: ''
+- label: (2)
+  points: 7.0
+  answer: ''
+solution: |-
+  解 （1）由 $f(x)=a e^{2 x+}(a-2) e^{x}-x$, 求导 $f^{\prime}(x)=2 a e^{2 x+}(a-2) e^{x}-1$ 当 $a=0$ 时, $f^{\prime}(x)=-2 e^{x}-1<0$,
+
+  $\therefore$ 当 $x \in R, f(x)$ 单调递减,
+
+  当 $a>0$ 时, $f^{\prime}(x)=\left(2 e^{x+1}\right)\left(a e^{x}-1\right)=2 a\left(e^{x}+\frac{1}{2}\right)\left(e^{x}-\frac{1}{a}\right)$,
+
+  令 $f^{\prime}(x)=0$, 解得: $x=\ln \frac{1}{a}$,
+
+  当 $f^{\prime}(x)>0$ ，解得: $x>\ln \frac{1}{a}$,
+
+  当 $f^{\prime}(x)<0$, 解得: $x<\ln \frac{1}{a}$,
+
+  $\therefore x \in\left(-\infty, \ln \frac{1}{a}\right)$ 时, $f(x)$ 单调递减, $x \in\left(\ln \frac{1}{a},+\infty\right)$ 单调递增;
+
+  当 $a<0$ 时, $f^{\prime}(x)=2 a\left(e^{x}+\frac{1}{2}\right) \quad\left(e^{x}-\frac{1}{a}\right)<0$, 恒成立,
+
+  $\therefore$ 当 $x \in R, f(x)$ 单调递减,
+
+  综上可知: 当 $a \leqslant 0$ 时, $f(x)$ 在 $R$ 单调减函数,
+
+  当 $a>0$ 时, $f(x)$ 在 $\left(-\infty, \ln \frac{1}{a}\right)$ 是减函数, 在 $\left(\ln \frac{1}{a},+\infty\right)$ 是增函数;
+
+  (2) (1)若 $a \leqslant 0$ 时, 由（1）可知: $f(x)$ 最多有一个零点,
+
+  当 $a>0$ 时, $f(x)=a e^{2 x+}(a-2) e^{x}-x$,
+
+  当 $x \rightarrow-\infty$ 时, $e^{2 x} \rightarrow 0, e^{x} \rightarrow 0$,
+
+  $\therefore$ 当 $x \rightarrow-\infty$ 时, $f(x) \rightarrow+\infty$,
+
+  当 $x \rightarrow \infty, e^{2 x} \rightarrow+\infty$, 且远远大于 $e^{x}$ 和 $x$,
+
+  $\therefore$ 当 $x \rightarrow \infty, f(x) \rightarrow+\infty$,
+
+  $\therefore$ 函数有两个零点, $f(x)$ 的最小值小于 0 即可,
+
+  由 $f(x)$ 在 $\left(-\infty, \ln \frac{1}{a}\right)$ 是减函数, 在 $\left(\ln \frac{1}{a},+\infty\right)$ 是增函数,
+
+  $\therefore f(x)_{\min }=f\left(\ln \frac{1}{a}\right)=a \times\left(\frac{1}{a^{2}}\right)+(a-2) \times \frac{1}{a}-\ln \frac{1}{a}<0$,
+
+  $\therefore 1-\frac{1}{a}-\ln \frac{1}{a}<0$, 即 $\ln \frac{1}{a}+\frac{1}{a}-1>0$,
+
+  设 $t=\frac{1}{a}$, 则 $g(t)=\ln t+t-1, \quad(t>0)$,
+
+  求导 $g^{\prime}(t)=\frac{1}{t}+1$, 由 $g(1)=0$, $\therefore t=\frac{1}{a}>1$, 解得: $0<a<1$,
+
+  $\therefore a$ 的取值范围 $(0,1)$.
+
+  方法二: (1) 由 $f(x)=a e^{2 x}+(a-2) e^{x}-x$, 求导 $f^{\prime}(x)=2 a e^{2 x}+(a-2) e^{x}-1$
+
+  当 $a=0$ 时, $f^{\prime}(x)=-2 e^{x}-1<0$,
+
+  $\therefore$ 当 $x \in R, f(x)$ 单调递减,
+
+  当 $a>0$ 时, $f^{\prime}(x)=\left(2 e^{x}+1\right)\left(a e^{x}-1\right)=2 a\left(e^{x}+\frac{1}{2}\right)\left(e^{x}-\frac{1}{a}\right)$,
+
+  令 $f^{\prime}(x)=0$, 解得: $x=-\ln a$,
+
+  当 $f^{\prime}(x)>0$, 解得: $x>-\ln a$,
+
+  当 $f^{\prime}(x)<0$, 解得: $x<-\ln a$,
+
+  $\therefore x \in(-\infty,-\ln a)$ 时, $f(x)$ 单调递减, $x \in(-\ln a,+\infty)$ 单调递增;
+
+  当 $a<0$ 时, $f^{\prime}(x)=2 a\left(e^{x}+\frac{1}{2}\right) \quad\left(e^{x}-\frac{1}{a}\right)<0$, 恒成立，
+
+  $\therefore$ 当 $x \in R, f(x)$ 单调递减,
+
+  综上可知: 当 $a \leqslant 0$ 时, $f(x)$ 在 $R$ 单调减函数,
+
+  当 $a>0$ 时, $f(x)$ 在 $(-\infty,-\ln a)$ 是减函数, 在 $(-\ln a,+\infty)$ 是增函数;
+
+  (2) (1)若 $a \leqslant 0$ 时, 由（1）可知: $f(x)$ 最多有一个零点,
+
+  (2)当 $a>0$ 时, 由 (1) 可知 当 $x=-\ln a$ 时, $f(x)$ 取得最小值, $f(x){ }_{\min }=f(-\ln a$
+
+  $$
+  =1-\frac{1}{\mathrm{a}}-\ln \frac{1}{\mathrm{a}}
+  $$
+
+  当 $a=1$, 时, $f(-\ln a)=0$, 故 $f(x)$ 只有一个零点,
+
+  当 $a \in(1,+\infty)$ 时, 由 $1-\frac{1}{a}-\ln \frac{1}{a}>0$, 即 $f(-\ln a)>0$,
+
+  故 $f(x)$ 没有零点,
+
+  当 $a \in(0,1)$ 时, $1-\frac{1}{a}-\ln \frac{1}{a}<0, f(-\ln a)<0$,
+
+  由 $f(-2)=a e^{-4+}(a-2) e^{-2+2}>-2 e^{-2}+2>0$,
+
+  故 $f(x)$ 在 $(-\infty,-\ln a)$ 有一个零点, 假设存在正整数 $n_{0}$, 满足 $n_{0}>\ln \left(\frac{3}{a}-1\right)$, 则 $f\left(n_{0}\right)=e^{n_{0}}\left(a_{e}{ }^{n_{0}+a-} 2\right)-n_{0}>$ $e^{n_{0-} n_{0}>2^{n_{0}-} n_{0}>0}$
+
+  由 $\ln \left(\frac{3}{\mathrm{a}}-1\right)>-\ln a$,
+
+  因此在 $(-\ln a,+\infty)$ 有一个零点.
+
+  $\therefore a$ 的取值范围 ( $0,1 ）$.

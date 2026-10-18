@@ -1,0 +1,18 @@
+type: fill
+source: 2018 全国III卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 曲线 $y=(a x+1) e^{x}$ 在点 $(0,1)$ 处的切线的斜率为 -2 , 则 $a=$ ______
+answer: '-3'
+answer_kind: expr
+solution: |-
+  解: 曲线 $y=(a x+1) e^{x}$, 可得 $y^{\prime}=a e^{x}+(a x+1) e^{x}$,
+
+  曲线 $y=(a x+1) e^{x}$ 在点 $(0,1)$ 处的切线的斜率为 -2 ,
+
+  可得: $a+1=-2$, 解得 $a=-3$.
+
+  故答案为: -3 .

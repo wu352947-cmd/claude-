@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  conic.parabola: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: '设抛物线 $C: y^{2}=2 p x(p>0)$ 的焦点为 $F$, 点 $M$ 在 $C$ 上, $|M F|=5$, 若以 MF 为直径的圆过点 $(0,2)$, 则 $C$ 的方程为 ($\qquad$)'
+options:
+  A: $y^{2}=4 x$ 或 $y^{2}=8 x$
+  B: $y^{2}=2 x$ 或 $y^{2}=8 x$
+  C: $y^{2}=4 x$ 或 $y^{2}=16 x$
+  D: $y^{2}=2 x$ 或 $y^{2}=16 x$
+answer: C

@@ -1,0 +1,33 @@
+type: single
+source: 2019 全国III卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 0.35
+  func.zeros: 0.34
+  deriv.extremum: 0.32
+difficulty_label: 较难
+points: 5.0
+stem: |-
+  设函数 $f(x)=\sin \left(\omega x+\frac{\pi}{5}\right)(\omega>0)$, 已知 $f(x)$ 在 $[0,2 \pi]$ 有且仅有 5 个零点, 下 述四个结论:
+
+  (1) $f(x)$ 在 $(0,2 \pi)$ 有且仅有 3 个极大值点
+
+  (2) $f(x)$ 在 $(0,2 \pi)$ 有且仅有 2 个极小值点 (3) $f(x)$ 在 $\left(0, \frac{\pi}{10}\right)$ 单调递增
+
+  (4) 的取值范围是 $\left[\frac{12}{5}, \frac{29}{10}\right)$
+
+  其中所有正确结论的编号是
+options:
+  A: (1)(4)
+  B: (2)(3)
+  C: (1)(2)(3)
+  D: (1)(3)(4)
+answer: D
+solution: |-
+  【详解】 $\because f(x)=\sin \left(w x+\frac{\pi}{5}\right)(w>0)$, 在 $[0,2 \pi]$ 有且仅有 5 个零点. $\therefore 0 \leq x \leq 2 \pi$ ， $\frac{1}{5} \leq w x+\frac{\pi}{5} \leq 2 \pi w+\frac{\pi}{5}, \frac{12}{5} \leq w<\frac{29}{10}$, (4)正确. 如图 $x_{1}, x_{2}, x_{3}$ 为极大值点为 3 个, (1)正 确; 极小值点为 2 个或 3 个. $\therefore$ (2)不正确.
+
+  当 $0<x<\frac{\pi}{10}$ 时, $\frac{\pi}{5}<w x+\frac{\pi}{f}<\frac{w \pi}{10}+\frac{\pi}{5}$, 当 $w=\frac{29}{10}$ 时,
+
+  $\frac{w \pi}{10}+\frac{\pi}{5}=\frac{29 \pi}{100}+\frac{20 \pi}{100}=\frac{49 \pi}{100}<\frac{\pi}{2}$.
+
+  $\therefore$ (3)正确, 故选 D.

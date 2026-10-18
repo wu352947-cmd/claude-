@@ -1,0 +1,26 @@
+type: single
+source: 2018 全国I卷（文科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  solid.section: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知圆柱的上、下底面的中心分别为 $\mathrm{O}_{1}, \mathrm{O}_{2}$, 过直线 $\mathrm{O}_{1} \mathrm{O}_{2}$ 的平面截 该圆柱所得的截面是面积为 8 的正方形，则该圆柱的表面积为（）
+options:
+  A: $12 \sqrt{2} \pi$
+  B: $12 \pi$
+  C: $8 \sqrt{2} \pi$
+  D: $10 \pi$
+answer: B
+solution: |-
+  解：设圆柱的底面直径为 $2 R$, 则高为 $2 R$,
+
+  圆柱的上、下底面的中心分别为 $\mathrm{O}_{1}, \mathrm{O}_{2}$,
+
+  过直线 $\mathrm{O}_{1} \mathrm{O}_{2}$ 的平面截该圆柱所得的截面是面积为 8 的正方形,
+
+  可得: $4 R^{2}=8$, 解得 $R=\sqrt{2}$,
+
+  则该圆柱的表面积为: $\pi \cdot(\sqrt{2})^{2} \times 2+2 \sqrt{2} \pi \times 2 \sqrt{2}=12 \pi$.
+
+  故选: B.

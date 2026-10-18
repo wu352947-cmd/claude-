@@ -1,0 +1,34 @@
+type: single
+source: 2021 全国乙卷（文科） 第 11 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2021
+kps:
+  conic.ellipse: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: '设 $B$ 是椭圆 $C: \frac{x^{2}}{5}+y^{2}=1$ 的上顶点, 点 $P$ 在 $C$ 上, 则 $|P B|$ 的最大值为'
+options:
+  A: $\frac{5}{2}$
+  B: $\sqrt{6}$
+  C: $\sqrt{5}$
+  D: '2'
+answer: A
+solution: |-
+  解析:
+
+  方法一: 由 $C: \frac{x^{2}}{5}+y^{2}=1, B(0,1)$
+
+  则 $C$ 的参数方程: $\left\{\begin{array}{l}x=\sqrt{5} \cos \theta \\ y=\sin \theta\end{array}\right.$.
+
+  $|P B|=\sqrt{(\sin \theta-1)^{2}+(\sqrt{5} \cos \theta)^{2}}$
+
+  $=\sqrt{-4 \sin ^{2} \theta-2 \sin \theta+6}$
+
+  $=\sqrt{-4\left(\sin \theta+\frac{1}{4}\right)^{2}+\frac{25}{4}} \geq \frac{5}{2}$.
+
+  $\therefore|P B|_{\max }=\frac{5}{2}$, 故选 A.
+
+  方法二: 设 $P\left(x_{0}, y_{0}\right)$, 则 $\frac{x_{0}^{2}}{5}+y_{0}^{2}=1\left(y_{0} \in[-1,1]\right)(1), B(0,1)$.
+
+  因此 $|P B|^{2}=x_{0}^{2}+\left(y_{0}-1\right)^{2}(2)$
+
+  将(1)式代人(2)式化简得: $|P B|^{2}=-4\left(y_{0}+\frac{1}{4}\right)^{2}+\frac{25}{4} \geq \frac{25}{4}$, 当且仅当 $y_{0}=-\frac{1}{4}$ 时 $|P B|$ 的最大值为 $\frac{5}{2}$, 故选 $\mathrm{A}$.

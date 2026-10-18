@@ -1,0 +1,10 @@
+type: fill
+source: 2022 新课标I卷 填空题 · 来源：AGIEval（MIT）
+year: 2022
+kps:
+  deriv.tangent: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若曲线 $y=(x+a) \mathrm{e}^{x}$ 有两条过坐标原点的切线, 则 $a$ 的取值范围是 ______ .
+answer: (-\infty,-4)\cup(0,+\infty)
+answer_kind: interval

@@ -1,0 +1,19 @@
+type: fill
+source: 2022 全国甲卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2022
+kps:
+  vec.projection: 0.52
+  vec.dot: 0.48
+difficulty_label: 基础
+points: 5.0
+stem: 设向量 $\vec{a}, \vec{b}$ 的夹角的余弦值为 $\frac{1}{3}$, 且 $|\vec{a}|=1,|b|=3$, 则 $(2 \vec{a}+\vec{b}) \cdot \vec{b}=$ ______
+answer: '11'
+answer_kind: expr
+solution: |-
+  【详解】解: 设 $\vec{a}$ 与 $\vec{b}$ 的夹角为 $\theta$, 因为 $\vec{a}$ 与 $\vec{b}$ 的夹角的余弦值为 $\frac{1}{3}$, 即 $\cos \theta=\frac{1}{3}$,
+
+  又 $|\vec{a}|=1,|b|=3$, 所以 $\vec{a} \cdot \vec{b}=|\vec{a}| \cdot|\vec{b}| \cos \theta=1 \times 3 \times \frac{1}{3}=1$,
+
+  所以 $(2 \vec{a}+\vec{b}) \cdot \vec{b}=2 \vec{a} \cdot \vec{b}+\vec{b}^{2}=2 \vec{a} \cdot \vec{b}+|\vec{b}|^{2}=2 \times 1+3^{2}=11$.
+
+  故答案为: 11 .

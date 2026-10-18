@@ -1,0 +1,14 @@
+type: single
+source: 2014 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2014
+kps:
+  solid.vector: 1.0
+difficulty_label: 中档
+points: 5.0
+stem: 直三棱柱 $A B C-A_{1} B_{1} C_{1}$ 中, $\angle B C A=90^{\circ}, M, N$ 分别是 $A_{1} B_{1}, A_{1} C_{1}$ 的 中点, $B C=C A=C C_{1}$, 则 $B M$ 与 $A N$ 所成角的余弦值为 ($\qquad$)
+options:
+  A: $\frac{1}{10}$
+  B: $\frac{2}{5}$
+  C: $\frac{\sqrt{30}}{10}$
+  D: $\frac{\sqrt{2}}{2}$
+answer: C

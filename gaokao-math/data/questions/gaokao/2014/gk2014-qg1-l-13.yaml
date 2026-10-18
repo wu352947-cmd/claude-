@@ -1,0 +1,18 @@
+type: fill
+source: 2014 全国I卷（理科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $(x-y)(x+y)^{8}$ 的展开式中 $x^{2} y^{7}$ 的系数为___. (用数字填写 答案)
+answer: '-20'
+answer_kind: expr
+solution: |-
+  解: $(x+y)^{8}$ 的展开式中, 含 $x y^{7}$ 的系数是: 8 .
+
+  含 $x^{2} y^{6}$ 的系数是 28 ,
+
+  $\therefore(x-y)(x+y)^{8}$ 的展开式中 $x^{2} y^{7}$ 的系数为: $8-28=-20$.
+
+  故答案为: - 20

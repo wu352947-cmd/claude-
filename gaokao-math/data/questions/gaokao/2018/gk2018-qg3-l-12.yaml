@@ -1,0 +1,26 @@
+type: single
+source: 2018 全国III卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  expo.ops: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设 $a=\log _{0.2} 0.3, b=\log _{2} 0.3$, 则 $(\quad)$
+options:
+  A: $a+b<a b<0$
+  B: $a b<a+b<0$
+  C: $a+b<0<a b$
+  D: $a b<0<a+b$
+answer: B
+solution: |-
+  解: $\because \mathrm{a}=\log _{0.2} 0.3=\frac{1 \mathrm{g} 0.3}{-\lg 5}, \mathrm{b}=\log _{2} 0.3=\frac{\lg 0.3}{1 \mathrm{g} 2}$,
+
+  $\therefore \mathrm{a}+\mathrm{b}=\frac{\lg 0.3}{\lg 2}-\frac{\lg 0.3}{\lg 5}=\frac{\lg 0.3(\lg 5-\lg 2)}{\lg 2 \lg 5}=\frac{\lg 0.3 \lg \frac{5}{2}}{\lg 2 \lg 5}$,
+
+  $\mathrm{ab}=-\frac{\lg 0.3}{\lg 2} \cdot \frac{\lg 0.3}{\lg 5}=\frac{\lg 0.3 \cdot 1 \mathrm{g} \frac{10}{3}}{\lg 2 \lg 5}$,
+
+  $\because \lg \frac{10}{3}>\lg \frac{5}{2}, \frac{\lg 0.3}{\lg 2 \lg 5}<0$,
+
+  $\therefore \mathrm{ab}<\mathrm{a}+\mathrm{b}<0$.
+
+  故选: B.

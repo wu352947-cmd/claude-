@@ -1,0 +1,45 @@
+type: single
+source: 2016 全国I卷（文科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  trig.identities: 0.5
+  trig.graph: 0.5
+difficulty_label: 较难
+points: 5.0
+stem: 若函数 $f(x)=x-\frac{1}{3} \sin 2 x+a \sin x$ 在 $(-\infty,+\infty)$ 单调递增, 则 $a$ 的 取值范围是 $(\quad)$
+options:
+  A: $[-1,1]$
+  B: $\left[-1, \frac{1}{3}\right]$
+  C: $\left[-\frac{1}{3}, \frac{1}{3}\right]$
+  D: $\left[-1,-\frac{1}{3}\right]$
+answer: C
+solution: |-
+  解: 函数 $\mathrm{f}(\mathrm{x})=\mathrm{x}-\frac{1}{3} \sin 2 x+a \sin x$ 的导数为 $f^{\prime}(x)=1-\frac{2}{3} \cos 2 x+a \cos x$, 由题意可得 $f^{\prime}(x) \geqslant 0$ 恒成立，
+
+  即为 $1-\frac{2}{3} \cos 2 x+a \cos x \geqslant 0$,
+
+  即有 $\frac{5}{3}-\frac{4}{3} \cos ^{2} x+\operatorname{acos} x \geqslant 0$ ，
+
+  设 $t=\cos x(-1 \leqslant t \leqslant 1)$ ， 即有 $5-4 t^{2}+3 a t \geqslant 0$,
+
+  当 $t=0$ 时，不等式显然成立;
+
+  当 $0<t \leqslant 1$ 时， $3 a \geqslant 4 t-\frac{5}{t}$,
+
+  由 $4 t-\frac{5}{t}$ 在 $(0,1]$ 递增, 可得 $t=1$ 时, 取得最大值 -1 , 可得 $3 a \geqslant-1$, 即 $a \geqslant-\frac{1}{3}$;
+
+  当 $-1 \leqslant t<0$ 时, $3 a \leqslant 4 t-\frac{5}{t}$,
+
+  由 $4 t-\frac{5}{t}$ 在 $[-1,0)$ 递增, 可得 $t=-1$ 时, 取得最小值 1 ,
+
+  可得 $3 a \leqslant 1$, 即 $a \leqslant \frac{1}{3}$.
+
+  综上可得 $\mathrm{a}$ 的范围是 $\left[-\frac{1}{3}, \frac{1}{3}\right]$.
+
+  另解: 设 $t=\cos x(-1 \leqslant t \leqslant 1)$, 即有 $5-4 t^{2}+3 a t \geqslant 0$,
+
+  由题意可得 $5-4+3 a \geqslant 0$, 且 $5-4-3 a \geqslant 0$,
+
+  解得 $\mathrm{a}$ 的范围是 $\left[-\frac{1}{3}, \frac{1}{3}\right]$.
+
+  故选: C.

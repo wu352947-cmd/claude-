@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国II卷（理科） 第 12 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  deriv.extremum: 1.0
+difficulty_label: 较难
+points: 5.0
+stem: 设函数 $\mathrm{f}(\mathrm{x})=\sqrt{3} \sin \frac{\pi \mathrm{x}}{\mathrm{m}}$, 若存在 $\mathrm{f}(\mathrm{x})$ 的极值点 $\mathrm{x}_{0}$ 满足 $\mathrm{x}_{0}{ }^{2}+\left[\mathrm{f}\left(\mathrm{x}_{0}\right.\right.$ ]$^{2}<m^{2}$ ，则 $m$ 的取值范围是 $(\quad)$
+options:
+  A: $(-\infty,-6) \cup(6,+\infty)$
+  B: $(-\infty,-4) \cup(4,+\infty)$
+  C: $(-\infty,-2) \cup(2,+\infty)$
+  D: $(-\infty,-1) \cup(1,+\infty)$
+answer: C
+solution: |-
+  解：由题意可得, $f\left(x_{0}\right)= \pm \sqrt{3}$, 即 $\frac{\pi x_{0}}{m}=k \pi+\frac{\pi}{2}, k \in z$, 即 $\mathrm{x}_{0}=\frac{2 k+1}{2} \mathrm{m}$
+
+  再由 $x_{0}{ }^{2}+\left[f\left(x_{0}\right)\right]^{2}<m^{2}$, 即 $x_{0}^{2}+3<m^{2}$, 可得当 $m^{2}$ 最小时, $\left|x_{0}\right|$ 最小, 而 $\left|x_{0}\right|$ 最小为 $\frac{1}{2}|m|$, $\therefore m^{2}>\frac{1}{4} m^{2}+3, \quad \therefore m^{2}>4$.
+
+  求得 $m>2$, 或 $m<-2$,
+
+  故选: C.

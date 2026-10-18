@@ -1,0 +1,24 @@
+type: single
+source: 2016 全国II卷（文科） 第 4 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2016
+kps:
+  solid.sphere: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 体积为 8 的正方体的顶点都在同一球面上, 则该球面的表面积为（
+options:
+  A: $12 \pi$
+  B: $\frac{32}{3} \pi$
+  C: $8 \pi$
+  D: $4 \pi$
+answer: A
+solution: |-
+  解: 正方体体积为 8 , 可知其边长为 2 ,
+
+  正方体的体对角线为 $\sqrt{4+4+4}=2 \sqrt{3}$,
+
+  即为球的直径, 所以半径为 $\sqrt{3}$,
+
+  所以球的表面积为 $4 \pi \cdot(\sqrt{3})^{2}=12 \pi$.
+
+  故选: A.

@@ -1,0 +1,19 @@
+type: single
+source: 2018 全国III卷（文科） 第 6 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2018
+kps:
+  trig.graph: 0.54
+  func.symmetry: 0.46
+difficulty_label: 中档
+points: 5.0
+stem: 函数 $\mathrm{f}(\mathrm{x})=\frac{\tan x}{1+\tan ^{2} \mathrm{x}}$ 的最小正周期为 $(\quad)$
+options:
+  A: $\frac{\pi}{4}$
+  B: $\frac{\pi}{2}$
+  C: $\pi$
+  D: $2 \pi$
+answer: C
+solution: |-
+  解: 函数 $f(x)=\frac{\tan x}{1+\tan ^{2} x}=\frac{\sin x \cos x}{\cos ^{2} x+\sin ^{2} x}=\frac{1}{2} \sin 2 x$ 的最小正周期为 $\frac{2 \pi}{2}=\pi$
+
+  故选: C.

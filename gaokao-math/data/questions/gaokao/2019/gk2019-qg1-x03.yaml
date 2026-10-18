@@ -1,0 +1,15 @@
+type: single
+source: 2019 全国I卷 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2019
+kps:
+  conic.ellipse: 0.6
+  conic.chord: 0.4
+difficulty_label: 基础
+points: 5.0
+stem: 已知椭圆 $C$ 的焦点为 $F_{1}(-1,0), F_{2}(1,0)$, 过 $F_{2}$ 的直线与 $C$ 交于 $A, B$ 两点. 若 $\left|A F_{2}\right|=2\left|F_{2} B\right|,|A B|=\left|B F_{1}\right|$, 则 $C$ 的方程为
+options:
+  A: $\frac{x^{2}}{2}+y^{2}=1$
+  B: $\frac{x^{2}}{3}+\frac{y^{2}}{2}=1$
+  C: $\frac{x^{2}}{4}+\frac{y^{2}}{3}=1$
+  D: $\frac{x^{2}}{5}+\frac{y^{2}}{4}=1$
+answer: B

@@ -1,0 +1,18 @@
+type: single
+source: 2015 全国I卷（文科） 第 3 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  complex.arith: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知复数 $z$ 满足 $(z-1) i=1+i$, 则 $z=(\quad)$
+options:
+  A: $-2-\mathrm{i}$
+  B: $-2+i$
+  C: 2- $i$
+  D: $2+i$
+answer: C
+solution: |-
+  解：由 $(z-1) i=1+i$ ，得 $z-1=\frac{1+i}{i}=\frac{-i(1+i)}{-i^{2}}=1-i$, $\therefore \mathrm{z}=2-\mathrm{i}$.
+
+  故选: C.

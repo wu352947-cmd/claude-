@@ -1,0 +1,22 @@
+type: single
+source: 2014 全国I卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2014
+kps:
+  prob.classical: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 4 位同学各自在周六、周日两天中任选一天参加公益活动, 则周六、 周日都有同学参加公益活动的概率为（）
+options:
+  A: $\frac{1}{8}$
+  B: $\frac{3}{8}$
+  C: $\frac{5}{8}$
+  D: $\frac{7}{8}$
+answer: D
+solution: |-
+  解：4 位同学各自在周六、周日两天中任选一天参加公益活动, 共有 $2^{4}=16$ 种情况,
+
+  周六、周日都有同学参加公益活动, 共有 $2^{4}-2=16-2=14$ 种情况,
+
+  $\therefore$ 所求概率为 $\frac{14}{16}=\frac{7}{8}$.
+
+  故选: D.

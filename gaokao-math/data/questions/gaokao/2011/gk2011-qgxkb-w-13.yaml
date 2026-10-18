@@ -1,0 +1,24 @@
+type: fill
+source: 2011 全国新课标卷（文科） 第 13 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2011
+kps:
+  vec.dot: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知 $a$ 与 $b$ 为两个垂直的单位向量, $k$ 为实数, 若向量 $\vec{a}+\vec{b}$ 与向量 $k$ $\vec{a}-\vec{b}$ 垂直，则 $k=$ ______
+answer: '1'
+answer_kind: expr
+solution: |-
+  解： $\because \vec{a} \perp \vec{b}$
+
+  $\therefore \vec{a} \cdot \vec{b}=0$
+
+  $\because \vec{a}+\vec{b}$ 与 $k \vec{a}-\vec{b}$ 垂直
+
+  $\therefore(\vec{a}+\vec{b}) \cdot(k \vec{a}-\vec{b})=0$
+
+  即 $k \vec{a}^{2}+k \vec{a} \cdot b-\vec{a} \cdot \vec{b}-\vec{b}^{2}=0$
+
+  $\therefore \mathrm{k}=1$
+
+  故答案为: 1

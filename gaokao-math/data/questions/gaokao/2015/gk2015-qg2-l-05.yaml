@@ -1,0 +1,24 @@
+type: single
+source: 2015 全国II卷（理科） 第 5 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2015
+kps:
+  func.piecewise: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 设函数 $f(x)=\left\{\begin{array}{ll}1+\log _{2}(2-x), & x<1 \\ 2^{x-1}, & x \geqslant 1\end{array}\right.$, 则 $f(-2)+f\left(\log _{2} 12\right)=($ )
+options:
+  A: '3'
+  B: '6'
+  C: '9'
+  D: '12'
+answer: C
+solution: |-
+  解：函数 $f(x)=\left\{\begin{array}{l}1+\log _{2}(2-x), x<1 \\ 2^{x-1}, x \geqslant 1\end{array}\right.$,
+
+  即有 $f(-2)=1+\log _{2}(2+2)=1+2=3$,
+
+  $f\left(\log _{2} 12\right)=2^{\log _{2} 12-1}=2 \log _{2} 12 \times \frac{1}{2}=12 \times \frac{1}{2}=6$
+
+  则有 $f(-2)+f\left(\log _{2} 12\right)=3+6=9$.
+
+  故选: C.

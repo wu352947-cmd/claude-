@@ -1,0 +1,26 @@
+type: fill
+source: 2020 全国III卷（理科） 第 14 题 · 来源：GAOKAO-Bench（Apache-2.0）
+year: 2020
+kps:
+  count.binomial: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: $\left(x^{2}+\frac{2}{x}\right)^{6}$ 的展开式中常数项是 (用数字作答) ______
+answer: '240'
+answer_kind: expr
+solution: |-
+  【详解】 $\because\left(x^{2}+\frac{2}{x}\right)^{6}$
+
+  其二项式展开通项:
+
+  $T_{r+1}=C_{6}^{r} \cdot\left(x^{2}\right)^{6-r} \cdot\left(\frac{2}{x}\right)^{r}$
+
+  $=C_{6}^{r} \cdot x^{12-2 r}(2)^{r} \cdot x^{-r}$
+
+  $=C_{6}^{r}(2)^{r} \cdot x^{12-3 r}$
+
+  当 $12-3 r=0$, 解得 $r=4$
+
+  $\therefore\left(x^{2}+\frac{2}{x}\right)^{6}$ 的展开式中常数项是: $C_{6}^{4} \cdot 2^{4}=C_{6}^{2} \cdot 16=15 \times 16=240$.
+
+  故答案为: 240 .

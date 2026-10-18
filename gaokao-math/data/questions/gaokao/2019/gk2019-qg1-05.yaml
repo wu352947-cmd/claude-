@@ -1,0 +1,17 @@
+type: single
+source: 2019 全国I卷 第 5 题 · 来源：GAOKAO-MM（Apache-2.0）
+year: 2019
+kps:
+  trig.graph: 0.55
+  func.graph: 0.45
+difficulty_label: 基础
+points: 5.0
+stem: 函数 $f(x)=\frac{\sin x+x}{\cos x+x^2}$ 在 $[-\pi, \pi]$ 的图像大致为
+figure: 5829bd35e45c9c89.png
+options:
+  A: 见图中 A
+  B: 见图中 B
+  C: 见图中 C
+  D: 见图中 D
+answer: D
+solution: 【详解】由 $f(-x)=\frac{\sin (-x)+(-x)}{\cos (-x)+(-x)^2}=\frac{-\sin x-x}{\cos x+x^2}=-f(x)$, 得 $f(x)$ 是奇函数, 其图象关于原点对称. 又 $f\left(\frac{\pi}{2}\right)=\frac{1+\frac{\pi}{2}}{\left(\frac{\pi}{2}\right)^2}=\frac{4+2 \pi}{\pi^2}>1, f(\pi)=\frac{\pi}{-1+\pi^2}>0$. 故选 D.

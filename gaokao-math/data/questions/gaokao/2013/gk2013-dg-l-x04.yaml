@@ -1,0 +1,14 @@
+type: single
+source: 2013 全国大纲卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2013
+kps:
+  func.domain_range: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 已知函数 $f(x)$ 的定义域为 $(-1$， $0)$, 则函数 $f(2 x+1)$ 的定义域为 （$\qquad$）
+options:
+  A: $(-1,1)$
+  B: $\left(-1,-\frac{1}{2}\right)$
+  C: $(-1,0)$
+  D: $\left(\frac{1}{2}, 1\right)$
+answer: B

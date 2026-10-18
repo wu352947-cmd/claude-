@@ -1,0 +1,14 @@
+type: single
+source: 2008 全国II卷（理科） 单选题 · 来源：AGIEval（MIT） · 答案未经人工核对
+year: 2008
+kps:
+  expo.compare: 1.0
+difficulty_label: 基础
+points: 5.0
+stem: 若 $x \in\left(e^{-1}, 1\right), a=\ln x, b=2 \ln x, c=\ln ^{3} x$, 则($\qquad$)
+options:
+  A: $a<b<c$
+  B: $c<a<b$
+  C: $b<a<c$
+  D: $\mathrm{b}<\mathrm{c}<\mathrm{a}$
+answer: C
