@@ -1,0 +1,687 @@
+{
+ "$comment": "地名位置由 AI 从 AMS 图幅上读取；status 与 note 记录核对情况。",
+ "labels": [
+  {
+   "id": "belgorod",
+   "names": {
+    "zh": "别尔哥罗德",
+    "ru": "Белгород",
+    "de": "Belgorod",
+    "en": "Belgorod"
+   },
+   "kind": "city",
+   "lat": 50.5973,
+   "lon": 36.5845,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在城区内，拼写与图上一致"
+  },
+  {
+   "id": "oboyan",
+   "names": {
+    "zh": "奥博扬",
+    "ru": "Обоянь",
+    "de": "Obojan",
+    "en": "Oboyan'"
+   },
+   "kind": "town",
+   "lat": 51.2126,
+   "lon": 36.2765,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在城区内，拼写与图上一致"
+  },
+  {
+   "id": "prokhorovka-st",
+   "names": {
+    "zh": "普罗霍罗夫卡站",
+    "ru": "ст. Прохоровка",
+    "de": "Prochorowka",
+    "en": "Prokhorovka"
+   },
+   "kind": "town",
+   "lat": 51.0358,
+   "lon": 36.7358,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置正确；图上印作 \"Stantsiya Prokhorovka\"（车站），大居民点注记为 Aleksandrovskiy，英文名沿用通行写法 Prokhorovka"
+  },
+  {
+   "id": "oktyabrsky",
+   "names": {
+    "zh": "十月农场",
+    "ru": "Октябрьский",
+    "de": "Oktjabrskij",
+    "en": "Oktyabr'skiy"
+   },
+   "kind": "village",
+   "lat": 51.0259,
+   "lon": 36.6571,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "pravorot",
+   "names": {
+    "zh": "普拉沃罗季",
+    "ru": "Правороть",
+    "de": "Praworot",
+    "en": "Pravorot'"
+   },
+   "kind": "village",
+   "lat": 50.9809,
+   "lon": 36.7307,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "pokrovka",
+   "names": {
+    "zh": "波克罗夫卡",
+    "ru": "Покровка",
+    "de": "Pokrowka",
+    "en": "Pokrovka"
+   },
+   "kind": "village",
+   "lat": 50.8894,
+   "lon": 36.4412,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "yakovlevo",
+   "names": {
+    "zh": "雅科夫列沃",
+    "ru": "Яковлево",
+    "de": "Jakowlewo",
+    "en": "Yakovlevo"
+   },
+   "kind": "village",
+   "lat": 50.8624,
+   "lon": 36.4485,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "luchki",
+   "names": {
+    "zh": "卢奇基",
+    "ru": "Лучки",
+    "de": "Lutschki",
+    "en": "Luchki"
+   },
+   "kind": "village",
+   "lat": 50.8774,
+   "lon": 36.5432,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "teterevino",
+   "names": {
+    "zh": "捷捷列维诺",
+    "ru": "Тетеревино",
+    "de": "Teterewino",
+    "en": "Teterevino"
+   },
+   "kind": "village",
+   "lat": 50.8761,
+   "lon": 36.6095,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "belenikhino",
+   "names": {
+    "zh": "别列尼希诺",
+    "ru": "Беленихино",
+    "de": "Belenichino",
+    "en": "Belenikhino"
+   },
+   "kind": "village",
+   "lat": 50.9319,
+   "lon": 36.6429,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "gostishchevo",
+   "names": {
+    "zh": "戈斯季谢沃",
+    "ru": "Гостищево",
+    "de": "Gostischtschewo",
+    "en": "Gostishchevo"
+   },
+   "kind": "village",
+   "lat": 50.7831,
+   "lon": 36.6573,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2314",
+   "names": {
+    "zh": "彼得罗夫卡",
+    "en": "Petrovka"
+   },
+   "kind": "village",
+   "lat": 51.05212,
+   "lon": 36.64731,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2116",
+   "names": {
+    "zh": "安德烈耶夫卡",
+    "en": "Andreyevka"
+   },
+   "kind": "village",
+   "lat": 51.01822,
+   "lon": 36.59993,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2015",
+   "names": {
+    "zh": "科兹洛夫卡",
+    "en": "Kozlovka"
+   },
+   "kind": "village",
+   "lat": 51.01682,
+   "lon": 36.5499,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09 待定：Kozlovka 注记附近的房屋可能属于 Gresnoye，无法确定，位置暂不改"
+  },
+  {
+   "id": "ams-2115",
+   "names": {
+    "zh": "米哈伊洛夫卡",
+    "en": "Mikhaylovka"
+   },
+   "kind": "village",
+   "lat": 51.02886,
+   "lon": 36.60801,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2114",
+   "names": {
+    "zh": "波列扎耶夫",
+    "en": "Polezhayev"
+   },
+   "kind": "village",
+   "lat": 51.05061,
+   "lon": 36.62227,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2014",
+   "names": {
+    "zh": "克柳奇",
+    "en": "Klyuchi"
+   },
+   "kind": "village",
+   "lat": 51.03929,
+   "lon": 36.54267,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-1915",
+   "names": {
+    "zh": "红十月",
+    "en": "Krasnyy Oktyabr'"
+   },
+   "kind": "village",
+   "lat": 51.02797,
+   "lon": 36.49266,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09 待定：图上找不到能确定属于 Krasnyy Oktyabr' 的房屋符号（附近两组房屋都可能），位置暂不改"
+  },
+  {
+   "id": "ams-2013",
+   "names": {
+    "zh": "韦肖雷",
+    "en": "Veselyy"
+   },
+   "kind": "village",
+   "lat": 51.06628,
+   "lon": 36.54974,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2012",
+   "names": {
+    "zh": "卡尔塔舍夫卡",
+    "en": "Kartashevka"
+   },
+   "kind": "village",
+   "lat": 51.091,
+   "lon": 36.54608,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2412",
+   "names": {
+    "zh": "上奥利尚卡",
+    "en": "Vyshnyaya Ol'shanka"
+   },
+   "kind": "village",
+   "lat": 51.09785,
+   "lon": 36.68568,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2413",
+   "names": {
+    "zh": "别列戈沃耶",
+    "en": "Beregovoye"
+   },
+   "kind": "village",
+   "lat": 51.07537,
+   "lon": 36.69642,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2614",
+   "names": {
+    "zh": "莫尔多夫卡",
+    "en": "Mordovka"
+   },
+   "kind": "village",
+   "lat": 51.04387,
+   "lon": 36.76437,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2615",
+   "names": {
+    "zh": "赫拉莫夫",
+    "en": "Khlamov"
+   },
+   "kind": "village",
+   "lat": 51.02678,
+   "lon": 36.77149,
+   "status": "unverified",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09 待定：Khlamov 注记附近房屋很少、看不清，无法确定属于哪一格，暂不改"
+  },
+  {
+   "id": "ams-2415",
+   "names": {
+    "zh": "亚姆基",
+    "en": "Yamki"
+   },
+   "kind": "village",
+   "lat": 51.01166,
+   "lon": 36.695,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2512",
+   "names": {
+    "zh": "小普辛卡",
+    "en": "Malaya Psinka"
+   },
+   "kind": "village",
+   "lat": 51.11657,
+   "lon": 36.7468,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2713",
+   "names": {
+    "zh": "斯科罗夫卡",
+    "en": "Skorovka"
+   },
+   "kind": "village",
+   "lat": 51.08654,
+   "lon": 36.82885,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2814",
+   "names": {
+    "zh": "鲍里索夫",
+    "en": "Borisov"
+   },
+   "kind": "village",
+   "lat": 51.0528,
+   "lon": 36.84307,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2915",
+   "names": {
+    "zh": "普里扎纳奇诺耶",
+    "en": "Prizanachnoye"
+   },
+   "kind": "village",
+   "lat": 51.03927,
+   "lon": 36.86805,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0102"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-1917",
+   "names": {
+    "zh": "小马亚奇基",
+    "en": "Malyye Mayachki"
+   },
+   "kind": "village",
+   "lat": 50.96278,
+   "lon": 36.50105,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-1819",
+   "names": {
+    "zh": "大马亚奇基",
+    "en": "Bol'shiye Mayachki"
+   },
+   "kind": "village",
+   "lat": 50.91549,
+   "lon": 36.46107,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-1919",
+   "names": {
+    "zh": "卢奇基",
+    "en": "Luchki"
+   },
+   "kind": "village",
+   "lat": 50.93355,
+   "lon": 36.50022,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2119",
+   "names": {
+    "zh": "奥泽罗夫斯基",
+    "en": "Ozerovskiy"
+   },
+   "kind": "village",
+   "lat": 50.92556,
+   "lon": 36.56803,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2118",
+   "names": {
+    "zh": "捷捷列维诺农庄",
+    "en": "Khutor Teterevino"
+   },
+   "kind": "village",
+   "lat": 50.95764,
+   "lon": 36.57603,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，注记点原在地名文字上，已移到房屋符号处"
+  },
+  {
+   "id": "ams-2320",
+   "names": {
+    "zh": "列斯基",
+    "en": "Leski"
+   },
+   "kind": "village",
+   "lat": 50.91123,
+   "lon": 36.64865,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2518",
+   "names": {
+    "zh": "日洛莫斯特诺耶",
+    "en": "Zhilomostnoye"
+   },
+   "kind": "village",
+   "lat": 50.94406,
+   "lon": 36.72712,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2618",
+   "names": {
+    "zh": "诺沃肖洛夫卡",
+    "en": "Novoselovka"
+   },
+   "kind": "village",
+   "lat": 50.94268,
+   "lon": 36.7892,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2619",
+   "names": {
+    "zh": "普洛塔",
+    "en": "Plota"
+   },
+   "kind": "village",
+   "lat": 50.92247,
+   "lon": 36.7642,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2521",
+   "names": {
+    "zh": "沙霍沃",
+    "en": "Shakhovo"
+   },
+   "kind": "village",
+   "lat": 50.87526,
+   "lon": 36.72993,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2321",
+   "names": {
+    "zh": "沃洛布耶夫卡",
+    "en": "Volobuyevka"
+   },
+   "kind": "village",
+   "lat": 50.86178,
+   "lon": 36.6715,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2721",
+   "names": {
+    "zh": "伦金卡",
+    "en": "Ryndinka"
+   },
+   "kind": "village",
+   "lat": 50.86847,
+   "lon": 36.80688,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2820",
+   "names": {
+    "zh": "维波尔佐夫卡",
+    "en": "Vypolzovka"
+   },
+   "kind": "village",
+   "lat": 50.87743,
+   "lon": 36.84253,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2918",
+   "names": {
+    "zh": "普洛斯基",
+    "en": "Ploskiy"
+   },
+   "kind": "village",
+   "lat": 50.9516,
+   "lon": 36.8606,
+   "status": "crosschecked",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09：对照 AMS 原始扫描，位置在居民点符号上，拼写与图上一致"
+  },
+  {
+   "id": "ams-2717",
+   "names": {
+    "zh": "克拉斯诺耶",
+    "en": "Krasnoye"
+   },
+   "kind": "village",
+   "lat": 50.99214,
+   "lon": 36.80002,
+   "status": "unverified",
+   "sources": [
+    "SRC-0101"
+   ],
+   "note": "AI 复查 2026-10-09 待定：上下两幅 AMS 图在接缝处错开约 1 km：下幅只有小圆圈符号（现位置），上幅房屋在 2716，暂不改"
+  }
+ ]
+}

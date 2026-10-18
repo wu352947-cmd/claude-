@@ -1,0 +1,37 @@
+{
+  "$comment": "单位数据模板。数值均为占位（null 或 0），请按史料填写并在 provenance 中注明出处。ratings 由 tools/derive-ratings 从 equipment 计算，不要手填。",
+  "id": "DE.IISS.LSSAH.PzRgt1",
+  "side": "DE",
+  "names": {
+    "zh": "党卫军第1装甲团（“警卫旗队”师）",
+    "de": "SS-Panzer-Regiment 1 (LSSAH)",
+    "en": "SS Panzer Regiment 1 (LSSAH)"
+  },
+  "parent": "DE.IISS.LSSAH",
+  "type": "armor",
+  "size": "regiment",
+  "mobility": "tracked",
+  "steps": null,
+  "quality": {
+    "rating": null,
+    "rationale": "",
+    "sources": []
+  },
+  "equipment": [
+    { "ref": "pz-iii-l-m", "onHand": null, "operational": null, "inRepair": null },
+    { "ref": "pz-iv-g-h", "onHand": null, "operational": null, "inRepair": null },
+    { "ref": "tiger-i-e", "onHand": null, "operational": null, "inRepair": null },
+    { "ref": "befehls-pz", "onHand": null, "operational": null, "inRepair": null }
+  ],
+  "personnel": { "total": null, "combatStrength": null },
+  "asOf": "1943-07-04T18:00",
+  "timeZone": "Europe/Berlin (1943 summer time)",
+  "ratings": { "attack": null, "defense": null, "movement": null, "armorClass": null, "antiTank": null },
+  "provenance": [
+    { "field": "equipment[2].onHand", "source": "SRC-0004", "page": "", "grade": "B", "note": "口径：在编 / 可作战 / 维修中，请注明" },
+    { "field": "equipment[2].onHand", "source": "SRC-0005", "page": "", "grade": "B", "note": "第二个独立来源，用于交叉核对" }
+  ],
+  "changes": [
+    { "effective": "1943-07-17", "type": "withdraw", "note": "示例：撤出/转隶记录，按史料填写", "source": "" }
+  ]
+}

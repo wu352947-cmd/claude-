@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>库尔斯克 1943</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Cpolygon points=%2216,1 29,8.5 29,23.5 16,31 3,23.5 3,8.5%22 fill=%22%23e9e2c9%22 stroke=%22%238c2f1e%22 stroke-width=%222%22/%3E%3C/svg%3E" />
+    <style>
+      :root {
+        --ink: #2b2a24; --paper: #ece5c9; --panel: rgba(29, 31, 27, 0.92); --panel-ink: #efe6c8;
+        --accent: #b3261e; --muted: #9a917a; --auto: #d9822b;
+        font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+      html, body { margin: 0; height: 100%; background: #2b2e30; overflow: hidden; touch-action: none; }
+      #app { position: fixed; inset: 0; }
+      #app canvas { display: block; }
+      .bar {
+        position: fixed; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 10px;
+        padding: 8px 12px; background: var(--panel); color: var(--panel-ink); z-index: 2;
+      }
+      .bar h1 { font-size: 16px; margin: 0; font-weight: 700; letter-spacing: 0.05em; white-space: nowrap; }
+      .bar .sub { font-size: 12px; color: #b9b096; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0; }
+      .bar button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px;
+        padding: 5px 10px; font-size: 13px; cursor: pointer; white-space: nowrap;
+      }
+      #layers {
+        position: fixed; top: 48px; right: 10px; background: var(--panel); color: var(--panel-ink);
+        border-radius: 8px; padding: 10px 14px; font-size: 14px; z-index: 2; display: none; min-width: 200px;
+      }
+      #layers.open { display: block; }
+      #layers label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+      #layers input[type=range] { width: 100%; }
+      #layers .hint { font-size: 12px; color: #b9b096; margin-top: 6px; line-height: 1.5; }
+      .swatch-auto { display: inline-block; width: 9px; height: 9px; background: var(--auto); transform: rotate(45deg); }
+      #info {
+        position: fixed; left: 10px; bottom: 10px; background: var(--panel); color: var(--panel-ink);
+        border-radius: 8px; padding: 10px 14px; font-size: 14px; z-index: 2; min-width: 220px; max-width: calc(100vw - 48px);
+      }
+      #info .info-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+      #info .hexno { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+      #info button { background: none; border: none; color: var(--panel-ink); font-size: 22px; cursor: pointer; line-height: 1; }
+      #info dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin: 0; }
+      #info dt { color: #b9b096; }
+      #info dd { margin: 0; }
+      .muted { color: var(--muted); }
+      .ph { color: #9a9a92; font-style: italic; }
+      .est { font-style: italic; }
+      #info details.deriv { margin-top: 8px; font-size: 12px; }
+      #info details.deriv summary { cursor: pointer; color: #d8cfae; }
+      #info details.deriv table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+      #info details.deriv th, #info details.deriv td { text-align: left; vertical-align: top; padding: 3px 4px; border-bottom: 1px solid #3c3a31; }
+      #info details.deriv td:nth-child(n+2), #info details.deriv th:nth-child(n+2) { text-align: right; white-space: nowrap; }
+      #info details.deriv .src { color: #a39a80; font-size: 11px; margin-top: 2px; word-break: break-word; }
+      #info details.deriv q { color: #8f8770; }
+      #info details.deriv a { color: #8fb8ea; }
+      #info { max-height: calc(100vh - 80px); overflow-y: auto; width: min(360px, calc(100vw - 48px)); box-sizing: border-box; }
+      #info .units { border-top: 1px solid #4a473c; margin-top: 8px; padding-top: 6px; }
+      #info .units-head { color: #b9b096; margin-bottom: 4px; }
+      #info button.unit-row {
+        display: flex; align-items: center; gap: 8px; width: 100%; text-align: left; font-size: 13px; line-height: 1.3;
+        padding: 3px 4px; border-radius: 6px; border: 1px solid transparent;
+      }
+      #info button.unit-row.on { border-color: var(--accent); background: rgba(179, 38, 30, 0.15); }
+      #info button.unit-row svg { flex: none; }
+      #info small { color: #b9b096; font-size: 12px; }
+      #info .unit-detail { display: flex; gap: 10px; align-items: flex-start; margin-top: 8px; }
+      #info .unit-detail .unit-big { flex: none; }
+      @media (max-width: 520px) { #info .unit-detail { flex-direction: column; } }
+      .st-auto { color: var(--auto); } .st-verified { color: #7fc78a; } .st-crosschecked { color: #8fb8ea; }
+      #loading {
+        position: fixed; inset: 0; display: grid; place-items: center; background: #2b2e30; color: #efe6c8;
+        font-size: 16px; z-index: 3;
+      }
+      /* 编辑器 */
+      .bar button.on { background: var(--accent); border-color: var(--accent); }
+      #editor {
+        position: fixed; top: 48px; left: 10px; background: var(--panel); color: var(--panel-ink);
+        border-radius: 8px; padding: 10px 12px; font-size: 14px; z-index: 2; width: 236px; max-width: calc(100vw - 44px);
+      }
+      #editor[hidden] { display: none; }
+      #editor .row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; }
+      #editor button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px;
+        padding: 6px 9px; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+      }
+      #editor button.on { background: #efe6c8; color: #1d1f1b; border-color: #efe6c8; }
+      #editor button:disabled { opacity: 0.4; cursor: default; }
+      #editor .sw { width: 12px; height: 12px; border-radius: 2px; border: 1px solid rgba(0,0,0,0.35); }
+      #editor .tabs button { flex: 1; justify-content: center; }
+      #editor label { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; font-size: 13px; }
+      #editor select { max-width: 100%; width: 100%; font-size: 13px; margin-bottom: 8px; padding: 4px; border-radius: 6px; }
+      #editor .hint { font-size: 12px; color: #b9b096; line-height: 1.5; margin-bottom: 8px; }
+      #editor .stats { font-size: 12px; color: #b9b096; border-top: 1px solid #4a473c; padding-top: 6px; }
+      #editor .collapse { float: right; padding: 0 6px; border: none; font-size: 16px; }
+      #editor.min .body { display: none; }
+      @media (max-width: 520px) {
+        #editor { width: 200px; padding: 8px 10px; font-size: 13px; }
+        #editor button { padding: 4px 7px; font-size: 12px; }
+        #editor .row { gap: 4px; margin-bottom: 6px; }
+        #editor .hint, #editor label, #editor .stats { font-size: 11px; }
+        #editor select { font-size: 12px; }
+      }
+      #toast {
+        position: fixed; left: 50%; top: 56px; transform: translateX(-50%); background: rgba(29,31,27,0.92); color: #efe6c8;
+        padding: 6px 14px; border-radius: 16px; font-size: 13px; z-index: 4; pointer-events: none; opacity: 0; transition: opacity .2s;
+      }
+      #toast.show { opacity: 1; }
+      #game {
+        position: fixed; right: 10px; bottom: 26px; background: var(--panel); color: var(--panel-ink); border-radius: 8px;
+        padding: 8px 10px; font-size: 13px; z-index: 2; width: min(300px, calc(100vw - 20px)); box-sizing: border-box;
+      }
+      #game .g-ph { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+      #game .g-ph small { font-weight: 400; color: var(--muted); margin-left: 8px; }
+      #game .row { display: flex; gap: 6px; flex-wrap: wrap; }
+      #game button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px; padding: 4px 9px; font-size: 13px; cursor: pointer;
+      }
+      #game button:disabled { opacity: .35; cursor: default; }
+      #game button.primary { background: var(--accent); border-color: var(--accent); }
+      #game .more { display: none; margin-top: 8px; }
+      #game.open .more { display: block; }
+      #game ol { list-style: none; margin: 8px 0 0; padding: 0; max-height: 30vh; overflow-y: auto; border-top: 1px solid #4a4738; }
+      #game li { padding: 3px 0; border-bottom: 1px solid #34332b; }
+      #game li.new { color: #fff; }
+      #game .meta { color: var(--muted); font-size: 11px; margin-top: 6px; word-break: break-all; }
+      @media (max-width: 600px) { body:has(#info:not([hidden])) #game { display: none; } }
+      #game .night { background: #2c3e66; color: #dfe6ff; border-radius: 3px; padding: 0 4px; margin-left: 4px; font-size: 12px; }
+      #game .g-report { font-size: 12px; margin: 0 0 8px; max-height: 40vh; overflow-y: auto; border: 1px solid #4a4738; padding: 6px; border-radius: 4px; }
+      #game .g-report small { display: block; color: var(--muted); }
+      #game .g-report table { width: 100%; border-collapse: collapse; margin: 4px 0; }
+      #game .g-report td { padding: 1px 4px; border-bottom: 1px solid #34332b; }
+      #game .g-report tr.ok td:last-child { color: #8fc28f; }
+      #game .g-report tr.no td:last-child { color: #e08a7a; }
+      #game .g-report tr.ct td { color: var(--muted); font-style: italic; }
+      #game .g-report ul { margin: 4px 0 0; padding-left: 16px; }
+      #game .g-report li { border: 0; }
+      #info .start-note .est { font-style: italic; }
+      #game .g-score { font-size: 12px; margin: -2px 0 6px; }
+      #game .g-score small { color: var(--muted); margin-left: 6px; }
+      #game label.hs { display: block; margin-top: 8px; font-size: 12px; }
+      #handoff { position: fixed; inset: 0; z-index: 50; background: #1d1f20; display: flex; align-items: center; justify-content: center; padding: 16px; }
+      #handoff[hidden] { display: none; }
+      #handoff .box { text-align: center; color: #eee; max-width: 420px; }
+      #handoff-text { font-size: 22px; margin-bottom: 20px; line-height: 1.5; }
+      #handoff-text small { display: block; font-size: 14px; color: var(--muted); }
+      #handoff .pbem { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+      #handoff button { font: inherit; font-size: 16px; padding: 10px 22px; border-radius: 6px; border: 1px solid var(--accent); background: var(--accent); color: #fff; cursor: pointer; }
+      #info .combat { border-top: 1px solid #4a4738; margin-top: 8px; padding-top: 6px; font-size: 13px; }
+      #info .combat .atk-row { display: block; margin: 2px 0; }
+      #info .combat dl.odds { margin: 6px 0; }
+      #info .combat small { display: block; color: var(--muted); font-size: 11px; }
+      #info .combat .sub { margin-top: 6px; color: var(--muted); }
+      #info .combat ul.mods { list-style: none; padding: 0; margin: 2px 0 4px; }
+      #info .combat ul.mods li { margin: 3px 0; }
+      #info .combat .final { margin: 6px 0 2px; }
+      #info .combat .bad { color: #ff8a80; }
+      #info .combat .small { font-size: 11px; margin-top: 6px; }
+      #game .g-assault { margin: 6px 0; padding: 6px 8px; border: 1px solid #6b6650; border-radius: 6px; font-size: 12.5px; line-height: 1.5; }
+      #game .g-assault .as-row { display: flex; justify-content: space-between; gap: 6px; align-items: center; padding: 2px 0; }
+      #game .g-assault .as-row small { color: var(--muted); display: block; }
+      #game .g-assault button { font-size: 12px; padding: 2px 8px; border-radius: 4px; border: 1px solid #6b6650; background: transparent; color: inherit; cursor: pointer; }
+      #game .g-assault button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+      #game .g-assault button:disabled { opacity: .45; cursor: default; }
+      #game .g-assault .bad { color: #ff8a80; }
+      #info .combat button.primary { margin-top: 6px; background: var(--accent); border: 1px solid var(--accent); color: #fff; border-radius: 6px; padding: 5px 14px; font-size: 14px; cursor: pointer; }
+      #info .move-note { margin-top: 6px; font-size: 12.5px; line-height: 1.5; }
+      .c-reach { color: #6fb0f0; } .c-zoc { color: #f0a040; }
+      #info textarea { width: 100%; box-sizing: border-box; min-height: 52px; font-size: 13px; margin-top: 4px; border-radius: 6px; padding: 4px; }
+      #info .note-save { margin-top: 4px; font-size: 13px; border: 1px solid #6b6650; border-radius: 6px; padding: 4px 10px; }
+      #export {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 5; display: grid; place-items: center;
+      }
+      #export[hidden] { display: none; }
+      #export .box {
+        background: var(--panel); color: var(--panel-ink); border-radius: 10px; padding: 14px; width: min(560px, calc(100vw - 32px));
+        font-size: 14px; line-height: 1.6;
+      }
+      #export textarea { width: 100%; box-sizing: border-box; height: 40vh; font: 12px/1.4 ui-monospace, Menlo, monospace; border-radius: 6px; padding: 6px; }
+      #export .row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+      #export button {
+        background: transparent; color: var(--panel-ink); border: 1px solid #6b6650; border-radius: 6px; padding: 6px 12px; font-size: 14px; cursor: pointer;
+      }
+      #export button.primary { background: var(--accent); border-color: var(--accent); }
+      .credit { position: fixed; right: 8px; bottom: 6px; font-size: 10px; color: #a39a80; z-index: 1; pointer-events: none; }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <header class="bar">
+      <h1 id="title">库尔斯克 1943</h1>
+      <span class="sub" id="subtitle"></span>
+      <button id="edit-toggle">编辑</button>
+      <button id="fit">全图</button>
+      <button id="layers-toggle">图层</button>
+    </header>
+    <div id="layers">
+      <label><input type="checkbox" id="ly-ref" /> 参考底图（美军 1:25 万）</label>
+      <label><input type="checkbox" id="ly-ref2" /> 参考底图（红军 1:10 万，仅部分地区）</label>
+      <input type="range" id="ref-opacity" min="0" max="100" value="55" aria-label="参考底图透明度" />
+      <div class="hint">不透明度 <span id="ref-op-val"></span></div>
+      <label><input type="checkbox" id="ly-relief" checked /> 地形起伏（高程晕渲）</label>
+      <label><input type="checkbox" id="ly-terrain" checked /> 地形</label>
+      <label><input type="checkbox" id="ly-grid" checked /> 六角格网</label>
+      <label><input type="checkbox" id="ly-num" checked /> 格号（放大后显示）</label>
+      <label><input type="checkbox" id="ly-labels" checked /> 地名</label>
+      <label><input type="checkbox" id="ly-units" checked /> 部队算子（演示摆放）</label>
+      <label><input type="checkbox" id="ly-status" /> <span class="swatch-auto"></span> 未核对标记（橙色菱形）</label>
+      <div class="hint">橙色菱形 = 程序自动提取、尚未人工核对的格子。<br />样板区（普罗霍罗夫卡—捷捷列维诺）的村庄、河流、道路、铁路为 AI 转录草稿，均未核对。</div>
+    </div>
+    <div id="info" hidden></div>
+    <div id="editor" hidden>
+      <div><b>地图编辑</b><button class="collapse" id="ed-min" aria-label="收起">–</button></div>
+      <div class="body">
+        <div class="row tabs" id="ed-tools">
+          <button data-tool="view">查看</button>
+          <button data-tool="terrain">地形</button>
+          <button data-tool="side">格边</button>
+          <button data-tool="verify">核对</button>
+        </div>
+        <div class="hint" id="ed-hint"></div>
+        <div class="row" id="ed-brushes"></div>
+        <label><input type="checkbox" id="ed-ref" /> 显示参考底图（对照原图）</label>
+        <label><input type="checkbox" id="ed-verify" checked /> 修改时同时标为"已核对"</label>
+        <div class="hint" style="margin-bottom:2px">依据的史料</div>
+        <select id="ed-source"></select>
+        <div class="row">
+          <button id="ed-undo">↶ 撤销</button>
+          <button id="ed-export">导出 / 导入</button>
+        </div>
+        <div class="stats" id="ed-stats"></div>
+      </div>
+    </div>
+    <div id="export" hidden>
+      <div class="box">
+        <b>导出修改</b>
+        <div class="hint">修改只保存在这台设备的浏览器里。把下面整段内容复制发给 AI（Claude），它会合并进地图数据并上线。<br />
+          换设备时，可以把这段内容粘贴到另一台设备的这个框里，点"载入"。</div>
+        <textarea id="ex-text" spellcheck="false"></textarea>
+        <div class="row">
+          <button class="primary" id="ex-copy">复制</button>
+          <button id="ex-download">下载文件</button>
+          <button id="ex-load">载入框里的内容</button>
+          <button id="ex-clear">清空全部修改</button>
+          <button id="ex-close">关闭</button>
+        </div>
+      </div>
+    </div>
+    <div id="game">
+      <div class="g-ph" id="g-phase"></div>
+      <div class="g-score" id="g-score" hidden></div>
+      <div class="g-report" id="g-report" hidden></div>
+      <div class="g-assault" id="g-assault" hidden></div>
+      <div class="row">
+        <button class="primary" id="g-end">结束阶段</button>
+        <button id="g-conclude" title="现在结束对局，按现状判胜负">收兵</button>
+        <button id="g-undo" title="撤销（Ctrl+Z）">↶ 撤销</button>
+        <button id="g-redo" title="重做（Ctrl+Y）">↷ 重做</button>
+        <button id="g-org">编制</button>
+        <button id="g-plan">计划</button>
+        <button id="g-howto">怎么玩</button>
+        <button id="g-more">记录 / 存档</button>
+      </div>
+      <div class="more">
+        <div class="row">
+          <button id="g-roll">掷测试骰</button>
+          <button id="g-save">存档（下载）</button>
+          <button id="g-load">读档</button>
+          <button id="g-new">新对局</button>
+          <input type="file" id="g-file" accept=".json,application/json" hidden />
+        </div>
+        <label class="hs">想定 <select id="g-scn"></select></label>
+        <label class="hs">对战方式 <select id="g-mode"><option value="hotseat">热座（一台设备轮流）</option><option value="pbem">异地对战（交换回合文件）</option><option value="ai">人机对战（我对电脑）</option><option value="off">上帝视角（一个人测试）</option></select>
+          <select id="g-side" hidden><option value="DE">我是德军</option><option value="SU">我是苏军</option></select>
+          <select id="g-style" hidden title="电脑的打法"></select></label>
+        <label class="hs"><input type="checkbox" id="g-src" /> 显示史料详情（出处、考据、公式，给核对史料用）</label>
+        <ol id="g-log"></ol>
+        <div class="meta" id="g-meta"></div>
+      </div>
+    </div>
+    <style>
+      #howto { position: fixed; inset: 0; z-index: 60; background: rgba(20,22,23,.82); display: flex; align-items: center; justify-content: center; padding: 16px; }
+      #howto[hidden] { display: none; }
+      #howto .box { background: var(--panel); color: var(--panel-ink); max-width: 520px; max-height: 90vh; overflow: auto; padding: 16px 20px; border-radius: 6px; font-size: 14px; line-height: 1.6; }
+      #howto h2 { margin: 0 0 8px; font-size: 17px; }
+      #howto ol { margin: 0 0 8px; padding-left: 20px; }
+      #howto li { margin-bottom: 4px; }
+      #howto .muted { font-size: 12px; color: #b7ae90; }
+      #howto .box > button { display: block; margin: 8px 0 0 auto; }
+    </style>
+    <style>
+      #org { position: fixed; top: 48px; left: 10px; width: min(360px, calc(100vw - 20px)); max-height: 70vh; overflow: auto; z-index: 3; background: var(--panel); color: var(--panel-ink); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.5; }
+      #org[hidden] { display: none; }
+      #org .org-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+      #org .org-head button { background: transparent; border: 0; color: inherit; font-size: 18px; cursor: pointer; }
+      #org .org-row { border-top: 1px solid rgba(0,0,0,.12); padding: 4px 0; }
+      #org .org-row.on { background: rgba(200,60,40,.1); }
+      #org .org-row small { color: var(--muted); }
+      #org .org-act { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+      #org .org-act button, #org .org-act select { font-size: 12px; padding: 2px 6px; border-radius: 4px; border: 1px solid #6b6650; background: transparent; color: inherit; cursor: pointer; max-width: 170px; }
+      #org .small { font-size: 11px; margin-bottom: 4px; }
+      #org .org-act button.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+    </style>
+    <style>
+      #plan { position: fixed; top: 48px; right: 10px; width: min(330px, calc(100vw - 20px)); max-height: 60vh; overflow: auto; z-index: 3; background: var(--panel); color: var(--panel-ink); border-radius: 8px; padding: 10px 12px; font-size: 13px; line-height: 1.5; }
+      #plan[hidden] { display: none; }
+      #plan .pl-head { display: flex; justify-content: space-between; align-items: center; }
+      #plan .pl-head button { background: transparent; border: 0; color: inherit; font-size: 18px; cursor: pointer; }
+      #plan .pl-row, #plan .pl-new { border-top: 1px solid rgba(0,0,0,.12); padding: 5px 0; }
+      #plan .pl-row small { display: block; color: var(--muted); }
+      #plan .pl-dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 4px; }
+      #plan button, #plan select { font-size: 12px; padding: 2px 6px; border-radius: 4px; border: 1px solid #6b6650; background: transparent; color: inherit; cursor: pointer; margin: 2px 4px 2px 0; }
+      #plan .small { font-size: 11px; }
+    </style>
+    <div id="plan" hidden></div>
+    <div id="org" hidden></div>
+    <div id="howto" hidden></div>
+    <div id="handoff" hidden><div class="box"><div id="handoff-text"></div><button class="primary" id="handoff-go">继续</button>
+      <div id="handoff-pbem" class="pbem" hidden><button class="primary" id="handoff-export">导出回合文件</button> <button id="handoff-import">读入对手的文件</button></div></div></div>
+    <div id="toast"></div>
+    <div id="loading">正在绘制地图…</div>
+    <div class="credit">底图：U.S. Army Map Service N501；红军总参谋部 1:100,000（Indiana University Libraries）（均为公有领域）· 高程：Copernicus DEM GLO-30 © DLR, Airbus DS, EU/ESA</div>
+    <script type="module" src="/src/client/main.ts"></script>
+  </body>
+</html>

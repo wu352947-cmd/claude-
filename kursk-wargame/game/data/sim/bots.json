@@ -1,0 +1,6 @@
+{
+ "$comment": "无界面模拟用的简单自动对手（docs/14）。不是历史命令脚本，只是让两边按最朴素的逻辑把想定打完，用来看规则与数据会产生什么分布。全部是 AI 拟定的模拟参数，⟨待校准⟩。goal：objectives = 向最近的没占到的胜利目标推进；enemy = 向最近的敌军推进；hold = 原地不动。WhenFirst：本回合本方有主动权时用。minRatio：赔率（攻防比）达到这个数才进攻。artilleryStandoff：炮兵不进入离最近敌军小于这个距离的格子（炮兵移动后本回合不能射击）。",
+ "status": "draft",
+ "DE": { "goal": "objectives", "goalWhenFirst": "objectives", "footAdvances": true, "minRatio": 1.5, "minRatioWhenFirst": 1.5, "artilleryStandoff": 2 },
+ "SU": { "goal": "hold", "goalWhenFirst": "enemy", "footAdvances": false, "minRatio": 3, "minRatioWhenFirst": 1.5, "artilleryStandoff": 2 }
+}

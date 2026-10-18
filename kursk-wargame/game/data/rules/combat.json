@@ -1,0 +1,110 @@
+{
+ "$comment": "战斗规则参数（docs/02 §4、docs/10）。全部是 AI 拟定的游戏设计参数，不是史料数字，状态：草案，⟨待校准⟩。结果写法：A = 攻方损失步数，D = 守方损失步数，R = 守方撤退格数。",
+ "status": "draft",
+ "dice": "2d6",
+ "columns": [
+  { "name": "1:2", "min": 0.5 },
+  { "name": "1:1", "min": 1 },
+  { "name": "1.5:1", "min": 1.5 },
+  { "name": "2:1", "min": 2 },
+  { "name": "3:1", "min": 3 },
+  { "name": "4:1", "min": 4 },
+  { "name": "5:1", "min": 5 },
+  { "name": "6:1", "min": 6 }
+ ],
+ "crt": {
+  "2":  ["A2",   "A2",   "A2",   "A1",   "A1",   "A1D1", "A1D1", "D1"],
+  "3":  ["A2",   "A2",   "A1",   "A1",   "A1D1", "A1D1", "D1",   "D1R1"],
+  "4":  ["A2",   "A1",   "A1",   "A1D1", "A1D1", "D1",   "D1R1", "D1R1"],
+  "5":  ["A1",   "A1",   "A1D1", "A1D1", "D1",   "D1R1", "D1R1", "D2R1"],
+  "6":  ["A1",   "A1D1", "A1D1", "D1",   "D1R1", "D1R1", "D2R1", "D2R1"],
+  "7":  ["A1",   "A1D1", "D1",   "D1R1", "D1R1", "D2R1", "D2R1", "D2R2"],
+  "8":  ["A1D1", "D1",   "D1R1", "D1R1", "D2R1", "D2R1", "D2R2", "D2R2"],
+  "9":  ["A1D1", "D1R1", "D1R1", "D2R1", "D2R1", "D2R2", "D2R2", "D3R2"],
+  "10": ["D1",   "D1R1", "D2R1", "D2R1", "D2R2", "D2R2", "D3R2", "D3R2"],
+  "11": ["D1R1", "D2R1", "D2R1", "D2R2", "D2R2", "D3R2", "D3R2", "D3R3"],
+  "12": ["D1R1", "D2R1", "D2R2", "D2R2", "D3R2", "D3R2", "D3R3", "D3R3"]
+ },
+ "maxShift": 3,
+ "terrainShift": {
+  "$comment": "守方所在格地形：负数 = 向左移（对守方有利）。近战地形抵消远射程优势（02 §2）",
+  "clear": 0, "woods": -1, "village": -1, "town": -1, "city": -2, "marsh": -1, "water": 0
+ },
+ "sideShift": {
+  "$comment": "所有攻方单位都隔着这种格边进攻时才生效（有一个单位不隔就不算）",
+  "stream": 0, "minorRiver": -1, "majorRiver": -2, "balka": 0, "railEmbankment": -1
+ },
+ "armor": {
+  "$comment": "装甲效应（02 §4.2 的简化版）：攻方有中/重装甲，守方格是开阔地，且守方没有坦克、突击炮、坦克歼击车或反坦克炮单位 → +1。攻方装甲隔冲沟进攻 → -1（冲沟是天然反坦克障碍）",
+  "armorTypes": ["armor", "assault-gun", "tank-destroyer"],
+  "antiTankTypes": ["armor", "assault-gun", "tank-destroyer", "antitank"],
+  "openTerrain": ["clear"],
+  "bonus": 1,
+  "balkaPenalty": -1
+ },
+ "combinedArms": {
+  "$comment": "诸兵种合成（02 §4.3 的简化版）：攻方同一编制里既有装甲单位又有步兵单位 → +1",
+  "armorTypes": ["armor", "assault-gun"],
+  "infantryTypes": ["panzergrenadier", "motorized-infantry", "infantry", "airborne", "recon"],
+  "bonus": 1
+ },
+ "artillery": {
+  "$comment": "炮兵单位不直接进攻，在射程内给进攻或防御提供支援（攻方右移，守方左移）。每个炮兵每阶段支援一次；本回合移动过的炮兵不能支援（移动或射击）",
+  "types": ["artillery"],
+  "range": 2,
+  "pointsPerShift": 3,
+  "maxShifts": 2
+ },
+ "defenseOnlyTypes": ["artillery", "antitank"],
+ "qualityDrm": {
+  "$comment": "素质不进攻防数字（08 §6），作骰子修正：攻方最高素质 − 守方最高素质，每级 ±1，最多 ±2",
+  "perLevel": 1,
+  "max": 2
+ },
+ "retreat": {
+  "$comment": "撤退：每格优先选不在敌控制区、离攻方最远的格子；只能退入敌控制区时每个单位损失 1 步；无路可退时每少退 1 格损失 1 步；完全无路可退（被围死）且要求撤退 ≥ annihilateAtR 格时整格被歼灭，0 = 不启用（docs/16）",
+  "zocLoss": 1,
+  "blockedLoss": 1,
+  "annihilateAtR": 2
+ },
+ "fortification": {
+  "$comment": "工事（02 §5.1，简化版）：想定里标了工事的格子，守方每级工事使列向左移 shiftPerLevel 列，与地形偏移相加，总偏移受 maxShift 限制。雷场、反坦克支撑点、埋设坦克后续再做。游戏设计参数，⟨待校准⟩。",
+  "shiftPerLevel": 1
+ },
+ "plan": {
+  "$comment": "作战计划（docs/15 §7）：主攻轴线在前一回合或更早定下，指派的编制沿走廊进攻时赔率列右移。游戏设计参数，待试玩校准。",
+  "mainShift": 1,
+  "corridorRadius": 1,
+  "maxAxes": 5
+ },
+ "pin": {
+  "$comment": "牵制（docs/16 第 4 轮，软规定）：进攻单位侧翼还贴着没被同时进攻的敌军格，进攻要降一列（敌人会来侧击）。牵制不要求赔率：哪怕是低赔率的佯攻也算——一起加进作战分配即可（赔率低到不能进攻的格除外，那种格只能承受惩罚）。scope flank = 只管同时贴着进攻单位和目标格的两个侧翼格；all = 进攻单位旁边所有敌军格。shift 0 或 enabled false = 无惩罚。",
+  "enabled": true,
+  "scope": "flank",
+  "shift": -1
+ },
+ "supply": {
+  "$comment": "补给线（docs/16）：断补的单位进攻降一列，被进攻时对方升一列；混乱的单位断补时不能恢复。游戏设计参数，待试玩校准。",
+  "attackShift": -1,
+  "defendShift": 1,
+  "recoverNeedsSupply": true
+ },
+ "disorganize": {
+  "$comment": "混乱状态（docs/16）：被打垮的部队暂时失去战斗力。游戏设计参数，待试玩校准。",
+  "onRetreat": true,
+  "defenderLossAtLeast": 2,
+  "attackerLossAtLeast": 2,
+  "defenderShift": 1,
+  "recoverAfterTurns": 1
+ },
+ "coordination": {
+  "$comment": "编制协同（docs/15）：进攻单位分属不同集团军（或本回合刚调整过隶属）时，赔率列偏移。游戏设计参数，待试玩校准。",
+  "crossGroupShift": -1
+ },
+ "frontage": {
+  "$comment": "正面限制（02 §4）：一次进攻最多几个单位参加（炮兵支援不算）。一格最多 6 个邻格，战场上展不开更多的兵力。游戏设计参数，⟨待校准⟩。",
+  "maxAttackers": 6
+ },
+ "advanceMax": 3,
+ "combatPhases": ["first.combat", "first.exploitation", "second.combat", "second.exploitation"]
+}
